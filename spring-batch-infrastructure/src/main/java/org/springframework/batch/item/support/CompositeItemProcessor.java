@@ -18,11 +18,12 @@ package org.springframework.batch.item.support;
 
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 import java.util.Arrays;
 import java.util.List;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * Composite {@link ItemProcessor} that passes the item through a sequence of injected
@@ -37,7 +38,7 @@ import java.util.List;
  */
 public class CompositeItemProcessor<I, O> implements ItemProcessor<I, O>, InitializingBean {
 
-	private List<? extends ItemProcessor<?, ?>> delegates;
+	private @Nullable List<? extends ItemProcessor<?, ?>> delegates;
 
 	/**
 	 * Default constructor
@@ -64,10 +65,9 @@ public class CompositeItemProcessor<I, O> implements ItemProcessor<I, O>, Initia
 		setDelegates(delegates);
 	}
 
-	@Nullable
 	@Override
-	@SuppressWarnings("unchecked")
-	public O process(I item) throws Exception {
+	@SuppressWarnings({ "unchecked", "DataFlowIssue" })
+	public @Nullable O process(I item) throws Exception {
 		Object result = item;
 
 		for (ItemProcessor<?, ?> delegate : delegates) {
@@ -87,7 +87,7 @@ public class CompositeItemProcessor<I, O> implements ItemProcessor<I, O>, Initia
 	 * not applicable for the arguments (Object)
 	 */
 	@SuppressWarnings("unchecked")
-	private <T> Object processItem(ItemProcessor<T, ?> processor, Object input) throws Exception {
+	private @Nullable <T> Object processItem(ItemProcessor<T, ?> processor, Object input) throws Exception {
 		return processor.process((T) input);
 	}
 

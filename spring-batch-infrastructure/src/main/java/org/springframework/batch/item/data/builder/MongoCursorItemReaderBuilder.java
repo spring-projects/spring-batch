@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.data.MongoCursorItemReader;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -31,6 +32,7 @@ import org.springframework.util.StringUtils;
 /**
  * @author LEE Juchan
  * @author Mahmoud Ben Hassine
+ * @author Stefano Cordio
  * @since 5.1
  * @see MongoCursorItemReader
  */
@@ -38,35 +40,35 @@ public class MongoCursorItemReaderBuilder<T> {
 
 	private boolean saveState = true;
 
-	private String name;
+	private @Nullable String name;
 
 	private int maxItemCount = Integer.MAX_VALUE;
 
 	private int currentItemCount;
 
-	private MongoOperations template;
+	private @Nullable MongoOperations template;
 
-	private Class<? extends T> targetType;
+	private @Nullable Class<? extends T> targetType;
 
-	private String collection;
+	private @Nullable String collection;
 
-	private Query query;
+	private @Nullable Query query;
 
-	private String jsonQuery;
+	private @Nullable String jsonQuery;
 
 	private List<Object> parameterValues = new ArrayList<>();
 
-	private String fields;
+	private @Nullable String fields;
 
-	private Map<String, Sort.Direction> sorts;
+	private @Nullable Map<String, Sort.Direction> sorts;
 
-	private String hint;
+	private @Nullable String hint;
 
 	private int batchSize;
 
 	private int limit;
 
-	private Duration maxTime;
+	private @Nullable Duration maxTime;
 
 	/**
 	 * Configure if the state of the
@@ -279,26 +281,35 @@ public class MongoCursorItemReaderBuilder<T> {
 		}
 		Assert.notNull(this.targetType, "targetType is required.");
 		Assert.state(StringUtils.hasText(this.jsonQuery) || this.query != null, "A query is required");
-
-		if (StringUtils.hasText(this.jsonQuery) || this.query != null) {
-			Assert.notNull(this.sorts, "sorts map is required.");
-		}
+		Assert.notNull(this.sorts, "sorts map is required.");
 
 		MongoCursorItemReader<T> reader = new MongoCursorItemReader<>();
 		reader.setSaveState(this.saveState);
-		reader.setName(this.name);
+		if (this.name != null) {
+			reader.setName(this.name);
+		}
 		reader.setCurrentItemCount(this.currentItemCount);
 		reader.setMaxItemCount(this.maxItemCount);
 
 		reader.setTemplate(this.template);
 		reader.setTargetType(this.targetType);
-		reader.setCollection(this.collection);
-		reader.setQuery(this.query);
-		reader.setQuery(this.jsonQuery);
+		if (this.collection != null) {
+			reader.setCollection(this.collection);
+		}
+		if (this.query != null) {
+			reader.setQuery(this.query);
+		}
+		if (StringUtils.hasText(this.jsonQuery)) {
+			reader.setQuery(this.jsonQuery);
+		}
 		reader.setParameterValues(this.parameterValues);
-		reader.setFields(this.fields);
+		if (this.fields != null) {
+			reader.setFields(this.fields);
+		}
 		reader.setSort(this.sorts);
-		reader.setHint(this.hint);
+		if (this.hint != null) {
+			reader.setHint(this.hint);
+		}
 		reader.setBatchSize(this.batchSize);
 		reader.setLimit(this.limit);
 		if (this.maxTime != null) {

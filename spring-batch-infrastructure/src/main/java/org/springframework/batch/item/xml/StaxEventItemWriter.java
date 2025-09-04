@@ -39,6 +39,7 @@ import javax.xml.transform.Result;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
@@ -90,7 +91,7 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T>
 	public static final String DEFAULT_XML_VERSION = "1.0";
 
 	// default standalone document declaration, value not set
-	public static final Boolean DEFAULT_STANDALONE_DOCUMENT = null;
+	public static final @Nullable Boolean DEFAULT_STANDALONE_DOCUMENT = null;
 
 	// default root tag name
 	public static final String DEFAULT_ROOT_TAG_NAME = "root";
@@ -105,10 +106,10 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T>
 	private static final String WRITE_STATISTICS_NAME = "record.count";
 
 	// file system resource
-	private WritableResource resource;
+	private @Nullable WritableResource resource;
 
 	// xml marshaller
-	private Marshaller marshaller;
+	private @Nullable Marshaller marshaller;
 
 	// encoding to be used while reading from the resource
 	private String encoding = DEFAULT_ENCODING;
@@ -117,7 +118,7 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T>
 	private String version = DEFAULT_XML_VERSION;
 
 	// standalone header attribute
-	private Boolean standalone = DEFAULT_STANDALONE_DOCUMENT;
+	private @Nullable Boolean standalone = DEFAULT_STANDALONE_DOCUMENT;
 
 	// name of the root tag
 	private String rootTagName = DEFAULT_ROOT_TAG_NAME;
@@ -129,32 +130,32 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T>
 	private String rootTagNamespace = "";
 
 	// root element attributes
-	private Map<String, String> rootElementAttributes = null;
+	private @Nullable Map<String, String> rootElementAttributes;
 
 	// TRUE means, that output file will be overwritten if exists - default is
 	// TRUE
 	private boolean overwriteOutput = true;
 
 	// file channel
-	private FileChannel channel;
+	private @Nullable FileChannel channel;
 
 	// wrapper for XML event writer that swallows StartDocument and EndDocument
 	// events
-	private XMLEventWriter eventWriter;
+	private @Nullable XMLEventWriter eventWriter;
 
 	// XML event writer
-	private XMLEventWriter delegateEventWriter;
+	private @Nullable XMLEventWriter delegateEventWriter;
 
 	// current count of processed records
 	private long currentRecordCount = 0;
 
 	private boolean saveState = true;
 
-	private StaxWriterCallback headerCallback;
+	private @Nullable StaxWriterCallback headerCallback;
 
-	private StaxWriterCallback footerCallback;
+	private @Nullable StaxWriterCallback footerCallback;
 
-	private Writer bufferedWriter;
+	private @Nullable Writer bufferedWriter;
 
 	private boolean transactional = true;
 

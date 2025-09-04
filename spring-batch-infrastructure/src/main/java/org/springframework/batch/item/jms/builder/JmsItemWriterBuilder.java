@@ -16,6 +16,7 @@
 
 package org.springframework.batch.item.jms.builder;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.jms.JmsItemWriter;
 import org.springframework.jms.core.JmsOperations;
 import org.springframework.util.Assert;
@@ -28,7 +29,7 @@ import org.springframework.util.Assert;
  */
 public class JmsItemWriterBuilder<T> {
 
-	private JmsOperations jmsTemplate;
+	private @Nullable JmsOperations jmsTemplate;
 
 	/**
 	 * Establish the JMS template that will be used by the {@link JmsItemWriter}.

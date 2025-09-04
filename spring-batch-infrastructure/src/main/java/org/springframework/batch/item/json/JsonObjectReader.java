@@ -16,8 +16,9 @@
 
 package org.springframework.batch.item.json;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.core.io.Resource;
-import org.springframework.lang.Nullable;
 
 /**
  * Strategy interface for Json readers. Implementations are expected to use a streaming
@@ -44,8 +45,7 @@ public interface JsonObjectReader<T> {
 	 * @return the next object or {@code null} if the resource is exhausted
 	 * @throws Exception if unable to read the next object
 	 */
-	@Nullable
-	T read() throws Exception;
+	@Nullable T read() throws Exception;
 
 	/**
 	 * Close the input resource.

@@ -20,6 +20,7 @@ import java.util.Map.Entry;
 
 import jakarta.mail.internet.MimeMessage;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.mail.DefaultMailErrorHandler;
@@ -60,7 +61,7 @@ import org.springframework.util.Assert;
  */
 public class MimeMessageItemWriter implements ItemWriter<MimeMessage> {
 
-	private JavaMailSender mailSender;
+	private @Nullable JavaMailSender mailSender;
 
 	private MailErrorHandler mailErrorHandler = new DefaultMailErrorHandler();
 
@@ -94,6 +95,7 @@ public class MimeMessageItemWriter implements ItemWriter<MimeMessage> {
 	 * @param chunk the chunk of items to send
 	 * @see ItemWriter#write(Chunk)
 	 */
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public void write(Chunk<? extends MimeMessage> chunk) throws MailException {
 		try {

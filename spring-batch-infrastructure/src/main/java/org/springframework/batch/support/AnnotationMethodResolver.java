@@ -23,8 +23,9 @@ import java.lang.reflect.Method;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.springframework.aop.support.AopUtils;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.ReflectionUtils;
@@ -61,9 +62,8 @@ public class AnnotationMethodResolver implements MethodResolver {
 	 * @throws IllegalArgumentException if more than one Method has the specified
 	 * annotation
 	 */
-	@Nullable
 	@Override
-	public Method findMethod(Object candidate) {
+	public @Nullable Method findMethod(Object candidate) {
 		Assert.notNull(candidate, "candidate object must not be null");
 		Class<?> targetClass = AopUtils.getTargetClass(candidate);
 		if (targetClass == null) {
@@ -81,9 +81,8 @@ public class AnnotationMethodResolver implements MethodResolver {
 	 * @throws IllegalArgumentException if more than one Method has the specified
 	 * annotation
 	 */
-	@Nullable
 	@Override
-	public Method findMethod(final Class<?> clazz) {
+	public @Nullable Method findMethod(Class<?> clazz) {
 		Assert.notNull(clazz, "class must not be null");
 		final AtomicReference<Method> annotatedMethod = new AtomicReference<>();
 		ReflectionUtils.doWithMethods(clazz, method -> {

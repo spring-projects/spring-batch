@@ -16,6 +16,7 @@
 
 package org.springframework.batch.item.support;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
@@ -42,7 +43,7 @@ import java.util.List;
  */
 public class CompositeItemWriter<T> implements ItemStreamWriter<T>, InitializingBean {
 
-	private List<ItemWriter<? super T>> delegates;
+	private @Nullable List<ItemWriter<? super T>> delegates;
 
 	private boolean ignoreItemStream = false;
 
@@ -82,6 +83,7 @@ public class CompositeItemWriter<T> implements ItemStreamWriter<T>, Initializing
 		this.ignoreItemStream = ignoreItemStream;
 	}
 
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public void write(Chunk<? extends T> chunk) throws Exception {
 		for (ItemWriter<? super T> writer : delegates) {
@@ -111,6 +113,7 @@ public class CompositeItemWriter<T> implements ItemStreamWriter<T>, Initializing
 	 * exceptions thrown by delegates are added as suppressed exceptions into this one, in
 	 * the same order as delegates were registered.
 	 */
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public void close() throws ItemStreamException {
 		List<Exception> exceptions = new ArrayList<>();
@@ -134,6 +137,7 @@ public class CompositeItemWriter<T> implements ItemStreamWriter<T>, Initializing
 		}
 	}
 
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
 		for (ItemWriter<? super T> writer : delegates) {
@@ -143,6 +147,7 @@ public class CompositeItemWriter<T> implements ItemStreamWriter<T>, Initializing
 		}
 	}
 
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
 		for (ItemWriter<? super T> writer : delegates) {

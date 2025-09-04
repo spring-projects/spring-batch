@@ -19,9 +19,10 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.springframework.batch.item.ExecutionContext;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -29,7 +30,7 @@ import org.springframework.util.Assert;
  * This is a simple ItemStreamReader decorator with a synchronized ItemReader.read()
  * method - which makes a non-thread-safe ItemReader thread-safe.
  * <p>
- * However, if reprocessing an item is problematic then using this will make a job not
+ * However, if reprocessing an item is problematic, then using this will make a job not
  * restartable.
  * <p>
  * Here is the motivation behind this class: https://stackoverflow.com/a/20002493/2910265
@@ -41,7 +42,7 @@ import org.springframework.util.Assert;
  */
 public class SynchronizedItemStreamReader<T> implements ItemStreamReader<T>, InitializingBean {
 
-	private ItemStreamReader<T> delegate;
+	private @Nullable ItemStreamReader<T> delegate;
 
 	private final Lock lock = new ReentrantLock();
 
@@ -52,9 +53,9 @@ public class SynchronizedItemStreamReader<T> implements ItemStreamReader<T>, Ini
 	/**
 	 * This delegates to the read method of the <code>delegate</code>
 	 */
+	@SuppressWarnings("DataFlowIssue")
 	@Override
-	@Nullable
-	public T read() throws Exception {
+	public @Nullable T read() throws Exception {
 		this.lock.lock();
 		try {
 			return this.delegate.read();
@@ -64,16 +65,19 @@ public class SynchronizedItemStreamReader<T> implements ItemStreamReader<T>, Ini
 		}
 	}
 
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public void close() {
 		this.delegate.close();
 	}
 
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public void open(ExecutionContext executionContext) {
 		this.delegate.open(executionContext);
 	}
 
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public void update(ExecutionContext executionContext) {
 		this.delegate.update(executionContext);

@@ -19,6 +19,7 @@ import java.util.Map;
 
 import jakarta.persistence.EntityManagerFactory;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamSupport;
 import org.springframework.batch.item.database.JpaCursorItemReader;
@@ -31,23 +32,24 @@ import org.springframework.util.Assert;
  *
  * @author Mahmoud Ben Hassine
  * @author Jinwoo Bae
+ * @author Stefano Cordio
  * @since 4.3
  */
 public class JpaCursorItemReaderBuilder<T> {
 
-	private EntityManagerFactory entityManagerFactory;
+	private @Nullable EntityManagerFactory entityManagerFactory;
 
-	private String queryString;
+	private @Nullable String queryString;
 
-	private JpaQueryProvider queryProvider;
+	private @Nullable JpaQueryProvider queryProvider;
 
-	private Map<String, Object> parameterValues;
+	private @Nullable Map<String, Object> parameterValues;
 
-	private Map<String, Object> hintValues;
+	private @Nullable Map<String, Object> hintValues;
 
 	private boolean saveState = true;
 
-	private String name;
+	private @Nullable String name;
 
 	private int maxItemCount = Integer.MAX_VALUE;
 
@@ -182,14 +184,24 @@ public class JpaCursorItemReaderBuilder<T> {
 
 		JpaCursorItemReader<T> reader = new JpaCursorItemReader<>();
 		reader.setEntityManagerFactory(this.entityManagerFactory);
-		reader.setQueryProvider(this.queryProvider);
-		reader.setQueryString(this.queryString);
-		reader.setParameterValues(this.parameterValues);
-		reader.setHintValues(this.hintValues);
+		if (this.queryProvider != null) {
+			reader.setQueryProvider(this.queryProvider);
+		}
+		if (this.queryString != null) {
+			reader.setQueryString(this.queryString);
+		}
+		if (this.parameterValues != null) {
+			reader.setParameterValues(this.parameterValues);
+		}
+		if (this.hintValues != null) {
+			reader.setHintValues(this.hintValues);
+		}
 		reader.setCurrentItemCount(this.currentItemCount);
 		reader.setMaxItemCount(this.maxItemCount);
 		reader.setSaveState(this.saveState);
-		reader.setName(this.name);
+		if (this.name != null) {
+			reader.setName(this.name);
+		}
 
 		return reader;
 	}

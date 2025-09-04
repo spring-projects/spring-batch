@@ -28,12 +28,12 @@ import org.apache.avro.io.DecoderFactory;
 import org.apache.avro.reflect.ReflectDatumReader;
 import org.apache.avro.specific.SpecificDatumReader;
 import org.apache.avro.specific.SpecificRecordBase;
+import org.jspecify.annotations.Nullable;
 
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.core.io.Resource;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
@@ -54,9 +54,9 @@ public class AvroItemReader<T> extends AbstractItemCountingItemStreamItemReader<
 
 	private boolean embeddedSchema = true;
 
-	private InputStreamReader<T> inputStreamReader;
+	private @Nullable InputStreamReader<T> inputStreamReader;
 
-	private DataFileStream<T> dataFileReader;
+	private @Nullable DataFileStream<T> dataFileReader;
 
 	private final InputStream inputStream;
 
@@ -104,15 +104,16 @@ public class AvroItemReader<T> extends AbstractItemCountingItemStreamItemReader<
 
 	/**
 	 * Disable or enable reading an embedded Avro schema. True by default.
-	 * @param embeddedSchema set to false to if the input does not embed an Avro schema.
+	 * @param embeddedSchema set to {@code false} if the input does not embed an Avro
+	 * schema.
 	 */
 	public void setEmbeddedSchema(boolean embeddedSchema) {
 		this.embeddedSchema = embeddedSchema;
 	}
 
-	@Nullable
+	@SuppressWarnings("DataFlowIssue")
 	@Override
-	protected T doRead() throws Exception {
+	protected @Nullable T doRead() throws Exception {
 		if (this.inputStreamReader != null) {
 			return this.inputStreamReader.read();
 		}
@@ -124,6 +125,7 @@ public class AvroItemReader<T> extends AbstractItemCountingItemStreamItemReader<
 		initializeReader();
 	}
 
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	protected void doClose() throws Exception {
 		if (this.inputStreamReader != null) {
@@ -171,7 +173,7 @@ public class AvroItemReader<T> extends AbstractItemCountingItemStreamItemReader<
 			this.binaryDecoder = DecoderFactory.get().binaryDecoder(inputStream, null);
 		}
 
-		private T read() throws Exception {
+		private @Nullable T read() throws Exception {
 			if (!this.binaryDecoder.isEnd()) {
 				return this.datumReader.read(null, this.binaryDecoder);
 			}
