@@ -87,6 +87,10 @@ public class JobStepBuilder extends StepBuilderHelper<JobStepBuilder> {
 		JobStep step = new JobStep();
 		step.setName(getName());
 		super.enhance(step);
+		if (!listenerErrors.isEmpty()) {
+			throw new StepBuilderException(
+					new IllegalArgumentException("Errors occurred while registering listeners" + listenerErrors));
+		}
 		if (job != null) {
 			step.setJob(job);
 		}

@@ -194,16 +194,20 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 	@Override
 	public FaultTolerantStepBuilder<I, O> listener(Object listener) {
 		super.listener(listener);
-
 		Set<Method> skipListenerMethods = new HashSet<>();
 		skipListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), OnSkipInRead.class));
 		skipListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), OnSkipInProcess.class));
 		skipListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), OnSkipInWrite.class));
 
 		if (!skipListenerMethods.isEmpty()) {
+			listenerErrors.clear();
 			StepListenerFactoryBean factory = new StepListenerFactoryBean();
 			factory.setDelegate(listener);
 			skipListeners.add((SkipListener<I, O>) factory.getObject());
+		}
+		else if (!listenerErrors.isEmpty()) {
+			listenerErrors.add(new IllegalArgumentException(
+					"Missing @OnSkipInRead, @OnSkipInProcess or @OnSkipInWrite annotations on Listener."));
 		}
 
 		return this;
