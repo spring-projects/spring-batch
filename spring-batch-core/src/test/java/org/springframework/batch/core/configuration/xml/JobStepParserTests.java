@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
-import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +35,7 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 /**
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- *
+ * @author Seungyong Hong
  */
 @SpringJUnitConfig
 class JobStepParserTests {
@@ -54,7 +54,8 @@ class JobStepParserTests {
 	@Test
 	void testFlowStep() throws Exception {
 		assertNotNull(job1);
-		JobExecution jobExecution = jobRepository.createJobExecution(job1.getName(), new JobParameters());
+		JobExecution jobExecution = jobRepository.createJobExecution(job1.getName(),
+				new JobParametersBuilder().addString("name", "foo").toJobParameters());
 		job1.execute(jobExecution);
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		List<String> stepNames = getStepNames(jobExecution);
@@ -65,7 +66,8 @@ class JobStepParserTests {
 	@Test
 	void testFlowExternalStep() throws Exception {
 		assertNotNull(job2);
-		JobExecution jobExecution = jobRepository.createJobExecution(job2.getName(), new JobParameters());
+		JobExecution jobExecution = jobRepository.createJobExecution(job2.getName(),
+				new JobParametersBuilder().addString("name", "bar").toJobParameters());
 		job2.execute(jobExecution);
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		List<String> stepNames = getStepNames(jobExecution);

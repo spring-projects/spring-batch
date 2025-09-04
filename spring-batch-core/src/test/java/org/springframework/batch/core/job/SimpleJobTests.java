@@ -38,6 +38,7 @@ import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.batch.core.listener.JobExecutionListener;
+import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.observability.BatchJobObservation;
@@ -49,12 +50,7 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -64,6 +60,7 @@ import static org.mockito.Mockito.mock;
  * @author Will Schipp
  * @author Mahmoud Ben Hassine
  * @author Jinwoo Bae
+ * @author Seungyong Hong
  */
 class SimpleJobTests {
 
@@ -343,11 +340,9 @@ class SimpleJobTests {
 		jobExecution.setEndTime(LocalDateTime.now());
 		jobExecution.setStatus(BatchStatus.COMPLETED);
 		jobRepository.update(jobExecution);
-		jobExecution = jobRepository.createJobExecution(job.getName(), jobParameters);
-		job.execute(jobExecution);
-		assertEquals(0, jobExecution.getFailureExceptions().size());
-		assertEquals(1, jobExecution.getStepExecutions().size());
-		assertEquals(stepExecution2.getStepName(), jobExecution.getStepExecutions().iterator().next().getStepName());
+		assertThrows(JobInstanceAlreadyCompleteException.class, () -> {
+			jobExecution = jobRepository.createJobExecution(job.getName(), jobParameters);
+		});
 	}
 
 	@Test
