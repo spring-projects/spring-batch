@@ -16,6 +16,7 @@
 package org.springframework.batch.item.database.support;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
@@ -26,6 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Mahmoud Ben Hassine
+ * @author Kyeonghoon Lee
  */
 class MariaDBPagingQueryProviderTests extends AbstractSqlPagingQueryProviderTests {
 
@@ -63,6 +65,22 @@ class MariaDBPagingQueryProviderTests extends AbstractSqlPagingQueryProviderTest
 	void testGenerateRemainingPagesQueryWithGroupBy() {
 		pagingQueryProvider.setGroupClause("dep");
 		String sql = "SELECT *  FROM (SELECT id, name, age FROM foo WHERE bar = 1 GROUP BY dep) AS MAIN_QRY WHERE ((id > ?)) ORDER BY id ASC LIMIT 100";
+		String s = pagingQueryProvider.generateRemainingPagesQuery(pageSize);
+		assertEquals(sql, s);
+	}
+
+	@Test
+	void testGenerateRemainingPagesQueryWithGroupByWithAlias() {
+		pagingQueryProvider.setSelectClause("SELECT f.id, f.name, f.age");
+		pagingQueryProvider.setFromClause("FROM foo f");
+		pagingQueryProvider.setWhereClause("f.bar = 1");
+		pagingQueryProvider.setGroupClause("f.id, f.dep");
+		Map<String, Order> sortKeys = new LinkedHashMap<>();
+		sortKeys.put("f.id", Order.ASCENDING);
+		pagingQueryProvider.setSortKeys(sortKeys);
+
+		String sql = "SELECT *  FROM (SELECT f.id, f.name, f.age FROM foo f WHERE f.bar = 1 GROUP BY f.id, f.dep) AS MAIN_QRY WHERE ((id > ?)) ORDER BY id ASC LIMIT "
+				+ pageSize;
 		String s = pagingQueryProvider.generateRemainingPagesQuery(pageSize);
 		assertEquals(sql, s);
 	}
