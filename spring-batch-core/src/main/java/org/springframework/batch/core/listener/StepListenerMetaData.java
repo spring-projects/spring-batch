@@ -46,6 +46,7 @@ import org.springframework.lang.Nullable;
  * methods, their interfaces, annotation, and expected arguments.
  *
  * @author Lucas Ward
+ * @author Hyunsang Han
  * @since 2.0
  * @see StepListenerFactoryBean
  */
@@ -53,8 +54,8 @@ public enum StepListenerMetaData implements ListenerMetaData {
 
 	BEFORE_STEP("beforeStep", "before-step-method", BeforeStep.class, StepExecutionListener.class, StepExecution.class),
 	AFTER_STEP("afterStep", "after-step-method", AfterStep.class, StepExecutionListener.class, StepExecution.class),
-	BEFORE_CHUNK("beforeChunk", "before-chunk-method", BeforeChunk.class, ChunkListener.class, ChunkContext.class),
-	AFTER_CHUNK("afterChunk", "after-chunk-method", AfterChunk.class, ChunkListener.class, ChunkContext.class),
+	BEFORE_CHUNK("beforeChunk", "before-chunk-method", BeforeChunk.class, ChunkListener.class, Chunk.class),
+	AFTER_CHUNK("afterChunk", "after-chunk-method", AfterChunk.class, ChunkListener.class, Chunk.class),
 	AFTER_CHUNK_ERROR("afterChunkError", "after-chunk-error-method", AfterChunkError.class, ChunkListener.class,
 			ChunkContext.class),
 	BEFORE_READ("beforeRead", "before-read-method", BeforeRead.class, ItemReadListener.class),
