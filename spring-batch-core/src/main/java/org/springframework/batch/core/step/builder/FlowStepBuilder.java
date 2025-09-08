@@ -60,6 +60,10 @@ public class FlowStepBuilder extends StepBuilderHelper<FlowStepBuilder> {
 		step.setName(getName());
 		step.setFlow(flow);
 		super.enhance(step);
+		if (!listenerErrors.isEmpty()) {
+			throw new StepBuilderException(
+					new IllegalArgumentException("Errors occurred while registering listeners" + listenerErrors));
+		}
 		try {
 			step.afterPropertiesSet();
 		}

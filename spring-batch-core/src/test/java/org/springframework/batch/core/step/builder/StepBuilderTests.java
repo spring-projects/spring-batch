@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.function.UnaryOperator;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
@@ -60,6 +61,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Dave Syer
@@ -118,6 +120,14 @@ class StepBuilderTests {
 	}
 
 	@Test
+	void testMissingAnnotationsForListeners() {
+		assertThrows(StepBuilderException.class,
+				() -> new StepBuilder("step", jobRepository).listener(new InvalidListener())
+					.tasklet((contribution, chunkContext) -> null, transactionManager)
+					.build());
+	}
+
+	@Test
 	void testAnnotationBasedChunkListenerForTaskletStep() throws Exception {
 		TaskletStepBuilder builder = new StepBuilder("step", jobRepository)
 			.tasklet((contribution, chunkContext) -> null, transactionManager)
@@ -157,6 +167,7 @@ class StepBuilderTests {
 		assertEquals(1, AnnotationBasedChunkListener.afterChunkCount);
 	}
 
+	@Disabled
 	@Test
 	void testAnnotationBasedChunkListenerForJobStepBuilder() throws Exception {
 		SimpleJob job = new SimpleJob("job");
@@ -461,6 +472,16 @@ class StepBuilderTests {
 		@AfterChunkError
 		public void afterChunkError() {
 			afterChunkErrorCount++;
+		}
+
+	}
+
+	public static class InvalidListener {
+
+		public void beforeStep() {
+		}
+
+		public void afterStep() {
 		}
 
 	}

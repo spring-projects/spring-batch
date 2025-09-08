@@ -54,6 +54,8 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 
 	private final CommonJobProperties properties;
 
+	protected List<Throwable> listenerErrors = new ArrayList<>();
+
 	/**
 	 * Create a new {@link JobBuilderHelper}.
 	 * @param jobRepository the job repository
@@ -83,6 +85,7 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 	 */
 	protected JobBuilderHelper(JobBuilderHelper<?> parent) {
 		this.properties = new CommonJobProperties(parent.properties);
+		this.listenerErrors = parent.listenerErrors;
 	}
 
 	/**
@@ -160,6 +163,10 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 			JobListenerFactoryBean factory = new JobListenerFactoryBean();
 			factory.setDelegate(listener);
 			properties.addJobExecutionListener((JobExecutionListener) factory.getObject());
+		}
+		else {
+			listenerErrors
+				.add(new IllegalArgumentException("Missing @BeforeJob or @AfterJob annotations on Listener."));
 		}
 
 		@SuppressWarnings("unchecked")

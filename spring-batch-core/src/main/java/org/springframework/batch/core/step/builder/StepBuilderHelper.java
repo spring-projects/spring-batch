@@ -53,6 +53,8 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 
 	protected final CommonStepProperties properties;
 
+	protected List<Throwable> listenerErrors = new ArrayList<>();
+
 	/**
 	 * Create a new {@link StepBuilderHelper} with the given job repository.
 	 * @param jobRepository the job repository
@@ -82,6 +84,7 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 	 */
 	protected StepBuilderHelper(StepBuilderHelper<?> parent) {
 		this.properties = new CommonStepProperties(parent.properties);
+		this.listenerErrors = parent.listenerErrors;
 	}
 
 	/**
@@ -124,6 +127,10 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 			StepListenerFactoryBean factory = new StepListenerFactoryBean();
 			factory.setDelegate(listener);
 			properties.addStepExecutionListener((StepExecutionListener) factory.getObject());
+		}
+		else {
+			listenerErrors
+				.add(new IllegalArgumentException("Missing @BeforeStep or @AfterStep annotations on Listener."));
 		}
 
 		return self();
