@@ -22,15 +22,22 @@ import io.micrometer.core.instrument.Metrics;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.aop.framework.ProxyFactory;
+import org.springframework.batch.core.configuration.BatchConfigurationException;
+import org.springframework.batch.core.configuration.DuplicateJobException;
 import org.springframework.batch.core.configuration.JobRegistry;
+import org.springframework.batch.core.configuration.support.MapJobRegistry;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.batch.core.converter.JobParametersConverter;
+import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -50,9 +57,11 @@ import org.springframework.util.Assert;
  * @author Mahmoud Ben Hassine
  * @since 5.0
  */
-public class JobOperatorFactoryBean implements FactoryBean<JobOperator>, InitializingBean {
+public class JobOperatorFactoryBean implements FactoryBean<JobOperator>, ApplicationContextAware, InitializingBean {
 
 	protected static final Log logger = LogFactory.getLog(JobOperatorFactoryBean.class);
+
+	private ApplicationContext applicationContext;
 
 	private PlatformTransactionManager transactionManager;
 
@@ -71,9 +80,19 @@ public class JobOperatorFactoryBean implements FactoryBean<JobOperator>, Initial
 	private final ProxyFactory proxyFactory = new ProxyFactory();
 
 	@Override
+	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+		this.applicationContext = applicationContext;
+	}
+
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(this.jobRepository, "JobRepository must not be null");
-		Assert.notNull(this.jobRegistry, "JobRegistry must not be null");
+		if (this.jobRegistry == null) {
+			this.jobRegistry = new MapJobRegistry();
+			populateJobRegistry();
+			logger.info(
+					"No JobRegistry has been set, defaulting to a MapJobRegistry populated with jobs defined in the application context.");
+		}
 		if (this.transactionManager == null) {
 			this.transactionManager = new ResourcelessTransactionManager();
 			logger.info("No transaction manager has been set, defaulting to ResourcelessTransactionManager.");
@@ -95,6 +114,17 @@ public class JobOperatorFactoryBean implements FactoryBean<JobOperator>, Initial
 			((MethodMapTransactionAttributeSource) this.transactionAttributeSource)
 				.addTransactionalMethod(recoverMethod, transactionAttribute);
 		}
+	}
+
+	private void populateJobRegistry() {
+		this.applicationContext.getBeansOfType(Job.class).values().forEach(job -> {
+			try {
+				jobRegistry.register(job);
+			}
+			catch (DuplicateJobException e) {
+				throw new BatchConfigurationException(e);
+			}
+		});
 	}
 
 	/**

@@ -5,11 +5,8 @@
 
 	<import resource="classpath:data-source-context.xml" />
 
-	<bean id="jobRegistry" class="org.springframework.batch.core.configuration.support.MapJobRegistry" />
-
-	<bean id="jobOperator" class="org.springframework.batch.core.launch.support.TaskExecutorJobOperator">
+	<bean id="jobOperator" class="org.springframework.batch.core.launch.support.JobOperatorFactoryBean">
 		<property name="jobRepository" ref="jobRepository" />
-		<property name="jobRegistry" ref="jobRegistry" />
 	</bean>
 
 	<batch:job-repository id="jobRepository" table-prefix="BATCH_"/>

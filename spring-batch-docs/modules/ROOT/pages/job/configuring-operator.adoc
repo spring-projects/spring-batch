@@ -2,40 +2,40 @@
 = Configuring a JobOperator
 
 The most basic implementation of the `JobOperator` interface is the `TaskExecutorJobOperator`.
-It only requires two dependencies: a `JobRepository` and a `JobRegistry`.
-
+It requires only one dependency: a `JobRepository`. All other dependencies like `JobRegistry`,
+`MeterRegistry`, `TransactionManager`, etc are optional. Spring Batch provides a factory bean
+to simplify the configuration of this operator: `JobOperatorFactoryBean`. This factory bean
+creates a transactional proxy around the `TaskExecutorJobOperator` to ensure that all its public methods
+are executed within a transaction.
 
 [tabs]
 ====
 Java::
 +
-The following example shows a `TaskExecutorJobLauncher` in Java:
+The following example shows how to configure a `TaskExecutorJobOperator` in Java:
 +
 .Java Configuration
 [source, java]
 ----
 ...
 @Bean
-public JobOperator jobOperator(JobRepository jobRepository, JobRegistry jobRegistry) throws Exception {
-	TaskExecutorJobJobOperator jobOperator = new TaskExecutorJobOperator();
+public JobOperatorFactoryBean jobOperator(JobRepository jobRepository) {
+	JobOperatorFactoryBean jobOperatorFactoryBean = new JobOperatorFactoryBean();
 	jobOperator.setJobRepository(jobRepository);
-	jobOperator.setJobRegistry(jobRegistry);
-	jobOperator.afterPropertiesSet();
-	return jobOperator;
+	return jobOperatorFactoryBean;
 }
 ...
 ----
 
 XML::
 +
-The following example shows a `TaskExecutorJobOperator` in XML:
+The following example shows how to configure a `TaskExecutorJobOperator` in XML:
 +
 .XML Configuration
 [source, xml]
 ----
-<bean id="jobOperator" class="org.springframework.batch.core.launch.support.TaskExecutorJobOperator">
+<bean id="jobOperator" class="org.springframework.batch.core.launch.support.JobOperatorFactoryBean">
     <property name="jobRepository" ref="jobRepository" />
-    <property name="jobRegistry" ref="jobRegistry" />
 </bean>
 ----
 
@@ -72,13 +72,11 @@ The following Java example configures a `TaskExecutorJobOperator` to return imme
 [source, java]
 ----
 @Bean
-public JobOperator jobOperator(JobRepository jobRepository, JobRegistry jobRegistry) throws Exception {
-	TaskExecutorJobJobOperator jobOperator = new TaskExecutorJobOperator();
+public JobOperatorFactoryBean jobOperator(JobRepository jobRepository) {
+	JobOperatorFactoryBean jobOperatorFactoryBean = new JobOperatorFactoryBean();
 	jobOperator.setJobRepository(jobRepository);
-	jobOperator.setJobRegistry(jobRegistry);
 	jobOperator.setTaskExecutor(new SimpleAsyncTaskExecutor());
-	jobOperator.afterPropertiesSet();
-	return jobOperator;
+	return jobOperatorFactoryBean;
 }
 ----
 
@@ -89,9 +87,8 @@ The following XML example configures a `TaskExecutorJobOperator` to return immed
 .XML Configuration
 [source, xml]
 ----
-<bean id="jobOperator" class="org.springframework.batch.core.launch.support.TaskExecutorJobOperator">
+<bean id="jobOperator" class="org.springframework.batch.core.launch.support.JobOperatorFactoryBean">
     <property name="jobRepository" ref="jobRepository" />
-    <property name="jobRegistry" ref="jobRegistry" />
     <property name="taskExecutor">
         <bean class="org.springframework.core.task.SimpleAsyncTaskExecutor" />
     </property>

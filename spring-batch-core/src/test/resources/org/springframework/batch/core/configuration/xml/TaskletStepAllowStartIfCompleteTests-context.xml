@@ -36,6 +36,4 @@
 		</batch:step>
 	</batch:job>
 
-	<bean id="jobRegistry" class="org.springframework.batch.core.configuration.support.MapJobRegistry"/>
-
 </beans>

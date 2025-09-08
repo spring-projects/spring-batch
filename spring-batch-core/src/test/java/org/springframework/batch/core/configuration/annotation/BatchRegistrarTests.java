@@ -141,12 +141,10 @@ class BatchRegistrarTests {
 
 		// when
 		JobRepository jobRepository = context.getBean(JobRepository.class);
-		JobRegistry jobRegistry = context.getBean(JobRegistry.class);
 		JobOperator jobOperator = context.getBean(JobOperator.class);
 
 		// then
 		Assertions.assertNotNull(jobRepository);
-		Assertions.assertNotNull(jobRegistry);
 		Assertions.assertNotNull(jobOperator);
 	}
 

@@ -11,15 +11,8 @@
 		p:dataSource-ref="dataSource" p:transactionManager-ref="transactionManager" />
 
 	<bean id="jobOperator"
-		class="org.springframework.batch.core.launch.support.TaskExecutorJobOperator"
-		p:jobRepository-ref="jobRepository" p:jobRegistry-ref="jobRegistry" />
-
-	<bean id="jobExplorer"
-		class="org.springframework.batch.core.repository.explore.support.JobExplorerFactoryBean"
-		p:dataSource-ref="dataSource" p:transactionManager-ref="transactionManager" />
-
-	<bean id="jobRegistry"
-		class="org.springframework.batch.core.configuration.support.MapJobRegistry" />
+		class="org.springframework.batch.core.launch.support.JobOperatorFactoryBean"
+		p:jobRepository-ref="jobRepository"/>
 
 	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
 		<property name="dataSource" ref="dataSource" />

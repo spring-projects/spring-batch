@@ -15,7 +15,9 @@
  */
 package org.springframework.batch.core.configuration.support;
 
+import org.springframework.batch.core.configuration.DuplicateJobException;
 import org.springframework.batch.core.job.DefaultJobKeyGenerator;
+import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.JobKeyGenerator;
 import org.springframework.batch.core.configuration.BatchConfigurationException;
@@ -48,7 +50,6 @@ import org.springframework.transaction.annotation.Isolation;
  *
  * <ul>
  * <li>a {@link ResourcelessJobRepository} named "jobRepository"</li>
- * <li>a {@link MapJobRegistry} named "jobRegistry"</li>
  * <li>a {@link TaskExecutorJobOperator} named "jobOperator"</li>
  * <li>a {@link org.springframework.batch.core.scope.StepScope} named "stepScope"</li>
  * <li>a {@link org.springframework.batch.core.scope.JobScope} named "jobScope"</li>
@@ -93,16 +94,10 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 	}
 
 	@Bean
-	public JobRegistry jobRegistry() {
-		return new MapJobRegistry();
-	}
-
-	@Bean
-	public JobOperator jobOperator(JobRepository jobRepository, JobRegistry jobRegistry)
-			throws BatchConfigurationException {
+	public JobOperator jobOperator(JobRepository jobRepository) throws BatchConfigurationException {
 		JobOperatorFactoryBean jobOperatorFactoryBean = new JobOperatorFactoryBean();
 		jobOperatorFactoryBean.setJobRepository(jobRepository);
-		jobOperatorFactoryBean.setJobRegistry(jobRegistry);
+		jobOperatorFactoryBean.setJobRegistry(getJobRegistry());
 		jobOperatorFactoryBean.setTransactionManager(getTransactionManager());
 		jobOperatorFactoryBean.setJobParametersConverter(getJobParametersConverter());
 		jobOperatorFactoryBean.setTaskExecutor(getTaskExecutor());
@@ -113,6 +108,19 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 		catch (Exception e) {
 			throw new BatchConfigurationException("Unable to configure the default job operator", e);
 		}
+	}
+
+	protected JobRegistry getJobRegistry() {
+		MapJobRegistry jobRegistry = new MapJobRegistry();
+		this.applicationContext.getBeansOfType(Job.class).values().forEach(job -> {
+			try {
+				jobRegistry.register(job);
+			}
+			catch (DuplicateJobException e) {
+				throw new BatchConfigurationException(e);
+			}
+		});
+		return jobRegistry;
 	}
 
 	/**

@@ -18,13 +18,10 @@ package org.springframework.batch.test.context;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import org.springframework.batch.core.configuration.JobRegistry;
-import org.springframework.batch.core.configuration.support.MapJobRegistry;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.launch.support.JobOperatorFactoryBean;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.ResourcelessJobRepository;
-import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.batch.test.JobOperatorTestUtils;
 import org.springframework.batch.test.JobRepositoryTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 
 /**
  * @author Stefano Cordio
+ * @author Mahmoud Ben Hassine
  */
 @SpringJUnitConfig
 @SpringBatchTest
@@ -86,18 +84,10 @@ class SpringBatchTestIntegrationTests {
 		}
 
 		@Bean
-		public JobRegistry jobRegistry() {
-			return new MapJobRegistry();
-		}
-
-		@Bean
-		public JobOperator jobOperator(JobRepository jobRepository, JobRegistry jobRegistry) throws Exception {
+		public JobOperatorFactoryBean jobOperator(JobRepository jobRepository) throws Exception {
 			JobOperatorFactoryBean jobOperatorFactoryBean = new JobOperatorFactoryBean();
 			jobOperatorFactoryBean.setJobRepository(jobRepository);
-			jobOperatorFactoryBean.setJobRegistry(jobRegistry);
-			jobOperatorFactoryBean.setTransactionManager(new ResourcelessTransactionManager());
-			jobOperatorFactoryBean.afterPropertiesSet();
-			return jobOperatorFactoryBean.getObject();
+			return jobOperatorFactoryBean;
 		}
 
 	}

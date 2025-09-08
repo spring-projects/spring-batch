@@ -27,7 +27,6 @@ import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.step.Step;
-import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.configuration.xml.DummyJobRepository;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.JobOperator;
@@ -79,12 +78,10 @@ class DefaultBatchConfigurationTests {
 
 		// when
 		JobRepository jobRepository = context.getBean(JobRepository.class);
-		JobRegistry jobRegistry = context.getBean(JobRegistry.class);
 		JobOperator jobOperator = context.getBean(JobOperator.class);
 
 		// then
 		Assertions.assertNotNull(jobRepository);
-		Assertions.assertNotNull(jobRegistry);
 		Assertions.assertNotNull(jobOperator);
 	}
 

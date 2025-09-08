@@ -75,12 +75,9 @@
 		<property name="transactionManager" ref="transactionManager" />
 	</bean>
 
-	<bean id="jobRegistry" class="org.springframework.batch.core.configuration.support.MapJobRegistry" />
-
 	<bean id="jobOperator"
-		  class="org.springframework.batch.core.launch.support.TaskExecutorJobOperator">
+		  class="org.springframework.batch.core.launch.support.JobOperatorFactoryBean">
 		<property name="jobRepository" ref="jobRepository" />
-		<property name="jobRegistry" ref="jobRegistry" />
 	</bean>
 
 	<jdbc:embedded-database id="dataSource" generate-name="true">

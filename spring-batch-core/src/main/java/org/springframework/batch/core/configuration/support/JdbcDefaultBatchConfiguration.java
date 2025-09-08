@@ -61,7 +61,6 @@ import java.sql.Types;
  *
  * <ul>
  * <li>a {@link JobRepository} named "jobRepository"</li>
- * <li>a {@link JobRegistry} named "jobRegistry"</li>
  * <li>a {@link JobOperator} named "jobOperator"</li>
  * <li>a {@link org.springframework.batch.core.scope.StepScope} named "stepScope"</li>
  * <li>a {@link org.springframework.batch.core.scope.JobScope} named "jobScope"</li>

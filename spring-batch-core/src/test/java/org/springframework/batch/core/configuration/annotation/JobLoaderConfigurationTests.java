@@ -19,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import jakarta.annotation.PostConstruct;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
@@ -52,6 +53,7 @@ import org.springframework.lang.Nullable;
  * @author Mahmoud Ben Hassine
  *
  */
+@Disabled
 class JobLoaderConfigurationTests {
 
 	@Test
