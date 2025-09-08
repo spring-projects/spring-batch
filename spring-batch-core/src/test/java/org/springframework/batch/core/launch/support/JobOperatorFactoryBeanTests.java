@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.launch.support;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -25,6 +26,7 @@ import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.converter.JobParametersConverter;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.test.util.AopTestUtils;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.interceptor.TransactionAttributeSource;
@@ -66,6 +68,26 @@ class JobOperatorFactoryBeanTests {
 	}
 
 	@Test
+	public void testDefaultTransactionManagerConfiguration() throws Exception {
+		// given
+		JobOperatorFactoryBean jobOperatorFactoryBean = new JobOperatorFactoryBean();
+		jobOperatorFactoryBean.setJobRegistry(this.jobRegistry);
+		jobOperatorFactoryBean.setJobRepository(this.jobRepository);
+		jobOperatorFactoryBean.setJobParametersConverter(this.jobParametersConverter);
+		jobOperatorFactoryBean.afterPropertiesSet();
+
+		// when
+		JobOperator jobOperator = jobOperatorFactoryBean.getObject();
+
+		// then
+		Assertions.assertNotNull(jobOperator);
+		Object targetObject = AopTestUtils.getTargetObject(jobOperator);
+		Assertions.assertInstanceOf(TaskExecutorJobOperator.class, targetObject);
+		Assertions.assertInstanceOf(ResourcelessTransactionManager.class,
+				getTransactionManagerSetOnJobOperator(jobOperator));
+	}
+
+	@Test
 	public void testCustomTransactionAttributesSource() throws Exception {
 		// given
 		TransactionAttributeSource transactionAttributeSource = Mockito.mock();
@@ -87,10 +109,7 @@ class JobOperatorFactoryBeanTests {
 	}
 
 	private PlatformTransactionManager getTransactionManagerSetOnJobOperator(JobOperator jobOperator) {
-		Advised target = (Advised) jobOperator; // proxy created by
-												// AbstractJobOperatorFactoryBean
-		Advisor[] advisors = target.getAdvisors();
-		for (Advisor advisor : advisors) {
+		for (Advisor advisor : ((Advised) jobOperator).getAdvisors()) {
 			if (advisor.getAdvice() instanceof TransactionInterceptor transactionInterceptor) {
 				return (PlatformTransactionManager) transactionInterceptor.getTransactionManager();
 			}
@@ -99,10 +118,7 @@ class JobOperatorFactoryBeanTests {
 	}
 
 	private TransactionAttributeSource getTransactionAttributesSourceSetOnJobOperator(JobOperator jobOperator) {
-		Advised target = (Advised) jobOperator; // proxy created by
-		// AbstractJobOperatorFactoryBean
-		Advisor[] advisors = target.getAdvisors();
-		for (Advisor advisor : advisors) {
+		for (Advisor advisor : ((Advised) jobOperator).getAdvisors()) {
 			if (advisor.getAdvice() instanceof TransactionInterceptor transactionInterceptor) {
 				return transactionInterceptor.getTransactionAttributeSource();
 			}

@@ -226,13 +226,15 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 		BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder
 			.genericBeanDefinition(JobOperatorFactoryBean.class);
 		// set mandatory properties
-		String transactionManagerRef = batchAnnotation.transactionManagerRef();
-		beanDefinitionBuilder.addPropertyReference("transactionManager", transactionManagerRef);
-
 		beanDefinitionBuilder.addPropertyReference(JOB_REPOSITORY, JOB_REPOSITORY);
 		beanDefinitionBuilder.addPropertyReference(JOB_REGISTRY, JOB_REGISTRY);
 
 		// set optional properties
+		String transactionManagerRef = batchAnnotation.transactionManagerRef();
+		if (registry.containsBeanDefinition(transactionManagerRef)) {
+			beanDefinitionBuilder.addPropertyReference("transactionManager", transactionManagerRef);
+		}
+
 		String taskExecutorRef = batchAnnotation.taskExecutorRef();
 		if (registry.containsBeanDefinition(taskExecutorRef)) {
 			beanDefinitionBuilder.addPropertyReference("taskExecutor", taskExecutorRef);

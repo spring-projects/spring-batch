@@ -28,6 +28,7 @@ import org.springframework.batch.core.converter.JobParametersConverter;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.task.SyncTaskExecutor;
@@ -73,7 +74,10 @@ public class JobOperatorFactoryBean implements FactoryBean<JobOperator>, Initial
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(this.jobRepository, "JobRepository must not be null");
 		Assert.notNull(this.jobRegistry, "JobRegistry must not be null");
-		Assert.notNull(this.transactionManager, "TransactionManager must not be null");
+		if (this.transactionManager == null) {
+			this.transactionManager = new ResourcelessTransactionManager();
+			logger.info("No transaction manager has been set, defaulting to ResourcelessTransactionManager.");
+		}
 		if (this.taskExecutor == null) {
 			logger.info("No TaskExecutor has been set, defaulting to synchronous executor.");
 			this.taskExecutor = new SyncTaskExecutor();
