@@ -34,6 +34,7 @@ import org.springframework.batch.item.database.support.PostgresPagingQueryProvid
 import org.springframework.batch.item.database.support.SqlServerPagingQueryProvider;
 import org.springframework.batch.item.database.support.SqlitePagingQueryProvider;
 import org.springframework.batch.item.database.support.SybasePagingQueryProvider;
+import org.springframework.batch.item.database.support.KingbasePagingQueryProvider;
 import org.springframework.batch.support.DatabaseType;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.DataClassRowMapper;
@@ -361,6 +362,7 @@ public class JdbcPagingItemReaderBuilder<T> {
 				case MARIADB -> new MariaDBPagingQueryProvider();
 				case ORACLE -> new OraclePagingQueryProvider();
 				case POSTGRES -> new PostgresPagingQueryProvider();
+				case KINGBASE -> new KingbasePagingQueryProvider();
 				case SYBASE -> new SybasePagingQueryProvider();
 				case SQLITE -> new SqlitePagingQueryProvider();
 			};

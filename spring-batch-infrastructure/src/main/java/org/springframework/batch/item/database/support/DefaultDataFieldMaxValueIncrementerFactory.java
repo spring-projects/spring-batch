@@ -48,6 +48,7 @@ import static org.springframework.batch.support.DatabaseType.POSTGRES;
 import static org.springframework.batch.support.DatabaseType.SQLITE;
 import static org.springframework.batch.support.DatabaseType.SQLSERVER;
 import static org.springframework.batch.support.DatabaseType.SYBASE;
+import static org.springframework.batch.support.DatabaseType.KINGBASE;
 
 /**
  * Default implementation of the {@link DataFieldMaxValueIncrementerFactory} interface.
@@ -118,6 +119,9 @@ public class DefaultDataFieldMaxValueIncrementerFactory implements DataFieldMaxV
 			return new OracleSequenceMaxValueIncrementer(dataSource, incrementerName);
 		}
 		else if (databaseType == POSTGRES) {
+			return new PostgresSequenceMaxValueIncrementer(dataSource, incrementerName);
+		}
+		else if (databaseType == KINGBASE) {
 			return new PostgresSequenceMaxValueIncrementer(dataSource, incrementerName);
 		}
 		else if (databaseType == SQLITE) {
