@@ -384,9 +384,10 @@ public class ChunkOrientedStepIntegrationTests {
 		public Step chunkOrientedStep(JobRepository jobRepository, JdbcTransactionManager transactionManager,
 				ItemReader<Person> itemReader, ItemProcessor<Person, Person> itemProcessor,
 				ItemWriter<Person> itemWriter) {
-			return new ChunkOrientedStepBuilder<Person, Person>(jobRepository, transactionManager, 2).reader(itemReader)
+			return new ChunkOrientedStepBuilder<Person, Person>(jobRepository, 2).reader(itemReader)
 				.processor(itemProcessor)
 				.writer(itemWriter)
+				.transactionManager(transactionManager)
 				.build();
 		}
 
@@ -399,9 +400,10 @@ public class ChunkOrientedStepIntegrationTests {
 		public Step concurrentChunkOrientedStep(JobRepository jobRepository, JdbcTransactionManager transactionManager,
 				ItemReader<Person> itemReader, ItemProcessor<Person, Person> itemProcessor,
 				ItemWriter<Person> itemWriter) {
-			return new ChunkOrientedStepBuilder<Person, Person>(jobRepository, transactionManager, 2).reader(itemReader)
+			return new ChunkOrientedStepBuilder<Person, Person>(jobRepository, 2).reader(itemReader)
 				.processor(itemProcessor)
 				.writer(itemWriter)
+				.transactionManager(transactionManager)
 				.taskExecutor(new SimpleAsyncTaskExecutor())
 				.build();
 		}
@@ -430,9 +432,10 @@ public class ChunkOrientedStepIntegrationTests {
 					DataIntegrityViolationException.class, true);
 			LimitCheckingItemSkipPolicy skipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, skippableExceptions);
 
-			return new ChunkOrientedStepBuilder<Person, Person>(jobRepository, transactionManager, 2).reader(itemReader)
+			return new ChunkOrientedStepBuilder<Person, Person>(jobRepository, 2).reader(itemReader)
 				.processor(itemProcessor)
 				.writer(itemWriter)
+				.transactionManager(transactionManager)
 				.faultTolerant()
 				.retryPolicy(retryPolicy)
 				.skipPolicy(skipPolicy)
@@ -463,9 +466,10 @@ public class ChunkOrientedStepIntegrationTests {
 					DataIntegrityViolationException.class, true);
 			LimitCheckingItemSkipPolicy skipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, skippableExceptions);
 
-			return new ChunkOrientedStepBuilder<Person, Person>(jobRepository, transactionManager, 2).reader(itemReader)
+			return new ChunkOrientedStepBuilder<Person, Person>(jobRepository, 2).reader(itemReader)
 				.processor(itemProcessor)
 				.writer(itemWriter)
+				.transactionManager(transactionManager)
 				.taskExecutor(new SimpleAsyncTaskExecutor())
 				.faultTolerant()
 				.retryPolicy(retryPolicy)

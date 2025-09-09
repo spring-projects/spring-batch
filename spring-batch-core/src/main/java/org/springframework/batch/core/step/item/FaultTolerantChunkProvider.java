@@ -33,7 +33,11 @@ import org.springframework.classify.Classifier;
  * FaultTolerant implementation of the {@link ChunkProvider} interface, that allows for
  * skipping or retry of items that cause exceptions during reading or processing.
  *
+ * @deprecated Since 6.0, use
+ * {@link org.springframework.batch.core.step.item.ChunkOrientedStep} instead. Scheduled
+ * for removal in 7.0.
  */
+@Deprecated(since = "6.0", forRemoval = true)
 public class FaultTolerantChunkProvider<I> extends SimpleChunkProvider<I> {
 
 	/**

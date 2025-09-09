@@ -34,7 +34,9 @@ import org.springframework.batch.item.support.CompositeItemStream;
  * @author Mahmoud Ben Hassine
  * @author Seungrae Kim
  * @since 2.0
+ * @deprecated Since 6.0 with no replacement. Scheduled for removal in 7.0.
  */
+@Deprecated(since = "6.0", forRemoval = true)
 public class ChunkMonitor extends ItemStreamSupport {
 
 	private final Log logger = LogFactory.getLog(getClass());

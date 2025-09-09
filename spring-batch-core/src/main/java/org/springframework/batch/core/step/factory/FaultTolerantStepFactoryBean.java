@@ -48,8 +48,9 @@ import org.springframework.retry.policy.RetryContextCache;
  * @author Robert Kasanicky
  * @author Morten Andersen-Gott
  * @author Ian Choi
- *
+ * @deprecated Since 6.0 with no replacement. Scheduled for removal in 7.0.
  */
+@Deprecated(since = "6.0", forRemoval = true)
 public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> {
 
 	private Map<Class<? extends Throwable>, Boolean> skippableExceptionClasses = new HashMap<>();

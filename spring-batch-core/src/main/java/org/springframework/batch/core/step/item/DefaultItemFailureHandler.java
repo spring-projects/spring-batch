@@ -29,8 +29,9 @@ import org.springframework.batch.item.Chunk;
  *
  * @author Lucas Ward
  * @author Mahmoud Ben Hassine
- *
+ * @deprecated Since 6.0 with no replacement. Scheduled for removal in 7.0.
  */
+@Deprecated(since = "6.0", forRemoval = true)
 public class DefaultItemFailureHandler extends ItemListenerSupport<Object, Object> {
 
 	protected static final Log logger = LogFactory.getLog(DefaultItemFailureHandler.class);

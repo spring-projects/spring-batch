@@ -25,7 +25,9 @@ import org.springframework.batch.item.Chunk;
  *
  * @since 2.0
  * @see ChunkOrientedTasklet
+ * @deprecated Since 6.0 with no replacement. Scheduled for removal in 7.0.
  */
+@Deprecated(since = "6.0", forRemoval = true)
 public interface ChunkProvider<T> {
 
 	Chunk<T> provide(StepContribution contribution) throws Exception;

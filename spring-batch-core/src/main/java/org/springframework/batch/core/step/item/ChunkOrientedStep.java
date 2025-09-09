@@ -52,6 +52,7 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.CompositeItemStream;
+import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.core.retry.RetryException;
 import org.springframework.core.retry.RetryListener;
 import org.springframework.core.retry.RetryPolicy;
@@ -107,7 +108,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 	/*
 	 * Transaction related parameters
 	 */
-	private final PlatformTransactionManager transactionManager;
+	private PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
 
 	private TransactionTemplate transactionTemplate;
 
@@ -149,16 +150,14 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 	 * @param itemReader the item reader to read items
 	 * @param itemWriter the item writer to write items
 	 * @param jobRepository the job repository to use for this step
-	 * @param transactionManager the transaction manager to use for this step
 	 */
 	public ChunkOrientedStep(String name, int chunkSize, ItemReader<I> itemReader, ItemWriter<O> itemWriter,
-			JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+			JobRepository jobRepository) {
 		super(name);
 		this.chunkSize = chunkSize;
 		this.itemReader = itemReader;
 		this.itemWriter = itemWriter;
 		setJobRepository(jobRepository);
-		this.transactionManager = transactionManager;
 	}
 
 	/**
@@ -224,6 +223,16 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 	public void registerChunkListener(ChunkListener<I, O> chunkListener) {
 		Assert.notNull(chunkListener, "Chunk listener must not be null");
 		this.compositeChunkListener.register(chunkListener);
+	}
+
+	/**
+	 * Set the {@link PlatformTransactionManager} to use for the chunk-oriented tasklet.
+	 * Defaults to a {@link ResourcelessTransactionManager}.
+	 * @param transactionManager a transaction manager set, must not be null.
+	 */
+	public void setTransactionManager(PlatformTransactionManager transactionManager) {
+		Assert.notNull(transactionManager, "Transaction manager must not be null");
+		this.transactionManager = transactionManager;
 	}
 
 	/**
@@ -337,14 +346,19 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 				@Override
 				protected void doInTransactionWithoutResult(TransactionStatus status) {
 					StepContribution contribution = stepExecution.createStepContribution();
-					if (isConcurrent()) {
-						processChunkConcurrently(status, contribution, stepExecution);
-					}
-					else {
-						processChunkSequentially(status, contribution, stepExecution);
-					}
+					processNextChunk(status, contribution, stepExecution);
 				}
 			});
+		}
+	}
+
+	private void processNextChunk(TransactionStatus status, StepContribution contribution,
+			StepExecution stepExecution) {
+		if (isConcurrent()) {
+			processChunkConcurrently(status, contribution, stepExecution);
+		}
+		else {
+			processChunkSequentially(status, contribution, stepExecution);
 		}
 	}
 

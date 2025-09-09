@@ -50,6 +50,7 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.support.ReflectionUtils;
+import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.core.retry.RetryListener;
 import org.springframework.core.retry.RetryPolicy;
 import org.springframework.core.task.AsyncTaskExecutor;
@@ -74,7 +75,7 @@ public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrien
 
 	private ItemWriter<O> writer;
 
-	private final PlatformTransactionManager transactionManager;
+	private PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
 
 	private TransactionAttribute transactionAttribute = new DefaultTransactionAttribute();
 
@@ -96,17 +97,19 @@ public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrien
 
 	private AsyncTaskExecutor asyncTaskExecutor;
 
+	ChunkOrientedStepBuilder(StepBuilderHelper<?> parent, int chunkSize) {
+		super(parent);
+		this.chunkSize = chunkSize;
+	}
+
 	/**
 	 * Create a new {@link ChunkOrientedStepBuilder} with the given job repository and
 	 * transaction manager. The step name will be assigned to the bean name.
 	 * @param jobRepository the job repository
-	 * @param transactionManager the transaction manager
 	 * @param chunkSize the size of the chunk to be processed
 	 */
-	public ChunkOrientedStepBuilder(JobRepository jobRepository, PlatformTransactionManager transactionManager,
-			int chunkSize) {
+	public ChunkOrientedStepBuilder(JobRepository jobRepository, int chunkSize) {
 		super(jobRepository);
-		this.transactionManager = transactionManager;
 		this.chunkSize = chunkSize;
 	}
 
@@ -115,13 +118,10 @@ public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrien
 	 * repository and transaction manager.
 	 * @param name the step name
 	 * @param jobRepository the job repository
-	 * @param transactionManager the transaction manager
 	 * @param chunkSize the size of the chunk to be processed
 	 */
-	public ChunkOrientedStepBuilder(String name, JobRepository jobRepository,
-			PlatformTransactionManager transactionManager, int chunkSize) {
+	public ChunkOrientedStepBuilder(String name, JobRepository jobRepository, int chunkSize) {
 		super(name, jobRepository);
-		this.transactionManager = transactionManager;
 		this.chunkSize = chunkSize;
 	}
 
@@ -163,6 +163,17 @@ public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrien
 	 */
 	public ChunkOrientedStepBuilder<I, O> writer(ItemWriter<O> writer) {
 		this.writer = writer;
+		return self();
+	}
+
+	/**
+	 * Sets the transaction manager to use for the chunk-oriented tasklet. Defaults to a
+	 * {@link ResourcelessTransactionManager} if none is provided.
+	 * @param transactionManager a transaction manager set
+	 * @return this for fluent chaining
+	 */
+	public ChunkOrientedStepBuilder<I, O> transactionManager(PlatformTransactionManager transactionManager) {
+		this.transactionManager = transactionManager;
 		return self();
 	}
 
@@ -314,8 +325,9 @@ public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrien
 	@SuppressWarnings("unchecked")
 	public ChunkOrientedStep<I, O> build() {
 		ChunkOrientedStep<I, O> chunkOrientedStep = new ChunkOrientedStep<>(this.getName(), this.chunkSize, this.reader,
-				this.writer, this.getJobRepository(), this.transactionManager);
+				this.writer, this.getJobRepository());
 		chunkOrientedStep.setItemProcessor(this.processor);
+		chunkOrientedStep.setTransactionManager(this.transactionManager);
 		chunkOrientedStep.setTransactionAttribute(this.transactionAttribute);
 		chunkOrientedStep.setInterruptionPolicy(this.interruptionPolicy);
 		chunkOrientedStep.setRetryPolicy(this.retryPolicy);

@@ -24,7 +24,9 @@ import org.springframework.batch.item.Chunk;
  *
  * @author Kyeonghoon Lee (Add FunctionalInterface annotation)
  * @since 2.0
+ * @deprecated Since 6.0 with no replacement. Scheduled for removal in 7.0.
  */
+@Deprecated(since = "6.0", forRemoval = true)
 @FunctionalInterface
 public interface ChunkProcessor<I> {
 

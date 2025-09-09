@@ -53,8 +53,9 @@ import java.util.List;
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- *
+ * @deprecated Since 6.0 with no replacement. Scheduled for removal in 7.0.
  */
+@Deprecated(since = "6.0", forRemoval = true)
 public class BatchRetryTemplate implements RetryOperations {
 
 	private static class BatchRetryState extends DefaultRetryState {

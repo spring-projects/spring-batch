@@ -34,8 +34,11 @@ import java.util.Collection;
  * exception handling to another {@link ExceptionHandler}.
  *
  * @author Dave Syer
- *
+ * @deprecated Since 6.0, use
+ * {@link org.springframework.batch.core.step.item.ChunkOrientedStep} instead. Scheduled
+ * for removal in 7.0.
  */
+@Deprecated(since = "6.0", forRemoval = true)
 public class SimpleRetryExceptionHandler implements RetryListener, ExceptionHandler {
 
 	/**
