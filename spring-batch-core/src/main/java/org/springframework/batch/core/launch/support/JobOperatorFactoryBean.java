@@ -102,17 +102,7 @@ public class JobOperatorFactoryBean implements FactoryBean<JobOperator>, Applica
 			this.taskExecutor = new SyncTaskExecutor();
 		}
 		if (this.transactionAttributeSource == null) {
-			this.transactionAttributeSource = new MethodMapTransactionAttributeSource();
-			DefaultTransactionAttribute transactionAttribute = new DefaultTransactionAttribute();
-			Method stopMethod = TaskExecutorJobOperator.class.getMethod("stop", JobExecution.class);
-			Method abandonMethod = TaskExecutorJobOperator.class.getMethod("abandon", JobExecution.class);
-			Method recoverMethod = TaskExecutorJobOperator.class.getMethod("recover", JobExecution.class);
-			((MethodMapTransactionAttributeSource) this.transactionAttributeSource).addTransactionalMethod(stopMethod,
-					transactionAttribute);
-			((MethodMapTransactionAttributeSource) this.transactionAttributeSource)
-				.addTransactionalMethod(abandonMethod, transactionAttribute);
-			((MethodMapTransactionAttributeSource) this.transactionAttributeSource)
-				.addTransactionalMethod(recoverMethod, transactionAttribute);
+			this.transactionAttributeSource = new DefaultJobOperatorTransactionAttributeSource();
 		}
 	}
 
@@ -221,6 +211,26 @@ public class JobOperatorFactoryBean implements FactoryBean<JobOperator>, Applica
 		taskExecutorJobOperator.setJobParametersConverter(this.jobParametersConverter);
 		taskExecutorJobOperator.afterPropertiesSet();
 		return taskExecutorJobOperator;
+	}
+
+	private static class DefaultJobOperatorTransactionAttributeSource extends MethodMapTransactionAttributeSource {
+
+		public DefaultJobOperatorTransactionAttributeSource() {
+			DefaultTransactionAttribute transactionAttribute = new DefaultTransactionAttribute();
+			try {
+				Method stopMethod = TaskExecutorJobOperator.class.getMethod("stop", JobExecution.class);
+				Method abandonMethod = TaskExecutorJobOperator.class.getMethod("abandon", JobExecution.class);
+				Method recoverMethod = TaskExecutorJobOperator.class.getMethod("recover", JobExecution.class);
+				addTransactionalMethod(stopMethod, transactionAttribute);
+				addTransactionalMethod(abandonMethod, transactionAttribute);
+				addTransactionalMethod(recoverMethod, transactionAttribute);
+			}
+			catch (NoSuchMethodException e) {
+				throw new IllegalStateException("Failed to initialize default transaction attributes for JobOperator",
+						e);
+			}
+		}
+
 	}
 
 }
