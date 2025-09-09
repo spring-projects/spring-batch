@@ -16,10 +16,7 @@
 package org.springframework.batch.core.configuration.support;
 
 import org.springframework.batch.core.configuration.DuplicateJobException;
-import org.springframework.batch.core.job.DefaultJobKeyGenerator;
 import org.springframework.batch.core.job.Job;
-import org.springframework.batch.core.job.JobInstance;
-import org.springframework.batch.core.job.JobKeyGenerator;
 import org.springframework.batch.core.configuration.BatchConfigurationException;
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
@@ -31,6 +28,8 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.ResourcelessJobRepository;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
@@ -39,7 +38,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.annotation.Isolation;
 
 /**
  * Base {@link Configuration} class that provides common infrastructure beans for enabling
@@ -55,11 +53,11 @@ import org.springframework.transaction.annotation.Isolation;
  * <li>a {@link org.springframework.batch.core.scope.JobScope} named "jobScope"</li>
  * </ul>
  *
- * Customization is possible by extending the class and overriding getters.
  * <p>
  * A typical usage of this class is as follows: <pre class="code">
  * &#064;Configuration
- * public class MyJobConfiguration extends DefaultBatchConfiguration {
+ * &#064;Import(DefaultBatchConfiguration.class)
+ * public class MyJobConfiguration {
  *
  *     &#064;Bean
  *     public Job job(JobRepository jobRepository) {
@@ -70,6 +68,10 @@ import org.springframework.transaction.annotation.Isolation;
  *
  * }
  * </pre>
+ *
+ * Customization is possible by defining configurable artefacts (transaction manager,
+ * task executor, etc) as beans in the application context.
+ *
  *
  * @author Dave Syer
  * @author Michael Minella
@@ -82,6 +84,18 @@ import org.springframework.transaction.annotation.Isolation;
 public class DefaultBatchConfiguration implements ApplicationContextAware {
 
 	protected ApplicationContext applicationContext;
+
+	@Autowired
+	protected ObjectProvider<PlatformTransactionManager> transactionManagerObjectProvider;
+
+	@Autowired
+	protected ObjectProvider<JobParametersConverter> jobParametersConverterObjectProvider;
+
+	@Autowired
+	protected ObjectProvider<TaskExecutor> taskExecutorObjectProvider;
+
+	@Autowired
+	protected ObjectProvider<JobRegistry> jobRegistryObjectProvider;
 
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -97,10 +111,13 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 	public JobOperator jobOperator(JobRepository jobRepository) throws BatchConfigurationException {
 		JobOperatorFactoryBean jobOperatorFactoryBean = new JobOperatorFactoryBean();
 		jobOperatorFactoryBean.setJobRepository(jobRepository);
-		jobOperatorFactoryBean.setJobRegistry(getJobRegistry());
-		jobOperatorFactoryBean.setTransactionManager(getTransactionManager());
-		jobOperatorFactoryBean.setJobParametersConverter(getJobParametersConverter());
-		jobOperatorFactoryBean.setTaskExecutor(getTaskExecutor());
+		jobOperatorFactoryBean.setJobRegistry(jobRegistryObjectProvider.getIfAvailable(() -> getDefaultJobRegistry()));
+		jobOperatorFactoryBean.setTransactionManager(
+				transactionManagerObjectProvider.getIfAvailable(() -> getDefaultTransactionManager()));
+		jobOperatorFactoryBean.setJobParametersConverter(
+				jobParametersConverterObjectProvider.getIfAvailable(() -> getDefaultJobParametersConverter()));
+		jobOperatorFactoryBean.setTaskExecutor(taskExecutorObjectProvider.getIfAvailable(() -> getDefaultTaskExecutor()));
+        // TODO configure meter registry and transaction attribute source
 		try {
 			jobOperatorFactoryBean.afterPropertiesSet();
 			return jobOperatorFactoryBean.getObject();
@@ -110,7 +127,12 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 		}
 	}
 
-	protected JobRegistry getJobRegistry() {
+    /**
+     * Return the default {@link JobRegistry} to use for the job operator. By default, it
+     * is populated with jobs from the application context.
+     * @return The job registry to use for the job operator
+     */
+	private JobRegistry getDefaultJobRegistry() {
 		MapJobRegistry jobRegistry = new MapJobRegistry();
 		this.applicationContext.getBeansOfType(Job.class).values().forEach(job -> {
 			try {
@@ -124,62 +146,27 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 	}
 
 	/**
-	 * Return the transaction manager to use for the job operator. Defaults to
-	 * {@link ResourcelessTransactionManager}.
+	 * Return the default {@link PlatformTransactionManager} to use for the job operator.
 	 * @return The transaction manager to use for the job operator
 	 */
-	protected PlatformTransactionManager getTransactionManager() {
+	private PlatformTransactionManager getDefaultTransactionManager() {
 		return new ResourcelessTransactionManager();
 	}
 
 	/**
-	 * Return the {@link TaskExecutor} to use in the job operator. Defaults to
-	 * {@link SyncTaskExecutor}.
+	 * Return the default {@link TaskExecutor} to use in the job operator.
 	 * @return the {@link TaskExecutor} to use in the job operator.
 	 */
-	protected TaskExecutor getTaskExecutor() {
+	private TaskExecutor getDefaultTaskExecutor() {
 		return new SyncTaskExecutor();
 	}
 
 	/**
-	 * Return the {@link JobParametersConverter} to use in the job operator. Defaults to
-	 * {@link DefaultJobParametersConverter}
+	 * Return the default {@link JobParametersConverter} to use in the job operator.
 	 * @return the {@link JobParametersConverter} to use in the job operator.
-	 * @deprecated since 6.0 with no replacement and scheduled for removal in 6.2 or
-	 * later.
 	 */
-	@Deprecated(since = "6.0", forRemoval = true)
-	protected JobParametersConverter getJobParametersConverter() {
+	private JobParametersConverter getDefaultJobParametersConverter() {
 		return new DefaultJobParametersConverter();
-	}
-
-	/**
-	 * Return the value of the {@code validateTransactionState} parameter. Defaults to
-	 * {@code true}.
-	 * @return true if the transaction state should be validated, false otherwise
-	 */
-	protected boolean getValidateTransactionState() {
-		return true;
-	}
-
-	/**
-	 * Return the transaction isolation level when creating job executions. Defaults to
-	 * {@link Isolation#SERIALIZABLE}.
-	 * @return the transaction isolation level when creating job executions
-	 */
-	protected Isolation getIsolationLevelForCreate() {
-		return Isolation.SERIALIZABLE;
-	}
-
-	/**
-	 * A custom implementation of the {@link JobKeyGenerator}. The default, if not
-	 * injected, is the {@link DefaultJobKeyGenerator}.
-	 * @return the generator that creates the key used in identifying {@link JobInstance}
-	 * objects
-	 * @since 5.1
-	 */
-	protected JobKeyGenerator getJobKeyGenerator() {
-		return new DefaultJobKeyGenerator();
 	}
 
 }

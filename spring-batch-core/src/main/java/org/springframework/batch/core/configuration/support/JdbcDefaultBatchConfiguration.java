@@ -25,6 +25,8 @@ import org.springframework.batch.core.converter.StringToDateConverter;
 import org.springframework.batch.core.converter.StringToLocalDateConverter;
 import org.springframework.batch.core.converter.StringToLocalDateTimeConverter;
 import org.springframework.batch.core.converter.StringToLocalTimeConverter;
+import org.springframework.batch.core.job.DefaultJobKeyGenerator;
+import org.springframework.batch.core.job.JobKeyGenerator;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
 import org.springframework.batch.core.repository.JobRepository;
@@ -37,6 +39,9 @@ import org.springframework.batch.core.repository.support.JdbcJobRepositoryFactor
 import org.springframework.batch.item.database.support.DataFieldMaxValueIncrementerFactory;
 import org.springframework.batch.item.database.support.DefaultDataFieldMaxValueIncrementerFactory;
 import org.springframework.batch.support.DatabaseType;
+import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.support.ConfigurableConversionService;
@@ -46,6 +51,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.MetaDataAccessException;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.Isolation;
 
 import javax.sql.DataSource;
 import java.nio.charset.Charset;
@@ -88,21 +94,37 @@ import java.sql.Types;
 @Configuration(proxyBeanMethods = false)
 public class JdbcDefaultBatchConfiguration extends DefaultBatchConfiguration {
 
+    @Autowired
+    private ObjectProvider<DataSource> dataSourceObjectProvider;
+
+    @Autowired
+    private ObjectProvider<JdbcOperations> jdbcOperationsObjectProvider;
+
+    @Autowired
+    private ObjectProvider<JobKeyGenerator> jobKeyGeneratorObjectProvider;
+
+    @Autowired
+    private ObjectProvider<ExecutionContextSerializer> executionContextSerializerObjectProvider;
+
+    @Autowired
+    private ObjectProvider<ConfigurableConversionService> conversionServiceObjectProvider;
+
 	@Bean
 	@Override
 	public JobRepository jobRepository() throws BatchConfigurationException {
 		JdbcJobRepositoryFactoryBean jobRepositoryFactoryBean = new JdbcJobRepositoryFactoryBean();
 		try {
-			jobRepositoryFactoryBean.setDataSource(getDataSource());
-			jobRepositoryFactoryBean.setTransactionManager(getTransactionManager());
-			jobRepositoryFactoryBean.setDatabaseType(getDatabaseType());
-			jobRepositoryFactoryBean.setIncrementerFactory(getIncrementerFactory());
-			jobRepositoryFactoryBean.setJobKeyGenerator(getJobKeyGenerator());
-			jobRepositoryFactoryBean.setClobType(getClobType());
-			jobRepositoryFactoryBean.setTablePrefix(getTablePrefix());
-			jobRepositoryFactoryBean.setSerializer(getExecutionContextSerializer());
-			jobRepositoryFactoryBean.setConversionService(getConversionService());
-			jobRepositoryFactoryBean.setJdbcOperations(getJdbcOperations());
+			jobRepositoryFactoryBean.setDataSource(dataSourceObjectProvider.getIfAvailable());
+			jobRepositoryFactoryBean.setTransactionManager(transactionManagerObjectProvider.getIfAvailable(() -> getDefaultTransactionManager()));
+            jobRepositoryFactoryBean.setJobKeyGenerator(jobKeyGeneratorObjectProvider.getIfAvailable(() -> getDefaultJobKeyGenerator()));
+            jobRepositoryFactoryBean.setSerializer(executionContextSerializerObjectProvider.getIfAvailable(() -> getDefaultExecutionContextSerializer()));
+            jobRepositoryFactoryBean.setJdbcOperations(jdbcOperationsObjectProvider.getIfAvailable());
+            jobRepositoryFactoryBean.setConversionService(conversionServiceObjectProvider.getIfAvailable(() -> getDefaultConversionService()));
+            // TODO how to configure primitive types (custom config record? lambda style configuration?)
+            jobRepositoryFactoryBean.setDatabaseType(getDatabaseType());
+            jobRepositoryFactoryBean.setIncrementerFactory(getIncrementerFactory());
+            jobRepositoryFactoryBean.setClobType(getClobType());
+            jobRepositoryFactoryBean.setTablePrefix(getTablePrefix());
 			jobRepositoryFactoryBean.setCharset(getCharset());
 			jobRepositoryFactoryBean.setMaxVarCharLength(getMaxVarCharLength());
 			jobRepositoryFactoryBean.setIsolationLevelForCreateEnum(getIsolationLevelForCreate());
@@ -115,47 +137,30 @@ public class JdbcDefaultBatchConfiguration extends DefaultBatchConfiguration {
 		}
 	}
 
-	/*
-	 * Getters to customize the configuration of infrastructure beans
-	 */
-
-	/**
-	 * Return the data source to use for Batch meta-data. Defaults to the bean of type
-	 * {@link DataSource} and named "dataSource" in the application context.
-	 * @return The data source to use for Batch meta-data
-	 */
-	protected DataSource getDataSource() {
-		String errorMessage = " To use the default configuration, a data source bean named 'dataSource'"
-				+ " should be defined in the application context but none was found. Override getDataSource()"
-				+ " to provide the data source to use for Batch meta-data.";
-		if (this.applicationContext.getBeansOfType(DataSource.class).isEmpty()) {
-			throw new BatchConfigurationException(
-					"Unable to find a DataSource bean in the application context." + errorMessage);
-		}
-		else {
-			if (!this.applicationContext.containsBean("dataSource")) {
-				throw new BatchConfigurationException(errorMessage);
-			}
-		}
-		return this.applicationContext.getBean("dataSource", DataSource.class);
+	private PlatformTransactionManager getDefaultTransactionManager() {
+        return new ResourcelessTransactionManager();
 	}
 
-	@Override
-	protected PlatformTransactionManager getTransactionManager() {
-		String errorMessage = " To use the default configuration, a PlatformTransactionManager bean named 'transactionManager'"
-				+ " should be defined in the application context but none was found. Override getTransactionManager()"
-				+ " to provide the transaction manager to use for the job repository.";
-		if (this.applicationContext.getBeansOfType(PlatformTransactionManager.class).isEmpty()) {
-			throw new BatchConfigurationException(
-					"Unable to find a PlatformTransactionManager bean in the application context." + errorMessage);
-		}
-		else {
-			if (!this.applicationContext.containsBean("transactionManager")) {
-				throw new BatchConfigurationException(errorMessage);
-			}
-		}
-		return this.applicationContext.getBean("transactionManager", PlatformTransactionManager.class);
-	}
+    private JobKeyGenerator getDefaultJobKeyGenerator() {
+        return new DefaultJobKeyGenerator();
+    }
+
+    private ExecutionContextSerializer getDefaultExecutionContextSerializer() {
+        return new DefaultExecutionContextSerializer();
+    }
+
+    private ConfigurableConversionService getDefaultConversionService() {
+        DefaultConversionService conversionService = new DefaultConversionService();
+        conversionService.addConverter(new DateToStringConverter());
+        conversionService.addConverter(new StringToDateConverter());
+        conversionService.addConverter(new LocalDateToStringConverter());
+        conversionService.addConverter(new StringToLocalDateConverter());
+        conversionService.addConverter(new LocalTimeToStringConverter());
+        conversionService.addConverter(new StringToLocalTimeConverter());
+        conversionService.addConverter(new LocalDateTimeToStringConverter());
+        conversionService.addConverter(new StringToLocalDateTimeConverter());
+        return conversionService;
+    }
 
 	/**
 	 * Return the length of long string columns in database. Do not override this if you
@@ -167,7 +172,7 @@ public class JdbcDefaultBatchConfiguration extends DefaultBatchConfiguration {
 	 * DDL for the tables. Defaults to
 	 * {@link AbstractJdbcBatchMetadataDao#DEFAULT_EXIT_MESSAGE_LENGTH}
 	 */
-	protected int getMaxVarCharLength() {
+	private int getMaxVarCharLength() {
 		return AbstractJdbcBatchMetadataDao.DEFAULT_EXIT_MESSAGE_LENGTH;
 	}
 
@@ -176,7 +181,7 @@ public class JdbcDefaultBatchConfiguration extends DefaultBatchConfiguration {
 	 * {@link AbstractJdbcBatchMetadataDao#DEFAULT_TABLE_PREFIX}.
 	 * @return the prefix of meta-data tables
 	 */
-	protected String getTablePrefix() {
+	private String getTablePrefix() {
 		return AbstractJdbcBatchMetadataDao.DEFAULT_TABLE_PREFIX;
 	}
 
@@ -186,26 +191,8 @@ public class JdbcDefaultBatchConfiguration extends DefaultBatchConfiguration {
 	 * @return the charset to use when serializing/deserializing the execution context
 	 */
 	protected Charset getCharset() {
-		return StandardCharsets.UTF_8;
-	}
-
-	/**
-	 * Return the {@link JdbcOperations}. If this property is not overridden, a new
-	 * {@link JdbcTemplate} will be created for the configured data source by default.
-	 * @return the {@link JdbcOperations} to use
-	 */
-	protected JdbcOperations getJdbcOperations() {
-		return new JdbcTemplate(getDataSource());
-	}
-
-	/**
-	 * A custom implementation of the {@link ExecutionContextSerializer}. The default, if
-	 * not injected, is the {@link DefaultExecutionContextSerializer}.
-	 * @return the serializer to use to serialize/deserialize the execution context
-	 */
-	protected ExecutionContextSerializer getExecutionContextSerializer() {
-		return new DefaultExecutionContextSerializer();
-	}
+        return StandardCharsets.UTF_8;
+    }
 
 	/**
 	 * Return the value from {@link Types} class to indicate the type to use for a CLOB
@@ -222,7 +209,7 @@ public class JdbcDefaultBatchConfiguration extends DefaultBatchConfiguration {
 	 * implementations.
 	 */
 	protected DataFieldMaxValueIncrementerFactory getIncrementerFactory() {
-		return new DefaultDataFieldMaxValueIncrementerFactory(getDataSource());
+		return null;// new DefaultDataFieldMaxValueIncrementerFactory(getDataSource());
 	}
 
 	/**
@@ -234,26 +221,15 @@ public class JdbcDefaultBatchConfiguration extends DefaultBatchConfiguration {
 	 *
 	 */
 	protected String getDatabaseType() throws MetaDataAccessException {
-		return DatabaseType.fromMetaData(getDataSource()).name();
+		return null;// DatabaseType.fromMetaData(getDataSource()).name();
 	}
 
-	/**
-	 * Return the conversion service to use in the job repository and job explorer. This
-	 * service is used to convert job parameters from String literal to typed values and
-	 * vice versa.
-	 * @return the {@link ConfigurableConversionService} to use.
-	 */
-	protected ConfigurableConversionService getConversionService() {
-		DefaultConversionService conversionService = new DefaultConversionService();
-		conversionService.addConverter(new DateToStringConverter());
-		conversionService.addConverter(new StringToDateConverter());
-		conversionService.addConverter(new LocalDateToStringConverter());
-		conversionService.addConverter(new StringToLocalDateConverter());
-		conversionService.addConverter(new LocalTimeToStringConverter());
-		conversionService.addConverter(new StringToLocalTimeConverter());
-		conversionService.addConverter(new LocalDateTimeToStringConverter());
-		conversionService.addConverter(new StringToLocalDateTimeConverter());
-		return conversionService;
-	}
+    private boolean getValidateTransactionState() {
+        return true;
+    }
+
+    private Isolation getIsolationLevelForCreate() {
+        return Isolation.SERIALIZABLE;
+    }
 
 }

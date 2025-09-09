@@ -16,14 +16,19 @@
 package org.springframework.batch.core.configuration.support;
 
 import org.springframework.batch.core.configuration.BatchConfigurationException;
-import org.springframework.batch.core.configuration.JobRegistry;
+import org.springframework.batch.core.job.DefaultJobKeyGenerator;
+import org.springframework.batch.core.job.JobKeyGenerator;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MongoJobRepositoryFactoryBean;
+import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.mongodb.MongoTransactionManager;
 import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.Isolation;
 
 /**
  * Base {@link Configuration} class that provides common MongoDB-based infrastructure
@@ -61,16 +66,23 @@ import org.springframework.data.mongodb.core.MongoOperations;
 @Configuration(proxyBeanMethods = false)
 public class MongoDefaultBatchConfiguration extends DefaultBatchConfiguration {
 
+    @Autowired
+    private ObjectProvider<MongoOperations> mongoOperationsObjectProvider;
+
+    @Autowired
+    private ObjectProvider<JobKeyGenerator> jobKeyGeneratorObjectProvider;
+
 	@Bean
 	@Override
 	public JobRepository jobRepository() throws BatchConfigurationException {
 		MongoJobRepositoryFactoryBean jobRepositoryFactoryBean = new MongoJobRepositoryFactoryBean();
 		try {
-			jobRepositoryFactoryBean.setMongoOperations(getMongoOperations());
-			jobRepositoryFactoryBean.setTransactionManager(getTransactionManager());
-			jobRepositoryFactoryBean.setIsolationLevelForCreateEnum(getIsolationLevelForCreate());
-			jobRepositoryFactoryBean.setValidateTransactionState(getValidateTransactionState());
-			jobRepositoryFactoryBean.setJobKeyGenerator(getJobKeyGenerator());
+			jobRepositoryFactoryBean.setMongoOperations(mongoOperationsObjectProvider.getIfAvailable());
+            jobRepositoryFactoryBean.setTransactionManager(transactionManagerObjectProvider.getIfAvailable(() -> getDefaultTransactionManager()));
+            jobRepositoryFactoryBean.setJobKeyGenerator(jobKeyGeneratorObjectProvider.getIfAvailable(() -> getDefaultJobKeyGenerator()));
+            // TODO how to configure primitive types (custom config record? lambda style configuration?)
+            jobRepositoryFactoryBean.setIsolationLevelForCreateEnum(getIsolationLevelForCreate());
+            jobRepositoryFactoryBean.setValidateTransactionState(getValidateTransactionState());
 			jobRepositoryFactoryBean.afterPropertiesSet();
 			return jobRepositoryFactoryBean.getObject();
 		}
@@ -79,41 +91,30 @@ public class MongoDefaultBatchConfiguration extends DefaultBatchConfiguration {
 		}
 	}
 
-	/*
-	 * Getters to customize the configuration of infrastructure beans
-	 */
-
-	protected MongoOperations getMongoOperations() {
-		String errorMessage = " To use the default configuration, a MongoOperations bean named 'mongoTemplate'"
-				+ " should be defined in the application context but none was found. Override getMongoOperations()"
-				+ " to provide the MongoOperations for Batch meta-data.";
-		if (this.applicationContext.getBeansOfType(MongoOperations.class).isEmpty()) {
-			throw new BatchConfigurationException(
-					"Unable to find a MongoOperations bean in the application context." + errorMessage);
-		}
-		else {
-			if (!this.applicationContext.containsBean("mongoTemplate")) {
-				throw new BatchConfigurationException(errorMessage);
-			}
-		}
-		return this.applicationContext.getBean("mongoTemplate", MongoOperations.class);
+	private PlatformTransactionManager getDefaultTransactionManager() {
+        return new ResourcelessTransactionManager();
 	}
 
-	@Override
-	protected MongoTransactionManager getTransactionManager() {
-		String errorMessage = " To use the default configuration, a MongoTransactionManager bean named 'transactionManager'"
-				+ " should be defined in the application context but none was found. Override getTransactionManager()"
-				+ " to provide the transaction manager to use for the job repository.";
-		if (this.applicationContext.getBeansOfType(MongoTransactionManager.class).isEmpty()) {
-			throw new BatchConfigurationException(
-					"Unable to find a MongoTransactionManager bean in the application context." + errorMessage);
-		}
-		else {
-			if (!this.applicationContext.containsBean("transactionManager")) {
-				throw new BatchConfigurationException(errorMessage);
-			}
-		}
-		return this.applicationContext.getBean("transactionManager", MongoTransactionManager.class);
-	}
+    /**
+     * Return the value of the {@code validateTransactionState} parameter. Defaults to
+     * {@code true}.
+     * @return true if the transaction state should be validated, false otherwise
+     */
+    private boolean getValidateTransactionState() {
+        return true;
+    }
+
+    /**
+     * Return the transaction isolation level when creating job executions. Defaults to
+     * {@link Isolation#SERIALIZABLE}.
+     * @return the transaction isolation level when creating job executions
+     */
+    private Isolation getIsolationLevelForCreate() {
+        return Isolation.SERIALIZABLE;
+    }
+
+    private JobKeyGenerator getDefaultJobKeyGenerator() {
+        return new DefaultJobKeyGenerator();
+    }
 
 }
