@@ -16,6 +16,7 @@
 package org.springframework.batch.core.step.builder;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -44,6 +45,8 @@ import org.springframework.batch.core.step.StepInterruptionPolicy;
 import org.springframework.batch.core.step.ThreadStepInterruptionPolicy;
 import org.springframework.batch.core.step.item.ChunkOrientedStep;
 import org.springframework.batch.core.step.skip.AlwaysSkipItemSkipPolicy;
+import org.springframework.batch.core.step.skip.LimitCheckingExceptionHierarchySkipPolicy;
+import org.springframework.batch.core.step.skip.SkipLimitExceededException;
 import org.springframework.batch.core.step.skip.SkipPolicy;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
@@ -57,6 +60,7 @@ import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 import org.springframework.transaction.interceptor.TransactionAttribute;
+import org.springframework.util.Assert;
 
 /**
  * A builder for {@link ChunkOrientedStep}. This class extends {@link StepBuilderHelper}
@@ -87,13 +91,21 @@ public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrien
 
 	private boolean faultTolerant;
 
-	private RetryPolicy retryPolicy = throwable -> false;
+	private RetryPolicy retryPolicy;
 
 	private final Set<RetryListener> retryListeners = new LinkedHashSet<>();
 
-	private SkipPolicy skipPolicy = new AlwaysSkipItemSkipPolicy();
+	private final Set<Class<? extends Throwable>> retryableExceptions = new HashSet<>();
+
+	private long retryLimit = -1;
+
+	private SkipPolicy skipPolicy;
 
 	private final Set<SkipListener<I, O>> skipListeners = new LinkedHashSet<>();
+
+	private final Set<Class<? extends Throwable>> skippableExceptions = new HashSet<>();
+
+	private long skipLimit = -1;
 
 	private AsyncTaskExecutor asyncTaskExecutor;
 
@@ -270,6 +282,7 @@ public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrien
 	 * @return this for fluent chaining
 	 */
 	public ChunkOrientedStepBuilder<I, O> retryPolicy(RetryPolicy retryPolicy) {
+		Assert.notNull(retryPolicy, "retryPolicy must not be null");
 		this.retryPolicy = retryPolicy;
 		return self();
 	}
@@ -285,6 +298,18 @@ public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrien
 		return self();
 	}
 
+	@SafeVarargs
+	public final ChunkOrientedStepBuilder<I, O> retry(Class<? extends Throwable>... retryableExceptions) {
+		this.retryableExceptions.addAll(Arrays.stream(retryableExceptions).toList());
+		return self();
+	}
+
+	public ChunkOrientedStepBuilder<I, O> retryLimit(long retryLimit) {
+		Assert.isTrue(retryLimit > 0, "retryLimit must be positive");
+		this.retryLimit = retryLimit;
+		return self();
+	}
+
 	/**
 	 * Set the skip policy for the step. This policy determines how the step handles
 	 * skipping items in case of failures. It can be used to define the conditions under
@@ -294,6 +319,7 @@ public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrien
 	 * @return this for fluent chaining
 	 */
 	public ChunkOrientedStepBuilder<I, O> skipPolicy(SkipPolicy skipPolicy) {
+		Assert.notNull(skipPolicy, "skipPolicy must not be null");
 		this.skipPolicy = skipPolicy;
 		return self();
 	}
@@ -307,6 +333,18 @@ public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrien
 	 */
 	public ChunkOrientedStepBuilder<I, O> skipListener(SkipListener<I, O> skipListener) {
 		this.skipListeners.add(skipListener);
+		return self();
+	}
+
+	@SafeVarargs
+	public final ChunkOrientedStepBuilder<I, O> skip(Class<? extends Throwable>... skippableExceptions) {
+		this.skippableExceptions.addAll(Arrays.stream(skippableExceptions).toList());
+		return self();
+	}
+
+	public ChunkOrientedStepBuilder<I, O> skipLimit(long skipLimit) {
+		Assert.isTrue(skipLimit > 0, "skipLimit must be positive");
+		this.skipLimit = skipLimit;
 		return self();
 	}
 
@@ -326,11 +364,33 @@ public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrien
 	public ChunkOrientedStep<I, O> build() {
 		ChunkOrientedStep<I, O> chunkOrientedStep = new ChunkOrientedStep<>(this.getName(), this.chunkSize, this.reader,
 				this.writer, this.getJobRepository());
-		chunkOrientedStep.setItemProcessor(this.processor);
+		if (this.processor != null) {
+			chunkOrientedStep.setItemProcessor(this.processor);
+		}
 		chunkOrientedStep.setTransactionManager(this.transactionManager);
 		chunkOrientedStep.setTransactionAttribute(this.transactionAttribute);
 		chunkOrientedStep.setInterruptionPolicy(this.interruptionPolicy);
+		if (this.retryPolicy == null) {
+			if (!this.retryableExceptions.isEmpty() || this.retryLimit > 0) {
+				this.retryPolicy = RetryPolicy.builder()
+					.maxAttempts(this.retryLimit)
+					.includes(this.retryableExceptions)
+					.build();
+			}
+			else {
+				this.retryPolicy = throwable -> false;
+			}
+		}
 		chunkOrientedStep.setRetryPolicy(this.retryPolicy);
+		if (this.skipPolicy == null) {
+			if (!this.skippableExceptions.isEmpty() || this.skipLimit > 0) {
+				this.skipPolicy = new LimitCheckingExceptionHierarchySkipPolicy(this.skippableExceptions,
+						this.skipLimit);
+			}
+			else {
+				this.skipPolicy = new AlwaysSkipItemSkipPolicy();
+			}
+		}
 		chunkOrientedStep.setSkipPolicy(this.skipPolicy);
 		chunkOrientedStep.setFaultTolerant(this.faultTolerant);
 		if (this.asyncTaskExecutor != null) {
