@@ -84,7 +84,8 @@ public class SkippableExceptionDuringReadSample {
 
 	@Bean
 	public Step step(JobRepository jobRepository) {
-		return new StepBuilder("step", jobRepository).<Integer, Integer>chunk(3).transactionManager(this.transactionManager)
+		return new StepBuilder("step", jobRepository).<Integer, Integer>chunk(3)
+			.transactionManager(this.transactionManager)
 			.reader(itemReader())
 			.processor(itemProcessor())
 			.writer(itemWriter())
