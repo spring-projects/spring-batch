@@ -15,7 +15,6 @@
  */
 package org.springframework.batch.core.launch.support;
 
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

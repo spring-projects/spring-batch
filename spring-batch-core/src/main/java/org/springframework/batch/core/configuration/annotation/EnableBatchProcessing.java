@@ -15,7 +15,6 @@
  */
 package org.springframework.batch.core.configuration.annotation;
 
-import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.configuration.support.ApplicationContextFactory;
 import org.springframework.batch.core.configuration.support.AutomaticJobRegistrar;
 import org.springframework.batch.core.configuration.support.GroupAwareJob;

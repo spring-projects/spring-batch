@@ -46,7 +46,6 @@ import org.springframework.batch.core.step.ThreadStepInterruptionPolicy;
 import org.springframework.batch.core.step.item.ChunkOrientedStep;
 import org.springframework.batch.core.step.skip.AlwaysSkipItemSkipPolicy;
 import org.springframework.batch.core.step.skip.LimitCheckingExceptionHierarchySkipPolicy;
-import org.springframework.batch.core.step.skip.SkipLimitExceededException;
 import org.springframework.batch.core.step.skip.SkipPolicy;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;

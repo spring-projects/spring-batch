@@ -16,7 +16,6 @@
 package org.springframework.batch.core.configuration.support;
 
 import org.springframework.batch.core.configuration.BatchConfigurationException;
-import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MongoJobRepositoryFactoryBean;

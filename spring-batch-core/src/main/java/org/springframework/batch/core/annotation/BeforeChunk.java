@@ -21,7 +21,6 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.springframework.batch.core.listener.ChunkListener;
-import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.item.Chunk;
 
 /**
