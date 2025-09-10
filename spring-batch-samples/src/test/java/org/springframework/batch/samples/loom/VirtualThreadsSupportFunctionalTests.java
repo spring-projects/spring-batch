@@ -65,7 +65,7 @@ import org.springframework.core.task.VirtualThreadTaskExecutor;
  * @author Mahmoud Ben Hassine
  */
 @EnabledForJreRange(min = JRE.JAVA_21)
-public class VirtualThreadsSupportTests {
+public class VirtualThreadsSupportFunctionalTests {
 
 	@Test
 	public void testJobLaunchingWithVirtualThreads() throws Exception {

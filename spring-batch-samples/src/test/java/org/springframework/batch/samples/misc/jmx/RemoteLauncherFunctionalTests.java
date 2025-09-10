@@ -46,9 +46,9 @@ import static org.junit.jupiter.api.Assertions.fail;
  *
  */
 @SuppressWarnings("removal")
-class RemoteLauncherTests {
+class RemoteLauncherFunctionalTests {
 
-	private static final Log logger = LogFactory.getLog(RemoteLauncherTests.class);
+	private static final Log logger = LogFactory.getLog(RemoteLauncherFunctionalTests.class);
 
 	private static final List<Exception> errors = new ArrayList<>();
 

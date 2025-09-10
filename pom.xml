@@ -199,6 +199,7 @@
 					<argLine>${surefireArgLine}</argLine>
 					<excludes>
 						<exclude>**/*IntegrationTests.java</exclude>
+						<exclude>**/*FunctionalTests.java</exclude>
 					</excludes>
 				</configuration>
 			</plugin>
@@ -209,6 +210,7 @@
 				<configuration>
 					<includes>
 						<include>**/*IntegrationTests.java</include>
+                        <include>**/*FunctionalTests.java</include>
 					</includes>
 				</configuration>
 				<executions>
