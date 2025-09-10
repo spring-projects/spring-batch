@@ -29,6 +29,16 @@ import org.springframework.batch.core.job.UnexpectedJobExecutionException;
 public class SkipListenerFailedException extends UnexpectedJobExecutionException {
 
 	/**
+	 * Create a new {@link SkipListenerFailedException}.
+	 * @param message the exception message
+	 * @param throwable the error that was thrown by a {@link SkipListener}
+	 * @since 6.0
+	 */
+	public SkipListenerFailedException(String message, Throwable throwable) {
+		super(message, throwable);
+	}
+
+	/**
 	 * @param message describes the error to the user
 	 * @param ex the exception that was thrown by a {@link SkipListener}
 	 * @param t the exception that caused the skip

@@ -44,6 +44,7 @@ import org.springframework.batch.core.step.FatalStepExecutionException;
 import org.springframework.batch.core.step.StepInterruptionPolicy;
 import org.springframework.batch.core.step.ThreadStepInterruptionPolicy;
 import org.springframework.batch.core.step.skip.AlwaysSkipItemSkipPolicy;
+import org.springframework.batch.core.step.skip.SkipListenerFailedException;
 import org.springframework.batch.core.step.skip.SkipPolicy;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
@@ -516,8 +517,13 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 	private void doSkipInRead(RetryException retryException, StepContribution contribution) {
 		Throwable cause = retryException.getCause();
 		if (this.skipPolicy.shouldSkip(cause, contribution.getStepSkipCount())) {
-			this.compositeSkipListener.onSkipInRead(cause);
-			contribution.incrementReadSkipCount();
+			try {
+				this.compositeSkipListener.onSkipInRead(cause);
+				contribution.incrementReadSkipCount();
+			}
+			catch (Throwable throwable) {
+				throw new SkipListenerFailedException("Unable to apply onSkipInRead", throwable);
+			}
 		}
 	}
 
@@ -589,8 +595,13 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 	private void doSkipInProcess(I item, RetryException retryException, StepContribution contribution) {
 		Throwable cause = retryException.getCause();
 		if (this.skipPolicy.shouldSkip(cause, contribution.getStepSkipCount())) {
-			this.compositeSkipListener.onSkipInProcess(item, retryException.getCause());
-			contribution.incrementProcessSkipCount();
+			try {
+				this.compositeSkipListener.onSkipInProcess(item, retryException.getCause());
+				contribution.incrementProcessSkipCount();
+			}
+			catch (Throwable throwable) {
+				throw new SkipListenerFailedException("Unable to apply onSkipInProcess", throwable);
+			}
 		}
 	}
 
@@ -646,8 +657,13 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			}
 			catch (Exception exception) {
 				if (this.skipPolicy.shouldSkip(exception, contribution.getStepSkipCount())) {
-					this.compositeSkipListener.onSkipInWrite(item, exception);
-					contribution.incrementWriteSkipCount();
+					try {
+						this.compositeSkipListener.onSkipInWrite(item, exception);
+						contribution.incrementWriteSkipCount();
+					}
+					catch (Throwable throwable) {
+						throw new SkipListenerFailedException("Unable to apply onSkipInWrite", throwable);
+					}
 				}
 				else {
 					logger.error("Failed to write item: " + item, exception);
