@@ -24,6 +24,9 @@ import org.springframework.batch.item.Chunk;
  * <p>
  * {@link ChunkListener} shouldn't throw exceptions and expect continued processing, they
  * must be handled in the implementation or the step will terminate.
+ * <p>
+ * <strong>Note: This listener is not called in concurrent steps.</strong>
+ * </p>
  *
  * @author Lucas Ward
  * @author Michael Minella
@@ -78,14 +81,16 @@ public interface ChunkListener<I, O> extends StepListener {
 	}
 
 	/**
-	 * Callback before the chunk is processed, inside the transaction.
+	 * Callback before the chunk is processed, inside the transaction. This method is not
+	 * called in concurrent steps.
 	 * @since 6.0
 	 */
 	default void beforeChunk(Chunk<I> chunk) {
 	}
 
 	/**
-	 * Callback after the chunk is written, inside the transaction.
+	 * Callback after the chunk is written, inside the transaction. This method is not
+	 * called in concurrent steps.
 	 * @since 6.0
 	 */
 	default void afterChunk(Chunk<O> chunk) {
@@ -95,7 +100,7 @@ public interface ChunkListener<I, O> extends StepListener {
 	 * Callback if an exception occurs while processing or writing a chunk, inside the
 	 * transaction, which is about to be rolled back. <em>As a result, you should use
 	 * {@code PROPAGATION_REQUIRES_NEW} for any transactional operation that is called
-	 * here.</em>
+	 * here</em>. This method is not called in concurrent steps.
 	 * @param exception the exception that caused the underlying rollback.
 	 * @param chunk the processed chunk
 	 * @since 6.0
