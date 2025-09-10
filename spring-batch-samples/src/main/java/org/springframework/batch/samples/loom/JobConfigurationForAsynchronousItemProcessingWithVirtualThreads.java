@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 the original author or authors.
+ * Copyright 2023-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -77,7 +77,8 @@ public class JobConfigurationForAsynchronousItemProcessingWithVirtualThreads {
 	public Job job(JobRepository jobRepository, JdbcTransactionManager transactionManager,
 			ItemReader<Integer> itemReader, AsyncItemProcessor<Integer, Integer> itemProcessor,
 			AsyncItemWriter<Integer> itemWriter) {
-		Step step = new StepBuilder("step", jobRepository).<Integer, Future<Integer>>chunk(2, transactionManager)
+		Step step = new StepBuilder("step", jobRepository).<Integer, Future<Integer>>chunk(2)
+			.transactionManager(transactionManager)
 			.reader(itemReader)
 			.processor(itemProcessor)
 			.writer(itemWriter)

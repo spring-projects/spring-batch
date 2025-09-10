@@ -28,7 +28,7 @@ The following code fragment shows an example of a start limit configuration in J
 @Bean
 public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
 	return new StepBuilder("step1", jobRepository)
-				.<String, String>chunk(10, transactionManager)
+				.<String, String>chunk(10).transactionManager(transactionManager)
 				.reader(itemReader())
 				.writer(itemWriter())
 				.startLimit(1)
@@ -80,7 +80,7 @@ The following code fragment shows how to define a restartable job in Java:
 @Bean
 public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
 	return new StepBuilder("step1", jobRepository)
-				.<String, String>chunk(10, transactionManager)
+				.<String, String>chunk(10).transactionManager(transactionManager)
 				.reader(itemReader())
 				.writer(itemWriter())
 				.allowStartIfComplete(true)
@@ -132,7 +132,7 @@ public Job footballJob(JobRepository jobRepository, Step playerLoad, Step gameLo
 @Bean
 public Step playerLoad(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
 	return new StepBuilder("playerLoad", jobRepository)
-			.<String, String>chunk(10, transactionManager)
+			.<String, String>chunk(10).transactionManager(transactionManager)
 			.reader(playerFileItemReader())
 			.writer(playerWriter())
 			.build();
@@ -142,7 +142,7 @@ public Step playerLoad(JobRepository jobRepository, PlatformTransactionManager t
 public Step gameLoad(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
 	return new StepBuilder("gameLoad", jobRepository)
 			.allowStartIfComplete(true)
-			.<String, String>chunk(10, transactionManager)
+			.<String, String>chunk(10).transactionManager(transactionManager)
 			.reader(gameFileItemReader())
 			.writer(gameWriter())
 			.build();
@@ -152,7 +152,7 @@ public Step gameLoad(JobRepository jobRepository, PlatformTransactionManager tra
 public Step playerSummarization(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
 	return new StepBuilder("playerSummarization", jobRepository)
 			.startLimit(2)
-			.<String, String>chunk(10, transactionManager)
+			.<String, String>chunk(10).transactionManager(transactionManager)
 			.reader(playerSummarizationSource())
 			.writer(summaryWriter())
 			.build();

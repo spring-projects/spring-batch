@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 the original author or authors.
+ * Copyright 2023-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -129,7 +129,8 @@ public class MultiRecordTypeJobConfiguration {
 	public Job job(JobRepository jobRepository, JdbcTransactionManager transactionManager,
 			FlatFileItemReader itemReader, FlatFileItemWriter itemWriter) {
 		return new JobBuilder("ioSampleJob", jobRepository)
-			.start(new StepBuilder("step1", jobRepository).chunk(2, transactionManager)
+			.start(new StepBuilder("step1", jobRepository).chunk(2)
+				.transactionManager(transactionManager)
 				.reader(itemReader)
 				.writer(itemWriter)
 				.build())

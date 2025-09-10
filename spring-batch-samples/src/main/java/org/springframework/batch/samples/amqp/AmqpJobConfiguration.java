@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 the original author or authors.
+ * Copyright 2023-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,7 +54,8 @@ public class AmqpJobConfiguration {
 	@Bean
 	public Step step(JobRepository jobRepository, JdbcTransactionManager transactionManager,
 			RabbitTemplate rabbitInputTemplate, RabbitTemplate rabbitOutputTemplate) {
-		return new StepBuilder("step", jobRepository).<String, String>chunk(1, transactionManager)
+		return new StepBuilder("step", jobRepository).<String, String>chunk(1)
+			.transactionManager(transactionManager)
 			.reader(amqpItemReader(rabbitInputTemplate))
 			.processor(new MessageProcessor())
 			.writer(amqpItemWriter(rabbitOutputTemplate))

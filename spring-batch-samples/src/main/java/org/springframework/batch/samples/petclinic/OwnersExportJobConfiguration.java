@@ -61,7 +61,8 @@ public class OwnersExportJobConfiguration {
 	public Job job(JobRepository jobRepository, JdbcTransactionManager transactionManager,
 			JdbcCursorItemReader<Owner> ownersReader, FlatFileItemWriter<Owner> ownersWriter) {
 		return new JobBuilder("ownersExportJob", jobRepository)
-			.start(new StepBuilder("ownersExportStep", jobRepository).<Owner, Owner>chunk(5, transactionManager)
+			.start(new StepBuilder("ownersExportStep", jobRepository).<Owner, Owner>chunk(5)
+				.transactionManager(transactionManager)
 				.reader(ownersReader)
 				.writer(ownersWriter)
 				.build())

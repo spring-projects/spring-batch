@@ -25,7 +25,7 @@ public Step step1(JobRepository jobRepository, PlatformTransactionManager transa
 	attribute.setTimeout(30);
 
 	return new StepBuilder("step1", jobRepository)
-				.<String, String>chunk(2, transactionManager)
+				.<String, String>chunk(2).transactionManager(transactionManager)
 				.reader(itemReader())
 				.writer(itemWriter())
 				.transactionAttribute(attribute)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2023 the original author or authors.
+ * Copyright 2018-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,7 +69,8 @@ public class JsonJobConfiguration {
 	@Bean
 	public Step step(JobRepository jobRepository, JdbcTransactionManager transactionManager,
 			JsonItemReader<Trade> itemReader, JsonFileItemWriter<Trade> itemWriter) {
-		return new StepBuilder("step", jobRepository).<Trade, Trade>chunk(2, transactionManager)
+		return new StepBuilder("step", jobRepository).<Trade, Trade>chunk(2)
+			.transactionManager(transactionManager)
 			.reader(itemReader)
 			.writer(itemWriter)
 			.build();

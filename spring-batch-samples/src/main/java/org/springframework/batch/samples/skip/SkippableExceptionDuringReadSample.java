@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2023 the original author or authors.
+ * Copyright 2019-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,7 +84,7 @@ public class SkippableExceptionDuringReadSample {
 
 	@Bean
 	public Step step(JobRepository jobRepository) {
-		return new StepBuilder("step", jobRepository).<Integer, Integer>chunk(3, this.transactionManager)
+		return new StepBuilder("step", jobRepository).<Integer, Integer>chunk(3).transactionManager(this.transactionManager)
 			.reader(itemReader())
 			.processor(itemProcessor())
 			.writer(itemWriter())

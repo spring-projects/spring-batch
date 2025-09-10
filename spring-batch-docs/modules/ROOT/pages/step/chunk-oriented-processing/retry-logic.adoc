@@ -20,7 +20,7 @@ In Java, retry should be configured as follows:
 @Bean
 public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
 	return new StepBuilder("step1", jobRepository)
-				.<String, String>chunk(2, transactionManager)
+				.<String, String>chunk(2).transactionManager(transactionManager)
 				.reader(itemReader())
 				.writer(itemWriter())
 				.faultTolerant()

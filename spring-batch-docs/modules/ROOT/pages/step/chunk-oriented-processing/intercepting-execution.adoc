@@ -27,7 +27,7 @@ The following example shows a listener applied at the chunk level in Java:
 @Bean
 public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
 	return new StepBuilder("step1", jobRepository)
-				.<String, String>chunk(10, transactionManager)
+				.<String, String>chunk(10).transactionManager(transactionManager)
 				.reader(reader())
 				.writer(writer())
 				.listener(chunkListener())

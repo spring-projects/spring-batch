@@ -22,7 +22,7 @@ The following Java example shows an example of using a skip limit:
 @Bean
 public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
 	return new StepBuilder("step1", jobRepository)
-				.<String, String>chunk(10, transactionManager)
+				.<String, String>chunk(10).transactionManager(transactionManager)
 				.reader(flatFileItemReader())
 				.writer(itemWriter())
 				.faultTolerant()
@@ -83,7 +83,7 @@ The following Java example shows an example excluding a particular exception:
 @Bean
 public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
 	return new StepBuilder("step1", jobRepository)
-				.<String, String>chunk(10, transactionManager)
+				.<String, String>chunk(10).transactionManager(transactionManager)
 				.reader(flatFileItemReader())
 				.writer(itemWriter())
 				.faultTolerant()

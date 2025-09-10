@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2024 the original author or authors.
+ * Copyright 2020-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,7 +67,8 @@ public class DeletionJobConfiguration {
 	@Bean
 	public Step deletionStep(JobRepository jobRepository, PlatformTransactionManager transactionManager,
 			MongoPagingItemReader<Person> mongoPersonReader, MongoItemWriter<Person> mongoPersonRemover) {
-		return new StepBuilder("step", jobRepository).<Person, Person>chunk(2, transactionManager)
+		return new StepBuilder("step", jobRepository).<Person, Person>chunk(2)
+			.transactionManager(transactionManager)
 			.reader(mongoPersonReader)
 			.writer(mongoPersonRemover)
 			.build();

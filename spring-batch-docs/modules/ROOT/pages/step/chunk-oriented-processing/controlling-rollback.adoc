@@ -21,7 +21,7 @@ In Java, you can control rollback as follows:
 @Bean
 public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
 	return new StepBuilder("step1", jobRepository)
-				.<String, String>chunk(2, transactionManager)
+				.<String, String>chunk(2).transactionManager(transactionManager)
 				.reader(itemReader())
 				.writer(itemWriter())
 				.faultTolerant()
@@ -75,7 +75,7 @@ The following example shows how to create a reader that does not buffer items in
 @Bean
 public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
 	return new StepBuilder("step1", jobRepository)
-				.<String, String>chunk(2, transactionManager)
+				.<String, String>chunk(2).transactionManager(transactionManager)
 				.reader(itemReader())
 				.writer(itemWriter())
 				.readerIsTransactionalQueue()

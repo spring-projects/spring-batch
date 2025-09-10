@@ -101,7 +101,7 @@ public Job ioSampleJob(JobRepository jobRepository, Step step1) {
 @Bean
 public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
 	return new StepBuilder("step1", jobRepository)
-				.<Foo, Bar>chunk(2, transactionManager)
+				.<Foo, Bar>chunk(2).transactionManager(transactionManager)
 				.reader(fooReader())
 				.processor(fooProcessor())
 				.writer(barWriter())
@@ -205,7 +205,7 @@ public Job ioSampleJob(JobRepository jobRepository, Step step1) {
 @Bean
 public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
 	return new StepBuilder("step1", jobRepository)
-				.<Foo, Foobar>chunk(2, transactionManager)
+				.<Foo, Foobar>chunk(2).transactionManager(transactionManager)
 				.reader(fooReader())
 				.processor(compositeProcessor())
 				.writer(foobarWriter())

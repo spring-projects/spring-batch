@@ -120,7 +120,8 @@ public class CompositeItemReaderSampleFunctionalTests {
 		@Bean
 		public Job job(JobRepository jobRepository, JdbcTransactionManager transactionManager) {
 			return new JobBuilder("job", jobRepository)
-				.start(new StepBuilder("step", jobRepository).<Person, Person>chunk(5, transactionManager)
+				.start(new StepBuilder("step", jobRepository).<Person, Person>chunk(5)
+					.transactionManager(transactionManager)
 					.reader(itemReader())
 					.writer(itemWriter())
 					.build())
