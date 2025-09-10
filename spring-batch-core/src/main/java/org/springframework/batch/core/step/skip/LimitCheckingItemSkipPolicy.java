@@ -49,7 +49,10 @@ import org.springframework.classify.Classifier;
  * @author Dave Syer
  * @author Dan Garrette
  * @author Mahmoud Ben Hassine
+ * @deprecated Since 6.0, use {@link LimitCheckingExceptionHierarchySkipPolicy} instead.
+ * Scheduled for removal in 7.0.
  */
+@Deprecated(since = "6.0", forRemoval = true)
 public class LimitCheckingItemSkipPolicy implements SkipPolicy {
 
 	private long skipLimit;
