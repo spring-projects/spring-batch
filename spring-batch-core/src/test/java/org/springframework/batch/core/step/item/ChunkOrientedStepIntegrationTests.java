@@ -145,7 +145,7 @@ public class ChunkOrientedStepIntegrationTests {
 		Assertions.assertEquals(ExitStatus.FAILED.getExitCode(), stepExecutionExitStatus.getExitCode());
 		Assertions.assertTrue(stepExecutionExitStatus.getExitDescription()
 			.contains("Unable to process item Person[id=1, name=foo1]"));
-		Assertions.assertEquals(0, stepExecution.getReadCount());
+		Assertions.assertEquals(2, stepExecution.getReadCount());
 		Assertions.assertEquals(0, stepExecution.getWriteCount());
 		Assertions.assertEquals(0, stepExecution.getCommitCount());
 		Assertions.assertEquals(1, stepExecution.getRollbackCount());
@@ -175,7 +175,7 @@ public class ChunkOrientedStepIntegrationTests {
 		Assertions.assertEquals(ExitStatus.FAILED.getExitCode(), stepExecutionExitStatus.getExitCode());
 		Assertions.assertTrue(stepExecutionExitStatus.getExitDescription()
 			.contains("Unable to process item Person[id=1, name=foo1]"));
-		Assertions.assertEquals(0, stepExecution.getReadCount());
+		Assertions.assertEquals(2, stepExecution.getReadCount());
 		Assertions.assertEquals(0, stepExecution.getWriteCount());
 		Assertions.assertEquals(0, stepExecution.getCommitCount());
 		Assertions.assertEquals(1, stepExecution.getRollbackCount());
@@ -268,14 +268,13 @@ public class ChunkOrientedStepIntegrationTests {
 		Throwable failureException = stepExecution.getFailureExceptions().iterator().next();
 		Assertions.assertInstanceOf(FatalStepExecutionException.class, failureException);
 		Assertions.assertInstanceOf(SkipLimitExceededException.class, failureException.getCause());
-		Assertions.assertEquals(2, stepExecution.getReadCount());
+		Assertions.assertEquals(3, stepExecution.getReadCount());
 		Assertions.assertEquals(2, stepExecution.getWriteCount());
 		Assertions.assertEquals(1, stepExecution.getCommitCount());
 		Assertions.assertEquals(1, stepExecution.getRollbackCount());
-		// contribution not applied on second chunk rollback
-		Assertions.assertEquals(0, stepExecution.getReadSkipCount());
+		Assertions.assertEquals(1, stepExecution.getReadSkipCount());
 		Assertions.assertEquals(0, stepExecution.getWriteSkipCount());
-		Assertions.assertEquals(0, stepExecution.getSkipCount());
+		Assertions.assertEquals(1, stepExecution.getSkipCount());
 		Assertions.assertEquals(2, JdbcTestUtils.countRowsInTable(jdbcTemplate, "person_target"));
 		System.clearProperty("skipLimit");
 	}
@@ -303,14 +302,13 @@ public class ChunkOrientedStepIntegrationTests {
 		Throwable failureException = stepExecution.getFailureExceptions().iterator().next();
 		Assertions.assertInstanceOf(FatalStepExecutionException.class, failureException);
 		Assertions.assertInstanceOf(SkipLimitExceededException.class, failureException.getCause());
-		Assertions.assertEquals(2, stepExecution.getReadCount());
+		Assertions.assertEquals(3, stepExecution.getReadCount());
 		Assertions.assertEquals(2, stepExecution.getWriteCount());
 		Assertions.assertEquals(1, stepExecution.getCommitCount());
 		Assertions.assertEquals(1, stepExecution.getRollbackCount());
-		// contribution not applied on second chunk rollback
-		Assertions.assertEquals(0, stepExecution.getReadSkipCount());
+		Assertions.assertEquals(1, stepExecution.getReadSkipCount());
 		Assertions.assertEquals(0, stepExecution.getWriteSkipCount());
-		Assertions.assertEquals(0, stepExecution.getSkipCount());
+		Assertions.assertEquals(1, stepExecution.getSkipCount());
 		Assertions.assertEquals(2, JdbcTestUtils.countRowsInTable(jdbcTemplate, "person_target"));
 		System.clearProperty("skipLimit");
 	}

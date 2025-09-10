@@ -391,20 +391,18 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 
 			// write processed items
 			writeChunk(processedChunk, contribution);
-
-			// apply contribution and update job repository
-			stepExecution.apply(contribution);
 			stepExecution.incrementCommitCount();
-			this.compositeItemStream.update(stepExecution.getExecutionContext());
-			getJobRepository().update(stepExecution);
-			getJobRepository().updateExecutionContext(stepExecution);
-
 		}
 		catch (Exception e) {
 			logger.error("Rolling back chunk transaction", e);
 			status.setRollbackOnly();
 			stepExecution.incrementRollbackCount();
 			throw new FatalStepExecutionException("Unable to process chunk", e);
+		}
+		finally {
+			// apply contribution and update streams
+			stepExecution.apply(contribution);
+			this.compositeItemStream.update(stepExecution.getExecutionContext());
 		}
 
 	}
@@ -422,13 +420,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			processedChunk = processChunk(inputChunk, contribution);
 			writeChunk(processedChunk, contribution);
 			compositeChunkListener.afterChunk(processedChunk);
-
-			// apply contribution and update job repository
-			stepExecution.apply(contribution);
 			stepExecution.incrementCommitCount();
-			compositeItemStream.update(stepExecution.getExecutionContext());
-			getJobRepository().update(stepExecution);
-			getJobRepository().updateExecutionContext(stepExecution);
 		}
 		catch (Exception e) {
 			logger.error("Rolling back chunk transaction", e);
@@ -436,6 +428,11 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			stepExecution.incrementRollbackCount();
 			compositeChunkListener.onChunkError(e, processedChunk);
 			throw new FatalStepExecutionException("Unable to process chunk", e);
+		}
+		finally {
+			// apply contribution and update streams
+			stepExecution.apply(contribution);
+			compositeItemStream.update(stepExecution.getExecutionContext());
 		}
 	}
 
