@@ -32,7 +32,6 @@ import org.springframework.batch.test.JobOperatorTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
@@ -48,7 +47,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 		"/simple-job-launcher-context.xml" })
 class MultiLineFunctionalTests {
 
-	private static final String INPUT_FILE = "org/springframework/batch/samples/file/multiline/data/multiLine.txt";
+	private static final String INPUT_FILE = "src/main/resources/org/springframework/batch/samples/file/multiline/data/multiLine.txt";
 
 	private static final String OUTPUT_FILE = "target/test-outputs/multiLineOutput.txt";
 
@@ -66,7 +65,7 @@ class MultiLineFunctionalTests {
 
 		// then
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
-		Path inputFile = new ClassPathResource(INPUT_FILE).getFile().toPath();
+		Path inputFile = new FileSystemResource(INPUT_FILE).getFile().toPath();
 		Path outputFile = new FileSystemResource(OUTPUT_FILE).getFile().toPath();
 		Assertions.assertLinesMatch(Files.lines(inputFile), Files.lines(outputFile));
 	}
@@ -86,7 +85,7 @@ class MultiLineFunctionalTests {
 
 		// then
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
-		Path inputFile = new ClassPathResource(INPUT_FILE).getFile().toPath();
+		Path inputFile = new FileSystemResource(INPUT_FILE).getFile().toPath();
 		Path outputFile = new FileSystemResource(OUTPUT_FILE).getFile().toPath();
 		Assertions.assertLinesMatch(Files.lines(inputFile), Files.lines(outputFile));
 	}

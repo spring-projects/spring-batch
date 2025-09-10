@@ -55,9 +55,9 @@
 	<bean id="footerCallback" class="org.springframework.batch.samples.support.SummaryFooterCallback" />
 	<bean id="headerCopier"
 		class="org.springframework.batch.samples.support.HeaderCopyCallback" />
-	<bean id="inputResource" class="org.springframework.core.io.ClassPathResource">
+	<bean id="inputResource" class="org.springframework.core.io.FileSystemResource">
 		<constructor-arg type="java.lang.String"
-			value="org/springframework/batch/samples/headerfooter/data/input.txt" />
+			value="src/main/resources/org/springframework/batch/samples/headerfooter/data/input.txt" />
 	</bean>
 	<bean id="outputResource" class="org.springframework.core.io.FileSystemResource">
 		<constructor-arg type="java.lang.String"

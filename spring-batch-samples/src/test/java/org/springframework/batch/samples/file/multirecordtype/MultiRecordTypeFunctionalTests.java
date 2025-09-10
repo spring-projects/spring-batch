@@ -32,7 +32,6 @@ import org.springframework.batch.test.JobOperatorTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
@@ -50,7 +49,7 @@ class MultiRecordTypeFunctionalTests {
 
 	private static final String OUTPUT_FILE = "target/test-outputs/multiRecordTypeOutput.txt";
 
-	private static final String INPUT_FILE = "org/springframework/batch/samples/file/multirecordtype/data/multiRecordType.txt";
+	private static final String INPUT_FILE = "src/main/resources/org/springframework/batch/samples/file/multirecordtype/data/multiRecordType.txt";
 
 	@Autowired
 	private JobOperatorTestUtils jobOperatorTestUtils;
@@ -67,7 +66,7 @@ class MultiRecordTypeFunctionalTests {
 
 		// then
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
-		Path inputFile = new ClassPathResource(INPUT_FILE).getFile().toPath();
+		Path inputFile = new FileSystemResource(INPUT_FILE).getFile().toPath();
 		Path outputFile = new FileSystemResource(OUTPUT_FILE).getFile().toPath();
 		Assertions.assertLinesMatch(Files.lines(inputFile), Files.lines(outputFile));
 	}
@@ -87,7 +86,7 @@ class MultiRecordTypeFunctionalTests {
 
 		// then
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
-		Path inputFile = new ClassPathResource(INPUT_FILE).getFile().toPath();
+		Path inputFile = new FileSystemResource(INPUT_FILE).getFile().toPath();
 		Path outputFile = new FileSystemResource(OUTPUT_FILE).getFile().toPath();
 		Assertions.assertLinesMatch(Files.lines(inputFile), Files.lines(outputFile));
 	}

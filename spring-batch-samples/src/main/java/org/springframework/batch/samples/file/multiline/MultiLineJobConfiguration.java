@@ -34,7 +34,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.core.io.Resource;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.WritableResource;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 
@@ -45,7 +45,7 @@ public class MultiLineJobConfiguration {
 
 	@Bean
 	@StepScope
-	public MultiLineTradeItemReader itemReader(@Value("#{jobParameters[inputFile]}") Resource resource) {
+	public MultiLineTradeItemReader itemReader(@Value("#{jobParameters[inputFile]}") FileSystemResource resource) {
 		FlatFileItemReader<FieldSet> delegate = new FlatFileItemReaderBuilder<FieldSet>().name("delegateItemReader")
 			.resource(resource)
 			.lineTokenizer(new DelimitedLineTokenizer())

@@ -23,7 +23,6 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.test.JobOperatorTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
@@ -35,7 +34,7 @@ class PatternMatchingJobFunctionalTests {
 
 	private static final String ACTUAL = "target/test-outputs/multilineOrderOutput.txt";
 
-	private static final String EXPECTED = "org/springframework/batch/samples/file/patternmatching/data/multilineOrderOutput.txt";
+	private static final String EXPECTED = "src/main/resources/org/springframework/batch/samples/file/patternmatching/data/multilineOrderOutput.txt";
 
 	@Autowired
 	private JobOperatorTestUtils jobOperatorTestUtils;
@@ -43,7 +42,7 @@ class PatternMatchingJobFunctionalTests {
 	@Test
 	void testJobLaunch() throws Exception {
 		this.jobOperatorTestUtils.startJob();
-		Path expectedFile = new ClassPathResource(EXPECTED).getFile().toPath();
+		Path expectedFile = new FileSystemResource(EXPECTED).getFile().toPath();
 		Path actualFile = new FileSystemResource(ACTUAL).getFile().toPath();
 		assertLinesMatch(Files.lines(expectedFile), Files.lines(actualFile));
 	}

@@ -41,7 +41,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.core.io.Resource;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.WritableResource;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 
@@ -56,7 +56,7 @@ public class MultiRecordTypeJobConfiguration {
 	@Bean
 	@StepScope
 	public FlatFileItemReader itemReader(PatternMatchingCompositeLineMapper lineMapper,
-			@Value("#{jobParameters[inputFile]}") Resource resource) {
+			@Value("#{jobParameters[inputFile]}") FileSystemResource resource) {
 		return new FlatFileItemReaderBuilder().name("itemReader").resource(resource).lineMapper(lineMapper).build();
 	}
 
