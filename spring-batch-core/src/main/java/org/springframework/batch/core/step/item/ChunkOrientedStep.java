@@ -343,12 +343,9 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 		stepExecution.getExecutionContext().put(STEP_TYPE_KEY, this.getClass().getName());
 		while (this.chunkTracker.moreItems() && !interrupted(stepExecution)) {
 			// process next chunk in its own transaction
-			this.transactionTemplate.execute(new TransactionCallbackWithoutResult() {
-				@Override
-				protected void doInTransactionWithoutResult(TransactionStatus status) {
-					StepContribution contribution = stepExecution.createStepContribution();
-					processNextChunk(status, contribution, stepExecution);
-				}
+			this.transactionTemplate.executeWithoutResult(transactionStatus -> {
+				StepContribution contribution = stepExecution.createStepContribution();
+				processNextChunk(transactionStatus, contribution, stepExecution);
 			});
 		}
 	}
