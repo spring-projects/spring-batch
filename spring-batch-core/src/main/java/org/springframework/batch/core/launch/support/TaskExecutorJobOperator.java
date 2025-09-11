@@ -27,6 +27,7 @@ import org.springframework.batch.core.launch.JobExecutionNotRunningException;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.launch.NoSuchJobExecutionException;
+import org.springframework.batch.core.observability.jfr.events.job.JobLaunchEvent;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
@@ -92,6 +93,7 @@ public class TaskExecutorJobOperator extends SimpleJobOperator {
 			JobRestartException, JobParametersInvalidException {
 		Assert.notNull(job, "Job must not be null");
 		Assert.notNull(jobParameters, "JobParameters must not be null");
+		new JobLaunchEvent(job.getName(), jobParameters.toString()).commit();
 		return super.start(job, jobParameters);
 	}
 

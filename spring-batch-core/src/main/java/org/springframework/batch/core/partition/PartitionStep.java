@@ -18,6 +18,8 @@ package org.springframework.batch.core.partition;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.job.JobExecutionException;
+import org.springframework.batch.core.observability.jfr.events.step.partition.PartitionAggregateEvent;
+import org.springframework.batch.core.observability.jfr.events.step.partition.PartitionSplitEvent;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.partition.support.DefaultStepExecutionAggregator;
@@ -97,10 +99,21 @@ public class PartitionStep extends AbstractStep {
 	protected void doExecute(StepExecution stepExecution) throws Exception {
 		stepExecution.getExecutionContext().put(STEP_TYPE_KEY, this.getClass().getName());
 
-		// Wait for task completion and then aggregate the results
+		// Split execution into partitions and wait for task completion
+		PartitionSplitEvent partitionSplitEvent = new PartitionSplitEvent(stepExecution.getStepName(),
+				stepExecution.getId());
+		partitionSplitEvent.begin();
 		Collection<StepExecution> executions = partitionHandler.handle(stepExecutionSplitter, stepExecution);
+		partitionSplitEvent.partitionCount = executions.size();
 		stepExecution.upgradeStatus(BatchStatus.COMPLETED);
+		partitionSplitEvent.commit();
+
+		// aggregate the results of the executions
+		PartitionAggregateEvent partitionAggregateEvent = new PartitionAggregateEvent(stepExecution.getStepName(),
+				stepExecution.getId());
+		partitionAggregateEvent.begin();
 		stepExecutionAggregator.aggregate(stepExecution, executions);
+		partitionAggregateEvent.commit();
 
 		// If anything failed or had a problem we need to crap out
 		if (stepExecution.getStatus().isUnsuccessful()) {

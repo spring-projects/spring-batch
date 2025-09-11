@@ -34,6 +34,8 @@ import org.springframework.batch.core.listener.ItemProcessListener;
 import org.springframework.batch.core.listener.ItemReadListener;
 import org.springframework.batch.core.listener.ItemWriteListener;
 import org.springframework.batch.core.listener.SkipListener;
+import org.springframework.batch.core.observability.BatchMetrics;
+import org.springframework.batch.core.observability.jfr.events.step.chunk.*;
 import org.springframework.batch.core.scope.context.StepContext;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.batch.core.step.StepContribution;
@@ -344,8 +346,14 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 		while (this.chunkTracker.moreItems() && !interrupted(stepExecution)) {
 			// process next chunk in its own transaction
 			this.transactionTemplate.executeWithoutResult(transactionStatus -> {
+				ChunkTransactionEvent chunkTransactionEvent = new ChunkTransactionEvent(stepExecution.getStepName(),
+						stepExecution.getId());
+				chunkTransactionEvent.begin();
 				StepContribution contribution = stepExecution.createStepContribution();
 				processNextChunk(transactionStatus, contribution, stepExecution);
+				chunkTransactionEvent.transactionStatus = transactionStatus.isRollbackOnly()
+						? BatchMetrics.STATUS_ROLLED_BACK : BatchMetrics.STATUS_COMMITTED;
+				chunkTransactionEvent.commit();
 			});
 		}
 	}
@@ -464,9 +472,12 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 	}
 
 	@Nullable private I readItem(StepContribution contribution) throws Exception {
-		this.compositeItemReadListener.beforeRead();
+		ItemReadEvent itemReadEvent = new ItemReadEvent(contribution.getStepExecution().getStepName(),
+				contribution.getStepExecution().getId());
 		I item = null;
 		try {
+			itemReadEvent.begin();
+			this.compositeItemReadListener.beforeRead();
 			item = doRead();
 			if (item == null) {
 				this.chunkTracker.noMoreItems();
@@ -475,6 +486,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 				contribution.incrementReadCount();
 				this.compositeItemReadListener.afterRead(item);
 			}
+			itemReadEvent.itemReadStatus = BatchMetrics.STATUS_SUCCESS;
 		}
 		catch (Exception exception) {
 			this.compositeItemReadListener.onReadError(exception);
@@ -484,6 +496,10 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			else {
 				throw exception;
 			}
+			itemReadEvent.itemReadStatus = BatchMetrics.STATUS_FAILURE;
+		}
+		finally {
+			itemReadEvent.commit();
 		}
 		return item;
 	}
@@ -533,14 +549,18 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 	}
 
 	private O processItem(I item, StepContribution contribution) throws Exception {
+		ItemProcessEvent itemProcessEvent = new ItemProcessEvent(contribution.getStepExecution().getStepName(),
+				contribution.getStepExecution().getId());
 		O processedItem = null;
 		try {
+			itemProcessEvent.begin();
 			this.compositeItemProcessListener.beforeProcess(item);
 			processedItem = doProcess(item);
 			if (processedItem == null) {
 				contribution.incrementFilterCount();
 			}
 			this.compositeItemProcessListener.afterProcess(item, processedItem);
+			itemProcessEvent.itemProcessStatus = BatchMetrics.STATUS_SUCCESS;
 		}
 		catch (Exception exception) {
 			this.compositeItemProcessListener.onProcessError(item, exception);
@@ -550,6 +570,10 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			else {
 				throw exception;
 			}
+			itemProcessEvent.itemProcessStatus = BatchMetrics.STATUS_FAILURE;
+		}
+		finally {
+			itemProcessEvent.commit();
 		}
 		return processedItem;
 	}
@@ -600,22 +624,35 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 	}
 
 	private void writeChunk(Chunk<O> chunk, StepContribution contribution) throws Exception {
+		ChunkWriteEvent chunkWriteEvent = new ChunkWriteEvent(contribution.getStepExecution().getStepName(),
+				contribution.getStepExecution().getId(), chunk.size());
 		try {
+			chunkWriteEvent.begin();
 			this.compositeItemWriteListener.beforeWrite(chunk);
 			doWrite(chunk);
 			contribution.incrementWriteCount(chunk.size());
 			this.compositeItemWriteListener.afterWrite(chunk);
+			chunkWriteEvent.chunkWriteStatus = BatchMetrics.STATUS_SUCCESS;
 		}
 		catch (Exception exception) {
 			this.compositeItemWriteListener.onWriteError(exception, chunk);
+			chunkWriteEvent.chunkWriteStatus = BatchMetrics.STATUS_FAILURE;
 			if (this.faultTolerant && exception instanceof RetryException retryException) {
 				logger.info("Retry exhausted while attempting to write items, scanning the chunk", retryException);
+				ChunkScanEvent chunkScanEvent = new ChunkScanEvent(contribution.getStepExecution().getStepName(),
+						contribution.getStepExecution().getId());
+				chunkScanEvent.begin();
 				scan(chunk, contribution);
+				chunkScanEvent.skipCount = contribution.getSkipCount();
+				chunkScanEvent.commit();
 				logger.info("Chunk scan completed");
 			}
 			else {
 				throw exception;
 			}
+		}
+		finally {
+			chunkWriteEvent.commit();
 		}
 	}
 

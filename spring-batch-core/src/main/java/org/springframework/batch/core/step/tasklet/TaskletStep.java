@@ -20,6 +20,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.listener.ChunkListener;
 import org.springframework.batch.core.job.JobInterruptedException;
+import org.springframework.batch.core.observability.jfr.events.step.tasklet.TaskletExecutionEvent;
 import org.springframework.batch.core.step.StepContribution;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.listener.StepExecutionListener;
@@ -222,9 +223,12 @@ public class TaskletStep extends AbstractStep {
 	 */
 	@Override
 	protected void doExecute(StepExecution stepExecution) throws Exception {
-		stepExecution.getExecutionContext().put(TASKLET_TYPE_KEY, tasklet.getClass().getName());
+		String taskletType = tasklet.getClass().getName();
+		stepExecution.getExecutionContext().put(TASKLET_TYPE_KEY, taskletType);
 		stepExecution.getExecutionContext().put(STEP_TYPE_KEY, this.getClass().getName());
-
+		TaskletExecutionEvent taskletExecutionEvent = new TaskletExecutionEvent(stepExecution.getStepName(),
+				stepExecution.getId(), taskletType);
+		taskletExecutionEvent.begin();
 		stream.update(stepExecution.getExecutionContext());
 		getJobRepository().updateExecutionContext(stepExecution);
 
@@ -266,6 +270,8 @@ public class TaskletStep extends AbstractStep {
 
 		});
 
+		taskletExecutionEvent.taskletStatus = stepExecution.getExitStatus().getExitCode();
+		taskletExecutionEvent.commit();
 	}
 
 	/**

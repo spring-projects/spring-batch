@@ -42,6 +42,7 @@ import org.springframework.batch.core.observability.BatchStepContext;
 import org.springframework.batch.core.observability.BatchStepObservation;
 import org.springframework.batch.core.observability.BatchStepObservationConvention;
 import org.springframework.batch.core.observability.DefaultBatchStepObservationConvention;
+import org.springframework.batch.core.observability.jfr.events.step.StepExecutionEvent;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.batch.item.ExecutionContext;
@@ -205,6 +206,10 @@ public abstract class AbstractStep implements StoppableStep, InitializingBean, B
 		if (logger.isDebugEnabled()) {
 			logger.debug("Executing: id=" + stepExecution.getId());
 		}
+		StepExecutionEvent stepExecutionEvent = new StepExecutionEvent(stepExecution.getStepName(),
+				stepExecution.getJobExecution().getJobInstance().getJobName(), stepExecution.getId(),
+				stepExecution.getJobExecutionId());
+		stepExecutionEvent.begin();
 		stepExecution.setStartTime(LocalDateTime.now());
 		stepExecution.setStatus(BatchStatus.STARTED);
 		Observation observation = BatchMetrics
@@ -291,6 +296,8 @@ public abstract class AbstractStep implements StoppableStep, InitializingBean, B
 								+ "This job is now in an unknown state and should not be restarted.",
 						name, stepExecution.getJobExecution().getJobInstance().getJobName()), e);
 			}
+			stepExecutionEvent.exitStatus = stepExecution.getExitStatus().getExitCode();
+			stepExecutionEvent.commit();
 			stopObservation(stepExecution, observation);
 			stepExecution.setExitStatus(exitStatus);
 

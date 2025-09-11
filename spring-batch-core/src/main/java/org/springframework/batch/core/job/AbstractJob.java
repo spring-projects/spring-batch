@@ -37,6 +37,7 @@ import org.springframework.batch.core.job.parameters.JobParametersIncrementer;
 import org.springframework.batch.core.job.parameters.JobParametersValidator;
 import org.springframework.batch.core.listener.JobExecutionListener;
 import org.springframework.batch.core.SpringBatchVersion;
+import org.springframework.batch.core.observability.jfr.events.job.JobExecutionEvent;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.launch.NoSuchJobException;
@@ -277,6 +278,9 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 		}
 
 		JobSynchronizationManager.register(execution);
+		JobExecutionEvent jobExecutionEvent = new JobExecutionEvent(execution.getJobInstance().getJobName(),
+				execution.getJobInstance().getId(), execution.getId());
+		jobExecutionEvent.begin();
 		String activeJobMeterName = "job.active";
 		LongTaskTimer longTaskTimer = BatchMetrics.createLongTaskTimer(this.meterRegistry, activeJobMeterName,
 				"Active jobs", Tag.of(BatchMetrics.METRICS_PREFIX + activeJobMeterName + ".name",
@@ -349,6 +353,8 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 					execution.setExitStatus(exitStatus.and(newExitStatus));
 				}
 				stopObservation(execution, observation);
+				jobExecutionEvent.exitStatus = execution.getExitStatus().getExitCode();
+				jobExecutionEvent.commit();
 				longTaskTimerSample.stop();
 				execution.setEndTime(LocalDateTime.now());
 
@@ -364,6 +370,7 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 			finally {
 				JobSynchronizationManager.release();
 			}
+			System.out.println("execution = " + execution);
 
 		}
 
