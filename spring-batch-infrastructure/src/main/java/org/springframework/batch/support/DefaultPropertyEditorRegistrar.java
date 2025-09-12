@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.PropertyEditorRegistrar;
 import org.springframework.beans.PropertyEditorRegistry;
 import org.springframework.beans.factory.config.CustomEditorConfigurer;
@@ -34,11 +35,11 @@ import org.springframework.util.ClassUtils;
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- *
+ * @author Stefano Cordio
  */
 public class DefaultPropertyEditorRegistrar implements PropertyEditorRegistrar {
 
-	private Map<Class<?>, PropertyEditor> customEditors;
+	private final Map<Class<?>, PropertyEditor> customEditors = new HashMap<>();
 
 	/**
 	 * Register the custom editors with the given registry.
@@ -47,10 +48,8 @@ public class DefaultPropertyEditorRegistrar implements PropertyEditorRegistrar {
 	 */
 	@Override
 	public void registerCustomEditors(PropertyEditorRegistry registry) {
-		if (this.customEditors != null) {
-			for (Entry<Class<?>, PropertyEditor> entry : customEditors.entrySet()) {
-				registry.registerCustomEditor(entry.getKey(), entry.getValue());
-			}
+		for (Entry<Class<?>, PropertyEditor> entry : customEditors.entrySet()) {
+			registry.registerCustomEditor(entry.getKey(), entry.getValue());
 		}
 	}
 
@@ -61,7 +60,6 @@ public class DefaultPropertyEditorRegistrar implements PropertyEditorRegistrar {
 	 * @see CustomEditorConfigurer#setCustomEditors(Map)
 	 */
 	public void setCustomEditors(Map<?, ? extends PropertyEditor> customEditors) {
-		this.customEditors = new HashMap<>();
 		for (Entry<?, ? extends PropertyEditor> entry : customEditors.entrySet()) {
 			Object key = entry.getKey();
 			Class<?> requiredType;

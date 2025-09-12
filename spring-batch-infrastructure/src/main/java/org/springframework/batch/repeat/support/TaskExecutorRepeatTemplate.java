@@ -16,6 +16,7 @@
 
 package org.springframework.batch.repeat.support;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatException;
@@ -24,6 +25,8 @@ import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.util.Assert;
+
+import java.util.Objects;
 
 /**
  * Provides {@link RepeatOperations} support including interceptors that can be used to
@@ -44,7 +47,7 @@ import org.springframework.util.Assert;
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- *
+ * @author Stefano Cordio
  */
 public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 
@@ -126,7 +129,7 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 		if (result.getError() != null) {
 			throw result.getError();
 		}
-		return result.getResult();
+		return Objects.requireNonNull(result.getResult());
 	}
 
 	/**
@@ -196,18 +199,14 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 
 		private final ResultQueue<ResultHolder> queue;
 
-		private volatile RepeatStatus result;
+		private volatile @Nullable RepeatStatus result;
 
-		private volatile Throwable error;
+		private volatile @Nullable Throwable error;
 
 		public ExecutingRunnable(RepeatCallback callback, RepeatContext context, ResultQueue<ResultHolder> queue) {
-
-			super();
-
 			this.callback = callback;
 			this.context = context;
 			this.queue = queue;
-
 		}
 
 		/**
@@ -264,7 +263,7 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 		 * finish.
 		 */
 		@Override
-		public RepeatStatus getResult() {
+		public @Nullable RepeatStatus getResult() {
 			return result;
 		}
 
@@ -273,7 +272,7 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 		 * finish.
 		 */
 		@Override
-		public Throwable getError() {
+		public @Nullable Throwable getError() {
 			return error;
 		}
 

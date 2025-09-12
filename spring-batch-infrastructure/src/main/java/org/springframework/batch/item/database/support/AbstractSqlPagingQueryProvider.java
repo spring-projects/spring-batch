@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import javax.sql.DataSource;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.database.JdbcParameterUtils;
 import org.springframework.batch.item.database.Order;
 import org.springframework.batch.item.database.PagingQueryProvider;
@@ -50,19 +51,20 @@ import org.springframework.util.StringUtils;
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
  * @author Benjamin Hetz
+ * @author Stefano Cordio
  * @since 2.0
  */
 public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvider {
 
-	private String selectClause;
+	private @Nullable String selectClause;
 
-	private String fromClause;
+	private @Nullable String fromClause;
 
-	private String whereClause;
+	private @Nullable String whereClause;
 
 	private Map<String, Order> sortKeys = new LinkedHashMap<>();
 
-	private String groupClause;
+	private @Nullable String groupClause;
 
 	private int parameterCount;
 
@@ -72,20 +74,15 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 	 * The setter for the group by clause
 	 * @param groupClause SQL GROUP BY clause part of the SQL query string
 	 */
-	public void setGroupClause(String groupClause) {
-		if (StringUtils.hasText(groupClause)) {
-			this.groupClause = removeKeyWord("group by", groupClause);
-		}
-		else {
-			this.groupClause = null;
-		}
+	public void setGroupClause(@Nullable String groupClause) {
+		this.groupClause = StringUtils.hasText(groupClause) ? removeKeyWord("group by", groupClause) : null;
 	}
 
 	/**
 	 * The getter for the group by clause
 	 * @return SQL GROUP BY clause part of the SQL query string
 	 */
-	public String getGroupClause() {
+	public @Nullable String getGroupClause() {
 		return this.groupClause;
 	}
 
@@ -99,7 +96,7 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 	/**
 	 * @return SQL SELECT clause part of SQL query string
 	 */
-	protected String getSelectClause() {
+	protected @Nullable String getSelectClause() {
 		return selectClause;
 	}
 
@@ -113,14 +110,14 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 	/**
 	 * @return SQL FROM clause part of SQL query string
 	 */
-	protected String getFromClause() {
+	protected @Nullable String getFromClause() {
 		return fromClause;
 	}
 
 	/**
 	 * @param whereClause WHERE clause part of SQL query string
 	 */
-	public void setWhereClause(String whereClause) {
+	public void setWhereClause(@Nullable String whereClause) {
 		if (StringUtils.hasText(whereClause)) {
 			this.whereClause = removeKeyWord("where", whereClause);
 		}
@@ -132,7 +129,7 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 	/**
 	 * @return SQL WHERE clause part of SQL query string
 	 */
-	protected String getWhereClause() {
+	protected @Nullable String getWhereClause() {
 		return whereClause;
 	}
 
@@ -166,7 +163,7 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 	/**
 	 * The sort key placeholder will vary depending on whether named parameters or
 	 * traditional placeholders are used in query strings.
-	 * @return place holder for sortKey.
+	 * @return placeholder for sortKey.
 	 */
 	@Override
 	public String getSortKeyPlaceHolder(String keyName) {
@@ -205,7 +202,7 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 
 	/**
 	 * Method generating the query string to be used for retrieving the first page. This
-	 * method must be implemented in sub classes.
+	 * method must be implemented in subclasses.
 	 * @param pageSize number of rows to read per page
 	 * @return query string
 	 */

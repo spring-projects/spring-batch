@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
@@ -41,21 +42,22 @@ import org.springframework.util.StringUtils;
  * @author Robert Kasanicky
  * @author Mahmoud Ben Hassine
  * @author Glenn Renfro
+ * @author Stefano Cordio
  */
 public abstract class AbstractMethodInvokingDelegator<T> implements InitializingBean {
 
-	private Object targetObject;
+	private @Nullable Object targetObject;
 
-	private String targetMethod;
+	private @Nullable String targetMethod;
 
-	private Object[] arguments;
+	private @Nullable Object @Nullable [] arguments;
 
 	/**
 	 * Invoker the target method with arguments set by {@link #setArguments(Object[])}.
 	 * @return object returned by invoked method
 	 * @throws Exception exception thrown when executing the delegate method.
 	 */
-	protected T invokeDelegateMethod() throws Exception {
+	protected @Nullable T invokeDelegateMethod() throws Exception {
 		MethodInvoker invoker = createMethodInvoker(targetObject, targetMethod);
 		invoker.setArguments(arguments);
 		return doInvoke(invoker);
@@ -67,7 +69,7 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 	 * @return object returned by target method
 	 * @throws Exception exception thrown when executing the delegate method.
 	 */
-	protected T invokeDelegateMethodWithArgument(Object object) throws Exception {
+	protected @Nullable T invokeDelegateMethodWithArgument(Object object) throws Exception {
 		MethodInvoker invoker = createMethodInvoker(targetObject, targetMethod);
 		invoker.setArguments(object);
 		return doInvoke(invoker);
@@ -79,7 +81,7 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 	 * @return object returned by invoked method
 	 * @throws Exception exception thrown when executing the delegate method.
 	 */
-	protected T invokeDelegateMethodWithArguments(Object[] args) throws Exception {
+	protected @Nullable T invokeDelegateMethodWithArguments(@Nullable Object[] args) throws Exception {
 		MethodInvoker invoker = createMethodInvoker(targetObject, targetMethod);
 		invoker.setArguments(args);
 		return doInvoke(invoker);
@@ -88,7 +90,7 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 	/**
 	 * Create a new configured instance of {@link MethodInvoker}.
 	 */
-	private MethodInvoker createMethodInvoker(Object targetObject, String targetMethod) {
+	private MethodInvoker createMethodInvoker(@Nullable Object targetObject, @Nullable String targetMethod) {
 		HippyMethodInvoker invoker = new HippyMethodInvoker();
 		invoker.setTargetObject(targetObject);
 		invoker.setTargetMethod(targetMethod);
@@ -102,7 +104,7 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 	 * @return return value of the invoked method
 	 */
 	@SuppressWarnings("unchecked")
-	private T doInvoke(MethodInvoker invoker) throws Exception {
+	private @Nullable T doInvoke(MethodInvoker invoker) throws Exception {
 		try {
 			invoker.prepare();
 		}
@@ -141,6 +143,7 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 	private boolean targetClassDeclaresTargetMethod() {
 		MethodInvoker invoker = createMethodInvoker(targetObject, targetMethod);
 
+		@SuppressWarnings("DataFlowIssue")
 		Method[] memberMethods = invoker.getTargetClass().getMethods();
 		Method[] declaredMethods = invoker.getTargetClass().getDeclaredMethods();
 
@@ -200,11 +203,11 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 	 * providing explicit argument values.
 	 * <p>
 	 * If arguments are set to not-null value {@link #afterPropertiesSet()} will check the
-	 * values are compatible with target method's signature. In case arguments are null
-	 * (not set) method signature will not be checked and it is assumed correct values
-	 * will be supplied at runtime.
+	 * values are compatible with target method's signature. In case arguments are
+	 * {@code null} (not set), the method signature will not be checked, and it is assumed
+	 * correct values will be supplied at runtime.
 	 */
-	public void setArguments(Object[] arguments) {
+	public void setArguments(Object @Nullable [] arguments) {
 		this.arguments = arguments == null ? null : arguments.clone();
 	}
 
@@ -212,7 +215,7 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 	 * Return arguments.
 	 * @return arguments
 	 */
-	protected Object[] getArguments() {
+	protected @Nullable Object @Nullable [] getArguments() {
 		return arguments;
 	}
 
@@ -220,7 +223,7 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 	 * @return the object on which the method will be invoked.
 	 * @since 5.1
 	 */
-	protected Object getTargetObject() {
+	protected @Nullable Object getTargetObject() {
 		return targetObject;
 	}
 
@@ -228,7 +231,7 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 	 * @return the name of the method to be invoked.
 	 * @since 5.1
 	 */
-	protected String getTargetMethod() {
+	protected @Nullable String getTargetMethod() {
 		return targetMethod;
 	}
 
@@ -240,7 +243,7 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 	 */
 	public static class InvocationTargetThrowableWrapper extends RuntimeException {
 
-		public InvocationTargetThrowableWrapper(Throwable cause) {
+		public InvocationTargetThrowableWrapper(@Nullable Throwable cause) {
 			super(cause);
 		}
 
