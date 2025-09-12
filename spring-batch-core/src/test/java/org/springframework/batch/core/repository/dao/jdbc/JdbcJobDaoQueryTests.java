@@ -15,11 +15,12 @@
  */
 package org.springframework.batch.core.repository.dao.jdbc;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
@@ -27,7 +28,12 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import javax.sql.DataSource;
+
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.mock;
 import static org.springframework.test.util.AssertionErrors.assertTrue;
 
 /**
@@ -36,12 +42,19 @@ import static org.springframework.test.util.AssertionErrors.assertTrue;
  */
 class JdbcJobDaoQueryTests {
 
+	Connection connection = mock();
+
+	DataSource dataSource = mock();
+
+	PreparedStatement preparedStatement = mock();
+
 	JdbcJobExecutionDao jobExecutionDao;
 
-	List<String> list = new ArrayList<>();
-
 	@BeforeEach
-	void setUp() {
+	void setUp() throws Exception {
+
+		given(dataSource.getConnection()).willReturn(connection);
+		given(connection.prepareStatement(anyString())).willReturn(preparedStatement);
 
 		jobExecutionDao = new JdbcJobExecutionDao();
 		jobExecutionDao.setJobExecutionIncrementer(new DataFieldMaxValueIncrementer() {
@@ -65,20 +78,16 @@ class JdbcJobDaoQueryTests {
 	}
 
 	@Test
-	void testTablePrefix() {
+	void testTablePrefix() throws Exception {
 		jobExecutionDao.setTablePrefix("FOO_");
-		jobExecutionDao.setJdbcTemplate(new JdbcTemplate() {
-			@Override
-			public int update(String sql, Object[] args, int[] argTypes) throws DataAccessException {
-				list.add(sql);
-				return 1;
-			}
-		});
+		jobExecutionDao.setJdbcTemplate(new JdbcTemplate(dataSource));
 		JobExecution jobExecution = new JobExecution(new JobInstance(11L, "testJob"), new JobParameters());
 
 		jobExecutionDao.saveJobExecution(jobExecution);
-		assertEquals(1, list.size());
-		String query = list.get(0);
+
+		ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
+		then(connection).should().prepareStatement(sqlCaptor.capture());
+		String query = sqlCaptor.getValue();
 		assertTrue("Query did not contain FOO_:" + query, query.contains("FOO_"));
 	}
 
