@@ -16,6 +16,7 @@
 package org.springframework.batch.samples.metrics;
 
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
+import org.springframework.batch.core.configuration.annotation.EnableJdbcJobRepository;
 import org.springframework.batch.samples.common.DataSourceConfiguration;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -27,6 +28,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 @EnableScheduling
 @EnableBatchProcessing
+@EnableJdbcJobRepository
 @Import({ Job1Configuration.class, Job2Configuration.class, JobScheduler.class, PrometheusConfiguration.class,
 		DataSourceConfiguration.class })
 @PropertySource("metrics-sample.properties")

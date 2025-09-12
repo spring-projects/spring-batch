@@ -20,6 +20,7 @@ import javax.sql.DataSource;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
+import org.springframework.batch.core.configuration.annotation.EnableJdbcJobRepository;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.parameters.JobParameters;
@@ -77,6 +78,7 @@ public class SpringBatchVersionTests {
 
 	@Configuration
 	@EnableBatchProcessing
+	@EnableJdbcJobRepository
 	static class TestConfiguration {
 
 		@Bean

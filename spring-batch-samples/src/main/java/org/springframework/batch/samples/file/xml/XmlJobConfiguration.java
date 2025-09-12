@@ -20,6 +20,7 @@ import java.util.Map;
 
 import com.thoughtworks.xstream.security.ExplicitTypePermission;
 
+import org.springframework.batch.core.configuration.annotation.EnableJdbcJobRepository;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.StepScope;
@@ -46,6 +47,7 @@ import org.springframework.oxm.xstream.XStreamMarshaller;
 
 @Configuration
 @EnableBatchProcessing
+@EnableJdbcJobRepository
 @Import(DataSourceConfiguration.class)
 public class XmlJobConfiguration {
 

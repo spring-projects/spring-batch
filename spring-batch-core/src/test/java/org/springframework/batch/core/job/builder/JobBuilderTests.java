@@ -20,6 +20,7 @@ import javax.sql.DataSource;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.ExitStatus;
+import org.springframework.batch.core.configuration.annotation.EnableJdbcJobRepository;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.listener.JobExecutionListener;
@@ -67,6 +68,7 @@ class JobBuilderTests {
 
 	@Configuration
 	@EnableBatchProcessing
+	@EnableJdbcJobRepository
 	static class MyJobConfiguration {
 
 		@Bean

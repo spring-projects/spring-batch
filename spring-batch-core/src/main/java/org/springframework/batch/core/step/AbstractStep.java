@@ -201,6 +201,8 @@ public abstract class AbstractStep implements StoppableStep, InitializingBean, B
 			throws JobInterruptedException, UnexpectedJobExecutionException {
 
 		Assert.notNull(stepExecution, "stepExecution must not be null");
+		Assert.state(stepExecution.getId() != null,
+				"StepExecution has no id. It must be saved before it can be executed.");
 		stepExecution.getExecutionContext().put(SpringBatchVersion.BATCH_VERSION_KEY, SpringBatchVersion.getVersion());
 
 		if (logger.isDebugEnabled()) {

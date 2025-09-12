@@ -21,6 +21,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.configuration.annotation.EnableJdbcJobRepository;
 import org.springframework.batch.core.listener.ChunkListener;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.listener.ItemWriteListener;
@@ -179,6 +180,7 @@ class RegisterMultiListenerTests {
 
 	@Configuration
 	@EnableBatchProcessing
+	@EnableJdbcJobRepository
 	public static class MultiListenerFaultTolerantTestConfiguration extends MultiListenerTestConfigurationSupport {
 
 		@Bean
@@ -215,6 +217,7 @@ class RegisterMultiListenerTests {
 
 	@Configuration
 	@EnableBatchProcessing
+	@EnableJdbcJobRepository
 	public static class MultiListenerTestConfiguration extends MultiListenerTestConfigurationSupport {
 
 		@Bean

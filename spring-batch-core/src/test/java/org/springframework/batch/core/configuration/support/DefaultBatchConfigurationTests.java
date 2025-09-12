@@ -86,7 +86,7 @@ class DefaultBatchConfigurationTests {
 	}
 
 	@Configuration
-	static class MyJobConfiguration extends DefaultBatchConfiguration {
+	static class MyJobConfiguration extends JdbcDefaultBatchConfiguration {
 
 		@Bean
 		public Step myStep(JobRepository jobRepository, PlatformTransactionManager transactionManager) {

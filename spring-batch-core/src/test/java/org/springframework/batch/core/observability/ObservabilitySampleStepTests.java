@@ -31,6 +31,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.springframework.batch.core.ExitStatus;
+import org.springframework.batch.core.configuration.annotation.EnableJdbcJobRepository;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.parameters.JobParameters;
@@ -110,6 +111,7 @@ class ObservabilitySampleStepTests extends SampleTestRunner {
 
 	@Configuration(proxyBeanMethods = false)
 	@EnableBatchProcessing
+	@EnableJdbcJobRepository
 	static class TestConfig {
 
 		@Bean

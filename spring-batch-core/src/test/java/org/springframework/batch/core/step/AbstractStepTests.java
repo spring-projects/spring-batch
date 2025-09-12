@@ -38,7 +38,7 @@ class AbstractStepTests {
 	void testEndTimeInListener() throws Exception {
 		// given
 		StepExecution execution = new StepExecution("step",
-				new JobExecution(new JobInstance(1L, "job"), new JobParameters()));
+				new JobExecution(new JobInstance(1L, "job"), 0L, new JobParameters()), 0L);
 		AbstractStep tested = new AbstractStep() {
 			@Override
 			protected void doExecute(StepExecution stepExecution) {

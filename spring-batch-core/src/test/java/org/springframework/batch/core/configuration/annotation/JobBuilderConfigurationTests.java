@@ -98,6 +98,7 @@ public class JobBuilderConfigurationTests {
 
 	@Configuration
 	@EnableBatchProcessing
+	@EnableJdbcJobRepository
 	@Import(DataSourceConfiguration.class)
 	public static class TestConfiguration {
 
@@ -165,6 +166,7 @@ public class JobBuilderConfigurationTests {
 
 	@Configuration
 	@EnableBatchProcessing
+	@EnableJdbcJobRepository
 	@Import(DataSourceConfiguration.class)
 	public static class BeansConfigurer {
 

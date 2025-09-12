@@ -17,6 +17,7 @@ package org.springframework.batch.samples.football;
 
 import javax.sql.DataSource;
 
+import org.springframework.batch.core.configuration.annotation.EnableJdbcJobRepository;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -43,6 +44,7 @@ import org.springframework.jdbc.support.JdbcTransactionManager;
 
 @Configuration
 @EnableBatchProcessing
+@EnableJdbcJobRepository
 @Import(DataSourceConfiguration.class)
 public class FootballJobConfiguration {
 

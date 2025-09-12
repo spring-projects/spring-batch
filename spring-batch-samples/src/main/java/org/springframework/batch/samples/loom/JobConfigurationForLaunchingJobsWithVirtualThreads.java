@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.samples.loom;
 
+import org.springframework.batch.core.configuration.annotation.EnableJdbcJobRepository;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.step.Step;
@@ -39,6 +40,7 @@ import org.springframework.jdbc.support.JdbcTransactionManager;
  */
 @Configuration
 @EnableBatchProcessing
+@EnableJdbcJobRepository
 @Import(DataSourceConfiguration.class)
 public class JobConfigurationForLaunchingJobsWithVirtualThreads {
 

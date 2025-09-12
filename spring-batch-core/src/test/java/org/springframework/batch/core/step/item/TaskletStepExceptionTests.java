@@ -86,8 +86,8 @@ class TaskletStepExceptionTests {
 		taskletStep.setTransactionManager(new ResourcelessTransactionManager());
 
 		JobInstance jobInstance = new JobInstance(1L, "testJob");
-		JobExecution jobExecution = new JobExecution(jobInstance, new JobParameters());
-		stepExecution = new StepExecution("testStep", jobExecution);
+		JobExecution jobExecution = new JobExecution(jobInstance, 0L, new JobParameters());
+		stepExecution = new StepExecution("testStep", jobExecution, 0L);
 	}
 
 	@Test

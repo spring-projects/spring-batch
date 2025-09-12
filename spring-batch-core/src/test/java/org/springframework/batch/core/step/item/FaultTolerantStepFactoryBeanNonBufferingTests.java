@@ -79,7 +79,7 @@ class FaultTolerantStepFactoryBeanNonBufferingTests {
 		factory.setIsReaderTransactionalQueue(true);
 
 		JobInstance jobInstance = new JobInstance(1L, "skipJob");
-		jobExecution = new JobExecution(jobInstance, new JobParameters());
+		jobExecution = new JobExecution(jobInstance, 0L, new JobParameters());
 	}
 
 	/**
@@ -94,7 +94,7 @@ class FaultTolerantStepFactoryBeanNonBufferingTests {
 		factory.setListeners(new SkipListener[] { skipListener });
 		Step step = factory.getObject();
 
-		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
+		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution, 0L);
 		step.execute(stepExecution);
 
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());

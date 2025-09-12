@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.samples.file.multiresource;
 
+import org.springframework.batch.core.configuration.annotation.EnableJdbcJobRepository;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.StepScope;
@@ -47,6 +48,7 @@ import org.springframework.jdbc.support.JdbcTransactionManager;
  */
 @Configuration
 @EnableBatchProcessing
+@EnableJdbcJobRepository
 @Import(DataSourceConfiguration.class)
 public class MultiResourceJobConfiguration {
 

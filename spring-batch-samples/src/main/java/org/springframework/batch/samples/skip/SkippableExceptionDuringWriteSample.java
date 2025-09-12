@@ -18,6 +18,7 @@ package org.springframework.batch.samples.skip;
 
 import java.util.Arrays;
 
+import org.springframework.batch.core.configuration.annotation.EnableJdbcJobRepository;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -39,6 +40,7 @@ import org.springframework.transaction.PlatformTransactionManager;
  */
 @Configuration
 @EnableBatchProcessing
+@EnableJdbcJobRepository
 @Import(DataSourceConfiguration.class)
 public class SkippableExceptionDuringWriteSample {
 

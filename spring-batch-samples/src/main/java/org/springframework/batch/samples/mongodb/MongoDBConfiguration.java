@@ -19,6 +19,7 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
+import org.springframework.batch.core.configuration.annotation.EnableMongoJobRepository;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MongoJobRepositoryFactoryBean;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,6 +35,7 @@ import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 @Configuration
 @PropertySource("classpath:/org/springframework/batch/samples/mongodb/mongodb-sample.properties")
 @EnableBatchProcessing
+@EnableMongoJobRepository
 public class MongoDBConfiguration {
 
 	@Value("${mongodb.host}")
