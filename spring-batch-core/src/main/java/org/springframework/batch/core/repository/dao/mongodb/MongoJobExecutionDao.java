@@ -34,6 +34,7 @@ import static org.springframework.data.mongodb.core.query.Query.query;
 
 /**
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  * @since 5.2.0
  */
 public class MongoJobExecutionDao implements JobExecutionDao {
@@ -43,6 +44,8 @@ public class MongoJobExecutionDao implements JobExecutionDao {
 	private static final String JOB_EXECUTIONS_SEQUENCE_NAME = "BATCH_JOB_EXECUTION_SEQ";
 
 	private static final String JOB_INSTANCES_COLLECTION_NAME = "BATCH_JOB_INSTANCE";
+
+	private static final String STEP_EXECUTIONS_COLLECTION_NAME = "BATCH_STEP_EXECUTION";
 
 	private final MongoOperations mongoOperations;
 
@@ -81,7 +84,8 @@ public class MongoJobExecutionDao implements JobExecutionDao {
 
 	@Override
 	public List<JobExecution> findJobExecutions(JobInstance jobInstance) {
-		Query query = query(where("jobInstanceId").is(jobInstance.getId()));
+		Query query = query(where("jobInstanceId").is(jobInstance.getId()))
+			.with(Sort.by(Sort.Direction.DESC, "jobExecutionId"));
 		List<org.springframework.batch.core.repository.persistence.JobExecution> jobExecutions = this.mongoOperations
 			.find(query, org.springframework.batch.core.repository.persistence.JobExecution.class,
 					JOB_EXECUTIONS_COLLECTION_NAME);
@@ -118,7 +122,15 @@ public class MongoJobExecutionDao implements JobExecutionDao {
 				.find(query, org.springframework.batch.core.repository.persistence.JobExecution.class,
 						JOB_EXECUTIONS_COLLECTION_NAME)
 				.stream()
-				.map(jobExecution -> this.jobExecutionConverter.toJobExecution(jobExecution, jobInstance))
+				.map(jobExecution -> {
+					Query stepExecutionQuery = query(where("jobExecutionId").is(jobExecution.getJobExecutionId()));
+					List<org.springframework.batch.core.repository.persistence.StepExecution> stepExecutions = this.mongoOperations
+						.find(stepExecutionQuery,
+								org.springframework.batch.core.repository.persistence.StepExecution.class,
+								STEP_EXECUTIONS_COLLECTION_NAME);
+					jobExecution.setStepExecutions(stepExecutions);
+					return this.jobExecutionConverter.toJobExecution(jobExecution, jobInstance);
+				})
 				.forEach(runningJobExecutions::add);
 		}
 		return runningJobExecutions;
@@ -133,6 +145,13 @@ public class MongoJobExecutionDao implements JobExecutionDao {
 		if (jobExecution == null) {
 			return null;
 		}
+
+		Query stepExecutionQuery = query(where("jobExecutionId").is(executionId));
+		List<org.springframework.batch.core.repository.persistence.StepExecution> stepExecutions = this.mongoOperations
+			.find(stepExecutionQuery, org.springframework.batch.core.repository.persistence.StepExecution.class,
+					STEP_EXECUTIONS_COLLECTION_NAME);
+		jobExecution.setStepExecutions(stepExecutions);
+
 		Query jobInstanceQuery = query(where("jobInstanceId").is(jobExecution.getJobInstanceId()));
 		org.springframework.batch.core.repository.persistence.JobInstance jobInstance = this.mongoOperations.findOne(
 				jobInstanceQuery, org.springframework.batch.core.repository.persistence.JobInstance.class,
@@ -150,6 +169,13 @@ public class MongoJobExecutionDao implements JobExecutionDao {
 		// TODO the contract mentions to update the version as well. Double check if this
 		// is needed as the version is not used in the tests following the call sites of
 		// synchronizeStatus
+	}
+
+	@Override
+	public void deleteJobExecution(JobExecution jobExecution) {
+		this.mongoOperations.remove(query(where("jobExecutionId").is(jobExecution.getId())),
+				JOB_EXECUTIONS_COLLECTION_NAME);
+
 	}
 
 }
