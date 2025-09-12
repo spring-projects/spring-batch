@@ -370,7 +370,6 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 			finally {
 				JobSynchronizationManager.release();
 			}
-			System.out.println("execution = " + execution);
 
 		}
 
