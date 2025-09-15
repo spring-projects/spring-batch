@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 the original author or authors.
+ * Copyright 2023-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,10 @@
  */
 package org.springframework.batch.samples.helloworld;
 
+import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
+import org.springframework.batch.core.configuration.annotation.EnableJdbcJobRepository;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.step.Step;
-import org.springframework.batch.core.configuration.annotation.*;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
@@ -26,7 +27,6 @@ import org.springframework.batch.samples.common.DataSourceConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.jdbc.support.JdbcTransactionManager;
 
 @Configuration
 @EnableBatchProcessing
@@ -35,11 +35,11 @@ import org.springframework.jdbc.support.JdbcTransactionManager;
 public class HelloWorldJobConfiguration {
 
 	@Bean
-	public Step step(JobRepository jobRepository, JdbcTransactionManager transactionManager) {
+	public Step step(JobRepository jobRepository) {
 		return new StepBuilder("step", jobRepository).tasklet((contribution, chunkContext) -> {
 			System.out.println("Hello world!");
 			return RepeatStatus.FINISHED;
-		}, transactionManager).build();
+		}).build();
 	}
 
 	@Bean

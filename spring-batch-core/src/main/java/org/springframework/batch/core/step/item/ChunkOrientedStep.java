@@ -111,11 +111,11 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 	/*
 	 * Transaction related parameters
 	 */
-	private PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
+	private PlatformTransactionManager transactionManager;
 
 	private TransactionTemplate transactionTemplate;
 
-	private TransactionAttribute transactionAttribute = new DefaultTransactionAttribute();
+	private TransactionAttribute transactionAttribute;
 
 	/*
 	 * Chunk related parameters
@@ -309,7 +309,14 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
-		Assert.notNull(this.transactionManager, "Transaction manager must not be null");
+		if (this.transactionManager == null) {
+			logger.info("No transaction manager has been set. Defaulting to ResourcelessTransactionManager.");
+			this.transactionManager = new ResourcelessTransactionManager();
+		}
+		if (this.transactionAttribute == null) {
+			logger.info("No transaction attribute has been set. Defaulting to DefaultTransactionAttribute.");
+			this.transactionAttribute = new DefaultTransactionAttribute();
+		}
 		Assert.isTrue(this.chunkSize > 0, "Chunk size must be greater than 0");
 		Assert.notNull(this.itemReader, "Item reader must not be null");
 		Assert.notNull(this.itemWriter, "Item writer must not be null");

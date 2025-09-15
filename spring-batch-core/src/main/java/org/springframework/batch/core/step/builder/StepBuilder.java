@@ -66,6 +66,16 @@ public class StepBuilder extends StepBuilderHelper<StepBuilder> {
 	}
 
 	/**
+	 * Build a step with a custom tasklet, not necessarily item processing.
+	 * @param tasklet a tasklet
+	 * @return a {@link TaskletStepBuilder}
+	 * @since 6.0
+	 */
+	public TaskletStepBuilder tasklet(Tasklet tasklet) {
+		return new TaskletStepBuilder(this).tasklet(tasklet);
+	}
+
+	/**
 	 * Build a step that processes items in chunks with the size provided. To extend the
 	 * step to being fault tolerant, call the {@link SimpleStepBuilder#faultTolerant()}
 	 * method on the builder. In most cases you will want to parameterize your call to

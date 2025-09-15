@@ -41,6 +41,7 @@ import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.repeat.support.RepeatTemplate;
+import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
@@ -49,7 +50,6 @@ import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.transaction.support.TransactionTemplate;
-import org.springframework.util.Assert;
 
 import java.util.concurrent.Semaphore;
 
@@ -118,7 +118,10 @@ public class TaskletStep extends AbstractStep {
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
-		Assert.state(transactionManager != null, "A transaction manager must be provided");
+		if (this.transactionManager == null) {
+			logger.info("No transaction manager has been set.  Defaulting to ResourcelessTransactionManager.");
+			this.transactionManager = new ResourcelessTransactionManager();
+		}
 	}
 
 	/**
