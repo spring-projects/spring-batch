@@ -16,10 +16,7 @@
 package org.springframework.batch.core.configuration.support;
 
 import org.springframework.batch.core.configuration.DuplicateJobException;
-import org.springframework.batch.core.job.DefaultJobKeyGenerator;
 import org.springframework.batch.core.job.Job;
-import org.springframework.batch.core.job.JobInstance;
-import org.springframework.batch.core.job.JobKeyGenerator;
 import org.springframework.batch.core.configuration.BatchConfigurationException;
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
@@ -39,7 +36,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.annotation.Isolation;
 
 /**
  * Base {@link Configuration} class that provides common infrastructure beans for enabling
@@ -151,35 +147,6 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 	@Deprecated(since = "6.0", forRemoval = true)
 	protected JobParametersConverter getJobParametersConverter() {
 		return new DefaultJobParametersConverter();
-	}
-
-	/**
-	 * Return the value of the {@code validateTransactionState} parameter. Defaults to
-	 * {@code true}.
-	 * @return true if the transaction state should be validated, false otherwise
-	 */
-	protected boolean getValidateTransactionState() {
-		return true;
-	}
-
-	/**
-	 * Return the transaction isolation level when creating job executions. Defaults to
-	 * {@link Isolation#SERIALIZABLE}.
-	 * @return the transaction isolation level when creating job executions
-	 */
-	protected Isolation getIsolationLevelForCreate() {
-		return Isolation.SERIALIZABLE;
-	}
-
-	/**
-	 * A custom implementation of the {@link JobKeyGenerator}. The default, if not
-	 * injected, is the {@link DefaultJobKeyGenerator}.
-	 * @return the generator that creates the key used in identifying {@link JobInstance}
-	 * objects
-	 * @since 5.1
-	 */
-	protected JobKeyGenerator getJobKeyGenerator() {
-		return new DefaultJobKeyGenerator();
 	}
 
 }

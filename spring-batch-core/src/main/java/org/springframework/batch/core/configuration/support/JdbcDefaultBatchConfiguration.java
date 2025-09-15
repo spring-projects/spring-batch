@@ -24,6 +24,9 @@ import org.springframework.batch.core.converter.StringToDateConverter;
 import org.springframework.batch.core.converter.StringToLocalDateConverter;
 import org.springframework.batch.core.converter.StringToLocalDateTimeConverter;
 import org.springframework.batch.core.converter.StringToLocalTimeConverter;
+import org.springframework.batch.core.job.DefaultJobKeyGenerator;
+import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.JobKeyGenerator;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
 import org.springframework.batch.core.repository.JobRepository;
@@ -45,6 +48,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.MetaDataAccessException;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.Isolation;
 
 import javax.sql.DataSource;
 import java.nio.charset.Charset;
@@ -253,6 +257,35 @@ public class JdbcDefaultBatchConfiguration extends DefaultBatchConfiguration {
 		conversionService.addConverter(new LocalDateTimeToStringConverter());
 		conversionService.addConverter(new StringToLocalDateTimeConverter());
 		return conversionService;
+	}
+
+	/**
+	 * Return the value of the {@code validateTransactionState} parameter. Defaults to
+	 * {@code true}.
+	 * @return true if the transaction state should be validated, false otherwise
+	 */
+	protected boolean getValidateTransactionState() {
+		return true;
+	}
+
+	/**
+	 * Return the transaction isolation level when creating job executions. Defaults to
+	 * {@link Isolation#SERIALIZABLE}.
+	 * @return the transaction isolation level when creating job executions
+	 */
+	protected Isolation getIsolationLevelForCreate() {
+		return Isolation.SERIALIZABLE;
+	}
+
+	/**
+	 * A custom implementation of the {@link JobKeyGenerator}. The default, if not
+	 * injected, is the {@link DefaultJobKeyGenerator}.
+	 * @return the generator that creates the key used in identifying {@link JobInstance}
+	 * objects
+	 * @since 5.1
+	 */
+	protected JobKeyGenerator getJobKeyGenerator() {
+		return new DefaultJobKeyGenerator();
 	}
 
 }
