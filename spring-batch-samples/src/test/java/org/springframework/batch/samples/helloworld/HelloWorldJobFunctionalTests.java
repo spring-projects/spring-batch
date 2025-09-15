@@ -42,6 +42,8 @@ class HelloWorldJobFunctionalTests {
 
 		// then
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
+		assertEquals(1, jobExecution.getStepExecutions().size());
+		assertEquals(BatchStatus.COMPLETED, jobExecution.getStepExecutions().iterator().next().getStatus());
 	}
 
 }

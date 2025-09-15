@@ -16,7 +16,6 @@
 package org.springframework.batch.core.repository.support;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -50,6 +49,8 @@ public class ResourcelessJobRepository implements JobRepository {
 	private JobInstance jobInstance;
 
 	private JobExecution jobExecution;
+
+	private long stepExecutionIdIncrementer = 0L;
 
 	/*
 	 * ===================================================================================
@@ -189,6 +190,9 @@ public class ResourcelessJobRepository implements JobRepository {
 	@Override
 	@Nullable
 	public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
+		if (this.jobExecution == null || !this.jobExecution.getJobInstance().getId().equals(jobInstance.getId())) {
+			return null;
+		}
 		return this.jobExecution.getStepExecutions()
 			.stream()
 			.filter(stepExecution -> stepExecution.getStepName().equals(stepName))
@@ -206,12 +210,14 @@ public class ResourcelessJobRepository implements JobRepository {
 
 	@Override
 	public void add(StepExecution stepExecution) {
-		this.addAll(Collections.singletonList(stepExecution));
+		stepExecution.setId(this.stepExecutionIdIncrementer++);
 	}
 
 	@Override
 	public void addAll(Collection<StepExecution> stepExecutions) {
-		this.jobExecution.addStepExecutions(new ArrayList<>(stepExecutions));
+		for (StepExecution stepExecution : stepExecutions) {
+			this.add(stepExecution);
+		}
 	}
 
 	@Override
