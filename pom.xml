@@ -55,9 +55,9 @@
 		<spring-framework.version>7.0.0-SNAPSHOT</spring-framework.version>
 		<spring-retry.version>2.0.13-SNAPSHOT</spring-retry.version>
 		<spring-integration.version>7.0.0-SNAPSHOT</spring-integration.version>
+		<micrometer.version>1.16.0-SNAPSHOT</micrometer.version>
 
 		<!-- optional production dependencies -->
-        <micrometer.version>1.16.0-SNAPSHOT</micrometer.version>
 		<spring-data-commons.version>4.0.0-SNAPSHOT</spring-data-commons.version>
 		<spring-data-jpa.version>4.0.0-SNAPSHOT</spring-data-jpa.version>
 		<spring-data-redis.version>4.0.0-SNAPSHOT</spring-data-redis.version>
