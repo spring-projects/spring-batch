@@ -17,6 +17,7 @@ package org.springframework.batch.core.repository.support;
 
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
+import org.springframework.batch.core.configuration.annotation.EnableMongoJobRepository;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
@@ -37,6 +38,7 @@ import org.testcontainers.utility.DockerImageName;
  */
 @Configuration
 @EnableBatchProcessing
+@EnableMongoJobRepository
 class MongoDBIntegrationTestConfiguration {
 
 	private static final DockerImageName MONGODB_IMAGE = DockerImageName.parse("mongo:8.0.11");
