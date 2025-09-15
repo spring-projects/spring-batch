@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 the original author or authors.
+ * Copyright 2024-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,6 +49,8 @@ public class ResourcelessJobRepository implements JobRepository {
 
 	private JobExecution jobExecution;
 
+	private long stepExecutionIdIncrementer = 0L;
+
 	@Override
 	public boolean isJobInstanceExists(String jobName, JobParameters jobParameters) {
 		return false;
@@ -77,12 +79,14 @@ public class ResourcelessJobRepository implements JobRepository {
 
 	@Override
 	public void add(StepExecution stepExecution) {
-		this.addAll(Collections.singletonList(stepExecution));
+		stepExecution.setId(this.stepExecutionIdIncrementer++);
 	}
 
 	@Override
 	public void addAll(Collection<StepExecution> stepExecutions) {
-		this.jobExecution.addStepExecutions(new ArrayList<>(stepExecutions));
+		for (StepExecution stepExecution : stepExecutions) {
+			this.add(stepExecution);
+		}
 	}
 
 	@Override
@@ -105,6 +109,9 @@ public class ResourcelessJobRepository implements JobRepository {
 
 	@Override
 	public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
+		if (this.jobExecution == null || !this.jobExecution.getJobInstance().getId().equals(jobInstance.getId())) {
+			return null;
+		}
 		return this.jobExecution.getStepExecutions()
 			.stream()
 			.filter(stepExecution -> stepExecution.getStepName().equals(stepName))
