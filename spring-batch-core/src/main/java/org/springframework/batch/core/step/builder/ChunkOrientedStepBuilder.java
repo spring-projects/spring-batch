@@ -21,6 +21,8 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import io.micrometer.core.instrument.MeterRegistry;
+
 import org.springframework.batch.core.annotation.AfterChunk;
 import org.springframework.batch.core.annotation.AfterProcess;
 import org.springframework.batch.core.annotation.AfterRead;
@@ -107,6 +109,8 @@ public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrien
 	private long skipLimit = -1;
 
 	private AsyncTaskExecutor asyncTaskExecutor;
+
+	private MeterRegistry meterRegistry;
 
 	ChunkOrientedStepBuilder(StepBuilderHelper<?> parent, int chunkSize) {
 		super(parent);
@@ -359,6 +363,18 @@ public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrien
 		return self();
 	}
 
+	/**
+	 * Set the meter registry to be used for collecting metrics during step execution.
+	 * This allows for monitoring and analyzing the performance of the step. If not set,
+	 * it will default to {@link io.micrometer.core.instrument.Metrics#globalRegistry}.
+	 * @param meterRegistry the MeterRegistry to use
+	 * @return this for fluent chaining
+	 */
+	public ChunkOrientedStepBuilder<I, O> meterRegistry(MeterRegistry meterRegistry) {
+		this.meterRegistry = meterRegistry;
+		return self();
+	}
+
 	@SuppressWarnings("unchecked")
 	public ChunkOrientedStep<I, O> build() {
 		ChunkOrientedStep<I, O> chunkOrientedStep = new ChunkOrientedStep<>(this.getName(), this.chunkSize, this.reader,
@@ -412,6 +428,9 @@ public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrien
 		});
 		retryListeners.forEach(chunkOrientedStep::registerRetryListener);
 		skipListeners.forEach(chunkOrientedStep::registerSkipListener);
+		if (this.meterRegistry != null) {
+			chunkOrientedStep.setMeterRegistry(this.meterRegistry);
+		}
 		try {
 			chunkOrientedStep.afterPropertiesSet();
 		}
