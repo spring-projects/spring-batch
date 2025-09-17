@@ -53,8 +53,9 @@
 ** xref:spring-batch-integration/launching-jobs-through-messages.adoc[]
 ** xref:spring-batch-integration/available-attributes-of-the-job-launching-gateway.adoc[]
 ** xref:spring-batch-integration/sub-elements.adoc[]
-* xref:monitoring-and-metrics.adoc[]
-* xref:tracing.adoc[]
+* xref:spring-batch-observability.adoc[]
+** xref:spring-batch-observability/micrometer.adoc[]
+** xref:spring-batch-observability/jfr.adoc[]
 * Appendices
 ** xref:appendix.adoc[]
 ** xref:schema-appendix.adoc[]

@@ -3,13 +3,16 @@
 
 This section highlights the major changes in Spring Batch 6.0. For the complete list of changes, please refer to the https://github.com/spring-projects/spring-batch/releases[release notes].
 
-Spring Batch 6.0 includes the following features:
+Spring Batch 6.0 includes the following features and improvements:
 
 * xref:whatsnew.adoc#dependencies-upgrade[Dependencies upgrade]
 * xref:whatsnew.adoc#batch-infrastrucutre-configuration-improvements[Batch infrastructure configuration improvements]
 * xref:whatsnew.adoc#new-implementation-of-the-chunk-oriented-processing-model[New implementation of the chunk-oriented processing model]
+* xref:whatsnew.adoc#new-concurrency-model[New concurrency model]
 * xref:whatsnew.adoc#new-command-line-operator[New command line operator]
 * xref:whatsnew.adoc#ability-to-recover-failed-job-executions[Ability to recover failed job executions]
+* xref:whatsnew.adoc#ability-to-stop-all-kind-of-steps[Ability to stop all kinds of steps]
+* xref:whatsnew.adoc#observability-with-jfr[Observability support with the Java Flight Recorder (JFR)]
 * xref:whatsnew.adoc#deprecations-and-pruning[Deprecations and pruning]
 
 [[dependencies-upgrade]]
@@ -70,7 +73,8 @@ In this release, several changes have been made to simplify the batch infrastruc
 
 * The `JobRepository` now extends the `JobExplorer` interface, so there is no need to define a separate `JobExplorer` bean.
 * The `JobOperator` now extends the `JobLauncher` interface, so there is no need to define a separate `JobLauncher` bean.
-* The `JobRegistry` is now smart enough to register jobs automatically, so there is no need to define a separate `JobRegistrySmartInitializingSingleton` bean.
+* The `JobRegistry` is now optional, and smart enough to register jobs automatically, so there is no need to define a separate `JobRegistrySmartInitializingSingleton` bean.
+* The transaction manager is now optional, and a default `ResourcelessTransactionManager` is used if none is provided.
 
 This reduces the number of beans required for a typical batch application and simplifies the configuration code.
 
@@ -121,7 +125,7 @@ public Step faulTolerantChunkOrientedStep(JobRepository jobRepository, JdbcTrans
     // skip policy configuration
     int skipLimit = 50;
     var skippableExceptions = Set.of(FlatFileParseException.class);
-    SkipPolicy skipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, skippableExceptions);
+    SkipPolicy skipPolicy = new LimitCheckingExceptionHierarchySkipPolicy(skippableExceptions, skipLimit);
 
     // step configuration
     int chunkSize = 100;
@@ -138,6 +142,15 @@ public Step faulTolerantChunkOrientedStep(JobRepository jobRepository, JdbcTrans
 
 Please refer to the https://github.com/spring-projects/spring-batch/wiki/Spring-Batch-6.0-Migration-Guide[migration guide] for more details on how to migrate from the previous implementation to the new one.
 
+[[new-concurrency-model]]
+== New concurrency model
+
+Prior to this release, the concurrency model based on the "parallel iteration" concept required a lot of state synchronization at different levels and had several limitations related to throttling and backpressure leading to confusing transaction semantics and poor performance.
+
+This release revisits that model and comes with a new, simplified approach to concurrency based on the producer-consumer pattern. A concurrent chunk-oriented step now uses a bounded internal queue between the producer thread and consumer threads. Items are put in the queue as soon as they are ready to be processed, and consumer threads take items from the queue as soon as they are available for processing. Once a chunk is ready to be written, the producer thread pauses until the chunk is written, and then resumes producing items.
+
+This new model is more efficient, easier to understand and provides better performance for concurrent executions.
+
 [[new-command-line-operator]]
 == New command line operator
 
@@ -153,6 +166,23 @@ This release introduces a modern version of `CommandLineJobRunner`, named `Comma
 Prior to this release, if a job execution fails abruptly, it was not possible to recover it without a manual database update. This was error-prone and not consistent across different job repositories (as it required a few SQL statements for JDBC databases and some custom statements for NoSQL stores).
 
 This release introduces a new method named `recover` in the `JobOperator` interface that allows you to recover failed job executions consistently across all job repositories.
+
+[[ability-to-stop-all-kind-of-steps]]
+== Ability to stop all kinds of steps
+
+As of v5.2, it is only possible to externally stop `Tasklet` steps through  `JobOperator#stop`.
+If a custom `Step` implementation wants to handle external stop signals, it just can't.
+
+This release adds a new interface, named `StoppableStep`, that extends `Step` and which can be implemented by any step that is able to handle stop signals.
+
+[[observability-with-jfr]]
+== Observability with the Java Flight Recorder (JFR)
+
+In addition to the existing Micrometer metrics, Spring Batch 6.0 introduces support for the Java Flight Recorder (JFR) to provide enhanced observability capabilities.
+
+JFR is a powerful profiling and event collection framework built into the Java Virtual Machine (JVM). It allows you to capture detailed information about the runtime behavior of your applications with minimal performance overhead.
+
+This release introduces several JFR events to monitor key aspects of a batch job execution, including job and step executions, item reads and writes, as well as transaction boundaries.
 
 [[deprecations-and-pruning]]
 == Deprecations and pruning

@@ -28,9 +28,8 @@ xref:common-patterns.adoc#commonPatterns[Common Patterns] :: Common batch proces
 and guidelines.
 xref:spring-batch-integration.adoc[Spring Batch Integration] :: Integration
 between Spring Batch and Spring Integration projects.
-xref:monitoring-and-metrics.adoc[Monitoring and metrics] :: Batch jobs
+xref:spring-batch-observability.adoc[Spring Batch Observability] :: Batch jobs
 monitoring and metrics.
-xref:tracing.adoc[Tracing] :: Tracing with Micrometer.
 
 The following appendices are available:
 

@@ -1,7 +1,9 @@
+[[micrometer]]
+= Micrometer support
+
 
 [[monitoring-and-metrics]]
-= Monitoring and metrics
-
+== Monitoring and metrics
 
 Since version 4.2, Spring Batch provides support for batch monitoring and metrics
 based on link:$$https://micrometer.io/$$[Micrometer]. This section describes
@@ -83,3 +85,13 @@ Metrics.globalRegistry.config().meterFilter(MeterFilter.denyNameStartsWith("spri
 
 See Micrometer's link:$$http://micrometer.io/docs/concepts#_meter_filters$$[reference documentation]
 for more details.
+
+[[tracing]]
+== Tracing
+
+As of version 5, Spring Batch provides tracing through Micrometer's `Observation` API. By default, tracing is enabled
+when using `@EnableBatchProcessing`. Spring Batch will create a trace for each job execution and a span for each
+step execution.
+
+If you do not use `EnableBatchProcessing`, you need to register a `BatchObservabilityBeanPostProcessor` in your
+application context, which will automatically setup Micrometer's observability in your jobs and steps beans.
