@@ -38,7 +38,7 @@ import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.ChunkOrientedStepBuilder;
-import org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy;
+import org.springframework.batch.core.step.skip.LimitCheckingExceptionHierarchySkipPolicy;
 import org.springframework.batch.core.step.skip.SkipLimitExceededException;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
@@ -426,9 +426,10 @@ public class ChunkOrientedStepIntegrationTests {
 
 			// skip policy configuration
 			int skipLimit = Integer.parseInt(System.getProperty("skipLimit"));
-			Map<Class<? extends Throwable>, Boolean> skippableExceptions = Map.of(FlatFileParseException.class, true,
-					DataIntegrityViolationException.class, true);
-			LimitCheckingItemSkipPolicy skipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, skippableExceptions);
+			Set<Class<? extends Throwable>> skippableExceptions = Set.of(FlatFileParseException.class,
+					DataIntegrityViolationException.class);
+			LimitCheckingExceptionHierarchySkipPolicy skipPolicy = new LimitCheckingExceptionHierarchySkipPolicy(
+					skippableExceptions, skipLimit);
 
 			return new ChunkOrientedStepBuilder<Person, Person>(jobRepository, 2).reader(itemReader)
 				.processor(itemProcessor)
@@ -460,9 +461,10 @@ public class ChunkOrientedStepIntegrationTests {
 
 			// skip policy configuration
 			int skipLimit = Integer.parseInt(System.getProperty("skipLimit"));
-			Map<Class<? extends Throwable>, Boolean> skippableExceptions = Map.of(FlatFileParseException.class, true,
-					DataIntegrityViolationException.class, true);
-			LimitCheckingItemSkipPolicy skipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, skippableExceptions);
+			Set<Class<? extends Throwable>> skippableExceptions = Set.of(FlatFileParseException.class,
+					DataIntegrityViolationException.class);
+			LimitCheckingExceptionHierarchySkipPolicy skipPolicy = new LimitCheckingExceptionHierarchySkipPolicy(
+					skippableExceptions, skipLimit);
 
 			return new ChunkOrientedStepBuilder<Person, Person>(jobRepository, 2).reader(itemReader)
 				.processor(itemProcessor)
