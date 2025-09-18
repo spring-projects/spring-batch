@@ -100,7 +100,8 @@ class JobRepositoryFactoryBeanTests {
 
 		when(incrementerFactory.isSupportedIncrementerType("ORACLE")).thenReturn(true);
 		when(incrementerFactory.getSupportedIncrementerTypes()).thenReturn(new String[0]);
-		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_SEQ")).thenReturn(new StubIncrementer());
+		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_INSTANCE_SEQ"))
+			.thenReturn(new StubIncrementer());
 		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_EXECUTION_SEQ"))
 			.thenReturn(new StubIncrementer());
 		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "STEP_EXECUTION_SEQ"))
@@ -119,7 +120,8 @@ class JobRepositoryFactoryBeanTests {
 
 		incrementerFactory = mock();
 		when(incrementerFactory.isSupportedIncrementerType("ORACLE")).thenReturn(true);
-		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_SEQ")).thenReturn(new StubIncrementer());
+		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_INSTANCE_SEQ"))
+			.thenReturn(new StubIncrementer());
 		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_EXECUTION_SEQ"))
 			.thenReturn(new StubIncrementer());
 		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "STEP_EXECUTION_SEQ"))
@@ -139,7 +141,8 @@ class JobRepositoryFactoryBeanTests {
 
 		incrementerFactory = mock();
 		when(incrementerFactory.isSupportedIncrementerType("ORACLE")).thenReturn(true);
-		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_SEQ")).thenReturn(new StubIncrementer());
+		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_INSTANCE_SEQ"))
+			.thenReturn(new StubIncrementer());
 		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_EXECUTION_SEQ"))
 			.thenReturn(new StubIncrementer());
 		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "STEP_EXECUTION_SEQ"))
@@ -160,7 +163,8 @@ class JobRepositoryFactoryBeanTests {
 
 		incrementerFactory = mock();
 		when(incrementerFactory.isSupportedIncrementerType("ORACLE")).thenReturn(true);
-		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_SEQ")).thenReturn(new StubIncrementer());
+		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_INSTANCE_SEQ"))
+			.thenReturn(new StubIncrementer());
 		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_EXECUTION_SEQ"))
 			.thenReturn(new StubIncrementer());
 		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "STEP_EXECUTION_SEQ"))
@@ -180,7 +184,8 @@ class JobRepositoryFactoryBeanTests {
 
 		incrementerFactory = mock();
 		when(incrementerFactory.isSupportedIncrementerType("ORACLE")).thenReturn(true);
-		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_SEQ")).thenReturn(new StubIncrementer());
+		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_INSTANCE_SEQ"))
+			.thenReturn(new StubIncrementer());
 		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_EXECUTION_SEQ"))
 			.thenReturn(new StubIncrementer());
 		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "STEP_EXECUTION_SEQ"))
@@ -239,7 +244,7 @@ class JobRepositoryFactoryBeanTests {
 
 		when(incrementerFactory.isSupportedIncrementerType("HSQL")).thenReturn(true);
 		when(incrementerFactory.getSupportedIncrementerTypes()).thenReturn(new String[0]);
-		when(incrementerFactory.getIncrementer(databaseType, tablePrefix + "JOB_SEQ"))
+		when(incrementerFactory.getIncrementer(databaseType, tablePrefix + "JOB_INSTANCE_SEQ"))
 			.thenReturn(new StubIncrementer());
 		when(incrementerFactory.getIncrementer(databaseType, tablePrefix + "JOB_EXECUTION_SEQ"))
 			.thenReturn(new StubIncrementer());
