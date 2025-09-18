@@ -21,10 +21,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import io.micrometer.core.instrument.LongTaskTimer;
-import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Metrics;
-import io.micrometer.core.instrument.Tag;
 import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationRegistry;
 import org.apache.commons.logging.Log;
@@ -38,16 +34,12 @@ import org.springframework.batch.core.job.parameters.JobParametersValidator;
 import org.springframework.batch.core.listener.JobExecutionListener;
 import org.springframework.batch.core.SpringBatchVersion;
 import org.springframework.batch.core.observability.jfr.events.job.JobExecutionEvent;
+import org.springframework.batch.core.observability.micrometer.MicrometerMetrics;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.launch.support.ExitCodeMapper;
 import org.springframework.batch.core.listener.CompositeJobExecutionListener;
-import org.springframework.batch.core.observability.BatchJobContext;
-import org.springframework.batch.core.observability.BatchJobObservation;
-import org.springframework.batch.core.observability.BatchJobObservationConvention;
-import org.springframework.batch.core.observability.BatchMetrics;
-import org.springframework.batch.core.observability.DefaultBatchJobObservationConvention;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.core.scope.context.JobSynchronizationManager;
@@ -87,11 +79,7 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 
 	private StepHandler stepHandler;
 
-	private ObservationRegistry observationRegistry = ObservationRegistry.NOOP;
-
-	private MeterRegistry meterRegistry = Metrics.globalRegistry;
-
-	private BatchJobObservationConvention observationConvention = new DefaultBatchJobObservationConvention();
+	private ObservationRegistry observationRegistry;
 
 	/**
 	 * Default constructor.
@@ -126,6 +114,10 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(jobRepository != null, "JobRepository must be set");
+		if (this.observationRegistry == null) {
+			logger.info("No ObservationRegistry has been set, defaulting to ObservationRegistry NOOP");
+			this.observationRegistry = ObservationRegistry.NOOP;
+		}
 	}
 
 	/**
@@ -281,16 +273,10 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 		JobExecutionEvent jobExecutionEvent = new JobExecutionEvent(execution.getJobInstance().getJobName(),
 				execution.getJobInstance().getId(), execution.getId());
 		jobExecutionEvent.begin();
-		String activeJobMeterName = "job.active";
-		LongTaskTimer longTaskTimer = BatchMetrics.createLongTaskTimer(this.meterRegistry, activeJobMeterName,
-				"Active jobs", Tag.of(BatchMetrics.METRICS_PREFIX + activeJobMeterName + ".name",
-						execution.getJobInstance().getJobName()));
-		LongTaskTimer.Sample longTaskTimerSample = longTaskTimer.start();
-		Observation observation = BatchMetrics
-			.createObservation(BatchJobObservation.BATCH_JOB_OBSERVATION.getName(), new BatchJobContext(execution),
-					this.observationRegistry)
-			.contextualName(execution.getJobInstance().getJobName())
-			.observationConvention(this.observationConvention)
+		Observation observation = MicrometerMetrics.createObservation("spring.batch.job", this.observationRegistry)
+			.highCardinalityKeyValue("spring.batch.job.instanceId", execution.getJobInstance().getId().toString())
+			.highCardinalityKeyValue("spring.batch.job.executionId", execution.getId().toString())
+			.lowCardinalityKeyValue("spring.batch.job.name", execution.getJobInstance().getJobName())
 			.start();
 		try (Observation.Scope scope = observation.openScope()) {
 
@@ -355,7 +341,6 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 				stopObservation(execution, observation);
 				jobExecutionEvent.exitStatus = execution.getExitStatus().getExitCode();
 				jobExecutionEvent.commit();
-				longTaskTimerSample.stop();
 				execution.setEndTime(LocalDateTime.now());
 
 				try {
@@ -380,6 +365,7 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 		if (!throwables.isEmpty()) {
 			observation.error(mergedThrowables(throwables));
 		}
+		observation.lowCardinalityKeyValue("spring.batch.job.status", execution.getExitStatus().getExitCode());
 		observation.stop();
 	}
 
@@ -437,16 +423,8 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 		jobRepository.update(jobExecution);
 	}
 
-	public void setObservationConvention(BatchJobObservationConvention observationConvention) {
-		this.observationConvention = observationConvention;
-	}
-
 	public void setObservationRegistry(ObservationRegistry observationRegistry) {
 		this.observationRegistry = observationRegistry;
-	}
-
-	public void setMeterRegistry(MeterRegistry meterRegistry) {
-		this.meterRegistry = meterRegistry;
 	}
 
 	@Override

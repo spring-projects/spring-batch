@@ -18,12 +18,15 @@ package org.springframework.batch.core.step.item;
 import java.util.List;
 
 import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.observation.DefaultMeterObservationHandler;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
+import io.micrometer.observation.ObservationRegistry;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
+import org.springframework.batch.core.configuration.support.DefaultBatchConfiguration;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.builder.JobBuilder;
@@ -48,9 +51,9 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 public class ChunkOrientedStepObservabilityIntegrationTests {
 
 	@Test
-	void testChunkOrientedStepMetrics() throws Exception {
+	void testChunkOrientedStepMetricsWihDeclarativeApproach() throws Exception {
 		// given
-		ApplicationContext context = new AnnotationConfigApplicationContext(TestConfiguration.class);
+		ApplicationContext context = new AnnotationConfigApplicationContext(DeclarativeTestConfiguration.class);
 		SimpleMeterRegistry meterRegistry = context.getBean(SimpleMeterRegistry.class);
 		JobOperator jobOperator = context.getBean(JobOperator.class);
 		Job job = context.getBean(Job.class);
@@ -60,7 +63,27 @@ public class ChunkOrientedStepObservabilityIntegrationTests {
 
 		// then
 		Assertions.assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
-		Assertions.assertEquals(3, meterRegistry.getMeters().size());
+		assertMetrics(meterRegistry);
+	}
+
+	@Test
+	void testChunkOrientedStepMetricsWihProgrammaticApproach() throws Exception {
+		// given
+		ApplicationContext context = new AnnotationConfigApplicationContext(ProgrammaticTestConfiguration.class);
+		SimpleMeterRegistry meterRegistry = context.getBean(SimpleMeterRegistry.class);
+		JobOperator jobOperator = context.getBean(JobOperator.class);
+		Job job = context.getBean(Job.class);
+
+		// when
+		JobExecution jobExecution = jobOperator.start(job, new JobParameters());
+
+		// then
+		Assertions.assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
+		assertMetrics(meterRegistry);
+	}
+
+	private static void assertMetrics(SimpleMeterRegistry meterRegistry) {
+		Assertions.assertEquals(12, meterRegistry.getMeters().size());
 		assertDoesNotThrow(
 				() -> meterRegistry.get("spring.batch.item.read")
 					.tag("spring.batch.item.read.job.name", "job")
@@ -86,7 +109,7 @@ public class ChunkOrientedStepObservabilityIntegrationTests {
 
 	@Configuration
 	@EnableBatchProcessing
-	static class TestConfiguration {
+	static class DeclarativeTestConfiguration {
 
 		@Bean
 		public Job job(JobRepository jobRepository, Step step) {
@@ -94,19 +117,66 @@ public class ChunkOrientedStepObservabilityIntegrationTests {
 		}
 
 		@Bean
-		public Step step(JobRepository jobRepository, MeterRegistry meterRegistry) {
+		public Step step(JobRepository jobRepository, ObservationRegistry observationRegistry) {
 			return new ChunkOrientedStepBuilder<String, String>(jobRepository, 2)
 				.reader(new ListItemReader<>(List.of("one", "two", "three", "four", "five")))
 				.processor(String::toUpperCase)
 				.writer(items -> {
 				})
-				.meterRegistry(meterRegistry)
+				.observationRegistry(observationRegistry)
 				.build();
 		}
 
 		@Bean
 		public SimpleMeterRegistry meterRegistry() {
 			return new SimpleMeterRegistry();
+		}
+
+		@Bean
+		public ObservationRegistry observationRegistry(MeterRegistry meterRegistry) {
+			ObservationRegistry observationRegistry = ObservationRegistry.create();
+			observationRegistry.observationConfig()
+				.observationHandler(new DefaultMeterObservationHandler(meterRegistry));
+			return observationRegistry;
+		}
+
+	}
+
+	@Configuration
+	static class ProgrammaticTestConfiguration extends DefaultBatchConfiguration {
+
+		@Bean
+		public Job job(JobRepository jobRepository, Step step) {
+			return new JobBuilder(jobRepository).start(step).build();
+		}
+
+		@Bean
+		public Step step(JobRepository jobRepository, ObservationRegistry observationRegistry) {
+			return new ChunkOrientedStepBuilder<String, String>(jobRepository, 2)
+				.reader(new ListItemReader<>(List.of("one", "two", "three", "four", "five")))
+				.processor(String::toUpperCase)
+				.writer(items -> {
+				})
+				.observationRegistry(observationRegistry)
+				.build();
+		}
+
+		@Override
+		protected ObservationRegistry getObservationRegistry() {
+			return observationRegistry(meterRegistry());
+		}
+
+		@Bean
+		public SimpleMeterRegistry meterRegistry() {
+			return new SimpleMeterRegistry();
+		}
+
+		@Bean
+		public ObservationRegistry observationRegistry(MeterRegistry meterRegistry) {
+			ObservationRegistry observationRegistry = ObservationRegistry.create();
+			observationRegistry.observationConfig()
+				.observationHandler(new DefaultMeterObservationHandler(meterRegistry));
+			return observationRegistry;
 		}
 
 	}

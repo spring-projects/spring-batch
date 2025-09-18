@@ -24,6 +24,8 @@ import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Timer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import org.springframework.batch.core.observability.micrometer.MicrometerMetrics;
 import org.springframework.batch.core.step.StepContribution;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.listener.StepListener;
@@ -159,7 +161,7 @@ public class SimpleChunkProvider<I> implements ChunkProvider<I> {
 
 	private void stopTimer(Timer.Sample sample, StepExecution stepExecution, String status) {
 		String fullyQualifiedMetricName = BatchMetrics.METRICS_PREFIX + "item.read";
-		sample.stop(BatchMetrics.createTimer(this.meterRegistry, "item.read", "Item reading duration",
+		sample.stop(MicrometerMetrics.createTimer(this.meterRegistry, "item.read", "Item reading duration",
 				Tag.of(fullyQualifiedMetricName + ".job.name",
 						stepExecution.getJobExecution().getJobInstance().getJobName()),
 				Tag.of(fullyQualifiedMetricName + ".step.name", stepExecution.getStepName()),

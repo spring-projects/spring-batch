@@ -15,7 +15,10 @@
  */
 package org.springframework.batch.core.configuration.support;
 
+import io.micrometer.observation.ObservationRegistry;
+
 import org.springframework.batch.core.configuration.DuplicateJobException;
+import org.springframework.batch.core.configuration.annotation.BatchObservabilityBeanPostProcessor;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.configuration.BatchConfigurationException;
 import org.springframework.batch.core.configuration.JobRegistry;
@@ -74,7 +77,7 @@ import org.springframework.transaction.PlatformTransactionManager;
  * @since 5.0
  */
 @Configuration(proxyBeanMethods = false)
-@Import(ScopeConfiguration.class)
+@Import({ ScopeConfiguration.class, BatchObservabilityBeanPostProcessor.class })
 public class DefaultBatchConfiguration implements ApplicationContextAware {
 
 	protected ApplicationContext applicationContext;
@@ -95,6 +98,7 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 		jobOperatorFactoryBean.setJobRepository(jobRepository);
 		jobOperatorFactoryBean.setJobRegistry(getJobRegistry());
 		jobOperatorFactoryBean.setTransactionManager(getTransactionManager());
+		jobOperatorFactoryBean.setObservationRegistry(getObservationRegistry());
 		jobOperatorFactoryBean.setJobParametersConverter(getJobParametersConverter());
 		jobOperatorFactoryBean.setTaskExecutor(getTaskExecutor());
 		try {
@@ -117,6 +121,16 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 			}
 		});
 		return jobRegistry;
+	}
+
+	/**
+	 * Return the {@link ObservationRegistry} to use for the job operator. Defaults to
+	 * {@link ObservationRegistry#NOOP}.
+	 * @return The ObservationRegistry to use for the job operator
+	 * @since 6.0
+	 */
+	protected ObservationRegistry getObservationRegistry() {
+		return ObservationRegistry.NOOP;
 	}
 
 	/**

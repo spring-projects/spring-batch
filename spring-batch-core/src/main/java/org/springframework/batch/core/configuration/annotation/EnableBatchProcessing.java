@@ -179,6 +179,13 @@ public @interface EnableBatchProcessing {
 	String jobRegistryRef() default "jobRegistry";
 
 	/**
+	 * Set the observation registry to use in batch artifacts.
+	 * @return the bean name of the observation registry to use. Defaults to
+	 * {@literal observationRegistry}
+	 */
+	String observationRegistryRef() default "observationRegistry";
+
+	/**
 	 * Set the transaction manager to use in the job operator.
 	 * @return the bean name of the transaction manager to use. Defaults to
 	 * {@literal transactionManager}

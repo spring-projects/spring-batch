@@ -25,6 +25,7 @@ import io.micrometer.core.instrument.Timer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.springframework.batch.core.observability.micrometer.MicrometerMetrics;
 import org.springframework.batch.core.step.StepContribution;
 import org.springframework.batch.core.listener.StepListenerFailedException;
 import org.springframework.batch.core.observability.BatchMetrics;
@@ -220,7 +221,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 			final I item = iterator.next();
 
 			RetryCallback<O, Exception> retryCallback = context -> {
-				Timer.Sample sample = BatchMetrics.createTimerSample(meterRegistry);
+				Timer.Sample sample = MicrometerMetrics.createTimerSample(meterRegistry);
 				String status = BatchMetrics.STATUS_SUCCESS;
 				O output = null;
 				try {
@@ -329,7 +330,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 
 			if (!data.scanning()) {
 				chunkMonitor.setChunkSize(inputs.size());
-				Timer.Sample sample = BatchMetrics.createTimerSample(meterRegistry);
+				Timer.Sample sample = MicrometerMetrics.createTimerSample(meterRegistry);
 				String status = BatchMetrics.STATUS_SUCCESS;
 				try {
 					doWrite(outputs);

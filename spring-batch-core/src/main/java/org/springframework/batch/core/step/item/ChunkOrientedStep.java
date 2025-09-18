@@ -19,10 +19,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Future;
 
-import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Metrics;
-import io.micrometer.core.instrument.Tag;
-import io.micrometer.core.instrument.Timer;
+import io.micrometer.observation.Observation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jspecify.annotations.Nullable;
@@ -77,6 +74,8 @@ import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 import org.springframework.transaction.interceptor.TransactionAttribute;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.Assert;
+
+import static org.springframework.batch.core.observability.BatchMetrics.METRICS_PREFIX;
 
 /**
  * Step implementation for the chunk-oriented processing model. This class also supports
@@ -152,11 +151,6 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 	 * Concurrency parameters
 	 */
 	private AsyncTaskExecutor taskExecutor;
-
-	/*
-	 * Observability parameters
-	 */
-	private MeterRegistry meterRegistry;
 
 	/**
 	 * Create a new {@link ChunkOrientedStep}.
@@ -318,16 +312,6 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 		this.compositeSkipListener.register(skipListener);
 	}
 
-	/**
-	 * Set the meter registry to use for metrics.
-	 * @param meterRegistry the meter registry
-	 * @since 6.0
-	 */
-	public void setMeterRegistry(MeterRegistry meterRegistry) {
-		Assert.notNull(meterRegistry, "Meter registry must not be null");
-		this.meterRegistry = meterRegistry;
-	}
-
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
@@ -356,10 +340,6 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			this.retryTemplate = new RetryTemplate();
 			this.retryTemplate.setRetryPolicy(this.retryPolicy);
 			this.retryTemplate.setRetryListener(this.compositeRetryListener);
-		}
-		if (this.meterRegistry == null) {
-			logger.info("No meter registry has been set. Defaulting to the global meter registry.");
-			this.meterRegistry = Metrics.globalRegistry;
 		}
 	}
 
@@ -507,11 +487,16 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 	@Nullable private I readItem(StepContribution contribution) throws Exception {
 		ItemReadEvent itemReadEvent = new ItemReadEvent(contribution.getStepExecution().getStepName(),
 				contribution.getStepExecution().getId());
-		Timer.Sample sample = startTimerSample();
-		String status = BatchMetrics.STATUS_SUCCESS;
+		String fullyQualifiedMetricName = BatchMetrics.METRICS_PREFIX + "item.read";
+		Observation observation = Observation.createNotStarted(fullyQualifiedMetricName, this.observationRegistry)
+			.lowCardinalityKeyValue(fullyQualifiedMetricName + ".job.name",
+					contribution.getStepExecution().getJobExecution().getJobInstance().getJobName())
+			.lowCardinalityKeyValue(fullyQualifiedMetricName + ".step.name",
+					contribution.getStepExecution().getStepName())
+			.start();
+		itemReadEvent.begin();
 		I item = null;
-		try {
-			itemReadEvent.begin();
+		try (var scope = observation.openScope()) {
 			this.compositeItemReadListener.beforeRead();
 			item = doRead();
 			if (item == null) {
@@ -522,6 +507,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 				this.compositeItemReadListener.afterRead(item);
 			}
 			itemReadEvent.itemReadStatus = BatchMetrics.STATUS_SUCCESS;
+			observation.lowCardinalityKeyValue(fullyQualifiedMetricName + ".status", BatchMetrics.STATUS_SUCCESS);
 		}
 		catch (Exception exception) {
 			this.compositeItemReadListener.onReadError(exception);
@@ -532,12 +518,12 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 				throw exception;
 			}
 			itemReadEvent.itemReadStatus = BatchMetrics.STATUS_FAILURE;
-			status = BatchMetrics.STATUS_FAILURE;
+			observation.lowCardinalityKeyValue(fullyQualifiedMetricName + ".status", BatchMetrics.STATUS_FAILURE);
+			observation.error(exception);
 		}
 		finally {
 			itemReadEvent.commit();
-			stopTimerSample(sample, contribution.getStepExecution().getJobExecution().getJobInstance().getJobName(),
-					contribution.getStepExecution().getStepName(), "item.read", "Item reading", status);
+			observation.stop();
 		}
 		return item;
 	}
@@ -589,11 +575,16 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 	private O processItem(I item, StepContribution contribution) throws Exception {
 		ItemProcessEvent itemProcessEvent = new ItemProcessEvent(contribution.getStepExecution().getStepName(),
 				contribution.getStepExecution().getId());
-		Timer.Sample sample = startTimerSample();
-		String status = BatchMetrics.STATUS_SUCCESS;
+		String fullyQualifiedMetricName = METRICS_PREFIX + "item.process";
+		Observation observation = Observation.createNotStarted(fullyQualifiedMetricName, this.observationRegistry)
+			.lowCardinalityKeyValue(fullyQualifiedMetricName + ".job.name",
+					contribution.getStepExecution().getJobExecution().getJobInstance().getJobName())
+			.lowCardinalityKeyValue(fullyQualifiedMetricName + ".step.name",
+					contribution.getStepExecution().getStepName())
+			.start();
+		itemProcessEvent.begin();
 		O processedItem = null;
-		try {
-			itemProcessEvent.begin();
+		try (var scope = observation.openScope()) {
 			this.compositeItemProcessListener.beforeProcess(item);
 			processedItem = doProcess(item);
 			if (processedItem == null) {
@@ -601,6 +592,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			}
 			this.compositeItemProcessListener.afterProcess(item, processedItem);
 			itemProcessEvent.itemProcessStatus = BatchMetrics.STATUS_SUCCESS;
+			observation.lowCardinalityKeyValue(fullyQualifiedMetricName + ".status", BatchMetrics.STATUS_SUCCESS);
 		}
 		catch (Exception exception) {
 			this.compositeItemProcessListener.onProcessError(item, exception);
@@ -611,12 +603,12 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 				throw exception;
 			}
 			itemProcessEvent.itemProcessStatus = BatchMetrics.STATUS_FAILURE;
-			status = BatchMetrics.STATUS_FAILURE;
+			observation.lowCardinalityKeyValue(fullyQualifiedMetricName + ".status", BatchMetrics.STATUS_FAILURE);
+			observation.error(exception);
 		}
 		finally {
 			itemProcessEvent.commit();
-			stopTimerSample(sample, contribution.getStepExecution().getJobExecution().getJobInstance().getJobName(),
-					contribution.getStepExecution().getStepName(), "item.process", "Item processing", status);
+			observation.stop();
 		}
 		return processedItem;
 	}
@@ -669,20 +661,27 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 	private void writeChunk(Chunk<O> chunk, StepContribution contribution) throws Exception {
 		ChunkWriteEvent chunkWriteEvent = new ChunkWriteEvent(contribution.getStepExecution().getStepName(),
 				contribution.getStepExecution().getId(), chunk.size());
-		Timer.Sample sample = startTimerSample();
-		String status = BatchMetrics.STATUS_SUCCESS;
-		try {
-			chunkWriteEvent.begin();
+		String fullyQualifiedMetricName = METRICS_PREFIX + "chunk.write";
+		Observation observation = Observation.createNotStarted(fullyQualifiedMetricName, this.observationRegistry)
+			.lowCardinalityKeyValue(fullyQualifiedMetricName + ".job.name",
+					contribution.getStepExecution().getJobExecution().getJobInstance().getJobName())
+			.lowCardinalityKeyValue(fullyQualifiedMetricName + ".step.name",
+					contribution.getStepExecution().getStepName())
+			.start();
+		chunkWriteEvent.begin();
+		try (var scope = observation.openScope()) {
 			this.compositeItemWriteListener.beforeWrite(chunk);
 			doWrite(chunk);
 			contribution.incrementWriteCount(chunk.size());
 			this.compositeItemWriteListener.afterWrite(chunk);
 			chunkWriteEvent.chunkWriteStatus = BatchMetrics.STATUS_SUCCESS;
+			observation.lowCardinalityKeyValue(fullyQualifiedMetricName + ".status", BatchMetrics.STATUS_SUCCESS);
 		}
 		catch (Exception exception) {
 			this.compositeItemWriteListener.onWriteError(exception, chunk);
 			chunkWriteEvent.chunkWriteStatus = BatchMetrics.STATUS_FAILURE;
-			status = BatchMetrics.STATUS_FAILURE;
+			observation.lowCardinalityKeyValue(fullyQualifiedMetricName + ".status", BatchMetrics.STATUS_FAILURE);
+			observation.error(exception);
 			if (this.faultTolerant && exception instanceof RetryException retryException) {
 				logger.info("Retry exhausted while attempting to write items, scanning the chunk", retryException);
 				ChunkScanEvent chunkScanEvent = new ChunkScanEvent(contribution.getStepExecution().getStepName(),
@@ -699,8 +698,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 		}
 		finally {
 			chunkWriteEvent.commit();
-			stopTimerSample(sample, contribution.getStepExecution().getJobExecution().getJobInstance().getJobName(),
-					contribution.getStepExecution().getStepName(), "chunk.write", "Chunk writing", status);
+			observation.stop();
 		}
 	}
 
@@ -750,19 +748,6 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 				}
 			}
 		}
-	}
-
-	private Timer.Sample startTimerSample() {
-		return BatchMetrics.createTimerSample(this.meterRegistry);
-	}
-
-	private void stopTimerSample(Timer.Sample sample, String jobName, String stepName, String operation,
-			String description, String status) {
-		String fullyQualifiedMetricName = BatchMetrics.METRICS_PREFIX + operation;
-		sample.stop(BatchMetrics.createTimer(this.meterRegistry, operation, description + " duration",
-				Tag.of(fullyQualifiedMetricName + ".job.name", jobName),
-				Tag.of(fullyQualifiedMetricName + ".step.name", stepName),
-				Tag.of(fullyQualifiedMetricName + ".status", status)));
 	}
 
 	private boolean isConcurrent() {

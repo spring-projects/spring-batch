@@ -15,7 +15,10 @@
  */
 package org.springframework.batch.core.launch.support;
 
-import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.observation.Observation;
+import io.micrometer.observation.ObservationRegistry;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.job.Job;
@@ -28,12 +31,15 @@ import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.launch.NoSuchJobExecutionException;
 import org.springframework.batch.core.observability.jfr.events.job.JobLaunchEvent;
+import org.springframework.batch.core.observability.micrometer.MicrometerMetrics;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.util.Assert;
+
+import static org.springframework.batch.core.observability.BatchMetrics.METRICS_PREFIX;
 
 /**
  * A {@link org.springframework.core.task.TaskExecutor}-based implementation of the
@@ -58,9 +64,17 @@ import org.springframework.util.Assert;
 @SuppressWarnings("removal")
 public class TaskExecutorJobOperator extends SimpleJobOperator {
 
+	private static final Log logger = LogFactory.getLog(TaskExecutorJobOperator.class.getName());
+
+	protected ObservationRegistry observationRegistry;
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
+		if (this.observationRegistry == null) {
+			logger.info("No ObservationRegistry has been set, defaulting to ObservationRegistry NOOP");
+			this.observationRegistry = ObservationRegistry.NOOP;
+		}
 	}
 
 	@Override
@@ -81,10 +95,15 @@ public class TaskExecutorJobOperator extends SimpleJobOperator {
 		this.taskExecutor = taskExecutor;
 	}
 
-	@Override
-	public void setMeterRegistry(MeterRegistry meterRegistry) {
-		Assert.notNull(meterRegistry, "MeterRegistry must not be null");
-		this.meterRegistry = meterRegistry;
+	/**
+	 * Set the observation registry to use for observations. Defaults to
+	 * {@link ObservationRegistry#NOOP}.
+	 * @param observationRegistry the observation registry
+	 * @since 6.0
+	 */
+	public void setObservationRegistry(ObservationRegistry observationRegistry) {
+		Assert.notNull(observationRegistry, "ObservationRegistry must not be null");
+		this.observationRegistry = observationRegistry;
 	}
 
 	@Override
@@ -94,7 +113,15 @@ public class TaskExecutorJobOperator extends SimpleJobOperator {
 		Assert.notNull(job, "Job must not be null");
 		Assert.notNull(jobParameters, "JobParameters must not be null");
 		new JobLaunchEvent(job.getName(), jobParameters.toString()).commit();
-		return super.start(job, jobParameters);
+		Observation observation = MicrometerMetrics
+			.createObservation(METRICS_PREFIX + "job.launch.count", this.observationRegistry)
+			.start();
+		try (var scope = observation.openScope()) {
+			return super.start(job, jobParameters);
+		}
+		finally {
+			observation.stop();
+		}
 	}
 
 	@Override

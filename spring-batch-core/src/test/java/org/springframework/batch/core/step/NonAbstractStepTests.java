@@ -34,7 +34,6 @@ import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.listener.StepExecutionListener;
-import org.springframework.batch.core.observability.BatchStepObservation;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
@@ -218,7 +217,7 @@ class NonAbstractStepTests {
 
 		// Observability
 		MeterRegistryAssert.assertThat(Metrics.globalRegistry)
-			.hasTimerWithNameAndTags(BatchStepObservation.BATCH_STEP_OBSERVATION.getName(),
+			.hasTimerWithNameAndTags("spring.batch.step",
 					Tags.of(Tag.of("error", "none"), Tag.of("spring.batch.step.job.name", "jobName"),
 							Tag.of("spring.batch.step.name", "eventTrackingStep"),
 							Tag.of("spring.batch.step.status", "COMPLETED")));

@@ -21,7 +21,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.observation.ObservationRegistry;
 
 import org.springframework.batch.core.annotation.AfterChunk;
 import org.springframework.batch.core.annotation.AfterProcess;
@@ -110,7 +110,7 @@ public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrien
 
 	private AsyncTaskExecutor asyncTaskExecutor;
 
-	private MeterRegistry meterRegistry;
+	private ObservationRegistry observationRegistry;
 
 	ChunkOrientedStepBuilder(StepBuilderHelper<?> parent, int chunkSize) {
 		super(parent);
@@ -364,14 +364,14 @@ public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrien
 	}
 
 	/**
-	 * Set the meter registry to be used for collecting metrics during step execution.
-	 * This allows for monitoring and analyzing the performance of the step. If not set,
-	 * it will default to {@link io.micrometer.core.instrument.Metrics#globalRegistry}.
-	 * @param meterRegistry the MeterRegistry to use
+	 * Set the observation registry to be used for collecting metrics during step
+	 * execution. This allows for monitoring and analyzing the performance of the step. If
+	 * not set, it will default to {@link ObservationRegistry#NOOP}.
+	 * @param observationRegistry the observation registry to use
 	 * @return this for fluent chaining
 	 */
-	public ChunkOrientedStepBuilder<I, O> meterRegistry(MeterRegistry meterRegistry) {
-		this.meterRegistry = meterRegistry;
+	public ChunkOrientedStepBuilder<I, O> observationRegistry(ObservationRegistry observationRegistry) {
+		this.observationRegistry = observationRegistry;
 		return self();
 	}
 
@@ -428,8 +428,8 @@ public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrien
 		});
 		retryListeners.forEach(chunkOrientedStep::registerRetryListener);
 		skipListeners.forEach(chunkOrientedStep::registerSkipListener);
-		if (this.meterRegistry != null) {
-			chunkOrientedStep.setMeterRegistry(this.meterRegistry);
+		if (this.observationRegistry != null) {
+			chunkOrientedStep.setObservationRegistry(this.observationRegistry);
 		}
 		try {
 			chunkOrientedStep.afterPropertiesSet();

@@ -17,11 +17,9 @@ package org.springframework.batch.core.observability;
 
 import java.util.UUID;
 
-import javax.sql.DataSource;
-
 import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.observation.DefaultMeterObservationHandler;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import io.micrometer.core.tck.MeterRegistryAssert;
 import io.micrometer.observation.ObservationRegistry;
 import io.micrometer.tracing.test.SampleTestRunner;
@@ -31,7 +29,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.configuration.annotation.EnableJdbcJobRepository;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.parameters.JobParameters;
@@ -46,9 +43,6 @@ import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
-import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
@@ -61,6 +55,9 @@ class ObservabilitySampleStepTests extends SampleTestRunner {
 	private JobOperator jobOperator;
 
 	@Autowired
+	private MeterRegistry meterRegistry;
+
+	@Autowired
 	private ObservationRegistry observationRegistry;
 
 	ObservabilitySampleStepTests() {
@@ -69,7 +66,7 @@ class ObservabilitySampleStepTests extends SampleTestRunner {
 
 	@Override
 	protected MeterRegistry createMeterRegistry() {
-		return Metrics.globalRegistry;
+		return this.meterRegistry;
 	}
 
 	@Override
@@ -80,7 +77,7 @@ class ObservabilitySampleStepTests extends SampleTestRunner {
 	@AfterEach
 	@Override
 	protected void closeMeterRegistry() {
-		Metrics.globalRegistry.clear();
+		this.meterRegistry.clear();
 	}
 
 	@Override
@@ -99,52 +96,42 @@ class ObservabilitySampleStepTests extends SampleTestRunner {
 			// and
 			SpansAssert.assertThat(bb.getFinishedSpans())
 				.haveSameTraceId()
-				.hasASpanWithName("job")
-				.hasASpanWithName("step");
+				.hasASpanWithName("spring.batch.job")
+				.hasASpanWithName("spring.batch.step");
 
 			// and
 			MeterRegistryAssert.assertThat(meterRegistry)
-				.hasTimerWithName("spring.batch.job")
-				.hasTimerWithName("spring.batch.step");
+				.hasMeterWithName("spring.batch.job")
+				.hasMeterWithName("spring.batch.step");
 		};
 	}
 
 	@Configuration(proxyBeanMethods = false)
 	@EnableBatchProcessing
-	@EnableJdbcJobRepository
 	static class TestConfig {
 
 		@Bean
-		public ObservationRegistry observationRegistry() {
+		public MeterRegistry meterRegistry() {
+			return new SimpleMeterRegistry();
+		}
+
+		@Bean
+		public ObservationRegistry observationRegistry(MeterRegistry meterRegistry) {
 			ObservationRegistry observationRegistry = ObservationRegistry.create();
 			observationRegistry.observationConfig()
-				.observationHandler(new DefaultMeterObservationHandler(Metrics.globalRegistry));
+				.observationHandler(new DefaultMeterObservationHandler(meterRegistry));
 			return observationRegistry;
 		}
 
 		@Bean
-		public Step step(JobRepository jobRepository, JdbcTransactionManager transactionManager) {
-			return new StepBuilder("step", jobRepository)
-				.tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED, transactionManager)
+		public Step step(JobRepository jobRepository) {
+			return new StepBuilder("step", jobRepository).tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED)
 				.build();
 		}
 
 		@Bean
 		public Job job(JobRepository jobRepository, Step step) {
 			return new JobBuilder("job", jobRepository).start(step).build();
-		}
-
-		@Bean
-		public DataSource dataSource() {
-			return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.HSQL)
-				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-				.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
-				.build();
-		}
-
-		@Bean
-		public JdbcTransactionManager transactionManager(DataSource dataSource) {
-			return new JdbcTransactionManager(dataSource);
 		}
 
 	}

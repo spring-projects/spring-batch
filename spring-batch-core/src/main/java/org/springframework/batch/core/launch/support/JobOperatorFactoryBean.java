@@ -17,8 +17,7 @@ package org.springframework.batch.core.launch.support;
 
 import java.lang.reflect.Method;
 
-import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Metrics;
+import io.micrometer.observation.ObservationRegistry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.aop.framework.ProxyFactory;
@@ -75,7 +74,7 @@ public class JobOperatorFactoryBean implements FactoryBean<JobOperator>, Applica
 
 	private TaskExecutor taskExecutor;
 
-	private MeterRegistry meterRegistry = Metrics.globalRegistry;
+	private ObservationRegistry observationRegistry;
 
 	private final ProxyFactory proxyFactory = new ProxyFactory();
 
@@ -153,13 +152,13 @@ public class JobOperatorFactoryBean implements FactoryBean<JobOperator>, Applica
 	}
 
 	/**
-	 * Set the meter registry to use for metrics. Defaults to
-	 * {@link Metrics#globalRegistry}.
-	 * @param meterRegistry the meter registry
+	 * Set the observation registry to use for metrics. Defaults to
+	 * {@link ObservationRegistry#NOOP}.
+	 * @param observationRegistry the observation registry to use
 	 * @since 6.0
 	 */
-	public void setMeterRegistry(MeterRegistry meterRegistry) {
-		this.meterRegistry = meterRegistry;
+	public void setObservationRegistry(ObservationRegistry observationRegistry) {
+		this.observationRegistry = observationRegistry;
 	}
 
 	/**
@@ -207,7 +206,9 @@ public class JobOperatorFactoryBean implements FactoryBean<JobOperator>, Applica
 		taskExecutorJobOperator.setJobRegistry(this.jobRegistry);
 		taskExecutorJobOperator.setJobRepository(this.jobRepository);
 		taskExecutorJobOperator.setTaskExecutor(this.taskExecutor);
-		taskExecutorJobOperator.setMeterRegistry(this.meterRegistry);
+		if (this.observationRegistry != null) {
+			taskExecutorJobOperator.setObservationRegistry(this.observationRegistry);
+		}
 		taskExecutorJobOperator.setJobParametersConverter(this.jobParametersConverter);
 		taskExecutorJobOperator.afterPropertiesSet();
 		return taskExecutorJobOperator;

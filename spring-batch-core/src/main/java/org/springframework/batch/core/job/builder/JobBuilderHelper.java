@@ -22,7 +22,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.observation.ObservationRegistry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -34,8 +33,6 @@ import org.springframework.batch.core.annotation.AfterJob;
 import org.springframework.batch.core.annotation.BeforeJob;
 import org.springframework.batch.core.job.AbstractJob;
 import org.springframework.batch.core.listener.JobListenerFactoryBean;
-import org.springframework.batch.core.observability.BatchJobObservationConvention;
-import org.springframework.batch.core.observability.DefaultBatchJobObservationConvention;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.support.ReflectionUtils;
 
@@ -110,37 +107,12 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 	}
 
 	/**
-	 * Sets the job observation convention.
-	 * @param observationConvention the job observation convention (optional)
-	 * @return this to enable fluent chaining
-	 * @since 5.1
-	 */
-	public B observationConvention(BatchJobObservationConvention observationConvention) {
-		properties.observationConvention = observationConvention;
-		@SuppressWarnings("unchecked")
-		B result = (B) this;
-		return result;
-	}
-
-	/**
 	 * Sets the observation registry for the job.
 	 * @param observationRegistry the observation registry (optional)
 	 * @return this to enable fluent chaining
 	 */
 	public B observationRegistry(ObservationRegistry observationRegistry) {
 		properties.observationRegistry = observationRegistry;
-		@SuppressWarnings("unchecked")
-		B result = (B) this;
-		return result;
-	}
-
-	/**
-	 * Sets the meter registry for the job.
-	 * @param meterRegistry the meter registry (optional)
-	 * @return this to enable fluent chaining
-	 */
-	public B meterRegistry(MeterRegistry meterRegistry) {
-		properties.meterRegistry = meterRegistry;
 		@SuppressWarnings("unchecked")
 		B result = (B) this;
 		return result;
@@ -213,17 +185,9 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 		if (jobParametersValidator != null) {
 			job.setJobParametersValidator(jobParametersValidator);
 		}
-		BatchJobObservationConvention observationConvention = properties.getObservationConvention();
-		if (observationConvention != null) {
-			job.setObservationConvention(observationConvention);
-		}
 		ObservationRegistry observationRegistry = properties.getObservationRegistry();
 		if (observationRegistry != null) {
 			job.setObservationRegistry(observationRegistry);
-		}
-		MeterRegistry meterRegistry = properties.getMeterRegistry();
-		if (meterRegistry != null) {
-			job.setMeterRegistry(meterRegistry);
 		}
 
 		Boolean restartable = properties.getRestartable();
@@ -247,11 +211,7 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 
 		private JobRepository jobRepository;
 
-		private BatchJobObservationConvention observationConvention = new DefaultBatchJobObservationConvention();
-
 		private ObservationRegistry observationRegistry;
-
-		private MeterRegistry meterRegistry;
 
 		private JobParametersIncrementer jobParametersIncrementer;
 
@@ -264,9 +224,7 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 			this.name = properties.name;
 			this.restartable = properties.restartable;
 			this.jobRepository = properties.jobRepository;
-			this.observationConvention = properties.observationConvention;
 			this.observationRegistry = properties.observationRegistry;
-			this.meterRegistry = properties.meterRegistry;
 			this.jobExecutionListeners = new LinkedHashSet<>(properties.jobExecutionListeners);
 			this.jobParametersIncrementer = properties.jobParametersIncrementer;
 			this.jobParametersValidator = properties.jobParametersValidator;
@@ -296,28 +254,12 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 			this.jobRepository = jobRepository;
 		}
 
-		public BatchJobObservationConvention getObservationConvention() {
-			return observationConvention;
-		}
-
-		public void setObservationConvention(BatchJobObservationConvention observationConvention) {
-			this.observationConvention = observationConvention;
-		}
-
 		public ObservationRegistry getObservationRegistry() {
 			return observationRegistry;
 		}
 
 		public void setObservationRegistry(ObservationRegistry observationRegistry) {
 			this.observationRegistry = observationRegistry;
-		}
-
-		public MeterRegistry getMeterRegistry() {
-			return meterRegistry;
-		}
-
-		public void setMeterRegistry(MeterRegistry meterRegistry) {
-			this.meterRegistry = meterRegistry;
 		}
 
 		public String getName() {

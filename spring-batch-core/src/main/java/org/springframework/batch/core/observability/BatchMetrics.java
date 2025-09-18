@@ -17,31 +17,16 @@ package org.springframework.batch.core.observability;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
-
-import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.LongTaskTimer;
-import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Tag;
-import io.micrometer.core.instrument.Timer;
-import io.micrometer.core.instrument.observation.DefaultMeterObservationHandler;
-import io.micrometer.observation.Observation;
-import io.micrometer.observation.ObservationRegistry;
 
 import org.springframework.lang.Nullable;
 
 /**
- * Central class for batch metrics. It provides:
- *
- * <ul>
- * <li>the main entry point to interact with Micrometer's API to create common metrics
- * such as {@link Timer} and {@link LongTaskTimer}.</li>
- * <li>Some utility methods like calculating durations and formatting them in a human
- * readable format.</li>
- * </ul>
- *
- * Only intended for internal use.
+ * Central class for batch metrics. It provides some utility methods like calculating
+ * durations and formatting them in a human-readable format.
+ * <p>
+ * <strong>Only intended for internal use</strong>.
+ * </p>
  *
  * @author Mahmoud Ben Hassine
  * @author Glenn Renfro
@@ -60,98 +45,6 @@ public final class BatchMetrics {
 	public static final String STATUS_ROLLED_BACK = "ROLLED_BACK";
 
 	private BatchMetrics() {
-	}
-
-	/**
-	 * Create a {@link Timer}.
-	 * @param meterRegistry the meter registry to use
-	 * @param name of the timer. Will be prefixed with
-	 * {@link BatchMetrics#METRICS_PREFIX}.
-	 * @param description of the timer
-	 * @param tags of the timer
-	 * @return a new timer instance
-	 */
-	public static Timer createTimer(MeterRegistry meterRegistry, String name, String description, Tag... tags) {
-		return Timer.builder(METRICS_PREFIX + name)
-			.description(description)
-			.tags(Arrays.asList(tags))
-			.register(meterRegistry);
-	}
-
-	/**
-	 * Create a {@link Counter}.
-	 * @param meterRegistry the meter registry to use
-	 * @param name of the counter. Will be prefixed with
-	 * {@link BatchMetrics#METRICS_PREFIX}.
-	 * @param description of the counter
-	 * @param tags of the counter
-	 * @return a new timer instance
-	 */
-	public static Counter createCounter(MeterRegistry meterRegistry, String name, String description, Tag... tags) {
-		return Counter.builder(METRICS_PREFIX + name)
-			.description(description)
-			.tags(Arrays.asList(tags))
-			.register(meterRegistry);
-	}
-
-	/**
-	 * Create a new {@link Observation}. It's not started, you must explicitly call
-	 * {@link Observation#start()} to start it.
-	 * <p>
-	 * Remember to register the {@link DefaultMeterObservationHandler} via the
-	 * {@code Metrics.globalRegistry.withTimerObservationHandler()} in the user code.
-	 * Otherwise you won't observe any metrics.
-	 * @param name of the observation
-	 * @param context of the batch job observation
-	 * @return a new observation instance
-	 * @since 5.0
-	 */
-	public static Observation createObservation(String name, BatchJobContext context,
-			ObservationRegistry observationRegistry) {
-		return Observation.createNotStarted(name, context, observationRegistry);
-	}
-
-	/**
-	 * Create a new {@link Observation}. It's not started, you must explicitly call
-	 * {@link Observation#start()} to start it.
-	 * <p>
-	 * Remember to register the {@link DefaultMeterObservationHandler} via the
-	 * {@code Metrics.globalRegistry.withTimerObservationHandler()} in the user code.
-	 * Otherwise you won't observe any metrics.
-	 * @param name of the observation
-	 * @param context of the observation step context
-	 * @return a new observation instance
-	 * @since 5.0
-	 */
-	public static Observation createObservation(String name, BatchStepContext context,
-			ObservationRegistry observationRegistry) {
-		return Observation.createNotStarted(name, context, observationRegistry);
-	}
-
-	/**
-	 * Create a new {@link Timer.Sample}.
-	 * @param meterRegistry the meter registry to use
-	 * @return a new timer sample instance
-	 */
-	public static Timer.Sample createTimerSample(MeterRegistry meterRegistry) {
-		return Timer.start(meterRegistry);
-	}
-
-	/**
-	 * Create a new {@link LongTaskTimer}.
-	 * @param meterRegistry the meter registry to use
-	 * @param name of the long task timer. Will be prefixed with
-	 * {@link BatchMetrics#METRICS_PREFIX}.
-	 * @param description of the long task timer.
-	 * @param tags of the timer
-	 * @return a new long task timer instance
-	 */
-	public static LongTaskTimer createLongTaskTimer(MeterRegistry meterRegistry, String name, String description,
-			Tag... tags) {
-		return LongTaskTimer.builder(METRICS_PREFIX + name)
-			.description(description)
-			.tags(Arrays.asList(tags))
-			.register(meterRegistry);
 	}
 
 	/**

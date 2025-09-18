@@ -20,8 +20,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Metrics;
 import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationRegistry;
 import org.apache.commons.logging.Log;
@@ -38,11 +36,8 @@ import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.launch.support.ExitCodeMapper;
 import org.springframework.batch.core.listener.CompositeStepExecutionListener;
 import org.springframework.batch.core.observability.BatchMetrics;
-import org.springframework.batch.core.observability.BatchStepContext;
-import org.springframework.batch.core.observability.BatchStepObservation;
-import org.springframework.batch.core.observability.BatchStepObservationConvention;
-import org.springframework.batch.core.observability.DefaultBatchStepObservationConvention;
 import org.springframework.batch.core.observability.jfr.events.step.StepExecutionEvent;
+import org.springframework.batch.core.observability.micrometer.MicrometerMetrics;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.batch.item.ExecutionContext;
@@ -78,12 +73,7 @@ public abstract class AbstractStep implements StoppableStep, InitializingBean, B
 
 	private JobRepository jobRepository;
 
-	private ObservationRegistry observationRegistry = ObservationRegistry.NOOP;
-
-	@SuppressWarnings("unused")
-	private MeterRegistry meterRegistry = Metrics.globalRegistry;
-
-	private BatchStepObservationConvention observationConvention = new DefaultBatchStepObservationConvention();
+	protected ObservationRegistry observationRegistry;
 
 	/**
 	 * Default constructor.
@@ -95,6 +85,10 @@ public abstract class AbstractStep implements StoppableStep, InitializingBean, B
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(jobRepository != null, "JobRepository is mandatory");
+		if (this.observationRegistry == null) {
+			logger.info("No ObservationRegistry has been set, defaulting to ObservationRegistry NOOP");
+			this.observationRegistry = ObservationRegistry.NOOP;
+		}
 	}
 
 	@Override
@@ -214,11 +208,12 @@ public abstract class AbstractStep implements StoppableStep, InitializingBean, B
 		stepExecutionEvent.begin();
 		stepExecution.setStartTime(LocalDateTime.now());
 		stepExecution.setStatus(BatchStatus.STARTED);
-		Observation observation = BatchMetrics
-			.createObservation(BatchStepObservation.BATCH_STEP_OBSERVATION.getName(),
-					new BatchStepContext(stepExecution), this.observationRegistry)
-			.contextualName(stepExecution.getStepName())
-			.observationConvention(this.observationConvention)
+		Observation observation = MicrometerMetrics.createObservation("spring.batch.step", this.observationRegistry)
+			.highCardinalityKeyValue("spring.batch.step.executionId", stepExecution.getId().toString())
+			.lowCardinalityKeyValue("spring.batch.step.name", stepExecution.getStepName())
+			.lowCardinalityKeyValue("spring.batch.step.type", getClass().getName())
+			.lowCardinalityKeyValue("spring.batch.step.job.name",
+					stepExecution.getJobExecution().getJobInstance().getJobName())
 			.start();
 		getJobRepository().update(stepExecution);
 
@@ -338,6 +333,7 @@ public abstract class AbstractStep implements StoppableStep, InitializingBean, B
 		if (!throwables.isEmpty()) {
 			observation.error(mergedThrowables(throwables));
 		}
+		observation.lowCardinalityKeyValue("spring.batch.step.status", stepExecution.getExitStatus().getExitCode());
 		observation.stop();
 	}
 
@@ -437,16 +433,8 @@ public abstract class AbstractStep implements StoppableStep, InitializingBean, B
 		return exitStatus;
 	}
 
-	public void setObservationConvention(BatchStepObservationConvention observationConvention) {
-		this.observationConvention = observationConvention;
-	}
-
 	public void setObservationRegistry(ObservationRegistry observationRegistry) {
 		this.observationRegistry = observationRegistry;
-	}
-
-	public void setMeterRegistry(MeterRegistry meterRegistry) {
-		this.meterRegistry = meterRegistry;
 	}
 
 }
