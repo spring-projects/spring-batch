@@ -127,9 +127,11 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  * In the previous example, the imported configuration class
  * <code>MyBatchJobConfiguration</code> is expected to have such beans defined in it (or
  * imported from another configuration class). </strong>
+ * JUnit4 is deprecated in Spring Batch 6.0.0 and will be removed in a future release.
  *
  * @author Mahmoud Ben Hassine
  * @author Taeik Lim
+ * @author Hyuntae Park
  * @since 4.1
  * @see JobOperatorTestUtils
  * @see JobRepositoryTestUtils
