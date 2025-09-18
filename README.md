@@ -220,8 +220,6 @@ We welcome contributions in any kind! Here are some ways for you to contribute t
 * Github is for social coding: if you want to write code, we encourage contributions through pull requests. If you want to contribute code this way, please familiarize yourself with the process outlined here: [Contributor Guidelines](https://github.com/spring-projects/spring-batch/blob/main/CONTRIBUTING.md).
 * Watch for Spring Batch related articles on [spring.io](https://spring.io).
 
-Before we accept pull requests, we will need you to sign the [contributor's agreement](https://support.springsource.com/spring_committer_signup).  Signing the contributor's agreement does not grant anyone commit rights to the main repository, but it does mean that we can accept your contributions, and you will get an author credit if we do.  Active contributors might be asked to join the core team, and given the ability to merge pull requests.
-
 # Code of Conduct
 
 Please see our [code of conduct](https://github.com/spring-projects/.github/blob/main/CODE_OF_CONDUCT.md).
