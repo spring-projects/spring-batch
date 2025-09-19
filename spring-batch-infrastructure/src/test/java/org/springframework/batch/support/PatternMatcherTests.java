@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,11 +22,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.PatternSyntaxException;
 
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Dan Garrette
+ * @author Injae Kim
  * @since 2.0
  */
 class PatternMatcherTests {
@@ -37,6 +39,7 @@ class PatternMatcherTests {
 		map.put("an*", 3);
 		map.put("a*", 2);
 		map.put("big*", 4);
+		map.put("bcd.*", 5);
 	}
 
 	private static final Map<String, Integer> defaultMap = new HashMap<>();
@@ -47,6 +50,15 @@ class PatternMatcherTests {
 		defaultMap.put("big*", 4);
 		defaultMap.put("big?*", 5);
 		defaultMap.put("*", 1);
+	}
+
+	private static final Map<String, Integer> regexMap = new HashMap<>();
+
+	static {
+		regexMap.put("abc.*", 1);
+		regexMap.put("a...e", 2);
+		regexMap.put("123.[0-9][0-9]\\d", 3);
+		regexMap.put("*............", 100); // invalid regex format
 	}
 
 	@Test
@@ -105,6 +117,29 @@ class PatternMatcherTests {
 	}
 
 	@Test
+	void testMatchRegex() {
+		assertTrue(PatternMatcher.matchRegex("abc.*", "abcde"));
+	}
+
+	@Test
+	void testMatchRegex_notMatched() {
+		assertFalse(PatternMatcher.matchRegex("abc.*", "cdefg"));
+		assertFalse(PatternMatcher.matchRegex("abc.", "abcde"));
+	}
+
+	@Test
+	void testMatchRegex_thrown_invalidRegexFormat() {
+		assertThrows(PatternSyntaxException.class, () -> PatternMatcher.matchRegex("*..", "abc"));
+	}
+
+	@Test
+	void testMatchRegex_thrown_notNullParam() {
+		assertThrows(IllegalArgumentException.class, () -> PatternMatcher.matchRegex("regex", null));
+		assertThrows(IllegalArgumentException.class, () -> PatternMatcher.matchRegex(null, "str"));
+	}
+
+
+	@Test
 	void testMatchPrefixSubsumed() {
 		assertEquals(2, new PatternMatcher<>(map).match("apple").intValue());
 	}
@@ -117,6 +152,11 @@ class PatternMatcherTests {
 	@Test
 	void testMatchPrefixUnrelated() {
 		assertEquals(4, new PatternMatcher<>(map).match("biggest").intValue());
+	}
+
+	@Test
+	void testMatchByRegex() {
+		assertEquals(5, new PatternMatcher<>(map).match("bcdef12345").intValue());
 	}
 
 	@Test
@@ -138,6 +178,26 @@ class PatternMatcherTests {
 	@Test
 	void testMatchPrefixDefaultValueNoMatch() {
 		assertEquals(1, new PatternMatcher<>(defaultMap).match("bat").intValue());
+	}
+
+	@Test
+	void testMatchRegexPrefix() {
+		assertEquals(1, new PatternMatcher<>(regexMap).match("abcdefg").intValue());
+	}
+
+	@Test
+	void testMatchRegexWildCards() {
+		assertEquals(2, new PatternMatcher<>(regexMap).match("a12De").intValue());
+	}
+
+	@Test
+	void testMatchRegexDigits() {
+		assertEquals(3, new PatternMatcher<>(regexMap).match("123-789").intValue());
+	}
+
+	@Test
+	void testMatchRegexNotMatched() {
+		assertThrows(IllegalStateException.class, () -> new PatternMatcher<>(regexMap).match("Hello world!"));
 	}
 
 }
