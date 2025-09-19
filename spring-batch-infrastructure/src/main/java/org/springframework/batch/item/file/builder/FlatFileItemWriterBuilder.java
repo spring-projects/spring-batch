@@ -392,6 +392,9 @@ public class FlatFileItemWriterBuilder<T> {
 			if (this.fieldExtractor == null) {
 				if (this.sourceType != null && this.sourceType.isRecord()) {
 					this.fieldExtractor = new RecordFieldExtractor<>(this.sourceType);
+					if (!this.names.isEmpty()) {
+						((RecordFieldExtractor<?>) this.fieldExtractor).setNames(this.names.toArray(new String[0]));
+					}
 				}
 				else {
 					BeanWrapperFieldExtractor<T> beanWrapperFieldExtractor = new BeanWrapperFieldExtractor<>();
