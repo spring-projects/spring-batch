@@ -52,6 +52,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -279,6 +280,7 @@ class JobRepositoryFactoryBeanTests {
 		when(transactionManager.getTransaction(transactionDefinition)).thenReturn(null);
 		Connection conn = mock();
 		when(dataSource.getConnection()).thenReturn(conn);
+		when(conn.prepareStatement(any())).thenThrow(new IllegalArgumentException("No Statement specified"));
 		Exception exception = assertThrows(IllegalArgumentException.class,
 				() -> repository.createJobExecution("foo", new JobParameters()));
 		assertEquals("No Statement specified", exception.getMessage());
@@ -297,6 +299,7 @@ class JobRepositoryFactoryBeanTests {
 		when(transactionManager.getTransaction(transactionDefinition)).thenReturn(null);
 		Connection conn = mock();
 		when(dataSource.getConnection()).thenReturn(conn);
+		when(conn.prepareStatement(any())).thenThrow(new IllegalArgumentException("No Statement specified"));
 		Exception exception = assertThrows(IllegalArgumentException.class,
 				() -> repository.createJobExecution("foo", new JobParameters()));
 		assertEquals("No Statement specified", exception.getMessage());
