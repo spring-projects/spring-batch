@@ -18,8 +18,9 @@
  * Builders for JavaMail related components.
  *
  * @author Mahmoud Ben Hassine
+ * @author Stefano Cordio
  */
-@NonNullApi
+@NullMarked
 package org.springframework.batch.item.mail.builder;
 
-import org.springframework.lang.NonNullApi;
+import org.jspecify.annotations.NullMarked;

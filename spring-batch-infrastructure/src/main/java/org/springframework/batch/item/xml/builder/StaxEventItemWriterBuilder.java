@@ -17,6 +17,7 @@ package org.springframework.batch.item.xml.builder;
 
 import java.util.Map;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.xml.StaxEventItemWriter;
 import org.springframework.batch.item.xml.StaxWriterCallback;
 import org.springframework.core.io.WritableResource;
@@ -34,13 +35,13 @@ import org.springframework.util.Assert;
  */
 public class StaxEventItemWriterBuilder<T> {
 
-	private WritableResource resource;
+	private @Nullable WritableResource resource;
 
-	private Marshaller marshaller;
+	private @Nullable Marshaller marshaller;
 
-	private StaxWriterCallback headerCallback;
+	private @Nullable StaxWriterCallback headerCallback;
 
-	private StaxWriterCallback footerCallback;
+	private @Nullable StaxWriterCallback footerCallback;
 
 	private boolean transactional = true;
 
@@ -52,17 +53,17 @@ public class StaxEventItemWriterBuilder<T> {
 
 	private String version = StaxEventItemWriter.DEFAULT_XML_VERSION;
 
-	private Boolean standalone = StaxEventItemWriter.DEFAULT_STANDALONE_DOCUMENT;
+	private @Nullable Boolean standalone = StaxEventItemWriter.DEFAULT_STANDALONE_DOCUMENT;
 
 	private String rootTagName = StaxEventItemWriter.DEFAULT_ROOT_TAG_NAME;
 
-	private Map<String, String> rootElementAttributes;
+	private @Nullable Map<String, String> rootElementAttributes;
 
 	private boolean overwriteOutput = true;
 
 	private boolean saveState = true;
 
-	private String name;
+	private @Nullable String name;
 
 	/**
 	 * The name used to calculate the key within the
@@ -268,20 +269,32 @@ public class StaxEventItemWriterBuilder<T> {
 		StaxEventItemWriter<T> writer = new StaxEventItemWriter<>();
 
 		writer.setEncoding(this.encoding);
-		writer.setFooterCallback(this.footerCallback);
+		if (this.footerCallback != null) {
+			writer.setFooterCallback(this.footerCallback);
+		}
 		writer.setForceSync(this.forceSync);
-		writer.setHeaderCallback(this.headerCallback);
+		if (this.headerCallback != null) {
+			writer.setHeaderCallback(this.headerCallback);
+		}
 		writer.setMarshaller(this.marshaller);
 		writer.setOverwriteOutput(this.overwriteOutput);
-		writer.setResource(this.resource);
-		writer.setRootElementAttributes(this.rootElementAttributes);
+		if (this.resource != null) {
+			writer.setResource(this.resource);
+		}
+		if (this.rootElementAttributes != null) {
+			writer.setRootElementAttributes(this.rootElementAttributes);
+		}
 		writer.setRootTagName(this.rootTagName);
 		writer.setSaveState(this.saveState);
 		writer.setShouldDeleteIfEmpty(this.shouldDeleteIfEmpty);
 		writer.setTransactional(this.transactional);
 		writer.setVersion(this.version);
-		writer.setName(this.name);
-		writer.setStandalone(this.standalone);
+		if (this.name != null) {
+			writer.setName(this.name);
+		}
+		if (this.standalone != null) {
+			writer.setStandalone(this.standalone);
+		}
 
 		return writer;
 	}

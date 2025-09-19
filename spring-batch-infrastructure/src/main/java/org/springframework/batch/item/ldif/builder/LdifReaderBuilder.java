@@ -16,6 +16,7 @@
 
 package org.springframework.batch.item.ldif.builder;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.ldif.LdifReader;
 import org.springframework.batch.item.ldif.RecordCallbackHandler;
 import org.springframework.core.io.Resource;
@@ -29,17 +30,17 @@ import org.springframework.util.Assert;
  */
 public class LdifReaderBuilder {
 
-	private Resource resource;
+	private @Nullable Resource resource;
 
 	private int recordsToSkip = 0;
 
 	private boolean strict = true;
 
-	private RecordCallbackHandler skippedRecordsCallback;
+	private @Nullable RecordCallbackHandler skippedRecordsCallback;
 
 	private boolean saveState = true;
 
-	private String name;
+	private @Nullable String name;
 
 	private int maxItemCount = Integer.MAX_VALUE;
 
@@ -163,7 +164,9 @@ public class LdifReaderBuilder {
 		reader.setResource(this.resource);
 		reader.setRecordsToSkip(this.recordsToSkip);
 		reader.setSaveState(this.saveState);
-		reader.setName(this.name);
+		if (this.name != null) {
+			reader.setName(this.name);
+		}
 		reader.setCurrentItemCount(this.currentItemCount);
 		reader.setMaxItemCount(this.maxItemCount);
 		if (this.skippedRecordsCallback != null) {

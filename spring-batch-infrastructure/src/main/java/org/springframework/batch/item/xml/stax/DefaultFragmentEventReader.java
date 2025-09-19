@@ -30,6 +30,8 @@ import javax.xml.stream.events.XMLEvent;
 
 import org.springframework.batch.item.ItemStreamException;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Default implementation of {@link FragmentEventReader}
  *
@@ -56,7 +58,7 @@ public class DefaultFragmentEventReader extends AbstractEventReaderWrapper imple
 
 	// fragment root name is remembered so that the matching closing element can
 	// be identified
-	private QName fragmentRootName = null;
+	private @Nullable QName fragmentRootName;
 
 	// counts the occurrences of current fragmentRootName (increased for
 	// StartElement, decreased for EndElement)
@@ -166,7 +168,7 @@ public class DefaultFragmentEventReader extends AbstractEventReaderWrapper imple
 	}
 
 	@Override
-	public XMLEvent peek() throws XMLStreamException {
+	public @Nullable XMLEvent peek() throws XMLStreamException {
 		if (fakeDocumentEnd) {
 			return null;
 		}

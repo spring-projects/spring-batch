@@ -16,6 +16,7 @@
 
 package org.springframework.batch.item.kafka.builder;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.kafka.KafkaItemWriter;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -30,9 +31,9 @@ import org.springframework.util.Assert;
  */
 public class KafkaItemWriterBuilder<K, V> {
 
-	private KafkaTemplate<K, V> kafkaTemplate;
+	private @Nullable KafkaTemplate<K, V> kafkaTemplate;
 
-	private Converter<V, K> itemKeyMapper;
+	private @Nullable Converter<V, K> itemKeyMapper;
 
 	private boolean delete;
 

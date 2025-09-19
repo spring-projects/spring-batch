@@ -15,9 +15,10 @@
  */
 package org.springframework.batch.item.validator;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -31,7 +32,7 @@ import org.springframework.util.Assert;
  */
 public class ValidatingItemProcessor<T> implements ItemProcessor<T, T>, InitializingBean {
 
-	private Validator<? super T> validator;
+	private @Nullable Validator<? super T> validator;
 
 	private boolean filter = false;
 
@@ -72,9 +73,9 @@ public class ValidatingItemProcessor<T> implements ItemProcessor<T, T>, Initiali
 	 * @return the input item
 	 * @throws ValidationException if validation fails
 	 */
-	@Nullable
+	@SuppressWarnings("DataFlowIssue")
 	@Override
-	public T process(T item) throws ValidationException {
+	public @Nullable T process(T item) throws ValidationException {
 		try {
 			validator.validate(item);
 		}

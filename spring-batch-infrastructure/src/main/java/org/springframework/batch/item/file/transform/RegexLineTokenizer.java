@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -46,13 +47,15 @@ import org.springframework.util.Assert;
  *
  * @see Matcher#group(int)
  * @author Costin Leau
+ * @author Stefano Cordio
  */
 public class RegexLineTokenizer extends AbstractLineTokenizer {
 
-	private Pattern pattern;
+	private @Nullable Pattern pattern;
 
 	@Override
 	protected List<String> doTokenize(String line) {
+		Assert.state(pattern != null, "pattern must be initialized");
 		Matcher matcher = pattern.matcher(line);
 		boolean matchFound = matcher.find();
 
