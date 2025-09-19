@@ -16,10 +16,7 @@
 package org.springframework.batch.core.repository.support;
 
 import java.time.LocalDateTime;
-import java.util.Map;
 
-import org.bson.Document;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
@@ -35,10 +32,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.core.MongoOperations;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
-import org.testcontainers.junit.jupiter.Testcontainers;
+import org.springframework.test.context.ContextConfiguration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -49,23 +44,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  * @author Yanming Zhou
  */
 @DirtiesContext
-@Testcontainers(disabledWithoutDocker = true)
-@SpringJUnitConfig({ MongoDBIntegrationTestConfiguration.class, ExecutionContextDaoConfiguration.class })
-public class MongoExecutionContextDaoIntegrationTests {
-
-	@BeforeAll
-	static void setUp(@Autowired MongoTemplate mongoTemplate) {
-		mongoTemplate.createCollection("BATCH_JOB_INSTANCE");
-		mongoTemplate.createCollection("BATCH_JOB_EXECUTION");
-		mongoTemplate.createCollection("BATCH_STEP_EXECUTION");
-		mongoTemplate.createCollection("BATCH_SEQUENCES");
-		mongoTemplate.getCollection("BATCH_SEQUENCES")
-			.insertOne(new Document(Map.of("_id", "BATCH_JOB_INSTANCE_SEQ", "count", 0L)));
-		mongoTemplate.getCollection("BATCH_SEQUENCES")
-			.insertOne(new Document(Map.of("_id", "BATCH_JOB_EXECUTION_SEQ", "count", 0L)));
-		mongoTemplate.getCollection("BATCH_SEQUENCES")
-			.insertOne(new Document(Map.of("_id", "BATCH_STEP_EXECUTION_SEQ", "count", 0L)));
-	}
+@ContextConfiguration(classes = ExecutionContextDaoConfiguration.class)
+public class MongoExecutionContextDaoIntegrationTests extends AbstractMongoDBDaoIntegrationTests {
 
 	@Test
 	void testGetJobExecutionWithEmptyResult(@Autowired ExecutionContextDao executionContextDao) {
