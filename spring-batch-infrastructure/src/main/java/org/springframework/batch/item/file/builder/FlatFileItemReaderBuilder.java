@@ -284,12 +284,12 @@ public class FlatFileItemReaderBuilder<T> {
 	/**
 	 * A {@link FieldSetMapper} implementation to be used.
 	 * @param mapper a {@link FieldSetMapper}
-	 * @return The current instance of the builder.
+	 * @return A stage that prevents calling targetType()
 	 * @see DefaultLineMapper#setFieldSetMapper(FieldSetMapper)
 	 */
-	public FlatFileItemReaderBuilder<T> fieldSetMapper(FieldSetMapper<T> mapper) {
+	public FieldSetMapperStage<T> fieldSetMapper(FieldSetMapper<T> mapper) {
 		this.fieldSetMapper = mapper;
-		return this;
+		return new FieldSetMapperStageImpl();
 	}
 
 	/**
@@ -338,12 +338,12 @@ public class FlatFileItemReaderBuilder<T> {
 	 * required, providing your own {@link FieldSetMapper} via
 	 * {@link FlatFileItemReaderBuilder#fieldSetMapper} is required.
 	 * @param targetType The class to map to
-	 * @return The current instance of the builder.
+	 * @return A stage that prevents calling fieldSetMapper()
 	 * @see BeanWrapperFieldSetMapper#setTargetType(Class)
 	 */
-	public FlatFileItemReaderBuilder<T> targetType(Class<T> targetType) {
+	public TargetTypeStage<T> targetType(Class<T> targetType) {
 		this.targetType = targetType;
-		return this;
+		return new TargetTypeStageImpl();
 	}
 
 	/**
@@ -786,6 +786,454 @@ public class FlatFileItemReaderBuilder<T> {
 			tokenizer.setStrict(this.strict);
 
 			return tokenizer;
+		}
+
+	}
+
+	/**
+	 * Stage interface that prevents calling targetType() after fieldSetMapper() has been
+	 * called. This provides compile-time safety to ensure mutual exclusivity between
+	 * these two methods.
+	 */
+	public interface FieldSetMapperStage<T> {
+
+		/**
+		 * Configure if the state of the
+		 * {@link org.springframework.batch.item.ItemStreamSupport} should be persisted
+		 * within the {@link org.springframework.batch.item.ExecutionContext} for restart
+		 * purposes.
+		 * @param saveState defaults to true
+		 * @return The current instance of the builder.
+		 */
+		FieldSetMapperStage<T> saveState(boolean saveState);
+
+		/**
+		 * The name used to calculate the key within the
+		 * {@link org.springframework.batch.item.ExecutionContext}. Required if
+		 * {@link #saveState(boolean)} is set to true.
+		 * @param name name of the reader instance
+		 * @return The current instance of the builder.
+		 */
+		FieldSetMapperStage<T> name(String name);
+
+		/**
+		 * Configure the max number of items to be read.
+		 * @param maxItemCount the max items to be read
+		 * @return The current instance of the builder.
+		 */
+		FieldSetMapperStage<T> maxItemCount(int maxItemCount);
+
+		/**
+		 * Index for the current item. Used on restarts to indicate where to start from.
+		 * @param currentItemCount current index
+		 * @return this instance for method chaining
+		 */
+		FieldSetMapperStage<T> currentItemCount(int currentItemCount);
+
+		/**
+		 * The {@link Resource} to be used as input.
+		 * @param resource the input to the reader.
+		 * @return The current instance of the builder.
+		 */
+		FieldSetMapperStage<T> resource(Resource resource);
+
+		/**
+		 * Configure if the reader should be in strict mode (require the input
+		 * {@link Resource} to exist).
+		 * @param strict true if the input file is required to exist.
+		 * @return The current instance of the builder.
+		 */
+		FieldSetMapperStage<T> strict(boolean strict);
+
+		/**
+		 * Configure the encoding used by the reader to read the input source.
+		 * @param encoding to use to read the input source.
+		 * @return The current instance of the builder.
+		 */
+		FieldSetMapperStage<T> encoding(String encoding);
+
+		/**
+		 * The number of lines to skip at the beginning of reading the file.
+		 * @param linesToSkip number of lines to be skipped.
+		 * @return The current instance of the builder.
+		 */
+		FieldSetMapperStage<T> linesToSkip(int linesToSkip);
+
+		/**
+		 * A callback to be called for each line that is skipped.
+		 * @param callback the callback
+		 * @return The current instance of the builder.
+		 */
+		FieldSetMapperStage<T> skippedLinesCallback(LineCallbackHandler callback);
+
+		/**
+		 * Configures the comment prefixes for this reader.
+		 * @param comments comment prefixes
+		 * @return The current instance of the builder.
+		 */
+		FieldSetMapperStage<T> addComment(String comments);
+
+		/**
+		 * Configures the {@link RecordSeparatorPolicy} for this reader.
+		 * @param policy the policy to be used
+		 * @return The current instance of the builder.
+		 */
+		FieldSetMapperStage<T> recordSeparatorPolicy(RecordSeparatorPolicy policy);
+
+		/**
+		 * Configures the {@link BufferedReaderFactory} for this reader.
+		 * @param bufferedReaderFactory the factory to be used
+		 * @return The current instance of the builder.
+		 */
+		FieldSetMapperStage<T> bufferedReaderFactory(BufferedReaderFactory bufferedReaderFactory);
+
+		/**
+		 * Builds the {@link FlatFileItemReader}.
+		 * @return a {@link FlatFileItemReader}
+		 */
+		FlatFileItemReader<T> build();
+
+	}
+
+	/**
+	 * Stage interface that prevents calling fieldSetMapper() after targetType() has been
+	 * called. This provides compile-time safety to ensure mutual exclusivity between
+	 * these two methods.
+	 */
+	public interface TargetTypeStage<T> {
+
+		/**
+		 * Configure if the state of the
+		 * {@link org.springframework.batch.item.ItemStreamSupport} should be persisted
+		 * within the {@link org.springframework.batch.item.ExecutionContext} for restart
+		 * purposes.
+		 * @param saveState defaults to true
+		 * @return The current instance of the builder.
+		 */
+		TargetTypeStage<T> saveState(boolean saveState);
+
+		/**
+		 * The name used to calculate the key within the
+		 * {@link org.springframework.batch.item.ExecutionContext}. Required if
+		 * {@link #saveState(boolean)} is set to true.
+		 * @param name name of the reader instance
+		 * @return The current instance of the builder.
+		 */
+		TargetTypeStage<T> name(String name);
+
+		/**
+		 * Configure the max number of items to be read.
+		 * @param maxItemCount the max items to be read
+		 * @return The current instance of the builder.
+		 */
+		TargetTypeStage<T> maxItemCount(int maxItemCount);
+
+		/**
+		 * Index for the current item. Used on restarts to indicate where to start from.
+		 * @param currentItemCount current index
+		 * @return this instance for method chaining
+		 */
+		TargetTypeStage<T> currentItemCount(int currentItemCount);
+
+		/**
+		 * The {@link Resource} to be used as input.
+		 * @param resource the input to the reader.
+		 * @return The current instance of the builder.
+		 */
+		TargetTypeStage<T> resource(Resource resource);
+
+		/**
+		 * Configure if the reader should be in strict mode (require the input
+		 * {@link Resource} to exist).
+		 * @param strict true if the input file is required to exist.
+		 * @return The current instance of the builder.
+		 */
+		TargetTypeStage<T> strict(boolean strict);
+
+		/**
+		 * Configure the encoding used by the reader to read the input source.
+		 * @param encoding to use to read the input source.
+		 * @return The current instance of the builder.
+		 */
+		TargetTypeStage<T> encoding(String encoding);
+
+		/**
+		 * The number of lines to skip at the beginning of reading the file.
+		 * @param linesToSkip number of lines to be skipped.
+		 * @return The current instance of the builder.
+		 */
+		TargetTypeStage<T> linesToSkip(int linesToSkip);
+
+		/**
+		 * A callback to be called for each line that is skipped.
+		 * @param callback the callback
+		 * @return The current instance of the builder.
+		 */
+		TargetTypeStage<T> skippedLinesCallback(LineCallbackHandler callback);
+
+		/**
+		 * Configures the id of a prototype scoped bean to be used as the item returned by
+		 * the reader.
+		 * @param prototypeBeanName the name of a prototype scoped bean
+		 * @return The current instance of the builder.
+		 */
+		TargetTypeStage<T> prototypeBeanName(String prototypeBeanName);
+
+		/**
+		 * Configures the {@link BeanFactory} used to create the beans that are returned
+		 * as items.
+		 * @param beanFactory a {@link BeanFactory}
+		 * @return The current instance of the builder.
+		 */
+		TargetTypeStage<T> beanFactory(BeanFactory beanFactory);
+
+		/**
+		 * Register custom type converters for beans being mapped.
+		 * @param customEditors a {@link Map} of editors
+		 * @return The current instance of the builder.
+		 */
+		TargetTypeStage<T> customEditors(Map<Class<?>, PropertyEditor> customEditors);
+
+		/**
+		 * Configures the maximum tolerance between the actual spelling of a field's name
+		 * and the property's name.
+		 * @param distanceLimit distance limit to set
+		 * @return The current instance of the builder.
+		 */
+		TargetTypeStage<T> distanceLimit(int distanceLimit);
+
+		/**
+		 * If set to true, mapping will fail if the
+		 * {@link org.springframework.batch.item.file.transform.FieldSet} contains fields
+		 * that cannot be mapped to the bean.
+		 * @param beanMapperStrict defaults to false
+		 * @return The current instance of the builder.
+		 */
+		TargetTypeStage<T> beanMapperStrict(boolean beanMapperStrict);
+
+		/**
+		 * Configures the comment prefixes for this reader.
+		 * @param comments comment prefixes
+		 * @return The current instance of the builder.
+		 */
+		TargetTypeStage<T> addComment(String comments);
+
+		/**
+		 * Configures the {@link RecordSeparatorPolicy} for this reader.
+		 * @param policy the policy to be used
+		 * @return The current instance of the builder.
+		 */
+		TargetTypeStage<T> recordSeparatorPolicy(RecordSeparatorPolicy policy);
+
+		/**
+		 * Configures the {@link BufferedReaderFactory} for this reader.
+		 * @param bufferedReaderFactory the factory to be used
+		 * @return The current instance of the builder.
+		 */
+		TargetTypeStage<T> bufferedReaderFactory(BufferedReaderFactory bufferedReaderFactory);
+
+		/**
+		 * Builds the {@link FlatFileItemReader}.
+		 * @return a {@link FlatFileItemReader}
+		 */
+		FlatFileItemReader<T> build();
+
+	}
+
+	/**
+	 * Implementation of FieldSetMapperStage that delegates to the parent builder.
+	 */
+	private class FieldSetMapperStageImpl implements FieldSetMapperStage<T> {
+
+		@Override
+		public FieldSetMapperStage<T> saveState(boolean saveState) {
+			FlatFileItemReaderBuilder.this.saveState(saveState);
+			return this;
+		}
+
+		@Override
+		public FieldSetMapperStage<T> name(String name) {
+			FlatFileItemReaderBuilder.this.name(name);
+			return this;
+		}
+
+		@Override
+		public FieldSetMapperStage<T> maxItemCount(int maxItemCount) {
+			FlatFileItemReaderBuilder.this.maxItemCount(maxItemCount);
+			return this;
+		}
+
+		@Override
+		public FieldSetMapperStage<T> currentItemCount(int currentItemCount) {
+			FlatFileItemReaderBuilder.this.currentItemCount(currentItemCount);
+			return this;
+		}
+
+		@Override
+		public FieldSetMapperStage<T> resource(Resource resource) {
+			FlatFileItemReaderBuilder.this.resource(resource);
+			return this;
+		}
+
+		@Override
+		public FieldSetMapperStage<T> strict(boolean strict) {
+			FlatFileItemReaderBuilder.this.strict(strict);
+			return this;
+		}
+
+		@Override
+		public FieldSetMapperStage<T> encoding(String encoding) {
+			FlatFileItemReaderBuilder.this.encoding(encoding);
+			return this;
+		}
+
+		@Override
+		public FieldSetMapperStage<T> linesToSkip(int linesToSkip) {
+			FlatFileItemReaderBuilder.this.linesToSkip(linesToSkip);
+			return this;
+		}
+
+		@Override
+		public FieldSetMapperStage<T> skippedLinesCallback(LineCallbackHandler callback) {
+			FlatFileItemReaderBuilder.this.skippedLinesCallback(callback);
+			return this;
+		}
+
+		@Override
+		public FieldSetMapperStage<T> addComment(String comments) {
+			FlatFileItemReaderBuilder.this.addComment(comments);
+			return this;
+		}
+
+		@Override
+		public FieldSetMapperStage<T> recordSeparatorPolicy(RecordSeparatorPolicy policy) {
+			FlatFileItemReaderBuilder.this.recordSeparatorPolicy(policy);
+			return this;
+		}
+
+		@Override
+		public FieldSetMapperStage<T> bufferedReaderFactory(BufferedReaderFactory bufferedReaderFactory) {
+			FlatFileItemReaderBuilder.this.bufferedReaderFactory(bufferedReaderFactory);
+			return this;
+		}
+
+		@Override
+		public FlatFileItemReader<T> build() {
+			return FlatFileItemReaderBuilder.this.build();
+		}
+
+	}
+
+	/**
+	 * Implementation of TargetTypeStage that delegates to the parent builder.
+	 */
+	private class TargetTypeStageImpl implements TargetTypeStage<T> {
+
+		@Override
+		public TargetTypeStage<T> saveState(boolean saveState) {
+			FlatFileItemReaderBuilder.this.saveState(saveState);
+			return this;
+		}
+
+		@Override
+		public TargetTypeStage<T> name(String name) {
+			FlatFileItemReaderBuilder.this.name(name);
+			return this;
+		}
+
+		@Override
+		public TargetTypeStage<T> maxItemCount(int maxItemCount) {
+			FlatFileItemReaderBuilder.this.maxItemCount(maxItemCount);
+			return this;
+		}
+
+		@Override
+		public TargetTypeStage<T> currentItemCount(int currentItemCount) {
+			FlatFileItemReaderBuilder.this.currentItemCount(currentItemCount);
+			return this;
+		}
+
+		@Override
+		public TargetTypeStage<T> resource(Resource resource) {
+			FlatFileItemReaderBuilder.this.resource(resource);
+			return this;
+		}
+
+		@Override
+		public TargetTypeStage<T> strict(boolean strict) {
+			FlatFileItemReaderBuilder.this.strict(strict);
+			return this;
+		}
+
+		@Override
+		public TargetTypeStage<T> encoding(String encoding) {
+			FlatFileItemReaderBuilder.this.encoding(encoding);
+			return this;
+		}
+
+		@Override
+		public TargetTypeStage<T> linesToSkip(int linesToSkip) {
+			FlatFileItemReaderBuilder.this.linesToSkip(linesToSkip);
+			return this;
+		}
+
+		@Override
+		public TargetTypeStage<T> skippedLinesCallback(LineCallbackHandler callback) {
+			FlatFileItemReaderBuilder.this.skippedLinesCallback(callback);
+			return this;
+		}
+
+		@Override
+		public TargetTypeStage<T> prototypeBeanName(String prototypeBeanName) {
+			FlatFileItemReaderBuilder.this.prototypeBeanName(prototypeBeanName);
+			return this;
+		}
+
+		@Override
+		public TargetTypeStage<T> beanFactory(BeanFactory beanFactory) {
+			FlatFileItemReaderBuilder.this.beanFactory(beanFactory);
+			return this;
+		}
+
+		@Override
+		public TargetTypeStage<T> customEditors(Map<Class<?>, PropertyEditor> customEditors) {
+			FlatFileItemReaderBuilder.this.customEditors(customEditors);
+			return this;
+		}
+
+		@Override
+		public TargetTypeStage<T> distanceLimit(int distanceLimit) {
+			FlatFileItemReaderBuilder.this.distanceLimit(distanceLimit);
+			return this;
+		}
+
+		@Override
+		public TargetTypeStage<T> beanMapperStrict(boolean beanMapperStrict) {
+			FlatFileItemReaderBuilder.this.beanMapperStrict(beanMapperStrict);
+			return this;
+		}
+
+		@Override
+		public TargetTypeStage<T> addComment(String comments) {
+			FlatFileItemReaderBuilder.this.addComment(comments);
+			return this;
+		}
+
+		@Override
+		public TargetTypeStage<T> recordSeparatorPolicy(RecordSeparatorPolicy policy) {
+			FlatFileItemReaderBuilder.this.recordSeparatorPolicy(policy);
+			return this;
+		}
+
+		@Override
+		public TargetTypeStage<T> bufferedReaderFactory(BufferedReaderFactory bufferedReaderFactory) {
+			FlatFileItemReaderBuilder.this.bufferedReaderFactory(bufferedReaderFactory);
+			return this;
+		}
+
+		@Override
+		public FlatFileItemReader<T> build() {
+			return FlatFileItemReaderBuilder.this.build();
 		}
 
 	}
