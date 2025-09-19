@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
+ * @author Seungyong Hong
  *
  */
 @SpringJUnitConfig(locations = "/simple-job-launcher-context.xml")
@@ -81,12 +82,14 @@ class JobRepositoryTestUtilsTests {
 	void testRemoveJobExecutionsWithSameJobInstance() throws Exception {
 		utils = new JobRepositoryTestUtils(jobRepository);
 		List<JobExecution> list = new ArrayList<>();
-		JobExecution jobExecution = jobRepository.createJobExecution("job", new JobParameters());
+		JobExecution jobExecution = jobRepository.createJobExecution("job",
+				new JobParametersBuilder().addString("name", "foo").toJobParameters());
 		jobExecution.setEndTime(LocalDateTime.now());
 		jobExecution.setStatus(BatchStatus.COMPLETED);
 		list.add(jobExecution);
 		jobRepository.update(jobExecution);
-		jobExecution = jobRepository.createJobExecution("job", new JobParameters());
+		jobExecution = jobRepository.createJobExecution("job",
+				new JobParametersBuilder().addString("name", "bar").toJobParameters());
 		list.add(jobExecution);
 		assertEquals(beforeJobs + 2, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_EXECUTION"));
 		utils.removeJobExecutions(list);
