@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 the original author or authors.
+ * Copyright 2022-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 @EnableJdbcJobRepository
 @Import({ Job1Configuration.class, Job2Configuration.class, JobScheduler.class, PrometheusConfiguration.class,
 		DataSourceConfiguration.class })
-@PropertySource("metrics-sample.properties")
+@PropertySource("classpath:org/springframework/batch/samples/metrics/metrics-sample.properties")
 public class BatchMetricsApplication {
 
 	public static void main(String[] args) {

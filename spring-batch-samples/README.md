@@ -594,7 +594,7 @@ This should start the required monitoring stack:
 * Prometheus push gateway on port `9091`
 * Grafana on port `3000`
 
-Once started, you need to [configure Prometheus as data source in Grafana](https://grafana.com/docs/features/datasources/prometheus/)
+Once started, you need to [configure Prometheus as data source in Grafana](https://grafana.com/docs/grafana/latest/datasources/prometheus/configure/)
 and import the ready-to-use dashboard in `spring-batch-samples/src/main/resources/org/springframework/batch/samples/metrics/spring-batch-dashboard.json`.
 
 Finally, run the `org.springframework.batch.samples.metrics.BatchMetricsApplication`

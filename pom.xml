@@ -131,7 +131,7 @@
 		<!-- samples dependencies -->
 		<spring-rabbit.version>${spring-amqp.version}</spring-rabbit.version>
 		<quartz.version>2.5.0</quartz.version>
-		<prometheus_pushgateway.version>0.16.0</prometheus_pushgateway.version>
+		<prometheus-metrics-exporter-pushgateway>1.4.1</prometheus-metrics-exporter-pushgateway>
 		<groovy.version>3.0.22</groovy.version> <!-- change to org.apache.groovy:groovy + update to latest -->
 
 		<!-- documentation dependencies -->
