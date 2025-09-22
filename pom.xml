@@ -127,6 +127,7 @@
 		<jruby.version>9.4.13.0</jruby.version>
 		<lettuce.version>6.8.0.RELEASE</lettuce.version>
 		<jedis.version>6.1.0</jedis.version>
+		<vmlens.version>1.2.14</vmlens.version>
 
 		<!-- samples dependencies -->
 		<spring-rabbit.version>${spring-amqp.version}</spring-rabbit.version>
