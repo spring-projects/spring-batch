@@ -65,11 +65,11 @@ public class MapStepRegistry implements StepRegistry {
 	public Step getStep(String jobName, String stepName) throws NoSuchJobException {
 		Assert.notNull(jobName, "The job name cannot be null.");
 		Assert.notNull(stepName, "The step name cannot be null.");
-		if (!map.containsKey(jobName)) {
+		final Map<String, Step> jobSteps = map.get(jobName);
+		if (jobSteps == null) {
 			throw new NoSuchJobException("No job configuration with the name [" + jobName + "] was registered");
 		}
 		else {
-			final Map<String, Step> jobSteps = map.get(jobName);
 			if (jobSteps.containsKey(stepName)) {
 				return jobSteps.get(stepName);
 			}
