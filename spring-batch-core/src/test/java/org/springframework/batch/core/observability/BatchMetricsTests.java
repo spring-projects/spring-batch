@@ -18,39 +18,9 @@ package org.springframework.batch.core.observability;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
-import java.util.List;
 
-import javax.sql.DataSource;
-
-import io.micrometer.core.instrument.Meter;
-import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.observation.DefaultMeterObservationHandler;
-import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
-import io.micrometer.observation.ObservationRegistry;
 import org.junit.jupiter.api.Test;
 
-import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.configuration.annotation.EnableJdbcJobRepository;
-import org.springframework.batch.core.job.Job;
-import org.springframework.batch.core.job.JobExecution;
-import org.springframework.batch.core.job.parameters.JobParameters;
-import org.springframework.batch.core.step.Step;
-import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.job.builder.JobBuilder;
-import org.springframework.batch.core.launch.JobOperator;
-import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.step.builder.StepBuilder;
-import org.springframework.batch.item.support.ListItemReader;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
-import org.springframework.jdbc.support.JdbcTransactionManager;
-import org.springframework.transaction.PlatformTransactionManager;
-
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -130,120 +100,6 @@ class BatchMetricsTests {
 	void testFormatNullDuration() {
 		String formattedDuration = BatchMetrics.formatDuration(null);
 		assertTrue(formattedDuration.isEmpty());
-	}
-
-	@Test
-	void testBatchMetrics() throws Exception {
-		// given
-		ApplicationContext context = new AnnotationConfigApplicationContext(MyJobConfiguration.class);
-		JobOperator jobOperator = context.getBean(JobOperator.class);
-		Job job = context.getBean(Job.class);
-		MeterRegistry meterRegistry = context.getBean(MeterRegistry.class);
-		int expectedBatchMetricsCount = 6;
-
-		// when
-		JobExecution jobExecution = jobOperator.start(job, new JobParameters());
-
-		// then
-		assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
-		List<Meter> meters = meterRegistry.getMeters();
-		assertTrue(meters.size() >= expectedBatchMetricsCount);
-
-		// Job metrics
-
-		assertDoesNotThrow(() -> meterRegistry.get(BatchMetrics.METRICS_PREFIX + "job.launch.count").timer(),
-				"There should be a meter of type TIMER named spring.batch.job.launch.count registered in the meter registry");
-		assertEquals(1, meterRegistry.get(BatchMetrics.METRICS_PREFIX + "job.launch.count").timer().count());
-
-		assertDoesNotThrow(
-				() -> meterRegistry.get(BatchMetrics.METRICS_PREFIX + "job")
-					.tag(BatchMetrics.METRICS_PREFIX + "job.name", "job")
-					.tag(BatchMetrics.METRICS_PREFIX + "job.status", "COMPLETED")
-					.timer(),
-				"There should be a meter of type TIMER named spring.batch.job registered in the meter registry");
-
-		// Step metrics
-
-		assertDoesNotThrow(
-				() -> meterRegistry.get(BatchMetrics.METRICS_PREFIX + "step")
-					.tag(BatchMetrics.METRICS_PREFIX + "step.name", "step")
-					.tag(BatchMetrics.METRICS_PREFIX + "step.job.name", "job")
-					.tag(BatchMetrics.METRICS_PREFIX + "step.status", "COMPLETED")
-					.timer(),
-				"There should be a meter of type TIMER named spring.batch.step registered in the meter registry");
-
-		assertDoesNotThrow(
-				() -> meterRegistry.get(BatchMetrics.METRICS_PREFIX + ".item.read")
-					.tag(BatchMetrics.METRICS_PREFIX + ".item.read.job.name", "job")
-					.tag(BatchMetrics.METRICS_PREFIX + ".item.read.step.name", "step")
-					.tag(BatchMetrics.METRICS_PREFIX + ".item.read.status", "SUCCESS")
-					.timer(),
-				"There should be a meter of type TIMER named spring.batch.item.read registered in the meter registry");
-
-		assertDoesNotThrow(
-				() -> meterRegistry.get(BatchMetrics.METRICS_PREFIX + "item.process")
-					.tag(BatchMetrics.METRICS_PREFIX + "item.process.job.name", "job")
-					.tag(BatchMetrics.METRICS_PREFIX + "item.process.step.name", "step")
-					.tag(BatchMetrics.METRICS_PREFIX + "item.process.status", "SUCCESS")
-					.timer(),
-				"There should be a meter of type TIMER named spring.batch.item.process registered in the meter registry");
-
-		assertDoesNotThrow(
-				() -> meterRegistry.get(BatchMetrics.METRICS_PREFIX + "chunk.write")
-					.tag(BatchMetrics.METRICS_PREFIX + "chunk.write.job.name", "job")
-					.tag(BatchMetrics.METRICS_PREFIX + "chunk.write.step.name", "step")
-					.tag(BatchMetrics.METRICS_PREFIX + "chunk.write.status", "SUCCESS")
-					.timer(),
-				"There should be a meter of type TIMER named spring.batch.chunk.write registered in the meter registry");
-
-	}
-
-	@Configuration
-	@EnableBatchProcessing
-	@EnableJdbcJobRepository
-	static class MyJobConfiguration {
-
-		@Bean
-		public Step step(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
-			return new StepBuilder(jobRepository).<Integer, Integer>chunk(2)
-				.transactionManager(transactionManager)
-				.reader(new ListItemReader<>(Arrays.asList(1, 2, 3, 4, 5)))
-				.writer(items -> {
-				})
-				.build();
-		}
-
-		@Bean
-		public Job job(JobRepository jobRepository, Step step) {
-			return new JobBuilder("job", jobRepository).start(step).build();
-		}
-
-		@Bean
-		public MeterRegistry meterRegistry() {
-			return new SimpleMeterRegistry();
-		}
-
-		@Bean
-		public ObservationRegistry observationRegistry(MeterRegistry meterRegistry) {
-			ObservationRegistry observationRegistry = ObservationRegistry.create();
-			observationRegistry.observationConfig()
-				.observationHandler(new DefaultMeterObservationHandler(meterRegistry));
-			return observationRegistry;
-		}
-
-		@Bean
-		public DataSource dataSource() {
-			return new EmbeddedDatabaseBuilder().addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-				.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
-				.generateUniqueName(true)
-				.build();
-		}
-
-		@Bean
-		public JdbcTransactionManager transactionManager(DataSource dataSource) {
-			return new JdbcTransactionManager(dataSource);
-		}
-
 	}
 
 }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.observability;
+package org.springframework.batch.core.observability.micrometer;
 
 import java.util.UUID;
 
@@ -33,6 +33,7 @@ import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersBuilder;
+import org.springframework.batch.core.observability.BatchMetrics;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.job.builder.JobBuilder;
@@ -46,7 +47,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-class ObservabilitySampleStepTests extends SampleTestRunner {
+class MicrometerTracingTests extends SampleTestRunner {
 
 	@Autowired
 	private Job job;
@@ -60,7 +61,7 @@ class ObservabilitySampleStepTests extends SampleTestRunner {
 	@Autowired
 	private ObservationRegistry observationRegistry;
 
-	ObservabilitySampleStepTests() {
+	MicrometerTracingTests() {
 		super(SampleRunnerConfig.builder().build());
 	}
 

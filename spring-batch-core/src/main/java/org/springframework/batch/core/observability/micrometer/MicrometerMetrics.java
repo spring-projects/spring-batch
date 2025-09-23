@@ -41,7 +41,6 @@ public final class MicrometerMetrics {
 	/**
 	 * Create a new {@link Observation}. It's not started, you must explicitly call
 	 * {@link Observation#start()} to start it.
-	 * <p>
 	 * @param name of the observation
 	 * @param observationRegistry the observation registry to use
 	 * @return a new observation instance
