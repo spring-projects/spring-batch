@@ -63,6 +63,7 @@ import org.springframework.util.ClassUtils;
  * @author Chris Schaefer
  * @author Mahmoud Ben Hassine
  * @author Jinwoo Bae
+ * @author Hyunsang Han
  */
 public abstract class AbstractStep implements StoppableStep, InitializingBean, BeanNameAware {
 
@@ -85,16 +86,8 @@ public abstract class AbstractStep implements StoppableStep, InitializingBean, B
 
 	private BatchStepObservationConvention observationConvention = new DefaultBatchStepObservationConvention();
 
-	/**
-	 * Default constructor.
-	 */
-	public AbstractStep() {
-		super();
-	}
-
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.state(jobRepository != null, "JobRepository is mandatory");
 	}
 
 	@Override
@@ -156,11 +149,16 @@ public abstract class AbstractStep implements StoppableStep, InitializingBean, B
 	}
 
 	/**
-	 * Convenient constructor for setting only the name property.
+	 * Constructor requiring both name and JobRepository, ensuring all mandatory
+	 * dependencies are provided at construction time.
 	 * @param name Name of the step
+	 * @param jobRepository JobRepository for managing job metadata (must not be null)
+	 * @since 6.0
 	 */
-	public AbstractStep(String name) {
+	public AbstractStep(String name, JobRepository jobRepository) {
+		Assert.notNull(jobRepository, "JobRepository must not be null");
 		this.name = name;
+		this.jobRepository = jobRepository;
 	}
 
 	/**

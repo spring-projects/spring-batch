@@ -32,6 +32,7 @@ import org.springframework.util.Assert;
  * parent and one each for the flow steps).
  *
  * @author Dave Syer
+ * @author Hyunsang Han
  *
  */
 public class FlowStep extends AbstractStep {
@@ -40,17 +41,19 @@ public class FlowStep extends AbstractStep {
 
 	/**
 	 * Default constructor convenient for configuration purposes.
+	 * @param jobRepository the job repository for the {@link FlowStep}
 	 */
-	public FlowStep() {
-		super(null);
+	public FlowStep(JobRepository jobRepository) {
+		super(null, jobRepository);
 	}
 
 	/**
 	 * Constructor for a {@link FlowStep} that sets the flow and of the step explicitly.
 	 * @param flow the {@link Flow} instance to be associated with this step.
+	 * @param jobRepository the job repository for the {@link FlowStep}
 	 */
-	public FlowStep(Flow flow) {
-		super(flow.getName());
+	public FlowStep(Flow flow, JobRepository jobRepository) {
+		super(flow.getName(), jobRepository);
 	}
 
 	/**

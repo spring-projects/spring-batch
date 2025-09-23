@@ -50,6 +50,7 @@ import org.springframework.transaction.interceptor.TransactionAttribute;
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
  * @author Ilpyo Yang
+ * @author Hyunsang Han
  * @since 2.2
  * @param <B> the type of builder represented
  */
@@ -101,7 +102,7 @@ public abstract class AbstractTaskletStepBuilder<B extends AbstractTaskletStepBu
 
 		registerStepListenerAsChunkListener();
 
-		TaskletStep step = new TaskletStep(getName());
+		TaskletStep step = new TaskletStep(getName(), getJobRepository());
 
 		super.enhance(step);
 

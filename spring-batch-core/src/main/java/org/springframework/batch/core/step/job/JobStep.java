@@ -27,6 +27,7 @@ import org.springframework.batch.core.job.UnexpectedJobExecutionException;
 import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.util.Assert;
+import org.springframework.batch.core.repository.JobRepository;
 
 /**
  * A {@link Step} that delegates to a {@link Job} to do its work. This is a great tool for
@@ -36,6 +37,7 @@ import org.springframework.util.Assert;
  * worker in a parallel or partitioned execution.
  *
  * @author Dave Syer
+ * @author Hyunsang Han
  *
  */
 public class JobStep extends AbstractStep {
@@ -50,6 +52,15 @@ public class JobStep extends AbstractStep {
 	private JobOperator jobOperator;
 
 	private JobParametersExtractor jobParametersExtractor = new DefaultJobParametersExtractor();
+
+	/**
+	 * Default constructor for a {@link JobStep}.
+	 * @param name the name for the {@link JobStep}
+	 * @param jobRepository the job repository for the {@link JobStep}
+	 */
+	public JobStep(String name, JobRepository jobRepository) {
+		super(name, jobRepository);
+	}
 
 	@Override
 	public void afterPropertiesSet() throws Exception {

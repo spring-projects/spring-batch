@@ -72,6 +72,7 @@ import java.util.concurrent.Semaphore;
  * @author Michael Minella
  * @author Will Schipp
  * @author Mahmoud Ben Hassine
+ * @author Hyunsang Han
  */
 public class TaskletStep extends AbstractStep {
 
@@ -104,15 +105,16 @@ public class TaskletStep extends AbstractStep {
 	/**
 	 * Default constructor.
 	 */
-	public TaskletStep() {
-		this(null);
+	public TaskletStep(JobRepository jobRepository) {
+		this(null, jobRepository);
 	}
 
 	/**
 	 * @param name the name for the {@link TaskletStep}
+	 * @param jobRepository the job repository for the {@link TaskletStep}
 	 */
-	public TaskletStep(String name) {
-		super(name);
+	public TaskletStep(String name, JobRepository jobRepository) {
+		super(name, jobRepository);
 	}
 
 	@Override

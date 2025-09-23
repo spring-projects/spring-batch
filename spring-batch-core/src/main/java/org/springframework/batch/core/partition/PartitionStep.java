@@ -23,6 +23,7 @@ import org.springframework.batch.core.observability.jfr.events.step.partition.Pa
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.partition.support.DefaultStepExecutionAggregator;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.util.Assert;
@@ -35,6 +36,7 @@ import java.util.Collection;
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
+ * @author Hyunsang Han
  * @since 2.0
  */
 public class PartitionStep extends AbstractStep {
@@ -44,6 +46,15 @@ public class PartitionStep extends AbstractStep {
 	private PartitionHandler partitionHandler;
 
 	private StepExecutionAggregator stepExecutionAggregator = new DefaultStepExecutionAggregator();
+
+	/**
+	 * Default constructor for a {@link PartitionStep}.
+	 * @param name the name for the {@link PartitionStep}
+	 * @param jobRepository the job repository for the {@link PartitionStep}
+	 */
+	public PartitionStep(String name, JobRepository jobRepository) {
+		super(name, jobRepository);
+	}
 
 	/**
 	 * A {@link PartitionHandler} which can send out step executions for remote processing

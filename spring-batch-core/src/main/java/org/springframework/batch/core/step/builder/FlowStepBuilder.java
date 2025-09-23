@@ -24,6 +24,7 @@ import org.springframework.batch.core.job.flow.FlowStep;
  * nested flow composed of other steps.
  *
  * @author Dave Syer
+ * @author Hyunsang Han
  * @since 2.2
  */
 public class FlowStepBuilder extends StepBuilderHelper<FlowStepBuilder> {
@@ -56,7 +57,7 @@ public class FlowStepBuilder extends StepBuilderHelper<FlowStepBuilder> {
 	 * @return a flow step
 	 */
 	public Step build() {
-		FlowStep step = new FlowStep();
+		FlowStep step = new FlowStep(getJobRepository());
 		step.setName(getName());
 		step.setFlow(flow);
 		super.enhance(step);
