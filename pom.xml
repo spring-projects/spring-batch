@@ -76,8 +76,8 @@
 		<jakarta.validation-api.version>3.1.1</jakarta.validation-api.version>
 		<jakarta.persistence-api.version>3.2.0</jakarta.persistence-api.version>
 		<mongodb-driver.version>5.5.1</mongodb-driver.version>
-		<junit-jupiter.version>5.13.4</junit-jupiter.version>
-		<junit-platform-launcher.version>1.13.4</junit-platform-launcher.version>
+		<junit-jupiter.version>6.0.0-RC3</junit-jupiter.version>
+		<junit-platform-launcher.version>6.0.0-RC3</junit-platform-launcher.version>
 
 		<!-- provided dependencies -->
 		<jsr305.version>3.0.2</jsr305.version>
