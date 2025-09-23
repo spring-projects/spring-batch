@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.launch.JobOperator;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.job.UnexpectedJobExecutionException;
@@ -36,6 +37,7 @@ import org.springframework.util.Assert;
  * worker in a parallel or partitioned execution.
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 public class JobStep extends AbstractStep {
@@ -50,6 +52,15 @@ public class JobStep extends AbstractStep {
 	private JobOperator jobOperator;
 
 	private JobParametersExtractor jobParametersExtractor = new DefaultJobParametersExtractor();
+
+	/**
+	 * Create a new instance of a {@link JobStep} with the given job repository.
+	 * @param jobRepository the job repository to use. Must not be null.
+	 * @since 6.0
+	 */
+	public JobStep(JobRepository jobRepository) {
+		super(jobRepository);
+	}
 
 	@Override
 	public void afterPropertiesSet() throws Exception {

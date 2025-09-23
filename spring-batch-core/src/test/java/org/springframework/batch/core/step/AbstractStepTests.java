@@ -39,12 +39,12 @@ class AbstractStepTests {
 		// given
 		StepExecution execution = new StepExecution("step",
 				new JobExecution(new JobInstance(1L, "job"), 0L, new JobParameters()), 0L);
-		AbstractStep tested = new AbstractStep() {
+		JobRepository jobRepository = mock();
+		AbstractStep tested = new AbstractStep(jobRepository) {
 			@Override
 			protected void doExecute(StepExecution stepExecution) {
 			}
 		};
-		JobRepository jobRepository = mock();
 		Listener stepListener = new Listener();
 		tested.setStepExecutionListeners(new StepExecutionListener[] { stepListener });
 		tested.setJobRepository(jobRepository);

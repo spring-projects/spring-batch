@@ -96,6 +96,7 @@ class SimpleStepFactoryBeanTests {
 	@Test
 	void testMandatoryProperties() {
 		SimpleStepFactoryBean<String, String> factoryBean = new SimpleStepFactoryBean<>();
+		factoryBean.setBeanName("test");
 		assertThrows(IllegalStateException.class, factoryBean::getObject);
 	}
 
@@ -103,6 +104,7 @@ class SimpleStepFactoryBeanTests {
 	void testMandatoryReader() {
 		// given
 		SimpleStepFactoryBean<String, String> factory = new SimpleStepFactoryBean<>();
+		factory.setBeanName("test");
 		factory.setItemWriter(writer);
 
 		// when
@@ -116,6 +118,7 @@ class SimpleStepFactoryBeanTests {
 	void testMandatoryWriter() {
 		// given
 		SimpleStepFactoryBean<String, String> factory = new SimpleStepFactoryBean<>();
+		factory.setBeanName("test");
 		factory.setItemReader(reader);
 
 		// when

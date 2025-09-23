@@ -27,6 +27,7 @@ import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.listener.StepExecutionListener;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
@@ -42,7 +43,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class NonAbstractStepTests {
 
-	AbstractStep tested = new EventTrackingStep();
+	AbstractStep tested;
 
 	StepExecutionListener listener1 = new EventTrackingListener("listener1");
 
@@ -55,15 +56,15 @@ class NonAbstractStepTests {
 	 */
 	final List<String> events = new ArrayList<>();
 
-	final StepExecution execution = new StepExecution(tested.getName(),
-			new JobExecution(new JobInstance(1L, "jobName"), 0L, new JobParameters()), 0L);
+	StepExecution execution;
 
 	/**
 	 * Fills the events list when abstract methods are called.
 	 */
 	private class EventTrackingStep extends AbstractStep {
 
-		public EventTrackingStep() {
+		public EventTrackingStep(JobRepository jobRepository) {
+			super(jobRepository);
 			setBeanName("eventTrackingStep");
 		}
 
@@ -147,13 +148,15 @@ class NonAbstractStepTests {
 
 	@BeforeEach
 	void setUp() {
-		tested.setJobRepository(repository);
+		tested = new EventTrackingStep(repository);
+		execution = new StepExecution(tested.getName(),
+				new JobExecution(new JobInstance(1L, "jobName"), 0L, new JobParameters()), 0L);
 		repository.add(execution);
 	}
 
 	@Test
 	void testBeanName() {
-		AbstractStep step = new AbstractStep() {
+		AbstractStep step = new AbstractStep(repository) {
 			@Override
 			protected void doExecute(StepExecution stepExecution) throws Exception {
 			}
@@ -165,7 +168,7 @@ class NonAbstractStepTests {
 
 	@Test
 	void testName() {
-		AbstractStep step = new AbstractStep() {
+		AbstractStep step = new AbstractStep(repository) {
 			@Override
 			protected void doExecute(StepExecution stepExecution) throws Exception {
 			}
@@ -206,7 +209,7 @@ class NonAbstractStepTests {
 
 	@Test
 	void testFailure() throws Exception {
-		tested = new EventTrackingStep() {
+		tested = new EventTrackingStep(repository) {
 			@Override
 			protected void doExecute(StepExecution context) throws Exception {
 				super.doExecute(context);
@@ -244,7 +247,7 @@ class NonAbstractStepTests {
 	 */
 	@Test
 	void testStoppedStep() throws Exception {
-		tested = new EventTrackingStep() {
+		tested = new EventTrackingStep(repository) {
 			@Override
 			protected void doExecute(StepExecution context) throws Exception {
 				context.setTerminateOnly();
@@ -277,7 +280,7 @@ class NonAbstractStepTests {
 
 	@Test
 	void testStoppedStepWithCustomStatus() throws Exception {
-		tested = new EventTrackingStep() {
+		tested = new EventTrackingStep(repository) {
 			@Override
 			protected void doExecute(StepExecution context) throws Exception {
 				super.doExecute(context);
@@ -304,7 +307,7 @@ class NonAbstractStepTests {
 	 */
 	@Test
 	void testFailureInSavingExecutionContext() throws Exception {
-		tested = new EventTrackingStep() {
+		tested = new EventTrackingStep(repository) {
 			@Override
 			protected void doExecute(StepExecution context) throws Exception {
 				super.doExecute(context);

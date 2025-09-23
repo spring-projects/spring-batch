@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2012 the original author or authors.
+ * Copyright 2009-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@ import org.springframework.util.Assert;
  * parent and one each for the flow steps).
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 public class FlowStep extends AbstractStep {
@@ -39,10 +40,12 @@ public class FlowStep extends AbstractStep {
 	private Flow flow;
 
 	/**
-	 * Default constructor convenient for configuration purposes.
+	 * Create a new instance of a {@link FlowStep} with the given job repository.
+	 * @param jobRepository the job repository to use. Must not be null.
+	 * @since 6.0
 	 */
-	public FlowStep() {
-		super(null);
+	public FlowStep(JobRepository jobRepository) {
+		super(jobRepository);
 	}
 
 	/**

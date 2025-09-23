@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.integration.step;
 
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.step.AbstractStep;
@@ -31,6 +32,15 @@ import org.springframework.util.Assert;
 public class DelegateStep extends AbstractStep {
 
 	private Step delegate;
+
+	/**
+	 * Create a new instance of a {@link DelegateStep} with the given job repository.
+	 * @param jobRepository the job repository to use. Must not be null.
+	 * @since 6.0
+	 */
+	public DelegateStep(JobRepository jobRepository) {
+		super(jobRepository);
+	}
 
 	/**
 	 * @param delegate the delegate to set

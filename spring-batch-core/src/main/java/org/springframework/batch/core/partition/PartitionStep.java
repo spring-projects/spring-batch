@@ -20,6 +20,7 @@ import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.job.JobExecutionException;
 import org.springframework.batch.core.observability.jfr.events.step.partition.PartitionAggregateEvent;
 import org.springframework.batch.core.observability.jfr.events.step.partition.PartitionSplitEvent;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.partition.support.DefaultStepExecutionAggregator;
@@ -44,6 +45,15 @@ public class PartitionStep extends AbstractStep {
 	private PartitionHandler partitionHandler;
 
 	private StepExecutionAggregator stepExecutionAggregator = new DefaultStepExecutionAggregator();
+
+	/**
+	 * Create a new instance of a {@link PartitionStep} with the given job repository.
+	 * @param jobRepository the job repository to use. Must not be null.
+	 * @since 6.0
+	 */
+	public PartitionStep(JobRepository jobRepository) {
+		super(jobRepository);
+	}
 
 	/**
 	 * A {@link PartitionHandler} which can send out step executions for remote processing

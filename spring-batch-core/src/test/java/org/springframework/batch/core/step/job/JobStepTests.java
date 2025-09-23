@@ -47,7 +47,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class JobStepTests {
 
-	private final JobStep step = new JobStep();
+	private JobStep step;
 
 	private StepExecution stepExecution;
 
@@ -55,7 +55,6 @@ class JobStepTests {
 
 	@BeforeEach
 	void setUp() throws Exception {
-		step.setName("step");
 		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
 			.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
 			.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
@@ -65,7 +64,8 @@ class JobStepTests {
 		factory.setTransactionManager(new JdbcTransactionManager(embeddedDatabase));
 		factory.afterPropertiesSet();
 		jobRepository = factory.getObject();
-		step.setJobRepository(jobRepository);
+		step = new JobStep(jobRepository);
+		step.setName("step");
 		JobExecution jobExecution = jobRepository.createJobExecution("job", new JobParameters());
 		stepExecution = jobExecution.createStepExecution("step");
 		jobRepository.add(stepExecution);

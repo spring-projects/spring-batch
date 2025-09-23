@@ -76,10 +76,33 @@ public abstract class AbstractStep implements StoppableStep, InitializingBean, B
 	protected ObservationRegistry observationRegistry;
 
 	/**
-	 * Default constructor.
+	 * Create a new {@link AbstractStep}.
+	 * @deprecated since 6.0 for removal in 7.0. Use {@link #AbstractStep(JobRepository)}
+	 * instead.
 	 */
+	@Deprecated(since = "6.0", forRemoval = true)
 	public AbstractStep() {
-		super();
+	}
+
+	/**
+	 * Create a new {@link AbstractStep}.
+	 * @deprecated since 6.0 for removal in 7.0. Use {@link #AbstractStep(JobRepository)}
+	 * instead.
+	 */
+	@Deprecated(since = "6.0", forRemoval = true)
+	public AbstractStep(String name) {
+		Assert.notNull(name, "Step name must not be null");
+		this.name = name;
+	}
+
+	/**
+	 * Create a new {@link AbstractStep} with the given job repository.
+	 * @param jobRepository the job repository. Must not be null.
+	 * @since 6.0
+	 */
+	public AbstractStep(JobRepository jobRepository) {
+		Assert.notNull(jobRepository, "JobRepository must not be null");
+		this.jobRepository = jobRepository;
 	}
 
 	@Override
@@ -147,14 +170,6 @@ public abstract class AbstractStep implements StoppableStep, InitializingBean, B
 	 */
 	public void setAllowStartIfComplete(boolean allowStartIfComplete) {
 		this.allowStartIfComplete = allowStartIfComplete;
-	}
-
-	/**
-	 * Convenient constructor for setting only the name property.
-	 * @param name Name of the step
-	 */
-	public AbstractStep(String name) {
-		this.name = name;
 	}
 
 	/**

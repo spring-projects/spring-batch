@@ -162,11 +162,11 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 	 */
 	public ChunkOrientedStep(String name, int chunkSize, ItemReader<I> itemReader, ItemWriter<O> itemWriter,
 			JobRepository jobRepository) {
-		super(name);
+		super(jobRepository);
 		this.chunkSize = chunkSize;
 		this.itemReader = itemReader;
 		this.itemWriter = itemWriter;
-		setJobRepository(jobRepository);
+		setName(name);
 	}
 
 	/**

@@ -28,6 +28,7 @@ import org.springframework.batch.core.step.job.JobStep;
  * with parameters taken from the parent job or from the step execution.
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  * @since 2.2
  */
 public class JobStepBuilder extends StepBuilderHelper<JobStepBuilder> {
@@ -84,7 +85,7 @@ public class JobStepBuilder extends StepBuilderHelper<JobStepBuilder> {
 	 */
 	public Step build() {
 
-		JobStep step = new JobStep();
+		JobStep step = new JobStep(getJobRepository());
 		step.setName(getName());
 		super.enhance(step);
 		if (job != null) {

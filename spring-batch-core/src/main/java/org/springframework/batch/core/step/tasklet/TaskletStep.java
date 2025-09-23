@@ -103,16 +103,32 @@ public class TaskletStep extends AbstractStep {
 
 	/**
 	 * Default constructor.
+	 * @deprecated since 6.0 for removal in 7.0. Use {@link #TaskletStep(JobRepository)}
+	 * instead.
 	 */
+	@Deprecated(since = "6.0", forRemoval = true)
 	public TaskletStep() {
-		this(null);
+		super();
 	}
 
 	/**
+	 * Create a new instance with the given name.
+	 * @deprecated since 6.0 for removal in 7.0. Use {@link #TaskletStep(JobRepository)}
+	 * instead.
 	 * @param name the name for the {@link TaskletStep}
 	 */
+	@Deprecated(since = "6.0", forRemoval = true)
 	public TaskletStep(String name) {
 		super(name);
+	}
+
+	/**
+	 * Create a new instance with the given name and job repository.
+	 * @param jobRepository the job repository to use. Must not be null.
+	 * @since 6.0
+	 */
+	public TaskletStep(JobRepository jobRepository) {
+		super(jobRepository);
 	}
 
 	@Override

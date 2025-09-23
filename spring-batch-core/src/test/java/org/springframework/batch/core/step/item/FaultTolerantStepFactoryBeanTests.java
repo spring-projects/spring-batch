@@ -151,6 +151,7 @@ public class FaultTolerantStepFactoryBeanTests {
 	void testMandatoryReader() {
 		// given
 		factory = new FaultTolerantStepFactoryBean<>();
+		factory.setBeanName("test");
 		factory.setItemWriter(writer);
 
 		// when
@@ -164,6 +165,7 @@ public class FaultTolerantStepFactoryBeanTests {
 	void testMandatoryWriter() {
 		// given
 		factory = new FaultTolerantStepFactoryBean<>();
+		factory.setBeanName("test");
 		factory.setItemReader(reader);
 
 		// when

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import org.springframework.batch.core.job.flow.FlowStep;
  * nested flow composed of other steps.
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  * @since 2.2
  */
 public class FlowStepBuilder extends StepBuilderHelper<FlowStepBuilder> {
@@ -56,7 +57,7 @@ public class FlowStepBuilder extends StepBuilderHelper<FlowStepBuilder> {
 	 * @return a flow step
 	 */
 	public Step build() {
-		FlowStep step = new FlowStep();
+		FlowStep step = new FlowStep(getJobRepository());
 		step.setName(getName());
 		step.setFlow(flow);
 		super.enhance(step);
