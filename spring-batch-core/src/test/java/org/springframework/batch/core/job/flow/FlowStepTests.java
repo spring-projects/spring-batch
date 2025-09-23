@@ -44,6 +44,7 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 /**
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
+ * @author Hyunsang Han
  *
  */
 class FlowStepTests {
@@ -68,16 +69,14 @@ class FlowStepTests {
 
 	@Test
 	void testAfterPropertiesSet() {
-		FlowStep step = new FlowStep();
-		step.setJobRepository(jobRepository);
+		FlowStep step = new FlowStep(jobRepository);
 		assertThrows(IllegalStateException.class, step::afterPropertiesSet);
 	}
 
 	@Test
 	void testDoExecute() throws Exception {
 
-		FlowStep step = new FlowStep();
-		step.setJobRepository(jobRepository);
+		FlowStep step = new FlowStep(jobRepository);
 
 		SimpleFlow flow = new SimpleFlow("job");
 		List<StateTransition> transitions = new ArrayList<>();
@@ -108,8 +107,7 @@ class FlowStepTests {
 	@Test
 	void testDoExecuteAndFail() throws Exception {
 
-		FlowStep step = new FlowStep();
-		step.setJobRepository(jobRepository);
+		FlowStep step = new FlowStep(jobRepository);
 
 		SimpleFlow flow = new SimpleFlow("job");
 		List<StateTransition> transitions = new ArrayList<>();
@@ -141,8 +139,7 @@ class FlowStepTests {
 	@Test
 	void testExecuteWithParentContext() throws Exception {
 
-		FlowStep step = new FlowStep();
-		step.setJobRepository(jobRepository);
+		FlowStep step = new FlowStep(jobRepository);
 
 		SimpleFlow flow = new SimpleFlow("job");
 		List<StateTransition> transitions = new ArrayList<>();

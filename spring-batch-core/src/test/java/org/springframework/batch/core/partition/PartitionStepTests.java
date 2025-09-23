@@ -43,11 +43,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
+ * @author Hyunsang Han
  *
  */
 class PartitionStepTests {
 
-	private final PartitionStep step = new PartitionStep();
+	private PartitionStep step;
 
 	private JobRepository jobRepository;
 
@@ -62,8 +63,7 @@ class PartitionStepTests {
 		factory.setTransactionManager(new JdbcTransactionManager(embeddedDatabase));
 		factory.afterPropertiesSet();
 		jobRepository = factory.getObject();
-		step.setJobRepository(jobRepository);
-		step.setName("partitioned");
+		step = new PartitionStep("partitioned", jobRepository);
 	}
 
 	@Test

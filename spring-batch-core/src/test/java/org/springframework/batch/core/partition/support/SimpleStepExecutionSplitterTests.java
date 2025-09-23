@@ -46,6 +46,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+/**
+ * @author Hyunsang Han
+ *
+ */
 class SimpleStepExecutionSplitterTests {
 
 	private Step step;
@@ -56,7 +60,6 @@ class SimpleStepExecutionSplitterTests {
 
 	@BeforeEach
 	void setUp() throws Exception {
-		step = new TaskletStep("step");
 		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
 			.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
 			.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
@@ -66,6 +69,7 @@ class SimpleStepExecutionSplitterTests {
 		factory.setTransactionManager(new JdbcTransactionManager(embeddedDatabase));
 		factory.afterPropertiesSet();
 		jobRepository = factory.getObject();
+		step = new TaskletStep("step", jobRepository);
 		stepExecution = jobRepository.createJobExecution("job", new JobParameters()).createStepExecution("bar");
 		jobRepository.add(stepExecution);
 	}

@@ -64,6 +64,7 @@ import static org.springframework.batch.core.BatchStatus.UNKNOWN;
  * @author Mahmoud Ben Hassine
  * @author Parikshit Dutta
  * @author Elimelec Burghelea
+ * @author Hyunsang Han
  */
 class TaskletStepExceptionTests {
 
@@ -79,10 +80,9 @@ class TaskletStepExceptionTests {
 
 	@BeforeEach
 	void init() {
-		taskletStep = new TaskletStep();
-		taskletStep.setTasklet(new ExceptionTasklet());
 		jobRepository = new UpdateCountingJobRepository();
-		taskletStep.setJobRepository(jobRepository);
+		taskletStep = new TaskletStep("testStep", jobRepository);
+		taskletStep.setTasklet(new ExceptionTasklet());
 		taskletStep.setTransactionManager(new ResourcelessTransactionManager());
 
 		JobInstance jobInstance = new JobInstance(1L, "testJob");

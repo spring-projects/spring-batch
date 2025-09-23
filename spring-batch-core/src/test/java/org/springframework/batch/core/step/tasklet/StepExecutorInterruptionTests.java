@@ -45,6 +45,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+/**
+ * @author Hyunsang Han
+ *
+ */
 // FIXME This test fails with an embedded database. Need to check if the datasource should be configured with mvcc enabled
 @Disabled
 class StepExecutorInterruptionTests {
@@ -84,7 +88,6 @@ class StepExecutorInterruptionTests {
 		job.addStep(step);
 		job.setBeanName("testJob");
 		jobExecution = jobRepository.createJobExecution(job.getName(), new JobParameters());
-		step.setJobRepository(jobRepository);
 		step.setTransactionManager(this.transactionManager);
 		itemWriter = item -> {
 		};
@@ -94,7 +97,7 @@ class StepExecutorInterruptionTests {
 	@Test
 	void testInterruptStep() throws Exception {
 
-		configureStep(new TaskletStep("step"));
+		configureStep(new TaskletStep("step", jobRepository));
 
 		Thread processingThread = createThread(stepExecution);
 
@@ -139,7 +142,7 @@ class StepExecutorInterruptionTests {
 		// in Bamboo situation where the thread is interrupted before the lock
 		// is taken.
 
-		configureStep(new TaskletStep("step") {
+		configureStep(new TaskletStep("step", jobRepository) {
 			@SuppressWarnings("serial")
 			@Override
 			protected Semaphore createSemaphore() {
@@ -180,7 +183,7 @@ class StepExecutorInterruptionTests {
 	@Test
 	void testLockNotReleasedIfChunkFails() throws Exception {
 
-		configureStep(new TaskletStep("step") {
+		configureStep(new TaskletStep("step", jobRepository) {
 			@SuppressWarnings("serial")
 			@Override
 			protected Semaphore createSemaphore() {

@@ -51,6 +51,7 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 /**
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
+ * @author Hyunsang Han
  *
  */
 @SpringJUnitConfig(locations = "/org/springframework/batch/core/repository/dao/jdbc/sql-dao-test.xml")
@@ -98,8 +99,7 @@ class AsyncChunkOrientedStepIntegrationTests {
 		dataSource.setMaxTotal(1);
 		dataSource.setMaxIdle(1);
 
-		step = new TaskletStep("stepName");
-		step.setJobRepository(jobRepository);
+		step = new TaskletStep("stepName", jobRepository);
 		step.setTransactionManager(transactionManager);
 
 		// Only process one item:

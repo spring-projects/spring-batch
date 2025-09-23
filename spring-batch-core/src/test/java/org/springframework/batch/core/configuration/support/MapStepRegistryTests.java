@@ -28,10 +28,12 @@ import org.springframework.batch.core.configuration.DuplicateJobException;
 import org.springframework.batch.core.configuration.StepRegistry;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.step.NoSuchStepException;
+import org.springframework.batch.core.step.JobRepositorySupport;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 
 /**
  * @author Sebastien Gerard
+ * @author Hyunsang Han
  */
 class MapStepRegistryTests {
 
@@ -154,7 +156,7 @@ class MapStepRegistryTests {
 	}
 
 	protected Step createStep(String stepName) {
-		return new TaskletStep(stepName);
+		return new TaskletStep(stepName, new JobRepositorySupport());
 	}
 
 	protected Collection<Step> getStepCollection(Step... steps) {

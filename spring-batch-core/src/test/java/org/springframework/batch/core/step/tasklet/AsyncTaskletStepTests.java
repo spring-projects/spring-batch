@@ -47,6 +47,10 @@ import org.springframework.batch.support.transaction.ResourcelessTransactionMana
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.util.StringUtils;
 
+/**
+ * @author Hyunsang Han
+ *
+ */
 class AsyncTaskletStepTests {
 
 	private static final Log logger = LogFactory.getLog(AsyncTaskletStepTests.class);
@@ -76,7 +80,8 @@ class AsyncTaskletStepTests {
 
 	private void setUp() {
 
-		step = new TaskletStep("stepName");
+		jobRepository = new JobRepositorySupport();
+		step = new TaskletStep("stepName", jobRepository);
 
 		ResourcelessTransactionManager transactionManager = new ResourcelessTransactionManager();
 		step.setTransactionManager(transactionManager);
@@ -85,9 +90,6 @@ class AsyncTaskletStepTests {
 		chunkTemplate.setCompletionPolicy(new SimpleCompletionPolicy(2));
 		step.setTasklet(new TestingChunkOrientedTasklet<>(new SynchronizedItemReader<>(new ListItemReader<>(items)),
 				itemProcessor, itemWriter, chunkTemplate));
-
-		jobRepository = new JobRepositorySupport();
-		step.setJobRepository(jobRepository);
 
 		TaskExecutorRepeatTemplate template = new TaskExecutorRepeatTemplate();
 		SimpleAsyncTaskExecutor taskExecutor = new SimpleAsyncTaskExecutor();

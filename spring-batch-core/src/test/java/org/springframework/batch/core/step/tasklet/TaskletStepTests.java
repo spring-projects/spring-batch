@@ -67,6 +67,10 @@ import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 import org.springframework.transaction.support.DefaultTransactionStatus;
 
+/**
+ * @author Hyunsang Han
+ *
+ */
 class TaskletStepTests {
 
 	List<String> processed = new ArrayList<>();
@@ -96,12 +100,12 @@ class TaskletStepTests {
 	}
 
 	private TaskletStep getStep(String[] strings, int commitInterval) throws Exception {
-		TaskletStep step = new TaskletStep("stepName");
+		JobRepository jobRepository = new JobRepositorySupport();
+		TaskletStep step = new TaskletStep("stepName", jobRepository);
 		// Only process one item:
 		RepeatTemplate template = new RepeatTemplate();
 		template.setCompletionPolicy(new SimpleCompletionPolicy(commitInterval));
 		step.setTasklet(new TestingChunkOrientedTasklet<>(getReader(strings), itemWriter, template));
-		step.setJobRepository(new JobRepositorySupport());
 		step.setTransactionManager(transactionManager);
 		return step;
 	}

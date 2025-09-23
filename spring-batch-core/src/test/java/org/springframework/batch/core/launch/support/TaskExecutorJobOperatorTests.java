@@ -72,6 +72,7 @@ import static org.mockito.Mockito.when;
  * @author Mahmoud Ben Hassine
  * @author Jinwoo Bae
  * @author Yejeong Ham
+ * @author Hyunsang Han
  */
 @SuppressWarnings("removal")
 class TaskExecutorJobOperatorTests {
@@ -342,7 +343,7 @@ class TaskExecutorJobOperatorTests {
 		JobInstance jobInstance = new JobInstance(123L, job.getName());
 		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters);
 		StoppableTasklet tasklet = mock();
-		TaskletStep taskletStep = new TaskletStep();
+		TaskletStep taskletStep = new TaskletStep("testStep", jobRepository);
 		taskletStep.setTasklet(tasklet);
 		MockJob job = new MockJob();
 		job.taskletStep = taskletStep;
@@ -390,7 +391,7 @@ class TaskExecutorJobOperatorTests {
 				throw new IllegalStateException();
 			}
 		};
-		TaskletStep taskletStep = new TaskletStep();
+		TaskletStep taskletStep = new TaskletStep("testStep", jobRepository);
 		taskletStep.setTasklet(tasklet);
 		MockJob job = new MockJob();
 		job.taskletStep = taskletStep;

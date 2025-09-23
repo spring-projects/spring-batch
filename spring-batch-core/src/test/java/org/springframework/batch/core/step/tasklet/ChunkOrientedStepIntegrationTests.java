@@ -45,6 +45,7 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 
 /**
  * @author Dave Syer
+ * @author Hyunsang Han
  *
  */
 @SpringJUnitConfig(locations = "/org/springframework/batch/core/repository/dao/jdbc/sql-dao-test.xml")
@@ -69,8 +70,7 @@ class ChunkOrientedStepIntegrationTests {
 	@BeforeEach
 	void onSetUp() {
 
-		step = new TaskletStep("stepName");
-		step.setJobRepository(jobRepository);
+		step = new TaskletStep("stepName", jobRepository);
 		step.setTransactionManager(transactionManager);
 
 		// Only process one item:

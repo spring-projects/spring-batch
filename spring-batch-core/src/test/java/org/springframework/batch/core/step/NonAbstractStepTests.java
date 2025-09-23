@@ -35,6 +35,7 @@ import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.listener.StepExecutionListener;
 import org.springframework.batch.core.observability.BatchStepObservation;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
@@ -47,16 +48,18 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests for {@link AbstractStep}.
+ *
+ * @author Hyunsang Han
  */
 class NonAbstractStepTests {
 
-	AbstractStep tested = new EventTrackingStep();
+	JobRepositoryStub repository = new JobRepositoryStub();
+
+	AbstractStep tested = new EventTrackingStep(repository);
 
 	StepExecutionListener listener1 = new EventTrackingListener("listener1");
 
 	StepExecutionListener listener2 = new EventTrackingListener("listener2");
-
-	JobRepositoryStub repository = new JobRepositoryStub();
 
 	/**
 	 * Sequence of events encountered during step execution.
@@ -71,8 +74,8 @@ class NonAbstractStepTests {
 	 */
 	private class EventTrackingStep extends AbstractStep {
 
-		public EventTrackingStep() {
-			setBeanName("eventTrackingStep");
+		public EventTrackingStep(JobRepository jobRepository) {
+			super("eventTrackingStep", jobRepository);
 		}
 
 		@Override
@@ -161,7 +164,7 @@ class NonAbstractStepTests {
 
 	@Test
 	void testBeanName() {
-		AbstractStep step = new AbstractStep() {
+		AbstractStep step = new AbstractStep(null, repository) {
 			@Override
 			protected void doExecute(StepExecution stepExecution) throws Exception {
 			}
@@ -173,7 +176,7 @@ class NonAbstractStepTests {
 
 	@Test
 	void testName() {
-		AbstractStep step = new AbstractStep() {
+		AbstractStep step = new AbstractStep(null, repository) {
 			@Override
 			protected void doExecute(StepExecution stepExecution) throws Exception {
 			}
@@ -231,14 +234,13 @@ class NonAbstractStepTests {
 
 	@Test
 	void testFailure() throws Exception {
-		tested = new EventTrackingStep() {
+		tested = new EventTrackingStep(repository) {
 			@Override
 			protected void doExecute(StepExecution context) throws Exception {
 				super.doExecute(context);
 				throw new RuntimeException("crash!");
 			}
 		};
-		tested.setJobRepository(repository);
 		tested.setStepExecutionListeners(new StepExecutionListener[] { listener1, listener2 });
 
 		tested.execute(execution);
@@ -269,14 +271,13 @@ class NonAbstractStepTests {
 	 */
 	@Test
 	void testStoppedStep() throws Exception {
-		tested = new EventTrackingStep() {
+		tested = new EventTrackingStep(repository) {
 			@Override
 			protected void doExecute(StepExecution context) throws Exception {
 				context.setTerminateOnly();
 				super.doExecute(context);
 			}
 		};
-		tested.setJobRepository(repository);
 		tested.setStepExecutionListeners(new StepExecutionListener[] { listener1, listener2 });
 
 		tested.execute(execution);
@@ -302,7 +303,7 @@ class NonAbstractStepTests {
 
 	@Test
 	void testStoppedStepWithCustomStatus() throws Exception {
-		tested = new EventTrackingStep() {
+		tested = new EventTrackingStep(repository) {
 			@Override
 			protected void doExecute(StepExecution context) throws Exception {
 				super.doExecute(context);
@@ -310,7 +311,6 @@ class NonAbstractStepTests {
 				context.setExitStatus(new ExitStatus("FUNNY"));
 			}
 		};
-		tested.setJobRepository(repository);
 		tested.setStepExecutionListeners(new StepExecutionListener[] { listener1, listener2 });
 
 		tested.execute(execution);
@@ -329,19 +329,18 @@ class NonAbstractStepTests {
 	 */
 	@Test
 	void testFailureInSavingExecutionContext() throws Exception {
-		tested = new EventTrackingStep() {
-			@Override
-			protected void doExecute(StepExecution context) throws Exception {
-				super.doExecute(context);
-			}
-		};
 		repository = new JobRepositoryStub() {
 			@Override
 			public void updateExecutionContext(StepExecution stepExecution) {
 				throw new RuntimeException("Bad context!");
 			}
 		};
-		tested.setJobRepository(repository);
+		tested = new EventTrackingStep(repository) {
+			@Override
+			protected void doExecute(StepExecution context) throws Exception {
+				super.doExecute(context);
+			}
+		};
 
 		tested.execute(execution);
 		assertEquals(BatchStatus.UNKNOWN, execution.getStatus());
@@ -355,15 +354,6 @@ class NonAbstractStepTests {
 		assertEquals(3, events.size());
 
 		assertEquals(ExitStatus.UNKNOWN, execution.getExitStatus());
-	}
-
-	/**
-	 * JobRepository is a required property.
-	 */
-	@Test
-	void testAfterPropertiesSet() {
-		tested.setJobRepository(null);
-		assertThrows(IllegalStateException.class, tested::afterPropertiesSet);
 	}
 
 }
