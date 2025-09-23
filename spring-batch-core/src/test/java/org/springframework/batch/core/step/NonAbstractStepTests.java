@@ -18,13 +18,6 @@ package org.springframework.batch.core.step;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.micrometer.core.instrument.Metrics;
-import io.micrometer.core.instrument.Tag;
-import io.micrometer.core.instrument.Tags;
-import io.micrometer.core.instrument.observation.DefaultMeterObservationHandler;
-import io.micrometer.core.tck.MeterRegistryAssert;
-import io.micrometer.observation.ObservationRegistry;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -191,11 +184,6 @@ class NonAbstractStepTests {
 	void testExecute() throws Exception {
 		tested.setStepExecutionListeners(new StepExecutionListener[] { listener1, listener2 });
 
-		ObservationRegistry observationRegistry = ObservationRegistry.create();
-		observationRegistry.observationConfig()
-			.observationHandler(new DefaultMeterObservationHandler(Metrics.globalRegistry));
-		tested.setObservationRegistry(observationRegistry);
-
 		tested.execute(execution);
 
 		int i = 0;
@@ -214,18 +202,6 @@ class NonAbstractStepTests {
 				"Execution context modifications made by listener should be persisted");
 		assertTrue(repository.saved.containsKey("afterStep"),
 				"Execution context modifications made by listener should be persisted");
-
-		// Observability
-		MeterRegistryAssert.assertThat(Metrics.globalRegistry)
-			.hasTimerWithNameAndTags("spring.batch.step",
-					Tags.of(Tag.of("error", "none"), Tag.of("spring.batch.step.job.name", "jobName"),
-							Tag.of("spring.batch.step.name", "eventTrackingStep"),
-							Tag.of("spring.batch.step.status", "COMPLETED")));
-	}
-
-	@AfterEach
-	void cleanup() {
-		Metrics.globalRegistry.clear();
 	}
 
 	@Test

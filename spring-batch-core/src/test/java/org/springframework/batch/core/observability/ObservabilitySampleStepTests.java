@@ -96,13 +96,13 @@ class ObservabilitySampleStepTests extends SampleTestRunner {
 			// and
 			SpansAssert.assertThat(bb.getFinishedSpans())
 				.haveSameTraceId()
-				.hasASpanWithName("spring.batch.job")
-				.hasASpanWithName("spring.batch.step");
+				.hasASpanWithName(BatchMetrics.METRICS_PREFIX + "job")
+				.hasASpanWithName(BatchMetrics.METRICS_PREFIX + "step");
 
 			// and
 			MeterRegistryAssert.assertThat(meterRegistry)
-				.hasMeterWithName("spring.batch.job")
-				.hasMeterWithName("spring.batch.step");
+				.hasMeterWithName(BatchMetrics.METRICS_PREFIX + "job")
+				.hasMeterWithName(BatchMetrics.METRICS_PREFIX + "step");
 		};
 	}
 

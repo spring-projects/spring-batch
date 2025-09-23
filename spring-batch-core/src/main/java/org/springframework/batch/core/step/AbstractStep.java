@@ -208,11 +208,12 @@ public abstract class AbstractStep implements StoppableStep, InitializingBean, B
 		stepExecutionEvent.begin();
 		stepExecution.setStartTime(LocalDateTime.now());
 		stepExecution.setStatus(BatchStatus.STARTED);
-		Observation observation = MicrometerMetrics.createObservation("spring.batch.step", this.observationRegistry)
-			.highCardinalityKeyValue("spring.batch.step.executionId", stepExecution.getId().toString())
-			.lowCardinalityKeyValue("spring.batch.step.name", stepExecution.getStepName())
-			.lowCardinalityKeyValue("spring.batch.step.type", getClass().getName())
-			.lowCardinalityKeyValue("spring.batch.step.job.name",
+		Observation observation = MicrometerMetrics
+			.createObservation(BatchMetrics.METRICS_PREFIX + "step", this.observationRegistry)
+			.highCardinalityKeyValue(BatchMetrics.METRICS_PREFIX + "step.executionId", stepExecution.getId().toString())
+			.lowCardinalityKeyValue(BatchMetrics.METRICS_PREFIX + "step.name", stepExecution.getStepName())
+			.lowCardinalityKeyValue(BatchMetrics.METRICS_PREFIX + "step.type", getClass().getName())
+			.lowCardinalityKeyValue(BatchMetrics.METRICS_PREFIX + "step.job.name",
 					stepExecution.getJobExecution().getJobInstance().getJobName())
 			.start();
 		getJobRepository().update(stepExecution);
@@ -333,7 +334,8 @@ public abstract class AbstractStep implements StoppableStep, InitializingBean, B
 		if (!throwables.isEmpty()) {
 			observation.error(mergedThrowables(throwables));
 		}
-		observation.lowCardinalityKeyValue("spring.batch.step.status", stepExecution.getExitStatus().getExitCode());
+		observation.lowCardinalityKeyValue(BatchMetrics.METRICS_PREFIX + "step.status",
+				stepExecution.getExitStatus().getExitCode());
 		observation.stop();
 	}
 

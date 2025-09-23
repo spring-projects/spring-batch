@@ -32,6 +32,7 @@ import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.launch.JobOperator;
+import org.springframework.batch.core.observability.BatchMetrics;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.builder.ChunkOrientedStepBuilder;
@@ -85,24 +86,24 @@ public class ChunkOrientedStepObservabilityIntegrationTests {
 	private static void assertMetrics(SimpleMeterRegistry meterRegistry) {
 		Assertions.assertEquals(12, meterRegistry.getMeters().size());
 		assertDoesNotThrow(
-				() -> meterRegistry.get("spring.batch.item.read")
-					.tag("spring.batch.item.read.job.name", "job")
-					.tag("spring.batch.item.read.step.name", "step")
-					.tag("spring.batch.item.read.status", "SUCCESS")
+				() -> meterRegistry.get(BatchMetrics.METRICS_PREFIX + "item.read")
+					.tag(BatchMetrics.METRICS_PREFIX + "item.read.job.name", "job")
+					.tag(BatchMetrics.METRICS_PREFIX + "item.read.step.name", "step")
+					.tag(BatchMetrics.METRICS_PREFIX + "item.read.status", "SUCCESS")
 					.timer(),
 				"There should be a meter of type TIMER named spring.batch.item.read registered in the meter registry");
 		assertDoesNotThrow(
-				() -> meterRegistry.get("spring.batch.item.process")
-					.tag("spring.batch.item.process.job.name", "job")
-					.tag("spring.batch.item.process.step.name", "step")
-					.tag("spring.batch.item.process.status", "SUCCESS")
+				() -> meterRegistry.get(BatchMetrics.METRICS_PREFIX + "item.process")
+					.tag(BatchMetrics.METRICS_PREFIX + "item.process.job.name", "job")
+					.tag(BatchMetrics.METRICS_PREFIX + "item.process.step.name", "step")
+					.tag(BatchMetrics.METRICS_PREFIX + "item.process.status", "SUCCESS")
 					.timer(),
 				"There should be a meter of type TIMER named spring.batch.item.process registered in the meter registry");
 		assertDoesNotThrow(
-				() -> meterRegistry.get("spring.batch.chunk.write")
-					.tag("spring.batch.chunk.write.job.name", "job")
-					.tag("spring.batch.chunk.write.step.name", "step")
-					.tag("spring.batch.chunk.write.status", "SUCCESS")
+				() -> meterRegistry.get(BatchMetrics.METRICS_PREFIX + "chunk.write")
+					.tag(BatchMetrics.METRICS_PREFIX + "chunk.write.job.name", "job")
+					.tag(BatchMetrics.METRICS_PREFIX + "chunk.write.step.name", "step")
+					.tag(BatchMetrics.METRICS_PREFIX + "chunk.write.status", "SUCCESS")
 					.timer(),
 				"There should be a meter of type TIMER named spring.batch.chunk.write registered in the meter registry");
 	}

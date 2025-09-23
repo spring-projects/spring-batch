@@ -33,6 +33,7 @@ import org.springframework.batch.core.job.parameters.JobParametersIncrementer;
 import org.springframework.batch.core.job.parameters.JobParametersValidator;
 import org.springframework.batch.core.listener.JobExecutionListener;
 import org.springframework.batch.core.SpringBatchVersion;
+import org.springframework.batch.core.observability.BatchMetrics;
 import org.springframework.batch.core.observability.jfr.events.job.JobExecutionEvent;
 import org.springframework.batch.core.observability.micrometer.MicrometerMetrics;
 import org.springframework.batch.core.step.Step;
@@ -273,10 +274,12 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 		JobExecutionEvent jobExecutionEvent = new JobExecutionEvent(execution.getJobInstance().getJobName(),
 				execution.getJobInstance().getId(), execution.getId());
 		jobExecutionEvent.begin();
-		Observation observation = MicrometerMetrics.createObservation("spring.batch.job", this.observationRegistry)
-			.highCardinalityKeyValue("spring.batch.job.instanceId", execution.getJobInstance().getId().toString())
-			.highCardinalityKeyValue("spring.batch.job.executionId", execution.getId().toString())
-			.lowCardinalityKeyValue("spring.batch.job.name", execution.getJobInstance().getJobName())
+		Observation observation = MicrometerMetrics
+			.createObservation(BatchMetrics.METRICS_PREFIX + "job", this.observationRegistry)
+			.highCardinalityKeyValue(BatchMetrics.METRICS_PREFIX + "job.instanceId",
+					execution.getJobInstance().getId().toString())
+			.highCardinalityKeyValue(BatchMetrics.METRICS_PREFIX + "job.executionId", execution.getId().toString())
+			.lowCardinalityKeyValue(BatchMetrics.METRICS_PREFIX + "job.name", execution.getJobInstance().getJobName())
 			.start();
 		try (Observation.Scope scope = observation.openScope()) {
 
@@ -365,7 +368,8 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 		if (!throwables.isEmpty()) {
 			observation.error(mergedThrowables(throwables));
 		}
-		observation.lowCardinalityKeyValue("spring.batch.job.status", execution.getExitStatus().getExitCode());
+		observation.lowCardinalityKeyValue(BatchMetrics.METRICS_PREFIX + "job.status",
+				execution.getExitStatus().getExitCode());
 		observation.stop();
 	}
 

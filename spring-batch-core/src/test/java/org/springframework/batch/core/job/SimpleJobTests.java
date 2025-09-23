@@ -24,11 +24,6 @@ import java.util.Collections;
 import java.util.List;
 
 import io.micrometer.core.instrument.Metrics;
-import io.micrometer.core.instrument.Tag;
-import io.micrometer.core.instrument.Tags;
-import io.micrometer.core.instrument.observation.DefaultMeterObservationHandler;
-import io.micrometer.core.tck.MeterRegistryAssert;
-import io.micrometer.observation.ObservationRegistry;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -101,11 +96,6 @@ class SimpleJobTests {
 		this.jobRepository = repositoryFactoryBean.getObject();
 		job = new SimpleJob();
 		job.setJobRepository(jobRepository);
-
-		ObservationRegistry observationRegistry = ObservationRegistry.create();
-		observationRegistry.observationConfig()
-			.observationHandler(new DefaultMeterObservationHandler(Metrics.globalRegistry));
-		job.setObservationRegistry(observationRegistry);
 
 		step1 = new StubStep("TestStep1", jobRepository);
 		step1.setCallback(() -> list.add("default"));
@@ -198,11 +188,6 @@ class SimpleJobTests {
 
 		assertEquals(1, step1.passedInJobContext.size());
 		assertFalse(step2.passedInJobContext.isEmpty());
-
-		// Observability
-		MeterRegistryAssert.assertThat(Metrics.globalRegistry)
-			.hasTimerWithNameAndTags("spring.batch.job", Tags.of(Tag.of("error", "none"),
-					Tag.of("spring.batch.job.name", "testJob"), Tag.of("spring.batch.job.status", "COMPLETED")));
 	}
 
 	@AfterEach
