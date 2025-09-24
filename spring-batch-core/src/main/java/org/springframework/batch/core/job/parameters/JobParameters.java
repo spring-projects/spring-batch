@@ -20,6 +20,7 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -45,6 +46,7 @@ import org.springframework.util.Assert;
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
  * @author Taeik Lim
+ * @author Yanming Zhou
  * @since 1.0
  */
 public class JobParameters implements Serializable {
@@ -222,6 +224,10 @@ public class JobParameters implements Serializable {
 		if (!jobParameter.getType().equals(LocalDate.class)) {
 			throw new IllegalArgumentException("Key " + key + " is not of type java.time.LocalDate");
 		}
+		if (jobParameter.getValue() instanceof Date date) {
+			// MongoDB restore value as Date
+			return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+		}
 		return (LocalDate) jobParameter.getValue();
 	}
 
@@ -257,6 +263,10 @@ public class JobParameters implements Serializable {
 		if (!jobParameter.getType().equals(LocalTime.class)) {
 			throw new IllegalArgumentException("Key " + key + " is not of type java.time.LocalTime");
 		}
+		if (jobParameter.getValue() instanceof Date date) {
+			// MongoDB restore value as Date
+			return date.toInstant().atZone(ZoneId.systemDefault()).toLocalTime();
+		}
 		return (LocalTime) jobParameter.getValue();
 	}
 
@@ -291,6 +301,10 @@ public class JobParameters implements Serializable {
 		JobParameter<?> jobParameter = parameters.get(key);
 		if (!jobParameter.getType().equals(LocalDateTime.class)) {
 			throw new IllegalArgumentException("Key " + key + " is not of type java.time.LocalDateTime");
+		}
+		if (jobParameter.getValue() instanceof Date date) {
+			// MongoDB restore value as Date
+			return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
 		}
 		return (LocalDateTime) jobParameter.getValue();
 	}
