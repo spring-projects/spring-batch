@@ -16,6 +16,7 @@
 package org.springframework.batch.core.repository.support;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.Map;
 
 import com.mongodb.client.MongoCollection;
@@ -29,17 +30,26 @@ import org.springframework.data.mongodb.core.index.Index;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobOperator;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.repository.dao.StepExecutionDao;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 
 /**
  * @author Mahmoud Ben Hassine
+ * @author Jinwoo Bae
  * @author Yanming Zhou
  */
 @DirtiesContext
@@ -53,18 +63,25 @@ public class MongoDBJobRepositoryIntegrationTests {
 	@SuppressWarnings("removal")
 	@BeforeEach
 	public void setUp() {
-		// collections
+		// Clear existing collections to ensure clean state
+		mongoTemplate.getCollection("BATCH_JOB_INSTANCE").drop();
+		mongoTemplate.getCollection("BATCH_JOB_EXECUTION").drop();
+		mongoTemplate.getCollection("BATCH_STEP_EXECUTION").drop();
+		mongoTemplate.getCollection("BATCH_SEQUENCES").drop();
+
+		// sequences
 		mongoTemplate.createCollection("BATCH_JOB_INSTANCE");
 		mongoTemplate.createCollection("BATCH_JOB_EXECUTION");
 		mongoTemplate.createCollection("BATCH_STEP_EXECUTION");
-		// sequences
 		mongoTemplate.createCollection("BATCH_SEQUENCES");
+
 		mongoTemplate.getCollection("BATCH_SEQUENCES")
 			.insertOne(new Document(Map.of("_id", "BATCH_JOB_INSTANCE_SEQ", "count", 0L)));
 		mongoTemplate.getCollection("BATCH_SEQUENCES")
 			.insertOne(new Document(Map.of("_id", "BATCH_JOB_EXECUTION_SEQ", "count", 0L)));
 		mongoTemplate.getCollection("BATCH_SEQUENCES")
 			.insertOne(new Document(Map.of("_id", "BATCH_STEP_EXECUTION_SEQ", "count", 0L)));
+
 		// indices
 		mongoTemplate.indexOps("BATCH_JOB_INSTANCE")
 			.ensureIndex(new Index().on("jobName", Sort.Direction.ASC).named("job_name_idx"));
@@ -110,6 +127,58 @@ public class MongoDBJobRepositoryIntegrationTests {
 		dump(jobInstancesCollection, "job instance = ");
 		dump(jobExecutionsCollection, "job execution = ");
 		dump(stepExecutionsCollection, "step execution = ");
+	}
+
+	/**
+	 * Test for GitHub issue #4943: getLastStepExecution should work when JobExecution's
+	 * embedded stepExecutions array is empty.
+	 *
+	 * <p>
+	 * This can happen after abrupt shutdown when the embedded stepExecutions array is not
+	 * synchronized, but BATCH_STEP_EXECUTION collection still contains the data.
+	 *
+	 */
+	@Test
+	void testGetLastStepExecutionWithEmptyEmbeddedArray(@Autowired JobOperator jobOperator, @Autowired Job job,
+			@Autowired StepExecutionDao stepExecutionDao) throws Exception {
+		// Step 1: Run job normally
+		JobParameters jobParameters = new JobParametersBuilder().addString("name", "emptyArrayTest")
+			.addLocalDateTime("runtime", LocalDateTime.now())
+			.toJobParameters();
+
+		JobExecution jobExecution = jobOperator.start(job, jobParameters);
+		JobInstance jobInstance = jobExecution.getJobInstance();
+
+		// Verify job completed successfully
+		Assertions.assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
+
+		// Step 2: Simulate the core issue - clear embedded stepExecutions array
+		// while keeping BATCH_STEP_EXECUTION collection intact
+		Query jobQuery = new Query(Criteria.where("jobExecutionId").is(jobExecution.getId()));
+		Update jobUpdate = new Update().set("stepExecutions", Collections.emptyList());
+		mongoTemplate.updateFirst(jobQuery, jobUpdate, "BATCH_JOB_EXECUTION");
+
+		// Step 3: Verify embedded array is empty but collection still has data
+		MongoCollection<Document> jobExecutionsCollection = mongoTemplate.getCollection("BATCH_JOB_EXECUTION");
+		MongoCollection<Document> stepExecutionsCollection = mongoTemplate.getCollection("BATCH_STEP_EXECUTION");
+
+		Document jobDoc = jobExecutionsCollection.find(new Document("jobExecutionId", jobExecution.getId())).first();
+		Assertions.assertTrue(jobDoc.getList("stepExecutions", Document.class).isEmpty(),
+				"Embedded stepExecutions array should be empty");
+		Assertions.assertEquals(2, stepExecutionsCollection.countDocuments(),
+				"BATCH_STEP_EXECUTION collection should still contain data");
+
+		// Step 4: Test the fix - getLastStepExecution should work despite empty embedded
+		// array
+		StepExecution lastStepExecution = stepExecutionDao.getLastStepExecution(jobInstance, "step1");
+		Assertions.assertNotNull(lastStepExecution,
+				"getLastStepExecution should find step execution even with empty embedded array");
+		Assertions.assertEquals("step1", lastStepExecution.getStepName());
+		Assertions.assertEquals(BatchStatus.COMPLETED, lastStepExecution.getStatus());
+
+		// Step 5: Test countStepExecutions also works
+		long stepCount = stepExecutionDao.countStepExecutions(jobInstance, "step1");
+		Assertions.assertEquals(1L, stepCount, "countStepExecutions should work despite empty embedded array");
 	}
 
 	private static void dump(MongoCollection<Document> collection, String prefix) {

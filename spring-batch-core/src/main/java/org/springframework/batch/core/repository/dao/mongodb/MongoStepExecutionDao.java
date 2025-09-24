@@ -15,11 +15,8 @@
  */
 package org.springframework.batch.core.repository.dao.mongodb;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
@@ -27,6 +24,7 @@ import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.repository.dao.StepExecutionDao;
 import org.springframework.batch.core.repository.persistence.converter.JobExecutionConverter;
 import org.springframework.batch.core.repository.persistence.converter.StepExecutionConverter;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
@@ -36,6 +34,7 @@ import static org.springframework.data.mongodb.core.query.Query.query;
 
 /**
  * @author Mahmoud Ben Hassine
+ * @author Jinwoo Bae
  * @since 5.2.0
  */
 public class MongoStepExecutionDao implements StepExecutionDao {
@@ -100,34 +99,42 @@ public class MongoStepExecutionDao implements StepExecutionDao {
 	@Override
 	public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
 		// TODO optimize the query
-		// get all step executions
-		List<org.springframework.batch.core.repository.persistence.StepExecution> stepExecutions = new ArrayList<>();
-		Query query = query(where("jobInstanceId").is(jobInstance.getId()));
+		Query jobExecutionQuery = query(where("jobInstanceId").is(jobInstance.getId()));
 		List<org.springframework.batch.core.repository.persistence.JobExecution> jobExecutions = this.mongoOperations
-			.find(query, org.springframework.batch.core.repository.persistence.JobExecution.class,
+			.find(jobExecutionQuery, org.springframework.batch.core.repository.persistence.JobExecution.class,
 					JOB_EXECUTIONS_COLLECTION_NAME);
-		for (org.springframework.batch.core.repository.persistence.JobExecution jobExecution : jobExecutions) {
-			stepExecutions.addAll(jobExecution.getStepExecutions());
-		}
-		// sort step executions by creation date then id (see contract) and return the
-		// first one
-		Optional<org.springframework.batch.core.repository.persistence.StepExecution> lastStepExecution = stepExecutions
-			.stream()
-			.filter(stepExecution -> stepExecution.getName().equals(stepName))
-			.min(Comparator
-				.comparing(org.springframework.batch.core.repository.persistence.StepExecution::getCreateTime)
-				.thenComparing(org.springframework.batch.core.repository.persistence.StepExecution::getId));
-		if (lastStepExecution.isPresent()) {
-			org.springframework.batch.core.repository.persistence.StepExecution stepExecution = lastStepExecution.get();
-			JobExecution jobExecution = this.jobExecutionConverter.toJobExecution(jobExecutions.stream()
-				.filter(execution -> execution.getJobExecutionId().equals(stepExecution.getJobExecutionId()))
-				.findFirst()
-				.get(), jobInstance);
-			return this.stepExecutionConverter.toStepExecution(stepExecution, jobExecution);
-		}
-		else {
+
+		if (jobExecutions.isEmpty()) {
 			return null;
 		}
+
+		List<Long> jobExecutionIds = jobExecutions.stream()
+			.map(org.springframework.batch.core.repository.persistence.JobExecution::getJobExecutionId)
+			.toList();
+
+		Query stepExecutionQuery = query(where("name").is(stepName).and("jobExecutionId").in(jobExecutionIds))
+			.with(Sort.by(Sort.Direction.DESC, "createTime", "stepExecutionId"))
+			.limit(1);
+
+		org.springframework.batch.core.repository.persistence.StepExecution stepExecution = this.mongoOperations
+			.findOne(stepExecutionQuery, org.springframework.batch.core.repository.persistence.StepExecution.class,
+					STEP_EXECUTIONS_COLLECTION_NAME);
+
+		if (stepExecution == null) {
+			return null;
+		}
+
+		org.springframework.batch.core.repository.persistence.JobExecution jobExecution = jobExecutions.stream()
+			.filter(execution -> execution.getJobExecutionId().equals(stepExecution.getJobExecutionId()))
+			.findFirst()
+			.orElse(null);
+
+		if (jobExecution != null) {
+			JobExecution jobExecutionDomain = this.jobExecutionConverter.toJobExecution(jobExecution, jobInstance);
+			return this.stepExecutionConverter.toStepExecution(stepExecution, jobExecutionDomain);
+		}
+
+		return null;
 	}
 
 	@Override
@@ -144,22 +151,23 @@ public class MongoStepExecutionDao implements StepExecutionDao {
 
 	@Override
 	public long countStepExecutions(JobInstance jobInstance, String stepName) {
-		long count = 0;
-		// TODO optimize the count query
-		Query query = query(where("jobInstanceId").is(jobInstance.getId()));
-		List<org.springframework.batch.core.repository.persistence.JobExecution> jobExecutions = this.mongoOperations
-			.find(query, org.springframework.batch.core.repository.persistence.JobExecution.class,
-					JOB_EXECUTIONS_COLLECTION_NAME);
-		for (org.springframework.batch.core.repository.persistence.JobExecution jobExecution : jobExecutions) {
-			List<org.springframework.batch.core.repository.persistence.StepExecution> stepExecutions = jobExecution
-				.getStepExecutions();
-			for (org.springframework.batch.core.repository.persistence.StepExecution stepExecution : stepExecutions) {
-				if (stepExecution.getName().equals(stepName)) {
-					count++;
-				}
-			}
+		Query jobExecutionQuery = query(where("jobInstanceId").is(jobInstance.getId()));
+		List<Long> jobExecutionIds = this.mongoOperations
+			.find(jobExecutionQuery, org.springframework.batch.core.repository.persistence.JobExecution.class,
+					JOB_EXECUTIONS_COLLECTION_NAME)
+			.stream()
+			.map(org.springframework.batch.core.repository.persistence.JobExecution::getJobExecutionId)
+			.toList();
+
+		if (jobExecutionIds.isEmpty()) {
+			return 0;
 		}
-		return count;
+
+		// Count step executions directly from BATCH_STEP_EXECUTION collection
+		Query stepQuery = query(where("name").is(stepName).and("jobExecutionId").in(jobExecutionIds));
+		return this.mongoOperations.count(stepQuery,
+				org.springframework.batch.core.repository.persistence.StepExecution.class,
+				STEP_EXECUTIONS_COLLECTION_NAME);
 	}
 
 }
