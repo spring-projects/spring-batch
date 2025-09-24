@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import java.sql.Types;
 
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jdbc.core.JdbcOperations;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -29,6 +30,7 @@ import org.springframework.util.StringUtils;
  *
  * @author Robert Kasanicky
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  */
 public abstract class AbstractJdbcBatchMetadataDao implements InitializingBean {
 
@@ -46,6 +48,8 @@ public abstract class AbstractJdbcBatchMetadataDao implements InitializingBean {
 	private int clobTypeToUse = Types.CLOB;
 
 	private JdbcOperations jdbcTemplate;
+
+	private JdbcClient jdbcClient;
 
 	protected String getQuery(String base) {
 		return StringUtils.replace(base, "%PREFIX%", tablePrefix);
@@ -66,10 +70,15 @@ public abstract class AbstractJdbcBatchMetadataDao implements InitializingBean {
 
 	public void setJdbcTemplate(JdbcOperations jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
+		this.jdbcClient = JdbcClient.create(jdbcTemplate);
 	}
 
 	protected JdbcOperations getJdbcTemplate() {
 		return jdbcTemplate;
+	}
+
+	protected JdbcClient getJdbcClient() {
+		return jdbcClient;
 	}
 
 	public int getClobTypeToUse() {
@@ -83,6 +92,7 @@ public abstract class AbstractJdbcBatchMetadataDao implements InitializingBean {
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(jdbcTemplate != null, "JdbcOperations is required");
+		Assert.state(jdbcClient != null, "JdbcClient is required");
 	}
 
 }
