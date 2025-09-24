@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,8 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
@@ -61,6 +63,7 @@ import org.springframework.batch.core.step.StepSupport;
  * @author Baris Cubukcuoglu
  * @author Mahmoud Ben Hassine
  * @author Parikshit Dutta
+ * @author Seungyong Hong
  *
  */
 class SimpleJobRepositoryTests {
@@ -103,7 +106,7 @@ class SimpleJobRepositoryTests {
 
 		jobRepository = new SimpleJobRepository(jobInstanceDao, jobExecutionDao, stepExecutionDao, ecDao);
 
-		jobParameters = new JobParametersBuilder().addString("bar", "test").toJobParameters();
+		jobParameters = new JobParametersBuilder().addString("bar", "test", false).toJobParameters();
 
 		job = new JobSupport();
 		job.setBeanName("RepositoryTest");
@@ -289,9 +292,10 @@ class SimpleJobRepositoryTests {
 		assertThrows(JobRestartException.class, () -> jobRepository.createJobExecution("foo", new JobParameters()));
 	}
 
-	@Test
-	void testCreateJobExecutionAlreadyComplete() {
-		jobExecution.setStatus(BatchStatus.COMPLETED);
+	@ParameterizedTest
+	@EnumSource(mode = EnumSource.Mode.INCLUDE, names = { "COMPLETED", "ABANDONED" })
+	void testCreateJobExecutionAlreadyComplete(BatchStatus batchStatus) {
+		jobExecution.setStatus(batchStatus);
 		jobExecution.setEndTime(LocalDateTime.now());
 
 		when(jobInstanceDao.getJobInstance("foo", new JobParameters())).thenReturn(jobInstance);
