@@ -24,6 +24,8 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.NullUnmarked;
+
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.listener.JobExecutionListener;
@@ -67,6 +69,7 @@ import org.springframework.lang.Nullable;
  * {@link JobOperatorTestUtils#startStep(String, JobParameters, ExecutionContext)}.
  * Scheduled for removal in 6.2 or later
  */
+@NullUnmarked
 @SuppressWarnings("removal")
 @Deprecated(since = "6.0", forRemoval = true)
 public class StepRunner {

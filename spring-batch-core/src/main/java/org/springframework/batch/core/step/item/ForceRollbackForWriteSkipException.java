@@ -16,6 +16,8 @@
 
 package org.springframework.batch.core.step.item;
 
+import org.jspecify.annotations.NullUnmarked;
+
 /**
  * Fatal exception to be thrown when a rollback must be forced, typically after catching
  * an exception that otherwise would not cause a rollback.
@@ -24,6 +26,7 @@ package org.springframework.batch.core.step.item;
  * @author Mahmoud Ben Hassine
  * @deprecated since 6.0 with no replacement. Scheduled for removal in 7.0.
  */
+@NullUnmarked
 @Deprecated(since = "6.0", forRemoval = true)
 public class ForceRollbackForWriteSkipException extends RuntimeException {
 

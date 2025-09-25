@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.core.step.item;
 
+import org.jspecify.annotations.NullUnmarked;
+
 /**
  * Interface for defining keys to uniquely identify items. this can be useful if the item
  * itself cannot be modified to properly override equals.
@@ -24,6 +26,7 @@ package org.springframework.batch.core.step.item;
  * @deprecated Since 6.0 in favor of equals/hashcode in a wrapper type if needed.
  * Scheduled for removal in 7.0.
  */
+@NullUnmarked
 @Deprecated(since = "6.0", forRemoval = true)
 @FunctionalInterface
 public interface KeyGenerator {

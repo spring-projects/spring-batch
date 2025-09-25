@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.NullUnmarked;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactoryAware;
@@ -50,6 +51,7 @@ import org.springframework.util.ClassUtils;
  *
  * @deprecated since 6.0 with no replacement. Scheduled for removal in 6.2 or later.
  */
+@NullUnmarked
 @Deprecated(since = "6.0", forRemoval = true)
 public abstract class AbstractApplicationContextFactory implements ApplicationContextFactory, ApplicationContextAware {
 

@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.core.launch.support;
 
+import org.jspecify.annotations.NullUnmarked;
+
 /**
  * Interface for exiting the JVM. This abstraction is only useful in order to allow
  * classes that make System.exit calls to be testable, since calling System.exit during a
@@ -23,6 +25,7 @@ package org.springframework.batch.core.launch.support;
  * @author Lucas Ward
  * @deprecated since 6.0 with no replacement. Scheduled for removal in 6.2 or later.
  */
+@NullUnmarked
 @Deprecated(since = "6.0", forRemoval = true)
 public interface SystemExiter {
 

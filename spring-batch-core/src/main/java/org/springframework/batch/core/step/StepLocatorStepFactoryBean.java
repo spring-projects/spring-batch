@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.core.step;
 
+import org.jspecify.annotations.NullUnmarked;
+
 import org.springframework.batch.core.job.Job;
 import org.springframework.beans.factory.FactoryBean;
 
@@ -26,6 +28,7 @@ import org.springframework.beans.factory.FactoryBean;
  * @author Dave Syer
  * @deprecated since 6.0 with no replacement. Scheduled for removal in 7.0.
  */
+@NullUnmarked
 @Deprecated(since = "6.0", forRemoval = true)
 public class StepLocatorStepFactoryBean implements FactoryBean<Step> {
 

@@ -20,6 +20,8 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.NullUnmarked;
+
 import org.springframework.batch.core.configuration.JobFactory;
 import org.springframework.batch.core.configuration.JobRegistry;
 
@@ -30,6 +32,7 @@ import org.springframework.batch.core.configuration.JobRegistry;
  * @author Mahmoud Ben Hassine
  * @deprecated since 6.0 with no replacement. Scheduled for removal in 6.2 or later.
  */
+@NullUnmarked
 @Deprecated(since = "6.0", forRemoval = true)
 public class JobFactoryRegistrationListener {
 

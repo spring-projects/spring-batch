@@ -28,6 +28,7 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.NullUnmarked;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
@@ -171,6 +172,7 @@ import org.springframework.util.StringUtils;
  * @deprecated since 6.0 in favor of {@link CommandLineJobOperator}. Scheduled for removal
  * in 6.2 or later.
  */
+@NullUnmarked
 @Deprecated(since = "6.0", forRemoval = true)
 public class CommandLineJobRunner {
 

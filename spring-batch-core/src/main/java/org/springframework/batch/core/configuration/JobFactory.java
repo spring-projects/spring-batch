@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.core.configuration;
 
+import org.jspecify.annotations.NullUnmarked;
+
 import org.springframework.batch.core.job.Job;
 
 /**
@@ -23,6 +25,7 @@ import org.springframework.batch.core.job.Job;
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  */
+@NullUnmarked
 @Deprecated(since = "6.0", forRemoval = true)
 public interface JobFactory {
 

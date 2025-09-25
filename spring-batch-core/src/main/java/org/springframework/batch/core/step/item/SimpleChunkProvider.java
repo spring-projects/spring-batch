@@ -24,6 +24,7 @@ import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Timer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.NullUnmarked;
 
 import org.springframework.batch.core.observability.micrometer.MicrometerMetrics;
 import org.springframework.batch.core.step.StepContribution;
@@ -49,6 +50,7 @@ import org.springframework.lang.Nullable;
  * {@link org.springframework.batch.core.step.item.ChunkOrientedStep} instead. Scheduled
  * for removal in 7.0.
  */
+@NullUnmarked
 @Deprecated(since = "6.0", forRemoval = true)
 public class SimpleChunkProvider<I> implements ChunkProvider<I> {
 

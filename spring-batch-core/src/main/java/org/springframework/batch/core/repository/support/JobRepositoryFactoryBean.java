@@ -18,6 +18,8 @@ package org.springframework.batch.core.repository.support;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.NullUnmarked;
+
 import org.springframework.batch.core.converter.DateToStringConverter;
 import org.springframework.batch.core.converter.LocalDateTimeToStringConverter;
 import org.springframework.batch.core.converter.LocalDateToStringConverter;
@@ -66,6 +68,7 @@ import static org.springframework.batch.support.DatabaseType.SYBASE;
  * @deprecated since 6.0 in favor of {@link JdbcJobRepositoryFactoryBean}. Scheduled for
  * removal in 6.2 or later.
  */
+@NullUnmarked
 @Deprecated(since = "6.0", forRemoval = true)
 public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean implements InitializingBean {
 

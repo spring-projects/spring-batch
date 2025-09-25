@@ -17,6 +17,8 @@ package org.springframework.batch.core.step.item;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.NullUnmarked;
+
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
@@ -36,6 +38,7 @@ import org.springframework.batch.item.support.CompositeItemStream;
  * @since 2.0
  * @deprecated Since 6.0 with no replacement. Scheduled for removal in 7.0.
  */
+@NullUnmarked
 @Deprecated(since = "6.0", forRemoval = true)
 public class ChunkMonitor extends ItemStreamSupport {
 

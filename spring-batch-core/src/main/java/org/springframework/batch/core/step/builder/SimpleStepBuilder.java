@@ -23,6 +23,7 @@ import java.util.Set;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Metrics;
+import org.jspecify.annotations.NullUnmarked;
 
 import org.springframework.batch.core.listener.ChunkListener;
 import org.springframework.batch.core.listener.ItemProcessListener;
@@ -69,6 +70,7 @@ import org.springframework.util.Assert;
  * @deprecated Since 6.0 in favor of {@link ChunkOrientedStepBuilder}. Scheduled for
  * removal in 7.0.
  */
+@NullUnmarked
 @Deprecated(since = "6.0", forRemoval = true)
 public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleStepBuilder<I, O>> {
 

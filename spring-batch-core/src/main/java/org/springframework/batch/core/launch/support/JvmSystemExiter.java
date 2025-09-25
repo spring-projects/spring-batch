@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.core.launch.support;
 
+import org.jspecify.annotations.NullUnmarked;
+
 /**
  * Implementation of the {@link SystemExiter} interface that calls the standards
  * System.exit method. It should be noted that there will be no unit tests for this class,
@@ -25,6 +27,7 @@ package org.springframework.batch.core.launch.support;
  * @author Dave Syer
  * @deprecated since 6.0 with no replacement. Scheduled for removal in 6.2 or later.
  */
+@NullUnmarked
 @Deprecated(since = "6.0", forRemoval = true)
 public class JvmSystemExiter implements SystemExiter {
 

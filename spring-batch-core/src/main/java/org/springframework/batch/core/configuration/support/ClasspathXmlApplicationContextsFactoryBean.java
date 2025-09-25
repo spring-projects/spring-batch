@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.jspecify.annotations.NullUnmarked;
+
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
@@ -37,6 +39,7 @@ import org.springframework.core.io.Resource;
  * @author Mahmoud Ben Hassine
  * @deprecated since 6.0 with no replacement. Scheduled for removal in 6.2 or later.
  */
+@NullUnmarked
 @SuppressWarnings("removal")
 @Deprecated(since = "6.0", forRemoval = true)
 public class ClasspathXmlApplicationContextsFactoryBean

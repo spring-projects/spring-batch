@@ -16,6 +16,8 @@
 
 package org.springframework.batch.core.step.item;
 
+import org.jspecify.annotations.NullUnmarked;
+
 import org.springframework.batch.core.step.StepContribution;
 import org.springframework.batch.item.Chunk;
 
@@ -26,6 +28,7 @@ import org.springframework.batch.item.Chunk;
  * @since 2.0
  * @deprecated Since 6.0 with no replacement. Scheduled for removal in 7.0.
  */
+@NullUnmarked
 @Deprecated(since = "6.0", forRemoval = true)
 @FunctionalInterface
 public interface ChunkProcessor<I> {

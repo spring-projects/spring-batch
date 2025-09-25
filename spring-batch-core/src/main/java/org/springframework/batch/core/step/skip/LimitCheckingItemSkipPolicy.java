@@ -19,6 +19,8 @@ import java.io.FileNotFoundException;
 import java.util.Collections;
 import java.util.Map;
 
+import org.jspecify.annotations.NullUnmarked;
+
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.item.file.FlatFileParseException;
@@ -52,6 +54,7 @@ import org.springframework.classify.Classifier;
  * @deprecated Since 6.0, use {@link LimitCheckingExceptionHierarchySkipPolicy} instead.
  * Scheduled for removal in 7.0.
  */
+@NullUnmarked
 @Deprecated(since = "6.0", forRemoval = true)
 public class LimitCheckingItemSkipPolicy implements SkipPolicy {
 

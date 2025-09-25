@@ -17,12 +17,14 @@ package org.springframework.batch.core.launch.support;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
+import org.jspecify.annotations.NullUnmarked;
 
 /**
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  * @deprecated since 6.0 with no replacement, for removal in 6.2 or later.
  */
+@NullUnmarked
 @Deprecated(since = "6.0", forRemoval = true)
 public class RuntimeExceptionTranslator implements MethodInterceptor {
 

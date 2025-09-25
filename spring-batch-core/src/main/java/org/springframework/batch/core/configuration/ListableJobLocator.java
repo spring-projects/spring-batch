@@ -17,6 +17,8 @@ package org.springframework.batch.core.configuration;
 
 import java.util.Collection;
 
+import org.jspecify.annotations.NullUnmarked;
+
 /**
  * A listable extension of {@link JobLocator}.
  *
@@ -25,6 +27,7 @@ import java.util.Collection;
  * @deprecated since 6.0, scheduled for removal in 6.2 or later. Use {@link JobRegistry}
  * instead.
  */
+@NullUnmarked
 @Deprecated(since = "6.0", forRemoval = true)
 public interface ListableJobLocator extends JobLocator {
 

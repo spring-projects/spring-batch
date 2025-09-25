@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.jspecify.annotations.NullUnmarked;
+
 import org.springframework.batch.core.listener.ChunkListener;
 import org.springframework.batch.core.job.JobInterruptedException;
 import org.springframework.batch.core.listener.SkipListener;
@@ -96,6 +98,7 @@ import org.springframework.util.Assert;
  * {@link org.springframework.batch.core.step.builder.ChunkOrientedStepBuilder} instead.
  * Scheduled for removal in 7.0.
  */
+@NullUnmarked
 @Deprecated(since = "6.0", forRemoval = true)
 public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 

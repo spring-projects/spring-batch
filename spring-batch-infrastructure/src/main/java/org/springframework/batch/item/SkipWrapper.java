@@ -16,6 +16,8 @@
 
 package org.springframework.batch.item;
 
+import org.jspecify.annotations.NullUnmarked;
+
 import org.springframework.lang.Nullable;
 
 /**
@@ -25,6 +27,7 @@ import org.springframework.lang.Nullable;
  * @author Mahmoud Ben Hassine
  * @deprecated since 6.0 with no replacement. Scheduled for removal in 7.0.
  */
+@NullUnmarked
 @Deprecated(since = "6.0", forRemoval = true)
 public class SkipWrapper<T> {
 

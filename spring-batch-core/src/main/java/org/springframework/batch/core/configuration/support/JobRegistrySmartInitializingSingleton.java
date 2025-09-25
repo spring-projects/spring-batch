@@ -21,6 +21,8 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.NullUnmarked;
+
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.configuration.DuplicateJobException;
 import org.springframework.batch.core.configuration.JobLocator;
@@ -48,6 +50,7 @@ import org.springframework.util.Assert;
  * @deprecated since 6.0 with no replacement. Register a {@link MapJobRegistry} as a bean,
  * and it will automatically register all {@link Job} beans in the application context.
  */
+@NullUnmarked
 @Deprecated(since = "6.0", forRemoval = true)
 public class JobRegistrySmartInitializingSingleton
 		implements SmartInitializingSingleton, BeanFactoryAware, InitializingBean, DisposableBean {

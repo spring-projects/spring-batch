@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.core.launch;
 
+import org.jspecify.annotations.NullUnmarked;
+
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.parameters.JobParameters;
@@ -37,6 +39,7 @@ import org.springframework.batch.core.repository.JobRestartException;
  * @deprecated since 6.0 in favor of {@link JobOperator}. Scheduled for removal in 6.2 or
  * later.
  */
+@NullUnmarked
 @FunctionalInterface
 @Deprecated(since = "6.0", forRemoval = true)
 public interface JobLauncher {

@@ -30,6 +30,8 @@ import java.util.concurrent.CopyOnWriteArraySet;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
+import org.jspecify.annotations.NullUnmarked;
+
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
@@ -60,6 +62,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  * @author Dave Syer
  * @deprecated since 6.0 with no replacement. Scheduled for removal in 6.2 or later.
  */
+@NullUnmarked
 @Deprecated(since = "6.0", forRemoval = true)
 public class TransactionAwareProxyFactory<T> {
 

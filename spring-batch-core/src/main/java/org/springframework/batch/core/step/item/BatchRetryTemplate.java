@@ -37,6 +37,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import org.jspecify.annotations.NullUnmarked;
+
 /**
  * A special purpose retry template that deals specifically with multi-valued stateful
  * retry. This is useful in the case where the operation to be retried operates on
@@ -55,6 +57,7 @@ import java.util.List;
  * @author Mahmoud Ben Hassine
  * @deprecated Since 6.0 with no replacement. Scheduled for removal in 7.0.
  */
+@NullUnmarked
 @Deprecated(since = "6.0", forRemoval = true)
 public class BatchRetryTemplate implements RetryOperations {
 

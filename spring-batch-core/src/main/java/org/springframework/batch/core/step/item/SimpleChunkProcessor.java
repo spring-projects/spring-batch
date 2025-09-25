@@ -22,6 +22,7 @@ import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Timer;
+import org.jspecify.annotations.NullUnmarked;
 
 import org.springframework.batch.core.observability.micrometer.MicrometerMetrics;
 import org.springframework.batch.core.step.StepContribution;
@@ -45,6 +46,7 @@ import org.springframework.util.Assert;
  * {@link org.springframework.batch.core.step.item.ChunkOrientedStep} instead. Scheduled
  * for removal in 7.0.
  */
+@NullUnmarked
 @Deprecated(since = "6.0", forRemoval = true)
 public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, InitializingBean {
 

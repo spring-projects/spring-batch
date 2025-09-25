@@ -19,6 +19,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import org.jspecify.annotations.NullUnmarked;
+
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
@@ -42,6 +44,7 @@ import org.springframework.lang.Nullable;
  * @deprecated since 6.0 in favor of {@link JobRepository}. Scheduled for removal in 6.2
  * or later.
  */
+@NullUnmarked
 @Deprecated(since = "6.0", forRemoval = true)
 public interface JobExplorer {
 

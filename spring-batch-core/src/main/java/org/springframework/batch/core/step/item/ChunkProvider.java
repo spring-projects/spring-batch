@@ -16,6 +16,8 @@
 
 package org.springframework.batch.core.step.item;
 
+import org.jspecify.annotations.NullUnmarked;
+
 import org.springframework.batch.core.step.StepContribution;
 import org.springframework.batch.item.Chunk;
 
@@ -27,6 +29,7 @@ import org.springframework.batch.item.Chunk;
  * @see ChunkOrientedTasklet
  * @deprecated Since 6.0 with no replacement. Scheduled for removal in 7.0.
  */
+@NullUnmarked
 @Deprecated(since = "6.0", forRemoval = true)
 public interface ChunkProvider<T> {
 

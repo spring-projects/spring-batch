@@ -16,6 +16,8 @@
 
 package org.springframework.batch.core.configuration.support;
 
+import org.jspecify.annotations.NullUnmarked;
+
 import org.springframework.batch.core.job.Job;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -28,6 +30,7 @@ import org.springframework.context.ConfigurableApplicationContext;
  * @author Mahmoud Ben Hassine
  * @deprecated since 6.0 with no replacement. Scheduled for removal in 6.2 or later.
  */
+@NullUnmarked
 @Deprecated(since = "6.0", forRemoval = true)
 public interface ApplicationContextFactory {
 

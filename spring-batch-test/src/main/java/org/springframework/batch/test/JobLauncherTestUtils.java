@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.NullUnmarked;
 
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
@@ -69,6 +70,7 @@ import org.springframework.lang.Nullable;
  * @deprecated Since 6.0 in favor of {@link JobOperatorTestUtils}. Scheduled for removal
  * in 6.2 or later.
  */
+@NullUnmarked
 @SuppressWarnings("removal")
 @Deprecated(since = "6.0", forRemoval = true)
 public class JobLauncherTestUtils {

@@ -33,6 +33,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.jspecify.annotations.NullUnmarked;
+
 /**
  * {@link ApplicationContextFactory} implementation that takes a parent context and a path
  * to the context to create. When the {@code createApplicationContext} method is called,
@@ -42,6 +44,7 @@ import java.util.List;
  *
  * @deprecated since 6.0 with no replacement. Scheduled for removal in 6.2 or later.
  */
+@NullUnmarked
 @Deprecated(since = "6.0", forRemoval = true)
 public class GenericApplicationContextFactory extends AbstractApplicationContextFactory {
 

@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.core.configuration;
 
+import org.jspecify.annotations.NullUnmarked;
+
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.lang.Nullable;
@@ -28,6 +30,7 @@ import org.springframework.lang.Nullable;
  * @deprecated since 6.0 in favor of {@link JobRegistry}. Scheduled for removal in 6.2 or
  * later.
  */
+@NullUnmarked
 @Deprecated(since = "6.0", forRemoval = true)
 public interface JobLocator {
 

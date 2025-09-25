@@ -16,6 +16,8 @@
 
 package org.springframework.batch.core.resource;
 
+import org.jspecify.annotations.NullUnmarked;
+
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.listener.StepExecutionListener;
@@ -46,6 +48,7 @@ import org.springframework.util.Assert;
  * @see CompletionPolicy
  * @deprecated since 6.0 with no replacement. Scheduled for removal in 6.2 or later.
  */
+@NullUnmarked
 @Deprecated(since = "6.0", forRemoval = true)
 public class StepExecutionSimpleCompletionPolicy implements StepExecutionListener, CompletionPolicy {
 
