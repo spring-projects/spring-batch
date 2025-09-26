@@ -13,7 +13,7 @@ This layered architecture highlights three major high-level components: Applicat
 Core, and Infrastructure. The application contains all batch jobs and custom code written
 by developers using Spring Batch. The Batch Core contains the core runtime classes
 necessary to launch and control a batch job. It includes implementations for
-`JobLauncher`, `Job`, and `Step`. Both Application and Core are built on top of a common
+`JobOperator`, `Job`, and `Step`. Both Application and Core are built on top of a common
 infrastructure. This infrastructure contains common readers and writers and services
 (such as the `RetryTemplate`), which are used both by application developers(readers and
 writers, such as `ItemReader` and `ItemWriter`), and the core framework itself (retry,

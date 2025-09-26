@@ -119,7 +119,7 @@ class AsyncTaskletStepTests {
 
 		JobExecution jobExecution = jobRepository.createJobExecution("JOB", new JobParameters());
 		StepExecution stepExecution = jobExecution.createStepExecution(step.getName());
-
+		stepExecution.setId(0L);
 		step.execute(stepExecution);
 
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
@@ -148,6 +148,7 @@ class AsyncTaskletStepTests {
 
 		JobExecution jobExecution = jobRepository.createJobExecution("JOB", new JobParameters());
 		StepExecution stepExecution = jobExecution.createStepExecution(step.getName());
+		stepExecution.setId(0L);
 
 		step.execute(stepExecution);
 
@@ -178,7 +179,7 @@ class AsyncTaskletStepTests {
 
 		JobExecution jobExecution = jobRepository.createJobExecution("JOB", new JobParameters());
 		StepExecution stepExecution = jobExecution.createStepExecution(step.getName());
-
+		stepExecution.setId(0L);
 		step.execute(stepExecution);
 
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
@@ -200,6 +201,7 @@ class AsyncTaskletStepTests {
 
 		JobExecution jobExecution = jobRepository.createJobExecution("JOB", new JobParameters());
 		StepExecution stepExecution = jobExecution.createStepExecution(step.getName());
+		stepExecution.setId(0L);
 
 		step.execute(stepExecution);
 

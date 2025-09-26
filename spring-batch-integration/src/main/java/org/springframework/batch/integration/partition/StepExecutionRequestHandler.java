@@ -2,9 +2,9 @@ package org.springframework.batch.integration.partition;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.job.JobInterruptedException;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
-import org.springframework.batch.core.repository.explore.JobExplorer;
 import org.springframework.batch.core.step.NoSuchStepException;
 import org.springframework.batch.core.step.StepLocator;
 import org.springframework.integration.annotation.MessageEndpoint;
@@ -21,7 +21,7 @@ import org.springframework.integration.annotation.ServiceActivator;
 @MessageEndpoint
 public class StepExecutionRequestHandler {
 
-	private JobExplorer jobExplorer;
+	private JobRepository jobRepository;
 
 	private StepLocator stepLocator;
 
@@ -34,12 +34,12 @@ public class StepExecutionRequestHandler {
 	}
 
 	/**
-	 * An explorer that should be used to check for {@link StepExecution} completion.
-	 * @param jobExplorer a {@link JobExplorer} that is linked to the shared repository
-	 * used by all remote workers.
+	 * A job repository that should be used to check for {@link StepExecution} completion.
+	 * @param jobRepository a {@link JobRepository} that is linked to the shared
+	 * repository used by all remote workers.
 	 */
-	public void setJobExplorer(JobExplorer jobExplorer) {
-		this.jobExplorer = jobExplorer;
+	public void setJobRepository(JobRepository jobRepository) {
+		this.jobRepository = jobRepository;
 	}
 
 	@ServiceActivator
@@ -47,7 +47,7 @@ public class StepExecutionRequestHandler {
 
 		Long jobExecutionId = request.getJobExecutionId();
 		Long stepExecutionId = request.getStepExecutionId();
-		StepExecution stepExecution = jobExplorer.getStepExecution(jobExecutionId, stepExecutionId);
+		StepExecution stepExecution = jobRepository.getStepExecution(jobExecutionId, stepExecutionId);
 		if (stepExecution == null) {
 			throw new NoSuchStepException("No StepExecution could be located for this request: " + request);
 		}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 the original author or authors.
+ * Copyright 2024-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+
+import org.junit.jupiter.api.Disabled;
 import org.testcontainers.containers.MSSQLServerContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -36,6 +38,7 @@ import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.BEFORE_TE
 @Testcontainers(disabledWithoutDocker = true)
 @SpringJUnitConfig
 @Sql(scripts = "query-provider-fixture.sql", executionPhase = BEFORE_TEST_CLASS)
+@Disabled("https://github.com/spring-projects/spring-batch/issues/4828")
 class SqlServerPagingQueryProviderIntegrationTests extends AbstractPagingQueryProviderIntegrationTests {
 
 	// TODO find the best way to externalize and manage image versions

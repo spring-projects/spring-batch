@@ -19,13 +19,9 @@
 
 	<job-repository id="jobRepository" table-prefix="BATCH_"/>
 
-	<beans:bean id="jobExplorer" class="org.springframework.batch.core.repository.explore.support.JobExplorerFactoryBean">
-		<beans:property name="dataSource" ref="dataSource"/>
-		<beans:property name="transactionManager" ref="transactionManager"/>
+	<beans:bean id="jobOperator" class="org.springframework.batch.core.launch.support.JobOperatorFactoryBean">
+		<beans:property name="jobRepository" ref="jobRepository" />
 	</beans:bean>
-
-	<beans:bean id="jobLauncher" class="org.springframework.batch.core.launch.support.TaskExecutorJobLauncher"
-				p:jobRepository-ref="jobRepository"/>
 
 	<beans:bean id="reader" class="org.springframework.batch.item.support.ListItemReader">
 		<beans:constructor-arg>

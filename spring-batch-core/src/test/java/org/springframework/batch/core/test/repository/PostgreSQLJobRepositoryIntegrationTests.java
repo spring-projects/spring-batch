@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2023 the original author or authors.
+ * Copyright 2020-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.job.builder.JobBuilder;
-import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.repeat.RepeatStatus;
@@ -58,7 +58,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class PostgreSQLJobRepositoryIntegrationTests {
 
 	// TODO find the best way to externalize and manage image versions
-	private static final DockerImageName POSTGRESQL_IMAGE = DockerImageName.parse("postgres:13.3");
+	private static final DockerImageName POSTGRESQL_IMAGE = DockerImageName.parse("postgres:17.5");
 
 	@Container
 	public static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(POSTGRESQL_IMAGE);
@@ -67,7 +67,7 @@ class PostgreSQLJobRepositoryIntegrationTests {
 	private DataSource dataSource;
 
 	@Autowired
-	private JobLauncher jobLauncher;
+	private JobOperator jobOperator;
 
 	@Autowired
 	private Job job;
@@ -85,7 +85,7 @@ class PostgreSQLJobRepositoryIntegrationTests {
 		JobParameters jobParameters = new JobParametersBuilder().toJobParameters();
 
 		// when
-		JobExecution jobExecution = this.jobLauncher.run(this.job, jobParameters);
+		JobExecution jobExecution = this.jobOperator.start(this.job, jobParameters);
 
 		// then
 		assertNotNull(jobExecution);

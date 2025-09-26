@@ -27,7 +27,7 @@
 
 	<!-- This is the "remote" worker (which in this case is local) -->
 	<bean id="stepExecutionRequestHandler" class="org.springframework.batch.integration.partition.StepExecutionRequestHandler"
-		p:jobExplorer-ref="jobExplorer" p:stepLocator-ref="stepLocator" />
+		p:jobRepository-ref="jobRepository" p:stepLocator-ref="stepLocator" />
 
 	<bean id="stepLocator" class="org.springframework.batch.integration.partition.BeanFactoryStepLocator" />
 

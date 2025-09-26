@@ -92,7 +92,11 @@ import org.springframework.util.Assert;
  * @author Mahmoud Ben Hassine
  * @author Ian Choi
  * @since 2.2
+ * @deprecated Since 6.0, use
+ * {@link org.springframework.batch.core.step.builder.ChunkOrientedStepBuilder} instead.
+ * Scheduled for removal in 7.0.
  */
+@Deprecated(since = "6.0", forRemoval = true)
 public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 
 	private final ChunkMonitor chunkMonitor = new ChunkMonitor();

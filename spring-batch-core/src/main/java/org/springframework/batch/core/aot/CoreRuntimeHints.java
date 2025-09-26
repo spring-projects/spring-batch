@@ -95,9 +95,18 @@ public class CoreRuntimeHints implements RuntimeHintsRegistrar {
 				"java.util.concurrent.ConcurrentHashMap$Segment");
 
 		// resource hints
-		hints.resources()
-			.registerPattern(
-					"org/springframework/batch/core/schema-{h2,derby,hsqldb,sqlite,db2,hana,mysql,mariadb,oracle,postgresql,sqlserver,sybase}.sql");
+		hints.resources().registerPattern("org/springframework/batch/core/schema-h2.sql");
+		hints.resources().registerPattern("org/springframework/batch/core/schema-derby.sql");
+		hints.resources().registerPattern("org/springframework/batch/core/schema-hsqldb.sql");
+		hints.resources().registerPattern("org/springframework/batch/core/schema-sqlite.sql");
+		hints.resources().registerPattern("org/springframework/batch/core/schema-db2.sql");
+		hints.resources().registerPattern("org/springframework/batch/core/schema-hana.sql");
+		hints.resources().registerPattern("org/springframework/batch/core/schema-mysql.sql");
+		hints.resources().registerPattern("org/springframework/batch/core/schema-mariadb.sql");
+		hints.resources().registerPattern("org/springframework/batch/core/schema-oracle.sql");
+		hints.resources().registerPattern("org/springframework/batch/core/schema-postgresql.sql");
+		hints.resources().registerPattern("org/springframework/batch/core/schema-sqlserver.sql");
+		hints.resources().registerPattern("org/springframework/batch/core/schema-sybase.sql");
 
 		// proxy hints
 		hints.proxies()

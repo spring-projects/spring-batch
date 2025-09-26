@@ -35,7 +35,6 @@ import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
-import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.batch.core.job.parameters.JobParametersIncrementer;
 import org.springframework.batch.core.configuration.JobLocator;
 import org.springframework.batch.core.configuration.JobRegistry;
@@ -169,7 +168,8 @@ import org.springframework.util.StringUtils;
  * @author Mahmoud Ben Hassine
  * @author Minsoo Kim
  * @since 1.0
- * @deprecated since 6.0 with no replacement. Scheduled for removal in 6.2 or later.
+ * @deprecated since 6.0 in favor of {@link CommandLineJobOperator}. Scheduled for removal
+ * in 6.2 or later.
  */
 @Deprecated(since = "6.0", forRemoval = true)
 public class CommandLineJobRunner {
@@ -368,12 +368,27 @@ public class CommandLineJobRunner {
 				}
 			}
 			if (job == null) {
-				job = (Job) context.getBean(jobName);
+				job = context.getBean(jobName, Job.class);
 			}
 
 			if (opts.contains("-next")) {
-				jobParameters = new JobParametersBuilder(jobParameters, jobExplorer).getNextJobParameters(job)
-					.toJobParameters();
+				JobInstance lastInstance = jobRepository.getLastJobInstance(jobName);
+				JobParametersIncrementer incrementer = job.getJobParametersIncrementer();
+				if (lastInstance == null) {
+					// Start from a completely clean sheet
+					jobParameters = incrementer.getNext(new JobParameters());
+				}
+				else {
+					JobExecution previousExecution = jobRepository.getLastJobExecution(lastInstance);
+					if (previousExecution == null) {
+						// Normally this will not happen - an instance exists with no
+						// executions
+						jobParameters = incrementer.getNext(new JobParameters());
+					}
+					else {
+						jobParameters = incrementer.getNext(previousExecution.getJobParameters());
+					}
+				}
 			}
 
 			JobExecution jobExecution = launcher.run(job, jobParameters);

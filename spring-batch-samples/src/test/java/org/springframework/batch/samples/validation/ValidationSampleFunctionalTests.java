@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 the original author or authors.
+ * Copyright 2018-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.parameters.JobParameters;
-import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.item.support.ListItemWriter;
 import org.springframework.batch.samples.validation.domain.Person;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +43,7 @@ class ValidationSampleFunctionalTests {
 	private Job job;
 
 	@Autowired
-	private JobLauncher jobLauncher;
+	private JobOperator jobOperator;
 
 	@Autowired
 	private ListItemWriter<Person> listItemWriter;
@@ -54,7 +54,7 @@ class ValidationSampleFunctionalTests {
 		JobParameters jobParameters = new JobParameters();
 
 		// when
-		JobExecution jobExecution = this.jobLauncher.run(this.job, jobParameters);
+		JobExecution jobExecution = this.jobOperator.start(this.job, jobParameters);
 
 		// then
 		assertEquals(ExitStatus.COMPLETED.getExitCode(), jobExecution.getExitStatus().getExitCode());

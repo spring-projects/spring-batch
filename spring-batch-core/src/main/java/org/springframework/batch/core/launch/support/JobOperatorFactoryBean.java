@@ -15,27 +15,34 @@
  */
 package org.springframework.batch.core.launch.support;
 
-import java.util.Properties;
+import java.lang.reflect.Method;
 
-import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Metrics;
+import io.micrometer.observation.ObservationRegistry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.aop.framework.ProxyFactory;
+import org.springframework.batch.core.configuration.BatchConfigurationException;
+import org.springframework.batch.core.configuration.DuplicateJobException;
 import org.springframework.batch.core.configuration.JobRegistry;
+import org.springframework.batch.core.configuration.support.MapJobRegistry;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.batch.core.converter.JobParametersConverter;
+import org.springframework.batch.core.job.Job;
+import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionManager;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.interceptor.NameMatchTransactionAttributeSource;
+import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
+import org.springframework.transaction.interceptor.MethodMapTransactionAttributeSource;
 import org.springframework.transaction.interceptor.TransactionAttributeSource;
 import org.springframework.transaction.interceptor.TransactionInterceptor;
 import org.springframework.util.Assert;
@@ -49,13 +56,11 @@ import org.springframework.util.Assert;
  * @author Mahmoud Ben Hassine
  * @since 5.0
  */
-public class JobOperatorFactoryBean implements FactoryBean<JobOperator>, InitializingBean {
+public class JobOperatorFactoryBean implements FactoryBean<JobOperator>, ApplicationContextAware, InitializingBean {
 
 	protected static final Log logger = LogFactory.getLog(JobOperatorFactoryBean.class);
 
-	private static final String TRANSACTION_ISOLATION_LEVEL_PREFIX = "ISOLATION_";
-
-	private static final String TRANSACTION_PROPAGATION_PREFIX = "PROPAGATION_";
+	private ApplicationContext applicationContext;
 
 	private PlatformTransactionManager transactionManager;
 
@@ -69,27 +74,46 @@ public class JobOperatorFactoryBean implements FactoryBean<JobOperator>, Initial
 
 	private TaskExecutor taskExecutor;
 
-	private MeterRegistry meterRegistry = Metrics.globalRegistry;
+	private ObservationRegistry observationRegistry;
 
 	private final ProxyFactory proxyFactory = new ProxyFactory();
 
 	@Override
+	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+		this.applicationContext = applicationContext;
+	}
+
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(this.jobRepository, "JobRepository must not be null");
-		Assert.notNull(this.jobRegistry, "JobRegistry must not be null");
-		Assert.notNull(this.transactionManager, "TransactionManager must not be null");
+		if (this.jobRegistry == null) {
+			this.jobRegistry = new MapJobRegistry();
+			populateJobRegistry();
+			logger.info(
+					"No JobRegistry has been set, defaulting to a MapJobRegistry populated with jobs defined in the application context.");
+		}
+		if (this.transactionManager == null) {
+			this.transactionManager = new ResourcelessTransactionManager();
+			logger.info("No transaction manager has been set, defaulting to ResourcelessTransactionManager.");
+		}
 		if (this.taskExecutor == null) {
 			logger.info("No TaskExecutor has been set, defaulting to synchronous executor.");
 			this.taskExecutor = new SyncTaskExecutor();
 		}
 		if (this.transactionAttributeSource == null) {
-			Properties transactionAttributes = new Properties();
-			String transactionProperties = String.join(",", TRANSACTION_PROPAGATION_PREFIX + Propagation.REQUIRED,
-					TRANSACTION_ISOLATION_LEVEL_PREFIX + Isolation.DEFAULT);
-			transactionAttributes.setProperty("stop*", transactionProperties);
-			this.transactionAttributeSource = new NameMatchTransactionAttributeSource();
-			((NameMatchTransactionAttributeSource) transactionAttributeSource).setProperties(transactionAttributes);
+			this.transactionAttributeSource = new DefaultJobOperatorTransactionAttributeSource();
 		}
+	}
+
+	private void populateJobRegistry() {
+		this.applicationContext.getBeansOfType(Job.class).values().forEach(job -> {
+			try {
+				jobRegistry.register(job);
+			}
+			catch (DuplicateJobException e) {
+				throw new BatchConfigurationException(e);
+			}
+		});
 	}
 
 	/**
@@ -111,7 +135,9 @@ public class JobOperatorFactoryBean implements FactoryBean<JobOperator>, Initial
 	/**
 	 * Setter for the job parameters converter.
 	 * @param jobParametersConverter the job parameters converter to set
+	 * @deprecated since 6.0 with nor replacement. Scheduled for removal in 6.2 or later.
 	 */
+	@Deprecated(since = "6.0", forRemoval = true)
 	public void setJobParametersConverter(JobParametersConverter jobParametersConverter) {
 		this.jobParametersConverter = jobParametersConverter;
 	}
@@ -126,13 +152,13 @@ public class JobOperatorFactoryBean implements FactoryBean<JobOperator>, Initial
 	}
 
 	/**
-	 * Set the meter registry to use for metrics. Defaults to
-	 * {@link Metrics#globalRegistry}.
-	 * @param meterRegistry the meter registry
+	 * Set the observation registry to use for metrics. Defaults to
+	 * {@link ObservationRegistry#NOOP}.
+	 * @param observationRegistry the observation registry to use
 	 * @since 6.0
 	 */
-	public void setMeterRegistry(MeterRegistry meterRegistry) {
-		this.meterRegistry = meterRegistry;
+	public void setObservationRegistry(ObservationRegistry observationRegistry) {
+		this.observationRegistry = observationRegistry;
 	}
 
 	/**
@@ -180,10 +206,32 @@ public class JobOperatorFactoryBean implements FactoryBean<JobOperator>, Initial
 		taskExecutorJobOperator.setJobRegistry(this.jobRegistry);
 		taskExecutorJobOperator.setJobRepository(this.jobRepository);
 		taskExecutorJobOperator.setTaskExecutor(this.taskExecutor);
-		taskExecutorJobOperator.setMeterRegistry(this.meterRegistry);
+		if (this.observationRegistry != null) {
+			taskExecutorJobOperator.setObservationRegistry(this.observationRegistry);
+		}
 		taskExecutorJobOperator.setJobParametersConverter(this.jobParametersConverter);
 		taskExecutorJobOperator.afterPropertiesSet();
 		return taskExecutorJobOperator;
+	}
+
+	private static class DefaultJobOperatorTransactionAttributeSource extends MethodMapTransactionAttributeSource {
+
+		public DefaultJobOperatorTransactionAttributeSource() {
+			DefaultTransactionAttribute transactionAttribute = new DefaultTransactionAttribute();
+			try {
+				Method stopMethod = TaskExecutorJobOperator.class.getMethod("stop", JobExecution.class);
+				Method abandonMethod = TaskExecutorJobOperator.class.getMethod("abandon", JobExecution.class);
+				Method recoverMethod = TaskExecutorJobOperator.class.getMethod("recover", JobExecution.class);
+				addTransactionalMethod(stopMethod, transactionAttribute);
+				addTransactionalMethod(abandonMethod, transactionAttribute);
+				addTransactionalMethod(recoverMethod, transactionAttribute);
+			}
+			catch (NoSuchMethodException e) {
+				throw new IllegalStateException("Failed to initialize default transaction attributes for JobOperator",
+						e);
+			}
+		}
+
 	}
 
 }

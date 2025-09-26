@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2023 the original author or authors.
+ * Copyright 2012-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,11 +32,11 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.parameters.JobParameters;
-import org.springframework.batch.core.repository.explore.JobExplorer;
-import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.test.JobLauncherTestUtils;
+import org.springframework.batch.test.JobOperatorTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -64,24 +64,24 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 @Testcontainers(disabledWithoutDocker = true)
 class AmqpJobFunctionalTests {
 
-	private static final DockerImageName RABBITMQ_IMAGE = DockerImageName.parse("rabbitmq:3");
+	private static final DockerImageName RABBITMQ_IMAGE = DockerImageName.parse("rabbitmq:4.1.2");
 
 	@Container
 	public static RabbitMQContainer rabbitmq = new RabbitMQContainer(RABBITMQ_IMAGE);
 
 	@Autowired
-	private JobLauncherTestUtils jobLauncherTestUtils;
+	private JobOperatorTestUtils jobOperatorTestUtils;
 
 	@Autowired
-	private JobExplorer jobExplorer;
+	private JobRepository jobRepository;
 
 	@Test
 	void testLaunchJobWithXmlConfig() throws Exception {
 		// given
-		this.jobLauncherTestUtils.launchJob();
+		this.jobOperatorTestUtils.startJob();
 
 		// when
-		int count = jobExplorer.getJobInstances("amqp-example-job", 0, 1).size();
+		int count = jobRepository.getJobInstances("amqp-example-job", 0, 1).size();
 
 		// then
 		assertTrue(count > 0);
@@ -92,15 +92,15 @@ class AmqpJobFunctionalTests {
 		// given
 		ApplicationContext context = new AnnotationConfigApplicationContext(AmqpJobConfiguration.class,
 				AmqpConfiguration.class);
-		JobLauncher jobLauncher = context.getBean(JobLauncher.class);
+		JobOperator jobOperator = context.getBean(JobOperator.class);
 		Job job = context.getBean(Job.class);
 
 		// when
-		jobLauncher.run(job, new JobParameters());
+		jobOperator.start(job, new JobParameters());
 
 		// then
-		JobExplorer localJobExplorer = context.getBean(JobExplorer.class);
-		int count = localJobExplorer.getJobInstances("amqp-config-job", 0, 1).size();
+		JobRepository localJobRepository = context.getBean(JobRepository.class);
+		int count = localJobRepository.getJobInstances("amqp-config-job", 0, 1).size();
 		assertTrue(count > 0);
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2023 the original author or authors.
+ * Copyright 2018-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import java.lang.annotation.Target;
 
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import org.springframework.batch.test.JobLauncherTestUtils;
+import org.springframework.batch.test.JobOperatorTestUtils;
 import org.springframework.batch.test.JobRepositoryTestUtils;
 import org.springframework.batch.test.JobScopeTestExecutionListener;
 import org.springframework.batch.test.StepScopeTestExecutionListener;
@@ -35,8 +35,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  * Annotation that can be specified on a test class that runs Spring Batch based tests.
  * Provides the following features over the regular <em>Spring TestContext Framework</em>:
  * <ul>
- * <li>Registers a {@link JobLauncherTestUtils} bean named "jobLauncherTestUtils" which
- * can be used in tests for launching jobs and steps.</li>
+ * <li>Registers a {@link JobOperatorTestUtils} bean named "jobOperatorTestUtils" which
+ * can be used in tests for starting jobs and steps.</li>
  * <li>Registers a {@link JobRepositoryTestUtils} bean named "jobRepositoryTestUtils"
  * which can be used in tests setup to create or remove job executions.</li>
  * <li>Registers the {@link StepScopeTestExecutionListener} and
@@ -53,7 +53,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  * public class MyBatchJobTests {
  *
  *     &#064;Autowired
- *     private JobLauncherTestUtils jobLauncherTestUtils;
+ *     private JobOperatorTestUtils jobOperatorTestUtils;
  *
  *     &#064;Autowired
  *     private JobRepositoryTestUtils jobRepositoryTestUtils;
@@ -64,16 +64,16 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  *     &#064;Before
  *     public void setup() {
  *         this.jobRepositoryTestUtils.removeJobExecutions();
- *         this.jobLauncherTestUtils.setJob(this.jobUnderTest); // this is optional if the job is unique
+ *         this.jobOperatorTestUtils.setJob(this.jobUnderTest); // this is optional if the job is unique
  *     }
  *
  *     &#064;Test
  *     public void testMyJob() throws Exception {
  *         // given
- *         JobParameters jobParameters = this.jobLauncherTestUtils.getUniqueJobParameters();
+ *         JobParameters jobParameters = this.jobOperatorTestUtils.getUniqueJobParameters();
  *
  *         // when
- *         JobExecution jobExecution = this.jobLauncherTestUtils.launchJob(jobParameters);
+ *         JobExecution jobExecution = this.jobOperatorTestUtils.startJob(jobParameters);
  *
  *         // then
  *         Assert.assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
@@ -92,24 +92,24 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  * public class MyBatchJobTests {
  *
  *     &#064;Autowired
- *     private JobLauncherTestUtils jobLauncherTestUtils;
+ *     private JobOperatorTestUtils jobOperatorTestUtils;
  *
  *     &#064;Autowired
  *     private JobRepositoryTestUtils jobRepositoryTestUtils;
  *
  *     &#064;BeforeEach
  *     public void setup(@Autowired Job jobUnderTest) {
- *         this.jobLauncherTestUtils.setJob(jobUnderTest); // this is optional if the job is unique
+ *         this.jobOperatorTestUtils.setJob(jobUnderTest); // this is optional if the job is unique
  *         this.jobRepositoryTestUtils.removeJobExecutions();
  *     }
  *
  *     &#064;Test
  *     public void testMyJob() throws Exception {
  *         // given
- *         JobParameters jobParameters = this.jobLauncherTestUtils.getUniqueJobParameters();
+ *         JobParameters jobParameters = this.jobOperatorTestUtils.getUniqueJobParameters();
  *
  *         // when
- *         JobExecution jobExecution = this.jobLauncherTestUtils.launchJob(jobParameters);
+ *         JobExecution jobExecution = this.jobOperatorTestUtils.startJob(jobParameters);
  *
  *         // then
  *         Assertions.assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
@@ -120,7 +120,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  *
  * It should be noted that if the test context contains a single job bean definition, that
  * is the job under test, then this annotation will set that job in the
- * {@link JobLauncherTestUtils} automatically.
+ * {@link JobOperatorTestUtils} automatically.
  *
  * <strong>The test context must contain a <code>JobRepository</code> and a
  * <code>JobLauncher</code> beans for this annotation to properly set up test utilities.
@@ -131,7 +131,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  * @author Mahmoud Ben Hassine
  * @author Taeik Lim
  * @since 4.1
- * @see JobLauncherTestUtils
+ * @see JobOperatorTestUtils
  * @see JobRepositoryTestUtils
  * @see StepScopeTestExecutionListener
  * @see JobScopeTestExecutionListener

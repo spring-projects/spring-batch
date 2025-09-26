@@ -26,7 +26,7 @@ import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.batch.core.step.StepExecution;
-import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.repository.dao.ExecutionContextDao;
 import org.springframework.batch.core.repository.dao.mongodb.MongoExecutionContextDao;
 import org.springframework.batch.core.repository.support.MongoExecutionContextDaoIntegrationTests.ExecutionContextDaoConfiguration;
@@ -81,13 +81,13 @@ public class MongoExecutionContextDaoIntegrationTests {
 	}
 
 	@Test
-	void testSaveJobExecution(@Autowired JobLauncher jobLauncher, @Autowired Job job,
+	void testSaveJobExecution(@Autowired JobOperator jobOperator, @Autowired Job job,
 			@Autowired ExecutionContextDao executionContextDao) throws Exception {
 		// given
 		JobParameters jobParameters = new JobParametersBuilder().addString("name", "testSaveJobExecution")
 			.addLocalDateTime("runtime", LocalDateTime.now())
 			.toJobParameters();
-		JobExecution jobExecution = jobLauncher.run(job, jobParameters);
+		JobExecution jobExecution = jobOperator.start(job, jobParameters);
 
 		// when
 		jobExecution.getExecutionContext().putString("foo", "bar");
@@ -114,13 +114,13 @@ public class MongoExecutionContextDaoIntegrationTests {
 	}
 
 	@Test
-	void testSaveStepExecution(@Autowired JobLauncher jobLauncher, @Autowired Job job,
+	void testSaveStepExecution(@Autowired JobOperator jobOperator, @Autowired Job job,
 			@Autowired ExecutionContextDao executionContextDao) throws Exception {
 		// given
 		JobParameters jobParameters = new JobParametersBuilder().addString("name", "testSaveJobExecution")
 			.addLocalDateTime("runtime", LocalDateTime.now())
 			.toJobParameters();
-		JobExecution jobExecution = jobLauncher.run(job, jobParameters);
+		JobExecution jobExecution = jobOperator.start(job, jobParameters);
 		StepExecution stepExecution = jobExecution.getStepExecutions().stream().findFirst().orElseThrow();
 
 		// when

@@ -1,0 +1,13 @@
+[[jfr]]
+= Java Flight Recorder (JFR) support
+
+As of version 6, Spring Batch provides support for Java Flight Recorder (JFR) to help you monitor and troubleshoot batch jobs. JFR is a low-overhead, event-based profiling tool built into the Java Virtual Machine (JVM) that allows developers to collect detailed information about the performance and behavior of their applications.
+
+JFR can be enabled by adding the following JVM options when starting your Spring Batch application:
+
+[source, bash]
+----
+java -XX:StartFlightRecording:filename=my-batch-job.jfr,dumponexit=true -jar my-batch-job.jar
+----
+
+Once JFR is enabled, Spring Batch will automatically create JFR events for key batch processing activities, such as job and step executions, item reads and writes, as well as transaction boundaries. These events can be viewed and analyzed using tools such as Java Mission Control (JMC) or other JFR-compatible tools.

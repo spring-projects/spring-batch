@@ -1,26 +1,31 @@
 [[configuringJobRepository]]
 = Configuring a JobRepository
 
-As described earlier, the xref:job.adoc[`JobRepository`] is used for basic CRUD operations of the various persisted
-domain objects within Spring Batch, such as `JobExecution` and `StepExecution`.
-It is required by many of the major framework features, such as the `JobLauncher`,
+As described the xref:job.adoc[earlier], the `JobRepository` is used for basic CRUD operations
+of the various persisted domain objects within Spring Batch, such as `JobExecution` and `StepExecution`.
+It is required by many of the major framework features, such as the `JobOperator`,
 `Job`, and `Step`.
-
 
 [tabs]
 ====
 Java::
 +
-When using `@EnableBatchProcessing`, a `JobRepository` is provided for you.
-This section describes how to customize it. Configuration options of the job
-repository can be specified through the attributes of the `@EnableBatchProcessing`
-annotation, as shown in the following example:
+When using `@EnableBatchProcessing`, a `ResourcelssJobRepository` is provided for you.
+This section describes how to customize it. Spring Batch provides two implementations
+of the `JobRepository` interface which are backed by a database: a JDBC implementation
+(which can be used with any JDBC-compliant database) and a MongoDB implementation. These two
+implementations are provided by the `@EnableJdbcJobRepository` and `@EnableMongoJobRepository`
+annotations, respectively.
++
+The following example shows how to customize a JDBC-based job repository through the attributes
+of the `@EnableJdbcJobRepository` annotation:
 +
 .Java Configuration
 [source, java]
 ----
 @Configuration
-@EnableBatchProcessing(
+@EnableBatchProcessing
+@EnableJdbcJobRepository(
 		dataSourceRef = "batchDataSource",
 		transactionManagerRef = "batchTransactionManager",
 		tablePrefix = "BATCH_",
@@ -60,9 +65,7 @@ configuration options available, as the following example shows:
 Other than the `id`, none of the configuration options listed earlier are required. If they are
 not set, the defaults shown earlier are used.
 The `max-varchar-length` defaults to `2500`, which is the length of the long
-`VARCHAR` columns in the xref:schema-appendix.adoc#metaDataSchemaOverview[sample schema scripts]
-.
-
+`VARCHAR` columns in the xref:schema-appendix.adoc#metaDataSchemaOverview[sample schema scripts].
 ====
 
 
@@ -93,7 +96,8 @@ The following example shows how to override the isolation level in Java:
 [source, java]
 ----
 @Configuration
-@EnableBatchProcessing(isolationLevelForCreate = "ISOLATION_REPEATABLE_READ")
+@EnableBatchProcessing
+@EnableJdbcJobRepository(isolationLevelForCreate = "ISOLATION_REPEATABLE_READ")
 public class MyJobConfiguration {
 
    // job definition
@@ -189,7 +193,8 @@ The following example shows how to change the table prefix in Java:
 [source, java]
 ----
 @Configuration
-@EnableBatchProcessing(tablePrefix = "SYSTEM.TEST_")
+@EnableBatchProcessing
+@EnableJdbcJobRepository(tablePrefix = "SYSTEM.TEST_")
 public class MyJobConfiguration {
 
    // job definition
@@ -209,10 +214,6 @@ The following example shows how to change the table prefix in XML:
 ----
 
 ====
-
-
-
-
 
 Given the preceding changes, every query to the metadata tables is prefixed with
 `SYSTEM.TEST_`. `BATCH_JOB_EXECUTION` is referred to as `SYSTEM.TEST_JOB_EXECUTION`.

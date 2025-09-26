@@ -66,6 +66,16 @@ public class StepBuilder extends StepBuilderHelper<StepBuilder> {
 	}
 
 	/**
+	 * Build a step with a custom tasklet, not necessarily item processing.
+	 * @param tasklet a tasklet
+	 * @return a {@link TaskletStepBuilder}
+	 * @since 6.0
+	 */
+	public TaskletStepBuilder tasklet(Tasklet tasklet) {
+		return new TaskletStepBuilder(this).tasklet(tasklet);
+	}
+
+	/**
 	 * Build a step that processes items in chunks with the size provided. To extend the
 	 * step to being fault tolerant, call the {@link SimpleStepBuilder#faultTolerant()}
 	 * method on the builder. In most cases you will want to parameterize your call to
@@ -82,9 +92,26 @@ public class StepBuilder extends StepBuilderHelper<StepBuilder> {
 	 * @param <I> the type of item to be processed as input
 	 * @param <O> the type of item to be output
 	 * @since 5.0
+	 * @deprecated since 6.0, use {@link #chunk(int)} instead. Scheduled for removal in
+	 * 7.0.
 	 */
+	@Deprecated(since = "6.0", forRemoval = true)
 	public <I, O> SimpleStepBuilder<I, O> chunk(int chunkSize, PlatformTransactionManager transactionManager) {
 		return new SimpleStepBuilder<I, O>(this).transactionManager(transactionManager).chunk(chunkSize);
+	}
+
+	/**
+	 * Build a step that processes items in chunks with the size provided. To extend the
+	 * step to being fault-tolerant, call the
+	 * {@link ChunkOrientedStepBuilder#faultTolerant()} method on the builder.
+	 * @param chunkSize the chunk size (commit interval)
+	 * @return a {@link ChunkOrientedStepBuilder} for method chaining
+	 * @param <I> the type of item to be processed as input
+	 * @param <O> the type of item to be output
+	 * @since 6.0
+	 */
+	public <I, O> ChunkOrientedStepBuilder<I, O> chunk(int chunkSize) {
+		return new ChunkOrientedStepBuilder<>(this, chunkSize);
 	}
 
 	/**
@@ -105,7 +132,10 @@ public class StepBuilder extends StepBuilderHelper<StepBuilder> {
 	 * @param <I> the type of item to be processed as input
 	 * @param <O> the type of item to be output
 	 * @since 5.0
+	 * @deprecated since 6.0, use {@link #chunk(int)} instead. Scheduled for removal in
+	 * 7.0.
 	 */
+	@Deprecated(since = "6.0", forRemoval = true)
 	public <I, O> SimpleStepBuilder<I, O> chunk(CompletionPolicy completionPolicy,
 			PlatformTransactionManager transactionManager) {
 		return new SimpleStepBuilder<I, O>(this).transactionManager(transactionManager).chunk(completionPolicy);

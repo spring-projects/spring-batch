@@ -23,6 +23,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.listener.ChunkListener;
 import org.springframework.batch.core.listener.ItemProcessListener;
 import org.springframework.batch.core.listener.ItemReadListener;
@@ -33,7 +34,6 @@ import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.listener.StepExecutionListener;
 import org.springframework.batch.core.listener.StepListener;
 import org.springframework.batch.core.job.flow.Flow;
-import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.partition.PartitionHandler;
 import org.springframework.batch.core.partition.Partitioner;
 import org.springframework.batch.core.partition.StepExecutionAggregator;
@@ -125,7 +125,7 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 	//
 	private Job job;
 
-	private JobLauncher jobLauncher;
+	private JobOperator jobOperator;
 
 	private JobParametersExtractor jobParametersExtractor;
 
@@ -516,7 +516,7 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 		JobStepBuilder builder = new StepBuilder(name, jobRepository).job(job);
 		enhanceCommonStep(builder);
 		builder.parametersExtractor(jobParametersExtractor);
-		builder.launcher(jobLauncher);
+		builder.operator(jobOperator);
 		return builder.build();
 
 	}
@@ -656,8 +656,8 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 		this.jobParametersExtractor = jobParametersExtractor;
 	}
 
-	public void setJobLauncher(JobLauncher jobLauncher) {
-		this.jobLauncher = jobLauncher;
+	public void setJobOperator(JobOperator jobOperator) {
+		this.jobOperator = jobOperator;
 	}
 
 	// =========================================================

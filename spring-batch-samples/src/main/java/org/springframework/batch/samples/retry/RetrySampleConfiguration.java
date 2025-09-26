@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2023 the original author or authors.
+ * Copyright 2012-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.samples.retry;
 
+import org.springframework.batch.core.configuration.annotation.EnableJdbcJobRepository;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -37,6 +38,7 @@ import org.springframework.jdbc.support.JdbcTransactionManager;
  */
 @Configuration
 @EnableBatchProcessing
+@EnableJdbcJobRepository
 @Import(DataSourceConfiguration.class)
 public class RetrySampleConfiguration {
 
@@ -47,7 +49,8 @@ public class RetrySampleConfiguration {
 
 	@Bean
 	protected Step step(JobRepository jobRepository, JdbcTransactionManager transactionManager) {
-		return new StepBuilder("step", jobRepository).<Trade, Object>chunk(1, transactionManager)
+		return new StepBuilder("step", jobRepository).<Trade, Object>chunk(1)
+			.transactionManager(transactionManager)
 			.reader(reader())
 			.writer(writer())
 			.faultTolerant()

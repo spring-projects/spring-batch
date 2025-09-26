@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 the original author or authors.
+ * Copyright 2023-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package org.springframework.batch.samples.file.multirecordtype;
 
 import java.util.Map;
 
+import org.springframework.batch.core.configuration.annotation.EnableJdbcJobRepository;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.StepScope;
@@ -41,7 +42,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.core.io.Resource;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.WritableResource;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 
@@ -50,13 +51,14 @@ import org.springframework.jdbc.support.JdbcTransactionManager;
  */
 @Configuration
 @EnableBatchProcessing
+@EnableJdbcJobRepository
 @Import(DataSourceConfiguration.class)
 public class MultiRecordTypeJobConfiguration {
 
 	@Bean
 	@StepScope
 	public FlatFileItemReader itemReader(PatternMatchingCompositeLineMapper lineMapper,
-			@Value("#{jobParameters[inputFile]}") Resource resource) {
+			@Value("#{jobParameters[inputFile]}") FileSystemResource resource) {
 		return new FlatFileItemReaderBuilder().name("itemReader").resource(resource).lineMapper(lineMapper).build();
 	}
 
@@ -129,7 +131,8 @@ public class MultiRecordTypeJobConfiguration {
 	public Job job(JobRepository jobRepository, JdbcTransactionManager transactionManager,
 			FlatFileItemReader itemReader, FlatFileItemWriter itemWriter) {
 		return new JobBuilder("ioSampleJob", jobRepository)
-			.start(new StepBuilder("step1", jobRepository).chunk(2, transactionManager)
+			.start(new StepBuilder("step1", jobRepository).chunk(2)
+				.transactionManager(transactionManager)
 				.reader(itemReader)
 				.writer(itemWriter)
 				.build())

@@ -140,7 +140,7 @@ class MulticasterBatchListenerTests {
 	 */
 	@Test
 	void testAfterChunk() {
-		multicast.afterChunk(null);
+		multicast.afterChunk((ChunkContext) null);
 		assertEquals(1, count);
 	}
 
@@ -152,7 +152,8 @@ class MulticasterBatchListenerTests {
 	@Test
 	void testAfterChunkFails() {
 		error = true;
-		Exception exception = assertThrows(StepListenerFailedException.class, () -> multicast.afterChunk(null));
+		Exception exception = assertThrows(StepListenerFailedException.class,
+				() -> multicast.afterChunk((ChunkContext) null));
 		String message = exception.getCause().getMessage();
 		assertEquals("listener error", message, "Wrong message: " + message);
 		assertEquals(1, count);
@@ -165,7 +166,7 @@ class MulticasterBatchListenerTests {
 	 */
 	@Test
 	void testBeforeChunk() {
-		multicast.beforeChunk(null);
+		multicast.beforeChunk((ChunkContext) null);
 		assertEquals(1, count);
 	}
 
@@ -177,7 +178,8 @@ class MulticasterBatchListenerTests {
 	@Test
 	void testBeforeChunkFails() {
 		error = true;
-		Exception exception = assertThrows(StepListenerFailedException.class, () -> multicast.beforeChunk(null));
+		Exception exception = assertThrows(StepListenerFailedException.class,
+				() -> multicast.beforeChunk((ChunkContext) null));
 		String message = exception.getCause().getMessage();
 		assertEquals("listener error", message, "Wrong message: " + message);
 		assertEquals(1, count);
@@ -526,7 +528,8 @@ class MulticasterBatchListenerTests {
 		StepListener listener = StepListenerFactoryBean.getListener(new AnnotationBasedStepListener());
 		multicast.register(listener);
 
-		Exception exception = assertThrows(StepListenerFailedException.class, () -> multicast.beforeChunk(null));
+		Exception exception = assertThrows(StepListenerFailedException.class,
+				() -> multicast.beforeChunk((ChunkContext) null));
 		Throwable cause = exception.getCause();
 		String message = cause.getMessage();
 		assertInstanceOf(IllegalStateException.class, cause);
@@ -538,7 +541,8 @@ class MulticasterBatchListenerTests {
 		StepListener listener = StepListenerFactoryBean.getListener(new AnnotationBasedStepListener());
 		multicast.register(listener);
 
-		Exception exception = assertThrows(StepListenerFailedException.class, () -> multicast.afterChunk(null));
+		Exception exception = assertThrows(StepListenerFailedException.class,
+				() -> multicast.afterChunk((ChunkContext) null));
 		Throwable cause = exception.getCause();
 		String message = cause.getMessage();
 		assertInstanceOf(IllegalStateException.class, cause);

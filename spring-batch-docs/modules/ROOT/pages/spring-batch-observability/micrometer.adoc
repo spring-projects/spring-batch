@@ -1,0 +1,111 @@
+[[micrometer]]
+= Micrometer support
+
+[[monitoring-and-metrics]]
+== Monitoring and metrics
+
+Since version 4.2, Spring Batch provides support for batch monitoring and metrics
+based on link:$$https://micrometer.io/$$[Micrometer]. This section describes
+which metrics are provided out-of-the-box and how to contribute custom metrics.
+
+[[built-in-metrics]]
+== Built-in metrics
+
+Metrics collection is disabled by default. To enable it, you need to define a Micrometer
+`ObservationRegistry` bean in your application context. Typically, you would need to define
+which ObservationHandler to use. The following example shows how to register a `DefaultMeterObservationHandler`
+that will store metrics in a `MeterRegistry` (for example, a Prometheus registry):
+
+[source, java]
+----
+@Bean
+public ObservationRegistry observationRegistry(MeterRegistry meterRegistry) {
+    ObservationRegistry observationRegistry = ObservationRegistry.create();
+    observationRegistry.observationConfig()
+        .observationHandler(new DefaultMeterObservationHandler(meterRegistry));
+    return observationRegistry;
+}
+----
+
+Spring Batch specific metrics are registered under the `spring.batch` prefix. The following
+table explains all the metrics in details:
+
+|===============
+|__Metric Name__|__Type__|__Description__|__Tags__
+|`spring.batch.job`|`TIMER`|Duration of job execution|`name`, `status`
+|`spring.batch.job.active`|`LONG_TASK_TIMER`|Currently active job|`name`
+|`spring.batch.step`|`TIMER`|Duration of step execution|`name`, `job.name`, `status`
+|`spring.batch.step.active`|`LONG_TASK_TIMER`|Currently active step|`name`
+|`spring.batch.item.read`|`TIMER`|Duration of item reading|`job.name`, `step.name`, `status`
+|`spring.batch.item.process`|`TIMER`|Duration of item processing|`job.name`, `step.name`, `status`
+|`spring.batch.chunk.write`|`TIMER`|Duration of chunk writing|`job.name`, `step.name`, `status`
+|`spring.batch.job.launch.count`|`COUNTER`|Job launch count| N/A
+|===============
+
+NOTE: The `status` tag for jobs and steps is equal to the exit status. For item reading, processing
+and writing, this `status` tag can be either `SUCCESS` or `FAILURE`.
+
+[[custom-metrics]]
+== Custom metrics
+
+If you want to use your own metrics in your custom components, we recommend using
+Micrometer APIs directly. The following is an example of how to time a `Tasklet`:
+
+[source, java]
+----
+import io.micrometer.observation.Observation;
+import io.micrometer.observation.ObservationRegistry;
+
+import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.scope.context.ChunkContext;
+import org.springframework.batch.core.step.tasklet.Tasklet;
+import org.springframework.batch.repeat.RepeatStatus;
+
+public class MyTimedTasklet implements Tasklet {
+
+    private ObservationRegistry observationRegistry;
+
+    public MyTimedTasklet(ObservationRegistry observationRegistry) {
+        this.observationRegistry = observationRegistry;
+    }
+
+	@Override
+	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) {
+		Observation observation = Observation.start("my.tasklet.step", this.observationRegistry);
+		try (Observation.Scope scope = observation.openScope()) {
+			// do some work
+		    return RepeatStatus.FINISHED;
+		} catch (Exception e) {
+			// handle exception
+            observation.error(exception);
+		} finally {
+			observation.stop();
+		}
+	}
+}
+----
+
+[[tracing]]
+== Tracing
+
+As of version 5, Spring Batch provides tracing through Micrometer's `Observation` API. By default, tracing is disabled.
+To enable it, you need to define an `ObservationRegistry` bean configured with an `ObservationHandler` that supports tracing,
+such as `TracingAwareMeterObservationHandler`:
+
+[source, java]
+----
+@Bean
+public ObservationRegistry observationRegistry(MeterRegistry meterRegistry, Tracer tracer) {
+    DefaultMeterObservationHandler observationHandler = new DefaultMeterObservationHandler(meterRegistry);
+    ObservationRegistry observationRegistry = ObservationRegistry.create();
+    observationRegistry.observationConfig()
+            .observationHandler(new TracingAwareMeterObservationHandler<>(observationHandler, tracer));
+    return observationRegistry;
+}
+----
+
+With that in place, Spring Batch will create a trace for each job execution and a span for each step execution.
+
+If you do not use `EnableBatchProcessing` or `DefaultBatchConfiguration`, you need to register a
+`BatchObservabilityBeanPostProcessor` in your application context, which will automatically set Micrometer's observation
+registry in observable batch artefacts.

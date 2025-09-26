@@ -9,7 +9,7 @@ xref:spring-batch-intro.adoc[Spring Batch Introduction] :: Background, usage
  scenarios, and general guidelines.
 xref:spring-batch-architecture.adoc[Spring Batch Architecture] :: Spring Batch
 architecture, general batch principles, batch processing strategies.
-xref:whatsnew.adoc[What's new in Spring Batch 5.2] :: New features introduced in version 5.2.
+xref:whatsnew.adoc[What's new in Spring Batch 6.0] :: New features introduced in version 6.0.
 xref:domain.adoc[The Domain Language of Batch] :: Core concepts and abstractions
 of the Batch domain language.
 xref:job.adoc[Configuring and Running a Job] :: Job configuration, execution, and
@@ -28,9 +28,8 @@ xref:common-patterns.adoc#commonPatterns[Common Patterns] :: Common batch proces
 and guidelines.
 xref:spring-batch-integration.adoc[Spring Batch Integration] :: Integration
 between Spring Batch and Spring Integration projects.
-xref:monitoring-and-metrics.adoc[Monitoring and metrics] :: Batch jobs
+xref:spring-batch-observability.adoc[Spring Batch Observability] :: Batch jobs
 monitoring and metrics.
-xref:tracing.adoc[Tracing] :: Tracing with Micrometer.
 
 The following appendices are available:
 

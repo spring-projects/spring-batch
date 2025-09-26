@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import org.springframework.batch.test.JobLauncherTestUtils;
+import org.springframework.batch.test.JobOperatorTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class GroovyJobFunctionalTests {
 
 	@Autowired
-	private JobLauncherTestUtils jobLauncherTestUtils;
+	private JobOperatorTestUtils jobOperatorTestUtils;
 
 	@BeforeEach
 	void removeOldData() throws IOException {
@@ -45,7 +45,7 @@ public class GroovyJobFunctionalTests {
 	@Test
 	void testLaunchJob() throws Exception {
 		assertFalse(new File("target/groovyJob/output/files.zip").exists());
-		jobLauncherTestUtils.launchJob();
+		jobOperatorTestUtils.startJob();
 		assertTrue(new File("target/groovyJob/output/files.zip").exists());
 	}
 

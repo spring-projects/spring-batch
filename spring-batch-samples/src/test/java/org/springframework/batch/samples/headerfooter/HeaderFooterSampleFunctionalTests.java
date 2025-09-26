@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2023 the original author or authors.
+ * Copyright 2008-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import java.io.FileReader;
 
 import org.junit.jupiter.api.Test;
 
-import org.springframework.batch.test.JobLauncherTestUtils;
+import org.springframework.batch.test.JobOperatorTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.Resource;
@@ -41,11 +41,11 @@ class HeaderFooterSampleFunctionalTests {
 	private Resource output;
 
 	@Autowired
-	private JobLauncherTestUtils jobLauncherTestUtils;
+	private JobOperatorTestUtils jobOperatorTestUtils;
 
 	@Test
 	void testJob() throws Exception {
-		this.jobLauncherTestUtils.launchJob();
+		this.jobOperatorTestUtils.startJob();
 
 		BufferedReader inputReader = new BufferedReader(new FileReader(input.getFile()));
 		BufferedReader outputReader = new BufferedReader(new FileReader(output.getFile()));

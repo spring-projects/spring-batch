@@ -5,16 +5,11 @@
 
 	<import resource="classpath:data-source-context.xml" />
 
-	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.TaskExecutorJobLauncher">
+	<bean id="jobOperator" class="org.springframework.batch.core.launch.support.JobOperatorFactoryBean">
 		<property name="jobRepository" ref="jobRepository" />
 	</bean>
 
 	<batch:job-repository id="jobRepository" table-prefix="BATCH_"/>
-
-	<bean id="jobExplorer" class="org.springframework.batch.core.repository.explore.support.JobExplorerFactoryBean">
-		<property name="dataSource" ref="dataSource"/>
-		<property name="transactionManager" ref="transactionManager"/>
-	</bean>
 
 	<bean id="simpleJob" class="org.springframework.batch.core.job.SimpleJob" abstract="true">
 		<property name="jobRepository" ref="jobRepository" />

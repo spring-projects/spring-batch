@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 the original author or authors.
+ * Copyright 2022-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.springframework.batch.core.job.AbstractJob;
+import org.springframework.batch.core.launch.support.TaskExecutorJobOperator;
 import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -28,8 +29,8 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 
 /**
- * Bean post processor that configures observable batch artifacts (jobs and steps) with
- * Micrometer's observation registry.
+ * Bean post processor that configures observable batch artifacts (typically jobs and
+ * steps) with a Micrometer's observation registry.
  *
  * @author Mahmoud Ben Hassine
  * @since 5.0
@@ -48,13 +49,17 @@ public class BatchObservabilityBeanPostProcessor implements BeanFactoryPostProce
 	@Override
 	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
 		try {
-			if (bean instanceof AbstractJob || bean instanceof AbstractStep) {
+			if (bean instanceof AbstractJob || bean instanceof AbstractStep
+					|| bean instanceof TaskExecutorJobOperator) {
 				ObservationRegistry observationRegistry = this.beanFactory.getBean(ObservationRegistry.class);
 				if (bean instanceof AbstractJob job) {
 					job.setObservationRegistry(observationRegistry);
 				}
 				if (bean instanceof AbstractStep step) {
 					step.setObservationRegistry(observationRegistry);
+				}
+				if (bean instanceof TaskExecutorJobOperator operator) {
+					operator.setObservationRegistry(observationRegistry);
 				}
 			}
 		}

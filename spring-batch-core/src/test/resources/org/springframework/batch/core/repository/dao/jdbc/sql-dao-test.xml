@@ -38,7 +38,7 @@
 
 	<bean id="jobInstanceIncrementer" class="org.springframework.jdbc.support.incrementer.HsqlMaxValueIncrementer">
 		<constructor-arg name="dataSource" ref="dataSource"/>
-		<constructor-arg name="incrementerName" value="BATCH_JOB_SEQ"/>
+		<constructor-arg name="incrementerName" value="BATCH_JOB_INSTANCE_SEQ"/>
 		<constructor-arg name="columnName" value="ID"/>
 	</bean>
 

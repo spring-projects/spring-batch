@@ -53,10 +53,6 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 
 	private static final String JOB_OPERATOR = "jobOperator";
 
-	private static final String JOB_REGISTRY = "jobRegistry";
-
-	private static final String JOB_LOADER = "jobLoader";
-
 	@Override
 	public void registerBeanDefinitions(AnnotationMetadata importingClassMetadata, BeanDefinitionRegistry registry) {
 		StopWatch watch = new StopWatch();
@@ -66,7 +62,6 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 			.get(EnableBatchProcessing.class)
 			.synthesize();
 		registerJobRepository(registry, importingClassMetadata);
-		registerJobRegistry(registry);
 		registerJobOperator(registry, batchAnnotation);
 		registerAutomaticJobRegistrar(registry, batchAnnotation);
 		watch.stop();
@@ -206,17 +201,6 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 		registry.registerBeanDefinition(JOB_REPOSITORY, beanDefinitionBuilder.getBeanDefinition());
 	}
 
-	private void registerJobRegistry(BeanDefinitionRegistry registry) {
-		if (registry.containsBeanDefinition(JOB_REGISTRY)) {
-			LOGGER.info("Bean jobRegistry already defined in the application context, skipping"
-					+ " the registration of a jobRegistry");
-			return;
-		}
-		BeanDefinition beanDefinition = BeanDefinitionBuilder.genericBeanDefinition(MapJobRegistry.class)
-			.getBeanDefinition();
-		registry.registerBeanDefinition(JOB_REGISTRY, beanDefinition);
-	}
-
 	private void registerJobOperator(BeanDefinitionRegistry registry, EnableBatchProcessing batchAnnotation) {
 		if (registry.containsBeanDefinition(JOB_OPERATOR)) {
 			LOGGER.info("Bean jobOperator already defined in the application context, skipping"
@@ -226,13 +210,24 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 		BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder
 			.genericBeanDefinition(JobOperatorFactoryBean.class);
 		// set mandatory properties
-		String transactionManagerRef = batchAnnotation.transactionManagerRef();
-		beanDefinitionBuilder.addPropertyReference("transactionManager", transactionManagerRef);
-
 		beanDefinitionBuilder.addPropertyReference(JOB_REPOSITORY, JOB_REPOSITORY);
-		beanDefinitionBuilder.addPropertyReference(JOB_REGISTRY, JOB_REGISTRY);
 
 		// set optional properties
+		String jobRegistryRef = batchAnnotation.jobRegistryRef();
+		if (registry.containsBeanDefinition(jobRegistryRef)) {
+			beanDefinitionBuilder.addPropertyReference("jobRegistry", jobRegistryRef);
+		}
+
+		String observationRegistryRef = batchAnnotation.observationRegistryRef();
+		if (registry.containsBeanDefinition(observationRegistryRef)) {
+			beanDefinitionBuilder.addPropertyReference("observationRegistry", observationRegistryRef);
+		}
+
+		String transactionManagerRef = batchAnnotation.transactionManagerRef();
+		if (registry.containsBeanDefinition(transactionManagerRef)) {
+			beanDefinitionBuilder.addPropertyReference("transactionManager", transactionManagerRef);
+		}
+
 		String taskExecutorRef = batchAnnotation.taskExecutorRef();
 		if (registry.containsBeanDefinition(taskExecutorRef)) {
 			beanDefinitionBuilder.addPropertyReference("taskExecutor", taskExecutorRef);
@@ -256,12 +251,12 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 			return;
 		}
 		BeanDefinition jobLoaderBeanDefinition = BeanDefinitionBuilder.genericBeanDefinition(DefaultJobLoader.class)
-			.addPropertyReference(JOB_REGISTRY, JOB_REGISTRY)
+			.addPropertyValue("jobRegistry", new MapJobRegistry())
 			.getBeanDefinition();
-		registry.registerBeanDefinition(JOB_LOADER, jobLoaderBeanDefinition);
+		registry.registerBeanDefinition("jobLoader", jobLoaderBeanDefinition);
 		BeanDefinition jobRegistrarBeanDefinition = BeanDefinitionBuilder
 			.genericBeanDefinition(AutomaticJobRegistrar.class)
-			.addPropertyReference(JOB_LOADER, JOB_LOADER)
+			.addPropertyReference("jobLoader", "jobLoader")
 			.getBeanDefinition();
 		registry.registerBeanDefinition("jobRegistrar", jobRegistrarBeanDefinition);
 	}

@@ -16,7 +16,6 @@
 package org.springframework.batch.core.configuration.support;
 
 import org.springframework.batch.core.configuration.BatchConfigurationException;
-import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.converter.DateToStringConverter;
 import org.springframework.batch.core.converter.LocalDateTimeToStringConverter;
 import org.springframework.batch.core.converter.LocalDateToStringConverter;
@@ -25,6 +24,9 @@ import org.springframework.batch.core.converter.StringToDateConverter;
 import org.springframework.batch.core.converter.StringToLocalDateConverter;
 import org.springframework.batch.core.converter.StringToLocalDateTimeConverter;
 import org.springframework.batch.core.converter.StringToLocalTimeConverter;
+import org.springframework.batch.core.job.DefaultJobKeyGenerator;
+import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.JobKeyGenerator;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
 import org.springframework.batch.core.repository.JobRepository;
@@ -43,9 +45,10 @@ import org.springframework.core.convert.support.ConfigurableConversionService;
 import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.support.MetaDataAccessException;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.Isolation;
 
 import javax.sql.DataSource;
 import java.nio.charset.Charset;
@@ -61,7 +64,6 @@ import java.sql.Types;
  *
  * <ul>
  * <li>a {@link JobRepository} named "jobRepository"</li>
- * <li>a {@link JobRegistry} named "jobRegistry"</li>
  * <li>a {@link JobOperator} named "jobOperator"</li>
  * <li>a {@link org.springframework.batch.core.scope.StepScope} named "stepScope"</li>
  * <li>a {@link org.springframework.batch.core.scope.JobScope} named "jobScope"</li>
@@ -142,20 +144,20 @@ public class JdbcDefaultBatchConfiguration extends DefaultBatchConfiguration {
 	}
 
 	@Override
-	protected DataSourceTransactionManager getTransactionManager() {
-		String errorMessage = " To use the default configuration, a DataSourceTransactionManager bean named 'transactionManager'"
+	protected PlatformTransactionManager getTransactionManager() {
+		String errorMessage = " To use the default configuration, a PlatformTransactionManager bean named 'transactionManager'"
 				+ " should be defined in the application context but none was found. Override getTransactionManager()"
 				+ " to provide the transaction manager to use for the job repository.";
-		if (this.applicationContext.getBeansOfType(DataSourceTransactionManager.class).isEmpty()) {
+		if (this.applicationContext.getBeansOfType(PlatformTransactionManager.class).isEmpty()) {
 			throw new BatchConfigurationException(
-					"Unable to find a DataSourceTransactionManager bean in the application context." + errorMessage);
+					"Unable to find a PlatformTransactionManager bean in the application context." + errorMessage);
 		}
 		else {
 			if (!this.applicationContext.containsBean("transactionManager")) {
 				throw new BatchConfigurationException(errorMessage);
 			}
 		}
-		return this.applicationContext.getBean("transactionManager", DataSourceTransactionManager.class);
+		return this.applicationContext.getBean("transactionManager", PlatformTransactionManager.class);
 	}
 
 	/**
@@ -255,6 +257,35 @@ public class JdbcDefaultBatchConfiguration extends DefaultBatchConfiguration {
 		conversionService.addConverter(new LocalDateTimeToStringConverter());
 		conversionService.addConverter(new StringToLocalDateTimeConverter());
 		return conversionService;
+	}
+
+	/**
+	 * Return the value of the {@code validateTransactionState} parameter. Defaults to
+	 * {@code true}.
+	 * @return true if the transaction state should be validated, false otherwise
+	 */
+	protected boolean getValidateTransactionState() {
+		return true;
+	}
+
+	/**
+	 * Return the transaction isolation level when creating job executions. Defaults to
+	 * {@link Isolation#SERIALIZABLE}.
+	 * @return the transaction isolation level when creating job executions
+	 */
+	protected Isolation getIsolationLevelForCreate() {
+		return Isolation.SERIALIZABLE;
+	}
+
+	/**
+	 * A custom implementation of the {@link JobKeyGenerator}. The default, if not
+	 * injected, is the {@link DefaultJobKeyGenerator}.
+	 * @return the generator that creates the key used in identifying {@link JobInstance}
+	 * objects
+	 * @since 5.1
+	 */
+	protected JobKeyGenerator getJobKeyGenerator() {
+		return new DefaultJobKeyGenerator();
 	}
 
 }

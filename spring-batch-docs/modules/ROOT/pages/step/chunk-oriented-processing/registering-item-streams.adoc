@@ -25,7 +25,7 @@ The following example shows how to register a `stream` on a `step` in Java:
 @Bean
 public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
 	return new StepBuilder("step1", jobRepository)
-				.<String, String>chunk(2, transactionManager)
+				.<String, String>chunk(2).transactionManager(transactionManager)
 				.reader(itemReader())
 				.writer(compositeItemWriter())
 				.stream(fileItemWriter1())

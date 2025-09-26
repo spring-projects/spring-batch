@@ -1,0 +1,1 @@
+create table person_target (id int primary key, name varchar(5));

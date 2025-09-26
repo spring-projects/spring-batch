@@ -49,7 +49,7 @@ class RepeatOperationsStepFactoryBeanTests {
 
 	private List<String> list;
 
-	private final JobExecution jobExecution = new JobExecution(new JobInstance(0L, "job"), new JobParameters());
+	private final JobExecution jobExecution = new JobExecution(new JobInstance(0L, "job"), 0L, new JobParameters());
 
 	@BeforeEach
 	void setUp() {
@@ -86,7 +86,7 @@ class RepeatOperationsStepFactoryBeanTests {
 		});
 
 		Step step = factory.getObject();
-		step.execute(new StepExecution(step.getName(), jobExecution));
+		step.execute(new StepExecution(step.getName(), jobExecution, 0L));
 
 		assertEquals(1, list.size());
 	}

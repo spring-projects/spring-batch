@@ -15,9 +15,11 @@
  */
 package org.springframework.batch.core.configuration.support;
 
-import org.springframework.batch.core.job.DefaultJobKeyGenerator;
-import org.springframework.batch.core.job.JobInstance;
-import org.springframework.batch.core.job.JobKeyGenerator;
+import io.micrometer.observation.ObservationRegistry;
+
+import org.springframework.batch.core.configuration.DuplicateJobException;
+import org.springframework.batch.core.configuration.annotation.BatchObservabilityBeanPostProcessor;
+import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.configuration.BatchConfigurationException;
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
@@ -37,7 +39,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.annotation.Isolation;
 
 /**
  * Base {@link Configuration} class that provides common infrastructure beans for enabling
@@ -48,7 +49,6 @@ import org.springframework.transaction.annotation.Isolation;
  *
  * <ul>
  * <li>a {@link ResourcelessJobRepository} named "jobRepository"</li>
- * <li>a {@link MapJobRegistry} named "jobRegistry"</li>
  * <li>a {@link TaskExecutorJobOperator} named "jobOperator"</li>
  * <li>a {@link org.springframework.batch.core.scope.StepScope} named "stepScope"</li>
  * <li>a {@link org.springframework.batch.core.scope.JobScope} named "jobScope"</li>
@@ -77,7 +77,7 @@ import org.springframework.transaction.annotation.Isolation;
  * @since 5.0
  */
 @Configuration(proxyBeanMethods = false)
-@Import(ScopeConfiguration.class)
+@Import({ ScopeConfiguration.class, BatchObservabilityBeanPostProcessor.class })
 public class DefaultBatchConfiguration implements ApplicationContextAware {
 
 	protected ApplicationContext applicationContext;
@@ -93,17 +93,12 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 	}
 
 	@Bean
-	public JobRegistry jobRegistry() {
-		return new MapJobRegistry();
-	}
-
-	@Bean
-	public JobOperator jobOperator(JobRepository jobRepository, JobRegistry jobRegistry)
-			throws BatchConfigurationException {
+	public JobOperator jobOperator(JobRepository jobRepository) throws BatchConfigurationException {
 		JobOperatorFactoryBean jobOperatorFactoryBean = new JobOperatorFactoryBean();
 		jobOperatorFactoryBean.setJobRepository(jobRepository);
-		jobOperatorFactoryBean.setJobRegistry(jobRegistry);
+		jobOperatorFactoryBean.setJobRegistry(getJobRegistry());
 		jobOperatorFactoryBean.setTransactionManager(getTransactionManager());
+		jobOperatorFactoryBean.setObservationRegistry(getObservationRegistry());
 		jobOperatorFactoryBean.setJobParametersConverter(getJobParametersConverter());
 		jobOperatorFactoryBean.setTaskExecutor(getTaskExecutor());
 		try {
@@ -113,6 +108,29 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 		catch (Exception e) {
 			throw new BatchConfigurationException("Unable to configure the default job operator", e);
 		}
+	}
+
+	protected JobRegistry getJobRegistry() {
+		MapJobRegistry jobRegistry = new MapJobRegistry();
+		this.applicationContext.getBeansOfType(Job.class).values().forEach(job -> {
+			try {
+				jobRegistry.register(job);
+			}
+			catch (DuplicateJobException e) {
+				throw new BatchConfigurationException(e);
+			}
+		});
+		return jobRegistry;
+	}
+
+	/**
+	 * Return the {@link ObservationRegistry} to use for the job operator. Defaults to
+	 * {@link ObservationRegistry#NOOP}.
+	 * @return The ObservationRegistry to use for the job operator
+	 * @since 6.0
+	 */
+	protected ObservationRegistry getObservationRegistry() {
+		return ObservationRegistry.NOOP;
 	}
 
 	/**
@@ -143,35 +161,6 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 	@Deprecated(since = "6.0", forRemoval = true)
 	protected JobParametersConverter getJobParametersConverter() {
 		return new DefaultJobParametersConverter();
-	}
-
-	/**
-	 * Return the value of the {@code validateTransactionState} parameter. Defaults to
-	 * {@code true}.
-	 * @return true if the transaction state should be validated, false otherwise
-	 */
-	protected boolean getValidateTransactionState() {
-		return true;
-	}
-
-	/**
-	 * Return the transaction isolation level when creating job executions. Defaults to
-	 * {@link Isolation#SERIALIZABLE}.
-	 * @return the transaction isolation level when creating job executions
-	 */
-	protected Isolation getIsolationLevelForCreate() {
-		return Isolation.SERIALIZABLE;
-	}
-
-	/**
-	 * A custom implementation of the {@link JobKeyGenerator}. The default, if not
-	 * injected, is the {@link DefaultJobKeyGenerator}.
-	 * @return the generator that creates the key used in identifying {@link JobInstance}
-	 * objects
-	 * @since 5.1
-	 */
-	protected JobKeyGenerator getJobKeyGenerator() {
-		return new DefaultJobKeyGenerator();
 	}
 
 }

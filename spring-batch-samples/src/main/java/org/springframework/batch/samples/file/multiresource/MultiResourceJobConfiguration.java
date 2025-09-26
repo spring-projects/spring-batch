@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 the original author or authors.
+ * Copyright 2023-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.samples.file.multiresource;
 
+import org.springframework.batch.core.configuration.annotation.EnableJdbcJobRepository;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.StepScope;
@@ -47,6 +48,7 @@ import org.springframework.jdbc.support.JdbcTransactionManager;
  */
 @Configuration
 @EnableBatchProcessing
+@EnableJdbcJobRepository
 @Import(DataSourceConfiguration.class)
 public class MultiResourceJobConfiguration {
 
@@ -92,7 +94,8 @@ public class MultiResourceJobConfiguration {
 	public Job job(JobRepository jobRepository, JdbcTransactionManager transactionManager,
 			ItemReader<CustomerCredit> itemReader, ItemWriter<CustomerCredit> itemWriter) {
 		return new JobBuilder("ioSampleJob", jobRepository)
-			.start(new StepBuilder("step1", jobRepository).<CustomerCredit, CustomerCredit>chunk(2, transactionManager)
+			.start(new StepBuilder("step1", jobRepository).<CustomerCredit, CustomerCredit>chunk(2)
+				.transactionManager(transactionManager)
 				.reader(itemReader)
 				.processor(new CustomerCreditIncreaseProcessor())
 				.writer(itemWriter)

@@ -17,6 +17,7 @@ package org.springframework.batch.samples.petclinic;
 
 import javax.sql.DataSource;
 
+import org.springframework.batch.core.configuration.annotation.EnableJdbcJobRepository;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.job.builder.JobBuilder;
@@ -36,6 +37,7 @@ import org.springframework.jdbc.support.JdbcTransactionManager;
 
 @Configuration
 @EnableBatchProcessing
+@EnableJdbcJobRepository
 @Import(DataSourceConfiguration.class)
 public class OwnersExportJobConfiguration {
 
@@ -61,7 +63,8 @@ public class OwnersExportJobConfiguration {
 	public Job job(JobRepository jobRepository, JdbcTransactionManager transactionManager,
 			JdbcCursorItemReader<Owner> ownersReader, FlatFileItemWriter<Owner> ownersWriter) {
 		return new JobBuilder("ownersExportJob", jobRepository)
-			.start(new StepBuilder("ownersExportStep", jobRepository).<Owner, Owner>chunk(5, transactionManager)
+			.start(new StepBuilder("ownersExportStep", jobRepository).<Owner, Owner>chunk(5)
+				.transactionManager(transactionManager)
 				.reader(ownersReader)
 				.writer(ownersWriter)
 				.build())

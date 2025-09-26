@@ -15,8 +15,8 @@
 			</bean>
 		</property>
 	</bean>
-	
-	<bean class="org.springframework.batch.core.launch.support.TaskExecutorJobLauncher">
+
+	<bean class="org.springframework.batch.core.launch.support.JobOperatorFactoryBean">
 		<property name="jobRepository" ref="jobRepository"/>
 	</bean>
 

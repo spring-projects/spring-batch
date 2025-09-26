@@ -18,13 +18,6 @@ package org.springframework.batch.core.step;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.micrometer.core.instrument.Metrics;
-import io.micrometer.core.instrument.Tag;
-import io.micrometer.core.instrument.Tags;
-import io.micrometer.core.instrument.observation.DefaultMeterObservationHandler;
-import io.micrometer.core.tck.MeterRegistryAssert;
-import io.micrometer.observation.ObservationRegistry;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -34,7 +27,7 @@ import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.listener.StepExecutionListener;
-import org.springframework.batch.core.observability.BatchStepObservation;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
@@ -50,7 +43,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class NonAbstractStepTests {
 
-	AbstractStep tested = new EventTrackingStep();
+	AbstractStep tested;
 
 	StepExecutionListener listener1 = new EventTrackingListener("listener1");
 
@@ -63,15 +56,15 @@ class NonAbstractStepTests {
 	 */
 	final List<String> events = new ArrayList<>();
 
-	final StepExecution execution = new StepExecution(tested.getName(),
-			new JobExecution(new JobInstance(1L, "jobName"), new JobParameters()));
+	StepExecution execution;
 
 	/**
 	 * Fills the events list when abstract methods are called.
 	 */
 	private class EventTrackingStep extends AbstractStep {
 
-		public EventTrackingStep() {
+		public EventTrackingStep(JobRepository jobRepository) {
+			super(jobRepository);
 			setBeanName("eventTrackingStep");
 		}
 
@@ -155,13 +148,15 @@ class NonAbstractStepTests {
 
 	@BeforeEach
 	void setUp() {
-		tested.setJobRepository(repository);
+		tested = new EventTrackingStep(repository);
+		execution = new StepExecution(tested.getName(),
+				new JobExecution(new JobInstance(1L, "jobName"), 0L, new JobParameters()), 0L);
 		repository.add(execution);
 	}
 
 	@Test
 	void testBeanName() {
-		AbstractStep step = new AbstractStep() {
+		AbstractStep step = new AbstractStep(repository) {
 			@Override
 			protected void doExecute(StepExecution stepExecution) throws Exception {
 			}
@@ -173,7 +168,7 @@ class NonAbstractStepTests {
 
 	@Test
 	void testName() {
-		AbstractStep step = new AbstractStep() {
+		AbstractStep step = new AbstractStep(repository) {
 			@Override
 			protected void doExecute(StepExecution stepExecution) throws Exception {
 			}
@@ -191,11 +186,6 @@ class NonAbstractStepTests {
 	@Test
 	void testExecute() throws Exception {
 		tested.setStepExecutionListeners(new StepExecutionListener[] { listener1, listener2 });
-
-		ObservationRegistry observationRegistry = ObservationRegistry.create();
-		observationRegistry.observationConfig()
-			.observationHandler(new DefaultMeterObservationHandler(Metrics.globalRegistry));
-		tested.setObservationRegistry(observationRegistry);
 
 		tested.execute(execution);
 
@@ -215,23 +205,11 @@ class NonAbstractStepTests {
 				"Execution context modifications made by listener should be persisted");
 		assertTrue(repository.saved.containsKey("afterStep"),
 				"Execution context modifications made by listener should be persisted");
-
-		// Observability
-		MeterRegistryAssert.assertThat(Metrics.globalRegistry)
-			.hasTimerWithNameAndTags(BatchStepObservation.BATCH_STEP_OBSERVATION.getName(),
-					Tags.of(Tag.of("error", "none"), Tag.of("spring.batch.step.job.name", "jobName"),
-							Tag.of("spring.batch.step.name", "eventTrackingStep"),
-							Tag.of("spring.batch.step.status", "COMPLETED")));
-	}
-
-	@AfterEach
-	void cleanup() {
-		Metrics.globalRegistry.clear();
 	}
 
 	@Test
 	void testFailure() throws Exception {
-		tested = new EventTrackingStep() {
+		tested = new EventTrackingStep(repository) {
 			@Override
 			protected void doExecute(StepExecution context) throws Exception {
 				super.doExecute(context);
@@ -269,7 +247,7 @@ class NonAbstractStepTests {
 	 */
 	@Test
 	void testStoppedStep() throws Exception {
-		tested = new EventTrackingStep() {
+		tested = new EventTrackingStep(repository) {
 			@Override
 			protected void doExecute(StepExecution context) throws Exception {
 				context.setTerminateOnly();
@@ -302,7 +280,7 @@ class NonAbstractStepTests {
 
 	@Test
 	void testStoppedStepWithCustomStatus() throws Exception {
-		tested = new EventTrackingStep() {
+		tested = new EventTrackingStep(repository) {
 			@Override
 			protected void doExecute(StepExecution context) throws Exception {
 				super.doExecute(context);
@@ -329,7 +307,7 @@ class NonAbstractStepTests {
 	 */
 	@Test
 	void testFailureInSavingExecutionContext() throws Exception {
-		tested = new EventTrackingStep() {
+		tested = new EventTrackingStep(repository) {
 			@Override
 			protected void doExecute(StepExecution context) throws Exception {
 				super.doExecute(context);

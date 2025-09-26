@@ -20,6 +20,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.batch.core.scope.context.ChunkContext;
+import org.springframework.batch.item.Chunk;
 import org.springframework.core.Ordered;
 
 /**
@@ -27,7 +28,7 @@ import org.springframework.core.Ordered;
  * @author Mahmoud Ben Hassine
  *
  */
-public class CompositeChunkListener implements ChunkListener {
+public class CompositeChunkListener<I, O> implements ChunkListener<I, O> {
 
 	private final OrderedComposite<ChunkListener> listeners = new OrderedComposite<>();
 
@@ -74,7 +75,10 @@ public class CompositeChunkListener implements ChunkListener {
 	 * Call the registered listeners in reverse order.
 	 *
 	 * @see ChunkListener#afterChunk(ChunkContext context)
+	 * @deprecated since 6.0, use {@link #afterChunk(Chunk)} instead. Scheduled for
+	 * removal in 6.2 or later.
 	 */
+	@Deprecated(since = "6.0", forRemoval = true)
 	@Override
 	public void afterChunk(ChunkContext context) {
 		for (Iterator<ChunkListener> iterator = listeners.reverse(); iterator.hasNext();) {
@@ -84,11 +88,27 @@ public class CompositeChunkListener implements ChunkListener {
 	}
 
 	/**
+	 * Call the registered listeners in reverse order.
+	 *
+	 * @see ChunkListener#afterChunk(Chunk)
+	 */
+	@Override
+	public void afterChunk(Chunk chunk) {
+		for (Iterator<ChunkListener> iterator = listeners.reverse(); iterator.hasNext();) {
+			ChunkListener listener = iterator.next();
+			listener.afterChunk(chunk);
+		}
+	}
+
+	/**
 	 * Call the registered listeners in order, respecting and prioritizing those that
 	 * implement {@link Ordered}.
 	 *
 	 * @see ChunkListener#beforeChunk(ChunkContext context)
+	 * @deprecated since 6.0, use {@link #beforeChunk(Chunk)} instead. Scheduled for
+	 * removal in 6.2 or later.
 	 */
+	@Deprecated(since = "6.0", forRemoval = true)
 	@Override
 	public void beforeChunk(ChunkContext context) {
 		for (Iterator<ChunkListener> iterator = listeners.iterator(); iterator.hasNext();) {
@@ -98,15 +118,45 @@ public class CompositeChunkListener implements ChunkListener {
 	}
 
 	/**
+	 * Call the registered listeners in order, respecting and prioritizing those that
+	 * implement {@link Ordered}.
+	 *
+	 * @see ChunkListener#beforeChunk(Chunk chunk)
+	 */
+	@Override
+	public void beforeChunk(Chunk chunk) {
+		for (Iterator<ChunkListener> iterator = listeners.iterator(); iterator.hasNext();) {
+			ChunkListener listener = iterator.next();
+			listener.beforeChunk(chunk);
+		}
+	}
+
+	/**
 	 * Call the registered listeners in reverse order.
 	 *
 	 * @see ChunkListener#afterChunkError(ChunkContext context)
+	 * @deprecated since 6.0, use {@link #onChunkError(Exception,Chunk)} instead.
+	 * Scheduled for removal in 6.2 or later.
 	 */
+	@Deprecated(since = "6.0", forRemoval = true)
 	@Override
 	public void afterChunkError(ChunkContext context) {
 		for (Iterator<ChunkListener> iterator = listeners.reverse(); iterator.hasNext();) {
 			ChunkListener listener = iterator.next();
 			listener.afterChunkError(context);
+		}
+	}
+
+	/**
+	 * Call the registered listeners in reverse order.
+	 *
+	 * @see ChunkListener#onChunkError(Exception, Chunk)
+	 */
+	@Override
+	public void onChunkError(Exception exception, Chunk chunk) {
+		for (Iterator<ChunkListener> iterator = listeners.reverse(); iterator.hasNext();) {
+			ChunkListener listener = iterator.next();
+			listener.onChunkError(exception, chunk);
 		}
 	}
 

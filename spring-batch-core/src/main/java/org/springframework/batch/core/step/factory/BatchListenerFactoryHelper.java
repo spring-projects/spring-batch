@@ -22,10 +22,11 @@ import org.springframework.batch.core.listener.StepListener;
 
 /**
  * Package private helper for step factory beans.
- * 
+ *
  * @author Dave Syer
- * 
+ * @deprecated Since 6.0 with no replacement. Scheduled for removal in 7.0.
  */
+@Deprecated(since = "6.0", forRemoval = true)
 abstract class BatchListenerFactoryHelper {
 
 	public static <T> List<T> getListeners(StepListener[] listeners, Class<? super T> cls) {

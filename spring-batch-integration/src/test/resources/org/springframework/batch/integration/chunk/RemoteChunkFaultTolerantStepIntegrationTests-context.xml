@@ -75,7 +75,8 @@
 
 	<batch:job-repository id="jobRepository" table-prefix="BATCH_"/>
 
-	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.TaskExecutorJobLauncher">
+	<bean id="jobOperator"
+		  class="org.springframework.batch.core.launch.support.JobOperatorFactoryBean">
 		<property name="jobRepository" ref="jobRepository" />
 	</bean>
 

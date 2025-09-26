@@ -49,6 +49,16 @@ public class TaskletStepBuilder extends AbstractTaskletStepBuilder<TaskletStepBu
 		return this;
 	}
 
+	/**
+	 * @param tasklet the tasklet to use
+	 * @return this for fluent chaining
+	 * @since 6.0
+	 */
+	public TaskletStepBuilder tasklet(Tasklet tasklet) {
+		this.tasklet = tasklet;
+		return this;
+	}
+
 	@Override
 	protected TaskletStepBuilder self() {
 		return this;

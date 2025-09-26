@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2023 the original author or authors.
+ * Copyright 2013-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ import org.springframework.batch.core.job.flow.support.SimpleFlow;
 import org.springframework.batch.core.job.flow.support.StateTransition;
 import org.springframework.batch.core.job.flow.support.state.EndState;
 import org.springframework.batch.core.job.flow.support.state.StepState;
-import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
@@ -150,7 +150,7 @@ class SimpleJobExplorerIntegrationTests {
 	private FlowStep flowStep;
 
 	@Autowired
-	private JobLauncher jobLauncher;
+	private JobOperator jobOperator;
 
 	@Autowired
 	private Job job;
@@ -174,7 +174,7 @@ class SimpleJobExplorerIntegrationTests {
 
 	@Test
 	void getLastJobExecutionShouldFetchStepExecutions() throws Exception {
-		this.jobLauncher.run(this.job, new JobParameters());
+		this.jobOperator.start(this.job, new JobParameters());
 		JobInstance lastJobInstance = this.jobExplorer.getLastJobInstance("job");
 		JobExecution lastJobExecution = this.jobExplorer.getLastJobExecution(lastJobInstance);
 		assertEquals(1, lastJobExecution.getStepExecutions().size());
@@ -224,7 +224,7 @@ class SimpleJobExplorerIntegrationTests {
 	void retrievedJobExecutionsShouldHaveTheirOwnParameters() throws Exception {
 		// given
 		ApplicationContext context = new AnnotationConfigApplicationContext(JobConfiguration.class);
-		JobLauncher jobLauncher = context.getBean(JobLauncher.class);
+		JobOperator jobOperator = context.getBean(JobOperator.class);
 		JobExplorer jobExplorer = context.getBean(JobExplorer.class);
 		Job job = context.getBean(Job.class);
 		long id = 1L;
@@ -236,8 +236,8 @@ class SimpleJobExplorerIntegrationTests {
 			.toJobParameters();
 
 		// when
-		JobExecution jobExecution1 = jobLauncher.run(job, jobParameters1);
-		JobExecution jobExecution2 = jobLauncher.run(job, jobParameters2);
+		JobExecution jobExecution1 = jobOperator.start(job, jobParameters1);
+		JobExecution jobExecution2 = jobOperator.start(job, jobParameters2);
 
 		// then
 		Assertions.assertEquals(jobExecution1.getJobInstance(), jobExecution2.getJobInstance());

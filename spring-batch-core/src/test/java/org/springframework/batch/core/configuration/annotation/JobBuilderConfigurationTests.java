@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepContribution;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.job.builder.SimpleJobBuilder;
-import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.builder.StepBuilder;
@@ -86,8 +86,8 @@ public class JobBuilderConfigurationTests {
 		configs[0] = DataSourceConfiguration.class;
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(configs);
 		Job job = jobName == null ? context.getBean(Job.class) : context.getBean(jobName, Job.class);
-		JobLauncher jobLauncher = context.getBean(JobLauncher.class);
-		JobExecution execution = jobLauncher.run(job,
+		JobOperator jobOperator = context.getBean(JobOperator.class);
+		JobExecution execution = jobOperator.start(job,
 				new JobParametersBuilder().addLong("run.id", (long) (Math.random() * Long.MAX_VALUE))
 					.toJobParameters());
 		assertEquals(status, execution.getStatus());
@@ -98,6 +98,7 @@ public class JobBuilderConfigurationTests {
 
 	@Configuration
 	@EnableBatchProcessing
+	@EnableJdbcJobRepository
 	@Import(DataSourceConfiguration.class)
 	public static class TestConfiguration {
 
@@ -165,6 +166,7 @@ public class JobBuilderConfigurationTests {
 
 	@Configuration
 	@EnableBatchProcessing
+	@EnableJdbcJobRepository
 	@Import(DataSourceConfiguration.class)
 	public static class BeansConfigurer {
 

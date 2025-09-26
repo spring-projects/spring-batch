@@ -36,7 +36,6 @@ import org.springframework.batch.core.listener.ItemWriteListener;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.step.Step;
-import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.listener.StepListener;
 import org.springframework.batch.core.job.SimpleJob;
 import org.springframework.batch.core.listener.ItemListenerSupport;
@@ -54,7 +53,6 @@ import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.repeat.exception.SimpleLimitExceptionHandler;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
-import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
@@ -98,6 +96,7 @@ class SimpleStepFactoryBeanTests {
 	@Test
 	void testMandatoryProperties() {
 		SimpleStepFactoryBean<String, String> factoryBean = new SimpleStepFactoryBean<>();
+		factoryBean.setBeanName("test");
 		assertThrows(IllegalStateException.class, factoryBean::getObject);
 	}
 
@@ -105,6 +104,7 @@ class SimpleStepFactoryBeanTests {
 	void testMandatoryReader() {
 		// given
 		SimpleStepFactoryBean<String, String> factory = new SimpleStepFactoryBean<>();
+		factory.setBeanName("test");
 		factory.setItemWriter(writer);
 
 		// when
@@ -118,6 +118,7 @@ class SimpleStepFactoryBeanTests {
 	void testMandatoryWriter() {
 		// given
 		SimpleStepFactoryBean<String, String> factory = new SimpleStepFactoryBean<>();
+		factory.setBeanName("test");
 		factory.setItemReader(reader);
 
 		// when
@@ -143,24 +144,6 @@ class SimpleStepFactoryBeanTests {
 		job.execute(jobExecution);
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		assertEquals(3, written.size());
-		assertTrue(written.contains("foo"));
-	}
-
-	@Test
-	void testSimpleConcurrentJob() throws Exception {
-
-		SimpleStepFactoryBean<String, String> factory = getStepFactory("foo", "bar");
-		factory.setTaskExecutor(new SimpleAsyncTaskExecutor());
-
-		AbstractStep step = (AbstractStep) factory.getObject();
-		step.setName("step1");
-
-		JobExecution jobExecution = repository.createJobExecution(job.getName(), new JobParameters());
-		StepExecution stepExecution = jobExecution.createStepExecution(step.getName());
-		repository.add(stepExecution);
-		step.execute(stepExecution);
-		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
-		assertEquals(2, written.size());
 		assertTrue(written.contains("foo"));
 	}
 

@@ -33,7 +33,7 @@ public Job sampleJob(JobRepository jobRepository, Step sampleStep) {
 public Step sampleStep(JobRepository jobRepository, // <2>
 		PlatformTransactionManager transactionManager) { // <1>
 	return new StepBuilder("sampleStep", jobRepository)
-				.<String, String>chunk(10, transactionManager) // <3>
+				.<String, String>chunk(10).transactionManager(transactionManager) // <3>
 				.reader(itemReader())
 				.writer(itemWriter())
 				.build();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 the original author or authors.
+ * Copyright 2023-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.springframework.batch.core.configuration.annotation.EnableJdbcJobRepository;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -43,6 +44,7 @@ import org.springframework.jdbc.support.JdbcTransactionManager;
  */
 @Configuration
 @EnableBatchProcessing
+@EnableJdbcJobRepository
 @Import(DataSourceConfiguration.class)
 public class JobConfigurationForRunningConcurrentStepsWithVirtualThreads {
 
@@ -78,7 +80,8 @@ public class JobConfigurationForRunningConcurrentStepsWithVirtualThreads {
 	@Bean
 	public Job job(JobRepository jobRepository, JdbcTransactionManager transactionManager,
 			ItemReader<Integer> itemReader, ItemWriter<Integer> itemWriter) {
-		Step step = new StepBuilder("step", jobRepository).<Integer, Integer>chunk(2, transactionManager)
+		Step step = new StepBuilder("step", jobRepository).<Integer, Integer>chunk(2)
+			.transactionManager(transactionManager)
 			.reader(itemReader)
 			.writer(itemWriter)
 			.taskExecutor(new VirtualThreadTaskExecutor("spring-batch-"))

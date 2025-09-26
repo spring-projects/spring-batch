@@ -19,7 +19,7 @@
 	<integration:service-activator input-channel="requests" ref="jobLaunchingHandler" method="launch" />
 
 	<bean id="jobLaunchingHandler" class="org.springframework.batch.integration.launch.JobLaunchingMessageHandler">
-		<constructor-arg ref="jobLauncher" />
+		<constructor-arg ref="jobOperator" />
 	</bean>
 	<bean id="testJob" parent="simpleJob">
 		<property name="steps" ref="step" />

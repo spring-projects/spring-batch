@@ -14,10 +14,14 @@
 		</batch:step>
 	</batch:job>
 
+    <bean id="inputResource" class="org.springframework.core.io.FileSystemResource" scope="step">
+        <constructor-arg type="java.lang.String" value="#{jobParameters[inputFile]}" />
+    </bean>
+
 	<bean id="itemReader" class="org.springframework.batch.samples.file.multiline.MultiLineTradeItemReader" scope="step">
 		<property name="delegate">
 			<bean class="org.springframework.batch.item.file.FlatFileItemReader">
-				<property name="resource" value="#{jobParameters[inputFile]}" />
+				<property name="resource" ref="inputResource" />
 				<property name="lineMapper">
 					<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
 						<property name="lineTokenizer">

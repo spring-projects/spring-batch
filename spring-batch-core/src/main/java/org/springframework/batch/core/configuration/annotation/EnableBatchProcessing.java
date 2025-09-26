@@ -15,7 +15,6 @@
  */
 package org.springframework.batch.core.configuration.annotation;
 
-import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.configuration.support.ApplicationContextFactory;
 import org.springframework.batch.core.configuration.support.AutomaticJobRegistrar;
 import org.springframework.batch.core.configuration.support.GroupAwareJob;
@@ -76,8 +75,6 @@ import java.lang.annotation.Target;
  * <ul>
  * <li>a {@link JobRepository} (bean name "jobRepository" of type
  * {@link org.springframework.batch.core.repository.support.ResourcelessJobRepository})</li>
- * <li>a {@link JobRegistry} (bean name "jobRegistry" of type
- * {@link org.springframework.batch.core.configuration.support.MapJobRegistry})</li>
  * <li>a {@link org.springframework.batch.core.launch.JobOperator} (bean name
  * "jobOperator" of type
  * {@link org.springframework.batch.core.launch.support.TaskExecutorJobOperator})</li>
@@ -134,7 +131,7 @@ import java.lang.annotation.Target;
  *     <beans:bean id="dataSource" .../>
  *     <beans:bean id="transactionManager" .../>
  *     <beans:bean id="jobOperator" class=
-"org.springframework.batch.core.launch.support.TaskExecutorJobOperator">
+"org.springframework.batch.core.launch.support.JobOperatorFactoryBean">
  *         <beans:property name="jobRepository" ref="jobRepository" />
  *     </beans:bean>
  * </batch>
@@ -173,6 +170,20 @@ public @interface EnableBatchProcessing {
 	 * {@literal taskExecutor}
 	 */
 	String taskExecutorRef() default "taskExecutor";
+
+	/**
+	 * Set the job registry to use in the job operator.
+	 * @return the bean name of the job registry to use. Defaults to
+	 * {@literal jobRegistry}
+	 */
+	String jobRegistryRef() default "jobRegistry";
+
+	/**
+	 * Set the observation registry to use in batch artifacts.
+	 * @return the bean name of the observation registry to use. Defaults to
+	 * {@literal observationRegistry}
+	 */
+	String observationRegistryRef() default "observationRegistry";
 
 	/**
 	 * Set the transaction manager to use in the job operator.

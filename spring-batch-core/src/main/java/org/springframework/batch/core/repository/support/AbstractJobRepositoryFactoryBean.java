@@ -196,15 +196,8 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean<Jo
 			jobKeyGenerator = new DefaultJobKeyGenerator();
 		}
 		if (this.transactionAttributeSource == null) {
-			Properties transactionAttributes = new Properties();
-			transactionAttributes.setProperty("create*",
-					TRANSACTION_PROPAGATION_PREFIX + Propagation.REQUIRES_NEW + "," + this.isolationLevelForCreate);
-			transactionAttributes.setProperty("getLastJobExecution*",
-					TRANSACTION_PROPAGATION_PREFIX + Propagation.REQUIRES_NEW + "," + this.isolationLevelForCreate);
-			transactionAttributes.setProperty("*", "PROPAGATION_REQUIRED");
-			this.transactionAttributeSource = new NameMatchTransactionAttributeSource();
-			((NameMatchTransactionAttributeSource) this.transactionAttributeSource)
-				.setProperties(transactionAttributes);
+			this.transactionAttributeSource = new DefaultJobRepositoryTransactionAttributeSource(
+					this.isolationLevelForCreate);
 		}
 	}
 
@@ -235,6 +228,20 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean<Jo
 	private Object getTarget() throws Exception {
 		return new SimpleJobRepository(createJobInstanceDao(), createJobExecutionDao(), createStepExecutionDao(),
 				createExecutionContextDao());
+	}
+
+	private static class DefaultJobRepositoryTransactionAttributeSource extends NameMatchTransactionAttributeSource {
+
+		public DefaultJobRepositoryTransactionAttributeSource(String isolationLevelForCreate) {
+			Properties transactionAttributes = new Properties();
+			transactionAttributes.setProperty("create*",
+					TRANSACTION_PROPAGATION_PREFIX + Propagation.REQUIRES_NEW + "," + isolationLevelForCreate);
+			transactionAttributes.setProperty("getLastJobExecution*",
+					TRANSACTION_PROPAGATION_PREFIX + Propagation.REQUIRES_NEW + "," + isolationLevelForCreate);
+			transactionAttributes.setProperty("*", "PROPAGATION_REQUIRED");
+			this.setProperties(transactionAttributes);
+		}
+
 	}
 
 }

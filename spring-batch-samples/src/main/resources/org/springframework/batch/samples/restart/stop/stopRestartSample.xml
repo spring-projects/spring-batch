@@ -10,17 +10,14 @@
 		  p:dataSource-ref="dataSource" p:transactionManager-ref="transactionManager"/>
 
 	<bean id="jobOperator"
-		  class="org.springframework.batch.core.launch.support.TaskExecutorJobOperator"
-		  p:jobRepository-ref="jobRepository" p:jobRegistry-ref="jobRegistry">
+		  class="org.springframework.batch.core.launch.support.JobOperatorFactoryBean"
+		  p:jobRepository-ref="jobRepository">
 		<property name="taskExecutor">
 			<bean class="org.springframework.core.task.SimpleAsyncTaskExecutor"/>
 		</property>
 	</bean>
 
-	<bean id="jobRegistry"
-		  class="org.springframework.batch.core.configuration.support.MapJobRegistry" />
-
-	<bean class="org.springframework.batch.test.JobLauncherTestUtils"/>
+	<bean class="org.springframework.batch.test.JobOperatorTestUtils"/>
 	<bean class="org.springframework.batch.test.context.BatchTestContextBeanPostProcessor"/>
 
 	<!-- The tasklet used in this job will run in an infinite loop.  This is useful for testing graceful shutdown from

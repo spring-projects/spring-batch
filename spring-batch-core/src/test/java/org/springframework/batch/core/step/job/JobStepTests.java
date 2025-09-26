@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,12 +22,13 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
+import org.springframework.batch.core.configuration.support.MapJobRegistry;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.launch.support.TaskExecutorJobOperator;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.job.UnexpectedJobExecutionException;
 import org.springframework.batch.core.job.JobSupport;
-import org.springframework.batch.core.launch.support.TaskExecutorJobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.JdbcJobRepositoryFactoryBean;
 import org.springframework.batch.item.ExecutionContext;
@@ -46,7 +47,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class JobStepTests {
 
-	private final JobStep step = new JobStep();
+	private JobStep step;
 
 	private StepExecution stepExecution;
 
@@ -54,7 +55,6 @@ class JobStepTests {
 
 	@BeforeEach
 	void setUp() throws Exception {
-		step.setName("step");
 		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
 			.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
 			.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
@@ -64,14 +64,16 @@ class JobStepTests {
 		factory.setTransactionManager(new JdbcTransactionManager(embeddedDatabase));
 		factory.afterPropertiesSet();
 		jobRepository = factory.getObject();
-		step.setJobRepository(jobRepository);
+		step = new JobStep(jobRepository);
+		step.setName("step");
 		JobExecution jobExecution = jobRepository.createJobExecution("job", new JobParameters());
 		stepExecution = jobExecution.createStepExecution("step");
 		jobRepository.add(stepExecution);
-		TaskExecutorJobLauncher jobLauncher = new TaskExecutorJobLauncher();
-		jobLauncher.setJobRepository(jobRepository);
-		jobLauncher.afterPropertiesSet();
-		step.setJobLauncher(jobLauncher);
+		TaskExecutorJobOperator jobOperator = new TaskExecutorJobOperator();
+		jobOperator.setJobRepository(jobRepository);
+		jobOperator.setJobRegistry(new MapJobRegistry());
+		jobOperator.afterPropertiesSet();
+		step.setJobOperator(jobOperator);
 	}
 
 	@Test
@@ -80,9 +82,9 @@ class JobStepTests {
 	}
 
 	@Test
-	void testAfterPropertiesSetWithNoLauncher() {
+	void testAfterPropertiesSetWithNoOperator() {
 		step.setJob(new JobSupport("child"));
-		step.setJobLauncher(null);
+		step.setJobOperator(null);
 		assertThrows(IllegalStateException.class, step::afterPropertiesSet);
 	}
 

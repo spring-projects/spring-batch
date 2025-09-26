@@ -21,8 +21,10 @@ package org.springframework.batch.core.step.item;
  *
  * @author Dave Syer
  * @author Taeik Lim
- *
+ * @deprecated Since 6.0 in favor of equals/hashcode in a wrapper type if needed.
+ * Scheduled for removal in 7.0.
  */
+@Deprecated(since = "6.0", forRemoval = true)
 @FunctionalInterface
 public interface KeyGenerator {
 

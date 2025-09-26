@@ -4,29 +4,34 @@ on: [push, pull_request, workflow_dispatch]
 
 jobs:
   build:
-    name: Build branch
+    name: Build main branch
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4.2.2
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4.7.1
         with:
           java-version: '17'
           distribution: 'temurin'
           cache: 'maven'
 
       - name: Build with Maven
-        if: ${{ github.repository != 'spring-projects/spring-batch' || github.ref_name != 'main' }}
-        run: mvn -s settings.xml --batch-mode --update-snapshots verify
+        run: mvn -DaltDeploymentRepository=local::file:deployment-repository --no-transfer-progress --batch-mode --update-snapshots deploy
 
-      - name: Build with Maven and deploy to Artifactory
+      - name: Deploy to Artifactory
         if: ${{ github.repository == 'spring-projects/spring-batch' && github.ref_name == 'main' }}
-        env:
-          ARTIFACTORY_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
-          ARTIFACTORY_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
-        run: mvn -s settings.xml --batch-mode --update-snapshots deploy
+        uses: spring-io/artifactory-deploy-action@v0.0.2
+        with:
+          uri: 'https://repo.spring.io'
+          username: ${{ secrets.ARTIFACTORY_USERNAME }}
+          password: ${{ secrets.ARTIFACTORY_PASSWORD }}
+          build-name: 'spring-batch-main'
+          repository: 'libs-snapshot-local'
+          folder: 'deployment-repository'
+          signing-key: ${{ secrets.GPG_PRIVATE_KEY }}
+          signing-passphrase: ${{ secrets.GPG_PASSPHRASE }}
 
       - name: Generate Java docs
         run: mvn javadoc:aggregate

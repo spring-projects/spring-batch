@@ -31,7 +31,11 @@ import org.springframework.lang.Nullable;
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  * @param <I> input item type
+ * @deprecated Since 6.0, use
+ * {@link org.springframework.batch.core.step.item.ChunkOrientedStep} instead. Scheduled
+ * for removal in 7.0.
  */
+@Deprecated(since = "6.0", forRemoval = true)
 public class ChunkOrientedTasklet<I> implements Tasklet {
 
 	private static final String INPUTS_KEY = "INPUTS";

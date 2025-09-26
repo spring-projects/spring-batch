@@ -17,9 +17,7 @@ package org.springframework.batch.core.launch.support;
 
 import java.time.Duration;
 
-import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Metrics;
+import io.micrometer.observation.ObservationRegistry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -68,6 +66,7 @@ import org.springframework.util.Assert;
  * @deprecated since 6.0 in favor of {@link TaskExecutorJobOperator}. Scheduled for
  * removal in 6.2 or later.
  */
+@SuppressWarnings("removal")
 @Deprecated(since = "6.0", forRemoval = true)
 public class TaskExecutorJobLauncher implements JobLauncher, InitializingBean {
 
@@ -77,9 +76,7 @@ public class TaskExecutorJobLauncher implements JobLauncher, InitializingBean {
 
 	protected TaskExecutor taskExecutor;
 
-	protected MeterRegistry meterRegistry = Metrics.globalRegistry;
-
-	protected Counter jobLaunchCount; // NoopCounter is still incubating
+	protected ObservationRegistry observationRegistry;
 
 	/**
 	 * Run the provided job with the given {@link JobParameters}. The
@@ -104,9 +101,6 @@ public class TaskExecutorJobLauncher implements JobLauncher, InitializingBean {
 
 		Assert.notNull(job, "The Job must not be null.");
 		Assert.notNull(jobParameters, "The JobParameters must not be null.");
-		if (this.jobLaunchCount != null) {
-			this.jobLaunchCount.increment();
-		}
 
 		final JobExecution jobExecution;
 		JobExecution lastExecution = jobRepository.getLastJobExecution(job.getName(), jobParameters);
@@ -214,16 +208,6 @@ public class TaskExecutorJobLauncher implements JobLauncher, InitializingBean {
 	}
 
 	/**
-	 * Set the meter registry to use for metrics. Defaults to
-	 * {@link Metrics#globalRegistry}.
-	 * @param meterRegistry the meter registry
-	 * @since 5.0
-	 */
-	public void setMeterRegistry(MeterRegistry meterRegistry) {
-		this.meterRegistry = meterRegistry;
-	}
-
-	/**
 	 * Ensure the required dependencies of a {@link JobRepository} have been set.
 	 */
 	@Override
@@ -233,7 +217,6 @@ public class TaskExecutorJobLauncher implements JobLauncher, InitializingBean {
 			logger.info("No TaskExecutor has been set, defaulting to synchronous executor.");
 			taskExecutor = new SyncTaskExecutor();
 		}
-		this.jobLaunchCount = BatchMetrics.createCounter(this.meterRegistry, "job.launch.count", "Job launch count");
 	}
 
 }

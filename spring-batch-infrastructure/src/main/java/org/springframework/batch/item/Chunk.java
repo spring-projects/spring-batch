@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2024 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,6 +64,7 @@ public class Chunk<W> implements Iterable<W>, Serializable {
 		this(items, null);
 	}
 
+	@Deprecated(since = "6.0", forRemoval = true)
 	public Chunk(List<? extends W> items, List<SkipWrapper<W>> skips) {
 		super();
 		if (items != null) {
@@ -109,6 +110,7 @@ public class Chunk<W> implements Iterable<W>, Serializable {
 	/**
 	 * @return a copy of the skips as an unmodifiable list
 	 */
+	@Deprecated(since = "6.0", forRemoval = true)
 	public List<SkipWrapper<W>> getSkips() {
 		return Collections.unmodifiableList(skips);
 	}
@@ -116,6 +118,7 @@ public class Chunk<W> implements Iterable<W>, Serializable {
 	/**
 	 * @return a copy of the anonymous errors as an unmodifiable list
 	 */
+	@Deprecated(since = "6.0", forRemoval = true)
 	public List<Exception> getErrors() {
 		return Collections.unmodifiableList(errors);
 	}
@@ -125,6 +128,7 @@ public class Chunk<W> implements Iterable<W>, Serializable {
 	 * {@link ChunkIterator#remove()}.
 	 * @param e the exception that caused the skip
 	 */
+	@Deprecated(since = "6.0", forRemoval = true)
 	public void skip(Exception e) {
 		errors.add(e);
 	}
@@ -153,6 +157,14 @@ public class Chunk<W> implements Iterable<W>, Serializable {
 	}
 
 	/**
+	 * @return the number of skipped items
+	 */
+	@Deprecated(since = "6.0", forRemoval = true)
+	public int getSkipsSize() {
+		return skips.size();
+	}
+
+	/**
 	 * Flag to indicate if the source data is exhausted.
 	 *
 	 * <p>
@@ -163,6 +175,7 @@ public class Chunk<W> implements Iterable<W>, Serializable {
 	 * </p>
 	 * @return true if there is no more data to process
 	 */
+	@Deprecated(since = "6.0", forRemoval = true)
 	public boolean isEnd() {
 		return end;
 	}
@@ -171,6 +184,7 @@ public class Chunk<W> implements Iterable<W>, Serializable {
 	 * Set the flag to say that this chunk represents an end of stream (there is no more
 	 * data to process).
 	 */
+	@Deprecated(since = "6.0", forRemoval = true)
 	public void setEnd() {
 		this.end = true;
 	}
@@ -180,6 +194,7 @@ public class Chunk<W> implements Iterable<W>, Serializable {
 	 * to it.
 	 * @return the busy flag
 	 */
+	@Deprecated(since = "6.0", forRemoval = true)
 	public boolean isBusy() {
 		return busy;
 	}
@@ -189,6 +204,7 @@ public class Chunk<W> implements Iterable<W>, Serializable {
 	 * flag is reset to false.
 	 * @param busy the flag to set
 	 */
+	@Deprecated(since = "6.0", forRemoval = true)
 	public void setBusy(boolean busy) {
 		this.busy = busy;
 	}
@@ -196,14 +212,17 @@ public class Chunk<W> implements Iterable<W>, Serializable {
 	/**
 	 * Clear only the skips list.
 	 */
+	@Deprecated(since = "6.0", forRemoval = true)
 	public void clearSkips() {
 		skips.clear();
 	}
 
+	@Deprecated(since = "6.0", forRemoval = true)
 	public Object getUserData() {
 		return userData;
 	}
 
+	@Deprecated(since = "6.0", forRemoval = true)
 	public void setUserData(Object userData) {
 		this.userData = userData;
 	}

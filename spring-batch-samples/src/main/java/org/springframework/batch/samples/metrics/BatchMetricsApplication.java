@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 the original author or authors.
+ * Copyright 2022-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package org.springframework.batch.samples.metrics;
 
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
+import org.springframework.batch.core.configuration.annotation.EnableJdbcJobRepository;
 import org.springframework.batch.samples.common.DataSourceConfiguration;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -27,9 +28,10 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 @EnableScheduling
 @EnableBatchProcessing
+@EnableJdbcJobRepository
 @Import({ Job1Configuration.class, Job2Configuration.class, JobScheduler.class, PrometheusConfiguration.class,
 		DataSourceConfiguration.class })
-@PropertySource("metrics-sample.properties")
+@PropertySource("classpath:org/springframework/batch/samples/metrics/metrics-sample.properties")
 public class BatchMetricsApplication {
 
 	public static void main(String[] args) {

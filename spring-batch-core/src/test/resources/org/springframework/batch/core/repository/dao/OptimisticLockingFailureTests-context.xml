@@ -41,16 +41,8 @@
 		<property name="dataSource" ref="dataSource" />
 	</bean>
 
-	<bean id="jobExplorer" class="org.springframework.batch.core.repository.explore.support.JobExplorerFactoryBean">
-		<property name="dataSource" ref="dataSource"/>
-		<property name="transactionManager" ref="transactionManager"/>
-	</bean>
-
-	<bean id="jobRegistry" class="org.springframework.batch.core.configuration.support.MapJobRegistry"/>
-
-	<bean id="jobOperator" class="org.springframework.batch.core.launch.support.TaskExecutorJobOperator">
+	<bean id="jobOperator" class="org.springframework.batch.core.launch.support.JobOperatorFactoryBean">
 		<property name="jobRepository" ref="jobRepository"/>
-		<property name="jobRegistry" ref="jobRegistry"/>
 		<property name="taskExecutor">
 			<bean class="org.springframework.core.task.SimpleAsyncTaskExecutor"/>
 		</property>

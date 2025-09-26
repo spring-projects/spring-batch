@@ -23,6 +23,7 @@ import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Timer;
 
+import org.springframework.batch.core.observability.micrometer.MicrometerMetrics;
 import org.springframework.batch.core.step.StepContribution;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.listener.StepListener;
@@ -40,7 +41,11 @@ import org.springframework.util.Assert;
  * writing and processing. Any exceptions encountered will be rethrown.
  *
  * @see ChunkOrientedTasklet
+ * @deprecated Since 6.0, use
+ * {@link org.springframework.batch.core.step.item.ChunkOrientedStep} instead. Scheduled
+ * for removal in 7.0.
  */
+@Deprecated(since = "6.0", forRemoval = true)
 public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, InitializingBean {
 
 	private ItemProcessor<? super I, ? extends O> itemProcessor;
@@ -291,7 +296,7 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 	 * @throws Exception if there is a problem
 	 */
 	protected void write(StepContribution contribution, Chunk<I> inputs, Chunk<O> outputs) throws Exception {
-		Timer.Sample sample = BatchMetrics.createTimerSample(this.meterRegistry);
+		Timer.Sample sample = MicrometerMetrics.createTimerSample(this.meterRegistry);
 		String status = BatchMetrics.STATUS_SUCCESS;
 		try {
 			doWrite(outputs);
@@ -309,6 +314,7 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 			stopTimer(sample, contribution.getStepExecution(), "chunk.write", status, "Chunk writing");
 		}
 		contribution.incrementWriteCount(outputs.size());
+		contribution.incrementWriteSkipCount(outputs.getSkipsSize());
 	}
 
 	protected Chunk<O> transform(StepContribution contribution, Chunk<I> inputs) throws Exception {
@@ -316,7 +322,7 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 		for (Chunk<I>.ChunkIterator iterator = inputs.iterator(); iterator.hasNext();) {
 			final I item = iterator.next();
 			O output;
-			Timer.Sample sample = BatchMetrics.createTimerSample(this.meterRegistry);
+			Timer.Sample sample = MicrometerMetrics.createTimerSample(this.meterRegistry);
 			String status = BatchMetrics.STATUS_SUCCESS;
 			try {
 				output = doProcess(item);
@@ -349,7 +355,7 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 	protected void stopTimer(Timer.Sample sample, StepExecution stepExecution, String metricName, String status,
 			String description) {
 		String fullyQualifiedMetricName = BatchMetrics.METRICS_PREFIX + metricName;
-		sample.stop(BatchMetrics.createTimer(this.meterRegistry, metricName, description + " duration",
+		sample.stop(MicrometerMetrics.createTimer(this.meterRegistry, metricName, description + " duration",
 				Tag.of(fullyQualifiedMetricName + ".job.name",
 						stepExecution.getJobExecution().getJobInstance().getJobName()),
 				Tag.of(fullyQualifiedMetricName + ".step.name", stepExecution.getStepName()),

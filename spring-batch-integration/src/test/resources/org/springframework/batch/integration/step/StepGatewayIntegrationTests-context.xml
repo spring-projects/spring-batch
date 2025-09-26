@@ -19,8 +19,8 @@
 	</job>
 
 	<bean id="delegateStep" class="org.springframework.batch.integration.step.DelegateStep">
+        <constructor-arg name="jobRepository" ref="jobRepository"/>
 		<property name="delegate" ref="gateway" />
-		<property name="jobRepository" ref="jobRepository" />
 	</bean>
 
 	<integration:gateway service-interface="org.springframework.batch.core.step.Step" id="gateway"

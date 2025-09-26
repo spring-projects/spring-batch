@@ -20,6 +20,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.listener.ChunkListener;
 import org.springframework.batch.core.job.JobInterruptedException;
+import org.springframework.batch.core.observability.jfr.events.step.tasklet.TaskletExecutionEvent;
 import org.springframework.batch.core.step.StepContribution;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.listener.StepExecutionListener;
@@ -40,6 +41,7 @@ import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.repeat.support.RepeatTemplate;
+import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
@@ -48,7 +50,6 @@ import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.transaction.support.TransactionTemplate;
-import org.springframework.util.Assert;
 
 import java.util.concurrent.Semaphore;
 
@@ -102,22 +103,41 @@ public class TaskletStep extends AbstractStep {
 
 	/**
 	 * Default constructor.
+	 * @deprecated since 6.0 for removal in 7.0. Use {@link #TaskletStep(JobRepository)}
+	 * instead.
 	 */
+	@Deprecated(since = "6.0", forRemoval = true)
 	public TaskletStep() {
-		this(null);
+		super();
 	}
 
 	/**
+	 * Create a new instance with the given name.
+	 * @deprecated since 6.0 for removal in 7.0. Use {@link #TaskletStep(JobRepository)}
+	 * instead.
 	 * @param name the name for the {@link TaskletStep}
 	 */
+	@Deprecated(since = "6.0", forRemoval = true)
 	public TaskletStep(String name) {
 		super(name);
+	}
+
+	/**
+	 * Create a new instance with the given name and job repository.
+	 * @param jobRepository the job repository to use. Must not be null.
+	 * @since 6.0
+	 */
+	public TaskletStep(JobRepository jobRepository) {
+		super(jobRepository);
 	}
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
-		Assert.state(transactionManager != null, "A transaction manager must be provided");
+		if (this.transactionManager == null) {
+			logger.info("No transaction manager has been set.  Defaulting to ResourcelessTransactionManager.");
+			this.transactionManager = new ResourcelessTransactionManager();
+		}
 	}
 
 	/**
@@ -222,9 +242,12 @@ public class TaskletStep extends AbstractStep {
 	 */
 	@Override
 	protected void doExecute(StepExecution stepExecution) throws Exception {
-		stepExecution.getExecutionContext().put(TASKLET_TYPE_KEY, tasklet.getClass().getName());
+		String taskletType = tasklet.getClass().getName();
+		stepExecution.getExecutionContext().put(TASKLET_TYPE_KEY, taskletType);
 		stepExecution.getExecutionContext().put(STEP_TYPE_KEY, this.getClass().getName());
-
+		TaskletExecutionEvent taskletExecutionEvent = new TaskletExecutionEvent(stepExecution.getStepName(),
+				stepExecution.getId(), taskletType);
+		taskletExecutionEvent.begin();
 		stream.update(stepExecution.getExecutionContext());
 		getJobRepository().updateExecutionContext(stepExecution);
 
@@ -266,6 +289,8 @@ public class TaskletStep extends AbstractStep {
 
 		});
 
+		taskletExecutionEvent.taskletStatus = stepExecution.getExitStatus().getExitCode();
+		taskletExecutionEvent.commit();
 	}
 
 	/**

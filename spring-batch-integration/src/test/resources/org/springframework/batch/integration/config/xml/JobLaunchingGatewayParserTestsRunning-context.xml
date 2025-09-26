@@ -14,14 +14,15 @@
 		<int:queue/>
 	</int:channel>
 
-	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.TaskExecutorJobLauncher">
-		<property name="jobRepository" ref="jobRepository"/>
+	<bean id="jobOperator"
+		  class="org.springframework.batch.core.launch.support.JobOperatorFactoryBean">
+		<property name="jobRepository" ref="jobRepository" />
 	</bean>
 
 	<batch-int:job-launching-gateway id="batchjobExecutor"
 		auto-startup="true"
 		request-channel="requestChannel"
 		reply-channel="replyChannel"
-		job-launcher="jobLauncher"/>
+		job-operator="jobOperator"/>
 
 </beans>

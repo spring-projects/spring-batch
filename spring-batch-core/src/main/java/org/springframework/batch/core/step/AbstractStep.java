@@ -20,8 +20,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Metrics;
 import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationRegistry;
 import org.apache.commons.logging.Log;
@@ -38,10 +36,8 @@ import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.launch.support.ExitCodeMapper;
 import org.springframework.batch.core.listener.CompositeStepExecutionListener;
 import org.springframework.batch.core.observability.BatchMetrics;
-import org.springframework.batch.core.observability.BatchStepContext;
-import org.springframework.batch.core.observability.BatchStepObservation;
-import org.springframework.batch.core.observability.BatchStepObservationConvention;
-import org.springframework.batch.core.observability.DefaultBatchStepObservationConvention;
+import org.springframework.batch.core.observability.jfr.events.step.StepExecutionEvent;
+import org.springframework.batch.core.observability.micrometer.MicrometerMetrics;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.batch.item.ExecutionContext;
@@ -63,7 +59,7 @@ import org.springframework.util.ClassUtils;
  * @author Mahmoud Ben Hassine
  * @author Jinwoo Bae
  */
-public abstract class AbstractStep implements Step, InitializingBean, BeanNameAware {
+public abstract class AbstractStep implements StoppableStep, InitializingBean, BeanNameAware {
 
 	private static final Log logger = LogFactory.getLog(AbstractStep.class);
 
@@ -77,23 +73,45 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 
 	private JobRepository jobRepository;
 
-	private ObservationRegistry observationRegistry = ObservationRegistry.NOOP;
-
-	@SuppressWarnings("unused")
-	private MeterRegistry meterRegistry = Metrics.globalRegistry;
-
-	private BatchStepObservationConvention observationConvention = new DefaultBatchStepObservationConvention();
+	protected ObservationRegistry observationRegistry;
 
 	/**
-	 * Default constructor.
+	 * Create a new {@link AbstractStep}.
+	 * @deprecated since 6.0 for removal in 7.0. Use {@link #AbstractStep(JobRepository)}
+	 * instead.
 	 */
+	@Deprecated(since = "6.0", forRemoval = true)
 	public AbstractStep() {
-		super();
+	}
+
+	/**
+	 * Create a new {@link AbstractStep}.
+	 * @deprecated since 6.0 for removal in 7.0. Use {@link #AbstractStep(JobRepository)}
+	 * instead.
+	 */
+	@Deprecated(since = "6.0", forRemoval = true)
+	public AbstractStep(String name) {
+		Assert.notNull(name, "Step name must not be null");
+		this.name = name;
+	}
+
+	/**
+	 * Create a new {@link AbstractStep} with the given job repository.
+	 * @param jobRepository the job repository. Must not be null.
+	 * @since 6.0
+	 */
+	public AbstractStep(JobRepository jobRepository) {
+		Assert.notNull(jobRepository, "JobRepository must not be null");
+		this.jobRepository = jobRepository;
 	}
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(jobRepository != null, "JobRepository is mandatory");
+		if (this.observationRegistry == null) {
+			logger.info("No ObservationRegistry has been set, defaulting to ObservationRegistry NOOP");
+			this.observationRegistry = ObservationRegistry.NOOP;
+		}
 	}
 
 	@Override
@@ -155,14 +173,6 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	}
 
 	/**
-	 * Convenient constructor for setting only the name property.
-	 * @param name Name of the step
-	 */
-	public AbstractStep(String name) {
-		this.name = name;
-	}
-
-	/**
 	 * Extension point for subclasses to execute business logic. Subclasses should set the
 	 * {@link ExitStatus} on the {@link StepExecution} before returning.
 	 * @param stepExecution the current step context
@@ -200,18 +210,26 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 			throws JobInterruptedException, UnexpectedJobExecutionException {
 
 		Assert.notNull(stepExecution, "stepExecution must not be null");
+		Assert.state(stepExecution.getId() != null,
+				"StepExecution has no id. It must be saved before it can be executed.");
 		stepExecution.getExecutionContext().put(SpringBatchVersion.BATCH_VERSION_KEY, SpringBatchVersion.getVersion());
 
 		if (logger.isDebugEnabled()) {
 			logger.debug("Executing: id=" + stepExecution.getId());
 		}
+		StepExecutionEvent stepExecutionEvent = new StepExecutionEvent(stepExecution.getStepName(),
+				stepExecution.getJobExecution().getJobInstance().getJobName(), stepExecution.getId(),
+				stepExecution.getJobExecutionId());
+		stepExecutionEvent.begin();
 		stepExecution.setStartTime(LocalDateTime.now());
 		stepExecution.setStatus(BatchStatus.STARTED);
-		Observation observation = BatchMetrics
-			.createObservation(BatchStepObservation.BATCH_STEP_OBSERVATION.getName(),
-					new BatchStepContext(stepExecution), this.observationRegistry)
-			.contextualName(stepExecution.getStepName())
-			.observationConvention(this.observationConvention)
+		Observation observation = MicrometerMetrics
+			.createObservation(BatchMetrics.METRICS_PREFIX + "step", this.observationRegistry)
+			.highCardinalityKeyValue(BatchMetrics.METRICS_PREFIX + "step.executionId", stepExecution.getId().toString())
+			.lowCardinalityKeyValue(BatchMetrics.METRICS_PREFIX + "step.name", stepExecution.getStepName())
+			.lowCardinalityKeyValue(BatchMetrics.METRICS_PREFIX + "step.type", getClass().getName())
+			.lowCardinalityKeyValue(BatchMetrics.METRICS_PREFIX + "step.job.name",
+					stepExecution.getJobExecution().getJobInstance().getJobName())
 			.start();
 		getJobRepository().update(stepExecution);
 
@@ -291,6 +309,8 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 								+ "This job is now in an unknown state and should not be restarted.",
 						name, stepExecution.getJobExecution().getJobInstance().getJobName()), e);
 			}
+			stepExecutionEvent.exitStatus = stepExecution.getExitStatus().getExitCode();
+			stepExecutionEvent.commit();
 			stopObservation(stepExecution, observation);
 			stepExecution.setExitStatus(exitStatus);
 
@@ -329,6 +349,8 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 		if (!throwables.isEmpty()) {
 			observation.error(mergedThrowables(throwables));
 		}
+		observation.lowCardinalityKeyValue(BatchMetrics.METRICS_PREFIX + "step.status",
+				stepExecution.getExitStatus().getExitCode());
 		observation.stop();
 	}
 
@@ -428,16 +450,8 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 		return exitStatus;
 	}
 
-	public void setObservationConvention(BatchStepObservationConvention observationConvention) {
-		this.observationConvention = observationConvention;
-	}
-
 	public void setObservationRegistry(ObservationRegistry observationRegistry) {
 		this.observationRegistry = observationRegistry;
-	}
-
-	public void setMeterRegistry(MeterRegistry meterRegistry) {
-		this.meterRegistry = meterRegistry;
 	}
 
 }

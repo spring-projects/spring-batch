@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2024 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import io.micrometer.core.instrument.Timer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.springframework.batch.core.observability.micrometer.MicrometerMetrics;
 import org.springframework.batch.core.step.StepContribution;
 import org.springframework.batch.core.listener.StepListenerFailedException;
 import org.springframework.batch.core.observability.BatchMetrics;
@@ -50,7 +51,11 @@ import org.springframework.retry.support.DefaultRetryState;
  * FaultTolerant implementation of the {@link ChunkProcessor} interface, that allows for
  * skipping or retry of items that cause exceptions during writing.
  *
+ * @deprecated Since 6.0, use
+ * {@link org.springframework.batch.core.step.item.ChunkOrientedStep} instead. Scheduled
+ * for removal in 7.0.
  */
+@Deprecated(since = "6.0", forRemoval = true)
 public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O> {
 
 	private SkipPolicy itemProcessSkipPolicy = new LimitCheckingItemSkipPolicy();
@@ -216,7 +221,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 			final I item = iterator.next();
 
 			RetryCallback<O, Exception> retryCallback = context -> {
-				Timer.Sample sample = BatchMetrics.createTimerSample(meterRegistry);
+				Timer.Sample sample = MicrometerMetrics.createTimerSample(meterRegistry);
 				String status = BatchMetrics.STATUS_SUCCESS;
 				O output = null;
 				try {
@@ -325,7 +330,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 
 			if (!data.scanning()) {
 				chunkMonitor.setChunkSize(inputs.size());
-				Timer.Sample sample = BatchMetrics.createTimerSample(meterRegistry);
+				Timer.Sample sample = MicrometerMetrics.createTimerSample(meterRegistry);
 				String status = BatchMetrics.STATUS_SUCCESS;
 				try {
 					doWrite(outputs);
@@ -347,6 +352,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 					stopTimer(sample, contribution.getStepExecution(), "chunk.write", status, "Chunk writing");
 				}
 				contribution.incrementWriteCount(outputs.size());
+				contribution.incrementWriteSkipCount(outputs.getSkipsSize());
 			}
 			else {
 				scan(contribution, inputs, outputs, chunkMonitor, false);

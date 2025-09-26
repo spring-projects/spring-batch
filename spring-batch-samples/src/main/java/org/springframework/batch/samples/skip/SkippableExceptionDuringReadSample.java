@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2023 the original author or authors.
+ * Copyright 2019-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package org.springframework.batch.samples.skip;
 
 import java.util.Arrays;
 
+import org.springframework.batch.core.configuration.annotation.EnableJdbcJobRepository;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -39,6 +40,7 @@ import org.springframework.transaction.PlatformTransactionManager;
  */
 @Configuration
 @EnableBatchProcessing
+@EnableJdbcJobRepository
 @Import(DataSourceConfiguration.class)
 public class SkippableExceptionDuringReadSample {
 
@@ -84,7 +86,8 @@ public class SkippableExceptionDuringReadSample {
 
 	@Bean
 	public Step step(JobRepository jobRepository) {
-		return new StepBuilder("step", jobRepository).<Integer, Integer>chunk(3, this.transactionManager)
+		return new StepBuilder("step", jobRepository).<Integer, Integer>chunk(3)
+			.transactionManager(this.transactionManager)
 			.reader(itemReader())
 			.processor(itemProcessor())
 			.writer(itemWriter())

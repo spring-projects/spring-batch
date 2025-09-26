@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2023 the original author or authors.
+ * Copyright 2021-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,26 +15,20 @@
  */
 package org.springframework.batch.samples.metrics;
 
-import java.util.HashMap;
-import java.util.Map;
-import jakarta.annotation.PostConstruct;
-
-import io.micrometer.core.instrument.Metrics;
-import io.micrometer.prometheus.PrometheusConfig;
-import io.micrometer.prometheus.PrometheusMeterRegistry;
-import io.prometheus.client.CollectorRegistry;
-import io.prometheus.client.exporter.PushGateway;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.micrometer.core.instrument.Clock;
+import io.micrometer.core.instrument.observation.DefaultMeterObservationHandler;
+import io.micrometer.observation.ObservationRegistry;
+import io.micrometer.prometheusmetrics.PrometheusConfig;
+import io.micrometer.prometheusmetrics.PrometheusMeterRegistry;
+import io.prometheus.metrics.exporter.pushgateway.PushGateway;
+import io.prometheus.metrics.model.registry.PrometheusRegistry;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.scheduling.annotation.Scheduled;
 
 @Configuration
 public class PrometheusConfiguration {
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(PrometheusConfiguration.class);
 
 	@Value("${prometheus.job.name}")
 	private String prometheusJobName;
@@ -45,29 +39,30 @@ public class PrometheusConfiguration {
 	@Value("${prometheus.pushgateway.url}")
 	private String prometheusPushGatewayUrl;
 
-	private final Map<String, String> groupingKey = new HashMap<>();
-
-	private PushGateway pushGateway;
-
-	private CollectorRegistry collectorRegistry;
-
-	@PostConstruct
-	public void init() {
-		pushGateway = new PushGateway(prometheusPushGatewayUrl);
-		groupingKey.put(prometheusGroupingKey, prometheusJobName);
-		PrometheusMeterRegistry prometheusMeterRegistry = new PrometheusMeterRegistry(PrometheusConfig.DEFAULT);
-		collectorRegistry = prometheusMeterRegistry.getPrometheusRegistry();
-		Metrics.globalRegistry.add(prometheusMeterRegistry);
+	@Bean
+	public PrometheusRegistry prometheusRegistry() {
+		return new PrometheusRegistry();
 	}
 
-	@Scheduled(fixedRateString = "${prometheus.push.rate}")
-	public void pushMetrics() {
-		try {
-			pushGateway.pushAdd(collectorRegistry, prometheusJobName, groupingKey);
-		}
-		catch (Throwable ex) {
-			LOGGER.error("Unable to push metrics to Prometheus Push Gateway", ex);
-		}
+	@Bean
+	public PrometheusMeterRegistry meterRegistry(PrometheusRegistry prometheusRegistry) {
+		return new PrometheusMeterRegistry(PrometheusConfig.DEFAULT, prometheusRegistry, Clock.SYSTEM);
+	}
+
+	@Bean
+	public PushGateway pushGateway(PrometheusRegistry prometheusRegistry) {
+		return PushGateway.builder()
+			.address(prometheusPushGatewayUrl)
+			.groupingKey(prometheusGroupingKey, prometheusJobName)
+			.registry(prometheusRegistry)
+			.build();
+	}
+
+	@Bean
+	public ObservationRegistry observationRegistry(PrometheusMeterRegistry meterRegistry) {
+		ObservationRegistry observationRegistry = ObservationRegistry.create();
+		observationRegistry.observationConfig().observationHandler(new DefaultMeterObservationHandler(meterRegistry));
+		return observationRegistry;
 	}
 
 }

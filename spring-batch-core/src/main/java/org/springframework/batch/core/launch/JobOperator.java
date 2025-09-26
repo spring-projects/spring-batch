@@ -39,8 +39,10 @@ import org.springframework.lang.Nullable;
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
+ * @author Yejeong Ham
  * @since 2.0
  */
+@SuppressWarnings("removal")
 public interface JobOperator extends JobLauncher {
 
 	/**
@@ -73,7 +75,9 @@ public interface JobOperator extends JobLauncher {
 	}
 
 	/**
-	 * Start a new instance of a job with the specified parameters.
+	 * Start a new instance of a job with the specified parameters. If the job defines a
+	 * {@link JobParametersIncrementer}, then the incrementer will be used to calculate
+	 * the next parameters in the sequence and the provided parameters will be ignored.
 	 * @param job the {@link Job} to start
 	 * @param jobParameters the {@link JobParameters} to start the job with
 	 * @return the {@link JobExecution} that was started
@@ -90,7 +94,7 @@ public interface JobOperator extends JobLauncher {
 	default JobExecution start(Job job, JobParameters jobParameters)
 			throws NoSuchJobException, JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException,
 			JobRestartException, JobParametersInvalidException {
-		return run(job, jobParameters);
+		throw new UnsupportedOperationException();
 	}
 
 	/**
@@ -179,10 +183,6 @@ public interface JobOperator extends JobLauncher {
 	 * method (or a similar one) at the same time.
 	 * @param job the job to launch
 	 * @return the {@link JobExecution} created when the job is launched
-	 * @throws NoSuchJobException if there is no such job definition available
-	 * @throws JobParametersNotFoundException if the parameters cannot be found
-	 * @throws JobParametersInvalidException thrown if some of the job parameters are
-	 * invalid.
 	 * @throws UnexpectedJobExecutionException if an unexpected condition arises
 	 * @throws JobRestartException thrown if a job is restarted illegally.
 	 * @throws JobExecutionAlreadyRunningException thrown if attempting to restart a job
@@ -190,9 +190,8 @@ public interface JobOperator extends JobLauncher {
 	 * @throws JobInstanceAlreadyCompleteException thrown if attempting to restart a
 	 * completed job.
 	 */
-	JobExecution startNextInstance(Job job) throws NoSuchJobException, JobParametersNotFoundException,
-			JobRestartException, JobExecutionAlreadyRunningException, JobInstanceAlreadyCompleteException,
-			UnexpectedJobExecutionException, JobParametersInvalidException;
+	JobExecution startNextInstance(Job job) throws JobRestartException, JobExecutionAlreadyRunningException,
+			JobInstanceAlreadyCompleteException, UnexpectedJobExecutionException;
 
 	/**
 	 * Send a stop signal to the {@link JobExecution} with the supplied id. The signal is
@@ -249,6 +248,17 @@ public interface JobOperator extends JobLauncher {
 	 * should be stopped first)
 	 */
 	JobExecution abandon(JobExecution jobExecution) throws JobExecutionAlreadyRunningException;
+
+	/**
+	 * Marks the given {@link JobExecution} as {@code FAILED} when it is stuck in a
+	 * {@code STARTED} state due to an abrupt shutdown or failure, in order to make it
+	 * restartable. This operation makes a previously non-restartable execution eligible
+	 * for restart by updating its execution context with the flag {@code recovered=true}.
+	 * @param jobExecution the {@link JobExecution} to recover
+	 * @return the {@link JobExecution} after it has been marked as recovered
+	 * @since 6.0
+	 */
+	JobExecution recover(JobExecution jobExecution);
 
 	/**
 	 * List the {@link JobExecution JobExecutions} associated with a particular

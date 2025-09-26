@@ -30,7 +30,7 @@ public Job ioSampleJob(JobRepository jobRepository, Step step1) {
 @Bean
 public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
 	return new StepBuilder("step1", jobRepository)
-				.<String, String>chunk(2, transactionManager)
+				.<String, String>chunk(2).transactionManager(transactionManager)
 				.reader(fooReader())
 				.processor(fooProcessor())
 				.writer(compositeItemWriter())

@@ -1,0 +1,11 @@
+
+[[springBatchObservability]]
+= Spring Batch Observability
+
+Observability is a critical aspect of modern applications, and Spring Batch provides robust support for monitoring and tracing batch jobs.
+
+This section covers the integration of Spring Batch with popular observability tools such as Micrometer and Java Flight Recorder (JFR):
+
+[role="xmlContent"]
+* xref:spring-batch-observability/micrometer.adoc[Micrometer Support]
+* xref:spring-batch-observability/jfr.adoc[Java Flight Recorder Support]

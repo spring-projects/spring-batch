@@ -20,6 +20,7 @@ import java.util.Arrays;
 import jakarta.jms.JMSException;
 import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
 
+import org.springframework.batch.core.configuration.annotation.EnableJdbcJobRepository;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.job.builder.JobBuilder;
@@ -50,6 +51,7 @@ import org.springframework.integration.jms.dsl.Jms;
  */
 @Configuration
 @EnableBatchProcessing
+@EnableJdbcJobRepository
 @EnableBatchIntegration
 @EnableIntegration
 @PropertySource("classpath:org/springframework/batch/samples/chunking/remote-chunking.properties")

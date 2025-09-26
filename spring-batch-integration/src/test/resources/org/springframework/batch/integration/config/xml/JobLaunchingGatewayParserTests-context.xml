@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:int="http://www.springframework.org/schema/integration"
-	xmlns:batch-int="http://www.springframework.org/schema/batch-integration"
-	xsi:schemaLocation="http://www.springframework.org/schema/batch-integration https://www.springframework.org/schema/batch-integration/spring-batch-integration.xsd
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:int="http://www.springframework.org/schema/integration"
+	   xmlns:batch-int="http://www.springframework.org/schema/batch-integration"
+	   xmlns:beans="http://www.springframework.org/schema/c"
+	   xsi:schemaLocation="http://www.springframework.org/schema/batch-integration https://www.springframework.org/schema/batch-integration/spring-batch-integration.xsd
 		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/integration https://www.springframework.org/schema/integration/spring-integration.xsd">
 
@@ -14,14 +15,15 @@
 		<int:queue/>
 	</int:channel>
 
-	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.TaskExecutorJobLauncher">
-		<property name="jobRepository" ref="jobRepository"/>
+	<bean id="jobOperator"
+		  class="org.springframework.batch.core.launch.support.JobOperatorFactoryBean">
+		<property name="jobRepository" ref="jobRepository" />
 	</bean>
 
 	<batch-int:job-launching-gateway id="batchjobExecutor" reply-timeout="123"
 		auto-startup="false"
 		request-channel="requestChannel"
 		reply-channel="replyChannel"
-		job-launcher="jobLauncher"/>
+		job-operator="jobOperator"/>
 
 </beans>

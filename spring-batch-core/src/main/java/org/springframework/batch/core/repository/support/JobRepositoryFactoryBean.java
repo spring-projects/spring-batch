@@ -269,7 +269,8 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 	protected JobInstanceDao createJobInstanceDao() throws Exception {
 		JdbcJobInstanceDao dao = new JdbcJobInstanceDao();
 		dao.setJdbcTemplate(jdbcOperations);
-		dao.setJobInstanceIncrementer(incrementerFactory.getIncrementer(databaseType, tablePrefix + "JOB_SEQ"));
+		dao.setJobInstanceIncrementer(
+				incrementerFactory.getIncrementer(databaseType, tablePrefix + "JOB_INSTANCE_SEQ"));
 		dao.setJobKeyGenerator(jobKeyGenerator);
 		dao.setTablePrefix(tablePrefix);
 		dao.afterPropertiesSet();

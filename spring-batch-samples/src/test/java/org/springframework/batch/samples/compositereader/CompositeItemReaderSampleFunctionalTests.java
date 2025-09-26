@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 the original author or authors.
+ * Copyright 2024-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,12 +23,13 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.ExitStatus;
+import org.springframework.batch.core.configuration.annotation.EnableJdbcJobRepository;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.job.builder.JobBuilder;
-import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.database.JdbcBatchItemWriter;
@@ -59,11 +60,11 @@ public class CompositeItemReaderSampleFunctionalTests {
 	void testJobLaunch() throws Exception {
 		// given
 		ApplicationContext context = new AnnotationConfigApplicationContext(JobConfiguration.class);
-		JobLauncher jobLauncher = context.getBean(JobLauncher.class);
+		JobOperator jobOperator = context.getBean(JobOperator.class);
 		Job job = context.getBean(Job.class);
 
 		// when
-		JobExecution jobExecution = jobLauncher.run(job, new JobParameters());
+		JobExecution jobExecution = jobOperator.start(job, new JobParameters());
 
 		// then
 		Assertions.assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
@@ -74,6 +75,7 @@ public class CompositeItemReaderSampleFunctionalTests {
 
 	@Configuration
 	@EnableBatchProcessing
+	@EnableJdbcJobRepository
 	static class JobConfiguration {
 
 		@Bean
@@ -120,7 +122,8 @@ public class CompositeItemReaderSampleFunctionalTests {
 		@Bean
 		public Job job(JobRepository jobRepository, JdbcTransactionManager transactionManager) {
 			return new JobBuilder("job", jobRepository)
-				.start(new StepBuilder("step", jobRepository).<Person, Person>chunk(5, transactionManager)
+				.start(new StepBuilder("step", jobRepository).<Person, Person>chunk(5)
+					.transactionManager(transactionManager)
 					.reader(itemReader())
 					.writer(itemWriter())
 					.build())

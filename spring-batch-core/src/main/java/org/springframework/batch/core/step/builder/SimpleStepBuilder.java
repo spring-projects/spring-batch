@@ -66,7 +66,10 @@ import org.springframework.util.Assert;
  * @author Mahmoud Ben Hassine
  * @author Parikshit Dutta
  * @since 2.2
+ * @deprecated Since 6.0 in favor of {@link ChunkOrientedStepBuilder}. Scheduled for
+ * removal in 7.0.
  */
+@Deprecated(since = "6.0", forRemoval = true)
 public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleStepBuilder<I, O>> {
 
 	private static final int DEFAULT_COMMIT_INTERVAL = 1;

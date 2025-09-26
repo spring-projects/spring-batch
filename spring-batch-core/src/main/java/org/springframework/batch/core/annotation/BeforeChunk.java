@@ -21,16 +21,17 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.springframework.batch.core.listener.ChunkListener;
-import org.springframework.batch.core.scope.context.ChunkContext;
+import org.springframework.batch.item.Chunk;
 
 /**
  * Marks a method to be called before a chunk is executed. <br>
  * <br>
- * Expected signature: void beforeChunk(ChunkContext context)
+ * Expected signature: void beforeChunk(Chunk)
  *
  * @author Lucas Ward
+ * @author Mahmoud Ben Hassine
  * @since 2.0
- * @see ChunkListener#beforeChunk(ChunkContext context)
+ * @see ChunkListener#beforeChunk(Chunk)
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.METHOD })

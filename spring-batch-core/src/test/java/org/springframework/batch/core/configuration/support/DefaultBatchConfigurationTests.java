@@ -27,10 +27,8 @@ import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.step.Step;
-import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.configuration.xml.DummyJobRepository;
 import org.springframework.batch.core.job.builder.JobBuilder;
-import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
@@ -54,10 +52,10 @@ class DefaultBatchConfigurationTests {
 		// given
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(MyJobConfiguration.class);
 		Job job = context.getBean(Job.class);
-		JobLauncher jobLauncher = context.getBean(JobLauncher.class);
+		JobOperator jobOperator = context.getBean(JobOperator.class);
 
 		// when
-		JobExecution jobExecution = jobLauncher.run(job, new JobParameters());
+		JobExecution jobExecution = jobOperator.start(job, new JobParameters());
 
 		// then
 		Assertions.assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
@@ -79,20 +77,16 @@ class DefaultBatchConfigurationTests {
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(MyJobConfiguration.class);
 
 		// when
-		JobLauncher jobLauncher = context.getBean(JobLauncher.class);
 		JobRepository jobRepository = context.getBean(JobRepository.class);
-		JobRegistry jobRegistry = context.getBean(JobRegistry.class);
 		JobOperator jobOperator = context.getBean(JobOperator.class);
 
 		// then
-		Assertions.assertNotNull(jobLauncher);
 		Assertions.assertNotNull(jobRepository);
-		Assertions.assertNotNull(jobRegistry);
 		Assertions.assertNotNull(jobOperator);
 	}
 
 	@Configuration
-	static class MyJobConfiguration extends DefaultBatchConfiguration {
+	static class MyJobConfiguration extends JdbcDefaultBatchConfiguration {
 
 		@Bean
 		public Step myStep(JobRepository jobRepository, PlatformTransactionManager transactionManager) {

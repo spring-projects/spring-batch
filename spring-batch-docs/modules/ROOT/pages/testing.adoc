@@ -18,11 +18,11 @@ For the unit test to run a batch job, the framework must load the job's
 * `@SpringJUnitConfig` indicates that the class should use Spring's
 JUnit facilities
 * `@SpringBatchTest` injects Spring Batch test utilities (such as the
-`JobLauncherTestUtils` and `JobRepositoryTestUtils`) in the test context
+`JobOperatorTestUtils` and `JobRepositoryTestUtils`) in the test context
 
 NOTE: If the test context contains a single `Job` bean definition, this
-bean will be autowired in `JobLauncherTestUtils`. Otherwise, the job
-under test should be manually set on the `JobLauncherTestUtils`.
+bean will be autowired in `JobOperatorTestUtils`. Otherwise, the job
+under test should be manually set on the `JobOperatorTestUtils`.
 
 
 [tabs]
@@ -67,9 +67,9 @@ and verifies the end result.
 Consider an example of a batch job that reads from the database and writes to a flat file.
 The test method begins by setting up the database with test data. It clears the `CUSTOMER`
 table and then inserts 10 new records. The test then launches the `Job` by using the
-`launchJob()` method. The `launchJob()` method is provided by the `JobLauncherTestUtils`
-class. The `JobLauncherTestUtils` class also provides the `launchJob(JobParameters)`
-method, which lets the test give particular parameters. The `launchJob()` method
+`srartJob()` method. The `srartJob()` method is provided by the `JobOperatorTestUtils`
+class. The `JobOperatorTestUtils` class also provides the `startJob(JobParameters)`
+method, which lets the test give particular parameters. The `srartJob()` method
 returns the `JobExecution` object, which is useful for asserting particular information
 about the `Job` run. In the following case, the test verifies that the `Job` ended with
 a status of `COMPLETED`.
@@ -89,7 +89,7 @@ The following listing shows an example with JUnit 5 in Java configuration style:
 public class SkipSampleFunctionalTests {
 
     @Autowired
-    private JobLauncherTestUtils jobLauncherTestUtils;
+    private JobOperatorTestUtils jobOperatorTestUtils;
 
     private JdbcTemplate jdbcTemplate;
 
@@ -100,14 +100,14 @@ public class SkipSampleFunctionalTests {
 
     @Test
     public void testJob(@Autowired Job job) throws Exception {
-        this.jobLauncherTestUtils.setJob(job);
+        this.jobOperatorTestUtils.setJob(job);
         this.jdbcTemplate.update("delete from CUSTOMER");
         for (int i = 1; i <= 10; i++) {
             this.jdbcTemplate.update("insert into CUSTOMER values (?, 0, ?, 100000)",
                                       i, "customer" + i);
         }
 
-        JobExecution jobExecution = jobLauncherTestUtils.launchJob();
+        JobExecution jobExecution = jobOperatorTestUtils.startJob();
 
 
         Assert.assertEquals("COMPLETED", jobExecution.getExitStatus().getExitCode());
@@ -129,7 +129,7 @@ The following listing shows an example with JUnit 5 in XML configuration style:
 public class SkipSampleFunctionalTests {
 
     @Autowired
-    private JobLauncherTestUtils jobLauncherTestUtils;
+    private JobOperatorTestUtils jobOperatorTestUtils;
 
     private JdbcTemplate jdbcTemplate;
 
@@ -140,14 +140,14 @@ public class SkipSampleFunctionalTests {
 
     @Test
     public void testJob(@Autowired Job job) throws Exception {
-        this.jobLauncherTestUtils.setJob(job);
+        this.jobOperatorTestUtils.setJob(job);
         this.jdbcTemplate.update("delete from CUSTOMER");
         for (int i = 1; i <= 10; i++) {
             this.jdbcTemplate.update("insert into CUSTOMER values (?, 0, ?, 100000)",
                                       i, "customer" + i);
         }
 
-        JobExecution jobExecution = jobLauncherTestUtils.launchJob();
+        JobExecution jobExecution = jobOperatorTestUtils.startJob();
 
 
         Assert.assertEquals("COMPLETED", jobExecution.getExitStatus().getExitCode());
@@ -162,15 +162,15 @@ public class SkipSampleFunctionalTests {
 
 For complex batch jobs, test cases in the end-to-end testing approach may become
 unmanageable. It these cases, it may be more useful to have test cases to test individual
-steps on their own. The `JobLauncherTestUtils` class contains a method called `launchStep`,
+steps on their own. The `JobOperatorTestUtils` class contains a method called `launchStep`,
 which takes a step name and runs just that particular `Step`. This approach allows for
 more targeted tests letting the test set up data for only that step and to validate its
-results directly. The following example shows how to use the `launchStep` method to load a
+results directly. The following example shows how to use the `startStep` method to start a
 `Step` by name:
 
 [source, java]
 ----
-JobExecution jobExecution = jobLauncherTestUtils.launchStep("loadFileStep");
+JobExecution jobExecution = jobOperatorTestUtils.startStep("loadFileStep");
 ----
 
 

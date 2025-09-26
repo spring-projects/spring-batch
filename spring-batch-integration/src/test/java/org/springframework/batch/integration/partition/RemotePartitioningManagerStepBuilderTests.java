@@ -38,10 +38,7 @@ import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.util.ReflectionTestUtils.getField;
 
 /**
@@ -93,20 +90,6 @@ class RemotePartitioningManagerStepBuilderTests {
 
 		// then
 		assertThat(expectedException).hasMessage("messagingTemplate must not be null");
-	}
-
-	@Test
-	void jobExplorerMustNotBeNull() {
-		// given
-		final RemotePartitioningManagerStepBuilder builder = new RemotePartitioningManagerStepBuilder("step",
-				this.jobRepository);
-
-		// when
-		final Exception expectedException = assertThrows(IllegalArgumentException.class,
-				() -> builder.jobExplorer(null));
-
-		// then
-		assertThat(expectedException).hasMessage("jobExplorer must not be null");
 	}
 
 	@Test
@@ -207,6 +190,7 @@ class RemotePartitioningManagerStepBuilderTests {
 		// given
 		int gridSize = 5;
 		int startLimit = 3;
+		DirectChannel inputChannel = new DirectChannel();
 		DirectChannel outputChannel = new DirectChannel();
 		Partitioner partitioner = Mockito.mock();
 		StepExecutionAggregator stepExecutionAggregator = (result, executions) -> {
@@ -214,6 +198,7 @@ class RemotePartitioningManagerStepBuilderTests {
 
 		// when
 		Step step = new RemotePartitioningManagerStepBuilder("managerStep", this.jobRepository)
+			.inputChannel(inputChannel)
 			.outputChannel(outputChannel)
 			.partitioner("workerStep", partitioner)
 			.gridSize(gridSize)

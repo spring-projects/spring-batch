@@ -21,8 +21,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Metrics;
 import io.micrometer.observation.ObservationRegistry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -31,8 +29,6 @@ import org.springframework.batch.core.listener.StepExecutionListener;
 import org.springframework.batch.core.annotation.AfterStep;
 import org.springframework.batch.core.annotation.BeforeStep;
 import org.springframework.batch.core.listener.StepListenerFactoryBean;
-import org.springframework.batch.core.observability.BatchStepObservationConvention;
-import org.springframework.batch.core.observability.DefaultBatchStepObservationConvention;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.support.ReflectionUtils;
@@ -84,24 +80,8 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 		this.properties = new CommonStepProperties(parent.properties);
 	}
 
-	/**
-	 * Sets the step observation convention.
-	 * @param observationConvention the step observation convention (optional)
-	 * @return this to enable fluent chaining
-	 * @since 5.1
-	 */
-	public B observationConvention(BatchStepObservationConvention observationConvention) {
-		properties.observationConvention = observationConvention;
-		return self();
-	}
-
 	public B observationRegistry(ObservationRegistry observationRegistry) {
 		properties.observationRegistry = observationRegistry;
-		return self();
-	}
-
-	public B meterRegistry(MeterRegistry meterRegistry) {
-		properties.meterRegistry = meterRegistry;
 		return self();
 	}
 
@@ -156,19 +136,9 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 	protected void enhance(AbstractStep step) {
 		step.setJobRepository(properties.getJobRepository());
 
-		BatchStepObservationConvention observationConvention = properties.getObservationConvention();
-		if (observationConvention != null) {
-			step.setObservationConvention(observationConvention);
-		}
-
 		ObservationRegistry observationRegistry = properties.getObservationRegistry();
 		if (observationRegistry != null) {
 			step.setObservationRegistry(observationRegistry);
-		}
-
-		MeterRegistry meterRegistry = properties.getMeterRegistry();
-		if (meterRegistry != null) {
-			step.setMeterRegistry(meterRegistry);
 		}
 
 		Boolean allowStartIfComplete = properties.allowStartIfComplete;
@@ -196,11 +166,7 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 
 		private JobRepository jobRepository;
 
-		private BatchStepObservationConvention observationConvention = new DefaultBatchStepObservationConvention();
-
 		private ObservationRegistry observationRegistry = ObservationRegistry.NOOP;
-
-		private MeterRegistry meterRegistry = Metrics.globalRegistry;
 
 		public CommonStepProperties() {
 		}
@@ -210,9 +176,7 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 			this.startLimit = properties.startLimit;
 			this.allowStartIfComplete = properties.allowStartIfComplete;
 			this.jobRepository = properties.jobRepository;
-			this.observationConvention = properties.observationConvention;
 			this.observationRegistry = properties.observationRegistry;
-			this.meterRegistry = properties.meterRegistry;
 			this.stepExecutionListeners = new ArrayList<>(properties.stepExecutionListeners);
 		}
 
@@ -224,28 +188,12 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 			this.jobRepository = jobRepository;
 		}
 
-		public BatchStepObservationConvention getObservationConvention() {
-			return observationConvention;
-		}
-
-		public void setObservationConvention(BatchStepObservationConvention observationConvention) {
-			this.observationConvention = observationConvention;
-		}
-
 		public ObservationRegistry getObservationRegistry() {
 			return observationRegistry;
 		}
 
 		public void setObservationRegistry(ObservationRegistry observationRegistry) {
 			this.observationRegistry = observationRegistry;
-		}
-
-		public MeterRegistry getMeterRegistry() {
-			return meterRegistry;
-		}
-
-		public void setMeterRegistry(MeterRegistry meterRegistry) {
-			this.meterRegistry = meterRegistry;
 		}
 
 		public String getName() {

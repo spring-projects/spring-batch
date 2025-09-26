@@ -16,7 +16,9 @@
 package org.springframework.batch.core.configuration.support;
 
 import org.springframework.batch.core.configuration.BatchConfigurationException;
-import org.springframework.batch.core.configuration.JobRegistry;
+import org.springframework.batch.core.job.DefaultJobKeyGenerator;
+import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.JobKeyGenerator;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MongoJobRepositoryFactoryBean;
@@ -24,6 +26,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.MongoTransactionManager;
 import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.transaction.annotation.Isolation;
 
 /**
  * Base {@link Configuration} class that provides common MongoDB-based infrastructure
@@ -34,7 +37,6 @@ import org.springframework.data.mongodb.core.MongoOperations;
  *
  * <ul>
  * <li>a {@link JobRepository} named "jobRepository"</li>
- * <li>a {@link JobRegistry} named "jobRegistry"</li>
  * <li>a {@link JobOperator} named "jobOperator"</li>
  * <li>a {@link org.springframework.batch.core.scope.StepScope} named "stepScope"</li>
  * <li>a {@link org.springframework.batch.core.scope.JobScope} named "jobScope"</li>
@@ -115,6 +117,35 @@ public class MongoDefaultBatchConfiguration extends DefaultBatchConfiguration {
 			}
 		}
 		return this.applicationContext.getBean("transactionManager", MongoTransactionManager.class);
+	}
+
+	/**
+	 * Return the value of the {@code validateTransactionState} parameter. Defaults to
+	 * {@code true}.
+	 * @return true if the transaction state should be validated, false otherwise
+	 */
+	protected boolean getValidateTransactionState() {
+		return true;
+	}
+
+	/**
+	 * Return the transaction isolation level when creating job executions. Defaults to
+	 * {@link Isolation#SERIALIZABLE}.
+	 * @return the transaction isolation level when creating job executions
+	 */
+	protected Isolation getIsolationLevelForCreate() {
+		return Isolation.SERIALIZABLE;
+	}
+
+	/**
+	 * A custom implementation of the {@link JobKeyGenerator}. The default, if not
+	 * injected, is the {@link DefaultJobKeyGenerator}.
+	 * @return the generator that creates the key used in identifying {@link JobInstance}
+	 * objects
+	 * @since 5.1
+	 */
+	protected JobKeyGenerator getJobKeyGenerator() {
+		return new DefaultJobKeyGenerator();
 	}
 
 }

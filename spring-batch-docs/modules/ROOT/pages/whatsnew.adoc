@@ -1,175 +1,196 @@
 [[whatsNew]]
-= What's new in Spring Batch 5.2
+= What's new in Spring Batch 6
 
-This section highlights the major changes in Spring Batch 5.2. For the complete list of changes, please refer to the https://github.com/spring-projects/spring-batch/releases[release notes].
+This section highlights the major changes in Spring Batch 6.0. For the complete list of changes, please refer to the https://github.com/spring-projects/spring-batch/releases[release notes].
 
-Spring Batch 5.2 includes the following features:
+Spring Batch 6.0 includes the following features and improvements:
 
 * xref:whatsnew.adoc#dependencies-upgrade[Dependencies upgrade]
-* xref:whatsnew.adoc#mongodb-job-repository-support[MongoDB job repository support]
-* xref:whatsnew.adoc#new-resourceless-job-repository[New resourceless job repository]
-* xref:whatsnew.adoc#composite-item-reader-implementation[Composite Item Reader implementation]
-* xref:whatsnew.adoc#new-adapters-for-java-util-function-apis[New adapters for java.util.function APIs]
-* xref:whatsnew.adoc#concurrent-steps-with-blocking-queue-item-reader-and-writer[Concurrent steps with blocking queue item reader and writer]
-* xref:whatsnew.adoc#query-hints-support[Query hints support in JPA item readers]
-* xref:whatsnew.adoc#data-class-support[Data class support in JDBC item readers]
-* xref:whatsnew.adoc#configurable-line-separator-in-recursivecollectionlineaggregator[Configurable line separator in RecursiveCollectionLineAggregator]
-* xref:whatsnew.adoc#job-registration-improvements[Job registration improvements]
+* xref:whatsnew.adoc#batch-infrastrucutre-configuration-improvements[Batch infrastructure configuration improvements]
+* xref:whatsnew.adoc#new-implementation-of-the-chunk-oriented-processing-model[New implementation of the chunk-oriented processing model]
+* xref:whatsnew.adoc#new-concurrency-model[New concurrency model]
+* xref:whatsnew.adoc#new-command-line-operator[New command line operator]
+* xref:whatsnew.adoc#ability-to-recover-failed-job-executions[Ability to recover failed job executions]
+* xref:whatsnew.adoc#ability-to-stop-all-kind-of-steps[Ability to stop all kinds of steps]
+* xref:whatsnew.adoc#observability-with-jfr[Observability support with the Java Flight Recorder (JFR)]
+* xref:whatsnew.adoc#deprecations-and-pruning[Deprecations and pruning]
 
 [[dependencies-upgrade]]
 == Dependencies upgrade
 
-In this release, the Spring dependencies are upgraded to the following versions:
+In this major release, the Spring dependencies are upgraded to the following versions:
 
-* Spring Framework 6.2.0
-* Spring Integration 6.4.0
-* Spring Data 3.4.0
-* Spring Retry 2.0.10
-* Spring LDAP 3.2.8
-* Spring AMQP 3.2.0
-* Spring Kafka 3.3.0
-* Micrometer 1.14.1
+* Spring Framework 7.0
+* Spring Integration 7.0
+* Spring Data 4.0
+* Spring LDAP 4.0
+* Spring AMQP 4.0
+* Spring Kafka 4.0
+* Micrometer 1.16
 
-[[mongodb-job-repository-support]]
-== MongoDB job repository support
+[[batch-infrastrucutre-configuration-improvements]]
+== Batch infrastructure configuration improvements
 
-This release introduces the first NoSQL job repository implementation which is backed by MongoDB.
-Similar to relational job repository implementations, Spring Batch comes with a script to create the
-necessary collections in MongoDB in order to save and retrieve batch meta-data.
+=== New annotations and classes for batch infrastructure configuration
 
-This implementation requires MongoDB version 4 or later and is based on Spring Data MongoDB.
-In order to use this job repository, all you need to do is define a `MongoTemplate` and a
-`MongoTransactionManager` which are required by the newly added `MongoJobRepositoryFactoryBean`:
+Before v6, the `@EnableBatchProcessing` annotation was tied to a JDBC-based infrastructure. This is not the case anymore. Two new annotations have been introduced to configure the underlying job repository: `@EnableJdbcJobRepository` and `@EnableMongoJobRepository`.
 
-```
-@Bean
-public JobRepository jobRepository(MongoTemplate mongoTemplate, MongoTransactionManager transactionManager) throws Exception {
-	MongoJobRepositoryFactoryBean jobRepositoryFactoryBean = new MongoJobRepositoryFactoryBean();
-	jobRepositoryFactoryBean.setMongoOperations(mongoTemplate);
-	jobRepositoryFactoryBean.setTransactionManager(transactionManager);
-	jobRepositoryFactoryBean.afterPropertiesSet();
-	return jobRepositoryFactoryBean.getObject();
+Starting from v6, `@EnableBatchProcessing` allows you to configure common attributes for the batch infrastructure, while store-specific attributes can be specified with the new dedicated annotations.
+
+Here is an example of how to use these annotations:
+
+[source, java]
+----
+@EnableBatchProcessing(taskExecutorRef = "batchTaskExecutor")
+@EnableJdbcJobRepository(dataSourceRef = "batchDataSource", transactionManagerRef = "batchTransactionManager")
+class MyJobConfiguration {
+
+	@Bean
+	public Job job(JobRepository jobRepository) {
+		return new JobBuilder("job", jobRepository)
+                    // job flow omitted
+                    .build();
+	}
 }
-```
+----
 
-Once the MongoDB job repository defined, you can inject it in any job or step as a regular job repository.
-You can find a complete example in the https://github.com/spring-projects/spring-batch/blob/main/spring-batch-core/src/test/java/org/springframework/batch/core/repository/support/MongoDBJobRepositoryIntegrationTests.java[MongoDBJobRepositoryIntegrationTests].
+Similarly, the programmatic model based on `DefaultBatchConfiguration` has been updated by introducing two new configuration classes to define store-specific attributes: `JdbcDefaultBatchConfiguration` and `MongoDefaultBatchConfiguration`.
+These classes can be used to configure specific attributes of each job repository as well as other batch infrastructure beans programmatically.
 
-[[new-resourceless-job-repository]]
-== New resourceless job repository
+=== Resourceless batch infrastructure by default
 
-In v5, the in-memory Map-based job repository implementation was removed for several reasons.
-The only job repository implementation that was left in Spring Batch was the JDBC implementation, which requires a data source.
-While this works well with in-memory databases like H2 or HSQLDB, requiring a data source was a strong constraint
-for many users of our community who used to use the Map-based repository without any additional dependency.
+The `DefaultBatchConfiguration` class has been updated to provide a "resourceless" batch infrastructure by default (based on the `ResourcelessJobRepository` implementation introduced in v5.2). This means that it no longer requires an in-memory database (like H2 or HSQLDB) for the job repository, which was previously necessary for batch metadata storage.
 
-In this release, we introduce a `JobRepository` implementation that does not use or store batch meta-data in any form
-(not even in-memory). It is a "NoOp" implementation that throws away batch meta-data and does not interact with any resource
-(hence the name "resourceless job repository", which is named after the "resourceless transaction manager").
+Moreover, this change will improve the default performance of batch applications when the meta-data is not used, as the `ResourcelessJobRepository` does not require any database connections or transactions.
 
-This implementation is intended for use-cases where restartability is not required and where the execution context is not involved
-in any way (like sharing data between steps through the execution context, or partitioned steps where partitions meta-data is
-shared between the manager and workers through the execution context, etc).
+Finally, this change will help to reduce the memory footprint of batch applications, as the in-memory database is no longer required for metadata storage.
 
-This implementation is suitable for one-time jobs executed in their own JVM. It works with transactional steps (configured with
-a `DataSourceTransactionManager` for instance) as well as non-transactional steps (configured with a `ResourcelessTransactionManager`).
-The implementation is not thread-safe and should not be used in any concurrent environment.
+=== Batch infrastructure configuration simplification
 
-[[composite-item-reader-implementation]]
-== Composite Item Reader implementation
+Before v6, the typical configuration of a non-trivial Spring Batch application was quite complex and required a lot of beans: `JobRepository`, `JobLauncher`, `JobExplorer`, `JobOperator`, `JobRegistry`, `JobRegistrySmartInitializingSingleton` and so on. This required a lot of configuration code, like for example the need to configure the same execution context serializer on both the `JobRepository` and `JobExplorer`.
 
-Similar to the `CompositeItemProcessor` and `CompositeItemWriter`, we introduce a new `CompositeItemReader` implementation
-that is designed to read data sequentially from several sources having the same format. This is useful when data is spread
-over different resources and writing a custom reader is not an option.
+In this release, several changes have been made to simplify the batch infrastructure configuration:
 
-A `CompositeItemReader` works like other composite artifacts, by delegating the reading operation to regular item readers
-in order. Here is a quick example showing a composite reader that reads persons data from a flat file then from a database table:
+* The `JobRepository` now extends the `JobExplorer` interface, so there is no need to define a separate `JobExplorer` bean.
+* The `JobOperator` now extends the `JobLauncher` interface, so there is no need to define a separate `JobLauncher` bean.
+* The `JobRegistry` is now optional, and smart enough to register jobs automatically, so there is no need to define a separate `JobRegistrySmartInitializingSingleton` bean.
+* The transaction manager is now optional, and a default `ResourcelessTransactionManager` is used if none is provided.
 
-```
+This reduces the number of beans required for a typical batch application and simplifies the configuration code.
+
+[[new-implementation-of-the-chunk-oriented-processing-model]]
+== New implementation of the chunk-oriented processing model
+
+This is not a new feature, but rather a new implementation of the chunk-oriented processing model. This new implementation was introduced as an experimental addition in version 5.1, and is now available as stable in version 6.0.
+
+The new implementation is provided in the `ChunkOrientedStep` class, which is a replacement for the `ChunkOrientedTasklet` / `TaskletStep` classes.
+
+Here is an example of how to define a `ChunkOrientedStep` by using its builder:
+
+[source, java]
+----
 @Bean
-public FlatFileItemReader<Person> itemReader1() {
-    return new FlatFileItemReaderBuilder<Person>()
-            .name("personFileItemReader")
-            .resource(new FileSystemResource("persons.csv"))
-            .delimited()
-            .names("id", "name")
-            .targetType(Person.class)
-            .build();
+public Step chunkOrientedStep(JobRepository jobRepository, JdbcTransactionManager transactionManager,
+        ItemReader<Person> itemReader, ItemProcessor<Person, Person> itemProcessor, ItemWriter<Person> itemWriter) {
+    int chunkSize = 100;
+    return new ChunkOrientedStepBuilder<Person, Person>(jobRepository, transactionManager, chunkSize)
+        .reader(itemReader)
+        .processor(itemProcessor)
+        .writer(itemWriter)
+        .build();
 }
+----
 
+Moreover, fault-tolerance features were adapted as follows:
+
+- The retry feature is now based on the retry functionality introduced in https://docs.spring.io/spring/reference/7.0/core/resilience.html[Spring Framework 7], instead of the previous Spring Retry library
+- The skip feature has been slightly adapted to the new implementation, which is now only based entirely on the `SkipPolicy` interface
+
+Here is a quick example of how to use the retry and skip features with the new `ChunkOrientedStep`:
+
+[source, java]
+----
 @Bean
-public JdbcCursorItemReader<Person> itemReader2() {
-    String sql = "select * from persons";
-    return new JdbcCursorItemReaderBuilder<Person>()
-            .name("personTableItemReader")
-            .dataSource(dataSource())
-            .sql(sql)
-            .beanRowMapper(Person.class)
-            .build();
+public Step faulTolerantChunkOrientedStep(JobRepository jobRepository, JdbcTransactionManager transactionManager,
+        ItemReader<Person> itemReader, ItemProcessor<Person, Person> itemProcessor, ItemWriter<Person> itemWriter) {
+
+    // retry policy configuration
+    int maxAttempts = 10;
+    var retrybaleExceptions = Set.of(TransientException.class);
+    RetryPolicy retryPolicy = RetryPolicy.builder()
+        .maxAttempts(maxAttempts)
+        .includes(retrybaleExceptions)
+        .build();
+
+    // skip policy configuration
+    int skipLimit = 50;
+    var skippableExceptions = Set.of(FlatFileParseException.class);
+    SkipPolicy skipPolicy = new LimitCheckingExceptionHierarchySkipPolicy(skippableExceptions, skipLimit);
+
+    // step configuration
+    int chunkSize = 100;
+    return new ChunkOrientedStepBuilder<Person, Person>(jobRepository, transactionManager, chunkSize)
+        .reader(itemReader)
+        .processor(itemProcessor)
+        .writer(itemWriter)
+        .faultTolerant()
+        .retryPolicy(retryPolicy)
+        .skipPolicy(skipPolicy)
+        .build();
 }
+----
 
-@Bean
-public CompositeItemReader<Person> itemReader() {
-    return new CompositeItemReader<>(Arrays.asList(itemReader1(), itemReader2()));
-}
-```
+Please refer to the https://github.com/spring-projects/spring-batch/wiki/Spring-Batch-6.0-Migration-Guide[migration guide] for more details on how to migrate from the previous implementation to the new one.
 
-[[new-adapters-for-java-util-function-apis]]
-== New adapters for java.util.function APIs
+[[new-concurrency-model]]
+== New concurrency model
 
-Similar to `FucntionItemProcessor` that adapts a `java.util.function.Function` to an item processor, this release
-introduces several new adapters for other `java.util.function` interfaces like `Supplier`, `Consumer` and `Predicate`.
+Prior to this release, the concurrency model based on the "parallel iteration" concept required a lot of state synchronization at different levels and had several limitations related to throttling and backpressure leading to confusing transaction semantics and poor performance.
 
-The newly added adapters are: `SupplierItemReader`, `ConsumerItemWriter` and `PredicateFilteringItemProcessor`.
-For more details about these new adapters, please refer to the https://github.com/spring-projects/spring-batch/tree/main/spring-batch-infrastructure/src/main/java/org/springframework/batch/item/function[org.springframework.batch.item.function] package.
+This release revisits that model and comes with a new, simplified approach to concurrency based on the producer-consumer pattern. A concurrent chunk-oriented step now uses a bounded internal queue between the producer thread and consumer threads. Items are put in the queue as soon as they are ready to be processed, and consumer threads take items from the queue as soon as they are available for processing. Once a chunk is ready to be written, the producer thread pauses until the chunk is written, and then resumes producing items.
 
-[[concurrent-steps-with-blocking-queue-item-reader-and-writer]]
-== Concurrent steps with blocking queue item reader and writer
+This new model is more efficient, easier to understand and provides better performance for concurrent executions.
 
-The https://en.wikipedia.org/wiki/Staged_event-driven_architecture[staged event-driven architecture] (SEDA) is a
-powerful architecture style to process data in stages connected by queues. This style is directly applicable to data
-pipelines and easily implemented in Spring Batch thanks to the ability to design jobs as a sequence of steps.
+[[new-command-line-operator]]
+== New command line operator
 
-The only missing piece here is how to read data from and write data to intermediate queues. This release introduces an item reader
-and item writer to read data from and write it to a `BlockingQueue`. With these two new classes, one can design a first step
-that prepares data in a queue and a second step that consumes data from the same queue. This way, both steps can run concurrently
-to process data efficiently in a non-blocking, event-driven fashion.
+Spring Batch provided a `CommandLineJobRunner` since version 1. While this runner served its purpose well over the years, it started to show some limitations when it comes to extensibility and customisation. Many issues like static initialisation, non-standard way of handling options and parameters, lack of extensibility, etc have been reported.
 
-[[query-hints-support]]
-== Query hints support in JPA item readers
+Moreover, all these issues made it impossible to reuse that runner in Spring Boot, which resulted in duplicate code in both projects as well behaviour divergence (like job parameters incrementer behaviour differences) that is confusing to many users.
 
-Up until version 5.1, the JPA cursor and paging item readers did not support query hints (like the fetch size, timeout, etc).
-Users were required to provide a custom query provider in order to specify custom hints.
+This release introduces a modern version of `CommandLineJobRunner`, named `CommandLineJobOperator`, that allows you to operate batch jobs from the command line (start, stop, restart and so on) and that is customisable, extensible and updated to the new changes introduced in Spring Batch 6.
 
-In this release, JPA readers and their respective builders were updated to accept query hints when defining the JPA query to use.
+[[ability-to-recover-failed-job-executions]]
+== Ability to recover failed job executions
 
-[[data-class-support]]
-== Data class support in JDBC item readers
+Prior to this release, if a job execution fails abruptly, it was not possible to recover it without a manual database update. This was error-prone and not consistent across different job repositories (as it required a few SQL statements for JDBC databases and some custom statements for NoSQL stores).
 
-This release introduces a new method in the builders of JDBC cursor and paging item readers that allows users to specify a
-`DataClassRowMapper` when the type of items is a data class (Java record or Kotlin data class).
+This release introduces a new method named `recover` in the `JobOperator` interface that allows you to recover failed job executions consistently across all job repositories.
 
-The new method named `dataRowMapper(TargetType.class)` is similar to the `beanRowMapper(TargetType.class)` and is designed
-to make the configuration of row mappers consistent between regular classes (Java beans) and data classes (Java records).
+[[ability-to-stop-all-kind-of-steps]]
+== Ability to stop all kinds of steps
 
-[[configurable-line-separator-in-recursivecollectionlineaggregator]]
-== Configurable line separator in RecursiveCollectionLineAggregator
+As of v5.2, it is only possible to externally stop `Tasklet` steps through  `JobOperator#stop`.
+If a custom `Step` implementation wants to handle external stop signals, it just can't.
 
-Up until now, the line separator property in `RecursiveCollectionLineAggregator` was set to the System's line separator value.
-While it is possible to change the value through a System property, this configuration style is not consistent with other properties
-of batch artifacts.
+This release adds a new interface, named `StoppableStep`, that extends `Step` and which can be implemented by any step that is able to handle stop signals.
 
-This release introduces a new setter in `RecursiveCollectionLineAggregator` that allows users to configure a custom value of
-the line separator without having to use System properties.
+[[observability-with-jfr]]
+== Observability with the Java Flight Recorder (JFR)
 
-[[job-registration-improvements]]
-== Job registration improvements
+In addition to the existing Micrometer metrics, Spring Batch 6.0 introduces support for the Java Flight Recorder (JFR) to provide enhanced observability capabilities.
 
-In version 5.1, the default configuration of batch infrastructure beans was updated to automatically populate the job registry
-by defining a `JobRegistryBeanPostProcessor` bean in the application context. After a recent change in Spring Framework
-that changed the log level in `BeanPostProcessorChecker`, several warnings related to the `JobRegistryBeanPostProcessor` were
-logged in a typical Spring Batch application. These warnings are due to the `JobRegistryBeanPostProcessor` having a dependency
-to a `JobRegistry` bean, which is not recommended and might cause bean lifecycle issues.
+JFR is a powerful profiling and event collection framework built into the Java Virtual Machine (JVM). It allows you to capture detailed information about the runtime behavior of your applications with minimal performance overhead.
 
-These issues have been resolved in this release by changing the mechanism of populating the `JobRegistry` from using a `BeanPostProcessor`
-to using a `SmartInitializingSingleton`. The `JobRegistryBeanPostProcessor` is now deprecated in favor of the newly added `JobRegistrySmartInitializingSingleton`.
+This release introduces several JFR events to monitor key aspects of a batch job execution, including job and step executions, item reads and writes, as well as transaction boundaries.
+
+[[deprecations-and-pruning]]
+== Deprecations and pruning
+
+As with any major release, some features have been deprecated or removed in Spring Batch 6.0. The following changes are worth noting:
+
+* All deprecated APIs and features from previous versions have been removed
+* Modular configuration through `@EnableBatchProcessing(modular = true)` has been deprecated
+* Several APIs have been deprecated in this version, in order to simplify the core API and reduce its scope
+
+Fore more details, please refer to the https://github.com/spring-projects/spring-batch/wiki/Spring-Batch-6.0-Migration-Guide[migration guide].

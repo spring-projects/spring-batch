@@ -52,7 +52,7 @@ public TaskExecutor taskExecutor() {
 @Bean
 public Step sampleStep(TaskExecutor taskExecutor, JobRepository jobRepository, PlatformTransactionManager transactionManager) {
 	return new StepBuilder("sampleStep", jobRepository)
-				.<String, String>chunk(10, transactionManager)
+				.<String, String>chunk(10).transactionManager(transactionManager)
 				.reader(itemReader())
 				.writer(itemWriter())
 				.taskExecutor(taskExecutor)
@@ -103,7 +103,7 @@ follows:
 @Bean
 public Step sampleStep(TaskExecutor taskExecutor, JobRepository jobRepository, PlatformTransactionManager transactionManager) {
 	return new StepBuilder("sampleStep", jobRepository)
-				.<String, String>chunk(10, transactionManager)
+				.<String, String>chunk(10).transactionManager(transactionManager)
 				.reader(itemReader())
 				.writer(itemWriter())
 				.taskExecutor(taskExecutor)

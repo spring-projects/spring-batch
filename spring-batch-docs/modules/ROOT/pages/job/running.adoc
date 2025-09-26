@@ -3,13 +3,13 @@
 
 At a minimum, launching a batch job requires two things: the
 `Job` to be launched and a
-`JobLauncher`. Both can be contained within the same
+`JobOperator`. Both can be contained within the same
 context or different contexts. For example, if you launch jobs from the
 command line, a new JVM is instantiated for each `Job`. Thus, every
-job has its own `JobLauncher`. However, if
+job has its own `JobOperator`. However, if
 you run from within a web container that is within the scope of an
 `HttpRequest`, there is usually one
-`JobLauncher` (configured for asynchronous job
+`JobOperator` (configured for asynchronous job
 launching) that multiple requests invoke to launch their jobs.
 
 [[runningJobsFromCommandLine]]
@@ -24,67 +24,50 @@ to launch a Java process besides a shell script, such as Perl, Ruby, or
 even build tools, such as Ant or Maven. However, because most people
 are familiar with shell scripts, this example focuses on them.
 
-[[commandLineJobRunner]]
-=== The CommandLineJobRunner
+[[commandLineJobOperator]]
+=== The CommandLineJobOperator
 
 Because the script launching the job must kick off a Java
 Virtual Machine, there needs to be a class with a `main` method to act
 as the primary entry point. Spring Batch provides an implementation
 that serves this purpose:
-`CommandLineJobRunner`. Note
+`CommandLineJobOperator`. Note
 that this is just one way to bootstrap your application. There are
 many ways to launch a Java process, and this class should in no way be
-viewed as definitive. The `CommandLineJobRunner`
+viewed as definitive. The `CommandLineJobOperator`
 performs four tasks:
 
 * Load the appropriate `ApplicationContext`.
 * Parse command line arguments into `JobParameters`.
 * Locate the appropriate job based on arguments.
-* Use the `JobLauncher` provided in the application context to launch the job.
+* Use the `JobOperator` provided in the application context to launch the job.
 
 All of these tasks are accomplished with only the arguments passed in.
 The following table describes the required arguments:
 
-.CommandLineJobRunner arguments
+.CommandLineJobOperator arguments
 |===============
-|`jobPath`|The location of the XML file that is used to
+|`jobClass`|The fully qualified name of the job configuration class used to
 create an `ApplicationContext`. This file
 should contain everything needed to run the complete
 `Job`.
-|`jobName`|The name of the job to be run.
+|`operation`|The name of the operation to execute on the job. Can be one of [`start`, `startNextInstance`, `stop`, `restart`, `abandon`]
+|`jobName` or `jobExecutionId`|Depending on the operation, this can be the name of the job to start or the execution ID of the job to stop, restart or abandon.
 |===============
 
-These arguments must be passed in, with the path first and the name second. All arguments
-after these are considered to be job parameters, are turned into a `JobParameters` object,
-and must be in the format of `name=value`.
+When starting a job, all arguments after these are considered to be job parameters, are turned into a `JobParameters` object,
+and must be in the format of `name=value`. In the case of stopping, restarting or abandoning a job, the `jobExecutionId` is
+expected as the 4th argument, and all remaining arguments are ignored.
 
-
-[tabs]
-====
-Java::
-+
 The following example shows a date passed as a job parameter to a job defined in Java:
-+
+
 [source]
 ----
-<bash$ java CommandLineJobRunner io.spring.EndOfDayJobConfiguration endOfDay schedule.date=2007-05-05,java.time.LocalDate
+<bash$ java CommandLineJobOperator io.spring.EndOfDayJobConfiguration start endOfDay schedule.date=2007-05-05,java.time.LocalDate
 ----
 
-XML::
-+
-The following example shows a date passed as a job parameter to a job defined in XML:
-+
-[source]
-----
-<bash$ java CommandLineJobRunner endOfDayJob.xml endOfDay schedule.date=2007-05-05,java.time.LocalDate
-----
 
-====
-
-
-[NOTE]
-=====
-By default, the `CommandLineJobRunner` uses a `DefaultJobParametersConverter` that implicitly converts
+By default, the `CommandLineJobOperator` uses a `DefaultJobParametersConverter` that implicitly converts
 key/value pairs to identifying job parameters. However, you can explicitly specify
 which job parameters are identifying and which are not by suffixing them with `true` or `false`, respectively.
 
@@ -92,89 +75,12 @@ In the following example, `schedule.date` is an identifying job parameter, while
 
 [source]
 ----
-<bash$ java CommandLineJobRunner endOfDayJob.xml endOfDay \
+<bash$ java CommandLineJobOperator io.spring.EndOfDayJobConfiguration start endOfDay \
                                  schedule.date=2007-05-05,java.time.LocalDate,true \
                                  vendor.id=123,java.lang.Long,false
 ----
 
-[source]
-----
-<bash$ java CommandLineJobRunner io.spring.EndOfDayJobConfiguration endOfDay \
-                                 schedule.date=2007-05-05,java.time.LocalDate,true \
-                                 vendor.id=123,java.lang.Long,false
-----
-
-You can override this behavior by using a custom `JobParametersConverter`.
-=====
-
-
-[tabs]
-====
-Java::
-+
-In most cases, you would want to use a manifest to declare your `main` class in a jar. However,
-for simplicity, the class was used directly. This example uses the `EndOfDay`
-example from the xref:domain.adoc[The Domain Language of Batch]. The first
-argument is `io.spring.EndOfDayJobConfiguration`, which is the fully qualified class name
-to the configuration class that contains the Job. The second argument, `endOfDay`, represents
-the job name. The final argument, `schedule.date=2007-05-05,java.time.LocalDate`, is converted
-into a `JobParameter` object of type `java.time.LocalDate`.
-+
-The following example shows a sample configuration for `endOfDay` in Java:
-+
-[source, java]
-----
-@Configuration
-@EnableBatchProcessing
-public class EndOfDayJobConfiguration {
-
-    @Bean
-    public Job endOfDay(JobRepository jobRepository, Step step1) {
-        return new JobBuilder("endOfDay", jobRepository)
-    				.start(step1)
-    				.build();
-    }
-
-    @Bean
-    public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
-        return new StepBuilder("step1", jobRepository)
-    				.tasklet((contribution, chunkContext) -> null, transactionManager)
-    				.build();
-    }
-}
-----
-
-XML::
-+
-In most cases, you would want to use a manifest to declare your `main` class in a jar. However,
-for simplicity, the class was used directly. This example uses the `EndOfDay`
-example from the xref:domain.adoc[The Domain Language of Batch]. The first
-argument is `endOfDayJob.xml`, which is the Spring ApplicationContext that contains the
-`Job`. The second argument, `endOfDay,` represents the job name. The final argument,
-`schedule.date=2007-05-05,java.time.LocalDate`, is converted into a `JobParameter` object of type
-`java.time.LocalDate`.
-+
-The following example shows a sample configuration for `endOfDay` in XML:
-+
-[source, xml]
-----
-<job id="endOfDay">
-    <step id="step1" parent="simpleStep" />
-</job>
-
-<!-- Launcher details removed for clarity -->
-<beans:bean id="jobLauncher"
-         class="org.springframework.batch.core.launch.support.TaskExecutorJobLauncher" />
-----
-
-====
-
-
-
-The preceding example is overly simplistic, since there are many more requirements to a
-run a batch job in Spring Batch in general, but it serves to show the two main
-requirements of the `CommandLineJobRunner`: `Job` and `JobLauncher`.
-
+You can override this behavior by setting a custom `JobParametersConverter` on the `CommandLineJobOperator`.
 
 
 [[exitCodes]]
@@ -199,9 +105,8 @@ detail in Chapter 5. For the purposes of discussing exit codes, the
 only important thing to know is that an
 `ExitStatus` has an exit code property that is
 set by the framework (or the developer) and is returned as part of the
-`JobExecution` returned from the
-`JobLauncher`. The
-`CommandLineJobRunner` converts this string value
+`JobExecution` returned from the `JobOperator`. The
+`CommandLineJobOperator` converts this string value
 to a number by using the `ExitCodeMapper`
 interface:
 
@@ -209,32 +114,20 @@ interface:
 ----
 public interface ExitCodeMapper {
 
-    public int intValue(String exitCode);
+    int intValue(String exitCode);
 
 }
 ----
 
-The essential contract of an
-`ExitCodeMapper` is that, given a string exit
-code, a number representation will be returned. The default
-implementation used by the job runner is the `SimpleJvmExitCodeMapper`
+The essential contract of an `ExitCodeMapper` is that, given a string exit
+code, a number representation will be returned. The default implementation
+used by the job runner is the `SimpleJvmExitCodeMapper`
 that returns 0 for completion, 1 for generic errors, and 2 for any job
 runner errors such as not being able to find a
 `Job` in the provided context. If anything more
 complex than the three values above is needed, a custom
 implementation of the `ExitCodeMapper` interface
-must be supplied. Because the
-`CommandLineJobRunner` is the class that creates
-an `ApplicationContext` and, thus, cannot be
-'wired together', any values that need to be overwritten must be
-autowired. This means that if an implementation of
-`ExitCodeMapper` is found within the `BeanFactory`,
-it is injected into the runner after the context is created. All
-that needs to be done to provide your own
-`ExitCodeMapper` is to declare the implementation
-as a root level bean and ensure that it is part of the
-`ApplicationContext` that is loaded by the
-runner.
+must be supplied by setting it on the `CommandLineJobOperator`.
 
 [[runningJobsFromWebContainer]]
 == Running Jobs from within a Web Container
@@ -253,7 +146,7 @@ image::launch-from-request.png[Async Job Launcher Sequence from web container, s
 The controller in this case is a Spring MVC controller. See the
 Spring Framework Reference Guide for more about https://docs.spring.io/spring/docs/current/spring-framework-reference/web.html#mvc[Spring MVC].
 The controller launches a `Job` by using a
-`JobLauncher` that has been configured to launch
+`JobOperator` that has been configured to launch
 xref:job/running.adoc#runningJobsFromWebContainer[asynchronously], which
 immediately returns a `JobExecution`. The
 `Job` is likely still running. However, this
@@ -264,17 +157,17 @@ shows an example:
 [source, java]
 ----
 @Controller
-public class JobLauncherController {
+public class JobOperatorController {
 
     @Autowired
-    JobLauncher jobLauncher;
+    JobOperator jobOperator;
 
     @Autowired
     Job job;
 
-    @RequestMapping("/jobLauncher.html")
+    @RequestMapping("/jobOperator.html")
     public void handle() throws Exception{
-        jobLauncher.run(job, new JobParameters());
+        jobOperator.start(job, new JobParameters());
     }
 }
 ----

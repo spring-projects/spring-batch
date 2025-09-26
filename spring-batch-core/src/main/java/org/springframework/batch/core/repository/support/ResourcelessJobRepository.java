@@ -16,7 +16,6 @@
 package org.springframework.batch.core.repository.support;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -27,6 +26,7 @@ import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
+import org.springframework.lang.Nullable;
 
 /**
  * A {@link JobRepository} implementation that does not use or store batch meta-data. It
@@ -50,6 +50,14 @@ public class ResourcelessJobRepository implements JobRepository {
 
 	private JobExecution jobExecution;
 
+	private long stepExecutionIdIncrementer = 0L;
+
+	/*
+	 * ===================================================================================
+	 * Job operations
+	 * ===================================================================================
+	 */
+
 	@Override
 	public List<String> getJobNames() {
 		if (this.jobInstance == null) {
@@ -58,8 +66,41 @@ public class ResourcelessJobRepository implements JobRepository {
 		return Collections.singletonList(this.jobInstance.getJobName());
 	}
 
+	/*
+	 * ===================================================================================
+	 * Job instance operations
+	 * ===================================================================================
+	 */
+
+	@Override
+	public List<JobInstance> getJobInstances(String jobName, int start, int count) {
+		if (this.jobInstance == null) {
+			return Collections.emptyList();
+		}
+		return Collections.singletonList(this.jobInstance);
+	}
+
+	@Override
+	@Nullable
+	public JobInstance getJobInstance(@Nullable Long instanceId) {
+		return this.jobInstance;
+	}
+
+	@Override
+	@Nullable
+	public JobInstance getLastJobInstance(String jobName) {
+		return this.jobInstance;
+	}
+
+	@Override
+	@Nullable
+	public JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
+		return this.jobInstance;
+	}
+
 	@SuppressWarnings("removal")
 	@Override
+	@Deprecated(since = "6.0", forRemoval = true)
 	public boolean isJobInstanceExists(String jobName, JobParameters jobParameters) {
 		return false;
 	}
@@ -73,6 +114,38 @@ public class ResourcelessJobRepository implements JobRepository {
 	public JobInstance createJobInstance(String jobName, JobParameters jobParameters) {
 		this.jobInstance = new JobInstance(1L, jobName);
 		return this.jobInstance;
+	}
+
+	/*
+	 * ===================================================================================
+	 * Job execution operations
+	 * ===================================================================================
+	 */
+
+	@Override
+	@Nullable
+	public JobExecution getJobExecution(Long executionId) {
+		return this.jobExecution;
+	}
+
+	@Override
+	@Nullable
+	public JobExecution getLastJobExecution(String jobName, JobParameters jobParameters) {
+		return this.jobExecution;
+	}
+
+	@Override
+	@Nullable
+	public JobExecution getLastJobExecution(JobInstance jobInstance) {
+		return this.jobExecution;
+	}
+
+	@Override
+	public List<JobExecution> getJobExecutions(JobInstance jobInstance) {
+		if (this.jobExecution == null) {
+			return Collections.emptyList();
+		}
+		return Collections.singletonList(this.jobExecution);
 	}
 
 	@Override
@@ -91,35 +164,35 @@ public class ResourcelessJobRepository implements JobRepository {
 	}
 
 	@Override
-	public void add(StepExecution stepExecution) {
-		this.addAll(Collections.singletonList(stepExecution));
-	}
-
-	@Override
-	public void addAll(Collection<StepExecution> stepExecutions) {
-		this.jobExecution.addStepExecutions(new ArrayList<>(stepExecutions));
-	}
-
-	@Override
-	public void update(StepExecution stepExecution) {
-		stepExecution.setLastUpdated(LocalDateTime.now());
-		if (this.jobExecution.isStopping()) {
-			stepExecution.setTerminateOnly();
-		}
-	}
-
-	@Override
-	public void updateExecutionContext(StepExecution stepExecution) {
-		stepExecution.setLastUpdated(LocalDateTime.now());
-	}
-
-	@Override
 	public void updateExecutionContext(JobExecution jobExecution) {
 		jobExecution.setLastUpdated(LocalDateTime.now());
 	}
 
+	/*
+	 * ===================================================================================
+	 * Step execution operations
+	 * ===================================================================================
+	 */
+
 	@Override
+	@Nullable
+	public StepExecution getStepExecution(Long jobExecutionId, Long stepExecutionId) {
+		if (this.jobExecution == null || !this.jobExecution.getId().equals(jobExecutionId)) {
+			return null;
+		}
+		return this.jobExecution.getStepExecutions()
+			.stream()
+			.filter(stepExecution -> stepExecution.getId().equals(stepExecutionId))
+			.findFirst()
+			.orElse(null);
+	}
+
+	@Override
+	@Nullable
 	public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
+		if (this.jobExecution == null || !this.jobExecution.getJobInstance().getId().equals(jobInstance.getId())) {
+			return null;
+		}
 		return this.jobExecution.getStepExecutions()
 			.stream()
 			.filter(stepExecution -> stepExecution.getStepName().equals(stepName))
@@ -136,8 +209,28 @@ public class ResourcelessJobRepository implements JobRepository {
 	}
 
 	@Override
-	public JobExecution getLastJobExecution(String jobName, JobParameters jobParameters) {
-		return this.jobExecution;
+	public void add(StepExecution stepExecution) {
+		stepExecution.setId(this.stepExecutionIdIncrementer++);
+	}
+
+	@Override
+	public void addAll(Collection<StepExecution> stepExecutions) {
+		for (StepExecution stepExecution : stepExecutions) {
+			this.add(stepExecution);
+		}
+	}
+
+	@Override
+	public void update(StepExecution stepExecution) {
+		stepExecution.setLastUpdated(LocalDateTime.now());
+		if (this.jobExecution.isStopping()) {
+			stepExecution.setTerminateOnly();
+		}
+	}
+
+	@Override
+	public void updateExecutionContext(StepExecution stepExecution) {
+		stepExecution.setLastUpdated(LocalDateTime.now());
 	}
 
 }

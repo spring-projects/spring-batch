@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2023 the original author or authors.
+ * Copyright 2014-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,10 @@ import javax.sql.DataSource;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.ExitStatus;
+import org.springframework.batch.core.configuration.annotation.EnableJdbcJobRepository;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.annotation.AfterStep;
@@ -32,7 +34,6 @@ import org.springframework.batch.core.annotation.BeforeStep;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.job.builder.JobBuilder;
-import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemProcessor;
@@ -54,15 +55,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class StepScopeAnnotatedListenerIntegrationTests {
 
 	@Autowired
-	JobLauncherTestUtils jobLauncherTestUtils;
+	JobOperatorTestUtils jobOperatorTestUtils;
 
 	@Test
 	void test(@Autowired Job job) {
 		// given
-		this.jobLauncherTestUtils.setJob(job);
+		this.jobOperatorTestUtils.setJob(job);
 
 		// when
-		JobExecution jobExecution = jobLauncherTestUtils.launchStep("step-under-test");
+		JobExecution jobExecution = jobOperatorTestUtils.startStep("step-under-test");
 
 		// then
 		assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
@@ -96,17 +97,15 @@ class StepScopeAnnotatedListenerIntegrationTests {
 
 	@Configuration
 	@EnableBatchProcessing
+	@EnableJdbcJobRepository
 	static class TestConfig {
 
 		@Autowired
 		private PlatformTransactionManager transactionManager;
 
 		@Bean
-		JobLauncherTestUtils jobLauncherTestUtils(JobRepository jobRepository, JobLauncher jobLauncher) {
-			JobLauncherTestUtils jobLauncherTestUtils = new JobLauncherTestUtils();
-			jobLauncherTestUtils.setJobRepository(jobRepository);
-			jobLauncherTestUtils.setJobLauncher(jobLauncher);
-			return jobLauncherTestUtils;
+		JobOperatorTestUtils jobOperatorTestUtils(JobRepository jobRepository, JobOperator jobOperator) {
+			return new JobOperatorTestUtils(jobOperator, jobRepository);
 		}
 
 		@Bean

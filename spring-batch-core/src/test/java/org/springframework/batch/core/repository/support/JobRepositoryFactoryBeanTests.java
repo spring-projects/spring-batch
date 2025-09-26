@@ -100,7 +100,8 @@ class JobRepositoryFactoryBeanTests {
 
 		when(incrementerFactory.isSupportedIncrementerType("ORACLE")).thenReturn(true);
 		when(incrementerFactory.getSupportedIncrementerTypes()).thenReturn(new String[0]);
-		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_SEQ")).thenReturn(new StubIncrementer());
+		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_INSTANCE_SEQ"))
+			.thenReturn(new StubIncrementer());
 		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_EXECUTION_SEQ"))
 			.thenReturn(new StubIncrementer());
 		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "STEP_EXECUTION_SEQ"))
@@ -119,7 +120,8 @@ class JobRepositoryFactoryBeanTests {
 
 		incrementerFactory = mock();
 		when(incrementerFactory.isSupportedIncrementerType("ORACLE")).thenReturn(true);
-		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_SEQ")).thenReturn(new StubIncrementer());
+		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_INSTANCE_SEQ"))
+			.thenReturn(new StubIncrementer());
 		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_EXECUTION_SEQ"))
 			.thenReturn(new StubIncrementer());
 		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "STEP_EXECUTION_SEQ"))
@@ -139,7 +141,8 @@ class JobRepositoryFactoryBeanTests {
 
 		incrementerFactory = mock();
 		when(incrementerFactory.isSupportedIncrementerType("ORACLE")).thenReturn(true);
-		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_SEQ")).thenReturn(new StubIncrementer());
+		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_INSTANCE_SEQ"))
+			.thenReturn(new StubIncrementer());
 		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_EXECUTION_SEQ"))
 			.thenReturn(new StubIncrementer());
 		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "STEP_EXECUTION_SEQ"))
@@ -160,7 +163,8 @@ class JobRepositoryFactoryBeanTests {
 
 		incrementerFactory = mock();
 		when(incrementerFactory.isSupportedIncrementerType("ORACLE")).thenReturn(true);
-		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_SEQ")).thenReturn(new StubIncrementer());
+		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_INSTANCE_SEQ"))
+			.thenReturn(new StubIncrementer());
 		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_EXECUTION_SEQ"))
 			.thenReturn(new StubIncrementer());
 		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "STEP_EXECUTION_SEQ"))
@@ -180,7 +184,8 @@ class JobRepositoryFactoryBeanTests {
 
 		incrementerFactory = mock();
 		when(incrementerFactory.isSupportedIncrementerType("ORACLE")).thenReturn(true);
-		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_SEQ")).thenReturn(new StubIncrementer());
+		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_INSTANCE_SEQ"))
+			.thenReturn(new StubIncrementer());
 		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_EXECUTION_SEQ"))
 			.thenReturn(new StubIncrementer());
 		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "STEP_EXECUTION_SEQ"))
@@ -239,7 +244,7 @@ class JobRepositoryFactoryBeanTests {
 
 		when(incrementerFactory.isSupportedIncrementerType("HSQL")).thenReturn(true);
 		when(incrementerFactory.getSupportedIncrementerTypes()).thenReturn(new String[0]);
-		when(incrementerFactory.getIncrementer(databaseType, tablePrefix + "JOB_SEQ"))
+		when(incrementerFactory.getIncrementer(databaseType, tablePrefix + "JOB_INSTANCE_SEQ"))
 			.thenReturn(new StubIncrementer());
 		when(incrementerFactory.getIncrementer(databaseType, tablePrefix + "JOB_EXECUTION_SEQ"))
 			.thenReturn(new StubIncrementer());
@@ -334,8 +339,7 @@ class JobRepositoryFactoryBeanTests {
 	@Test
 	public void testDefaultJobKeyGenerator() throws Exception {
 		testCreateRepository();
-		@SuppressWarnings("rawtypes")
-		JobKeyGenerator<?> jobKeyGenerator = (JobKeyGenerator) ReflectionTestUtils.getField(factory, "jobKeyGenerator");
+		JobKeyGenerator jobKeyGenerator = (JobKeyGenerator) ReflectionTestUtils.getField(factory, "jobKeyGenerator");
 		assertEquals(DefaultJobKeyGenerator.class, jobKeyGenerator.getClass());
 	}
 
@@ -343,15 +347,14 @@ class JobRepositoryFactoryBeanTests {
 	public void testCustomJobKeyGenerator() throws Exception {
 		factory.setJobKeyGenerator(new CustomJobKeyGenerator());
 		testCreateRepository();
-		@SuppressWarnings("rawtypes")
-		JobKeyGenerator<?> jobKeyGenerator = (JobKeyGenerator) ReflectionTestUtils.getField(factory, "jobKeyGenerator");
+		JobKeyGenerator jobKeyGenerator = (JobKeyGenerator) ReflectionTestUtils.getField(factory, "jobKeyGenerator");
 		assertEquals(CustomJobKeyGenerator.class, jobKeyGenerator.getClass());
 	}
 
-	static class CustomJobKeyGenerator implements JobKeyGenerator<String> {
+	static class CustomJobKeyGenerator implements JobKeyGenerator {
 
 		@Override
-		public String generateKey(String source) {
+		public String generateKey(JobParameters source) {
 			return "1";
 		}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 the original author or authors.
+ * Copyright 2018-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import org.mockito.Mock;
 
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.tasklet.Tasklet;
-import org.springframework.integration.channel.DirectChannel;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -70,20 +69,6 @@ class RemotePartitioningWorkerStepBuilderTests {
 	}
 
 	@Test
-	void jobExplorerMustNotBeNull() {
-		// given
-		final RemotePartitioningWorkerStepBuilder builder = new RemotePartitioningWorkerStepBuilder("step",
-				this.jobRepository);
-
-		// when
-		final Exception expectedException = assertThrows(IllegalArgumentException.class,
-				() -> builder.jobExplorer(null));
-
-		// then
-		assertThat(expectedException).hasMessage("jobExplorer must not be null");
-	}
-
-	@Test
 	void stepLocatorMustNotBeNull() {
 		// given
 		final RemotePartitioningWorkerStepBuilder builder = new RemotePartitioningWorkerStepBuilder("step",
@@ -123,22 +108,6 @@ class RemotePartitioningWorkerStepBuilderTests {
 
 		// then
 		assertThat(expectedException).hasMessage("An InputChannel must be provided");
-	}
-
-	@Test
-	void testMandatoryJobExplorer() {
-		// given
-		DirectChannel inputChannel = new DirectChannel();
-		final RemotePartitioningWorkerStepBuilder builder = new RemotePartitioningWorkerStepBuilder("step",
-				this.jobRepository)
-			.inputChannel(inputChannel);
-
-		// when
-		final Exception expectedException = assertThrows(IllegalArgumentException.class,
-				() -> builder.tasklet(this.tasklet, this.transactionManager));
-
-		// then
-		assertThat(expectedException).hasMessage("A JobExplorer must be provided");
 	}
 
 }

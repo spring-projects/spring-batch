@@ -25,9 +25,9 @@ import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersBuilder;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.StepExecution;
-import org.springframework.batch.core.repository.explore.JobExplorer;
-import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.annotation.DirtiesContext;
@@ -47,6 +47,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @SpringJUnitConfig(MongoDBIntegrationTestConfiguration.class)
 public class MongoDBJobExplorerIntegrationTests {
 
+	@Autowired
+	private JobRepository jobRepository;
+
 	@BeforeAll
 	static void setUp(@Autowired MongoTemplate mongoTemplate) {
 		mongoTemplate.createCollection("BATCH_JOB_INSTANCE");
@@ -62,16 +65,16 @@ public class MongoDBJobExplorerIntegrationTests {
 	}
 
 	@Test
-	void testGetJobExecutionById(@Autowired JobLauncher jobLauncher, @Autowired Job job,
-			@Autowired JobExplorer jobExplorer) throws Exception {
+	void testGetJobExecutionById(@Autowired JobOperator jobOperator, @Autowired Job job,
+			@Autowired JobRepository jobRepository) throws Exception {
 		// given
 		JobParameters jobParameters = new JobParametersBuilder().addString("name", "testGetJobExecutionById")
 			.addLocalDateTime("runtime", LocalDateTime.now())
 			.toJobParameters();
-		JobExecution jobExecution = jobLauncher.run(job, jobParameters);
+		JobExecution jobExecution = jobOperator.start(job, jobParameters);
 
 		// when
-		JobExecution actual = jobExplorer.getJobExecution(jobExecution.getId());
+		JobExecution actual = jobRepository.getJobExecution(jobExecution.getId());
 
 		// then
 		assertNotNull(actual);
@@ -81,17 +84,17 @@ public class MongoDBJobExplorerIntegrationTests {
 	}
 
 	@Test
-	void testGetStepExecutionByIds(@Autowired JobLauncher jobLauncher, @Autowired Job job,
-			@Autowired JobExplorer jobExplorer) throws Exception {
+	void testGetStepExecutionByIds(@Autowired JobOperator jobOperator, @Autowired Job job,
+			@Autowired JobRepository jobRepository) throws Exception {
 		// given
 		JobParameters jobParameters = new JobParametersBuilder().addString("name", "testGetStepExecutionByIds")
 			.addLocalDateTime("runtime", LocalDateTime.now())
 			.toJobParameters();
-		JobExecution jobExecution = jobLauncher.run(job, jobParameters);
+		JobExecution jobExecution = jobOperator.start(job, jobParameters);
 		StepExecution stepExecution = jobExecution.getStepExecutions().stream().findFirst().orElseThrow();
 
 		// when
-		StepExecution actual = jobExplorer.getStepExecution(jobExecution.getId(), stepExecution.getId());
+		StepExecution actual = jobRepository.getStepExecution(jobExecution.getId(), stepExecution.getId());
 
 		// then
 		assertNotNull(actual);

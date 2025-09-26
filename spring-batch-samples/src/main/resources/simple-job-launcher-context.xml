@@ -11,13 +11,10 @@
 		p:dataSource-ref="dataSource" p:transactionManager-ref="transactionManager"/>
 
 	<bean id="jobOperator"
-		class="org.springframework.batch.core.launch.support.TaskExecutorJobOperator"
-		p:jobRepository-ref="jobRepository" p:jobRegistry-ref="jobRegistry" />
+		class="org.springframework.batch.core.launch.support.JobOperatorFactoryBean"
+		p:jobRepository-ref="jobRepository"/>
 
-	<bean id="jobRegistry"
-		class="org.springframework.batch.core.configuration.support.MapJobRegistry" />
-
-	<bean class="org.springframework.batch.test.JobLauncherTestUtils"/>
+	<bean class="org.springframework.batch.test.JobOperatorTestUtils"/>
 	<bean class="org.springframework.batch.test.context.BatchTestContextBeanPostProcessor"/>
 
 </beans>

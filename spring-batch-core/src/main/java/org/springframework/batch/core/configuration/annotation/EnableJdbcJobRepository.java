@@ -19,7 +19,7 @@ import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDa
 import org.springframework.batch.support.DatabaseType;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcOperations;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Isolation;
 
 import java.lang.annotation.Documented;
@@ -39,7 +39,7 @@ import javax.sql.DataSource;
  * necessary beans for a JDBC-based infrastructure, including a job repository.
  * <p>
  * The default configuration assumes that a {@link DataSource} bean named "dataSource" and
- * a {@link DataSourceTransactionManager} bean named "transactionManager" are available in
+ * a {@link PlatformTransactionManager} bean named "transactionManager" are available in
  * the application context.
  *
  * @author Mahmoud Ben Hassine
@@ -107,7 +107,7 @@ public @interface EnableJdbcJobRepository {
 	String dataSourceRef() default "dataSource";
 
 	/**
-	 * Set the {@link DataSourceTransactionManager} to use in the job repository.
+	 * Set the {@link PlatformTransactionManager} to use in the job repository.
 	 * @return the bean name of the transaction manager to use. Defaults to
 	 * {@literal transactionManager}
 	 */

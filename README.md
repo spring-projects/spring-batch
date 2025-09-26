@@ -1,17 +1,14 @@
 # Latest news
 
-* March 19, 2025: [Spring Batch 5.2.2 available now](https://spring.io/blog/2025/03/19/spring-batch-5-2-2-available-now) 
-* December 18, 2024: [Spring Batch 5.1.3 and 5.2.1 available now](https://spring.io/blog/2024/12/18/spring-batch-5-1-3-and-5-2-1-available-now) 
-* November 24, 2024: [Bootiful Spring Boot 3.4: Spring Batch](https://spring.io/blog/2024/11/24/bootiful-34-batch) 
-* November 20, 2024: [Spring Batch 5.2.0 goes GA!](https://spring.io/blog/2024/11/20/spring-batch-5-2-0-goes-ga)
+* September 17, 2025: [Spring Batch 6.0.0 M3 and 5.2.3 available now](https://spring.io/blog/2025/09/17/spring-batch-6-0-0-m3-5-2-3-released)
+* August 20, 2025: [Spring Batch 6.0.0 M2 available now](https://spring.io/blog/2025/08/20/spring-batch-6) 
+* July 23, 2025: [Spring Batch 6.0.0 M1 is out!](https://spring.io/blog/2025/07/23/spring-batch-6) 
 
 <img align="right" src="spring-batch-docs/modules/ROOT/assets/images/spring-batch.png" width="200" height="200">
 
 # Spring Batch [![build status](https://github.com/spring-projects/spring-batch/actions/workflows/continuous-integration.yml/badge.svg)](https://github.com/spring-projects/spring-batch/actions/workflows/continuous-integration.yml)
 
 Spring Batch is a lightweight, comprehensive batch framework designed to enable the development of robust batch applications vital for the daily operations of enterprise systems.  Spring Batch builds upon the productivity, POJO-based development approach, and general ease of use capabilities people have come to know from the [Spring Framework](https://github.com/spring-projects/spring-framework), while making it easy for developers to access and leverage more advanced enterprise services when necessary.
-
-If you are looking for a runtime orchestration tool for your Batch applications, or need a management console to view current and historic executions, take a look at [Spring Cloud Data Flow](https://cloud.spring.io/spring-cloud-dataflow/).  It is an orchestration tool for deploying and executing data integration based microservices including Spring Batch applications.
 
 # Getting Started
 
@@ -220,8 +217,6 @@ We welcome contributions in any kind! Here are some ways for you to contribute t
 * Help us reproduce issues marked with [status: need-help-to-reproduce](https://github.com/spring-projects/spring-batch/labels/status%3A%20need-help-to-reproduce) by following the [Issue Reporting Guidelines](https://github.com/spring-projects/spring-batch/blob/main/ISSUE_REPORTING.md).
 * Github is for social coding: if you want to write code, we encourage contributions through pull requests. If you want to contribute code this way, please familiarize yourself with the process outlined here: [Contributor Guidelines](https://github.com/spring-projects/spring-batch/blob/main/CONTRIBUTING.md).
 * Watch for Spring Batch related articles on [spring.io](https://spring.io).
-
-Before we accept pull requests, we will need you to sign the [contributor's agreement](https://support.springsource.com/spring_committer_signup).  Signing the contributor's agreement does not grant anyone commit rights to the main repository, but it does mean that we can accept your contributions, and you will get an author credit if we do.  Active contributors might be asked to join the core team, and given the ability to merge pull requests.
 
 # Code of Conduct
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 the original author or authors.
+ * Copyright 2022-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 package org.springframework.batch.test.context;
 
 import org.springframework.batch.core.job.Job;
-import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.test.JobLauncherTestUtils;
+import org.springframework.batch.test.JobOperatorTestUtils;
 import org.springframework.batch.test.JobRepositoryTestUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.ObjectProvider;
@@ -27,19 +27,20 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 
 /**
  * {@link BeanPostProcessor} implementation that injects a job bean into
- * {@link JobLauncherTestUtils} if there is a unique job bean.
+ * {@link JobOperatorTestUtils} if there is a unique job bean.
  *
  * @author Henning Pöttker
  * @author Mahmoud Ben Hassine
  * @since 5.0
  */
+@SuppressWarnings("removal")
 public class BatchTestContextBeanPostProcessor implements BeanPostProcessor {
 
 	private ObjectProvider<Job> jobProvider;
 
 	private ObjectProvider<JobRepository> jobRepositoryProvider;
 
-	private ObjectProvider<JobLauncher> jobLauncherProvider;
+	private ObjectProvider<JobOperator> jobOperatorProvider;
 
 	@Autowired
 	public void setJobProvider(ObjectProvider<Job> jobProvider) {
@@ -52,16 +53,16 @@ public class BatchTestContextBeanPostProcessor implements BeanPostProcessor {
 	}
 
 	@Autowired
-	public void setJobLauncherProvider(ObjectProvider<JobLauncher> jobLauncherProvider) {
-		this.jobLauncherProvider = jobLauncherProvider;
+	public void setJobOperatorProvider(ObjectProvider<JobOperator> jobOperatorProvider) {
+		this.jobOperatorProvider = jobOperatorProvider;
 	}
 
 	@Override
 	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-		if (bean instanceof JobLauncherTestUtils jobLauncherTestUtils) {
-			this.jobProvider.ifUnique(jobLauncherTestUtils::setJob);
-			this.jobRepositoryProvider.ifUnique(jobLauncherTestUtils::setJobRepository);
-			this.jobLauncherProvider.ifUnique(jobLauncherTestUtils::setJobLauncher);
+		if (bean instanceof JobOperatorTestUtils jobOperatorTestUtils) {
+			this.jobProvider.ifUnique(jobOperatorTestUtils::setJob);
+			this.jobRepositoryProvider.ifUnique(jobOperatorTestUtils::setJobRepository);
+			this.jobOperatorProvider.ifUnique(jobOperatorTestUtils::setJobOperator);
 		}
 		if (bean instanceof JobRepositoryTestUtils jobRepositoryTestUtils) {
 			this.jobRepositoryProvider.ifUnique(jobRepositoryTestUtils::setJobRepository);

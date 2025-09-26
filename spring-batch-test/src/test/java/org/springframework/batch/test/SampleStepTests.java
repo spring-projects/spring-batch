@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2022 the original author or authors.
+ * Copyright 2008-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,14 @@
  */
 package org.springframework.batch.test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.step.Step;
-import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,12 +38,12 @@ class SampleStepTests implements ApplicationContextAware {
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 
-	private StepRunner stepRunner;
+	private JobOperatorTestUtils jobOperatorTestUtils;
 
 	private ApplicationContext context;
 
 	@Autowired
-	private JobLauncher jobLauncher;
+	private JobOperator jobOperator;
 
 	@Autowired
 	private JobRepository jobRepository;
@@ -51,7 +51,7 @@ class SampleStepTests implements ApplicationContextAware {
 	@BeforeEach
 	void setUp() {
 		jdbcTemplate.update("create table TESTS (ID integer, NAME varchar(40))");
-		stepRunner = new StepRunner(jobLauncher, jobRepository);
+		jobOperatorTestUtils = new JobOperatorTestUtils(jobOperator, jobRepository);
 	}
 
 	@AfterEach
@@ -61,8 +61,8 @@ class SampleStepTests implements ApplicationContextAware {
 
 	@Test
 	void testTasklet() {
-		Step step = (Step) context.getBean("s2");
-		assertEquals(BatchStatus.COMPLETED, stepRunner.launchStep(step).getStatus());
+		Step step = context.getBean("s2", Step.class);
+		assertEquals(BatchStatus.COMPLETED, jobOperatorTestUtils.startStep(step).getStatus());
 		assertEquals(2, jdbcTemplate.queryForObject("SELECT ID from TESTS where NAME = 'SampleTasklet2'", Integer.class)
 			.intValue());
 	}

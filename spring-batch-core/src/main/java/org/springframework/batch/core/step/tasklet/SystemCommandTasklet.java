@@ -25,10 +25,10 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInterruptedException;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.StepContribution;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.listener.StepExecutionListener;
-import org.springframework.batch.core.repository.explore.JobExplorer;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.InitializingBean;
@@ -61,6 +61,7 @@ import org.springframework.util.StringUtils;
  * @author Will Schipp
  * @author Mahmoud Ben Hassine
  * @author Injae Kim
+ * @author Hyunsang Han
  */
 public class SystemCommandTasklet implements StepExecutionListener, StoppableTasklet, InitializingBean {
 
@@ -88,7 +89,7 @@ public class SystemCommandTasklet implements StepExecutionListener, StoppableTas
 
 	private volatile boolean stopped = false;
 
-	private JobExplorer jobExplorer;
+	private JobRepository jobRepository;
 
 	private boolean stoppable = false;
 
@@ -113,7 +114,7 @@ public class SystemCommandTasklet implements StepExecutionListener, StoppableTas
 			Thread.sleep(checkInterval);// moved to the end of the logic
 
 			if (stoppable) {
-				JobExecution jobExecution = jobExplorer
+				JobExecution jobExecution = jobRepository
 					.getJobExecution(chunkContext.getStepContext().getStepExecution().getJobExecutionId());
 
 				if (jobExecution.isStopping()) {
@@ -201,11 +202,11 @@ public class SystemCommandTasklet implements StepExecutionListener, StoppableTas
 		Assert.state(systemProcessExitCodeMapper != null, "SystemProcessExitCodeMapper must be set");
 		Assert.state(timeout > 0, "timeout value must be greater than zero");
 		Assert.state(taskExecutor != null, "taskExecutor is required");
-		stoppable = jobExplorer != null;
+		stoppable = jobRepository != null;
 	}
 
-	public void setJobExplorer(JobExplorer jobExplorer) {
-		this.jobExplorer = jobExplorer;
+	public void setJobRepository(JobRepository jobRepository) {
+		this.jobRepository = jobRepository;
 	}
 
 	/**
@@ -273,6 +274,27 @@ public class SystemCommandTasklet implements StepExecutionListener, StoppableTas
 	@Override
 	public void stop() {
 		stopped = true;
+	}
+
+	/**
+	 * Interrupts the execution of the system command if the given {@link StepExecution}
+	 * matches the current execution context. This method allows for granular control over
+	 * stopping specific step executions, ensuring that only the intended command is
+	 * halted.
+	 * <p>
+	 * This method will interrupt the thread executing the system command only if
+	 * {@link #setInterruptOnCancel(boolean)} has been set to true. Otherwise, the
+	 * underlying command will be allowed to finish before the tasklet ends.
+	 * @param stepExecution the current {@link StepExecution} context; the execution is
+	 * interrupted if it matches the ongoing one.
+	 * @since 6.0
+	 * @see StoppableTasklet#stop(StepExecution)
+	 */
+	@Override
+	public void stop(StepExecution stepExecution) {
+		if (stepExecution.equals(this.execution)) {
+			this.stopped = true;
+		}
 	}
 
 }

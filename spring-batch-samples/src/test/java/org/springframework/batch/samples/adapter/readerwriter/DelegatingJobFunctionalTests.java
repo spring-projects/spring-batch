@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 the original author or authors.
+ * Copyright 2007-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package org.springframework.batch.samples.adapter.readerwriter;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.samples.domain.person.PersonService;
-import org.springframework.batch.test.JobLauncherTestUtils;
+import org.springframework.batch.test.JobOperatorTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
@@ -30,14 +30,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class DelegatingJobFunctionalTests {
 
 	@Autowired
-	private JobLauncherTestUtils jobLauncherTestUtils;
+	private JobOperatorTestUtils jobOperatorTestUtils;
 
 	@Autowired
 	private PersonService personService;
 
 	@Test
 	void testLaunchJob() throws Exception {
-		jobLauncherTestUtils.launchJob();
+		jobOperatorTestUtils.startJob();
 
 		assertTrue(personService.getReturnedCount() > 0);
 		assertEquals(personService.getReturnedCount(), personService.getReceivedCount());
