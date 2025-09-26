@@ -16,7 +16,7 @@
 package org.springframework.batch.core.job.builder;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.batch.core.Job;
+import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.SimpleJob;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 

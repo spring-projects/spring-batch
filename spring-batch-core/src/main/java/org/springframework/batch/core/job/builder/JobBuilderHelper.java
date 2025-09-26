@@ -320,7 +320,6 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 			this.description = description;
 		}
 
-		private String name;
 	}
 
 }
