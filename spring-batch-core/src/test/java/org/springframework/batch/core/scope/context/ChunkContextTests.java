@@ -22,11 +22,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collections;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameter;
 import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.step.StepExecution;
 
 /**
  * @author Dave Syer
@@ -35,9 +37,16 @@ import org.springframework.batch.core.job.parameters.JobParameters;
  */
 class ChunkContextTests {
 
-	private final ChunkContext context = new ChunkContext(new StepContext(new JobExecution(new JobInstance(0L, "job"),
-			1L, new JobParameters(Collections.singletonMap("foo", new JobParameter<>("bar", String.class))))
-		.createStepExecution("foo")));
+	private ChunkContext context;
+
+	@BeforeEach
+	void setUp() {
+		JobInstance jobInstance = new JobInstance(1L, "job");
+		JobExecution jobExecution = new JobExecution(1L, jobInstance,
+				new JobParameters(Collections.singletonMap("foo", new JobParameter<>("bar", String.class))));
+		StepExecution stepExecution = new StepExecution(1L, "foo", jobExecution);
+		context = new ChunkContext(new StepContext(stepExecution));
+	}
 
 	@Test
 	void testGetStepContext() {

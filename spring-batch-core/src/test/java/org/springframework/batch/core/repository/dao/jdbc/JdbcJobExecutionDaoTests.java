@@ -19,99 +19,106 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
-import javax.sql.DataSource;
+import javax.transaction.Transactional;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.job.JobExecution;
-import org.springframework.batch.core.job.parameters.JobParameter;
+import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersBuilder;
-import org.springframework.batch.core.repository.dao.AbstractJobExecutionDaoTests;
-import org.springframework.batch.core.repository.dao.JobExecutionDao;
-import org.springframework.batch.core.repository.dao.JobInstanceDao;
-import org.springframework.batch.core.repository.dao.StepExecutionDao;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
+import org.springframework.jdbc.support.incrementer.H2SequenceMaxValueIncrementer;
 import org.springframework.test.jdbc.JdbcTestUtils;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author Parikshit Dutta
  * @author Mahmoud Ben Hassine
  */
-@SpringJUnitConfig(locations = { "sql-dao-test.xml" })
-public class JdbcJobExecutionDaoTests extends AbstractJobExecutionDaoTests {
+public class JdbcJobExecutionDaoTests {
 
-	@Autowired
-	private StepExecutionDao stepExecutionDao;
+	private JdbcJobExecutionDao jdbcJobExecutionDao;
 
-	@Autowired
-	private JobExecutionDao jobExecutionDao;
-
-	@Autowired
-	private JobInstanceDao jobInstanceDao;
+	private JdbcJobInstanceDao jdbcJobInstanceDao;
 
 	private JdbcTemplate jdbcTemplate;
 
-	@Autowired
-	public void setDataSource(DataSource dataSource) {
-		jdbcTemplate = new JdbcTemplate(dataSource);
+	@BeforeEach
+	void setup() throws Exception {
+		EmbeddedDatabase database = new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2)
+			.addScript("/org/springframework/batch/core/schema-drop-h2.sql")
+			.addScript("/org/springframework/batch/core/schema-h2.sql")
+			.build();
+		jdbcTemplate = new JdbcTemplate(database);
+
+		jdbcJobInstanceDao = new JdbcJobInstanceDao();
+		jdbcJobInstanceDao.setJdbcTemplate(jdbcTemplate);
+		H2SequenceMaxValueIncrementer jobInstanceIncrementer = new H2SequenceMaxValueIncrementer(database,
+				"BATCH_JOB_INSTANCE_SEQ");
+		jdbcJobInstanceDao.setJobInstanceIncrementer(jobInstanceIncrementer);
+		jdbcJobInstanceDao.afterPropertiesSet();
+
+		jdbcJobExecutionDao = new JdbcJobExecutionDao();
+		jdbcJobExecutionDao.setJdbcTemplate(jdbcTemplate);
+		H2SequenceMaxValueIncrementer jobExecutionIncrementer = new H2SequenceMaxValueIncrementer(database,
+				"BATCH_JOB_EXECUTION_SEQ");
+		jdbcJobExecutionDao.setJobExecutionIncrementer(jobExecutionIncrementer);
+		jdbcJobExecutionDao.setJobInstanceDao(jdbcJobInstanceDao);
+		jdbcJobExecutionDao.afterPropertiesSet();
+
 	}
 
-	@Override
-	protected JobInstanceDao getJobInstanceDao() {
-		return jobInstanceDao;
+	@Test
+	void testCreateJobExecution() {
+		// given
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = jdbcJobInstanceDao.createJobInstance("job", jobParameters);
+
+		// when
+		JobExecution jobExecution = jdbcJobExecutionDao.createJobExecution(jobInstance, jobParameters);
+
+		// then
+		Assertions.assertNotNull(jobExecution);
+		Assertions.assertEquals(1, jobExecution.getId());
+		Assertions.assertEquals(jobInstance, jobExecution.getJobInstance());
+		int batchJobExecutionsCount = JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_EXECUTION");
+		Assertions.assertEquals(1, batchJobExecutionsCount);
 	}
 
-	@Override
-	protected JobExecutionDao getJobExecutionDao() {
-		JdbcTestUtils.deleteFromTables(jdbcTemplate, "BATCH_JOB_EXECUTION_CONTEXT", "BATCH_STEP_EXECUTION_CONTEXT",
-				"BATCH_STEP_EXECUTION", "BATCH_JOB_EXECUTION", "BATCH_JOB_EXECUTION_PARAMS", "BATCH_JOB_INSTANCE");
-		return jobExecutionDao;
-	}
-
-	@Override
-	protected StepExecutionDao getStepExecutionDao() {
-		return stepExecutionDao;
-	}
-
-	@Transactional
 	@Test
 	void testDeleteJobExecution() {
 		// given
-		JobExecution execution = new JobExecution(jobInstance, new JobParameters());
-		dao.saveJobExecution(execution);
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = jdbcJobInstanceDao.createJobInstance("job", jobParameters);
+		JobExecution jobExecution = jdbcJobExecutionDao.createJobExecution(jobInstance, jobParameters);
 
 		// when
-		dao.deleteJobExecution(execution);
+		jdbcJobExecutionDao.deleteJobExecution(jobExecution);
 
 		// then
-		Assertions.assertNull(dao.getJobExecution(execution.getId()));
+		Assertions.assertEquals(0, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_EXECUTION"));
 	}
 
-	@Transactional
 	@Test
 	void testDeleteJobExecutionParameters() {
 		// given
-		Map<String, JobParameter<?>> parameters = new HashMap<>();
-		parameters.put("string-param", new JobParameter<>("value", String.class));
-		JobExecution execution = new JobExecution(jobInstance, new JobParameters(parameters));
-		dao.saveJobExecution(execution);
+		JobParameters jobParameters = new JobParametersBuilder().addString("name", "foo").toJobParameters();
+		JobInstance jobInstance = jdbcJobInstanceDao.createJobInstance("job", jobParameters);
+		JobExecution jobExecution = jdbcJobExecutionDao.createJobExecution(jobInstance, jobParameters);
 
 		// when
-		dao.deleteJobExecutionParameters(execution);
+		jdbcJobExecutionDao.deleteJobExecutionParameters(jobExecution);
 
 		// then
 		Assertions.assertEquals(0, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_EXECUTION_PARAMS"));
 	}
 
-	@Transactional
 	@Test
 	void testJobParametersPersistenceRoundTrip() {
 		// given
@@ -130,14 +137,14 @@ public class JdbcJobExecutionDaoTests extends AbstractJobExecutionDaoTests {
 			.addLocalTime("localTime", localTimeParameter)
 			.addLocalDateTime("localDateTime", localDateTimeParameter)
 			.toJobParameters();
-		JobExecution execution = new JobExecution(jobInstance, jobParameters);
+		JobInstance jobInstance = jdbcJobInstanceDao.createJobInstance("job", jobParameters);
+		JobExecution jobExecution = jdbcJobExecutionDao.createJobExecution(jobInstance, jobParameters);
 
 		// when
-		dao.saveJobExecution(execution);
-		execution = dao.getJobExecution(execution.getId());
+		JobExecution retrieved = jdbcJobExecutionDao.getJobExecution(jobExecution.getId());
 
 		// then
-		JobParameters parameters = execution.getJobParameters();
+		JobParameters parameters = retrieved.getJobParameters();
 		Assertions.assertNotNull(parameters);
 		Assertions.assertEquals(dateParameter, parameters.getDate("date"));
 		Assertions.assertEquals(localDateParameter, parameters.getLocalDate("localDate"));

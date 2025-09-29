@@ -29,6 +29,7 @@ import org.apache.commons.logging.LogFactory;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
@@ -117,9 +118,11 @@ class AsyncTaskletStepTests {
 
 		setUp();
 
-		JobExecution jobExecution = jobRepository.createJobExecution("JOB", new JobParameters());
-		StepExecution stepExecution = jobExecution.createStepExecution(step.getName());
-		stepExecution.setId(0L);
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = jobRepository.createJobInstance("JOB", jobParameters);
+		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
+				new ExecutionContext());
+		StepExecution stepExecution = jobRepository.createStepExecution(step.getName(), jobExecution);
 		step.execute(stepExecution);
 
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
@@ -146,9 +149,11 @@ class AsyncTaskletStepTests {
 		items = Arrays.asList("one", "fail", "three", "four");
 		setUp();
 
-		JobExecution jobExecution = jobRepository.createJobExecution("JOB", new JobParameters());
-		StepExecution stepExecution = jobExecution.createStepExecution(step.getName());
-		stepExecution.setId(0L);
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = jobRepository.createJobInstance("JOB", jobParameters);
+		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
+				new ExecutionContext());
+		StepExecution stepExecution = jobRepository.createStepExecution(step.getName(), jobExecution);
 
 		step.execute(stepExecution);
 
@@ -177,9 +182,11 @@ class AsyncTaskletStepTests {
 		};
 		setUp();
 
-		JobExecution jobExecution = jobRepository.createJobExecution("JOB", new JobParameters());
-		StepExecution stepExecution = jobExecution.createStepExecution(step.getName());
-		stepExecution.setId(0L);
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = jobRepository.createJobInstance("JOB", jobParameters);
+		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
+				new ExecutionContext());
+		StepExecution stepExecution = jobRepository.createStepExecution(step.getName(), jobExecution);
 		step.execute(stepExecution);
 
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
@@ -199,9 +206,11 @@ class AsyncTaskletStepTests {
 		items = Arrays.asList("one", "two", "three", "fail");
 		setUp();
 
-		JobExecution jobExecution = jobRepository.createJobExecution("JOB", new JobParameters());
-		StepExecution stepExecution = jobExecution.createStepExecution(step.getName());
-		stepExecution.setId(0L);
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = jobRepository.createJobInstance("JOB", jobParameters);
+		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
+				new ExecutionContext());
+		StepExecution stepExecution = jobRepository.createStepExecution(step.getName(), jobExecution);
 
 		step.execute(stepExecution);
 

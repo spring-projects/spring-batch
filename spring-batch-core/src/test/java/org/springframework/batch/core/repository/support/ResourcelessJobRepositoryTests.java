@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.item.ExecutionContext;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -61,7 +62,9 @@ class ResourcelessJobRepositoryTests {
 		JobParameters jobParameters = new JobParameters();
 
 		// when
-		JobExecution jobExecution = this.jobRepository.createJobExecution(jobName, jobParameters);
+		JobInstance jobInstance = jobRepository.createJobInstance(jobName, jobParameters);
+		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
+				new ExecutionContext());
 
 		// then
 		assertNotNull(jobExecution);
@@ -75,7 +78,8 @@ class ResourcelessJobRepositoryTests {
 		// given
 		String jobName = "job";
 		JobParameters jobParameters = new JobParameters();
-		this.jobRepository.createJobExecution(jobName, jobParameters);
+		JobInstance jobInstance = jobRepository.createJobInstance(jobName, jobParameters);
+		jobRepository.createJobExecution(jobInstance, jobParameters, new ExecutionContext());
 
 		// when
 		JobExecution jobExecution = this.jobRepository.getLastJobExecution(jobName, jobParameters);

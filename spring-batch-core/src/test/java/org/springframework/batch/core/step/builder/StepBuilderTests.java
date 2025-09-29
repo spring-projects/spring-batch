@@ -23,6 +23,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.listener.ChunkListener;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.listener.ItemReadListener;
@@ -45,6 +47,7 @@ import org.springframework.batch.core.configuration.xml.DummyItemWriter;
 import org.springframework.batch.core.job.SimpleJob;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.JdbcJobRepositoryFactoryBean;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStreamSupport;
 import org.springframework.batch.item.support.ListItemReader;
@@ -88,8 +91,11 @@ class StepBuilderTests {
 		factory.setTransactionManager(transactionManager);
 		factory.afterPropertiesSet();
 		this.jobRepository = factory.getObject();
-		this.execution = this.jobRepository.createJobExecution("foo", new JobParameters()).createStepExecution("step");
-		this.jobRepository.add(this.execution);
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = jobRepository.createJobInstance("foo", jobParameters);
+		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
+				new ExecutionContext());
+		this.execution = jobRepository.createStepExecution("step", jobExecution);
 		this.transactionManager = new ResourcelessTransactionManager();
 	}
 

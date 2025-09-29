@@ -20,12 +20,14 @@ import org.apache.commons.logging.LogFactory;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.JdbcJobRepositoryFactoryBean;
 import org.springframework.batch.core.step.factory.FaultTolerantStepFactoryBean;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,9 +91,10 @@ class FaultTolerantStepFactoryBeanUnexpectedRollbackTests {
 		JobRepository repository = repositoryFactory.getObject();
 		factory.setJobRepository(repository);
 
-		JobExecution jobExecution = repository.createJobExecution("job", new JobParameters());
-		StepExecution stepExecution = jobExecution.createStepExecution(factory.getName());
-		repository.add(stepExecution);
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = repository.createJobInstance("job", jobParameters);
+		JobExecution jobExecution = repository.createJobExecution(jobInstance, jobParameters, new ExecutionContext());
+		StepExecution stepExecution = repository.createStepExecution(factory.getName(), jobExecution);
 
 		Step step = factory.getObject();
 

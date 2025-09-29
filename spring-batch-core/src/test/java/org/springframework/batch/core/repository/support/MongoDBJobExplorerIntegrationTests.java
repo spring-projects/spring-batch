@@ -79,7 +79,7 @@ public class MongoDBJobExplorerIntegrationTests {
 		// then
 		assertNotNull(actual);
 		assertNotNull(actual.getJobInstance());
-		assertEquals(jobExecution.getJobId(), actual.getJobId());
+		assertEquals(jobExecution.getJobInstanceId(), actual.getJobInstanceId());
 		assertFalse(actual.getExecutionContext().isEmpty());
 	}
 

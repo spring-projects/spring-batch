@@ -24,6 +24,7 @@ import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.configuration.support.MapJobRegistry;
 import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.launch.support.TaskExecutorJobOperator;
 import org.springframework.batch.core.step.StepExecution;
@@ -66,9 +67,10 @@ class JobStepTests {
 		jobRepository = factory.getObject();
 		step = new JobStep(jobRepository);
 		step.setName("step");
-		JobExecution jobExecution = jobRepository.createJobExecution("job", new JobParameters());
-		stepExecution = jobExecution.createStepExecution("step");
-		jobRepository.add(stepExecution);
+		JobInstance jobInstance = jobRepository.createJobInstance("job", new JobParameters());
+		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, new JobParameters(),
+				new ExecutionContext());
+		stepExecution = jobRepository.createStepExecution("step", jobExecution);
 		TaskExecutorJobOperator jobOperator = new TaskExecutorJobOperator();
 		jobOperator.setJobRepository(jobRepository);
 		jobOperator.setJobRegistry(new MapJobRegistry());
@@ -168,11 +170,9 @@ class JobStepTests {
 		jobExecution.setStatus(BatchStatus.FAILED);
 		jobRepository.update(jobExecution);
 
-		jobExecution = jobRepository.createJobExecution("job", new JobParameters());
-		stepExecution = jobExecution.createStepExecution("step");
+		stepExecution = jobRepository.createStepExecution("step", jobExecution);
 		// In a restart the surrounding Job would set up the context like this...
 		stepExecution.setExecutionContext(executionContext);
-		jobRepository.add(stepExecution);
 		step.execute(stepExecution);
 		assertEquals("FOO", stepExecution.getFailureExceptions().get(0).getMessage());
 

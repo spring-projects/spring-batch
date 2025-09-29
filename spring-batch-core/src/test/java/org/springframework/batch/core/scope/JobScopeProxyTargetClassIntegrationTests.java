@@ -16,6 +16,7 @@
 package org.springframework.batch.core.scope;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -53,7 +54,7 @@ public class JobScopeProxyTargetClassIntegrationTests implements BeanFactoryAwar
 	void start() {
 
 		JobSynchronizationManager.close();
-		jobExecution = new JobExecution(123L);
+		jobExecution = new JobExecution(123L, mock(), mock());
 
 		ExecutionContext executionContext = new ExecutionContext();
 		executionContext.put("foo", "bar");

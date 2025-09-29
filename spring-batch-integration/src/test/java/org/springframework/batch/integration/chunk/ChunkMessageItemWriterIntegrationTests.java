@@ -162,8 +162,8 @@ class ChunkMessageItemWriterIntegrationTests {
 		stepExecution.getExecutionContext().putInt(ChunkMessageChannelItemWriter.EXPECTED, 6);
 		stepExecution.getExecutionContext().putInt(ChunkMessageChannelItemWriter.ACTUAL, 4);
 		// And make the back log real
-		requests.send(getSimpleMessage(stepExecution.getJobExecution().getJobId(), "foo"));
-		requests.send(getSimpleMessage(stepExecution.getJobExecution().getJobId(), "bar"));
+		requests.send(getSimpleMessage(stepExecution.getJobExecution().getJobInstanceId(), "foo"));
+		requests.send(getSimpleMessage(stepExecution.getJobExecution().getJobInstanceId(), "bar"));
 		step.execute(stepExecution);
 
 		waitForResults(8, 10);
@@ -207,9 +207,10 @@ class ChunkMessageItemWriterIntegrationTests {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private GenericMessage<ChunkRequest> getSimpleMessage(Long jobId, String... items) {
-		StepContribution stepContribution = new JobExecution(new JobInstance(0L, "job"), new JobParameters())
-			.createStepExecution("step")
-			.createStepContribution();
+		JobInstance jobInstance = new JobInstance(0L, "job");
+		JobExecution jobExecution = new JobExecution(1L, jobInstance, new JobParameters());
+		StepExecution stepExecution = new StepExecution(1L, "step", jobExecution);
+		StepContribution stepContribution = stepExecution.createStepContribution();
 		ChunkRequest chunk = new ChunkRequest(0, Chunk.of(items), jobId, stepContribution);
 		GenericMessage<ChunkRequest> message = new GenericMessage<>(chunk);
 		return message;
@@ -319,10 +320,11 @@ class ChunkMessageItemWriterIntegrationTests {
 			throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
 		SimpleJob job = new SimpleJob();
 		job.setName("job");
-		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(),
-				new JobParametersBuilder().addLong("job.counter", jobCounter++).toJobParameters());
-		StepExecution stepExecution = jobExecution.createStepExecution(step.getName());
-		jobRepository.add(stepExecution);
+		JobParameters jobParameters = new JobParametersBuilder().addLong("job.counter", jobCounter++).toJobParameters();
+		JobInstance jobInstance = jobRepository.createJobInstance(job.getName(), jobParameters);
+		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
+				new ExecutionContext());
+		StepExecution stepExecution = jobRepository.createStepExecution(step.getName(), jobExecution);
 		return stepExecution;
 	}
 

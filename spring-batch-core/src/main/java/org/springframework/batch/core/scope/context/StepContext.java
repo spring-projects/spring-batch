@@ -80,9 +80,6 @@ public class StepContext extends SynchronizedAttributeAccessor {
 	 * with the current {@link StepExecution}
 	 */
 	public String getJobName() {
-		Assert.state(stepExecution.getJobExecution() != null, "StepExecution does not have a JobExecution");
-		Assert.state(stepExecution.getJobExecution().getJobInstance() != null,
-				"StepExecution does not have a JobInstance");
 		return stepExecution.getJobExecution().getJobInstance().getJobName();
 	}
 
@@ -92,9 +89,6 @@ public class StepContext extends SynchronizedAttributeAccessor {
 	 * current {@link StepExecution}
 	 */
 	public Long getJobInstanceId() {
-		Assert.state(stepExecution.getJobExecution() != null, "StepExecution does not have a JobExecution");
-		Assert.state(stepExecution.getJobExecution().getJobInstance() != null,
-				"StepExecution does not have a JobInstance");
 		return stepExecution.getJobExecution().getJobInstance().getInstanceId();
 	}
 
@@ -218,8 +212,6 @@ public class StepContext extends SynchronizedAttributeAccessor {
 	 * @return unique identifier for this context based on the step execution
 	 */
 	public String getId() {
-		Assert.state(stepExecution.getId() != null,
-				"StepExecution has no id.  " + "It must be saved before it can be used in step scope.");
 		return "execution#" + stepExecution.getId();
 	}
 

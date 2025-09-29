@@ -26,6 +26,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.annotation.AfterChunk;
 import org.springframework.batch.core.annotation.AfterChunkError;
@@ -66,7 +68,7 @@ class StepListenerFactoryBeanTests {
 
 	private final StepListenerFactoryBean factoryBean = new StepListenerFactoryBean();
 
-	private final JobExecution jobExecution = new JobExecution(11L);
+	private final JobExecution jobExecution = new JobExecution(11L, new JobInstance(1L, "job"), new JobParameters());
 
 	private final StepExecution stepExecution = new StepExecution("testStep", jobExecution);
 

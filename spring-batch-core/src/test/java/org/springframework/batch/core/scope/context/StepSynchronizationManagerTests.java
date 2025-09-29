@@ -30,11 +30,14 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.step.StepExecution;
 
 class StepSynchronizationManagerTests {
 
-	private final StepExecution stepExecution = new StepExecution("step", new JobExecution(0L));
+	private final StepExecution stepExecution = new StepExecution(1L, "step",
+			new JobExecution(0L, new JobInstance(1L, "job"), new JobParameters()));
 
 	@BeforeEach
 	@AfterEach

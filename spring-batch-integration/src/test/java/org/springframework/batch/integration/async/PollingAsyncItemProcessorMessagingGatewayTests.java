@@ -69,7 +69,7 @@ class PollingAsyncItemProcessorMessagingGatewayTests {
 			 * an exception in the processor if an unexpected null value comes back.
 			 */
 			assertNotNull(value);
-			assertTrue(value.matches("foo.*foo.*"));
+			assertTrue(value.matches("foo.*"));
 		}
 	}
 

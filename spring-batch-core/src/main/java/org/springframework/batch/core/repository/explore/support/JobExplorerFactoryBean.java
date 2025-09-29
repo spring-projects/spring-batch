@@ -201,7 +201,6 @@ public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean imple
 		dao.setTablePrefix(tablePrefix);
 		dao.setSerializer(serializer);
 		dao.setCharset(charset);
-		dao.afterPropertiesSet();
 		return dao;
 	}
 
@@ -212,7 +211,6 @@ public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean imple
 		dao.setJobInstanceIncrementer(incrementer);
 		dao.setJobKeyGenerator(jobKeyGenerator);
 		dao.setTablePrefix(tablePrefix);
-		dao.afterPropertiesSet();
 		return dao;
 	}
 
@@ -223,7 +221,6 @@ public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean imple
 		dao.setJobExecutionIncrementer(incrementer);
 		dao.setTablePrefix(tablePrefix);
 		dao.setConversionService(this.conversionService);
-		dao.afterPropertiesSet();
 		return dao;
 	}
 
@@ -233,7 +230,6 @@ public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean imple
 		dao.setJdbcTemplate(jdbcOperations);
 		dao.setStepExecutionIncrementer(incrementer);
 		dao.setTablePrefix(tablePrefix);
-		dao.afterPropertiesSet();
 		return dao;
 	}
 

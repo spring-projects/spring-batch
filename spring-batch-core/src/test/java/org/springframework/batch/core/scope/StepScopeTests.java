@@ -29,6 +29,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.scope.context.StepContext;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
@@ -43,7 +45,8 @@ class StepScopeTests {
 
 	private final StepScope scope = new StepScope();
 
-	private final StepExecution stepExecution = new StepExecution("foo", new JobExecution(0L), 123L);
+	private final StepExecution stepExecution = new StepExecution(123L, "foo",
+			new JobExecution(0L, new JobInstance(1L, "job"), new JobParameters()));
 
 	private StepContext context;
 
@@ -84,7 +87,8 @@ class StepScopeTests {
 	@Test
 	void testGetWithSomethingAlreadyInParentContext() {
 		context.setAttribute("foo", "bar");
-		StepContext context = StepSynchronizationManager.register(new StepExecution("bar", new JobExecution(0L)));
+		StepContext context = StepSynchronizationManager.register(
+				new StepExecution(0L, "bar", new JobExecution(0L, new JobInstance(0L, "job"), new JobParameters())));
 		Object value = scope.get("foo", () -> "spam");
 		assertEquals("spam", value);
 		assertTrue(context.hasAttribute("foo"));

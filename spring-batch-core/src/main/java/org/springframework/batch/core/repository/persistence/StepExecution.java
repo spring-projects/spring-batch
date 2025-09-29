@@ -27,9 +27,9 @@ public class StepExecution {
 
 	private String id;
 
-	private Long stepExecutionId;
+	private long stepExecutionId;
 
-	private Long jobExecutionId;
+	private long jobExecutionId;
 
 	private String name;
 
@@ -72,19 +72,19 @@ public class StepExecution {
 		return id;
 	}
 
-	public Long getStepExecutionId() {
+	public long getStepExecutionId() {
 		return stepExecutionId;
 	}
 
-	public void setStepExecutionId(Long stepExecutionId) {
+	public void setStepExecutionId(long stepExecutionId) {
 		this.stepExecutionId = stepExecutionId;
 	}
 
-	public Long getJobExecutionId() {
+	public long getJobExecutionId() {
 		return jobExecutionId;
 	}
 
-	public void setJobExecutionId(Long jobExecutionId) {
+	public void setJobExecutionId(long jobExecutionId) {
 		this.jobExecutionId = jobExecutionId;
 	}
 

@@ -26,6 +26,7 @@ import org.junit.jupiter.api.Timeout;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
@@ -35,10 +36,7 @@ import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.core.step.skip.AlwaysSkipItemSkipPolicy;
 import org.springframework.batch.core.step.skip.SkipLimitExceededException;
 import org.springframework.batch.core.step.skip.SkipPolicy;
-import org.springframework.batch.item.Chunk;
-import org.springframework.batch.item.ItemProcessor;
-import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.*;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
@@ -253,9 +251,11 @@ class FaultTolerantStepIntegrationTests {
 	}
 
 	private StepExecution execute(Step step) throws Exception {
-		JobExecution jobExecution = jobRepository.createJobExecution("job" + Math.random(), new JobParameters());
-		StepExecution stepExecution = jobExecution.createStepExecution("step");
-		jobRepository.add(stepExecution);
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = jobRepository.createJobInstance("job" + Math.random(), jobParameters);
+		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
+				new ExecutionContext());
+		StepExecution stepExecution = jobRepository.createStepExecution("step", jobExecution);
 		step.execute(stepExecution);
 		return stepExecution;
 	}

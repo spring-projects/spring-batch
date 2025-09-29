@@ -92,10 +92,10 @@ public abstract class AbstractJobDaoTests {
 
 		// Create an execution
 		jobExecutionStartTime = LocalDateTime.now();
-		jobExecution = new JobExecution(jobInstance, jobParameters);
+		jobExecution = new JobExecution(1L, jobInstance, jobParameters);
 		jobExecution.setStartTime(jobExecutionStartTime);
 		jobExecution.setStatus(BatchStatus.STARTED);
-		jobExecutionDao.saveJobExecution(jobExecution);
+		jobExecutionDao.updateJobExecution(jobExecution);
 	}
 
 	@Transactional
@@ -191,7 +191,7 @@ public abstract class AbstractJobDaoTests {
 	void testUpdateInvalidJobExecution() {
 
 		// id is invalid
-		JobExecution execution = new JobExecution(jobInstance, 29432L, jobParameters);
+		JobExecution execution = new JobExecution(29432L, jobInstance, jobParameters);
 		execution.incrementVersion();
 		assertThrows(NoSuchObjectException.class, () -> jobExecutionDao.updateJobExecution(execution));
 	}
@@ -200,7 +200,7 @@ public abstract class AbstractJobDaoTests {
 	@Test
 	void testUpdateNullIdJobExecution() {
 
-		JobExecution execution = new JobExecution(jobInstance, jobParameters);
+		JobExecution execution = new JobExecution(1L, jobInstance, jobParameters);
 		assertThrows(IllegalArgumentException.class, () -> jobExecutionDao.updateJobExecution(execution));
 	}
 
@@ -254,12 +254,12 @@ public abstract class AbstractJobDaoTests {
 	@Transactional
 	@Test
 	void testGetLastJobExecution() {
-		JobExecution lastExecution = new JobExecution(jobInstance, jobParameters);
+		JobExecution lastExecution = new JobExecution(1L, jobInstance, jobParameters);
 		lastExecution.setStatus(BatchStatus.STARTED);
 
 		int JUMP_INTO_FUTURE = 1000; // makes sure start time is 'greatest'
 		lastExecution.setCreateTime(LocalDateTime.now().plus(JUMP_INTO_FUTURE, ChronoUnit.MILLIS));
-		jobExecutionDao.saveJobExecution(lastExecution);
+		jobExecutionDao.updateJobExecution(lastExecution);
 
 		assertEquals(lastExecution, jobExecutionDao.getLastJobExecution(jobInstance));
 		assertNotNull(lastExecution.getJobParameters());
@@ -293,12 +293,12 @@ public abstract class AbstractJobDaoTests {
 	@Test
 	void testSaveAddsVersionAndId() {
 
-		JobExecution jobExecution = new JobExecution(jobInstance, jobParameters);
+		JobExecution jobExecution = new JobExecution(1L, jobInstance, jobParameters);
 
 		assertNull(jobExecution.getId());
 		assertNull(jobExecution.getVersion());
 
-		jobExecutionDao.saveJobExecution(jobExecution);
+		jobExecutionDao.updateJobExecution(jobExecution);
 
 		assertNotNull(jobExecution.getId());
 		assertNotNull(jobExecution.getVersion());

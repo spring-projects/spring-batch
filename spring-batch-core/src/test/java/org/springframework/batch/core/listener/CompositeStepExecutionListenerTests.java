@@ -21,6 +21,8 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.lang.Nullable;
 
@@ -39,7 +41,7 @@ class CompositeStepExecutionListenerTests {
 
 	@Test
 	void testSetListeners() {
-		JobExecution jobExecution = new JobExecution(1L);
+		JobExecution jobExecution = new JobExecution(11L, new JobInstance(1L, "job"), new JobParameters());
 		StepExecution stepExecution = new StepExecution("s1", jobExecution);
 		listener.setListeners(new StepExecutionListener[] { new StepExecutionListener() {
 			@Nullable
@@ -63,7 +65,7 @@ class CompositeStepExecutionListenerTests {
 
 	@Test
 	void testSetListener() {
-		JobExecution jobExecution = new JobExecution(1L);
+		JobExecution jobExecution = new JobExecution(11L, new JobInstance(1L, "job"), new JobParameters());
 		StepExecution stepExecution = new StepExecution("s1", jobExecution);
 		listener.register(new StepExecutionListener() {
 			@Nullable

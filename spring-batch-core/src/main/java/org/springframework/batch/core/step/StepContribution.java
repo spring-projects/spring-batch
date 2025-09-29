@@ -16,6 +16,7 @@
 package org.springframework.batch.core.step;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 import org.springframework.batch.core.ExitStatus;
 
@@ -29,23 +30,23 @@ import org.springframework.batch.core.ExitStatus;
  */
 public class StepContribution implements Serializable {
 
-	private volatile long readCount = 0;
+	private final StepExecution stepExecution;
 
-	private volatile long writeCount = 0;
+	private long readCount = 0;
 
-	private volatile long filterCount = 0;
+	private long writeCount = 0;
+
+	private long filterCount = 0;
 
 	private final long parentSkipCount;
 
-	private volatile long readSkipCount;
+	private long readSkipCount;
 
-	private volatile long writeSkipCount;
+	private long writeSkipCount;
 
-	private volatile long processSkipCount;
+	private long processSkipCount;
 
 	private ExitStatus exitStatus = ExitStatus.EXECUTING;
-
-	private final StepExecution stepExecution;
 
 	/**
 	 * @param execution {@link StepExecution} the stepExecution used to initialize
@@ -181,6 +182,10 @@ public class StepContribution implements Serializable {
 		processSkipCount++;
 	}
 
+	public void incrementProcessSkipCount(long count) {
+		processSkipCount += count;
+	}
+
 	/**
 	 * Public getter for the read skip count.
 	 * @return the read skip count.
@@ -220,23 +225,20 @@ public class StepContribution implements Serializable {
 				+ processSkipCount + ", exitStatus=" + exitStatus.getExitCode() + "]";
 	}
 
-	/**
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
 	@Override
-	public boolean equals(Object obj) {
-		if (!(obj instanceof StepContribution other)) {
+	public boolean equals(Object o) {
+		if (!(o instanceof StepContribution that))
 			return false;
-		}
-		return toString().equals(other.toString());
+		return readCount == that.readCount && writeCount == that.writeCount && filterCount == that.filterCount
+				&& parentSkipCount == that.parentSkipCount && readSkipCount == that.readSkipCount
+				&& writeSkipCount == that.writeSkipCount && processSkipCount == that.processSkipCount
+				&& Objects.equals(stepExecution, that.stepExecution) && Objects.equals(exitStatus, that.exitStatus);
 	}
 
-	/**
-	 * @see java.lang.Object#hashCode()
-	 */
 	@Override
 	public int hashCode() {
-		return 11 + toString().hashCode() * 43;
+		return Objects.hash(stepExecution, readCount, writeCount, filterCount, parentSkipCount, readSkipCount,
+				writeSkipCount, processSkipCount, exitStatus);
 	}
 
 }

@@ -24,7 +24,10 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
@@ -50,7 +53,10 @@ class PartitionJdbcJobFunctionalTests implements ApplicationContextAware {
 	private ItemReader<CustomerCredit> inputReader;
 
 	@Autowired
-	private JobOperatorTestUtils jobOperatorTestUtils;
+	private JobOperator jobOperator;
+
+	@Autowired
+	private Job job;
 
 	private ApplicationContext applicationContext;
 
@@ -71,7 +77,7 @@ class PartitionJdbcJobFunctionalTests implements ApplicationContextAware {
 		List<CustomerCredit> inputs = new ArrayList<>(getCredits(inputReader));
 		close(inputReader);
 
-		JobExecution jobExecution = jobOperatorTestUtils.startJob();
+		JobExecution jobExecution = jobOperator.start(job, new JobParameters());
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 
 		@SuppressWarnings("unchecked")

@@ -110,7 +110,7 @@ class DefaultJobParametersExtractorJobParametersTests {
 			properties.setProperty(strings[0], strings[1]);
 		}
 		JobParameters jobParameters = this.jobParametersConverter.getJobParameters(properties);
-		return new StepExecution("step", new JobExecution(new JobInstance(1L, "job"), jobParameters));
+		return new StepExecution("step", new JobExecution(1L, new JobInstance(1L, "job"), jobParameters));
 	}
 
 }

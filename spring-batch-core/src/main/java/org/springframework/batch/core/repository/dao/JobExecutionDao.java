@@ -21,6 +21,7 @@ import java.util.Set;
 
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.lang.Nullable;
 
 /**
@@ -33,12 +34,17 @@ import org.springframework.lang.Nullable;
 public interface JobExecutionDao {
 
 	/**
-	 * Save a new JobExecution.
-	 * <p>
-	 * Preconditions: jobInstance the jobExecution belongs to must have a jobInstanceId.
-	 * @param jobExecution {@link JobExecution} instance to be saved.
+	 * Create a new job execution with an assigned id. This method should not add the job
+	 * execution to the job instance (no side effect on the parameter, this is done at the
+	 * repository level).
+	 * @param jobInstance {@link JobInstance} instance the job execution belongs to.
+	 * @param jobParameters {@link JobParameters} of the job execution.
+	 * @return a new {@link JobExecution} instance with an assigned id
+	 * @since 6.0
 	 */
-	void saveJobExecution(JobExecution jobExecution);
+	default JobExecution createJobExecution(JobInstance jobInstance, JobParameters jobParameters) {
+		throw new UnsupportedOperationException();
+	}
 
 	/**
 	 * Update and existing JobExecution.
@@ -79,7 +85,7 @@ public interface JobExecutionDao {
 	 * @return the {@link JobExecution} for given identifier.
 	 */
 	@Nullable
-	JobExecution getJobExecution(Long executionId);
+	JobExecution getJobExecution(long executionId);
 
 	/**
 	 * Because it may be possible that the status of a JobExecution is updated while

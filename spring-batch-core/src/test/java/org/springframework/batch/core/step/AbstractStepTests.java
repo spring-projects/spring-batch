@@ -37,8 +37,8 @@ class AbstractStepTests {
 	@Test
 	void testEndTimeInListener() throws Exception {
 		// given
-		StepExecution execution = new StepExecution("step",
-				new JobExecution(new JobInstance(1L, "job"), 0L, new JobParameters()), 0L);
+		StepExecution execution = new StepExecution(1L, "step",
+				new JobExecution(0L, new JobInstance(1L, "job"), new JobParameters()));
 		JobRepository jobRepository = mock();
 		AbstractStep tested = new AbstractStep(jobRepository) {
 			@Override

@@ -22,7 +22,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.repository.support.ResourcelessJobRepository;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.job.UnexpectedJobExecutionException;
 import org.springframework.batch.core.job.SimpleStepHandler;
@@ -30,8 +32,8 @@ import org.springframework.batch.core.job.flow.Flow;
 import org.springframework.batch.core.job.flow.FlowExecution;
 import org.springframework.batch.core.job.flow.JobFlowExecutor;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.step.JobRepositorySupport;
 import org.springframework.batch.core.step.StepSupport;
+import org.springframework.batch.item.ExecutionContext;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -48,14 +50,17 @@ class FlowBuilderTests {
 	@Test
 	void testNext() throws Exception {
 		FlowBuilder<Flow> builder = new FlowBuilder<>("flow");
-		JobRepository jobRepository = new JobRepositorySupport();
-		JobExecution execution = jobRepository.createJobExecution("foo", new JobParameters());
+		JobRepository jobRepository = new ResourcelessJobRepository();
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = jobRepository.createJobInstance("foo", jobParameters);
+		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
+				new ExecutionContext());
 
 		builder.next(createCompleteStep("stepA"))
 			.end()
-			.start(new JobFlowExecutor(jobRepository, new SimpleStepHandler(jobRepository), execution));
+			.start(new JobFlowExecutor(jobRepository, new SimpleStepHandler(jobRepository), jobExecution));
 
-		Iterator<StepExecution> stepExecutions = execution.getStepExecutions().iterator();
+		Iterator<StepExecution> stepExecutions = jobExecution.getStepExecutions().iterator();
 		assertEquals("stepA", stepExecutions.next().getStepName());
 		assertFalse(stepExecutions.hasNext());
 	}
@@ -63,16 +68,19 @@ class FlowBuilderTests {
 	@Test
 	void testMultipleNext() throws Exception {
 		FlowBuilder<Flow> builder = new FlowBuilder<>("flow");
-		JobRepository jobRepository = new JobRepositorySupport();
-		JobExecution execution = jobRepository.createJobExecution("foo", new JobParameters());
+		JobRepository jobRepository = new ResourcelessJobRepository();
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = jobRepository.createJobInstance("foo", jobParameters);
+		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
+				new ExecutionContext());
 
 		builder.next(createCompleteStep("stepA"))
 			.next(createCompleteStep("stepB"))
 			.next(createCompleteStep("stepC"))
 			.end()
-			.start(new JobFlowExecutor(jobRepository, new SimpleStepHandler(jobRepository), execution));
+			.start(new JobFlowExecutor(jobRepository, new SimpleStepHandler(jobRepository), jobExecution));
 
-		Iterator<StepExecution> stepExecutions = execution.getStepExecutions().iterator();
+		Iterator<StepExecution> stepExecutions = jobExecution.getStepExecutions().iterator();
 		assertEquals("stepA", stepExecutions.next().getStepName());
 		assertEquals("stepB", stepExecutions.next().getStepName());
 		assertEquals("stepC", stepExecutions.next().getStepName());
@@ -82,14 +90,17 @@ class FlowBuilderTests {
 	@Test
 	void testStart() throws Exception {
 		FlowBuilder<Flow> builder = new FlowBuilder<>("flow");
-		JobRepository jobRepository = new JobRepositorySupport();
-		JobExecution execution = jobRepository.createJobExecution("foo", new JobParameters());
+		JobRepository jobRepository = new ResourcelessJobRepository();
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = jobRepository.createJobInstance("foo", jobParameters);
+		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
+				new ExecutionContext());
 
 		builder.start(createCompleteStep("stepA"))
 			.end()
-			.start(new JobFlowExecutor(jobRepository, new SimpleStepHandler(jobRepository), execution));
+			.start(new JobFlowExecutor(jobRepository, new SimpleStepHandler(jobRepository), jobExecution));
 
-		Iterator<StepExecution> stepExecutions = execution.getStepExecutions().iterator();
+		Iterator<StepExecution> stepExecutions = jobExecution.getStepExecutions().iterator();
 		assertEquals("stepA", stepExecutions.next().getStepName());
 		assertFalse(stepExecutions.hasNext());
 	}
@@ -97,14 +108,17 @@ class FlowBuilderTests {
 	@Test
 	void testFrom() throws Exception {
 		FlowBuilder<Flow> builder = new FlowBuilder<>("flow");
-		JobRepository jobRepository = new JobRepositorySupport();
-		JobExecution execution = jobRepository.createJobExecution("foo", new JobParameters());
+		JobRepository jobRepository = new ResourcelessJobRepository();
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = jobRepository.createJobInstance("foo", jobParameters);
+		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
+				new ExecutionContext());
 
 		builder.from(createCompleteStep("stepA"))
 			.end()
-			.start(new JobFlowExecutor(jobRepository, new SimpleStepHandler(jobRepository), execution));
+			.start(new JobFlowExecutor(jobRepository, new SimpleStepHandler(jobRepository), jobExecution));
 
-		Iterator<StepExecution> stepExecutions = execution.getStepExecutions().iterator();
+		Iterator<StepExecution> stepExecutions = jobExecution.getStepExecutions().iterator();
 		assertEquals("stepA", stepExecutions.next().getStepName());
 		assertFalse(stepExecutions.hasNext());
 	}
@@ -112,8 +126,11 @@ class FlowBuilderTests {
 	@Test
 	void testTransitionOrdering() throws Exception {
 		FlowBuilder<Flow> builder = new FlowBuilder<>("transitionsFlow");
-		JobRepository jobRepository = new JobRepositorySupport();
-		JobExecution execution = jobRepository.createJobExecution("foo", new JobParameters());
+		JobRepository jobRepository = new ResourcelessJobRepository();
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = jobRepository.createJobInstance("foo", jobParameters);
+		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
+				new ExecutionContext());
 
 		StepSupport stepA = new StepSupport("stepA") {
 			@Override
@@ -141,9 +158,9 @@ class FlowBuilderTests {
 			.on("FAILED")
 			.to(stepC)
 			.end()
-			.start(new JobFlowExecutor(jobRepository, new SimpleStepHandler(jobRepository), execution));
+			.start(new JobFlowExecutor(jobRepository, new SimpleStepHandler(jobRepository), jobExecution));
 
-		Iterator<StepExecution> stepExecutions = execution.getStepExecutions().iterator();
+		Iterator<StepExecution> stepExecutions = jobExecution.getStepExecutions().iterator();
 		assertEquals("stepA", stepExecutions.next().getStepName());
 		assertEquals("stepC", stepExecutions.next().getStepName());
 		assertFalse(stepExecutions.hasNext());

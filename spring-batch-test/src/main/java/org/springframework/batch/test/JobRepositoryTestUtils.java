@@ -30,6 +30,7 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.lang.Nullable;
 
@@ -101,13 +102,15 @@ public class JobRepositoryTestUtils {
 			throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
 		List<JobExecution> list = new ArrayList<>();
 		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = jobRepository.createJobInstance(jobName, jobParameters);
 		for (int i = 0; i < count; i++) {
-			JobExecution jobExecution = jobRepository.createJobExecution(jobName,
-					jobParametersIncrementer.getNext(jobParameters));
-			list.add(jobExecution);
+			JobParameters nextJobParameters = jobParametersIncrementer.getNext(jobParameters);
+			JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, nextJobParameters,
+					new ExecutionContext());
 			for (String stepName : stepNames) {
-				jobRepository.add(jobExecution.createStepExecution(stepName));
+				jobRepository.createStepExecution(stepName, jobExecution);
 			}
+			list.add(jobExecution);
 		}
 		return list;
 	}

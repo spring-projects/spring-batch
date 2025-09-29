@@ -17,6 +17,8 @@ package org.springframework.batch.core.observability.micrometer;
 
 import java.util.UUID;
 
+import javax.sql.DataSource;
+
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.observation.DefaultMeterObservationHandler;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
@@ -29,6 +31,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.springframework.batch.core.ExitStatus;
+import org.springframework.batch.core.configuration.annotation.EnableJdbcJobRepository;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.parameters.JobParameters;
@@ -44,6 +47,8 @@ import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
@@ -109,6 +114,7 @@ class MicrometerTracingTests extends SampleTestRunner {
 
 	@Configuration(proxyBeanMethods = false)
 	@EnableBatchProcessing
+	@EnableJdbcJobRepository
 	static class TestConfig {
 
 		@Bean
@@ -133,6 +139,19 @@ class MicrometerTracingTests extends SampleTestRunner {
 		@Bean
 		public Job job(JobRepository jobRepository, Step step) {
 			return new JobBuilder("job", jobRepository).start(step).build();
+		}
+
+		@Bean
+		public DataSource dataSource() {
+			return new EmbeddedDatabaseBuilder().addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
+				.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
+				.generateUniqueName(true)
+				.build();
+		}
+
+		@Bean
+		public JdbcTransactionManager transactionManager(DataSource dataSource) {
+			return new JdbcTransactionManager(dataSource);
 		}
 
 	}

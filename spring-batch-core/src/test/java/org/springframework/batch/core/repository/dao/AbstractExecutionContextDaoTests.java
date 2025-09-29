@@ -60,10 +60,10 @@ public abstract class AbstractExecutionContextDaoTests extends AbstractTransacti
 		contextDao = getExecutionContextDao();
 
 		JobInstance ji = jobInstanceDao.createJobInstance("testJob", new JobParameters());
-		jobExecution = new JobExecution(ji, new JobParameters());
-		jobExecutionDao.saveJobExecution(jobExecution);
-		stepExecution = new StepExecution("stepName", jobExecution);
-		stepExecutionDao.saveStepExecution(stepExecution);
+		jobExecution = new JobExecution(1L, ji, new JobParameters());
+		jobExecutionDao.updateJobExecution(jobExecution);
+		stepExecution = new StepExecution(1L, "stepName", jobExecution);
+		stepExecutionDao.updateStepExecution(stepExecution);
 
 	}
 
@@ -106,9 +106,9 @@ public abstract class AbstractExecutionContextDaoTests extends AbstractTransacti
 		List<StepExecution> stepExecutions = new ArrayList<>();
 		for (int i = 0; i < 3; i++) {
 			JobInstance ji = jobInstanceDao.createJobInstance("testJob" + i, new JobParameters());
-			JobExecution je = new JobExecution(ji, new JobParameters());
-			jobExecutionDao.saveJobExecution(je);
-			StepExecution se = new StepExecution("step" + i, je);
+			JobExecution je = new JobExecution(i, ji, new JobParameters());
+			jobExecutionDao.updateJobExecution(je);
+			StepExecution se = new StepExecution(1L, "step" + i, je);
 			se.setStatus(BatchStatus.STARTED);
 			se.setReadSkipCount(i);
 			se.setProcessSkipCount(i);
@@ -121,7 +121,9 @@ public abstract class AbstractExecutionContextDaoTests extends AbstractTransacti
 			se.setWriteCount(i);
 			stepExecutions.add(se);
 		}
-		stepExecutionDao.saveStepExecutions(stepExecutions);
+		for (StepExecution stepExecution : stepExecutions) {
+			stepExecutionDao.updateStepExecution(stepExecution);
+		}
 		contextDao.saveExecutionContexts(stepExecutions);
 
 		for (int i = 0; i < 3; i++) {

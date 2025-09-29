@@ -22,6 +22,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.parameters.JobParameters;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -73,7 +74,7 @@ class CompositeJobExecutionListenerTests {
 				list.add("foo");
 			}
 		});
-		listener.beforeJob(new JobExecution(new JobInstance(11L, "testOpenJob"), null));
+		listener.beforeJob(new JobExecution(1L, new JobInstance(11L, "testOpenJob"), new JobParameters()));
 		assertEquals(1, list.size());
 	}
 

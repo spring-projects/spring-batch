@@ -24,11 +24,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.job.flow.FlowJob;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
@@ -55,7 +57,10 @@ class StepWithSimpleTaskJobParserTests {
 	void testJob() throws Exception {
 		assertNotNull(job);
 		assertTrue(job instanceof FlowJob);
-		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), new JobParameters());
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = jobRepository.createJobInstance(job.getName(), jobParameters);
+		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
+				new ExecutionContext());
 
 		TestTasklet t1 = assertTasklet(job, "step1", "t1");
 		TestTasklet t2 = assertTasklet(job, "step2", "t2");

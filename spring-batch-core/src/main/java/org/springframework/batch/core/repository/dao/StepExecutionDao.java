@@ -16,7 +16,8 @@
 
 package org.springframework.batch.core.repository.dao;
 
-import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
@@ -26,24 +27,17 @@ import org.springframework.lang.Nullable;
 public interface StepExecutionDao {
 
 	/**
-	 * Save the given StepExecution.
-	 * <p>
-	 * Preconditions: Id must be null.
-	 * <p>
-	 * Postconditions: Id will be set to a unique Long.
-	 * @param stepExecution {@link StepExecution} instance to be saved.
+	 * Create a new step execution with an assigned id. This method should not add the
+	 * step execution to the job execution (no side effect on the parameter, this is done
+	 * at the repository level).
+	 * @param stepName the name of the step
+	 * @param jobExecution the job execution the step execution belongs to
+	 * @return a new {@link StepExecution} instance with an assigned id
+	 * @since 6.0
 	 */
-	void saveStepExecution(StepExecution stepExecution);
-
-	/**
-	 * Save the given collection of StepExecution as a batch.
-	 * <p>
-	 * Preconditions: StepExecution Id must be null.
-	 * <p>
-	 * Postconditions: StepExecution Id will be set to a unique Long.
-	 * @param stepExecutions a collection of {@link JobExecution} instances to be saved.
-	 */
-	void saveStepExecutions(Collection<StepExecution> stepExecutions);
+	default StepExecution createStepExecution(String stepName, JobExecution jobExecution) {
+		throw new UnsupportedOperationException();
+	}
 
 	/**
 	 * Update the given StepExecution
@@ -54,13 +48,26 @@ public interface StepExecutionDao {
 	void updateStepExecution(StepExecution stepExecution);
 
 	/**
+	 * Retrieve a {@link StepExecution} from its id. The execution context will not be
+	 * loaded. If you need the execution context, use the job repository which coordinates
+	 * the calls to the various DAOs.
+	 * @param stepExecutionId the step execution id
+	 * @return a {@link StepExecution}
+	 * @since 6.0
+	 */
+	@Nullable
+	StepExecution getStepExecution(long stepExecutionId);
+
+	/**
 	 * Retrieve a {@link StepExecution} from its id.
 	 * @param jobExecution the parent {@link JobExecution}
 	 * @param stepExecutionId the step execution id
 	 * @return a {@link StepExecution}
+	 * @deprecated since 6.0 in favor of {@link #getStepExecution(long)}
 	 */
 	@Nullable
-	StepExecution getStepExecution(JobExecution jobExecution, Long stepExecutionId);
+	@Deprecated(since = "6.0", forRemoval = true)
+	StepExecution getStepExecution(JobExecution jobExecution, long stepExecutionId);
 
 	/**
 	 * Retrieve the last {@link StepExecution} for a given {@link JobInstance} ordered by
@@ -75,10 +82,16 @@ public interface StepExecutionDao {
 	}
 
 	/**
-	 * Retrieve all the {@link StepExecution} for the parent {@link JobExecution}.
-	 * @param jobExecution the parent job execution
+	 * Retrieve all {@link StepExecution}s for a given {@link JobExecution}. The execution
+	 * context will not be loaded. If you need the execution context, use the job
+	 * repository which coordinates the calls to the various DAOs.
+	 * @param jobExecution the parent {@link JobExecution}
+	 * @return a list of {@link StepExecution}s
+	 * @since 6.0
 	 */
-	void addStepExecutions(JobExecution jobExecution);
+	default List<StepExecution> getStepExecutions(JobExecution jobExecution) {
+		return Collections.emptyList();
+	}
 
 	/**
 	 * Counts all the {@link StepExecution} for a given step name.

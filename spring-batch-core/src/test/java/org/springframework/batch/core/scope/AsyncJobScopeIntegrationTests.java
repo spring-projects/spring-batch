@@ -27,6 +27,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.scope.context.JobContext;
 import org.springframework.batch.core.scope.context.JobSynchronizationManager;
 import org.springframework.batch.item.ExecutionContext;
@@ -75,7 +77,8 @@ public class AsyncJobScopeIntegrationTests implements BeanFactoryAware {
 
 	@Test
 	void testSimpleProperty() {
-		JobExecution jobExecution = new JobExecution(11L);
+		JobInstance jobInstance = new JobInstance(1L, "job");
+		JobExecution jobExecution = new JobExecution(11L, jobInstance, new JobParameters());
 		ExecutionContext executionContext = jobExecution.getExecutionContext();
 		executionContext.put("foo", "bar");
 		JobSynchronizationManager.register(jobExecution);
@@ -91,7 +94,8 @@ public class AsyncJobScopeIntegrationTests implements BeanFactoryAware {
 			final String value = "foo" + i;
 			final Long id = 123L + i;
 			FutureTask<String> task = new FutureTask<>(() -> {
-				JobExecution jobExecution = new JobExecution(id);
+				JobInstance jobInstance = new JobInstance(1L, "job");
+				JobExecution jobExecution = new JobExecution(id, jobInstance, new JobParameters());
 				ExecutionContext executionContext = jobExecution.getExecutionContext();
 				executionContext.put("foo", value);
 				JobContext context = JobSynchronizationManager.register(jobExecution);
@@ -119,7 +123,8 @@ public class AsyncJobScopeIntegrationTests implements BeanFactoryAware {
 	void testGetSameInMultipleThreads() throws Exception {
 
 		List<FutureTask<String>> tasks = new ArrayList<>();
-		final JobExecution jobExecution = new JobExecution(11L);
+		JobInstance jobInstance = new JobInstance(1L, "job");
+		JobExecution jobExecution = new JobExecution(11L, jobInstance, new JobParameters());
 		ExecutionContext executionContext = jobExecution.getExecutionContext();
 		executionContext.put("foo", "foo");
 		JobSynchronizationManager.register(jobExecution);

@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameter;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.step.StepExecution;
@@ -95,9 +96,12 @@ class ChunkOrientedStepIntegrationTests {
 					}
 				}), chunkOperations));
 
-		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), new JobParameters(
-				Collections.singletonMap("run.id", new JobParameter(getClass().getName() + ".1", Long.class))));
-		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
+		JobParameters jobParameters = new JobParameters(
+				Collections.singletonMap("run.id", new JobParameter(getClass().getName() + ".1", Long.class)));
+		JobInstance jobInstance = jobRepository.createJobInstance(job.getName(), jobParameters);
+		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
+				new ExecutionContext());
+		StepExecution stepExecution = jobRepository.createStepExecution(step.getName(), jobExecution);
 
 		stepExecution.setExecutionContext(new ExecutionContext() {
 			{
@@ -105,7 +109,6 @@ class ChunkOrientedStepIntegrationTests {
 			}
 		});
 
-		jobRepository.add(stepExecution);
 		step.execute(stepExecution);
 		// Exception on commit is not necessarily fatal: it should fail and rollback
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());

@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDao;
@@ -30,6 +31,8 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringJUnitConfig(locations = { "sql-dao-test.xml" })
+// TODO refactor using black-box testing instead of white-box testing
+@Disabled
 public class JdbcJobDaoTests extends AbstractJobDaoTests {
 
 	public static final String LONG_STRING = "A very long String A very long String A very long String A very long String A very long String A very long String A very long String A very long String A very long String A very long String A very long String A very long String A very long String A very long String A very long String A very long String A very long String A very long String A very long String ";

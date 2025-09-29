@@ -66,7 +66,7 @@ public interface JobInstanceDao {
 	 * @return the job instance with this identifier or {@code null} if it doesn't exist
 	 */
 	@Nullable
-	JobInstance getJobInstance(@Nullable Long instanceId);
+	JobInstance getJobInstance(long instanceId);
 
 	/**
 	 * Fetch the JobInstance for the provided JobExecution.
@@ -75,6 +75,8 @@ public interface JobInstanceDao {
 	 * exist.
 	 */
 	@Nullable
+	// TODO what is the added value of this? client should call
+	// jobExecution.getJobInstance()
 	JobInstance getJobInstance(JobExecution jobExecution);
 
 	/**
@@ -103,10 +105,21 @@ public interface JobInstanceDao {
 	}
 
 	/**
+	 * Fetch all job instance ids for the given job name.
+	 * @param jobName name of the job
+	 * @return the list of job instance ids, or an empty list if none
+	 * @since 6.0
+	 */
+	default List<Long> getJobInstanceIds(String jobName) {
+		throw new UnsupportedOperationException();
+	}
+
+	/**
 	 * Retrieve the names of all job instances sorted alphabetically - i.e. jobs that have
 	 * ever been executed.
 	 * @return the names of all job instances
 	 */
+	// FIXME javadoc: i.e. jobs that have * ever been executed ?
 	List<String> getJobNames();
 
 	/**
@@ -131,7 +144,7 @@ public interface JobInstanceDao {
 	 * repository
 	 * @throws NoSuchJobException thrown if no Job has the jobName specified.
 	 */
-	long getJobInstanceCount(@Nullable String jobName) throws NoSuchJobException;
+	long getJobInstanceCount(String jobName) throws NoSuchJobException;
 
 	/**
 	 * Delete the job instance. This method is not expected to delete the associated job

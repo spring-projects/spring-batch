@@ -26,7 +26,6 @@ import java.util.Set;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobExecutionException;
-import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.partition.PartitionNameProvider;
@@ -157,17 +156,22 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter, Initi
 
 			// Make the step execution name unique and repeatable
 			String stepName = this.stepName + STEP_NAME_SEPARATOR + context.getKey();
-
-			StepExecution currentStepExecution = jobExecution.createStepExecution(stepName);
-
-			boolean startable = isStartable(currentStepExecution, context.getValue());
-
-			if (startable) {
+			StepExecution lastStepExecution = jobRepository.getLastStepExecution(jobExecution.getJobInstance(),
+					stepName);
+			if (lastStepExecution == null) { // fresh start
+				StepExecution currentStepExecution = jobRepository.createStepExecution(stepName, jobExecution);
+				currentStepExecution.setExecutionContext(context.getValue());
 				set.add(currentStepExecution);
 			}
+			else { // restart
+				if (lastStepExecution.getStatus() != BatchStatus.COMPLETED
+						&& shouldStart(allowStartIfComplete, stepExecution, lastStepExecution)) {
+					StepExecution currentStepExecution = jobRepository.createStepExecution(stepName, jobExecution);
+					currentStepExecution.setExecutionContext(lastStepExecution.getExecutionContext());
+					set.add(currentStepExecution);
+				}
+			}
 		}
-
-		jobRepository.addAll(set);
 
 		Set<StepExecution> executions = new HashSet<>(set.size());
 		executions.addAll(set);
@@ -211,31 +215,6 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter, Initi
 		}
 
 		return result;
-	}
-
-	/**
-	 * Check if a step execution is startable.
-	 * @param stepExecution the step execution to check
-	 * @param context the execution context of the step
-	 * @return true if the step execution is startable, false otherwise
-	 * @throws JobExecutionException if unable to check if the step execution is startable
-	 */
-	protected boolean isStartable(StepExecution stepExecution, ExecutionContext context) throws JobExecutionException {
-		JobInstance jobInstance = stepExecution.getJobExecution().getJobInstance();
-		String stepName = stepExecution.getStepName();
-		StepExecution lastStepExecution = jobRepository.getLastStepExecution(jobInstance, stepName);
-
-		boolean isRestart = (lastStepExecution != null && lastStepExecution.getStatus() != BatchStatus.COMPLETED);
-
-		if (isRestart) {
-			stepExecution.setExecutionContext(lastStepExecution.getExecutionContext());
-		}
-		else {
-			stepExecution.setExecutionContext(context);
-		}
-
-		return shouldStart(allowStartIfComplete, stepExecution, lastStepExecution) || isRestart;
-
 	}
 
 	private boolean shouldStart(boolean allowStartIfComplete, StepExecution stepExecution,
@@ -284,10 +263,7 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter, Initi
 	}
 
 	private boolean isSameJobExecution(StepExecution stepExecution, StepExecution lastStepExecution) {
-		if (stepExecution.getJobExecutionId() == null) {
-			return lastStepExecution.getJobExecutionId() == null;
-		}
-		return stepExecution.getJobExecutionId().equals(lastStepExecution.getJobExecutionId());
+		return stepExecution.getJobExecutionId() == lastStepExecution.getJobExecutionId();
 	}
 
 }

@@ -25,6 +25,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.annotation.AfterChunk;
 import org.springframework.batch.core.annotation.AfterProcess;
@@ -58,7 +60,8 @@ class MulticasterBatchListenerTests {
 
 	@Test
 	void testSetListeners() {
-		JobExecution jobExecution = new JobExecution(1L);
+		JobInstance jobInstance = new JobInstance(1L, "job");
+		JobExecution jobExecution = new JobExecution(1L, jobInstance, new JobParameters());
 		StepExecution stepExecution = new StepExecution("s1", jobExecution);
 		multicast.setListeners(Arrays.asList(new StepListenerSupport<Integer, String>() {
 			@Nullable
@@ -80,7 +83,8 @@ class MulticasterBatchListenerTests {
 	 */
 	@Test
 	void testRegister() {
-		JobExecution jobExecution = new JobExecution(1L);
+		JobInstance jobInstance = new JobInstance(1L, "job");
+		JobExecution jobExecution = new JobExecution(1L, jobInstance, new JobParameters());
 		StepExecution stepExecution = new StepExecution("s1", jobExecution);
 		multicast.register(new StepListenerSupport<Integer, String>() {
 			@Nullable

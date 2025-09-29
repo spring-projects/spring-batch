@@ -21,6 +21,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.scope.context.JobSynchronizationManager;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.beans.BeansException;
@@ -85,7 +87,8 @@ class JobScopePlaceholderIntegrationTests implements BeanFactoryAware {
 	private void start(String foo) {
 
 		JobSynchronizationManager.close();
-		jobExecution = new JobExecution(123L);
+		JobInstance jobInstance = new JobInstance(1L, "foo");
+		jobExecution = new JobExecution(123L, jobInstance, new JobParameters());
 
 		ExecutionContext executionContext = new ExecutionContext();
 		executionContext.put("foo", foo);
@@ -125,7 +128,8 @@ class JobScopePlaceholderIntegrationTests implements BeanFactoryAware {
 		assertEquals("bar-bar", compound.getName());
 
 		JobSynchronizationManager.close();
-		jobExecution = new JobExecution(123L);
+		JobInstance jobInstance = new JobInstance(1L, "foo");
+		jobExecution = new JobExecution(123L, jobInstance, new JobParameters());
 
 		ExecutionContext executionContext = new ExecutionContext();
 		executionContext.put("foo", "spam");

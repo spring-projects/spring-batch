@@ -24,6 +24,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
@@ -66,14 +68,16 @@ class StepScopeIntegrationTests {
 
 	@Test
 	void testScopeCreation() throws Exception {
-		vanilla.execute(new StepExecution("foo", new JobExecution(11L), 12L));
+		vanilla.execute(
+				new StepExecution(12L, "foo", new JobExecution(11L, new JobInstance(1L, "job"), new JobParameters())));
 		assertNotNull(TestStep.getContext());
 		assertNull(StepSynchronizationManager.getContext());
 	}
 
 	@Test
 	void testScopedProxy() throws Exception {
-		proxied.execute(new StepExecution("foo", new JobExecution(11L), 31L));
+		proxied.execute(
+				new StepExecution(31L, "foo", new JobExecution(11L, new JobInstance(1L, "job"), new JobParameters())));
 		assertTrue(TestStep.getContext().attributeNames().length > 0);
 		String collaborator = (String) TestStep.getContext().getAttribute("collaborator");
 		assertNotNull(collaborator);
@@ -84,7 +88,8 @@ class StepScopeIntegrationTests {
 
 	@Test
 	void testNestedScopedProxy() throws Exception {
-		nested.execute(new StepExecution("foo", new JobExecution(11L), 31L));
+		nested.execute(
+				new StepExecution(31L, "foo", new JobExecution(11L, new JobInstance(1L, "job"), new JobParameters())));
 		assertTrue(TestStep.getContext().attributeNames().length > 0);
 		String collaborator = (String) TestStep.getContext().getAttribute("collaborator");
 		assertNotNull(collaborator);
@@ -98,7 +103,8 @@ class StepScopeIntegrationTests {
 
 	@Test
 	void testExecutionContext() throws Exception {
-		StepExecution stepExecution = new StepExecution("foo", new JobExecution(11L), 1L);
+		StepExecution stepExecution = new StepExecution(1L, "foo",
+				new JobExecution(11L, new JobInstance(1L, "job"), new JobParameters()));
 		ExecutionContext executionContext = new ExecutionContext();
 		executionContext.put("name", "spam");
 		stepExecution.setExecutionContext(executionContext);
@@ -111,7 +117,8 @@ class StepScopeIntegrationTests {
 
 	@Test
 	void testScopedProxyForReference() throws Exception {
-		enhanced.execute(new StepExecution("foo", new JobExecution(11L), 123L));
+		enhanced.execute(
+				new StepExecution(123L, "foo", new JobExecution(11L, new JobInstance(1L, "job"), new JobParameters())));
 		assertTrue(TestStep.getContext().attributeNames().length > 0);
 		String collaborator = (String) TestStep.getContext().getAttribute("collaborator");
 		assertNotNull(collaborator);
@@ -120,7 +127,8 @@ class StepScopeIntegrationTests {
 
 	@Test
 	void testScopedProxyForSecondReference() throws Exception {
-		doubleEnhanced.execute(new StepExecution("foo", new JobExecution(11L), 321L));
+		doubleEnhanced.execute(
+				new StepExecution(321L, "foo", new JobExecution(11L, new JobInstance(1L, "job"), new JobParameters())));
 		assertTrue(TestStep.getContext().attributeNames().length > 0);
 		String collaborator = (String) TestStep.getContext().getAttribute("collaborator");
 		assertNotNull(collaborator);

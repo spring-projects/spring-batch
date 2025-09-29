@@ -23,6 +23,8 @@ import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.batch.item.ItemReader;
@@ -101,7 +103,8 @@ class InlineItemHandlerParserTests {
 	void testInlineHandlersWithStepScope() {
 		context = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/xml/InlineItemHandlerWithStepScopeParserTests-context.xml");
-		StepSynchronizationManager.register(new StepExecution("step", new JobExecution(123L)));
+		StepSynchronizationManager.register(
+				new StepExecution(1L, "step", new JobExecution(123L, new JobInstance(1L, "job"), new JobParameters())));
 
 		@SuppressWarnings({ "rawtypes" })
 		Map<String, ItemReader> readers = context.getBeansOfType(ItemReader.class);

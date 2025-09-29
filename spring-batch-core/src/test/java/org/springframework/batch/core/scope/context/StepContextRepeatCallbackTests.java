@@ -23,6 +23,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatStatus;
@@ -33,7 +35,8 @@ import org.springframework.batch.repeat.RepeatStatus;
  */
 class StepContextRepeatCallbackTests {
 
-	private final StepExecution stepExecution = new StepExecution("foo", new JobExecution(0L), 123L);
+	private final StepExecution stepExecution = new StepExecution(123L, "foo",
+			new JobExecution(0L, new JobInstance(1L, "job"), new JobParameters()));
 
 	private boolean addedAttribute = false;
 

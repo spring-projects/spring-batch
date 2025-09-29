@@ -16,6 +16,7 @@
 package org.springframework.batch.core.launch.support;
 
 import java.time.Duration;
+import java.util.List;
 
 import io.micrometer.observation.ObservationRegistry;
 import org.apache.commons.logging.Log;
@@ -36,6 +37,7 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
@@ -104,32 +106,80 @@ public class TaskExecutorJobLauncher implements JobLauncher, InitializingBean {
 		Assert.notNull(job, "The Job must not be null.");
 		Assert.notNull(jobParameters, "The JobParameters must not be null.");
 
-		final JobExecution jobExecution;
-		JobExecution lastExecution = jobRepository.getLastJobExecution(job.getName(), jobParameters);
-		if (lastExecution != null) {
-			if (!job.isRestartable()) {
-				throw new JobRestartException("JobInstance already exists and is not restartable");
+		JobInstance jobInstance = jobRepository.getJobInstance(job.getName(), jobParameters);
+		ExecutionContext executionContext;
+		if (jobInstance == null) { // fresh start
+			logger.debug(
+					"Creating a new job instance for job = " + job.getName() + " with parameters = " + jobParameters);
+			jobInstance = jobRepository.createJobInstance(job.getName(), jobParameters);
+			executionContext = new ExecutionContext();
+		}
+		else { // restart
+			logger.debug(
+					"Found existing job instance for job = " + job.getName() + " with parameters = " + jobParameters);
+			List<JobExecution> executions = jobRepository.getJobExecutions(jobInstance);
+			if (executions.isEmpty()) {
+				throw new IllegalStateException("Cannot find any job execution for job instance: " + jobInstance);
 			}
-			/*
-			 * validate here if it has stepExecutions that are UNKNOWN, STARTING, STARTED
-			 * and STOPPING retrieve the previous execution and check
-			 */
-			for (StepExecution execution : lastExecution.getStepExecutions()) {
-				BatchStatus status = execution.getStatus();
-				if (status.isRunning()) {
-					throw new JobExecutionAlreadyRunningException(
-							"A job execution for this job is already running: " + lastExecution);
+			else {
+				// check for running executions and find the last started
+				for (JobExecution execution : executions) {
+					if (execution.isRunning()) {
+						throw new JobExecutionAlreadyRunningException(
+								"A job execution for this job is already running: " + jobInstance);
+					}
+					BatchStatus status = execution.getStatus();
+					if (status == BatchStatus.UNKNOWN) {
+						throw new JobRestartException("Cannot restart job from UNKNOWN status. "
+								+ "The last execution ended with a failure that could not be rolled back, "
+								+ "so it may be dangerous to proceed. Manual intervention is probably necessary.");
+					}
+					JobParameters allJobParameters = execution.getJobParameters();
+					JobParameters identifyingJobParameters = new JobParameters(
+							allJobParameters.getIdentifyingParameters());
+					if (!identifyingJobParameters.isEmpty()
+							&& (status == BatchStatus.COMPLETED || status == BatchStatus.ABANDONED)) {
+						throw new JobInstanceAlreadyCompleteException(
+								"A job instance already exists and is complete for identifying parameters="
+										+ identifyingJobParameters + ".  If you want to run this job again, "
+										+ "change the parameters.");
+					}
 				}
-				else if (status == BatchStatus.UNKNOWN) {
-					throw new JobRestartException(
-							"Cannot restart step [" + execution.getStepName() + "] from UNKNOWN status. "
-									+ "The last execution ended with a failure that could not be rolled back, "
-									+ "so it may be dangerous to proceed. Manual intervention is probably necessary.");
+			}
+
+			JobExecution lastJobExecution = jobRepository.getLastJobExecution(jobInstance);
+			if (lastJobExecution == null) { // should never happen, already checked above
+				throw new IllegalStateException("A job instance with no job executions exists for job = "
+						+ job.getName() + " and parameters = " + jobParameters);
+			}
+			else {
+				// check if the job is restartable
+				if (!job.isRestartable()) {
+					throw new JobRestartException("JobInstance already exists and is not restartable");
 				}
+				/*
+				 * validate here if it has stepExecutions that are UNKNOWN, STARTING,
+				 * STARTED and STOPPING retrieve the previous execution and check
+				 */
+				for (StepExecution execution : lastJobExecution.getStepExecutions()) {
+					BatchStatus status = execution.getStatus();
+					if (status.isRunning()) {
+						throw new JobExecutionAlreadyRunningException(
+								"A job execution for this job is already running: " + lastJobExecution);
+					}
+					else if (status == BatchStatus.UNKNOWN) {
+						throw new JobRestartException("Cannot restart step [" + execution.getStepName()
+								+ "] from UNKNOWN status. "
+								+ "The last execution ended with a failure that could not be rolled back, "
+								+ "so it may be dangerous to proceed. Manual intervention is probably necessary.");
+					}
+				}
+
+				executionContext = lastJobExecution.getExecutionContext();
 			}
 		}
 
-		// Check the validity of the parameters before doing creating anything
+		// Check the validity of the parameters before creating anything
 		// in the repository...
 		job.getJobParametersValidator().validate(jobParameters);
 
@@ -139,8 +189,8 @@ public class TaskExecutorJobLauncher implements JobLauncher, InitializingBean {
 		 * execution for this instance between the last assertion and the next method
 		 * returning successfully.
 		 */
-		jobExecution = jobRepository.createJobExecution(job.getName(), jobParameters);
-
+		final JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
+				executionContext);
 		try {
 			taskExecutor.execute(new Runnable() {
 
@@ -187,7 +237,7 @@ public class TaskExecutorJobLauncher implements JobLauncher, InitializingBean {
 			if (jobExecution.getExitStatus().equals(ExitStatus.UNKNOWN)) {
 				jobExecution.setExitStatus(ExitStatus.FAILED.addExitDescription(e));
 			}
-			jobRepository.update(jobExecution);
+			jobRepository.update(jobExecution); // FIXME should be in finally block
 		}
 
 		return jobExecution;

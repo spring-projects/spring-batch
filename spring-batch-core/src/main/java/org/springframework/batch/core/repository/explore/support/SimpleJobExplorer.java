@@ -120,7 +120,7 @@ public class SimpleJobExplorer implements JobExplorer {
 
 	@Nullable
 	@Override
-	public JobInstance getJobInstance(@Nullable Long instanceId) {
+	public JobInstance getJobInstance(long instanceId) {
 		return jobInstanceDao.getJobInstance(instanceId);
 	}
 
@@ -142,7 +142,7 @@ public class SimpleJobExplorer implements JobExplorer {
 	}
 
 	@Override
-	public long getJobInstanceCount(@Nullable String jobName) throws NoSuchJobException {
+	public long getJobInstanceCount(String jobName) throws NoSuchJobException {
 		return jobInstanceDao.getJobInstanceCount(jobName);
 	}
 
@@ -181,9 +181,10 @@ public class SimpleJobExplorer implements JobExplorer {
 	@Override
 	public List<JobExecution> findJobExecutions(JobInstance jobInstance) {
 		List<JobExecution> jobExecutions = this.jobExecutionDao.findJobExecutions(jobInstance);
-		for (JobExecution jobExecution : jobExecutions) {
-			this.stepExecutionDao.addStepExecutions(jobExecution);
-		}
+		// TODO retrieve step executions and execution context here as well?
+		// for (JobExecution jobExecution : jobExecutions) {
+		// this.stepExecutionDao.addStepExecutions(jobExecution);
+		// }
 		return jobExecutions;
 	}
 
@@ -197,8 +198,7 @@ public class SimpleJobExplorer implements JobExplorer {
 		JobExecution jobExecution = jobExecutionDao.getLastJobExecution(jobInstance);
 
 		if (jobExecution != null) {
-			jobExecution.setExecutionContext(ecDao.getExecutionContext(jobExecution));
-			stepExecutionDao.addStepExecutions(jobExecution);
+			getJobExecutionDependencies(jobExecution);
 		}
 		return jobExecution;
 	}
@@ -217,10 +217,7 @@ public class SimpleJobExplorer implements JobExplorer {
 
 	@Nullable
 	@Override
-	public JobExecution getJobExecution(@Nullable Long executionId) {
-		if (executionId == null) {
-			return null;
-		}
+	public JobExecution getJobExecution(long executionId) {
 		JobExecution jobExecution = jobExecutionDao.getJobExecution(executionId);
 		if (jobExecution == null) {
 			return null;
@@ -236,10 +233,12 @@ public class SimpleJobExplorer implements JobExplorer {
 	 * Find all dependencies for a JobExecution, including JobInstance (which requires
 	 * JobParameters) plus StepExecutions
 	 */
+	// TODO rename to something more representative of what it does (side effect on the
+	// parameter)
 	private void getJobExecutionDependencies(JobExecution jobExecution) {
 		JobInstance jobInstance = jobInstanceDao.getJobInstance(jobExecution);
-		stepExecutionDao.addStepExecutions(jobExecution);
 		jobExecution.setJobInstance(jobInstance);
+		jobExecution.addStepExecutions(stepExecutionDao.getStepExecutions(jobExecution));
 		jobExecution.setExecutionContext(ecDao.getExecutionContext(jobExecution));
 
 	}
@@ -252,7 +251,7 @@ public class SimpleJobExplorer implements JobExplorer {
 
 	@Nullable
 	@Override
-	public StepExecution getStepExecution(@Nullable Long jobExecutionId, @Nullable Long executionId) {
+	public StepExecution getStepExecution(long jobExecutionId, long executionId) {
 		JobExecution jobExecution = jobExecutionDao.getJobExecution(jobExecutionId);
 		if (jobExecution == null) {
 			return null;

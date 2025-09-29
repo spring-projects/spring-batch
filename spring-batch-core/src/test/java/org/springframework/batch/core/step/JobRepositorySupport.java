@@ -15,13 +15,7 @@
  */
 package org.springframework.batch.core.step;
 
-import java.util.Collection;
-
-import org.springframework.batch.core.job.JobExecution;
-import org.springframework.batch.core.job.JobInstance;
-import org.springframework.batch.core.job.parameters.JobParameters;
-import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.lang.Nullable;
+import org.springframework.batch.core.repository.support.ResourcelessJobRepository;
 
 /**
  * @author Dave Syer
@@ -29,70 +23,6 @@ import org.springframework.lang.Nullable;
  * @author Mahmoud Ben Hassine
  * @author Parikshit Dutta
  */
-public class JobRepositorySupport implements JobRepository {
-
-	@Override
-	public JobExecution createJobExecution(String jobName, JobParameters jobParameters) {
-		JobInstance jobInstance = new JobInstance(0L, jobName);
-		return new JobExecution(jobInstance, 11L, jobParameters);
-	}
-
-	@Override
-	public void update(JobExecution jobExecution) {
-	}
-
-	@Nullable
-	@Override
-	public JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
-		return null;
-	}
-
-	@Nullable
-	@Override
-	public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
-		return null;
-	}
-
-	@Override
-	public long getStepExecutionCount(JobInstance jobInstance, String stepName) {
-		return 0;
-	}
-
-	@Override
-	public void add(StepExecution stepExecution) {
-	}
-
-	@Override
-	public void update(StepExecution stepExecution) {
-	}
-
-	@Override
-	public void updateExecutionContext(StepExecution stepExecution) {
-	}
-
-	@SuppressWarnings("removal")
-	@Override
-	public boolean isJobInstanceExists(String jobName, JobParameters jobParameters) {
-		return false;
-	}
-
-	@Nullable
-	@Override
-	public JobExecution getLastJobExecution(String jobName, JobParameters jobParameters) {
-		return null;
-	}
-
-	@Override
-	public void updateExecutionContext(JobExecution jobExecution) {
-	}
-
-	@Override
-	public void addAll(Collection<StepExecution> stepExecutions) {
-	}
-
-	@Override
-	public JobInstance createJobInstance(String jobName, JobParameters jobParameters) {
-		return null;
-	}
+public class JobRepositorySupport extends ResourcelessJobRepository {
 
 }

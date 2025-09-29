@@ -86,7 +86,7 @@ public class StagingItemReader<T>
 
 					(rs, rowNum) -> rs.getLong(1),
 
-					stepExecution.getJobExecution().getJobId(), StagingItemWriter.NEW);
+					stepExecution.getJobExecution().getJobInstanceId(), StagingItemWriter.NEW);
 
 		}
 		finally {

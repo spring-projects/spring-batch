@@ -26,9 +26,11 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
@@ -81,12 +83,16 @@ class JobRepositoryTestUtilsTests {
 	void testRemoveJobExecutionsWithSameJobInstance() throws Exception {
 		utils = new JobRepositoryTestUtils(jobRepository);
 		List<JobExecution> list = new ArrayList<>();
-		JobExecution jobExecution = jobRepository.createJobExecution("job", new JobParameters());
+		JobParameters jobParameters = new JobParameters();
+		ExecutionContext executionContext = new ExecutionContext();
+		JobInstance jobInstance = jobRepository.createJobInstance("job", jobParameters);
+		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters, executionContext);
+
 		jobExecution.setEndTime(LocalDateTime.now());
 		jobExecution.setStatus(BatchStatus.COMPLETED);
 		list.add(jobExecution);
 		jobRepository.update(jobExecution);
-		jobExecution = jobRepository.createJobExecution("job", new JobParameters());
+		jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters, executionContext);
 		list.add(jobExecution);
 		assertEquals(beforeJobs + 2, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_EXECUTION"));
 		utils.removeJobExecutions(list);
@@ -103,18 +109,6 @@ class JobRepositoryTestUtilsTests {
 		utils.removeJobExecutions(list);
 		assertEquals(beforeJobs, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_EXECUTION"));
 		assertEquals(beforeSteps, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_STEP_EXECUTION"));
-	}
-
-	@Test
-	void testRemoveJobExecutionsIncrementally() throws Exception {
-		utils = new JobRepositoryTestUtils(jobRepository);
-		List<JobExecution> list1 = utils.createJobExecutions(3);
-		List<JobExecution> list2 = utils.createJobExecutions(2);
-		assertEquals(beforeJobs + 5, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_EXECUTION"));
-		utils.removeJobExecutions(list2);
-		assertEquals(beforeJobs + 3, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_EXECUTION"));
-		utils.removeJobExecutions(list1);
-		assertEquals(beforeJobs, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_EXECUTION"));
 	}
 
 	@Test

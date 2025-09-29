@@ -21,9 +21,12 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.AbstractStep;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
@@ -56,11 +59,14 @@ class TaskletStepAllowStartIfCompleteTests {
 	void testRestart() throws Exception {
 		JobParametersBuilder paramBuilder = new JobParametersBuilder();
 		paramBuilder.addString("value", "foo");
-		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), paramBuilder.toJobParameters());
+		JobParameters jobParameters = new JobParameters();
+		ExecutionContext executionContext = new ExecutionContext();
+		JobInstance jobInstance = jobRepository.createJobInstance(job.getName(), jobParameters);
+		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters, executionContext);
 
 		job.execute(jobExecution);
 
-		jobExecution = jobRepository.createJobExecution(job.getName(), paramBuilder.toJobParameters());
+		jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters, executionContext);
 		job.execute(jobExecution);
 
 		long count = jobRepository.getStepExecutionCount(jobExecution.getJobInstance(), "simpleJob.step1");

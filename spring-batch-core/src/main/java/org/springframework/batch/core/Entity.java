@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package org.springframework.batch.core;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 import org.springframework.util.ClassUtils;
 
@@ -32,44 +33,23 @@ import org.springframework.util.ClassUtils;
  */
 public class Entity implements Serializable {
 
-	private Long id;
+	private final long id;
 
-	private volatile Integer version;
-
-	/**
-	 * Default constructor for {@link Entity}.
-	 * <p>
-	 * The ID defaults to zero.
-	 */
-	public Entity() {
-		super();
-	}
+	private Integer version;
 
 	/**
 	 * The constructor for the {@link Entity} where the ID is established.
 	 * @param id The ID for the entity.
 	 */
-	public Entity(Long id) {
-		super();
-
-		// Commented out because StepExecutions are still created in a disconnected
-		// manner. The Repository should create them, then this can be uncommented.
-		// Assert.notNull(id, "Entity id must not be null.");
+	public Entity(long id) {
 		this.id = id;
 	}
 
 	/**
 	 * @return The ID associated with the {@link Entity}.
 	 */
-	public Long getId() {
+	public long getId() {
 		return id;
-	}
-
-	/**
-	 * @param id The ID for the {@link Entity}.
-	 */
-	public void setId(Long id) {
-		this.id = id;
 	}
 
 	/**
@@ -108,47 +88,16 @@ public class Entity implements Serializable {
 		return String.format("%s: id=%d, version=%d", ClassUtils.getShortName(getClass()), id, version);
 	}
 
-	/**
-	 * Attempt to establish identity based on {@code id} if both exist. If either
-	 * {@code id} does not exist, use {@code Object.equals()}.
-	 *
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
 	@Override
-	public boolean equals(Object other) {
-		if (other == this) {
-			return true;
-		}
-		if (other == null) {
+	public boolean equals(Object o) {
+		if (!(o instanceof Entity entity))
 			return false;
-		}
-		if (!(other instanceof Entity entity)) {
-			return false;
-		}
-		if (id == null || entity.getId() == null) {
-			return false;
-		}
-		return id.equals(entity.getId());
+		return id == entity.id;
 	}
 
-	/**
-	 * Use {@code id}, if it exists, to establish a hash code. Otherwise fall back to
-	 * {@code Object.hashCode()}. It is based on the same information as {@code equals},
-	 * so, if that changes, this will. Note that this follows the contract of
-	 * {@code Object.hashCode()} but will cause problems for anyone adding an unsaved
-	 * {@link Entity} to a {@code Set} because {@code Set.contains()} almost certainly
-	 * returns false for the {@link Entity} after it is saved. Spring Batch does not store
-	 * any of its entities in sets as a matter of course, so this is internally
-	 * consistent. Clients should not be exposed to unsaved entities.
-	 *
-	 * @see java.lang.Object#hashCode()
-	 */
 	@Override
 	public int hashCode() {
-		if (id == null) {
-			return System.identityHashCode(this);
-		}
-		return 39 + 87 * id.hashCode();
+		return Objects.hashCode(id);
 	}
 
 }

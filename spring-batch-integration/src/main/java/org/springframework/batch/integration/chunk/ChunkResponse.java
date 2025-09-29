@@ -76,7 +76,7 @@ public class ChunkResponse implements Serializable {
 		return stepContribution;
 	}
 
-	public Long getJobId() {
+	public Long getJobInstanceId() {
 		return jobId;
 	}
 

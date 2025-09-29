@@ -21,12 +21,15 @@ import org.junit.jupiter.api.BeforeEach;
 
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -50,13 +53,18 @@ public abstract class AbstractJobParserTests {
 		stepNamesList.clear();
 	}
 
+	private JobInstance jobInstance;
+
 	/**
 	 * @return JobExecution
 	 */
 	protected JobExecution createJobExecution()
 			throws JobInstanceAlreadyCompleteException, JobRestartException, JobExecutionAlreadyRunningException {
-		return jobRepository.createJobExecution(job.getName(),
-				new JobParametersBuilder().addLong("key1", 1L).toJobParameters());
+		JobParameters jobParameters = new JobParametersBuilder().addLong("key1", 1L).toJobParameters();
+		if (jobInstance == null) {
+			jobInstance = jobRepository.createJobInstance(job.getName(), jobParameters);
+		}
+		return jobRepository.createJobExecution(jobInstance, jobParameters, new ExecutionContext());
 	}
 
 	protected StepExecution getStepExecution(JobExecution jobExecution, String stepName) {

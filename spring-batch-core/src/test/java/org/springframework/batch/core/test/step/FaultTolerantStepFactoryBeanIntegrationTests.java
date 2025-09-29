@@ -28,15 +28,13 @@ import org.junit.jupiter.api.Timeout;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.factory.FaultTolerantStepFactoryBean;
-import org.springframework.batch.item.Chunk;
-import org.springframework.batch.item.ItemProcessor;
-import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.*;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.item.support.SynchronizedItemReader;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -116,7 +114,9 @@ class FaultTolerantStepFactoryBeanIntegrationTests {
 	@Timeout(value = 30, threadMode = SEPARATE_THREAD)
 	void testMultithreadedSunnyDay() throws Throwable {
 
-		JobExecution jobExecution = repository.createJobExecution("vanillaJob", new JobParameters());
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = repository.createJobInstance("vanillaJob", jobParameters);
+		JobExecution jobExecution = repository.createJobExecution(jobInstance, jobParameters, new ExecutionContext());
 
 		for (int i = 0; i < MAX_COUNT; i++) {
 
@@ -134,8 +134,7 @@ class FaultTolerantStepFactoryBeanIntegrationTests {
 
 				Step step = factory.getObject();
 
-				StepExecution stepExecution = jobExecution.createStepExecution(factory.getName());
-				repository.add(stepExecution);
+				StepExecution stepExecution = repository.createStepExecution(factory.getName(), jobExecution);
 				step.execute(stepExecution);
 				assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 

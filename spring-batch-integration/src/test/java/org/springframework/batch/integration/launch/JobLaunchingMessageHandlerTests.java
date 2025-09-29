@@ -65,7 +65,7 @@ class JobLaunchingMessageHandlerTests {
 		public JobExecution start(Job job, JobParameters jobParameters) {
 			jobs.add(job);
 			parameters.add(jobParameters);
-			return new JobExecution(new JobInstance(jobId.getAndIncrement(), job.getName()), jobParameters);
+			return new JobExecution(1L, new JobInstance(jobId.getAndIncrement(), job.getName()), jobParameters);
 		}
 
 	}

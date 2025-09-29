@@ -29,6 +29,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.listener.ChunkListener;
 import org.springframework.batch.core.listener.ItemProcessListener;
 import org.springframework.batch.core.listener.ItemReadListener;
@@ -45,10 +46,7 @@ import org.springframework.batch.core.repository.support.JdbcJobRepositoryFactor
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.core.step.factory.SimpleStepFactoryBean;
-import org.springframework.batch.item.Chunk;
-import org.springframework.batch.item.ItemProcessor;
-import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.*;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.repeat.exception.SimpleLimitExceptionHandler;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
@@ -139,7 +137,9 @@ class SimpleStepFactoryBeanTests {
 		step.setName("step2");
 		job.addStep(step);
 
-		JobExecution jobExecution = repository.createJobExecution(job.getName(), new JobParameters());
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = repository.createJobInstance(job.getName(), jobParameters);
+		JobExecution jobExecution = repository.createJobExecution(jobInstance, jobParameters, new ExecutionContext());
 
 		job.execute(jobExecution);
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
@@ -171,7 +171,9 @@ class SimpleStepFactoryBeanTests {
 
 		job.setSteps(Collections.singletonList(step));
 
-		JobExecution jobExecution = repository.createJobExecution(job.getName(), new JobParameters());
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = repository.createJobInstance(job.getName(), jobParameters);
+		JobExecution jobExecution = repository.createJobExecution(jobInstance, jobParameters, new ExecutionContext());
 
 		job.execute(jobExecution);
 		assertEquals("Error!", jobExecution.getAllFailureExceptions().get(0).getMessage());
@@ -193,7 +195,9 @@ class SimpleStepFactoryBeanTests {
 		AbstractStep step = (AbstractStep) factory.getObject();
 		job.setSteps(Collections.singletonList((Step) step));
 
-		JobExecution jobExecution = repository.createJobExecution(job.getName(), new JobParameters());
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = repository.createJobInstance(job.getName(), jobParameters);
+		JobExecution jobExecution = repository.createJobExecution(jobInstance, jobParameters, new ExecutionContext());
 
 		job.execute(jobExecution);
 		assertEquals("Foo", jobExecution.getAllFailureExceptions().get(0).getMessage());
@@ -220,7 +224,9 @@ class SimpleStepFactoryBeanTests {
 		AbstractStep step = (AbstractStep) factory.getObject();
 		job.setSteps(Collections.singletonList((Step) step));
 
-		JobExecution jobExecution = repository.createJobExecution(job.getName(), new JobParameters());
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = repository.createJobInstance(job.getName(), jobParameters);
+		JobExecution jobExecution = repository.createJobExecution(jobInstance, jobParameters, new ExecutionContext());
 
 		job.execute(jobExecution);
 
@@ -295,7 +301,9 @@ class SimpleStepFactoryBeanTests {
 
 		job.setSteps(Collections.singletonList((Step) step));
 
-		JobExecution jobExecution = repository.createJobExecution(job.getName(), new JobParameters());
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = repository.createJobInstance(job.getName(), jobParameters);
+		JobExecution jobExecution = repository.createJobExecution(jobInstance, jobParameters, new ExecutionContext());
 		job.execute(jobExecution);
 
 		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
@@ -377,7 +385,9 @@ class SimpleStepFactoryBeanTests {
 
 		job.setSteps(Collections.singletonList((Step) step));
 
-		JobExecution jobExecution = repository.createJobExecution(job.getName(), new JobParameters());
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = repository.createJobInstance(job.getName(), jobParameters);
+		JobExecution jobExecution = repository.createJobExecution(jobInstance, jobParameters, new ExecutionContext());
 		job.execute(jobExecution);
 
 		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
@@ -503,7 +513,9 @@ class SimpleStepFactoryBeanTests {
 
 		job.setSteps(Collections.singletonList(step));
 
-		JobExecution jobExecution = repository.createJobExecution(job.getName(), new JobParameters());
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = repository.createJobInstance(job.getName(), jobParameters);
+		JobExecution jobExecution = repository.createJobExecution(jobInstance, jobParameters, new ExecutionContext());
 
 		job.execute(jobExecution);
 
@@ -549,7 +561,9 @@ class SimpleStepFactoryBeanTests {
 
 		job.setSteps(Collections.singletonList(step));
 
-		JobExecution jobExecution = repository.createJobExecution(job.getName(), new JobParameters());
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = repository.createJobInstance(job.getName(), jobParameters);
+		JobExecution jobExecution = repository.createJobExecution(jobInstance, jobParameters, new ExecutionContext());
 
 		job.execute(jobExecution);
 

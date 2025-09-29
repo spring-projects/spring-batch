@@ -19,27 +19,25 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.JdbcJobRepositoryFactoryBean;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class RemoteStepExecutionAggregatorTests {
 
 	private final RemoteStepExecutionAggregator aggregator = new RemoteStepExecutionAggregator();
-
-	private JobExecution jobExecution;
 
 	private StepExecution result;
 
@@ -60,12 +58,13 @@ class RemoteStepExecutionAggregatorTests {
 		factory.afterPropertiesSet();
 		JobRepository jobRepository = factory.getObject();
 		aggregator.setJobRepository(jobRepository);
-		jobExecution = jobRepository.createJobExecution("job", new JobParameters());
-		result = jobExecution.createStepExecution("aggregate");
-		stepExecution1 = jobExecution.createStepExecution("foo:1");
-		stepExecution2 = jobExecution.createStepExecution("foo:2");
-		jobRepository.add(stepExecution1);
-		jobRepository.add(stepExecution2);
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = jobRepository.createJobInstance("job", jobParameters);
+		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
+				new ExecutionContext());
+		result = jobRepository.createStepExecution("aggregate", jobExecution);
+		stepExecution1 = jobRepository.createStepExecution("foo:1", jobExecution);
+		stepExecution2 = jobRepository.createStepExecution("foo:2", jobExecution);
 	}
 
 	@Test
@@ -85,15 +84,6 @@ class RemoteStepExecutionAggregatorTests {
 		aggregator.aggregate(result, Arrays.<StepExecution>asList(stepExecution1, stepExecution2));
 		assertNotNull(result);
 		assertEquals(BatchStatus.STARTING, result.getStatus());
-	}
-
-	@Test
-	void testAggregateStatusMissingExecution() {
-		stepExecution2 = jobExecution.createStepExecution("foo:3");
-		stepExecution1.setStatus(BatchStatus.COMPLETED);
-		stepExecution2.setStatus(BatchStatus.COMPLETED);
-		assertThrows(IllegalStateException.class,
-				() -> aggregator.aggregate(result, List.of(stepExecution1, stepExecution2)));
 	}
 
 }

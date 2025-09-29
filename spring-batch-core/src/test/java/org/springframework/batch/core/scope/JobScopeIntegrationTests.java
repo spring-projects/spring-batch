@@ -25,6 +25,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.scope.context.JobSynchronizationManager;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,14 +67,14 @@ class JobScopeIntegrationTests {
 
 	@Test
 	void testScopeCreation() {
-		vanilla.execute(new JobExecution(11L));
+		vanilla.execute(new JobExecution(11L, new JobInstance(1L, "job"), new JobParameters()));
 		assertNotNull(TestJob.getContext());
 		assertNull(JobSynchronizationManager.getContext());
 	}
 
 	@Test
 	void testScopedProxy() {
-		proxied.execute(new JobExecution(11L));
+		proxied.execute(new JobExecution(11L, new JobInstance(1L, "job"), new JobParameters()));
 		assertTrue(TestJob.getContext().attributeNames().length > 0);
 		String collaborator = (String) TestJob.getContext().getAttribute("collaborator");
 		assertNotNull(collaborator);
@@ -83,7 +85,7 @@ class JobScopeIntegrationTests {
 
 	@Test
 	void testNestedScopedProxy() {
-		nested.execute(new JobExecution(11L));
+		nested.execute(new JobExecution(11L, new JobInstance(1L, "job"), new JobParameters()));
 		assertTrue(TestJob.getContext().attributeNames().length > 0);
 		String collaborator = (String) TestJob.getContext().getAttribute("collaborator");
 		assertNotNull(collaborator);
@@ -97,7 +99,7 @@ class JobScopeIntegrationTests {
 
 	@Test
 	void testExecutionContext() {
-		JobExecution stepExecution = new JobExecution(11L);
+		JobExecution stepExecution = new JobExecution(11L, new JobInstance(1L, "job"), new JobParameters());
 		ExecutionContext executionContext = new ExecutionContext();
 		executionContext.put("name", "spam");
 		stepExecution.setExecutionContext(executionContext);
@@ -110,7 +112,7 @@ class JobScopeIntegrationTests {
 
 	@Test
 	void testScopedProxyForReference() {
-		enhanced.execute(new JobExecution(11L));
+		enhanced.execute(new JobExecution(11L, new JobInstance(1L, "job"), new JobParameters()));
 		assertTrue(TestJob.getContext().attributeNames().length > 0);
 		String collaborator = (String) TestJob.getContext().getAttribute("collaborator");
 		assertNotNull(collaborator);
@@ -119,7 +121,7 @@ class JobScopeIntegrationTests {
 
 	@Test
 	void testScopedProxyForSecondReference() {
-		doubleEnhanced.execute(new JobExecution(11L));
+		doubleEnhanced.execute(new JobExecution(11L, new JobInstance(1L, "job"), new JobParameters()));
 		assertTrue(TestJob.getContext().attributeNames().length > 0);
 		String collaborator = (String) TestJob.getContext().getAttribute("collaborator");
 		assertNotNull(collaborator);

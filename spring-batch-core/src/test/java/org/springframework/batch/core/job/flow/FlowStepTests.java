@@ -27,6 +27,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.JobInterruptedException;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.step.StepExecution;
@@ -37,6 +38,7 @@ import org.springframework.batch.core.job.flow.support.state.StepState;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.JdbcJobRepositoryFactoryBean;
 import org.springframework.batch.core.step.StepSupport;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
@@ -63,7 +65,9 @@ class FlowStepTests {
 		jobRepositoryFactoryBean.setTransactionManager(new JdbcTransactionManager(embeddedDatabase));
 		jobRepositoryFactoryBean.afterPropertiesSet();
 		jobRepository = jobRepositoryFactoryBean.getObject();
-		jobExecution = jobRepository.createJobExecution("job", new JobParameters());
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = jobRepository.createJobInstance("job", jobParameters);
+		jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters, new ExecutionContext());
 	}
 
 	@Test
@@ -90,8 +94,7 @@ class FlowStepTests {
 		step.setFlow(flow);
 		step.afterPropertiesSet();
 
-		StepExecution stepExecution = jobExecution.createStepExecution("step");
-		jobRepository.add(stepExecution);
+		StepExecution stepExecution = jobRepository.createStepExecution("step", jobExecution);
 		step.execute(stepExecution);
 
 		stepExecution = getStepExecution(jobExecution, "step");
@@ -121,8 +124,7 @@ class FlowStepTests {
 		step.setFlow(flow);
 		step.afterPropertiesSet();
 
-		StepExecution stepExecution = jobExecution.createStepExecution("step");
-		jobRepository.add(stepExecution);
+		StepExecution stepExecution = jobRepository.createStepExecution("step", jobExecution);
 		step.execute(stepExecution);
 
 		stepExecution = getStepExecution(jobExecution, "step1");
@@ -149,9 +151,8 @@ class FlowStepTests {
 		step.setFlow(flow);
 		step.afterPropertiesSet();
 
-		StepExecution stepExecution = jobExecution.createStepExecution("step");
+		StepExecution stepExecution = jobRepository.createStepExecution("step", jobExecution);
 		stepExecution.getExecutionContext().put("foo", "bar");
-		jobRepository.add(stepExecution);
 		step.execute(stepExecution);
 
 		stepExecution = getStepExecution(jobExecution, "step");

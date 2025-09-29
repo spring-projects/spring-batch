@@ -27,9 +27,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
@@ -63,8 +66,10 @@ class PartitionStepWithLateBindingParserTests {
 	@Test
 	void testExplicitHandlerStep() throws Exception {
 		assertNotNull(job1);
-		JobExecution jobExecution = jobRepository.createJobExecution(job1.getName(),
-				new JobParametersBuilder().addLong("gridSize", 1L).toJobParameters());
+		JobParameters jobParameters = new JobParametersBuilder().addLong("gridSize", 1L).toJobParameters();
+		JobInstance jobInstance = jobRepository.createJobInstance(job1.getName(), jobParameters);
+		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
+				new ExecutionContext());
 		job1.execute(jobExecution);
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		Collections.sort(savedStepNames);

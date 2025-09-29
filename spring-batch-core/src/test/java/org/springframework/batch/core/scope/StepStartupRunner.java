@@ -16,6 +16,8 @@
 package org.springframework.batch.core.scope;
 
 import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.beans.factory.InitializingBean;
@@ -30,7 +32,8 @@ public class StepStartupRunner implements InitializingBean {
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		StepExecution stepExecution = new StepExecution("step", new JobExecution(1L), 0L);
+		StepExecution stepExecution = new StepExecution(0L, "step",
+				new JobExecution(1L, new JobInstance(1L, "job"), new JobParameters()));
 		step.execute(stepExecution);
 		// expect no errors
 	}

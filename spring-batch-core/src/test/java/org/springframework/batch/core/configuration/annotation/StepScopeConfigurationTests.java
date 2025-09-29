@@ -22,6 +22,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.step.StepContribution;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.scope.context.ChunkContext;
@@ -186,7 +189,9 @@ public class StepScopeConfigurationTests {
 	@BeforeEach
 	void setup() {
 		StepSynchronizationManager.release();
-		stepExecution = new StepExecution("STEP", null);
+		JobInstance jobInstance = new JobInstance(1, "JOB");
+		JobExecution jobExecution = new JobExecution(1, jobInstance, new JobParameters());
+		stepExecution = new StepExecution(1, "STEP", jobExecution);
 	}
 
 	@AfterEach

@@ -58,7 +58,7 @@ class SystemCommandTaskletIntegrationTests {
 	private SystemCommandTasklet tasklet;
 
 	private final StepExecution stepExecution = new StepExecution("systemCommandStep",
-			new JobExecution(new JobInstance(1L, "systemCommandJob"), 1L, new JobParameters()));
+			new JobExecution(1L, new JobInstance(1L, "systemCommandJob"), new JobParameters()));
 
 	@Mock
 	private JobRepository jobRepository;
@@ -251,7 +251,7 @@ class SystemCommandTaskletIntegrationTests {
 		tasklet.afterPropertiesSet();
 		tasklet.beforeStep(stepExecution);
 
-		JobExecution stoppedJobExecution = new JobExecution(stepExecution.getJobExecution());
+		JobExecution stoppedJobExecution = stepExecution.getJobExecution();
 		stoppedJobExecution.setStatus(BatchStatus.STOPPING);
 
 		when(jobRepository.getJobExecution(1L)).thenReturn(stepExecution.getJobExecution(),

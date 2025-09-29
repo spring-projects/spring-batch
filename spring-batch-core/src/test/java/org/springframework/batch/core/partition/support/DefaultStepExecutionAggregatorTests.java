@@ -19,6 +19,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.partition.StepExecutionAggregator;
 
@@ -32,13 +34,13 @@ class DefaultStepExecutionAggregatorTests {
 
 	private final StepExecutionAggregator aggregator = new DefaultStepExecutionAggregator();
 
-	private final JobExecution jobExecution = new JobExecution(11L);
+	private final JobExecution jobExecution = new JobExecution(11L, new JobInstance(1L, "job"), new JobParameters());
 
-	private final StepExecution result = jobExecution.createStepExecution("aggregate");
+	private final StepExecution result = new StepExecution(1L, "aggregate", jobExecution);
 
-	private final StepExecution stepExecution1 = jobExecution.createStepExecution("foo:1");
+	private final StepExecution stepExecution1 = new StepExecution(2L, "foo:1", jobExecution);
 
-	private final StepExecution stepExecution2 = jobExecution.createStepExecution("foo:2");
+	private final StepExecution stepExecution2 = new StepExecution(3L, "foo:2", jobExecution);
 
 	@Test
 	void testAggregateEmpty() {

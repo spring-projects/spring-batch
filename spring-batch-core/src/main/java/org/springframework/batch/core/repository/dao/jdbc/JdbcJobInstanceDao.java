@@ -125,6 +125,10 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 			WHERE JOB_INSTANCE_ID = ? AND VERSION = ?
 			""";
 
+	private static final String GET_JOB_INSTANCE_IDS_BY_JOB_NAME = """
+			SELECT JOB_INSTANCE_ID FROM %PREFIX%JOB_INSTANCE WHERE JOB_NAME = ?
+			""";
+
 	private DataFieldMaxValueIncrementer jobInstanceIncrementer;
 
 	private JobKeyGenerator jobKeyGenerator = new DefaultJobKeyGenerator();
@@ -145,7 +149,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 
 		Assert.state(getJobInstance(jobName, jobParameters) == null, "JobInstance must not already exist");
 
-		Long jobInstanceId = jobInstanceIncrementer.nextLongValue();
+		long jobInstanceId = jobInstanceIncrementer.nextLongValue();
 
 		JobInstance jobInstance = new JobInstance(jobInstanceId, jobName);
 		jobInstance.incrementVersion();
@@ -186,7 +190,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 
 	@Override
 	@Nullable
-	public JobInstance getJobInstance(@Nullable Long instanceId) {
+	public JobInstance getJobInstance(long instanceId) {
 
 		try {
 			return getJdbcTemplate().queryForObject(getQuery(GET_JOB_FROM_ID), new JobInstanceRowMapper(), instanceId);
@@ -233,6 +237,11 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 	}
 
 	@Override
+	public List<Long> getJobInstanceIds(String jobName) {
+		return getJdbcTemplate().queryForList(getQuery(GET_JOB_INSTANCE_IDS_BY_JOB_NAME), Long.class, jobName);
+	}
+
+	@Override
 	@Nullable
 	public JobInstance getLastJobInstance(String jobName) {
 		try {
@@ -246,6 +255,9 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 
 	@Override
 	@Nullable
+	// TODO what is the added value of this method?
+	// TODO clients should use
+	// JobExecutionDao.getJobExecution(jobExecutionId).getJobInstance() instead
 	public JobInstance getJobInstance(JobExecution jobExecution) {
 
 		try {
@@ -258,7 +270,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 	}
 
 	@Override
-	public long getJobInstanceCount(@Nullable String jobName) throws NoSuchJobException {
+	public long getJobInstanceCount(String jobName) throws NoSuchJobException {
 
 		try {
 			return getJdbcTemplate().queryForObject(getQuery(COUNT_JOBS_WITH_NAME), Long.class, jobName);
@@ -310,25 +322,6 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
 		Assert.state(jobInstanceIncrementer != null, "jobInstanceIncrementer is required");
-	}
-
-	/**
-	 * @author Dave Syer
-	 *
-	 */
-	private static final class JobInstanceRowMapper implements RowMapper<JobInstance> {
-
-		public JobInstanceRowMapper() {
-		}
-
-		@Override
-		public JobInstance mapRow(ResultSet rs, int rowNum) throws SQLException {
-			JobInstance jobInstance = new JobInstance(rs.getLong(1), rs.getString(2));
-			// should always be at version=0 because they never get updated
-			jobInstance.incrementVersion();
-			return jobInstance;
-		}
-
 	}
 
 	/**

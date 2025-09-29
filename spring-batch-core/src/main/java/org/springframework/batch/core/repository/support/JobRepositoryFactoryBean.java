@@ -96,6 +96,16 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 
 	protected ConfigurableConversionService conversionService;
 
+	protected Object getTarget() throws Exception {
+		JdbcJobInstanceDao jobInstanceDao = createJobInstanceDao();
+		JdbcJobExecutionDao jobExecutionDao = createJobExecutionDao();
+		jobExecutionDao.setJobInstanceDao(jobInstanceDao);
+		JdbcStepExecutionDao stepExecutionDao = createStepExecutionDao();
+		stepExecutionDao.setJobExecutionDao(jobExecutionDao);
+		JdbcExecutionContextDao executionContextDao = createExecutionContextDao();
+		return new SimpleJobRepository(jobInstanceDao, jobExecutionDao, stepExecutionDao, executionContextDao);
+	}
+
 	/**
 	 * @param type a value from the {@link java.sql.Types} class to indicate the type to
 	 * use for a CLOB
@@ -269,19 +279,18 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 	}
 
 	@Override
-	protected JobInstanceDao createJobInstanceDao() throws Exception {
+	protected JdbcJobInstanceDao createJobInstanceDao() {
 		JdbcJobInstanceDao dao = new JdbcJobInstanceDao();
 		dao.setJdbcTemplate(jdbcOperations);
 		dao.setJobInstanceIncrementer(
 				incrementerFactory.getIncrementer(databaseType, tablePrefix + "JOB_INSTANCE_SEQ"));
 		dao.setJobKeyGenerator(jobKeyGenerator);
 		dao.setTablePrefix(tablePrefix);
-		dao.afterPropertiesSet();
 		return dao;
 	}
 
 	@Override
-	protected JobExecutionDao createJobExecutionDao() throws Exception {
+	protected JdbcJobExecutionDao createJobExecutionDao() {
 		JdbcJobExecutionDao dao = new JdbcJobExecutionDao();
 		dao.setJdbcTemplate(jdbcOperations);
 		dao.setJobExecutionIncrementer(
@@ -290,12 +299,11 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 		dao.setClobTypeToUse(determineClobTypeToUse(this.databaseType));
 		dao.setExitMessageLength(this.maxVarCharLengthForExitMessage);
 		dao.setConversionService(this.conversionService);
-		dao.afterPropertiesSet();
 		return dao;
 	}
 
 	@Override
-	protected StepExecutionDao createStepExecutionDao() throws Exception {
+	protected JdbcStepExecutionDao createStepExecutionDao() {
 		JdbcStepExecutionDao dao = new JdbcStepExecutionDao();
 		dao.setJdbcTemplate(jdbcOperations);
 		dao.setStepExecutionIncrementer(
@@ -303,20 +311,17 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 		dao.setTablePrefix(tablePrefix);
 		dao.setClobTypeToUse(determineClobTypeToUse(this.databaseType));
 		dao.setExitMessageLength(this.maxVarCharLengthForExitMessage);
-		dao.afterPropertiesSet();
 		return dao;
 	}
 
 	@Override
-	protected ExecutionContextDao createExecutionContextDao() throws Exception {
+	protected JdbcExecutionContextDao createExecutionContextDao() {
 		JdbcExecutionContextDao dao = new JdbcExecutionContextDao();
 		dao.setJdbcTemplate(jdbcOperations);
 		dao.setTablePrefix(tablePrefix);
 		dao.setClobTypeToUse(determineClobTypeToUse(this.databaseType));
 		dao.setSerializer(serializer);
 		dao.setCharset(charset);
-
-		dao.afterPropertiesSet();
 		dao.setShortContextLength(this.maxVarCharLengthForShortContext);
 		return dao;
 	}

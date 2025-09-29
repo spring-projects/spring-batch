@@ -18,6 +18,7 @@ package org.springframework.batch.core.step.job;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameter;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersBuilder;
@@ -38,7 +39,8 @@ class DefaultJobParametersExtractorTests {
 
 	private final DefaultJobParametersExtractor extractor = new DefaultJobParametersExtractor();
 
-	private final StepExecution stepExecution = new StepExecution("step", new JobExecution(0L));
+	private final StepExecution stepExecution = new StepExecution(1L, "step",
+			new JobExecution(0L, new JobInstance(1L, "job"), new JobParameters()));
 
 	@Test
 	void testGetEmptyJobParameters() {
@@ -80,7 +82,7 @@ class DefaultJobParametersExtractorTests {
 
 	@Test
 	void testUseParentParameters() {
-		JobExecution jobExecution = new JobExecution(0L,
+		JobExecution jobExecution = new JobExecution(0L, new JobInstance(1L, "job"),
 				new JobParametersBuilder().addString("parentParam", "val").toJobParameters());
 
 		StepExecution stepExecution = new StepExecution("step", jobExecution);
@@ -98,7 +100,7 @@ class DefaultJobParametersExtractorTests {
 		DefaultJobParametersExtractor extractor = new DefaultJobParametersExtractor();
 		extractor.setUseAllParentParameters(false);
 
-		JobExecution jobExecution = new JobExecution(0L,
+		JobExecution jobExecution = new JobExecution(0L, new JobInstance(1L, "job"),
 				new JobParametersBuilder().addString("parentParam", "val").toJobParameters());
 
 		StepExecution stepExecution = new StepExecution("step", jobExecution);
@@ -116,7 +118,7 @@ class DefaultJobParametersExtractorTests {
 		DefaultJobParametersExtractor extractor = new DefaultJobParametersExtractor();
 		extractor.setUseAllParentParameters(false);
 
-		JobExecution jobExecution = new JobExecution(0L,
+		JobExecution jobExecution = new JobExecution(0L, new JobInstance(1L, "job"),
 				new JobParametersBuilder().addString("parentParam", "val").addDouble("foo", 22.2).toJobParameters());
 
 		StepExecution stepExecution = new StepExecution("step", jobExecution);

@@ -23,7 +23,7 @@ public class JobInstance {
 
 	private String id;
 
-	private Long jobInstanceId;
+	private long jobInstanceId;
 
 	private String jobName;
 
@@ -36,11 +36,11 @@ public class JobInstance {
 		return id;
 	}
 
-	public Long getJobInstanceId() {
+	public long getJobInstanceId() {
 		return jobInstanceId;
 	}
 
-	public void setJobInstanceId(Long jobInstanceId) {
+	public void setJobInstanceId(long jobInstanceId) {
 		this.jobInstanceId = jobInstanceId;
 	}
 

@@ -16,11 +16,9 @@
 
 package org.springframework.batch.core.step;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.springframework.batch.core.BatchStatus;
@@ -30,7 +28,6 @@ import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.lang.Nullable;
-import org.springframework.util.Assert;
 
 /**
  * Batch domain object representation for the execution of a step. Unlike
@@ -45,43 +42,43 @@ import org.springframework.util.Assert;
  */
 public class StepExecution extends Entity {
 
-	private final JobExecution jobExecution;
-
 	private final String stepName;
 
-	private volatile BatchStatus status = BatchStatus.STARTING;
+	private final JobExecution jobExecution;
 
-	private volatile long readCount = 0;
+	private BatchStatus status = BatchStatus.STARTING;
 
-	private volatile long writeCount = 0;
+	private long readCount = 0;
 
-	private volatile long commitCount = 0;
+	private long writeCount = 0;
 
-	private volatile long rollbackCount = 0;
+	private long commitCount = 0;
 
-	private volatile long readSkipCount = 0;
+	private long rollbackCount = 0;
 
-	private volatile long processSkipCount = 0;
+	private long readSkipCount = 0;
 
-	private volatile long writeSkipCount = 0;
+	private long processSkipCount = 0;
 
-	private volatile LocalDateTime startTime = null;
+	private long writeSkipCount = 0;
 
-	private volatile LocalDateTime createTime = LocalDateTime.now();
+	private long filterCount = 0;
 
-	private volatile LocalDateTime endTime = null;
+	private LocalDateTime startTime = null;
 
-	private volatile LocalDateTime lastUpdated = null;
+	private LocalDateTime createTime = LocalDateTime.now();
 
-	private volatile ExecutionContext executionContext = new ExecutionContext();
+	private LocalDateTime endTime = null;
 
-	private volatile ExitStatus exitStatus = ExitStatus.EXECUTING;
+	private LocalDateTime lastUpdated = null;
 
-	private volatile boolean terminateOnly;
+	private ExecutionContext executionContext = new ExecutionContext();
 
-	private volatile long filterCount;
+	private ExitStatus exitStatus = ExitStatus.EXECUTING;
 
-	private transient volatile List<Throwable> failureExceptions = new CopyOnWriteArrayList<>();
+	private boolean terminateOnly;
+
+	private final List<Throwable> failureExceptions = new CopyOnWriteArrayList<>();
 
 	/**
 	 * Constructor with mandatory properties.
@@ -89,38 +86,18 @@ public class StepExecution extends Entity {
 	 * @param jobExecution The current job execution.
 	 * @param id The ID of this execution.
 	 */
-	public StepExecution(String stepName, JobExecution jobExecution, Long id) {
-		this(stepName, jobExecution);
-		Assert.notNull(jobExecution, "JobExecution must be provided to re-hydrate an existing StepExecution");
-		Assert.notNull(id, "The entity Id must be provided to re-hydrate an existing StepExecution");
-		setId(id);
-		jobExecution.addStepExecution(this);
-	}
-
-	/**
-	 * Constructor that substitutes null for the execution ID.
-	 * @param stepName The step to which this execution belongs.
-	 * @param jobExecution The current job execution.
-	 */
-	public StepExecution(String stepName, JobExecution jobExecution) {
-		super();
-		Assert.hasLength(stepName, "A stepName is required");
+	public StepExecution(long id, String stepName, JobExecution jobExecution) {
+		super(id);
 		this.stepName = stepName;
 		this.jobExecution = jobExecution;
 	}
 
-	/**
-	 * Constructor that requires only a stepName. Intended only to be used over
-	 * serialization libraries to address the circular reference between
-	 * {@link JobExecution} and StepExecution.
-	 * @param stepName The name of the executed step.
-	 */
-	@SuppressWarnings("unused")
-	private StepExecution(String stepName) {
-		super();
-		Assert.hasLength(stepName, "A stepName is required");
+	// TODO REMOVE IN V7.0. ONLY USED BY TASKLET STEP FOR BACKWARD COMPATIBILITY
+	@Deprecated(since = "6.0", forRemoval = true)
+	public StepExecution(String stepName, JobExecution jobExecution) {
+		super(0);
 		this.stepName = stepName;
-		this.jobExecution = null;
+		this.jobExecution = jobExecution;
 	}
 
 	/**
@@ -213,6 +190,14 @@ public class StepExecution extends Entity {
 	}
 
 	/**
+	 * Sets the number of rollbacks for this execution.
+	 * @param rollbackCount {@code long} the number of rollbacks.
+	 */
+	public void setRollbackCount(long rollbackCount) {
+		this.rollbackCount = rollbackCount;
+	}
+
+	/**
 	 * Returns the current number of items filtered out of this execution.
 	 * @return the current number of items filtered out of this execution.
 	 */
@@ -226,14 +211,6 @@ public class StepExecution extends Entity {
 	 */
 	public void setFilterCount(long filterCount) {
 		this.filterCount = filterCount;
-	}
-
-	/**
-	 * Sets the number of rollbacks for this execution.
-	 * @param rollbackCount {@code long} the number of rollbacks.
-	 */
-	public void setRollbackCount(long rollbackCount) {
-		this.rollbackCount = rollbackCount;
 	}
 
 	/**
@@ -306,11 +283,9 @@ public class StepExecution extends Entity {
 	 * Accessor for the job execution ID.
 	 * @return the {@code jobExecutionId}.
 	 */
-	public Long getJobExecutionId() {
-		if (jobExecution != null) {
-			return jobExecution.getId();
-		}
-		return null;
+	// TODO What is the added value of that?
+	public long getJobExecutionId() {
+		return this.jobExecution.getId();
 	}
 
 	/**
@@ -398,18 +373,6 @@ public class StepExecution extends Entity {
 	}
 
 	/**
-	 * Convenience method to get the current job parameters.
-	 * @return the {@link JobParameters} from the enclosing job or empty if that is
-	 * {@code null}.
-	 */
-	public JobParameters getJobParameters() {
-		if (jobExecution == null) {
-			return new JobParameters();
-		}
-		return jobExecution.getJobParameters();
-	}
-
-	/**
 	 * @return the number of records skipped on read.
 	 */
 	public long getReadSkipCount() {
@@ -489,27 +452,26 @@ public class StepExecution extends Entity {
 		this.failureExceptions.add(throwable);
 	}
 
+	/**
+	 * Convenience method to get the current job parameters.
+	 * @return the {@link JobParameters} from the enclosing job or empty if that is
+	 * {@code null}.
+	 */
+	// TODO What is the added value of that?
+	public JobParameters getJobParameters() {
+		return this.jobExecution.getJobParameters();
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 
 		Object jobExecutionId = getJobExecutionId();
-		if (jobExecutionId == null || !(obj instanceof StepExecution other) || getId() == null) {
+		if (jobExecutionId == null || !(obj instanceof StepExecution other)) {
 			return super.equals(obj);
 		}
 
 		return stepName.equals(other.getStepName()) && jobExecutionId.equals(other.getJobExecutionId())
-				&& getId().equals(other.getId());
-	}
-
-	/**
-	 * Deserialize and ensure transient fields are re-instantiated when read back.
-	 * @param stream An instance of {@link ObjectInputStream}.
-	 * @throws IOException If an error occurs during read.
-	 * @throws ClassNotFoundException If the class is not found.
-	 */
-	private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
-		stream.defaultReadObject();
-		failureExceptions = new ArrayList<>();
+				&& getId() == other.getId();
 	}
 
 	@Override

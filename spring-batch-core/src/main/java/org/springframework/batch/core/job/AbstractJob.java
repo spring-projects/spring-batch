@@ -277,8 +277,8 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 		Observation observation = MicrometerMetrics
 			.createObservation(BatchMetrics.METRICS_PREFIX + "job", this.observationRegistry)
 			.highCardinalityKeyValue(BatchMetrics.METRICS_PREFIX + "job.instanceId",
-					execution.getJobInstance().getId().toString())
-			.highCardinalityKeyValue(BatchMetrics.METRICS_PREFIX + "job.executionId", execution.getId().toString())
+					String.valueOf(execution.getJobInstance().getId()))
+			.highCardinalityKeyValue(BatchMetrics.METRICS_PREFIX + "job.executionId", String.valueOf(execution.getId()))
 			.lowCardinalityKeyValue(BatchMetrics.METRICS_PREFIX + "job.name", execution.getJobInstance().getJobName())
 			.start();
 		try (Observation.Scope scope = observation.openScope()) {

@@ -124,7 +124,7 @@ public class SimpleStepHandler implements StepHandler, InitializingBean {
 
 		if (shouldStart(lastStepExecution, execution, step)) {
 
-			currentStepExecution = execution.createStepExecution(step.getName());
+			currentStepExecution = jobRepository.createStepExecution(step.getName(), execution);
 
 			boolean isRestart = (lastStepExecution != null
 					&& !lastStepExecution.getStatus().equals(BatchStatus.COMPLETED));
@@ -139,8 +139,6 @@ public class SimpleStepHandler implements StepHandler, InitializingBean {
 			else {
 				currentStepExecution.setExecutionContext(new ExecutionContext(executionContext));
 			}
-
-			jobRepository.add(currentStepExecution);
 
 			if (logger.isInfoEnabled()) {
 				logger.info("Executing step: [" + step.getName() + "]");
@@ -178,8 +176,7 @@ public class SimpleStepHandler implements StepHandler, InitializingBean {
 	 * @return true if the {@link StepExecution} is part of the {@link JobExecution}
 	 */
 	private boolean stepExecutionPartOfExistingJobExecution(JobExecution jobExecution, StepExecution stepExecution) {
-		return stepExecution != null && stepExecution.getJobExecutionId() != null
-				&& stepExecution.getJobExecutionId().equals(jobExecution.getId());
+		return stepExecution != null && stepExecution.getJobExecutionId() == jobExecution.getId();
 	}
 
 	/**

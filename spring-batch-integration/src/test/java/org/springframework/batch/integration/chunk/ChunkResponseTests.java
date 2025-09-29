@@ -34,7 +34,7 @@ class ChunkResponseTests {
 
 	@Test
 	void testGetJobId() {
-		assertEquals(Long.valueOf(111L), response.getJobId());
+		assertEquals(Long.valueOf(111L), response.getJobInstanceId());
 	}
 
 	@Test
@@ -53,7 +53,7 @@ class ChunkResponseTests {
 	void testSerializable() {
 		ChunkResponse result = SerializationUtils.clone(response);
 		assertNotNull(result.getStepContribution());
-		assertEquals(Long.valueOf(111L), result.getJobId());
+		assertEquals(Long.valueOf(111L), result.getJobInstanceId());
 	}
 
 }

@@ -31,6 +31,7 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.listener.ChunkListener;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.listener.ItemProcessListener;
@@ -142,9 +143,10 @@ public class FaultTolerantStepFactoryBeanTests {
 		repository = repositoryFactoryBean.getObject();
 		factory.setJobRepository(repository);
 
-		jobExecution = repository.createJobExecution("skipJob", new JobParameters());
-		stepExecution = jobExecution.createStepExecution(factory.getName());
-		repository.add(stepExecution);
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = repository.createJobInstance("skipJob", jobParameters);
+		jobExecution = repository.createJobExecution(jobInstance, jobParameters, new ExecutionContext());
+		stepExecution = repository.createStepExecution(factory.getName(), jobExecution);
 	}
 
 	@Test

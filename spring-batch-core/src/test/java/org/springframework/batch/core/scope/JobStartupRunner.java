@@ -17,6 +17,8 @@ package org.springframework.batch.core.scope;
 
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.beans.factory.InitializingBean;
 
 public class JobStartupRunner implements InitializingBean {
@@ -29,7 +31,7 @@ public class JobStartupRunner implements InitializingBean {
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		JobExecution jobExecution = new JobExecution(11L);
+		JobExecution jobExecution = new JobExecution(11L, new JobInstance(11L, "test"), new JobParameters());
 		job.execute(jobExecution);
 		// expect no errors
 	}

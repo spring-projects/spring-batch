@@ -21,9 +21,9 @@ import java.util.Set;
 
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.persistence.converter.JobExecutionConverter;
-import org.springframework.batch.core.repository.persistence.converter.JobInstanceConverter;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Query;
@@ -42,15 +42,13 @@ public class MongoJobExecutionDao implements JobExecutionDao {
 
 	private static final String JOB_EXECUTIONS_SEQUENCE_NAME = "BATCH_JOB_EXECUTION_SEQ";
 
-	private static final String JOB_INSTANCES_COLLECTION_NAME = "BATCH_JOB_INSTANCE";
-
 	private final MongoOperations mongoOperations;
 
 	private final JobExecutionConverter jobExecutionConverter = new JobExecutionConverter();
 
-	private final JobInstanceConverter jobInstanceConverter = new JobInstanceConverter();
-
 	private DataFieldMaxValueIncrementer jobExecutionIncrementer;
+
+	private MongoJobInstanceDao jobInstanceDao;
 
 	public MongoJobExecutionDao(MongoOperations mongoOperations) {
 		this.mongoOperations = mongoOperations;
@@ -61,14 +59,19 @@ public class MongoJobExecutionDao implements JobExecutionDao {
 		this.jobExecutionIncrementer = jobExecutionIncrementer;
 	}
 
-	@Override
-	public void saveJobExecution(JobExecution jobExecution) {
+	public void setJobInstanceDao(MongoJobInstanceDao jobInstanceDao) {
+		this.jobInstanceDao = jobInstanceDao;
+	}
+
+	public JobExecution createJobExecution(JobInstance jobInstance, JobParameters jobParameters) {
+		long id = jobExecutionIncrementer.nextLongValue();
+		JobExecution jobExecution = new JobExecution(id, jobInstance, jobParameters);
+
 		org.springframework.batch.core.repository.persistence.JobExecution jobExecutionToSave = this.jobExecutionConverter
 			.fromJobExecution(jobExecution);
-		long jobExecutionId = this.jobExecutionIncrementer.nextLongValue();
-		jobExecutionToSave.setJobExecutionId(jobExecutionId);
 		this.mongoOperations.insert(jobExecutionToSave, JOB_EXECUTIONS_COLLECTION_NAME);
-		jobExecution.setId(jobExecutionId);
+
+		return jobExecution;
 	}
 
 	@Override
@@ -103,16 +106,10 @@ public class MongoJobExecutionDao implements JobExecutionDao {
 
 	@Override
 	public Set<JobExecution> findRunningJobExecutions(String jobName) {
-		Query query = query(where("jobName").is(jobName));
-		List<JobInstance> jobInstances = this.mongoOperations
-			.find(query, org.springframework.batch.core.repository.persistence.JobInstance.class,
-					JOB_INSTANCES_COLLECTION_NAME)
-			.stream()
-			.map(this.jobInstanceConverter::toJobInstance)
-			.toList();
+		List<JobInstance> jobInstances = this.jobInstanceDao.findJobInstancesByName(jobName);
 		Set<JobExecution> runningJobExecutions = new HashSet<>();
 		for (JobInstance jobInstance : jobInstances) {
-			query = query(
+			Query query = query(
 					where("jobInstanceId").is(jobInstance.getId()).and("status").in("STARTING", "STARTED", "STOPPING"));
 			this.mongoOperations
 				.find(query, org.springframework.batch.core.repository.persistence.JobExecution.class,
@@ -125,7 +122,7 @@ public class MongoJobExecutionDao implements JobExecutionDao {
 	}
 
 	@Override
-	public JobExecution getJobExecution(Long executionId) {
+	public JobExecution getJobExecution(long executionId) {
 		Query jobExecutionQuery = query(where("jobExecutionId").is(executionId));
 		org.springframework.batch.core.repository.persistence.JobExecution jobExecution = this.mongoOperations.findOne(
 				jobExecutionQuery, org.springframework.batch.core.repository.persistence.JobExecution.class,
@@ -133,12 +130,9 @@ public class MongoJobExecutionDao implements JobExecutionDao {
 		if (jobExecution == null) {
 			return null;
 		}
-		Query jobInstanceQuery = query(where("jobInstanceId").is(jobExecution.getJobInstanceId()));
-		org.springframework.batch.core.repository.persistence.JobInstance jobInstance = this.mongoOperations.findOne(
-				jobInstanceQuery, org.springframework.batch.core.repository.persistence.JobInstance.class,
-				JOB_INSTANCES_COLLECTION_NAME);
-		return this.jobExecutionConverter.toJobExecution(jobExecution,
-				this.jobInstanceConverter.toJobInstance(jobInstance));
+		org.springframework.batch.core.job.JobInstance jobInstance = this.jobInstanceDao
+			.getJobInstance(jobExecution.getJobInstanceId());
+		return this.jobExecutionConverter.toJobExecution(jobExecution, jobInstance);
 	}
 
 	@Override

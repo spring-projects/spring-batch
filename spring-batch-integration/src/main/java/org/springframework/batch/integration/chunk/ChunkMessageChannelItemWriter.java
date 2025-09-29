@@ -233,10 +233,11 @@ public class ChunkMessageChannelItemWriter<T>
 			if (logger.isDebugEnabled()) {
 				logger.debug("Found result: " + payload);
 			}
-			Long jobInstanceId = payload.getJobId();
+			Long jobInstanceId = payload.getJobInstanceId();
 			Assert.state(jobInstanceId != null, "Message did not contain job instance id.");
-			Assert.state(jobInstanceId.equals(localState.getJobId()), "Message contained wrong job instance id ["
-					+ jobInstanceId + "] should have been [" + localState.getJobId() + "].");
+			Assert.state(jobInstanceId.equals(localState.getJobInstanceId()),
+					"Message contained wrong job instance id [" + jobInstanceId + "] should have been ["
+							+ localState.getJobInstanceId() + "].");
 			if (payload.isRedelivered()) {
 				logger.warn(
 						"Redelivered result detected, which may indicate stale state. In the best case, we just picked up a timed out message "
@@ -290,7 +291,7 @@ public class ChunkMessageChannelItemWriter<T>
 		}
 
 		public <T> ChunkRequest<T> getRequest(Chunk<? extends T> items) {
-			return new ChunkRequest<>(current.incrementAndGet(), items, getJobId(), createStepContribution());
+			return new ChunkRequest<>(current.incrementAndGet(), items, getJobInstanceId(), createStepContribution());
 		}
 
 		public void open(int expectedValue, int actualValue) {
@@ -332,8 +333,8 @@ public class ChunkMessageChannelItemWriter<T>
 			return stepExecution.createStepContribution();
 		}
 
-		public Long getJobId() {
-			return stepExecution.getJobExecution().getJobId();
+		public Long getJobInstanceId() {
+			return stepExecution.getJobExecution().getJobInstanceId();
 		}
 
 		public void setStepExecution(StepExecution stepExecution) {

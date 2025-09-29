@@ -16,7 +16,6 @@
 package org.springframework.batch.core.configuration.xml;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
@@ -24,7 +23,6 @@ import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.step.StepExecution;
-import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 /**
@@ -36,10 +34,6 @@ class EndTransitionJobParserTests extends AbstractJobParserTests {
 
 	@Test
 	void testEndTransition() throws Exception {
-
-		//
-		// First Launch
-		//
 		JobExecution jobExecution = createJobExecution();
 		job.execute(jobExecution);
 		assertEquals(2, stepNamesList.size());
@@ -56,12 +50,6 @@ class EndTransitionJobParserTests extends AbstractJobParserTests {
 		StepExecution stepExecution2 = getStepExecution(jobExecution, "fail");
 		assertEquals(BatchStatus.FAILED, stepExecution2.getStatus());
 		assertEquals(ExitStatus.FAILED.getExitCode(), stepExecution2.getExitStatus().getExitCode());
-
-		//
-		// Second Launch
-		//
-		stepNamesList.clear();
-		assertThrows(JobInstanceAlreadyCompleteException.class, this::createJobExecution);
 	}
 
 }

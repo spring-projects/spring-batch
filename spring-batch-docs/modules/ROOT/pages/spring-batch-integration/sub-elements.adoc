@@ -53,7 +53,7 @@ through:
 * Event-driven listeners
 
 When starting a Spring Batch job asynchronously (for example, by using the Job Launching
-Gateway), a `JobExecution` instance is returned. Thus, you can use `JobExecution.getJobId()`
+Gateway), a `JobExecution` instance is returned. Thus, you can use `JobExecution.getJobInstanceId()`
 to continuously poll for status updates by retrieving updated instances of the
 `JobExecution` from the `JobRepository` by using the `JobExplorer`. However, this is
 considered sub-optimal, and an event-driven approach is preferred.

@@ -43,13 +43,6 @@ class JobInstanceTests {
 	}
 
 	@Test
-	void testCreateWithNulls() {
-		assertThrows(IllegalArgumentException.class, () -> new JobInstance(null, null));
-		instance = new JobInstance(null, "testJob");
-		assertEquals("testJob", instance.getJobName());
-	}
-
-	@Test
 	void testSerialization() {
 		instance = new JobInstance(1L, "jobName");
 		assertEquals(instance, SerializationUtils.clone(instance));

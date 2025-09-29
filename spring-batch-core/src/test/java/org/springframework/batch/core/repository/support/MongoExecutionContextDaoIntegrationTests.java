@@ -23,6 +23,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.batch.core.step.StepExecution;
@@ -70,7 +71,8 @@ public class MongoExecutionContextDaoIntegrationTests {
 	@Test
 	void testGetJobExecutionWithEmptyResult(@Autowired ExecutionContextDao executionContextDao) {
 		// given
-		JobExecution jobExecution = new JobExecution(12345678L);
+		JobInstance jobInstance = new JobInstance(1, "job");
+		JobExecution jobExecution = new JobExecution(12345678L, jobInstance, new JobParameters());
 
 		// when
 		ExecutionContext actual = executionContextDao.getExecutionContext(jobExecution);
@@ -102,8 +104,9 @@ public class MongoExecutionContextDaoIntegrationTests {
 	@Test
 	void testGetStepExecutionWithEmptyResult(@Autowired ExecutionContextDao executionContextDao) {
 		// given
-		JobExecution jobExecution = new JobExecution(12345678L);
-		StepExecution stepExecution = new StepExecution("step", jobExecution, 23456789L);
+		JobInstance jobInstance = new JobInstance(1, "job");
+		JobExecution jobExecution = new JobExecution(12345678L, jobInstance, new JobParameters());
+		StepExecution stepExecution = new StepExecution(23456789L, "step", jobExecution);
 
 		// when
 		ExecutionContext actual = executionContextDao.getExecutionContext(stepExecution);

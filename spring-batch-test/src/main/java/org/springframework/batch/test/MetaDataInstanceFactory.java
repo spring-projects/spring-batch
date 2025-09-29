@@ -115,7 +115,7 @@ public class MetaDataInstanceFactory {
 	 */
 	public static JobExecution createJobExecution(String jobName, Long instanceId, Long executionId,
 			JobParameters jobParameters) {
-		return new JobExecution(createJobInstance(jobName, instanceId), executionId, jobParameters);
+		return new JobExecution(executionId, createJobInstance(jobName, instanceId), jobParameters);
 	}
 
 	/**
@@ -146,9 +146,7 @@ public class MetaDataInstanceFactory {
 	 * @return a {@link StepExecution} with the given {@link JobExecution}.
 	 */
 	public static StepExecution createStepExecution(JobExecution jobExecution, String stepName, Long executionId) {
-		StepExecution stepExecution = jobExecution.createStepExecution(stepName);
-		stepExecution.setId(executionId);
-		return stepExecution;
+		return new StepExecution(executionId, stepName, jobExecution);
 	}
 
 	/**
@@ -191,7 +189,9 @@ public class MetaDataInstanceFactory {
 	public static StepExecution createStepExecution(JobParameters jobParameters) {
 		JobExecution jobExecution = createJobExecution(DEFAULT_JOB_NAME, DEFAULT_JOB_INSTANCE_ID,
 				DEFAULT_JOB_EXECUTION_ID, jobParameters);
-		return jobExecution.createStepExecution(DEFAULT_STEP_NAME);
+		StepExecution stepExecution = createStepExecution();
+		jobExecution.addStepExecution(stepExecution);
+		return stepExecution;
 	}
 
 	/**

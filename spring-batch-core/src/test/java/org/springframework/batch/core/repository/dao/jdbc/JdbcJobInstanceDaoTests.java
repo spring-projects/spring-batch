@@ -15,67 +15,97 @@
  */
 package org.springframework.batch.core.repository.dao.jdbc;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.List;
 
-import javax.sql.DataSource;
-
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import org.springframework.batch.core.job.DefaultJobKeyGenerator;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
-import org.springframework.batch.core.job.JobKeyGenerator;
 import org.springframework.batch.core.job.parameters.JobParameters;
-import org.springframework.batch.core.repository.dao.AbstractJobInstanceDaoTests;
-import org.springframework.batch.core.repository.dao.JobExecutionDao;
-import org.springframework.batch.core.repository.dao.JobInstanceDao;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
+import org.springframework.jdbc.support.incrementer.H2SequenceMaxValueIncrementer;
 import org.springframework.test.jdbc.JdbcTestUtils;
-import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.transaction.annotation.Transactional;
 
-@SpringJUnitConfig(locations = "sql-dao-test.xml")
-public class JdbcJobInstanceDaoTests extends AbstractJobInstanceDaoTests {
+import static org.junit.jupiter.api.Assertions.*;
 
-	private JdbcTemplate jdbcTemplate;
+public class JdbcJobInstanceDaoTests {
 
-	@Autowired
-	public void setDataSource(DataSource dataSource) {
-		this.jdbcTemplate = new JdbcTemplate(dataSource);
+	private JdbcJobExecutionDao jdbcJobExecutionDao;
+
+	private JdbcJobInstanceDao jdbcJobInstanceDao;
+
+	JdbcTemplate jdbcTemplate;
+
+	@BeforeEach
+	void setup() throws Exception {
+		EmbeddedDatabase database = new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2)
+			.addScript("/org/springframework/batch/core/schema-drop-h2.sql")
+			.addScript("/org/springframework/batch/core/schema-h2.sql")
+			.build();
+		jdbcTemplate = new JdbcTemplate(database);
+		jdbcJobInstanceDao = new JdbcJobInstanceDao();
+		jdbcJobInstanceDao.setJdbcTemplate(jdbcTemplate);
+		H2SequenceMaxValueIncrementer jobInstanceIncrementer = new H2SequenceMaxValueIncrementer(database,
+				"BATCH_JOB_INSTANCE_SEQ");
+		jdbcJobInstanceDao.setJobInstanceIncrementer(jobInstanceIncrementer);
+		jdbcJobInstanceDao.afterPropertiesSet();
+
+		jdbcJobExecutionDao = new JdbcJobExecutionDao();
+		jdbcJobExecutionDao.setJdbcTemplate(jdbcTemplate);
+		H2SequenceMaxValueIncrementer jobExecutionIncrementer = new H2SequenceMaxValueIncrementer(database,
+				"BATCH_JOB_EXECUTION_SEQ");
+		jdbcJobExecutionDao.setJobExecutionIncrementer(jobExecutionIncrementer);
+		jdbcJobExecutionDao.setJobInstanceDao(jdbcJobInstanceDao);
+		jdbcJobExecutionDao.afterPropertiesSet();
 	}
 
-	@Autowired
-	private JobInstanceDao jobInstanceDao;
+	@Test
+	void testCreateJobInstance() {
+		JobInstance jobInstance = jdbcJobInstanceDao.createJobInstance("job", new JobParameters());
 
-	@Autowired
-	private JobExecutionDao jobExecutionDao;
-
-	@Override
-	protected JobInstanceDao getJobInstanceDao() {
-		JdbcTestUtils.deleteFromTables(jdbcTemplate, "BATCH_JOB_EXECUTION_CONTEXT", "BATCH_STEP_EXECUTION_CONTEXT",
-				"BATCH_STEP_EXECUTION", "BATCH_JOB_EXECUTION_PARAMS", "BATCH_JOB_EXECUTION", "BATCH_JOB_INSTANCE");
-		return jobInstanceDao;
+		Assertions.assertNotNull(jobInstance);
+		assertEquals("job", jobInstance.getJobName());
+		assertEquals(1, jobInstance.getInstanceId());
+		assertEquals(0, jobInstance.getJobExecutions().size());
 	}
 
-	@Transactional
+	@Test
+	void testGetJobInstance() {
+		jdbcJobInstanceDao.createJobInstance("job", new JobParameters());
+
+		JobInstance jobInstance = jdbcJobInstanceDao.getJobInstance(1L);
+
+		Assertions.assertNotNull(jobInstance);
+		assertEquals("job", jobInstance.getJobName());
+		assertEquals(1, jobInstance.getInstanceId());
+		assertEquals(0, jobInstance.getJobExecutions().size());
+	}
+
+	@Test
+	void testGetJobNames() {
+		jdbcJobInstanceDao.createJobInstance("job", new JobParameters());
+
+		List<String> jobNames = jdbcJobInstanceDao.getJobNames();
+
+		assertEquals(1, jobNames.size());
+		assertEquals("job", jobNames.get(0));
+	}
+
 	@Test
 	void testFindJobInstanceByExecution() {
-
 		JobParameters jobParameters = new JobParameters();
-		JobInstance jobInstance = dao.createJobInstance("testInstance", jobParameters);
-		JobExecution jobExecution = new JobExecution(jobInstance, 2L, jobParameters);
-		jobExecutionDao.saveJobExecution(jobExecution);
-
-		JobInstance returnedInstance = dao.getJobInstance(jobExecution);
+		JobInstance jobInstance = jdbcJobInstanceDao.createJobInstance("testInstance", jobParameters);
+		JobExecution jobExecution = jdbcJobExecutionDao.createJobExecution(jobInstance, jobParameters);
+		JobInstance returnedInstance = jdbcJobInstanceDao.getJobInstance(jobExecution);
 		assertEquals(jobInstance, returnedInstance);
 	}
 
@@ -95,38 +125,70 @@ public class JdbcJobInstanceDaoTests extends AbstractJobInstanceDaoTests {
 
 	@Test
 	void testJobInstanceWildcard() {
-		dao.createJobInstance("anotherJob", new JobParameters());
-		dao.createJobInstance("someJob", new JobParameters());
+		jdbcJobInstanceDao.createJobInstance("anotherJob", new JobParameters());
+		jdbcJobInstanceDao.createJobInstance("someJob", new JobParameters());
 
-		List<JobInstance> jobInstances = dao.getJobInstances("*Job", 0, 2);
+		List<JobInstance> jobInstances = jdbcJobInstanceDao.getJobInstances("*Job", 0, 2);
 		assertEquals(2, jobInstances.size());
 
 		for (JobInstance instance : jobInstances) {
 			assertTrue(instance.getJobName().contains("Job"));
 		}
 
-		jobInstances = dao.getJobInstances("Job*", 0, 2);
+		jobInstances = jdbcJobInstanceDao.getJobInstances("Job*", 0, 2);
 		assertTrue(jobInstances.isEmpty());
 	}
 
-	@Transactional
 	@Test
 	void testDeleteJobInstance() {
 		// given
-		JobInstance jobInstance = dao.createJobInstance("someTestInstance", new JobParameters());
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = jdbcJobInstanceDao.createJobInstance("someTestInstance", jobParameters);
 
 		// when
-		dao.deleteJobInstance(jobInstance);
+		jdbcJobInstanceDao.deleteJobInstance(jobInstance);
 
 		// then
-		Assertions.assertNull(dao.getJobInstance(jobInstance.getId()));
+		Assertions.assertEquals(0, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_INSTANCE"));
+	}
+
+	/*
+	 * Create and retrieve a job instance.
+	 */
+	@Test
+	void testGetMissingById() {
+		JobInstance retrievedInstance = jdbcJobInstanceDao.getJobInstance(1111111L);
+		assertNull(retrievedInstance);
+
 	}
 
 	@Test
-	void testDefaultJobKeyGeneratorIsUsed() {
-		JobKeyGenerator jobKeyGenerator = (JobKeyGenerator) ReflectionTestUtils.getField(jobInstanceDao,
-				"jobKeyGenerator");
-		Assertions.assertEquals(DefaultJobKeyGenerator.class, jobKeyGenerator.getClass());
+	void testGetLastInstance() {
+		JobParameters jobParameters1 = new JobParametersBuilder().addString("name", "foo").toJobParameters();
+		JobParameters jobParameters2 = new JobParametersBuilder().addString("name", "bar").toJobParameters();
+		JobParameters jobParameters3 = new JobParameters();
+		jdbcJobInstanceDao.createJobInstance("job", jobParameters1);
+		JobInstance jobInstance2 = jdbcJobInstanceDao.createJobInstance("job", jobParameters2);
+		jdbcJobInstanceDao.createJobInstance("anotherJob", jobParameters3);
+		JobInstance lastJobInstance = jdbcJobInstanceDao.getLastJobInstance("job");
+		assertEquals(jobInstance2, lastJobInstance);
+	}
+
+	@Test
+	void testGetLastInstanceWhenNoInstance() {
+		JobInstance lastJobInstance = jdbcJobInstanceDao.getLastJobInstance("NonExistingJob");
+		assertNull(lastJobInstance);
+	}
+
+	/**
+	 * Trying to create instance twice for the same job+parameters causes error
+	 */
+	@Test
+	void testCreateDuplicateInstance() {
+		JobParameters jobParameters = new JobParametersBuilder().addString("name", "foo").toJobParameters();
+		jdbcJobInstanceDao.createJobInstance("job", jobParameters);
+
+		assertThrows(IllegalStateException.class, () -> jdbcJobInstanceDao.createJobInstance("job", jobParameters));
 	}
 
 }

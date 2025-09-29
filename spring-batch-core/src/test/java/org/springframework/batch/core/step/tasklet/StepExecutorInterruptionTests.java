@@ -24,6 +24,7 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.JobInterruptedException;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.step.StepExecution;
@@ -33,6 +34,7 @@ import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteExcep
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.core.repository.support.JdbcJobRepositoryFactoryBean;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
@@ -83,12 +85,14 @@ class StepExecutorInterruptionTests {
 		JobSupport job = new JobSupport();
 		job.addStep(step);
 		job.setBeanName("testJob");
-		jobExecution = jobRepository.createJobExecution(job.getName(), new JobParameters());
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = jobRepository.createJobInstance(job.getName(), jobParameters);
+		jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters, new ExecutionContext());
 		step.setJobRepository(jobRepository);
 		step.setTransactionManager(this.transactionManager);
 		itemWriter = item -> {
 		};
-		stepExecution = new StepExecution(step.getName(), jobExecution);
+		stepExecution = jobRepository.createStepExecution(step.getName(), jobExecution);
 	}
 
 	@Test
@@ -204,7 +208,7 @@ class StepExecutorInterruptionTests {
 			throw new RuntimeException("Planned!");
 		}, itemWriter));
 
-		jobRepository.add(stepExecution);
+		// jobRepository.add(stepExecution);
 		step.execute(stepExecution);
 
 		assertEquals("Planned!", stepExecution.getFailureExceptions().get(0).getMessage());
@@ -214,7 +218,7 @@ class StepExecutorInterruptionTests {
 	private Thread createThread(final StepExecution stepExecution) {
 		Thread processingThread = new Thread(() -> {
 			try {
-				jobRepository.add(stepExecution);
+				// jobRepository.add(stepExecution);
 				step.execute(stepExecution);
 			}
 			catch (JobInterruptedException e) {

@@ -29,7 +29,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobExecutionException;
+import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.JobInterruptedException;
+import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.partition.StepExecutionSplitter;
 import org.springframework.batch.core.step.StepSupport;
@@ -44,7 +46,8 @@ class TaskExecutorPartitionHandlerTests {
 
 	private final Collection<String> stepExecutions = new TreeSet<>();
 
-	private final StepExecution stepExecution = new StepExecution("step", new JobExecution(1L));
+	private final StepExecution stepExecution = new StepExecution(1L, "step",
+			new JobExecution(1L, new JobInstance(1L, "job"), new JobParameters()));
 
 	private final StepExecutionSplitter stepExecutionSplitter = new StepExecutionSplitter() {
 
@@ -57,7 +60,10 @@ class TaskExecutorPartitionHandlerTests {
 		public Set<StepExecution> split(StepExecution stepExecution, int gridSize) throws JobExecutionException {
 			HashSet<StepExecution> result = new HashSet<>();
 			for (int i = gridSize; i-- > 0;) {
-				result.add(stepExecution.getJobExecution().createStepExecution("foo" + i));
+				JobExecution jobExecution = stepExecution.getJobExecution();
+				StepExecution execution = new StepExecution(i, "foo" + i, jobExecution);
+				jobExecution.addStepExecution(execution);
+				result.add(execution);
 			}
 			return result;
 		}

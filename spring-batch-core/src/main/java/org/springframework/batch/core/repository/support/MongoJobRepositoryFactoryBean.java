@@ -15,10 +15,6 @@
  */
 package org.springframework.batch.core.repository.support;
 
-import org.springframework.batch.core.repository.dao.ExecutionContextDao;
-import org.springframework.batch.core.repository.dao.JobExecutionDao;
-import org.springframework.batch.core.repository.dao.JobInstanceDao;
-import org.springframework.batch.core.repository.dao.StepExecutionDao;
 import org.springframework.batch.core.repository.dao.mongodb.MongoExecutionContextDao;
 import org.springframework.batch.core.repository.dao.mongodb.MongoJobExecutionDao;
 import org.springframework.batch.core.repository.dao.mongodb.MongoJobInstanceDao;
@@ -48,24 +44,35 @@ public class MongoJobRepositoryFactoryBean extends AbstractJobRepositoryFactoryB
 	}
 
 	@Override
-	protected JobInstanceDao createJobInstanceDao() {
+	protected Object getTarget() throws Exception {
+		MongoJobInstanceDao jobInstanceDao = createJobInstanceDao();
+		MongoJobExecutionDao jobExecutionDao = createJobExecutionDao();
+		jobExecutionDao.setJobInstanceDao(jobInstanceDao);
+		MongoStepExecutionDao stepExecutionDao = createStepExecutionDao();
+		stepExecutionDao.setJobExecutionDao(jobExecutionDao);
+		MongoExecutionContextDao executionContextDao = createExecutionContextDao();
+		return new SimpleJobRepository(jobInstanceDao, jobExecutionDao, stepExecutionDao, executionContextDao);
+	}
+
+	@Override
+	protected MongoJobInstanceDao createJobInstanceDao() {
 		MongoJobInstanceDao mongoJobInstanceDao = new MongoJobInstanceDao(this.mongoOperations);
 		mongoJobInstanceDao.setJobKeyGenerator(this.jobKeyGenerator);
 		return mongoJobInstanceDao;
 	}
 
 	@Override
-	protected JobExecutionDao createJobExecutionDao() {
+	protected MongoJobExecutionDao createJobExecutionDao() {
 		return new MongoJobExecutionDao(this.mongoOperations);
 	}
 
 	@Override
-	protected StepExecutionDao createStepExecutionDao() {
+	protected MongoStepExecutionDao createStepExecutionDao() {
 		return new MongoStepExecutionDao(this.mongoOperations);
 	}
 
 	@Override
-	protected ExecutionContextDao createExecutionContextDao() {
+	protected MongoExecutionContextDao createExecutionContextDao() {
 		return new MongoExecutionContextDao(this.mongoOperations);
 	}
 

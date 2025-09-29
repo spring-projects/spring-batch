@@ -21,8 +21,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.support.JobFlowExecutorSupport;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.step.StepExecution;
 
 /**
  * @author Dave Syer
@@ -35,7 +38,7 @@ class EndStateTests {
 
 	@BeforeEach
 	void setUp() {
-		jobExecution = new JobExecution(0L);
+		jobExecution = new JobExecution(0L, new JobInstance(1L, "job"), new JobParameters());
 	}
 
 	@Test
@@ -58,7 +61,8 @@ class EndStateTests {
 	@Test
 	void testHandleOngoingSunnyDay() throws Exception {
 
-		jobExecution.createStepExecution("foo");
+		StepExecution stepExecution = new StepExecution(123L, "foo", jobExecution);
+		jobExecution.addStepExecution(stepExecution);
 
 		EndState state = new EndState(FlowExecutionStatus.UNKNOWN, "end");
 		FlowExecutionStatus status = state.handle(new JobFlowExecutorSupport() {

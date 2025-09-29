@@ -28,6 +28,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.scope.context.JobContext;
 import org.springframework.batch.core.scope.context.JobSynchronizationManager;
 import org.springframework.beans.factory.ObjectFactory;
@@ -42,7 +44,7 @@ class JobScopeTests {
 
 	private final JobScope scope = new JobScope();
 
-	private final JobExecution jobExecution = new JobExecution(0L);
+	private final JobExecution jobExecution = new JobExecution(11L, new JobInstance(1L, "job"), new JobParameters());
 
 	private JobContext context;
 

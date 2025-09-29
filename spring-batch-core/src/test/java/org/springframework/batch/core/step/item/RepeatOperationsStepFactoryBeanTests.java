@@ -29,6 +29,7 @@ import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.launch.EmptyItemWriter;
 import org.springframework.batch.core.step.JobRepositorySupport;
 import org.springframework.batch.core.step.factory.SimpleStepFactoryBean;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
@@ -49,7 +50,7 @@ class RepeatOperationsStepFactoryBeanTests {
 
 	private List<String> list;
 
-	private final JobExecution jobExecution = new JobExecution(new JobInstance(0L, "job"), 0L, new JobParameters());
+	private final JobExecution jobExecution = new JobExecution(1L, new JobInstance(0L, "job"), new JobParameters());
 
 	@BeforeEach
 	void setUp() {
@@ -76,7 +77,8 @@ class RepeatOperationsStepFactoryBeanTests {
 
 		factory.setItemReader(new ListItemReader<>(new ArrayList<>()));
 		factory.setItemWriter(new EmptyItemWriter<>());
-		factory.setJobRepository(new JobRepositorySupport());
+		JobRepositorySupport jobRepository = new JobRepositorySupport();
+		factory.setJobRepository(jobRepository);
 		factory.setTransactionManager(new ResourcelessTransactionManager());
 
 		factory.setStepOperations(callback -> {
@@ -86,7 +88,12 @@ class RepeatOperationsStepFactoryBeanTests {
 		});
 
 		Step step = factory.getObject();
-		step.execute(new StepExecution(step.getName(), jobExecution, 0L));
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = jobRepository.createJobInstance("job", jobParameters);
+		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
+				new ExecutionContext());
+		StepExecution stepExecution = jobRepository.createStepExecution(step.getName(), jobExecution);
+		step.execute(stepExecution);
 
 		assertEquals(1, list.size());
 	}

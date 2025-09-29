@@ -40,8 +40,8 @@ class StepExecutionSerializationUtilsTests {
 
 	@Test
 	void testCycle() {
-		StepExecution stepExecution = new StepExecution("step",
-				new JobExecution(new JobInstance(123L, "job"), 321L, new JobParameters()), 11L);
+		StepExecution stepExecution = new StepExecution(11L, "step",
+				new JobExecution(321L, new JobInstance(123L, "job"), new JobParameters()));
 		stepExecution.getExecutionContext().put("foo.bar.spam", 123);
 		StepExecution result = SerializationUtils.clone(stepExecution);
 		assertEquals(stepExecution, result);
@@ -58,10 +58,11 @@ class StepExecutionSerializationUtilsTests {
 		CompletionService<StepExecution> completionService = new ExecutorCompletionService<>(executor);
 
 		for (int i = 0; i < repeats; i++) {
-			final JobExecution jobExecution = new JobExecution(new JobInstance(123L, "job"), 321L, new JobParameters());
+			final JobExecution jobExecution = new JobExecution(1L, new JobInstance(123L, "job"), new JobParameters());
 			for (int j = 0; j < threads; j++) {
 				completionService.submit(() -> {
-					final StepExecution stepExecution = jobExecution.createStepExecution("step");
+					final StepExecution stepExecution = new StepExecution(1L, "step", jobExecution);
+					jobExecution.addStepExecution(stepExecution);
 					stepExecution.getExecutionContext().put("foo.bar.spam", 123);
 					StepExecution result = SerializationUtils.clone(stepExecution);
 					assertEquals(stepExecution.getExecutionContext(), result.getExecutionContext());

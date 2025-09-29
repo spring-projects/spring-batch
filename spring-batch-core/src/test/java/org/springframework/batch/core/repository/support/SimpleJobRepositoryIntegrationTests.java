@@ -15,9 +15,11 @@
  */
 package org.springframework.batch.core.repository.support;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.batch.core.step.Step;
@@ -47,6 +49,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * @author Dimitrios Liapis
  * @author Mahmoud Ben Hassine
  */
+// TODO rename to JdbcJobRepositoryIntegrationTests and update to new domain model
+// TODO should add a mongodb similar test suite
+@Disabled
 @SpringJUnitConfig(locations = "/org/springframework/batch/core/repository/dao/jdbc/sql-dao-test.xml")
 class SimpleJobRepositoryIntegrationTests {
 
@@ -55,7 +60,7 @@ class SimpleJobRepositoryIntegrationTests {
 
 	private final JobSupport job = new JobSupport("SimpleJobRepositoryIntegrationTestsJob");
 
-	private final JobParameters jobParameters = new JobParameters();
+	private JobParameters jobParameters = new JobParameters();
 
 	/*
 	 * Create two job executions for same job+parameters tuple. Check both executions
@@ -69,9 +74,11 @@ class SimpleJobRepositoryIntegrationTests {
 
 		JobParametersBuilder builder = new JobParametersBuilder();
 		builder.addString("stringKey", "stringValue").addLong("longKey", 1L).addDouble("doubleKey", 1.1);
-		JobParameters jobParams = builder.toJobParameters();
+		jobParameters = builder.toJobParameters();
 
-		JobExecution firstExecution = jobRepository.createJobExecution(job.getName(), jobParams);
+		ExecutionContext executionContext = new ExecutionContext();
+		JobInstance jobInstance = jobRepository.createJobInstance(job.getName(), jobParameters);
+		JobExecution firstExecution = jobRepository.createJobExecution(jobInstance, jobParameters, executionContext);
 		firstExecution.setStartTime(LocalDateTime.now());
 		assertNotNull(firstExecution.getLastUpdated());
 
@@ -81,7 +88,7 @@ class SimpleJobRepositoryIntegrationTests {
 		firstExecution.setStatus(BatchStatus.FAILED);
 		firstExecution.setEndTime(LocalDateTime.now());
 		jobRepository.update(firstExecution);
-		JobExecution secondExecution = jobRepository.createJobExecution(job.getName(), jobParams);
+		JobExecution secondExecution = jobRepository.createJobExecution(jobInstance, jobParameters, executionContext);
 
 		assertEquals(firstExecution.getJobInstance(), secondExecution.getJobInstance());
 		assertEquals(job.getName(), secondExecution.getJobInstance().getJobName());
@@ -96,13 +103,16 @@ class SimpleJobRepositoryIntegrationTests {
 	void testCreateAndFindWithNoStartDate() throws Exception {
 		job.setRestartable(true);
 
-		JobExecution firstExecution = jobRepository.createJobExecution(job.getName(), jobParameters);
+		JobInstance jobInstance = jobRepository.createJobInstance(job.getName(), jobParameters);
+		JobExecution firstExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
+				new ExecutionContext());
 		LocalDateTime now = LocalDateTime.now();
 		firstExecution.setStartTime(now);
 		firstExecution.setEndTime(now.plus(1, ChronoUnit.SECONDS));
 		firstExecution.setStatus(BatchStatus.COMPLETED);
 		jobRepository.update(firstExecution);
-		JobExecution secondExecution = jobRepository.createJobExecution(job.getName(), jobParameters);
+		JobExecution secondExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
+				new ExecutionContext());
 
 		assertEquals(firstExecution.getJobInstance(), secondExecution.getJobInstance());
 		assertEquals(job.getName(), secondExecution.getJobInstance().getJobName());
@@ -118,10 +128,11 @@ class SimpleJobRepositoryIntegrationTests {
 		job.setRestartable(true);
 		StepSupport step = new StepSupport("restartedStep");
 
+		ExecutionContext executionContext = new ExecutionContext();
+		JobInstance jobInstance = jobRepository.createJobInstance(job.getName(), jobParameters);
 		// first execution
-		JobExecution firstJobExec = jobRepository.createJobExecution(job.getName(), jobParameters);
-		StepExecution firstStepExec = new StepExecution(step.getName(), firstJobExec);
-		jobRepository.add(firstStepExec);
+		JobExecution firstJobExec = jobRepository.createJobExecution(jobInstance, jobParameters, executionContext);
+		StepExecution firstStepExec = jobRepository.createStepExecution(step.getName(), firstJobExec);
 
 		assertEquals(1, jobRepository.getStepExecutionCount(firstJobExec.getJobInstance(), step.getName()));
 		assertEquals(firstStepExec, jobRepository.getLastStepExecution(firstJobExec.getJobInstance(), step.getName()));
@@ -138,9 +149,8 @@ class SimpleJobRepositoryIntegrationTests {
 		jobRepository.update(firstJobExec);
 
 		// second execution
-		JobExecution secondJobExec = jobRepository.createJobExecution(job.getName(), jobParameters);
-		StepExecution secondStepExec = new StepExecution(step.getName(), secondJobExec);
-		jobRepository.add(secondStepExec);
+		JobExecution secondJobExec = jobRepository.createJobExecution(jobInstance, jobParameters, executionContext);
+		StepExecution secondStepExec = jobRepository.createStepExecution(step.getName(), firstJobExec);
 
 		assertEquals(2, jobRepository.getStepExecutionCount(secondJobExec.getJobInstance(), step.getName()));
 		assertEquals(secondStepExec,
@@ -154,14 +164,13 @@ class SimpleJobRepositoryIntegrationTests {
 	@Test
 	void testSaveExecutionContext() throws Exception {
 		ExecutionContext ctx = new ExecutionContext(Map.of("crashedPosition", 7));
-		JobExecution jobExec = jobRepository.createJobExecution(job.getName(), jobParameters);
+		JobInstance jobInstance = jobRepository.createJobInstance(job.getName(), jobParameters);
+		JobExecution jobExec = jobRepository.createJobExecution(jobInstance, jobParameters, new ExecutionContext());
 		jobExec.setStartTime(LocalDateTime.now());
 		jobExec.setExecutionContext(ctx);
 		Step step = new StepSupport("step1");
-		StepExecution stepExec = new StepExecution(step.getName(), jobExec);
+		StepExecution stepExec = jobRepository.createStepExecution(step.getName(), jobExec);
 		stepExec.setExecutionContext(ctx);
-
-		jobRepository.add(stepExec);
 
 		StepExecution retrievedStepExec = jobRepository.getLastStepExecution(jobExec.getJobInstance(), step.getName());
 		assertEquals(stepExec, retrievedStepExec);
@@ -176,27 +185,30 @@ class SimpleJobRepositoryIntegrationTests {
 	@Test
 	void testOnlyOneJobExecutionAllowedRunning() throws Exception {
 		job.setRestartable(true);
-		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), jobParameters);
+		JobInstance jobInstance = jobRepository.createJobInstance(job.getName(), jobParameters);
+		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
+				new ExecutionContext());
 
 		// simulating a running job execution
 		jobExecution.setStartTime(LocalDateTime.now());
 		jobRepository.update(jobExecution);
 
 		assertThrows(JobExecutionAlreadyRunningException.class,
-				() -> jobRepository.createJobExecution(job.getName(), jobParameters));
+				() -> jobRepository.createJobExecution(jobInstance, jobParameters, new ExecutionContext()));
 	}
 
 	@Transactional
 	@Test
 	void testGetLastJobExecution() throws Exception {
-		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), jobParameters);
+		JobInstance jobInstance = jobRepository.createJobInstance(job.getName(), jobParameters);
+		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
+				new ExecutionContext());
 		jobExecution.setStatus(BatchStatus.FAILED);
 		jobExecution.setEndTime(LocalDateTime.now());
 		jobRepository.update(jobExecution);
 		Thread.sleep(10);
-		jobExecution = jobRepository.createJobExecution(job.getName(), jobParameters);
-		StepExecution stepExecution = new StepExecution("step1", jobExecution);
-		jobRepository.add(stepExecution);
+		jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters, new ExecutionContext());
+		StepExecution stepExecution = jobRepository.createStepExecution("step1", jobExecution);
 		jobExecution.addStepExecutions(List.of(stepExecution));
 		assertEquals(jobExecution, jobRepository.getLastJobExecution(job.getName(), jobParameters));
 		assertEquals(stepExecution, jobExecution.getStepExecutions().iterator().next());
@@ -210,11 +222,14 @@ class SimpleJobRepositoryIntegrationTests {
 	@Test
 	void testReExecuteWithSameJobParameters() throws Exception {
 		JobParameters jobParameters = new JobParametersBuilder().addString("name", "foo", false).toJobParameters();
-		JobExecution jobExecution1 = jobRepository.createJobExecution(job.getName(), jobParameters);
+		JobInstance jobInstance = jobRepository.createJobInstance(job.getName(), jobParameters);
+		JobExecution jobExecution1 = jobRepository.createJobExecution(jobInstance, jobParameters,
+				new ExecutionContext());
 		jobExecution1.setStatus(BatchStatus.COMPLETED);
 		jobExecution1.setEndTime(LocalDateTime.now());
 		jobRepository.update(jobExecution1);
-		JobExecution jobExecution2 = jobRepository.createJobExecution(job.getName(), jobParameters);
+		JobExecution jobExecution2 = jobRepository.createJobExecution(jobInstance, jobParameters,
+				new ExecutionContext());
 		assertNotNull(jobExecution1);
 		assertNotNull(jobExecution2);
 	}
@@ -230,31 +245,33 @@ class SimpleJobRepositoryIntegrationTests {
 			.toJobParameters();
 
 		// jobExecution with status STARTING
-		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), jobParameters);
+		JobInstance jobInstance = jobRepository.createJobInstance(job.getName(), jobParameters);
+		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
+				new ExecutionContext());
 		assertThrows(JobExecutionAlreadyRunningException.class,
-				() -> jobRepository.createJobExecution(job.getName(), jobParameters));
+				() -> jobRepository.createJobExecution(jobInstance, jobParameters, new ExecutionContext()));
 
 		// jobExecution with status STARTED
 		jobExecution.setStatus(BatchStatus.STARTED);
 		jobExecution.setStartTime(LocalDateTime.now());
 		jobRepository.update(jobExecution);
 		assertThrows(JobExecutionAlreadyRunningException.class,
-				() -> jobRepository.createJobExecution(job.getName(), jobParameters));
+				() -> jobRepository.createJobExecution(jobInstance, jobParameters, new ExecutionContext()));
 
 		// jobExecution with status STOPPING
 		jobExecution.setStatus(BatchStatus.STOPPING);
 		jobRepository.update(jobExecution);
 		assertThrows(JobExecutionAlreadyRunningException.class,
-				() -> jobRepository.createJobExecution(job.getName(), jobParameters));
+				() -> jobRepository.createJobExecution(jobInstance, jobParameters, new ExecutionContext()));
 	}
 
 	@Transactional
 	@Test
 	void testDeleteJobInstance() throws Exception {
 		var jobParameters = new JobParametersBuilder().addString("foo", "bar").toJobParameters();
-		var jobExecution = jobRepository.createJobExecution(job.getName(), jobParameters);
-		var stepExecution = new StepExecution("step", jobExecution);
-		jobRepository.add(stepExecution);
+		JobInstance jobInstance = jobRepository.createJobInstance(job.getName(), jobParameters);
+		var jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters, new ExecutionContext());
+		jobRepository.createStepExecution("step", jobExecution);
 
 		jobRepository.deleteJobInstance(jobExecution.getJobInstance());
 

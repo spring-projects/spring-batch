@@ -22,6 +22,7 @@ import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.JobInterruptedException;
 import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.repository.support.ResourcelessJobRepository;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepContribution;
 import org.springframework.batch.core.step.StepExecution;
@@ -86,8 +87,8 @@ class TaskletStepExceptionTests {
 		taskletStep.setTransactionManager(new ResourcelessTransactionManager());
 
 		JobInstance jobInstance = new JobInstance(1L, "testJob");
-		JobExecution jobExecution = new JobExecution(jobInstance, 0L, new JobParameters());
-		stepExecution = new StepExecution("testStep", jobExecution, 0L);
+		JobExecution jobExecution = new JobExecution(0L, jobInstance, new JobParameters());
+		stepExecution = new StepExecution(0L, "testStep", jobExecution);
 	}
 
 	@Test
@@ -489,7 +490,7 @@ class TaskletStepExceptionTests {
 
 	}
 
-	private static class UpdateCountingJobRepository implements JobRepository {
+	private static class UpdateCountingJobRepository extends ResourcelessJobRepository {
 
 		private int updateCount = 0;
 
@@ -509,16 +510,6 @@ class TaskletStepExceptionTests {
 
 		public void setFailInTransaction(boolean failInTransaction) {
 			this.failInTransaction = failInTransaction;
-		}
-
-		@Override
-		public void add(StepExecution stepExecution) {
-		}
-
-		@Override
-		public JobExecution createJobExecution(String jobName, JobParameters jobParameters)
-				throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
-			return null;
 		}
 
 		@Nullable
@@ -580,10 +571,6 @@ class TaskletStepExceptionTests {
 
 		@Override
 		public void updateExecutionContext(JobExecution jobExecution) {
-		}
-
-		@Override
-		public void addAll(Collection<StepExecution> stepExecutions) {
 		}
 
 		@Override

@@ -18,6 +18,7 @@ package org.springframework.batch.core.listener;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 import static org.springframework.batch.core.listener.JobListenerMetaData.AFTER_JOB;
 
 import java.util.HashMap;
@@ -53,7 +54,7 @@ class JobListenerFactoryBeanTests {
 		JobListenerWithInterface delegate = new JobListenerWithInterface();
 		factoryBean.setDelegate(delegate);
 		JobExecutionListener listener = (JobExecutionListener) factoryBean.getObject();
-		JobExecution jobExecution = new JobExecution(11L);
+		JobExecution jobExecution = new JobExecution(11L, mock(), mock());
 		listener.beforeJob(jobExecution);
 		listener.afterJob(jobExecution);
 		assertTrue(delegate.beforeJobCalled);
@@ -65,7 +66,7 @@ class JobListenerFactoryBeanTests {
 		AnnotatedTestClass delegate = new AnnotatedTestClass();
 		factoryBean.setDelegate(delegate);
 		JobExecutionListener listener = (JobExecutionListener) factoryBean.getObject();
-		JobExecution jobExecution = new JobExecution(11L);
+		JobExecution jobExecution = new JobExecution(11L, mock(), mock());
 		listener.beforeJob(jobExecution);
 		listener.afterJob(jobExecution);
 		assertTrue(delegate.beforeJobCalled);
@@ -77,7 +78,7 @@ class JobListenerFactoryBeanTests {
 		JobListenerWithInterface delegate = new JobListenerWithInterface();
 		Object listener = JobListenerFactoryBean.getListener(delegate);
 		assertTrue(listener instanceof JobExecutionListener);
-		((JobExecutionListener) listener).afterJob(new JobExecution(11L));
+		((JobExecutionListener) listener).afterJob(new JobExecution(11L, mock(), mock()));
 		assertTrue(delegate.afterJobCalled);
 	}
 
@@ -152,7 +153,7 @@ class JobListenerFactoryBeanTests {
 		};
 		factoryBean.setDelegate(delegate);
 		JobExecutionListener listener = (JobExecutionListener) factoryBean.getObject();
-		listener.afterJob(new JobExecution(1L));
+		listener.afterJob(new JobExecution(1L, mock(), mock()));
 		assertTrue(delegate.isExecuted());
 	}
 
@@ -167,7 +168,7 @@ class JobListenerFactoryBeanTests {
 		};
 		factoryBean.setDelegate(delegate);
 		JobExecutionListener listener = (JobExecutionListener) factoryBean.getObject();
-		listener.afterJob(new JobExecution(25L));
+		listener.afterJob(new JobExecution(25L, mock(), mock()));
 		assertTrue(delegate.isExecuted());
 	}
 
@@ -196,7 +197,7 @@ class JobListenerFactoryBeanTests {
 		metaDataMap.put(AFTER_JOB.getPropertyName(), "aMethod");
 		factoryBean.setMetaDataMap(metaDataMap);
 		JobExecutionListener listener = (JobExecutionListener) factoryBean.getObject();
-		listener.afterJob(new JobExecution(1L));
+		listener.afterJob(new JobExecution(1L, mock(), mock()));
 		assertTrue(delegate.isExecuted());
 	}
 
@@ -214,7 +215,7 @@ class JobListenerFactoryBeanTests {
 		metaDataMap.put(AFTER_JOB.getPropertyName(), "aMethod");
 		factoryBean.setMetaDataMap(metaDataMap);
 		JobExecutionListener listener = (JobExecutionListener) factoryBean.getObject();
-		listener.afterJob(new JobExecution(25L));
+		listener.afterJob(new JobExecution(25L, mock(), mock()));
 		assertTrue(delegate.isExecuted());
 	}
 

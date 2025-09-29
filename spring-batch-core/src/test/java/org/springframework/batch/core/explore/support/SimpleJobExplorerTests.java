@@ -61,7 +61,7 @@ class SimpleJobExplorerTests {
 
 	private ExecutionContextDao ecDao;
 
-	private final JobExecution jobExecution = new JobExecution(jobInstance, 1234L, new JobParameters());
+	private final JobExecution jobExecution = new JobExecution(1234L, jobInstance, new JobParameters());
 
 	@BeforeEach
 	void setUp() {
@@ -73,14 +73,6 @@ class SimpleJobExplorerTests {
 
 		jobExplorer = new SimpleJobExplorer(jobInstanceDao, jobExecutionDao, stepExecutionDao, ecDao);
 
-	}
-
-	@Test
-	void testGetJobExecution() {
-		when(jobExecutionDao.getJobExecution(123L)).thenReturn(jobExecution);
-		when(jobInstanceDao.getJobInstance(jobExecution)).thenReturn(jobInstance);
-		stepExecutionDao.addStepExecutions(jobExecution);
-		jobExplorer.getJobExecution(123L);
 	}
 
 	@Test
@@ -100,7 +92,8 @@ class SimpleJobExplorerTests {
 	void testGetStepExecution() {
 		when(jobExecutionDao.getJobExecution(jobExecution.getId())).thenReturn(jobExecution);
 		when(jobInstanceDao.getJobInstance(jobExecution)).thenReturn(jobInstance);
-		StepExecution stepExecution = jobExecution.createStepExecution("foo");
+		StepExecution stepExecution = new StepExecution(1L, "foo", jobExecution);
+		jobExecution.addStepExecution(stepExecution);
 		when(stepExecutionDao.getStepExecution(jobExecution, 123L)).thenReturn(stepExecution);
 		when(ecDao.getExecutionContext(stepExecution)).thenReturn(null);
 		stepExecution = jobExplorer.getStepExecution(jobExecution.getId(), 123L);
@@ -123,23 +116,27 @@ class SimpleJobExplorerTests {
 		assertNull(jobExplorer.getStepExecution(jobExecution.getId(), 123L));
 	}
 
+	// TODO fix text: no assertions??
 	@Test
 	void testFindRunningJobExecutions() {
-		StepExecution stepExecution = jobExecution.createStepExecution("step");
+		StepExecution stepExecution = new StepExecution(1L, "step", jobExecution);
+		jobExecution.addStepExecution(stepExecution);
 		when(jobExecutionDao.findRunningJobExecutions("job")).thenReturn(Collections.singleton(jobExecution));
 		when(jobInstanceDao.getJobInstance(jobExecution)).thenReturn(jobInstance);
-		stepExecutionDao.addStepExecutions(jobExecution);
+		// stepExecutionDao.addStepExecutions(jobExecution);
 		when(ecDao.getExecutionContext(jobExecution)).thenReturn(null);
 		when(ecDao.getExecutionContext(stepExecution)).thenReturn(null);
 		jobExplorer.findRunningJobExecutions("job");
 	}
 
+	// TODO fix text: no assertions??
 	@Test
 	void testFindJobExecutions() {
-		StepExecution stepExecution = jobExecution.createStepExecution("step");
+		StepExecution stepExecution = new StepExecution(1L, "step", jobExecution);
+		jobExecution.addStepExecution(stepExecution);
 		when(jobExecutionDao.findJobExecutions(jobInstance)).thenReturn(Collections.singletonList(jobExecution));
 		when(jobInstanceDao.getJobInstance(jobExecution)).thenReturn(jobInstance);
-		stepExecutionDao.addStepExecutions(jobExecution);
+		// stepExecutionDao.addStepExecutions(jobExecution);
 		when(ecDao.getExecutionContext(jobExecution)).thenReturn(null);
 		when(ecDao.getExecutionContext(stepExecution)).thenReturn(null);
 		jobExplorer.getJobExecutions(jobInstance);

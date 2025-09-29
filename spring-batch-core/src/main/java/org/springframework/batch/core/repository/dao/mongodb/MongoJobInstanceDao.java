@@ -96,7 +96,7 @@ public class MongoJobInstanceDao implements JobInstanceDao {
 	}
 
 	@Override
-	public JobInstance getJobInstance(Long instanceId) {
+	public JobInstance getJobInstance(long instanceId) {
 		Query query = query(where("jobInstanceId").is(instanceId));
 		org.springframework.batch.core.repository.persistence.JobInstance jobInstance = this.mongoOperations
 			.findOne(query, org.springframework.batch.core.repository.persistence.JobInstance.class, COLLECTION_NAME);
@@ -105,7 +105,7 @@ public class MongoJobInstanceDao implements JobInstanceDao {
 
 	@Override
 	public JobInstance getJobInstance(JobExecution jobExecution) {
-		return getJobInstance(jobExecution.getJobId());
+		return getJobInstance(jobExecution.getJobInstanceId());
 	}
 
 	@Override
@@ -121,6 +121,15 @@ public class MongoJobInstanceDao implements JobInstanceDao {
 			.stream()
 			.map(this.jobInstanceConverter::toJobInstance)
 			.limit(count)
+			.toList();
+	}
+
+	public List<JobInstance> findJobInstancesByName(String jobName) {
+		Query query = query(where("jobName").is(jobName));
+		return this.mongoOperations
+			.find(query, org.springframework.batch.core.repository.persistence.JobInstance.class, COLLECTION_NAME)
+			.stream()
+			.map(this.jobInstanceConverter::toJobInstance)
 			.toList();
 	}
 

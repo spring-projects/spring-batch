@@ -16,21 +16,15 @@
 
 package org.springframework.batch.core.repository;
 
-import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.launch.NoSuchJobException;
-import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.repository.explore.JobExplorer;
-import org.springframework.batch.core.repository.dao.JobExecutionDao;
-import org.springframework.batch.core.repository.dao.JobInstanceDao;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.lang.Nullable;
-import org.springframework.transaction.annotation.Isolation;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -94,11 +88,11 @@ public interface JobRepository extends JobExplorer {
 	}
 
 	/**
-	 * @param instanceId {@link Long} The ID for the {@link JobInstance} to obtain.
+	 * @param jobInstanceId The ID for the {@link JobInstance} to obtain.
 	 * @return the {@code JobInstance} that has this ID, or {@code null} if not found.
 	 */
 	@Nullable
-	default JobInstance getJobInstance(@Nullable Long instanceId) {
+	default JobInstance getJobInstance(long jobInstanceId) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -155,7 +149,7 @@ public interface JobRepository extends JobExplorer {
 	 * @return the {@link JobExecution} that has this ID or {@code null} if not found.
 	 */
 	@Nullable
-	default JobExecution getJobExecution(@Nullable Long executionId) {
+	default JobExecution getJobExecution(long executionId) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -163,7 +157,7 @@ public interface JobRepository extends JobExplorer {
 	 * Retrieve job executions by their job instance. The corresponding step executions
 	 * may not be fully hydrated (for example, their execution context may be missing),
 	 * depending on the implementation. In that case, use
-	 * {@link #getStepExecution(Long, Long)} to hydrate them.
+	 * {@link #getStepExecution(long, long)} to hydrate them.
 	 * @param jobInstance The {@link JobInstance} to query.
 	 * @return the list of all executions for the specified {@link JobInstance}.
 	 */
@@ -199,7 +193,7 @@ public interface JobRepository extends JobExplorer {
 	/**
 	 * Retrieve running job executions. The corresponding step executions may not be fully
 	 * hydrated (for example, their execution context may be missing), depending on the
-	 * implementation. In that case, use {@link #getStepExecution(Long, Long)} to hydrate
+	 * implementation. In that case, use {@link #getStepExecution(long, long)} to hydrate
 	 * them.
 	 * @param jobName The name of the job.
 	 * @return the set of running executions for jobs with the specified name.
@@ -223,10 +217,12 @@ public interface JobRepository extends JobExplorer {
 	 * @param stepExecutionId The step execution ID.
 	 * @return the {@link StepExecution} that has this ID or {@code null} if not found.
 	 *
-	 * @see #getJobExecution(Long)
+	 * @see #getJobExecution(long)
 	 */
+	// FIXME incorrect contract: stepExecutionId is globally unique, no need for
+	// jobExecutionId
 	@Nullable
-	default StepExecution getStepExecution(@Nullable Long jobExecutionId, @Nullable Long stepExecutionId) {
+	default StepExecution getStepExecution(long jobExecutionId, long stepExecutionId) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -264,37 +260,36 @@ public interface JobRepository extends JobExplorer {
 	JobInstance createJobInstance(String jobName, JobParameters jobParameters);
 
 	/**
-	 * <p>
-	 * Create a {@link JobExecution} for a given {@link Job} and {@link JobParameters}. If
-	 * matching {@link JobInstance} already exists, the job must be restartable and it's
-	 * last JobExecution must *not* be completed. If matching {@link JobInstance} does not
-	 * exist yet it will be created.
-	 * </p>
-	 *
-	 * <p>
-	 * If this method is run in a transaction (as it normally would be) with isolation
-	 * level at {@link Isolation#REPEATABLE_READ} or better, then this method should block
-	 * if another transaction is already executing it (for the same {@link JobParameters}
-	 * and job name). The first transaction to complete in this scenario obtains a valid
-	 * {@link JobExecution}, and others throw {@link JobExecutionAlreadyRunningException}
-	 * (or timeout). There are no such guarantees if the {@link JobInstanceDao} and
-	 * {@link JobExecutionDao} do not respect the transaction isolation levels (e.g. if
-	 * using a non-relational data-store, or if the platform does not support the higher
-	 * isolation levels).
-	 * </p>
-	 * @param jobName the name of the job that is to be executed
-	 * @param jobParameters the runtime parameters for the job
-	 * @return a valid {@link JobExecution} for the arguments provided
-	 * @throws JobExecutionAlreadyRunningException if there is a {@link JobExecution}
-	 * already running for the job instance with the provided job and parameters.
-	 * @throws JobRestartException if one or more existing {@link JobInstance}s is found
-	 * with the same parameters and {@link Job#isRestartable()} is false.
-	 * @throws JobInstanceAlreadyCompleteException if a {@link JobInstance} is found and
-	 * was already completed successfully.
-	 *
+	 * Delete the job instance object graph (ie the job instance with all associated job
+	 * executions along with their respective object graphs as specified in
+	 * {@link #deleteJobExecution(JobExecution)}).
+	 * @param jobInstance the job instance to delete
+	 * @since 5.0
 	 */
-	JobExecution createJobExecution(String jobName, JobParameters jobParameters)
-			throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException;
+	default void deleteJobInstance(JobInstance jobInstance) {
+		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 * Create a {@link JobExecution} for a given {@link JobInstance},
+	 * {@link JobParameters} and {@link ExecutionContext}. The {@link JobInstance} must
+	 * already exist. The returned {@link JobExecution} will be associated with the
+	 * {@link JobInstance} (ie. should be added to the list of
+	 * {@link JobInstance#getJobExecutions()}.
+	 * @param jobInstance the job instance to which the execution belongs
+	 * @param jobParameters the runtime parameters for the job
+	 * @param executionContext the execution context to associate with the job execution
+	 * @return a valid {@link JobExecution} for the arguments provided
+	 * @throws JobExecutionAlreadyRunningException
+	 * @throws JobRestartException
+	 * @throws JobInstanceAlreadyCompleteException
+	 * @since 6.0
+	 */
+	default JobExecution createJobExecution(JobInstance jobInstance, JobParameters jobParameters,
+			ExecutionContext executionContext)
+			throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
+		throw new UnsupportedOperationException();
+	}
 
 	/**
 	 * Update the {@link JobExecution} (but not its {@link ExecutionContext}).
@@ -306,26 +301,35 @@ public interface JobRepository extends JobExplorer {
 	void update(JobExecution jobExecution);
 
 	/**
-	 * Save the {@link StepExecution} and its {@link ExecutionContext}. ID will be
-	 * assigned - it is not permitted that an ID be assigned before calling this method.
-	 * Instead, it should be left blank, to be assigned by a {@link JobRepository}.
-	 * <p>
-	 * Preconditions: {@link StepExecution} must have a valid {@link Step}.
-	 * @param stepExecution {@link StepExecution} instance to be added to the repo.
+	 * Persist the updated {@link ExecutionContext} of the given {@link JobExecution}.
+	 * @param jobExecution {@link JobExecution} instance to be used to update the context.
 	 */
-	void add(StepExecution stepExecution);
+	void updateExecutionContext(JobExecution jobExecution);
 
 	/**
-	 * Save a collection of {@link StepExecution}s and each {@link ExecutionContext}. The
-	 * StepExecution ID will be assigned - it is not permitted that an ID be assigned
-	 * before calling this method. Instead, it should be left blank, to be assigned by
-	 * {@link JobRepository}.
-	 * <p>
-	 * Preconditions: {@link StepExecution} must have a valid {@link Step}.
-	 * @param stepExecutions collection of {@link StepExecution} instances to be added to
-	 * the repo.
+	 * Delete the job execution object graph (ie the job execution with its execution
+	 * context, all related step executions and their executions contexts, as well as
+	 * associated job parameters)
+	 * @param jobExecution the job execution to delete
+	 * @since 5.0
 	 */
-	void addAll(Collection<StepExecution> stepExecutions);
+	default void deleteJobExecution(JobExecution jobExecution) {
+		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 * Create a {@link StepExecution} for a given {@link JobExecution} and step name. The
+	 * {@link JobExecution} must already exist. The returned {@link StepExecution} should
+	 * be associated with the {@link JobExecution} (ie. should be added to the list of
+	 * {@link JobExecution#getStepExecutions()}.
+	 * @param stepName the name of the step
+	 * @param jobExecution the job execution to which the step execution belongs
+	 * @return a valid {@link StepExecution} for the arguments provided
+	 * @since 6.0
+	 */
+	default StepExecution createStepExecution(String stepName, JobExecution jobExecution) {
+		throw new UnsupportedOperationException();
+	}
 
 	/**
 	 * Update the {@link StepExecution} (but not its {@link ExecutionContext}).
@@ -343,39 +347,11 @@ public interface JobRepository extends JobExplorer {
 	void updateExecutionContext(StepExecution stepExecution);
 
 	/**
-	 * Persist the updated {@link ExecutionContext} of the given {@link JobExecution}.
-	 * @param jobExecution {@link JobExecution} instance to be used to update the context.
-	 */
-	void updateExecutionContext(JobExecution jobExecution);
-
-	/**
 	 * Delete the step execution along with its execution context.
 	 * @param stepExecution the step execution to delete
 	 * @since 5.0
 	 */
 	default void deleteStepExecution(StepExecution stepExecution) {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * Delete the job execution object graph (ie the job execution with its execution
-	 * context, all related step executions and their executions contexts, as well as
-	 * associated job parameters)
-	 * @param jobExecution the job execution to delete
-	 * @since 5.0
-	 */
-	default void deleteJobExecution(JobExecution jobExecution) {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * Delete the job instance object graph (ie the job instance with all associated job
-	 * executions along with their respective object graphs as specified in
-	 * {@link #deleteJobExecution(JobExecution)}).
-	 * @param jobInstance the job instance to delete
-	 * @since 5.0
-	 */
-	default void deleteJobInstance(JobInstance jobInstance) {
 		throw new UnsupportedOperationException();
 	}
 

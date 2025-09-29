@@ -79,7 +79,8 @@ class CommandLineJobRunnerTests {
 
 	@BeforeEach
 	void setUp() {
-		JobExecution jobExecution = new JobExecution(null, 1L, null);
+		JobInstance jobInstance = new JobInstance(1L, "foo");
+		JobExecution jobExecution = new JobExecution(123L, jobInstance, new JobParameters());
 		ExitStatus exitStatus = ExitStatus.COMPLETED;
 		jobExecution.setExitStatus(exitStatus);
 		StubJobLauncher.jobExecution = jobExecution;
@@ -319,7 +320,7 @@ class CommandLineJobRunnerTests {
 	void testRestartExecution() throws Throwable {
 		String[] args = new String[] { jobPath, "-restart", "11" };
 		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "bar").toJobParameters();
-		JobExecution jobExecution = new JobExecution(new JobInstance(0L, jobName), 11L, jobParameters);
+		JobExecution jobExecution = new JobExecution(11L, new JobInstance(0L, jobName), jobParameters);
 		jobExecution.setStatus(BatchStatus.FAILED);
 		StubJobExplorer.jobExecution = jobExecution;
 		CommandLineJobRunner.main(args);
@@ -331,7 +332,7 @@ class CommandLineJobRunnerTests {
 	void testRestartExecutionNotFailed() throws Throwable {
 		String[] args = new String[] { jobPath, "-restart", "11" };
 		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "bar").toJobParameters();
-		JobExecution jobExecution = new JobExecution(new JobInstance(0L, jobName), 11L, jobParameters);
+		JobExecution jobExecution = new JobExecution(11L, new JobInstance(0L, jobName), jobParameters);
 		jobExecution.setStatus(BatchStatus.COMPLETED);
 		StubJobExplorer.jobExecution = jobExecution;
 		CommandLineJobRunner.main(args);
@@ -471,7 +472,7 @@ class CommandLineJobRunnerTests {
 
 		@Nullable
 		@Override
-		public JobExecution getJobExecution(@Nullable Long executionId) {
+		public JobExecution getJobExecution(long executionId) {
 			if (jobExecution != null) {
 				return jobExecution;
 			}
@@ -503,7 +504,7 @@ class CommandLineJobRunnerTests {
 		}
 
 		private JobExecution createJobExecution(JobInstance jobInstance, BatchStatus status) {
-			JobExecution jobExecution = new JobExecution(jobInstance, 1L, jobParameters);
+			JobExecution jobExecution = new JobExecution(1L, jobInstance, jobParameters);
 			jobExecution.setStatus(status);
 			jobExecution.setStartTime(LocalDateTime.now());
 			if (status != BatchStatus.STARTED) {
@@ -514,7 +515,7 @@ class CommandLineJobRunnerTests {
 
 		@Nullable
 		@Override
-		public JobInstance getJobInstance(@Nullable Long instanceId) {
+		public JobInstance getJobInstance(long instanceId) {
 			throw new UnsupportedOperationException();
 		}
 
@@ -548,7 +549,7 @@ class CommandLineJobRunnerTests {
 
 		@Nullable
 		@Override
-		public StepExecution getStepExecution(@Nullable Long jobExecutionId, @Nullable Long stepExecutionId) {
+		public StepExecution getStepExecution(long jobExecutionId, long stepExecutionId) {
 			throw new UnsupportedOperationException();
 		}
 

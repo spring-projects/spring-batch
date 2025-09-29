@@ -17,6 +17,7 @@ package org.springframework.batch.core.scope;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.mock;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -57,21 +58,21 @@ class JobScopeDestructionCallbackIntegrationTests {
 	@Test
 	void testDisposableScopedProxy() {
 		assertNotNull(proxied);
-		proxied.execute(new JobExecution(1L));
+		proxied.execute(new JobExecution(1L, mock(), mock()));
 		assertEquals(1, StringUtils.countOccurrencesOf(TestDisposableCollaborator.message, "destroyed"));
 	}
 
 	@Test
 	void testDisposableInnerScopedProxy() {
 		assertNotNull(nested);
-		nested.execute(new JobExecution(1L));
+		nested.execute(new JobExecution(1L, mock(), mock()));
 		assertEquals(1, StringUtils.countOccurrencesOf(TestDisposableCollaborator.message, "destroyed"));
 	}
 
 	@Test
 	void testProxiedScopedProxy() {
 		assertNotNull(nested);
-		nested.execute(new JobExecution(1L));
+		nested.execute(new JobExecution(1L, mock(), mock()));
 		assertEquals(4, TestAdvice.names.size());
 		assertEquals("bar", TestAdvice.names.get(0));
 		assertEquals(1, StringUtils.countOccurrencesOf(TestDisposableCollaborator.message, "destroyed"));
@@ -80,7 +81,7 @@ class JobScopeDestructionCallbackIntegrationTests {
 	@Test
 	void testRefScopedProxy() {
 		assertNotNull(ref);
-		ref.execute(new JobExecution(1L));
+		ref.execute(new JobExecution(1L, mock(), mock()));
 		assertEquals(4, TestAdvice.names.size());
 		assertEquals("spam", TestAdvice.names.get(0));
 		assertEquals(2, StringUtils.countOccurrencesOf(TestDisposableCollaborator.message, "destroyed"));

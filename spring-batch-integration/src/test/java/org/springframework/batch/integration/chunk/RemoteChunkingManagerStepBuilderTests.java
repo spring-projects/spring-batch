@@ -24,6 +24,7 @@ import javax.sql.DataSource;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.configuration.annotation.EnableJdbcJobRepository;
+import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.listener.ChunkListener;
 import org.springframework.batch.core.listener.ItemReadListener;
 import org.springframework.batch.core.listener.ItemWriteListener;
@@ -39,10 +40,7 @@ import org.springframework.batch.core.step.item.ChunkOrientedTasklet;
 import org.springframework.batch.core.step.item.SimpleChunkProcessor;
 import org.springframework.batch.core.step.item.SimpleChunkProvider;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
-import org.springframework.batch.item.ItemProcessor;
-import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemStreamSupport;
-import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.*;
 import org.springframework.batch.item.support.CompositeItemStream;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.repeat.support.RepeatTemplate;
@@ -310,9 +308,11 @@ class RemoteChunkingManagerStepBuilderTests {
 			.keyGenerator(Object::hashCode)
 			.build();
 
-		JobExecution jobExecution = this.jobRepository.createJobExecution("job1", new JobParameters());
-		StepExecution stepExecution = new StepExecution("step1", jobExecution);
-		this.jobRepository.add(stepExecution);
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = jobRepository.createJobInstance("job1", jobParameters);
+		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
+				new ExecutionContext());
+		StepExecution stepExecution = jobRepository.createStepExecution("step1", jobExecution);
 
 		taskletStep.execute(stepExecution);
 

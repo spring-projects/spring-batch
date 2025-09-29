@@ -133,7 +133,7 @@ public interface JobExplorer {
 	 * @return the {@code JobInstance} that has this ID, or {@code null} if not found.
 	 */
 	@Nullable
-	default JobInstance getJobInstance(@Nullable Long instanceId) {
+	default JobInstance getJobInstance(long instanceId) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -190,7 +190,7 @@ public interface JobExplorer {
 	 * @return the {@link JobExecution} that has this ID or {@code null} if not found.
 	 */
 	@Nullable
-	default JobExecution getJobExecution(@Nullable Long executionId) {
+	default JobExecution getJobExecution(long executionId) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -198,7 +198,7 @@ public interface JobExplorer {
 	 * Retrieve job executions by their job instance. The corresponding step executions
 	 * may not be fully hydrated (for example, their execution context may be missing),
 	 * depending on the implementation. In that case, use
-	 * {@link #getStepExecution(Long, Long)} to hydrate them.
+	 * {@link #getStepExecution(long, long)} to hydrate them.
 	 * @param jobInstance The {@link JobInstance} to query.
 	 * @return the list of all executions for the specified {@link JobInstance}.
 	 */
@@ -248,12 +248,12 @@ public interface JobExplorer {
 	/**
 	 * Retrieve running job executions. The corresponding step executions may not be fully
 	 * hydrated (for example, their execution context may be missing), depending on the
-	 * implementation. In that case, use {@link #getStepExecution(Long, Long)} to hydrate
+	 * implementation. In that case, use {@link #getStepExecution(long, long)} to hydrate
 	 * them.
 	 * @param jobName The name of the job.
 	 * @return the set of running executions for jobs with the specified name.
 	 */
-	default Set<JobExecution> findRunningJobExecutions(@Nullable String jobName) {
+	default Set<JobExecution> findRunningJobExecutions(String jobName) {
 		return Collections.emptySet();
 	}
 
@@ -272,10 +272,12 @@ public interface JobExplorer {
 	 * @param stepExecutionId The step execution ID.
 	 * @return the {@link StepExecution} that has this ID or {@code null} if not found.
 	 *
-	 * @see #getJobExecution(Long)
+	 * @see #getJobExecution(long)
 	 */
+	// FIXME incorrect contract: stepExecutionId is globally unique, no need for
+	// jobExecutionId
 	@Nullable
-	default StepExecution getStepExecution(@Nullable Long jobExecutionId, @Nullable Long stepExecutionId) {
+	default StepExecution getStepExecution(long jobExecutionId, long stepExecutionId) {
 		throw new UnsupportedOperationException();
 	}
 

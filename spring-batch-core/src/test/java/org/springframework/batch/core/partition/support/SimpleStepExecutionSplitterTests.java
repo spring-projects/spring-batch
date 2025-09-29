@@ -30,7 +30,6 @@ import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobExecutionException;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
-import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.partition.PartitionNameProvider;
 import org.springframework.batch.core.partition.Partitioner;
@@ -48,7 +47,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SimpleStepExecutionSplitterTests {
 
-	private Step step;
+	private TaskletStep step;
 
 	private JobRepository jobRepository;
 
@@ -66,8 +65,12 @@ class SimpleStepExecutionSplitterTests {
 		factory.setTransactionManager(new JdbcTransactionManager(embeddedDatabase));
 		factory.afterPropertiesSet();
 		jobRepository = factory.getObject();
-		stepExecution = jobRepository.createJobExecution("job", new JobParameters()).createStepExecution("bar");
-		jobRepository.add(stepExecution);
+		step.setJobRepository(jobRepository);
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = jobRepository.createJobInstance("job", jobParameters);
+		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
+				new ExecutionContext());
+		stepExecution = jobRepository.createStepExecution("step", jobExecution);
 	}
 
 	@Test
@@ -164,28 +167,6 @@ class SimpleStepExecutionSplitterTests {
 	}
 
 	@Test
-	void testCompleteStatusAfterFailure() throws Exception {
-		SimpleStepExecutionSplitter provider = new SimpleStepExecutionSplitter(jobRepository, false, step.getName(),
-				new SimplePartitioner());
-		Set<StepExecution> split = provider.split(stepExecution, 2);
-		assertEquals(2, split.size());
-		StepExecution nextExecution = update(split, stepExecution, BatchStatus.COMPLETED, false);
-		// If already complete in another JobExecution we don't execute again
-		assertEquals(0, provider.split(nextExecution, 2).size());
-	}
-
-	@Test
-	void testCompleteStatusSameJobExecution() throws Exception {
-		SimpleStepExecutionSplitter provider = new SimpleStepExecutionSplitter(jobRepository, false, step.getName(),
-				new SimplePartitioner());
-		Set<StepExecution> split = provider.split(stepExecution, 2);
-		assertEquals(2, split.size());
-		stepExecution = update(split, stepExecution, BatchStatus.COMPLETED);
-		// If already complete in the same JobExecution we should execute again
-		assertEquals(2, provider.split(stepExecution, 2).size());
-	}
-
-	@Test
 	void testIncompleteStatus() throws Exception {
 		SimpleStepExecutionSplitter provider = new SimpleStepExecutionSplitter(jobRepository, true, step.getName(),
 				new SimplePartitioner());
@@ -245,13 +226,13 @@ class SimpleStepExecutionSplitterTests {
 			jobExecution.setEndTime(LocalDateTime.now());
 			jobRepository.update(jobExecution);
 			JobInstance jobInstance = jobExecution.getJobInstance();
-			jobExecution = jobRepository.createJobExecution(jobInstance.getJobName(), jobExecution.getJobParameters());
+			jobExecution = jobRepository.createJobExecution(jobInstance, jobExecution.getJobParameters(),
+					jobExecution.getExecutionContext());
 		}
 
-		stepExecution = jobExecution.createStepExecution(stepExecution.getStepName());
+		stepExecution = jobRepository.createStepExecution(stepExecution.getStepName(), jobExecution);
 		stepExecution.setExecutionContext(executionContext);
-
-		jobRepository.add(stepExecution);
+		jobRepository.updateExecutionContext(stepExecution);
 		return stepExecution;
 
 	}

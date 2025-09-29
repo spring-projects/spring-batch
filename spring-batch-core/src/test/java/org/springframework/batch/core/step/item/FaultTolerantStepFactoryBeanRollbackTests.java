@@ -28,6 +28,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.listener.ChunkListener;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.parameters.JobParameters;
@@ -39,6 +40,7 @@ import org.springframework.batch.core.repository.support.JdbcJobRepositoryFactor
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.FatalStepExecutionException;
 import org.springframework.batch.core.step.factory.FaultTolerantStepFactoryBean;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.item.support.SynchronizedItemReader;
@@ -114,9 +116,10 @@ class FaultTolerantStepFactoryBeanRollbackTests {
 		repository = repositoryFactory.getObject();
 		factory.setJobRepository(repository);
 
-		jobExecution = repository.createJobExecution("skipJob", new JobParameters());
-		stepExecution = jobExecution.createStepExecution(factory.getName());
-		repository.add(stepExecution);
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = repository.createJobInstance("skipJob", jobParameters);
+		this.jobExecution = repository.createJobExecution(jobInstance, jobParameters, new ExecutionContext());
+		stepExecution = repository.createStepExecution(factory.getName(), jobExecution);
 	}
 
 	@AfterEach
@@ -234,7 +237,9 @@ class FaultTolerantStepFactoryBeanRollbackTests {
 	@Test
 	void testNoRollbackInProcessorWhenSkipExceeded() throws Throwable {
 
-		jobExecution = repository.createJobExecution("noRollbackJob", new JobParameters());
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = repository.createJobInstance("noRollbackJob", jobParameters);
+		this.jobExecution = repository.createJobExecution(jobInstance, jobParameters, new ExecutionContext());
 
 		factory.setSkipLimit(0);
 
@@ -253,8 +258,7 @@ class FaultTolerantStepFactoryBeanRollbackTests {
 
 		Step step = factory.getObject();
 
-		stepExecution = jobExecution.createStepExecution(factory.getName());
-		repository.add(stepExecution);
+		stepExecution = repository.createStepExecution(factory.getName(), jobExecution);
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 

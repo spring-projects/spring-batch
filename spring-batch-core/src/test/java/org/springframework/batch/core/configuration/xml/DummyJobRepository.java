@@ -15,16 +15,11 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
-import java.util.Collection;
-
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.repository.support.ResourcelessJobRepository;
 import org.springframework.batch.core.step.StepExecution;
-import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
-import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
-import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.lang.Nullable;
 
@@ -35,7 +30,7 @@ import org.springframework.lang.Nullable;
  * @author Parikshit Dutta
  * @since 2.0.1
  */
-public class DummyJobRepository implements JobRepository, BeanNameAware {
+public class DummyJobRepository extends ResourcelessJobRepository implements BeanNameAware {
 
 	private String name;
 
@@ -46,16 +41,6 @@ public class DummyJobRepository implements JobRepository, BeanNameAware {
 	@Override
 	public void setBeanName(String name) {
 		this.name = name;
-	}
-
-	@Override
-	public void add(StepExecution stepExecution) {
-	}
-
-	@Override
-	public JobExecution createJobExecution(String jobName, JobParameters jobParameters)
-			throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
-		return null;
 	}
 
 	@Nullable
@@ -101,10 +86,6 @@ public class DummyJobRepository implements JobRepository, BeanNameAware {
 
 	@Override
 	public void updateExecutionContext(JobExecution jobExecution) {
-	}
-
-	@Override
-	public void addAll(Collection<StepExecution> stepExecutions) {
 	}
 
 	@Override

@@ -19,6 +19,8 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.util.Assert;
 
@@ -55,8 +57,10 @@ class ExecutionContextPromotionListenerTests {
 	void promoteEntryNullStatuses() throws Exception {
 		ExecutionContextPromotionListener listener = new ExecutionContextPromotionListener();
 
-		JobExecution jobExecution = new JobExecution(1L);
-		StepExecution stepExecution = jobExecution.createStepExecution("step1");
+		JobInstance jobInstance = new JobInstance(1L, "foo");
+		JobExecution jobExecution = new JobExecution(1L, jobInstance, new JobParameters());
+		StepExecution stepExecution = new StepExecution(1L, "step1", jobExecution);
+		jobExecution.addStepExecution(stepExecution);
 		stepExecution.setExitStatus(ExitStatus.COMPLETED);
 
 		Assert.state(jobExecution.getExecutionContext().isEmpty(), "Job ExecutionContext is not empty");
@@ -85,8 +89,10 @@ class ExecutionContextPromotionListenerTests {
 		ExecutionContextPromotionListener listener = new ExecutionContextPromotionListener();
 		listener.setStrict(true);
 
-		JobExecution jobExecution = new JobExecution(1L);
-		StepExecution stepExecution = jobExecution.createStepExecution("step1");
+		JobInstance jobInstance = new JobInstance(1L, "foo");
+		JobExecution jobExecution = new JobExecution(1L, jobInstance, new JobParameters());
+		StepExecution stepExecution = new StepExecution(1L, "step1", jobExecution);
+		jobExecution.addStepExecution(stepExecution);
 		stepExecution.setExitStatus(new ExitStatus(status));
 
 		Assert.state(jobExecution.getExecutionContext().isEmpty(), "Job ExecutionContext is not empty");
@@ -115,8 +121,10 @@ class ExecutionContextPromotionListenerTests {
 	void promoteEntryStatusNotFound() throws Exception {
 		ExecutionContextPromotionListener listener = new ExecutionContextPromotionListener();
 
-		JobExecution jobExecution = new JobExecution(1L);
-		StepExecution stepExecution = jobExecution.createStepExecution("step1");
+		JobInstance jobInstance = new JobInstance(1L, "foo");
+		JobExecution jobExecution = new JobExecution(1L, jobInstance, new JobParameters());
+		StepExecution stepExecution = new StepExecution(1L, "step1", jobExecution);
+		jobExecution.addStepExecution(stepExecution);
 		stepExecution.setExitStatus(new ExitStatus(status2));
 
 		Assert.state(jobExecution.getExecutionContext().isEmpty(), "Job ExecutionContext is not empty");
@@ -144,8 +152,10 @@ class ExecutionContextPromotionListenerTests {
 	void promoteEntryStatusWildcardFound() throws Exception {
 		ExecutionContextPromotionListener listener = new ExecutionContextPromotionListener();
 
-		JobExecution jobExecution = new JobExecution(1L);
-		StepExecution stepExecution = jobExecution.createStepExecution("step1");
+		JobInstance jobInstance = new JobInstance(1L, "foo");
+		JobExecution jobExecution = new JobExecution(1L, jobInstance, new JobParameters());
+		StepExecution stepExecution = new StepExecution(1L, "step1", jobExecution);
+		jobExecution.addStepExecution(stepExecution);
 		stepExecution.setExitStatus(new ExitStatus(status));
 
 		Assert.state(jobExecution.getExecutionContext().isEmpty(), "Job ExecutionContext is not empty");
@@ -173,8 +183,10 @@ class ExecutionContextPromotionListenerTests {
 	void promoteEntriesKeyNotFound() throws Exception {
 		ExecutionContextPromotionListener listener = new ExecutionContextPromotionListener();
 
-		JobExecution jobExecution = new JobExecution(1L);
-		StepExecution stepExecution = jobExecution.createStepExecution("step1");
+		JobInstance jobInstance = new JobInstance(1L, "foo");
+		JobExecution jobExecution = new JobExecution(1L, jobInstance, new JobParameters());
+		StepExecution stepExecution = new StepExecution(1L, "step1", jobExecution);
+		jobExecution.addStepExecution(stepExecution);
 		stepExecution.setExitStatus(ExitStatus.COMPLETED);
 
 		Assert.state(jobExecution.getExecutionContext().isEmpty(), "Job ExecutionContext is not empty");
@@ -200,8 +212,10 @@ class ExecutionContextPromotionListenerTests {
 	void promoteEntriesKeyNotFoundInStep() throws Exception {
 		ExecutionContextPromotionListener listener = new ExecutionContextPromotionListener();
 
-		JobExecution jobExecution = new JobExecution(1L);
-		StepExecution stepExecution = jobExecution.createStepExecution("step1");
+		JobInstance jobInstance = new JobInstance(1L, "foo");
+		JobExecution jobExecution = new JobExecution(1L, jobInstance, new JobParameters());
+		StepExecution stepExecution = new StepExecution(1L, "step1", jobExecution);
+		jobExecution.addStepExecution(stepExecution);
 		stepExecution.setExitStatus(ExitStatus.COMPLETED);
 
 		Assert.state(jobExecution.getExecutionContext().isEmpty(), "Job ExecutionContext is not empty");
@@ -228,8 +242,10 @@ class ExecutionContextPromotionListenerTests {
 		ExecutionContextPromotionListener listener = new ExecutionContextPromotionListener();
 		listener.setStrict(true);
 
-		JobExecution jobExecution = new JobExecution(1L);
-		StepExecution stepExecution = jobExecution.createStepExecution("step1");
+		JobInstance jobInstance = new JobInstance(1L, "foo");
+		JobExecution jobExecution = new JobExecution(1L, jobInstance, new JobParameters());
+		StepExecution stepExecution = new StepExecution(1L, "step1", jobExecution);
+		jobExecution.addStepExecution(stepExecution);
 		stepExecution.setExitStatus(ExitStatus.COMPLETED);
 
 		Assert.state(jobExecution.getExecutionContext().isEmpty(), "Job ExecutionContext is not empty");

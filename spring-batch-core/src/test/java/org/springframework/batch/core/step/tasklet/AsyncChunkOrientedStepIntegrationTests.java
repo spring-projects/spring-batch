@@ -29,11 +29,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameter;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
@@ -121,12 +123,14 @@ class AsyncChunkOrientedStepIntegrationTests {
 		step.setTasklet(new TestingChunkOrientedTasklet<>(
 				getReader(new String[] { "a", "b", "c", "a", "b", "c", "a", "b", "c", "a", "b", "c" }),
 				data -> written.addAll(data.getItems()), chunkOperations));
+		JobParameters jobParameters = new JobParameters(
+				Collections.singletonMap("run.id", new JobParameter(getClass().getName() + ".1", Long.class)));
+		JobInstance jobInstance = jobRepository.createJobInstance(job.getName(), jobParameters);
+		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
+				new ExecutionContext());
 
-		final JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), new JobParameters(
-				Collections.singletonMap("run.id", new JobParameter(getClass().getName() + ".1", Long.class))));
-		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
+		StepExecution stepExecution = jobRepository.createStepExecution(step.getName(), jobExecution);
 
-		jobRepository.add(stepExecution);
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 		// Need a transaction so one connection is enough to get job execution and its

@@ -36,7 +36,6 @@ import org.springframework.batch.core.job.UnexpectedJobExecutionException;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.EnableJdbcJobRepository;
 import org.springframework.batch.core.configuration.xml.DummyStep;
-import org.springframework.batch.core.repository.explore.JobExplorer;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.FlowStep;
@@ -49,8 +48,8 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
-import org.springframework.batch.core.repository.explore.support.JobExplorerFactoryBean;
 import org.springframework.batch.core.step.builder.StepBuilder;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -84,20 +83,6 @@ class SimpleJobExplorerIntegrationTests {
 	@EnableBatchProcessing
 	@EnableJdbcJobRepository
 	static class Config {
-
-		@Bean
-		public JobExplorer jobExplorer() throws Exception {
-			return jobExplorerFactoryBean().getObject();
-		}
-
-		@SuppressWarnings("removal")
-		@Bean
-		public JobExplorerFactoryBean jobExplorerFactoryBean() {
-			JobExplorerFactoryBean jobExplorerFactoryBean = new JobExplorerFactoryBean();
-			jobExplorerFactoryBean.setDataSource(dataSource());
-			jobExplorerFactoryBean.setTransactionManager(transactionManager(dataSource()));
-			return jobExplorerFactoryBean;
-		}
 
 		@Bean
 		public Step flowStep(JobRepository jobRepository) {
@@ -144,9 +129,6 @@ class SimpleJobExplorerIntegrationTests {
 	private JobRepository jobRepository;
 
 	@Autowired
-	private JobExplorer jobExplorer;
-
-	@Autowired
 	private FlowStep flowStep;
 
 	@Autowired
@@ -160,12 +142,14 @@ class SimpleJobExplorerIntegrationTests {
 			JobInstanceAlreadyCompleteException, JobInterruptedException, UnexpectedJobExecutionException {
 
 		// Prepare the jobRepository for the test
-		JobExecution jobExecution = jobRepository.createJobExecution("myJob", new JobParameters());
-		StepExecution stepExecution = jobExecution.createStepExecution("flowStep");
-		jobRepository.add(stepExecution);
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = jobRepository.createJobInstance("myJob", jobParameters);
+		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
+				new ExecutionContext());
+		StepExecution stepExecution = jobRepository.createStepExecution("flowStep", jobExecution);
 
 		// Executed on the remote end in remote partitioning use case
-		StepExecution jobExplorerStepExecution = jobExplorer.getStepExecution(jobExecution.getId(),
+		StepExecution jobExplorerStepExecution = jobRepository.getStepExecution(jobExecution.getId(),
 				stepExecution.getId());
 		flowStep.execute(jobExplorerStepExecution);
 
@@ -175,8 +159,8 @@ class SimpleJobExplorerIntegrationTests {
 	@Test
 	void getLastJobExecutionShouldFetchStepExecutions() throws Exception {
 		this.jobOperator.start(this.job, new JobParameters());
-		JobInstance lastJobInstance = this.jobExplorer.getLastJobInstance("job");
-		JobExecution lastJobExecution = this.jobExplorer.getLastJobExecution(lastJobInstance);
+		JobInstance lastJobInstance = this.jobRepository.getLastJobInstance("job");
+		JobExecution lastJobExecution = this.jobRepository.getLastJobExecution(lastJobInstance);
 		assertEquals(1, lastJobExecution.getStepExecutions().size());
 		StepExecution stepExecution = lastJobExecution.getStepExecutions().iterator().next();
 		assertNotNull(stepExecution.getExecutionContext());
@@ -225,7 +209,7 @@ class SimpleJobExplorerIntegrationTests {
 		// given
 		ApplicationContext context = new AnnotationConfigApplicationContext(JobConfiguration.class);
 		JobOperator jobOperator = context.getBean(JobOperator.class);
-		JobExplorer jobExplorer = context.getBean(JobExplorer.class);
+		JobRepository jobRepository = context.getBean(JobRepository.class);
 		Job job = context.getBean(Job.class);
 		long id = 1L;
 		JobParameters jobParameters1 = new JobParametersBuilder().addLong("id", id)
@@ -241,7 +225,7 @@ class SimpleJobExplorerIntegrationTests {
 
 		// then
 		Assertions.assertEquals(jobExecution1.getJobInstance(), jobExecution2.getJobInstance());
-		List<JobExecution> jobExecutions = jobExplorer.getJobExecutions(jobExecution1.getJobInstance());
+		List<JobExecution> jobExecutions = jobRepository.getJobExecutions(jobExecution1.getJobInstance());
 		Assertions.assertEquals(2, jobExecutions.size());
 		JobParameters actualJobParameters1 = jobExecutions.get(0).getJobParameters();
 		JobParameters actualJobParameters2 = jobExecutions.get(1).getJobParameters();

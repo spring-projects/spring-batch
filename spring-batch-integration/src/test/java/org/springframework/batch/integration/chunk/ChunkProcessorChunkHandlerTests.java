@@ -43,7 +43,7 @@ class ChunkProcessorChunkHandlerTests {
 
 		// then
 		assertEquals(stepContribution, response.getStepContribution());
-		assertEquals(12, response.getJobId().longValue());
+		assertEquals(12, response.getJobInstanceId().longValue());
 		assertTrue(response.isSuccessful());
 		assertEquals(2, count);
 	}

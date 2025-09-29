@@ -17,6 +17,7 @@ package org.springframework.batch.core.job.flow;
 
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.flow.support.state.AbstractState;
+import org.springframework.batch.core.step.StepExecution;
 
 /**
  * Base class for {@link State} implementations in test cases.
@@ -27,6 +28,8 @@ import org.springframework.batch.core.job.flow.support.state.AbstractState;
 public class StateSupport extends AbstractState {
 
 	protected FlowExecutionStatus status;
+
+	private int stepExecutionId = 0;
 
 	public StateSupport(String name) {
 		this(name, FlowExecutionStatus.COMPLETED);
@@ -40,9 +43,8 @@ public class StateSupport extends AbstractState {
 	@Override
 	public FlowExecutionStatus handle(FlowExecutor executor) throws Exception {
 		JobExecution jobExecution = executor.getJobExecution();
-		if (jobExecution != null) {
-			jobExecution.createStepExecution(getName());
-		}
+		StepExecution stepExecution = new StepExecution(++stepExecutionId, getName(), jobExecution);
+		jobExecution.addStepExecution(stepExecution);
 		return this.status;
 	}
 

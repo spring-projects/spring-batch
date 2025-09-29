@@ -28,6 +28,7 @@ import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.JdbcJobRepositoryFactoryBean;
 import org.springframework.batch.core.step.StepSupport;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
@@ -58,7 +59,9 @@ class SimpleJobFailureTests {
 		factory.afterPropertiesSet();
 		JobRepository jobRepository = factory.getObject();
 		job.setJobRepository(jobRepository);
-		execution = jobRepository.createJobExecution("job", new JobParameters());
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = jobRepository.createJobInstance("job", jobParameters);
+		execution = jobRepository.createJobExecution(jobInstance, jobParameters, new ExecutionContext());
 	}
 
 	@Test

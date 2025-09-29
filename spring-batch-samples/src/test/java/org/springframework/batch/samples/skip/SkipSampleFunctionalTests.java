@@ -180,7 +180,7 @@ class SkipSampleFunctionalTests {
 		// instances
 		//
 		assertTrue(id1 != id2);
-		assertNotEquals(execution1.getJobId(), execution2.getJobId());
+		assertNotEquals(execution1.getJobInstanceId(), execution2.getJobInstanceId());
 	}
 
 	/*

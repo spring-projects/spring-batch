@@ -42,11 +42,13 @@
 	<bean id="jobExecutionDao" class="org.springframework.batch.core.repository.dao.jdbc.JdbcJobExecutionDao">
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 		<property name="jobExecutionIncrementer" ref="jobExecutionIncrementer" />
+		<property name="jobInstanceDao" ref="jobInstanceDao" />
 	</bean>
 
 	<bean id="stepExecutionDao" class="org.springframework.batch.core.repository.dao.jdbc.JdbcStepExecutionDao">
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 		<property name="stepExecutionIncrementer" ref="stepExecutionIncrementer" />
+		<property name="jobExecutionDao" ref="jobExecutionDao" />
 	</bean>
 
 	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">

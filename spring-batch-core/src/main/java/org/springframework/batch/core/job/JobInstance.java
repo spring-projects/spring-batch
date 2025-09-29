@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,10 @@
  */
 
 package org.springframework.batch.core.job;
+
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.springframework.batch.core.Entity;
 import org.springframework.batch.core.job.parameters.JobParameters;
@@ -43,12 +47,14 @@ public class JobInstance extends Entity {
 
 	private final String jobName;
 
+	private final List<JobExecution> jobExecutions = Collections.synchronizedList(new LinkedList<>());
+
 	/**
 	 * Constructor for {@link JobInstance}.
 	 * @param id The instance ID.
 	 * @param jobName The name associated with the {@link JobInstance}.
 	 */
-	public JobInstance(Long id, String jobName) {
+	public JobInstance(long id, String jobName) {
 		super(id);
 		Assert.hasLength(jobName, "A jobName is required");
 		this.jobName = jobName;
@@ -58,7 +64,16 @@ public class JobInstance extends Entity {
 	 * @return the job name. (Equivalent to {@code getJob().getName()}).
 	 */
 	public String getJobName() {
-		return jobName;
+		return this.jobName;
+	}
+
+	/**
+	 * Returns an immutable copy of the list of {@link JobExecution}s associated with this
+	 * JobInstance.
+	 * @return the job executions
+	 */
+	public List<JobExecution> getJobExecutions() {
+		return List.copyOf(this.jobExecutions);
 	}
 
 	/**
@@ -66,7 +81,7 @@ public class JobInstance extends Entity {
 	 */
 	@Override
 	public String toString() {
-		return super.toString() + ", Job=[" + jobName + "]";
+		return super.toString() + ", Job=[" + this.jobName + "]";
 	}
 
 	/**
@@ -74,6 +89,10 @@ public class JobInstance extends Entity {
 	 */
 	public long getInstanceId() {
 		return super.getId();
+	}
+
+	public void addJobExecution(JobExecution jobExecution) {
+		this.jobExecutions.add(jobExecution);
 	}
 
 }

@@ -22,6 +22,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,21 +60,30 @@ class StepScopeDestructionCallbackIntegrationTests {
 	@Test
 	void testDisposableScopedProxy() throws Exception {
 		assertNotNull(proxied);
-		proxied.execute(new StepExecution("step", new JobExecution(0L), 1L));
+		JobInstance jobInstance = new JobInstance(0L, "job");
+		JobExecution jobExecution = new JobExecution(0L, jobInstance, new JobParameters());
+		StepExecution step = new StepExecution(1L, "step", jobExecution);
+		proxied.execute(step);
 		assertEquals(1, StringUtils.countOccurrencesOf(TestDisposableCollaborator.message, "destroyed"));
 	}
 
 	@Test
 	void testDisposableInnerScopedProxy() throws Exception {
 		assertNotNull(nested);
-		nested.execute(new StepExecution("step", new JobExecution(0L), 1L));
+		JobInstance jobInstance = new JobInstance(0L, "job");
+		JobExecution jobExecution = new JobExecution(0L, jobInstance, new JobParameters());
+		StepExecution step = new StepExecution(1L, "step", jobExecution);
+		nested.execute(step);
 		assertEquals(1, StringUtils.countOccurrencesOf(TestDisposableCollaborator.message, "destroyed"));
 	}
 
 	@Test
 	void testProxiedScopedProxy() throws Exception {
 		assertNotNull(nested);
-		nested.execute(new StepExecution("step", new JobExecution(0L), 1L));
+		JobInstance jobInstance = new JobInstance(0L, "job");
+		JobExecution jobExecution = new JobExecution(0L, jobInstance, new JobParameters());
+		StepExecution step = new StepExecution(1L, "step", jobExecution);
+		nested.execute(step);
 		assertEquals(4, TestAdvice.names.size());
 		assertEquals("bar", TestAdvice.names.get(0));
 		assertEquals(1, StringUtils.countOccurrencesOf(TestDisposableCollaborator.message, "destroyed"));
@@ -81,7 +92,10 @@ class StepScopeDestructionCallbackIntegrationTests {
 	@Test
 	void testRefScopedProxy() throws Exception {
 		assertNotNull(ref);
-		ref.execute(new StepExecution("step", new JobExecution(0L), 1L));
+		JobInstance jobInstance = new JobInstance(0L, "job");
+		JobExecution jobExecution = new JobExecution(0L, jobInstance, new JobParameters());
+		StepExecution step = new StepExecution(1L, "step", jobExecution);
+		ref.execute(step);
 		assertEquals(4, TestAdvice.names.size());
 		assertEquals("spam", TestAdvice.names.get(0));
 		assertEquals(2, StringUtils.countOccurrencesOf(TestDisposableCollaborator.message, "destroyed"));

@@ -24,6 +24,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
@@ -81,7 +83,8 @@ public class StepScopeProxyTargetClassOverrideIntegrationTests implements BeanFa
 
 		StepSynchronizationManager.close();
 		TestStep.reset();
-		StepExecution stepExecution = new StepExecution("foo", new JobExecution(11L), 123L);
+		StepExecution stepExecution = new StepExecution(123L, "foo",
+				new JobExecution(11L, new JobInstance(1L, "job"), new JobParameters()));
 
 		ExecutionContext executionContext = new ExecutionContext();
 		executionContext.put("foo", "bar");
@@ -120,7 +123,8 @@ public class StepScopeProxyTargetClassOverrideIntegrationTests implements BeanFa
 
 	@Test
 	void testNested() throws Exception {
-		nested.execute(new StepExecution("foo", new JobExecution(11L), 31L));
+		nested.execute(
+				new StepExecution(31L, "foo", new JobExecution(11L, new JobInstance(1L, "job"), new JobParameters())));
 		assertTrue(TestStep.getContext().attributeNames().length > 0);
 		String collaborator = (String) TestStep.getContext().getAttribute("collaborator");
 		assertNotNull(collaborator);
@@ -134,7 +138,8 @@ public class StepScopeProxyTargetClassOverrideIntegrationTests implements BeanFa
 
 	@Test
 	void testNestedProxyTargetClassTrue() throws Exception {
-		nestedProxyTargetClassTrue.execute(new StepExecution("foo", new JobExecution(11L), 31L));
+		nestedProxyTargetClassTrue.execute(
+				new StepExecution(31L, "foo", new JobExecution(11L, new JobInstance(1L, "job"), new JobParameters())));
 		String parent = (String) TestStep.getContext().getAttribute("parent");
 		assertEquals("bar", parent);
 		assertTrue(((String) TestStep.getContext().getAttribute("parent.class")).matches(CGLIB_PROXY_TO_STRING_REGEX),
@@ -143,7 +148,8 @@ public class StepScopeProxyTargetClassOverrideIntegrationTests implements BeanFa
 
 	@Test
 	void testNestedProxyTargetClassFalse() throws Exception {
-		nestedProxyTargetClassFalse.execute(new StepExecution("foo", new JobExecution(11L), 31L));
+		nestedProxyTargetClassFalse.execute(
+				new StepExecution(31L, "foo", new JobExecution(11L, new JobInstance(1L, "job"), new JobParameters())));
 		String parent = (String) TestStep.getContext().getAttribute("parent");
 		assertEquals("bar", parent);
 		assertTrue(((String) TestStep.getContext().getAttribute("parent.class")).matches(JDK_PROXY_TO_STRING_REGEX),

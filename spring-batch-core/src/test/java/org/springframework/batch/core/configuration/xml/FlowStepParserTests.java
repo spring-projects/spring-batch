@@ -25,11 +25,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.JobExecutionDecider;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.lang.Nullable;
@@ -65,7 +67,10 @@ class FlowStepParserTests {
 	@Test
 	void testFlowStep() throws Exception {
 		assertNotNull(job1);
-		JobExecution jobExecution = jobRepository.createJobExecution(job1.getName(), new JobParameters());
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = jobRepository.createJobInstance(job1.getName(), jobParameters);
+		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
+				new ExecutionContext());
 		job1.execute(jobExecution);
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		List<String> stepNames = getStepNames(jobExecution);
@@ -76,7 +81,10 @@ class FlowStepParserTests {
 	@Test
 	void testFlowExternalStep() throws Exception {
 		assertNotNull(job2);
-		JobExecution jobExecution = jobRepository.createJobExecution(job2.getName(), new JobParameters());
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = jobRepository.createJobInstance(job2.getName(), jobParameters);
+		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
+				new ExecutionContext());
 		job2.execute(jobExecution);
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		List<String> stepNames = getStepNames(jobExecution);
@@ -87,7 +95,10 @@ class FlowStepParserTests {
 	@Test
 	void testRepeatedFlow() throws Exception {
 		assertNotNull(job3);
-		JobExecution jobExecution = jobRepository.createJobExecution(job3.getName(), new JobParameters());
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = jobRepository.createJobInstance(job3.getName(), jobParameters);
+		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
+				new ExecutionContext());
 		job3.execute(jobExecution);
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		List<String> stepNames = getStepNames(jobExecution);
@@ -99,13 +110,16 @@ class FlowStepParserTests {
 	// TODO: BATCH-1745
 	void testRestartedFlow() throws Exception {
 		assertNotNull(job4);
-		JobExecution jobExecution = jobRepository.createJobExecution(job4.getName(), new JobParameters());
+		JobParameters jobParameters = new JobParameters();
+		ExecutionContext executionContext = new ExecutionContext();
+		JobInstance jobInstance = jobRepository.createJobInstance(job4.getName(), jobParameters);
+		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters, executionContext);
 		job4.execute(jobExecution);
 		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
 		List<String> stepNames = getStepNames(jobExecution);
 		assertEquals(3, stepNames.size());
 		assertEquals("[job4.flow, s2, s3]", stepNames.toString());
-		jobExecution = jobRepository.createJobExecution(job4.getName(), new JobParameters());
+		jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters, executionContext);
 		job4.execute(jobExecution);
 		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
 		stepNames = getStepNames(jobExecution);

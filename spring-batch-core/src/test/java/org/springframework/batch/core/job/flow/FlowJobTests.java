@@ -36,6 +36,7 @@ import org.springframework.batch.core.job.flow.support.state.StepState;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.JdbcJobRepositoryFactoryBean;
 import org.springframework.batch.core.step.StepSupport;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
@@ -58,7 +59,9 @@ import static org.junit.jupiter.api.Assertions.fail;
  */
 public class FlowJobTests {
 
-	private final FlowJob job = new FlowJob();
+	private final FlowJob job = new FlowJob("job");
+
+	private JobInstance jobInstance;
 
 	private JobExecution jobExecution;
 
@@ -79,7 +82,9 @@ public class FlowJobTests {
 		factory.afterPropertiesSet();
 		this.jobRepository = factory.getObject();
 		job.setJobRepository(this.jobRepository);
-		this.jobExecution = this.jobRepository.createJobExecution("job", new JobParameters());
+		JobParameters jobParameters = new JobParameters();
+		this.jobInstance = jobRepository.createJobInstance(job.getName(), jobParameters);
+		this.jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters, new ExecutionContext());
 	}
 
 	@Test
@@ -142,10 +147,13 @@ public class FlowJobTests {
 		List<StateTransition> transitions = new ArrayList<>();
 		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1")), "step2"));
 		State step2State = new StateSupport("step2") {
+			int stepExecutionId = 0;
+
 			@Override
 			public FlowExecutionStatus handle(FlowExecutor executor) throws Exception {
 				JobExecution jobExecution = executor.getJobExecution();
-				jobExecution.createStepExecution(getName());
+				StepExecution stepExecution = new StepExecution(++stepExecutionId, getName(), jobExecution);
+				jobExecution.addStepExecution(stepExecution);
 				if (fail) {
 					return FlowExecutionStatus.FAILED;
 				}
@@ -166,7 +174,8 @@ public class FlowJobTests {
 		assertEquals(ExitStatus.FAILED, jobExecution.getExitStatus());
 		assertEquals(2, jobExecution.getStepExecutions().size());
 		jobRepository.update(jobExecution);
-		jobExecution = jobRepository.createJobExecution("job", new JobParameters());
+		JobParameters jobParameters = new JobParameters();
+		this.jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters, new ExecutionContext());
 		fail = false;
 		job.execute(jobExecution);
 		assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
@@ -365,6 +374,7 @@ public class FlowJobTests {
 		assertEquals(BatchStatus.STOPPED, jobExecution.getStatus());
 	}
 
+	// TODO Why is this not marked as a test?
 	public void testEndStateFailed() throws Exception {
 		SimpleFlow flow = new SimpleFlow("job");
 		List<StateTransition> transitions = new ArrayList<>();
@@ -406,7 +416,8 @@ public class FlowJobTests {
 		assertEquals(BatchStatus.STOPPED, jobExecution.getStatus());
 		assertEquals(1, jobExecution.getStepExecutions().size());
 
-		jobExecution = jobRepository.createJobExecution("job", new JobParameters());
+		JobParameters jobParameters = new JobParameters();
+		this.jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters, new ExecutionContext());
 		job.execute(jobExecution);
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		assertEquals(1, jobExecution.getStepExecutions().size());
@@ -705,7 +716,7 @@ public class FlowJobTests {
 	private void checkRepository(BatchStatus status, ExitStatus exitStatus) {
 		JobInstance jobInstance = this.jobExecution.getJobInstance();
 		JobExecution other = this.jobRepository.getJobExecutions(jobInstance).get(0);
-		assertEquals(jobInstance.getId(), other.getJobId());
+		assertEquals(jobInstance.getId(), other.getJobInstanceId());
 		assertEquals(status, other.getStatus());
 		if (exitStatus != null) {
 			assertEquals(exitStatus.getExitCode(), other.getExitStatus().getExitCode());

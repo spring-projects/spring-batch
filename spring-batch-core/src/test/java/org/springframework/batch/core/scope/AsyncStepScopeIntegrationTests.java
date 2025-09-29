@@ -27,6 +27,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.scope.context.StepContext;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
@@ -76,7 +78,8 @@ public class AsyncStepScopeIntegrationTests implements BeanFactoryAware {
 
 	@Test
 	void testSimpleProperty() {
-		StepExecution stepExecution = new StepExecution("step", new JobExecution(0L), 123L);
+		StepExecution stepExecution = new StepExecution(123L, "step",
+				new JobExecution(0L, new JobInstance(1L, "job"), new JobParameters()));
 		ExecutionContext executionContext = stepExecution.getExecutionContext();
 		executionContext.put("foo", "bar");
 		StepSynchronizationManager.register(stepExecution);
@@ -92,7 +95,8 @@ public class AsyncStepScopeIntegrationTests implements BeanFactoryAware {
 			final String value = "foo" + i;
 			final Long id = 123L + i;
 			FutureTask<String> task = new FutureTask<>(() -> {
-				StepExecution stepExecution = new StepExecution(value, new JobExecution(0L), id);
+				StepExecution stepExecution = new StepExecution(value,
+						new JobExecution(0L, new JobInstance(1L, "job"), new JobParameters()));
 				ExecutionContext executionContext = stepExecution.getExecutionContext();
 				executionContext.put("foo", value);
 				StepContext context = StepSynchronizationManager.register(stepExecution);
@@ -120,7 +124,8 @@ public class AsyncStepScopeIntegrationTests implements BeanFactoryAware {
 	void testGetSameInMultipleThreads() throws Exception {
 
 		List<FutureTask<String>> tasks = new ArrayList<>();
-		final StepExecution stepExecution = new StepExecution("foo", new JobExecution(0L), 123L);
+		final StepExecution stepExecution = new StepExecution(123L, "foo",
+				new JobExecution(0L, new JobInstance(1L, "job"), new JobParameters()));
 		ExecutionContext executionContext = stepExecution.getExecutionContext();
 		executionContext.put("foo", "foo");
 		StepSynchronizationManager.register(stepExecution);

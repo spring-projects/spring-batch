@@ -61,7 +61,7 @@ class FaultTolerantChunkProcessorTests {
 	private FaultTolerantChunkProcessor<String, String> processor;
 
 	private final StepContribution contribution = new StepExecution("foo",
-			new JobExecution(new JobInstance(0L, "job"), new JobParameters()))
+			new JobExecution(1L, new JobInstance(0L, "job"), new JobParameters()))
 		.createStepContribution();
 
 	@BeforeEach

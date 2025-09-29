@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.scope.context.StepContext;
@@ -93,9 +94,9 @@ class StepScopeTestExecutionListenerTests {
 	private static class WithStepExecutionFactory {
 
 		public StepExecution getStepExecution() {
-			JobExecution jobExecution = MetaDataInstanceFactory.createJobExecution("job", 11L, 123L,
-					new JobParametersBuilder().addString("foo", "spam").toJobParameters());
-			StepExecution stepExecution = jobExecution.createStepExecution("step");
+			JobParameters jobParameters = new JobParametersBuilder().addString("foo", "spam").toJobParameters();
+			JobExecution jobExecution = MetaDataInstanceFactory.createJobExecution("job", 11L, 123L, jobParameters);
+			StepExecution stepExecution = MetaDataInstanceFactory.createStepExecution(jobExecution, "step", 1L);
 			stepExecution.getExecutionContext().putString("foo", "bar");
 			return stepExecution;
 		}

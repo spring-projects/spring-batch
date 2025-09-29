@@ -37,7 +37,7 @@ class StepHandlerAdapterTests {
 	private Object result = null;
 
 	private final StepExecution stepExecution = new StepExecution("systemCommandStep",
-			new JobExecution(new JobInstance(1L, "systemCommandJob"), new JobParameters()));
+			new JobExecution(1L, new JobInstance(1L, "systemCommandJob"), new JobParameters()));
 
 	public ExitStatus execute() {
 		return ExitStatus.NOOP;

@@ -49,9 +49,10 @@ class StepExecutionSimpleCompletionPolicyTests {
 	void setUp() {
 		JobParameters jobParameters = new JobParametersBuilder().addLong("commit.interval", 2L).toJobParameters();
 		JobInstance jobInstance = new JobInstance(0L, "testJob");
-		JobExecution jobExecution = new JobExecution(jobInstance, jobParameters);
+		JobExecution jobExecution = new JobExecution(1L, jobInstance, jobParameters);
 		Step step = new StepSupport("bar");
-		StepExecution stepExecution = jobExecution.createStepExecution(step.getName());
+		StepExecution stepExecution = new StepExecution(1L, step.getName(), jobExecution);
+		jobExecution.addStepExecution(stepExecution);
 		policy.beforeStep(stepExecution);
 	}
 

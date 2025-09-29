@@ -131,8 +131,6 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean<Jo
 	 * which prevents accidental concurrent execution of the same job
 	 * (ISOLATION_REPEATABLE_READ would work as well).
 	 * @param isolationLevelForCreate the isolation level name to set
-	 *
-	 * @see SimpleJobRepository#createJobExecution(String, JobParameters)
 	 */
 	public void setIsolationLevelForCreate(String isolationLevelForCreate) {
 		this.isolationLevelForCreate = isolationLevelForCreate;
@@ -144,8 +142,6 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean<Jo
 	 * which prevents accidental concurrent execution of the same job
 	 * (ISOLATION_REPEATABLE_READ would work as well).
 	 * @param isolationLevelForCreate the isolation level to set
-	 *
-	 * @see SimpleJobRepository#createJobExecution(String, JobParameters)
 	 */
 	public void setIsolationLevelForCreateEnum(Isolation isolationLevelForCreate) {
 		this.setIsolationLevelForCreate(TRANSACTION_ISOLATION_LEVEL_PREFIX + isolationLevelForCreate.name());
@@ -225,7 +221,7 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean<Jo
 		return (JobRepository) this.proxyFactory.getProxy(getClass().getClassLoader());
 	}
 
-	private Object getTarget() throws Exception {
+	protected Object getTarget() throws Exception {
 		return new SimpleJobRepository(createJobInstanceDao(), createJobExecutionDao(), createStepExecutionDao(),
 				createExecutionContextDao());
 	}

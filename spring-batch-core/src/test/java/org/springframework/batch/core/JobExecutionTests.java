@@ -41,11 +41,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class JobExecutionTests {
 
-	private JobExecution execution = new JobExecution(new JobInstance(11L, "foo"), 12L, new JobParameters());
+	private JobExecution execution;
 
-	@Test
-	void testJobExecution() {
-		assertNull(new JobExecution(new JobInstance(null, "foo"), null).getId());
+	{
+		JobInstance jobInstance = new JobInstance(11L, "foo");
+		execution = new JobExecution(12L, jobInstance, new JobParameters());
 	}
 
 	/**
@@ -117,33 +117,6 @@ class JobExecutionTests {
 	}
 
 	/**
-	 * Test method for {@link JobExecution#getJobId()}.
-	 */
-	@Test
-	void testGetJobId() {
-		assertEquals(11, execution.getJobId().longValue());
-		execution = new JobExecution(new JobInstance(23L, "testJob"), null, new JobParameters());
-		assertEquals(23, execution.getJobId().longValue());
-	}
-
-	/**
-	 * Test method for {@link JobExecution#getJobId()}.
-	 */
-	@Test
-	void testGetJobIdForNullJob() {
-		execution = new JobExecution((JobInstance) null, (JobParameters) null);
-		assertNull(execution.getJobId());
-	}
-
-	/**
-	 * Test method for {@link JobExecution#getJobId()}.
-	 */
-	@Test
-	void testGetJob() {
-		assertNotNull(execution.getJobInstance());
-	}
-
-	/**
 	 * Test method for {@link JobExecution#getExitStatus()}.
 	 */
 	@Test
@@ -159,56 +132,10 @@ class JobExecutionTests {
 	}
 
 	@Test
-	void testAddAndRemoveStepExecution() throws Exception {
-		assertEquals(0, execution.getStepExecutions().size());
-		execution.createStepExecution("step");
-		assertEquals(1, execution.getStepExecutions().size());
-	}
-
-	@Test
-	void testStepExecutionsWithSameName() throws Exception {
-		assertEquals(0, execution.getStepExecutions().size());
-		execution.createStepExecution("step");
-		assertEquals(1, execution.getStepExecutions().size());
-		execution.createStepExecution("step");
-		assertEquals(2, execution.getStepExecutions().size());
-	}
-
-	@Test
 	void testSetStepExecutions() throws Exception {
 		assertEquals(0, execution.getStepExecutions().size());
 		execution.addStepExecutions(Arrays.asList(new StepExecution("step", execution)));
 		assertEquals(1, execution.getStepExecutions().size());
-	}
-
-	@Test
-	void testSetStepExecutionsWithIds() throws Exception {
-		assertEquals(0, execution.getStepExecutions().size());
-		new StepExecution("step", execution, 1L);
-		assertEquals(1, execution.getStepExecutions().size());
-		new StepExecution("step", execution, 2L);
-		assertEquals(2, execution.getStepExecutions().size());
-	}
-
-	@Test
-	void testToString() throws Exception {
-		assertTrue(execution.toString().contains("id="), "JobExecution string does not contain id");
-		assertTrue(execution.toString().contains("foo"), "JobExecution string does not contain name: " + execution);
-	}
-
-	@Test
-	void testToStringWithNullJob() {
-		execution = new JobExecution(new JobInstance(null, "foo"), null);
-		assertTrue(execution.toString().contains("id="), "JobExecution string does not contain id");
-		assertTrue(execution.toString().contains("job="), "JobExecution string does not contain job: " + execution);
-	}
-
-	@Test
-	void testSerialization() {
-		JobExecution clone = SerializationUtils.clone(execution);
-		assertEquals(execution, clone);
-		assertNotNull(clone.createStepExecution("foo"));
-		assertNotNull(clone.getFailureExceptions());
 	}
 
 	@Test
@@ -219,15 +146,6 @@ class JobExecutionTests {
 		execution.addFailureException(exception);
 		assertEquals(1, execution.getFailureExceptions().size());
 		assertEquals(exception, execution.getFailureExceptions().get(0));
-		StepExecution stepExecution1 = execution.createStepExecution("execution1");
-		RuntimeException stepException1 = new RuntimeException();
-		stepExecution1.addFailureException(stepException1);
-		execution.createStepExecution("execution2");
-		List<Throwable> allExceptions = execution.getAllFailureExceptions();
-		assertEquals(2, allExceptions.size());
-		assertEquals(1, execution.getFailureExceptions().size());
-		assertTrue(allExceptions.contains(exception));
-		assertTrue(allExceptions.contains(stepException1));
 	}
 
 }

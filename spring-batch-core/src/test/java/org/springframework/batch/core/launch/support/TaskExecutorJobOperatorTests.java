@@ -15,56 +15,33 @@
  */
 package org.springframework.batch.core.launch.support;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.job.Job;
-import org.springframework.batch.core.job.JobExecution;
-import org.springframework.batch.core.job.JobExecutionException;
-import org.springframework.batch.core.job.JobInstance;
-import org.springframework.batch.core.job.parameters.JobParameters;
-import org.springframework.batch.core.job.parameters.JobParametersIncrementer;
-import org.springframework.batch.core.step.Step;
-import org.springframework.batch.core.step.StepContribution;
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.configuration.support.MapJobRegistry;
-import org.springframework.batch.core.converter.DefaultJobParametersConverter;
-import org.springframework.batch.core.converter.JobParametersConverter;
-import org.springframework.batch.core.job.AbstractJob;
-import org.springframework.batch.core.job.JobSupport;
-import org.springframework.batch.core.launch.JobInstanceAlreadyExistsException;
+import org.springframework.batch.core.job.Job;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.job.parameters.JobParametersInvalidException;
 import org.springframework.batch.core.launch.NoSuchJobException;
-import org.springframework.batch.core.launch.NoSuchJobExecutionException;
-import org.springframework.batch.core.launch.NoSuchJobInstanceException;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
+import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.batch.core.repository.support.JdbcJobRepositoryFactoryBean;
 import org.springframework.batch.core.scope.context.ChunkContext;
-import org.springframework.batch.core.step.tasklet.StoppableTasklet;
-import org.springframework.batch.core.step.tasklet.TaskletStep;
+import org.springframework.batch.core.step.StepContribution;
+import org.springframework.batch.core.step.builder.StepBuilder;
+import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.batch.support.PropertiesConverter;
-import org.springframework.lang.Nullable;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
+import org.springframework.jdbc.support.JdbcTransactionManager;
 
 /**
  * @author Dave Syer
@@ -73,429 +50,81 @@ import static org.mockito.Mockito.when;
  * @author Jinwoo Bae
  * @author Yejeong Ham
  */
-@SuppressWarnings("removal")
 class TaskExecutorJobOperatorTests {
 
 	private TaskExecutorJobOperator jobOperator;
 
-	protected Job job;
+	private Job job;
 
 	private JobRepository jobRepository;
 
-	private JobParameters jobParameters;
-
-	private JobParametersConverter jobParametersConverter;
+	private JobRegistry jobRegistry;
 
 	@BeforeEach
 	void setUp() throws Exception {
+		EmbeddedDatabase database = new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2)
+			.addScript("/org/springframework/batch/core/schema-drop-h2.sql")
+			.addScript("/org/springframework/batch/core/schema-h2.sql")
+			.build();
+		JdbcTransactionManager transactionManager = new JdbcTransactionManager(database);
 
-		jobParametersConverter = new DefaultJobParametersConverter();
+		JdbcJobRepositoryFactoryBean jobRepositoryFactoryBean = new JdbcJobRepositoryFactoryBean();
+		jobRepositoryFactoryBean.setDataSource(database);
+		jobRepositoryFactoryBean.setTransactionManager(transactionManager);
+		jobRepositoryFactoryBean.afterPropertiesSet();
+		jobRepository = jobRepositoryFactoryBean.getObject();
 
-		job = new JobSupport("foo") {
-			@Nullable
-			@Override
-			public JobParametersIncrementer getJobParametersIncrementer() {
-				return parameters -> jobParameters;
-			}
-		};
+		job = new JobBuilder("job", jobRepository)
+			.start(new StepBuilder("step", jobRepository).tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED)
+				.build())
+			.build();
 
-		jobOperator = new TaskExecutorJobOperator() {
-			@Override
-			public JobExecution run(Job job, JobParameters jobParameters) {
-				return new JobExecution(new JobInstance(123L, job.getName()), 999L, jobParameters);
-			}
-		};
+		jobRegistry = new MapJobRegistry();
+		jobRegistry.register(job);
 
-		jobOperator.setJobRegistry(new MapJobRegistry() {
-			@Override
-			public Job getJob(@Nullable String name) throws NoSuchJobException {
-				if (name.equals("foo")) {
-					return job;
-				}
-				throw new NoSuchJobException("foo");
-			}
-
-			@Override
-			public Set<String> getJobNames() {
-				return new HashSet<>(Arrays.asList(new String[] { "foo", "bar" }));
-			}
-		});
-
-		jobRepository = mock();
-		jobOperator.setJobRepository(jobRepository);
-
-		jobOperator.setJobParametersConverter(new DefaultJobParametersConverter() {
-			@Override
-			public JobParameters getJobParameters(@Nullable Properties properties) {
-				assertTrue(properties.containsKey("a"), "Wrong properties");
-				return jobParameters;
-			}
-
-			@Override
-			public Properties getProperties(@Nullable JobParameters params) {
-				return PropertiesConverter.stringToProperties("a=b");
-			}
-		});
-
-		jobOperator.afterPropertiesSet();
-
-	}
-
-	@Test
-	void testMandatoryProperties() {
 		jobOperator = new TaskExecutorJobOperator();
-		assertThrows(IllegalStateException.class, jobOperator::afterPropertiesSet);
-	}
-
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.launch.support.TaskExecutorJobOperator#startNextInstance(java.lang.String)}
-	 * .
-	 */
-	@Test
-	void testStartNextInstanceSunnyDay() throws Exception {
-		jobParameters = new JobParameters();
-		JobInstance jobInstance = new JobInstance(321L, "foo");
-		when(jobRepository.getJobInstances("foo", 0, 1)).thenReturn(Collections.singletonList(jobInstance));
-		when(jobRepository.getJobExecutions(jobInstance))
-			.thenReturn(Collections.singletonList(new JobExecution(jobInstance, new JobParameters())));
-		Long value = jobOperator.startNextInstance("foo");
-		assertEquals(999, value.longValue());
-	}
-
-	@Test
-	void testStartNewInstanceSunnyDay() throws Exception {
-		Properties parameters = new Properties();
-		parameters.setProperty("a", "b");
-		JobParameters jobParameters = jobParametersConverter.getJobParameters(parameters);
-
-		jobRepository.isJobInstanceExists("foo", jobParameters);
-		Long value = jobOperator.start("foo", parameters);
-		assertEquals(999, value.longValue());
-	}
-
-	@Test
-	void testStartNewInstanceAlreadyExists() {
-		Properties properties = new Properties();
-		properties.setProperty("a", "b");
-		jobParameters = new JobParameters();
-		JobInstance jobInstance = new JobInstance(123L, "foo");
-		when(jobRepository.getJobInstance("foo", jobParameters)).thenReturn(jobInstance);
-		assertThrows(JobInstanceAlreadyExistsException.class, () -> jobOperator.start("foo", properties));
-	}
-
-	@Test
-	void testStartWithIncrementer() throws Exception {
-		jobOperator.start(job, new JobParameters());
-		verify(jobRepository).getLastJobInstance("foo");
-	}
-
-	@Test
-	void testResumeSunnyDay() throws Exception {
-		jobParameters = new JobParameters();
-		when(jobRepository.getJobExecution(111L))
-			.thenReturn(new JobExecution(new JobInstance(123L, job.getName()), 111L, jobParameters));
-		jobRepository.getJobExecution(111L);
-		Long value = jobOperator.restart(111L);
-		assertEquals(999, value.longValue());
-	}
-
-	@Test
-	void testGetSummarySunnyDay() throws Exception {
-		jobParameters = new JobParameters();
-		JobExecution jobExecution = new JobExecution(new JobInstance(123L, job.getName()), 111L, jobParameters);
-		when(jobRepository.getJobExecution(111L)).thenReturn(jobExecution);
-		jobRepository.getJobExecution(111L);
-		String value = jobOperator.getSummary(111L);
-		assertEquals(jobExecution.toString(), value);
-	}
-
-	@Test
-	void testGetSummaryNoSuchExecution() {
-		jobParameters = new JobParameters();
-		jobRepository.getJobExecution(111L);
-		assertThrows(NoSuchJobExecutionException.class, () -> jobOperator.getSummary(111L));
-	}
-
-	@Test
-	void testGetStepExecutionSummariesSunnyDay() throws Exception {
-		jobParameters = new JobParameters();
-
-		JobExecution jobExecution = new JobExecution(new JobInstance(123L, job.getName()), 111L, jobParameters);
-		jobExecution.createStepExecution("step1");
-		jobExecution.createStepExecution("step2");
-		jobExecution.getStepExecutions().iterator().next().setId(21L);
-		when(jobRepository.getJobExecution(111L)).thenReturn(jobExecution);
-		Map<Long, String> value = jobOperator.getStepExecutionSummaries(111L);
-		assertEquals(2, value.size());
-	}
-
-	@Test
-	void testGetStepExecutionSummariesNoSuchExecution() {
-		jobParameters = new JobParameters();
-		jobRepository.getJobExecution(111L);
-		assertThrows(NoSuchJobExecutionException.class, () -> jobOperator.getStepExecutionSummaries(111L));
-	}
-
-	@Test
-	void testFindRunningExecutionsSunnyDay() throws Exception {
-		jobParameters = new JobParameters();
-		JobExecution jobExecution = new JobExecution(new JobInstance(123L, job.getName()), 111L, jobParameters);
-		when(jobRepository.findRunningJobExecutions("foo")).thenReturn(Collections.singleton(jobExecution));
-		Set<Long> value = jobOperator.getRunningExecutions("foo");
-		assertEquals(111L, value.iterator().next().longValue());
-	}
-
-	@Test
-	@SuppressWarnings("unchecked")
-	void testFindRunningExecutionsNoSuchJob() {
-		jobParameters = new JobParameters();
-		when(jobRepository.findRunningJobExecutions("no-such-job")).thenReturn(Collections.EMPTY_SET);
-		assertThrows(NoSuchJobException.class, () -> jobOperator.getRunningExecutions("no-such-job"));
-	}
-
-	@Test
-	void testGetJobParametersSunnyDay() throws Exception {
-		final JobParameters jobParameters = new JobParameters();
-		when(jobRepository.getJobExecution(111L))
-			.thenReturn(new JobExecution(new JobInstance(123L, job.getName()), 111L, jobParameters));
-		String value = jobOperator.getParameters(111L);
-		assertEquals("a=b", value);
-	}
-
-	@Test
-	void testGetJobParametersNoSuchExecution() {
-		jobRepository.getJobExecution(111L);
-		assertThrows(NoSuchJobExecutionException.class, () -> jobOperator.getParameters(111L));
-	}
-
-	@Test
-	void testGetLastInstancesSunnyDay() throws Exception {
-		jobParameters = new JobParameters();
-		JobInstance jobInstance = new JobInstance(123L, job.getName());
-		when(jobRepository.getJobInstances("foo", 0, 2)).thenReturn(Collections.singletonList(jobInstance));
-		jobRepository.getJobInstances("foo", 0, 2);
-		List<Long> value = jobOperator.getJobInstances("foo", 0, 2);
-		assertEquals(123L, value.get(0).longValue());
-	}
-
-	@Test
-	void testGetLastInstancesNoSuchJob() {
-		jobParameters = new JobParameters();
-		jobRepository.getJobInstances("no-such-job", 0, 2);
-		assertThrows(NoSuchJobException.class, () -> jobOperator.getJobInstances("no-such-job", 0, 2));
-	}
-
-	@Test
-	public void testGetJobInstanceWithNameAndParameters() {
-		// given
-		String jobName = "job";
-		JobParameters jobParameters = new JobParameters();
-		JobInstance jobInstance = mock();
-
-		// when
-		when(this.jobRepository.getJobInstance(jobName, jobParameters)).thenReturn(jobInstance);
-		JobInstance actualJobInstance = this.jobOperator.getJobInstance(jobName, jobParameters);
-
-		// then
-		verify(this.jobRepository).getJobInstance(jobName, jobParameters);
-		assertEquals(jobInstance, actualJobInstance);
-	}
-
-	@Test
-	void testGetJobNames() {
-		Set<String> names = jobOperator.getJobNames();
-		assertEquals(2, names.size());
-		assertTrue(names.contains("foo"), "Wrong names: " + names);
-	}
-
-	@Test
-	void testGetExecutionsSunnyDay() throws Exception {
-		JobInstance jobInstance = new JobInstance(123L, job.getName());
-		when(jobRepository.getJobInstance(123L)).thenReturn(jobInstance);
-
-		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters);
-		when(jobRepository.getJobExecutions(jobInstance)).thenReturn(Collections.singletonList(jobExecution));
-		List<Long> value = jobOperator.getExecutions(123L);
-		assertEquals(111L, value.iterator().next().longValue());
-	}
-
-	@Test
-	void testGetExecutionsNoSuchInstance() {
-		jobRepository.getJobInstance(123L);
-		assertThrows(NoSuchJobInstanceException.class, () -> jobOperator.getExecutions(123L));
-	}
-
-	@Test
-	void testStop() throws Exception {
-		JobInstance jobInstance = new JobInstance(123L, job.getName());
-		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters);
-		when(jobRepository.getJobExecution(111L)).thenReturn(jobExecution);
-		jobRepository.getJobExecution(111L);
-		jobRepository.update(jobExecution);
-		jobOperator.stop(111L);
-		assertEquals(BatchStatus.STOPPING, jobExecution.getStatus());
-	}
-
-	@Test
-	void testStopTasklet() throws Exception {
-		JobInstance jobInstance = new JobInstance(123L, job.getName());
-		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters);
-		StoppableTasklet tasklet = mock();
-		TaskletStep taskletStep = new TaskletStep();
-		taskletStep.setTasklet(tasklet);
-		MockJob job = new MockJob();
-		job.taskletStep = taskletStep;
-
-		JobRegistry jobRegistry = mock();
-
-		when(jobRegistry.getJob(any(String.class))).thenReturn(job);
-		when(jobRepository.getJobExecution(111L)).thenReturn(jobExecution);
-
+		jobOperator.setJobRepository(jobRepository);
 		jobOperator.setJobRegistry(jobRegistry);
-		jobRepository.getJobExecution(111L);
-		jobRepository.update(jobExecution);
-		jobOperator.stop(111L);
-		assertEquals(BatchStatus.STOPPING, jobExecution.getStatus());
+		jobOperator.afterPropertiesSet();
 	}
 
 	@Test
-	void testStopTaskletWhenJobNotRegistered() throws Exception {
-		JobInstance jobInstance = new JobInstance(123L, job.getName());
-		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters);
-		JobRegistry jobRegistry = mock();
+	void testStart() throws JobInstanceAlreadyCompleteException, NoSuchJobException,
+			JobExecutionAlreadyRunningException, JobParametersInvalidException, JobRestartException {
+		JobExecution jobExecution = jobOperator.start(job, new JobParameters());
 
-		when(jobRegistry.getJob(job.getName())).thenThrow(new NoSuchJobException("Unable to find job"));
-		when(jobRepository.getJobExecution(111L)).thenReturn(jobExecution);
-
-		jobOperator.setJobRegistry(jobRegistry);
-		jobOperator.stop(111L);
-		assertEquals(BatchStatus.STOPPING, jobExecution.getStatus());
+		Assertions.assertNotNull(jobExecution);
+		Assertions.assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 	}
 
 	@Test
-	void testStopTaskletException() throws Exception {
-		JobInstance jobInstance = new JobInstance(123L, job.getName());
-		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters);
-		StoppableTasklet tasklet = new StoppableTasklet() {
+	void testRestart() throws Exception {
+		Tasklet tasklet = new Tasklet() {
+			boolean executed = false;
 
-			@Nullable
 			@Override
 			public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-				return null;
-			}
-
-			@Override
-			public void stop() {
-				throw new IllegalStateException();
+				if (!executed) {
+					executed = true;
+					throw new RuntimeException("Planned failure");
+				}
+				return RepeatStatus.FINISHED;
 			}
 		};
-		TaskletStep taskletStep = new TaskletStep();
-		taskletStep.setTasklet(tasklet);
-		MockJob job = new MockJob();
-		job.taskletStep = taskletStep;
+		job = new JobBuilder("job", jobRepository)
+			.start(new StepBuilder("step", jobRepository).tasklet(tasklet).build())
+			.build();
 
-		JobRegistry jobRegistry = mock();
+		JobParameters jobParameters = new JobParameters();
+		JobExecution jobExecution = jobOperator.start(job, jobParameters);
 
-		when(jobRegistry.getJob(any(String.class))).thenReturn(job);
-		when(jobRepository.getJobExecution(111L)).thenReturn(jobExecution);
+		Assertions.assertNotNull(jobExecution);
+		Assertions.assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
 
-		jobOperator.setJobRegistry(jobRegistry);
-		jobRepository.getJobExecution(111L);
-		jobRepository.update(jobExecution);
-		jobOperator.stop(111L);
-		assertEquals(BatchStatus.STOPPING, jobExecution.getStatus());
-	}
+		jobExecution = jobOperator.restart(jobExecution);
 
-	@Test
-	void testAbort() throws Exception {
-		JobInstance jobInstance = new JobInstance(123L, job.getName());
-		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters);
-		jobExecution.setStatus(BatchStatus.STOPPING);
-		when(jobRepository.getJobExecution(123L)).thenReturn(jobExecution);
-		jobRepository.update(jobExecution);
-		jobOperator.abandon(123L);
-		assertEquals(BatchStatus.ABANDONED, jobExecution.getStatus());
-		assertNotNull(jobExecution.getEndTime());
-	}
-
-	@Test
-	void testAbortNonStopping() {
-		JobInstance jobInstance = new JobInstance(123L, job.getName());
-		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters);
-		jobExecution.setStatus(BatchStatus.STARTED);
-		when(jobRepository.getJobExecution(123L)).thenReturn(jobExecution);
-		jobRepository.update(jobExecution);
-		assertThrows(JobExecutionAlreadyRunningException.class, () -> jobOperator.abandon(123L));
-	}
-
-	@Test
-	void testRecoverStartedJob() {
-		JobInstance jobInstance = new JobInstance(123L, job.getName());
-		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters);
-		jobExecution.setStatus(BatchStatus.STARTED);
-		jobExecution.createStepExecution("step1").setStatus(BatchStatus.STARTED);
-		when(jobRepository.getJobExecution(111L)).thenReturn(jobExecution);
-		JobExecution recover = jobOperator.recover(jobExecution);
-		assertEquals(BatchStatus.FAILED, recover.getStatus());
-		assertNotNull(recover.getEndTime());
-		assertTrue(recover.getExecutionContext().containsKey("recovered"));
-	}
-
-	@Test
-	void testRecoverStoppingStep() {
-		JobInstance jobInstance = new JobInstance(123L, job.getName());
-		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters);
-		jobExecution.setStatus(BatchStatus.STARTED);
-		jobExecution.createStepExecution("step1").setStatus(BatchStatus.STOPPING);
-		when(jobRepository.getJobExecution(111L)).thenReturn(jobExecution);
-		JobExecution recover = jobOperator.recover(jobExecution);
-		assertEquals(BatchStatus.FAILED, recover.getStatus());
-		assertNotNull(recover.getEndTime());
-		assertTrue(recover.getExecutionContext().containsKey("recovered"));
-	}
-
-	@Test
-	void testRecoverAbandonedJob() {
-		JobInstance jobInstance = new JobInstance(123L, job.getName());
-		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters);
-		jobExecution.setStatus(BatchStatus.ABANDONED);
-		when(jobRepository.getJobExecution(111L)).thenReturn(jobExecution);
-		JobExecution recover = jobOperator.recover(jobExecution);
-		assertSame(recover, jobExecution);
-		verifyNoInteractions(jobRepository);
-	}
-
-	@Test
-	void testRecoverCompletedJob() {
-		JobInstance jobInstance = new JobInstance(123L, job.getName());
-		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters);
-		jobExecution.setStatus(BatchStatus.COMPLETED);
-		when(jobRepository.getJobExecution(111L)).thenReturn(jobExecution);
-		JobExecution recover = jobOperator.recover(jobExecution);
-		assertSame(recover, jobExecution);
-		verifyNoInteractions(jobRepository);
-	}
-
-	static class MockJob extends AbstractJob {
-
-		private TaskletStep taskletStep;
-
-		@Override
-		public Step getStep(String stepName) {
-			return taskletStep;
-		}
-
-		@Override
-		public Collection<String> getStepNames() {
-			return Collections.singletonList("test_job.step1");
-		}
-
-		@Override
-		protected void doExecute(JobExecution execution) throws JobExecutionException {
-
-		}
-
+		Assertions.assertNotNull(jobExecution);
+		Assertions.assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 	}
 
 }

@@ -329,7 +329,7 @@ public interface JobOperator extends JobLauncher {
 	 * @throws NoSuchJobExecutionException if the id was not associated with any
 	 * {@link JobExecution}
 	 * @deprecated Since 6.0 in favor of the <code>getJobParameters()</code> method of
-	 * {@link org.springframework.batch.core.repository.JobRepository#getJobExecution(Long)}.
+	 * {@link org.springframework.batch.core.repository.JobRepository#getJobExecution(long)}.
 	 * Scheduled for removal in 6.2 or later.
 	 */
 	@Deprecated(since = "6.0", forRemoval = true)
@@ -343,7 +343,7 @@ public interface JobOperator extends JobLauncher {
 	 * @throws NoSuchJobExecutionException if there is no {@link JobExecution} with the
 	 * supplied id
 	 * @deprecated Since 6.0 in favor of the <code>toString()</code> method of
-	 * {@link org.springframework.batch.core.repository.JobRepository#getJobExecution(Long)}.
+	 * {@link org.springframework.batch.core.repository.JobRepository#getJobExecution(long)}.
 	 * Scheduled for removal in 6.2 or later.
 	 */
 	@Deprecated(since = "6.0", forRemoval = true)
@@ -357,7 +357,7 @@ public interface JobOperator extends JobLauncher {
 	 * @throws NoSuchJobExecutionException if there is no {@link JobExecution} with the
 	 * supplied id
 	 * @deprecated Since 6.0 in favor of the <code>getStepExecutions()</code> method of
-	 * {@link org.springframework.batch.core.repository.JobRepository#getJobExecution(Long)}.
+	 * {@link org.springframework.batch.core.repository.JobRepository#getJobExecution(long)}.
 	 * Scheduled for removal in 6.2 or later.
 	 */
 	@Deprecated(since = "6.0", forRemoval = true)

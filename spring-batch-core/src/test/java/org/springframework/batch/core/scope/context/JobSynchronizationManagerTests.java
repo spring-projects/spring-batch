@@ -30,6 +30,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.parameters.JobParameters;
 
 /**
  * JobSynchronizationManagerTests.
@@ -39,7 +41,7 @@ import org.springframework.batch.core.job.JobExecution;
  */
 class JobSynchronizationManagerTests {
 
-	private final JobExecution jobExecution = new JobExecution(0L);
+	private final JobExecution jobExecution = new JobExecution(0L, new JobInstance(1L, "job"), new JobParameters());
 
 	@BeforeEach
 	@AfterEach

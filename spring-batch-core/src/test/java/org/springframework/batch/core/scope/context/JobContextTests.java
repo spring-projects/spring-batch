@@ -47,9 +47,8 @@ class JobContextTests {
 
 	@BeforeEach
 	void setUp() {
-		jobExecution = new JobExecution(1L);
 		JobInstance jobInstance = new JobInstance(2L, "job");
-		jobExecution.setJobInstance(jobInstance);
+		jobExecution = new JobExecution(1L, jobInstance, new JobParameters());
 		context = new JobContext(jobExecution);
 		list = new ArrayList<>();
 	}
@@ -141,7 +140,7 @@ class JobContextTests {
 	void testJobParameters() {
 		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "bar").toJobParameters();
 		JobInstance jobInstance = new JobInstance(0L, "foo");
-		jobExecution = new JobExecution(5L, jobParameters);
+		jobExecution = new JobExecution(5L, jobInstance, jobParameters);
 		jobExecution.setJobInstance(jobInstance);
 		context = new JobContext(jobExecution);
 		assertEquals("bar", context.getJobParameters().get("foo"));
@@ -150,12 +149,6 @@ class JobContextTests {
 	@Test
 	void testContextId() {
 		assertEquals("jobExecution#1", context.getId());
-	}
-
-	@Test
-	void testIllegalContextId() {
-		context = new JobContext(new JobExecution((Long) null));
-		assertThrows(IllegalStateException.class, context::getId);
 	}
 
 }

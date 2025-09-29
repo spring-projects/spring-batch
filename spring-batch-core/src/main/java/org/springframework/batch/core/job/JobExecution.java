@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,12 @@
 
 package org.springframework.batch.core.job;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -50,85 +48,38 @@ public class JobExecution extends Entity {
 
 	private JobInstance jobInstance;
 
-	private volatile Collection<StepExecution> stepExecutions = Collections.synchronizedSet(new LinkedHashSet<>());
+	private final List<StepExecution> stepExecutions = Collections.synchronizedList(new LinkedList<>());
 
-	private volatile BatchStatus status = BatchStatus.STARTING;
+	private BatchStatus status = BatchStatus.STARTING;
 
-	private volatile LocalDateTime startTime = null;
+	private LocalDateTime createTime = LocalDateTime.now();
 
-	private volatile LocalDateTime createTime = LocalDateTime.now();
+	private LocalDateTime startTime = null;
 
-	private volatile LocalDateTime endTime = null;
+	private LocalDateTime endTime = null;
 
-	private volatile LocalDateTime lastUpdated = null;
+	private LocalDateTime lastUpdated = null;
 
-	private volatile ExitStatus exitStatus = ExitStatus.UNKNOWN;
+	private ExitStatus exitStatus = ExitStatus.UNKNOWN;
 
-	private volatile ExecutionContext executionContext = new ExecutionContext();
+	private ExecutionContext executionContext = new ExecutionContext();
 
-	private transient volatile List<Throwable> failureExceptions = new CopyOnWriteArrayList<>();
-
-	/**
-	 * Constructor that sets the state of the instance to the {@link JobExecution}
-	 * parameter.
-	 * @param original The {@link JobExecution} to be copied.
-	 */
-	public JobExecution(JobExecution original) {
-		this.jobParameters = original.getJobParameters();
-		this.jobInstance = original.getJobInstance();
-		this.stepExecutions = original.getStepExecutions();
-		this.status = original.getStatus();
-		this.startTime = original.getStartTime();
-		this.createTime = original.getCreateTime();
-		this.endTime = original.getEndTime();
-		this.lastUpdated = original.getLastUpdated();
-		this.exitStatus = original.getExitStatus();
-		this.executionContext = original.getExecutionContext();
-		this.failureExceptions = original.getFailureExceptions();
-		this.setId(original.getId());
-		this.setVersion(original.getVersion());
-	}
+	private final List<Throwable> failureExceptions = new CopyOnWriteArrayList<>();
 
 	/**
-	 * Because a JobExecution is not valid unless the job is set, this constructor is the
-	 * only valid one from a modeling point of view.
-	 * @param job The job of which this execution is a part.
-	 * @param id A {@link Long} that represents the {@code id} for the
-	 * {@code JobExecution}.
+	 * Create a new {@link JobExecution} instance. Because a JobExecution is not valid
+	 * unless the job instance is set, this constructor is the only valid one from a
+	 * modeling point of view.
+	 * @param jobInstance The job instance of which this execution is a part.
+	 * @param id of the {@code JobExecution}.
 	 * @param jobParameters A {@link JobParameters} instance for this
 	 * {@code JobExecution}.
 	 */
-	public JobExecution(JobInstance job, Long id, @Nullable JobParameters jobParameters) {
+	// TODO add execution context parameter
+	public JobExecution(long id, JobInstance jobInstance, JobParameters jobParameters) {
 		super(id);
-		this.jobInstance = job;
-		this.jobParameters = jobParameters == null ? new JobParameters() : jobParameters;
-	}
-
-	/**
-	 * Constructor for transient (unsaved) instances.
-	 * @param job The enclosing {@link JobInstance}.
-	 * @param jobParameters The {@link JobParameters} instance for this
-	 * {@code JobExecution}.
-	 */
-	public JobExecution(JobInstance job, JobParameters jobParameters) {
-		this(job, null, jobParameters);
-	}
-
-	/**
-	 * Constructor that accepts the job execution {@code id} and {@link JobParameters}.
-	 * @param id The job execution {@code id}.
-	 * @param jobParameters The {@link JobParameters} for the {@link JobExecution}.
-	 */
-	public JobExecution(Long id, JobParameters jobParameters) {
-		this(null, id, jobParameters);
-	}
-
-	/**
-	 * Constructor that accepts the job execution {@code id}.
-	 * @param id The job execution {@code id}.
-	 */
-	public JobExecution(Long id) {
-		this(null, id, null);
+		this.jobInstance = jobInstance;
+		this.jobParameters = jobParameters;
 	}
 
 	/**
@@ -204,15 +155,14 @@ public class JobExecution extends Entity {
 	}
 
 	/**
-	 * Convenience getter for the {@code id} of the enclosing job. Useful for DAO
+	 * Convenience getter for the {@code id} of the enclosing job instance. Useful for DAO
 	 * implementations.
-	 * @return the {@code id} of the enclosing job.
+	 * @return the {@code id} of the enclosing job instance.
 	 */
-	public Long getJobId() {
-		if (jobInstance != null) {
-			return jobInstance.getId();
-		}
-		return null;
+	// TODO why is that needed for DAO implementations? should not be needed with the new
+	// model
+	public long getJobInstanceId() {
+		return this.jobInstance.getId();
 	}
 
 	/**
@@ -230,10 +180,10 @@ public class JobExecution extends Entity {
 	}
 
 	/**
-	 * @return the Job that is executing.
+	 * @return the Job instance that is executing.
 	 */
 	public JobInstance getJobInstance() {
-		return jobInstance;
+		return this.jobInstance;
 	}
 
 	/**
@@ -241,18 +191,7 @@ public class JobExecution extends Entity {
 	 * @return the step executions that were registered.
 	 */
 	public Collection<StepExecution> getStepExecutions() {
-		return List.copyOf(stepExecutions);
-	}
-
-	/**
-	 * Register a step execution with the current job execution.
-	 * @param stepName the name of the step the new execution is associated with.
-	 * @return an empty {@link StepExecution} associated with this {@code JobExecution}.
-	 */
-	public StepExecution createStepExecution(String stepName) {
-		StepExecution stepExecution = new StepExecution(stepName, this);
-		this.stepExecutions.add(stepExecution);
-		return stepExecution;
+		return List.copyOf(this.stepExecutions);
 	}
 
 	/**
@@ -305,11 +244,19 @@ public class JobExecution extends Entity {
 	}
 
 	/**
-	 * Add a step execution from an existing instance.
+	 * Add a step execution.
 	 * @param stepExecution The {@code stepExecution} execution to be added.
 	 */
 	public void addStepExecution(StepExecution stepExecution) {
-		stepExecutions.add(stepExecution);
+		this.stepExecutions.add(stepExecution);
+	}
+
+	/**
+	 * Add some step executions.
+	 * @param stepExecutions The step executions to add to the current list.
+	 */
+	public void addStepExecutions(List<StepExecution> stepExecutions) {
+		this.stepExecutions.addAll(stepExecutions);
 	}
 
 	/**
@@ -364,33 +311,11 @@ public class JobExecution extends Entity {
 		return new ArrayList<>(allExceptions);
 	}
 
-	/**
-	 * Deserialize and ensure transient fields are re-instantiated when read back.
-	 * @param stream instance of {@link ObjectInputStream}.
-	 * @throws IOException if an error occurs during read.
-	 * @throws ClassNotFoundException thrown if the class is not found.
-	 */
-	private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
-		stream.defaultReadObject();
-		failureExceptions = new ArrayList<>();
-	}
-
 	@Override
 	public String toString() {
 		return super.toString() + String.format(
 				", startTime=%s, endTime=%s, lastUpdated=%s, status=%s, exitStatus=%s, job=[%s], jobParameters=[%s]",
 				startTime, endTime, lastUpdated, status, exitStatus, jobInstance, jobParameters);
-	}
-
-	/**
-	 * Add some step executions. For internal use only.
-	 * @param stepExecutions The step executions to add to the current list.
-	 */
-	public void addStepExecutions(List<StepExecution> stepExecutions) {
-		if (stepExecutions != null) {
-			this.stepExecutions.removeAll(stepExecutions);
-			this.stepExecutions.addAll(stepExecutions);
-		}
 	}
 
 }

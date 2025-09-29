@@ -15,40 +15,91 @@
  */
 package org.springframework.batch.core.repository.dao.jdbc;
 
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import org.springframework.batch.core.ExitStatus;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.step.StepExecution;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
+import org.springframework.jdbc.support.incrementer.H2SequenceMaxValueIncrementer;
+import org.springframework.test.jdbc.JdbcTestUtils;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.step.StepExecution;
-import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.repository.dao.AbstractStepExecutionDaoTests;
-import org.springframework.batch.core.repository.dao.StepExecutionDao;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
-import org.springframework.transaction.annotation.Transactional;
+class JdbcStepExecutionDaoTests {
 
-@SpringJUnitConfig(locations = "sql-dao-test.xml")
-class JdbcStepExecutionDaoTests extends AbstractStepExecutionDaoTests {
+	private JdbcStepExecutionDao jdbcStepExecutionDao;
 
-	@Override
-	protected StepExecutionDao getStepExecutionDao() {
-		return applicationContext.getBean("stepExecutionDao", StepExecutionDao.class);
+	private JdbcJobExecutionDao jdbcJobExecutionDao;
+
+	private JdbcJobInstanceDao jdbcJobInstanceDao;
+
+	private JdbcTemplate jdbcTemplate;
+
+	@BeforeEach
+	void setup() throws Exception {
+		EmbeddedDatabase database = new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2)
+			.addScript("/org/springframework/batch/core/schema-drop-h2.sql")
+			.addScript("/org/springframework/batch/core/schema-h2.sql")
+			.build();
+		jdbcTemplate = new JdbcTemplate(database);
+
+		jdbcJobInstanceDao = new JdbcJobInstanceDao();
+		jdbcJobInstanceDao.setJdbcTemplate(jdbcTemplate);
+		H2SequenceMaxValueIncrementer jobInstanceIncrementer = new H2SequenceMaxValueIncrementer(database,
+				"BATCH_JOB_INSTANCE_SEQ");
+		jdbcJobInstanceDao.setJobInstanceIncrementer(jobInstanceIncrementer);
+		jdbcJobInstanceDao.afterPropertiesSet();
+
+		jdbcJobExecutionDao = new JdbcJobExecutionDao();
+		jdbcJobExecutionDao.setJdbcTemplate(jdbcTemplate);
+		H2SequenceMaxValueIncrementer jobExecutionIncrementer = new H2SequenceMaxValueIncrementer(database,
+				"BATCH_JOB_EXECUTION_SEQ");
+		jdbcJobExecutionDao.setJobExecutionIncrementer(jobExecutionIncrementer);
+		jdbcJobExecutionDao.setJobInstanceDao(jdbcJobInstanceDao);
+		jdbcJobExecutionDao.afterPropertiesSet();
+
+		jdbcStepExecutionDao = new JdbcStepExecutionDao();
+		H2SequenceMaxValueIncrementer stepExecutionIncrementer = new H2SequenceMaxValueIncrementer(database,
+				"BATCH_STEP_EXECUTION_SEQ");
+		jdbcStepExecutionDao.setStepExecutionIncrementer(stepExecutionIncrementer);
+		jdbcStepExecutionDao.setJdbcTemplate(jdbcTemplate);
+		jdbcStepExecutionDao.setJobExecutionDao(jdbcJobExecutionDao);
+		jdbcStepExecutionDao.afterPropertiesSet();
 	}
 
-	@Override
-	protected JobRepository getJobRepository() {
-		deleteFromTables("BATCH_JOB_EXECUTION_CONTEXT", "BATCH_STEP_EXECUTION_CONTEXT", "BATCH_STEP_EXECUTION",
-				"BATCH_JOB_EXECUTION_PARAMS", "BATCH_JOB_EXECUTION", "BATCH_JOB_INSTANCE");
-		return applicationContext.getBean("jobRepository", JobRepository.class);
+	@Test
+	void testCreateStepExecution() {
+		// given
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = jdbcJobInstanceDao.createJobInstance("job", jobParameters);
+		JobExecution jobExecution = jdbcJobExecutionDao.createJobExecution(jobInstance, jobParameters);
+
+		// when
+		StepExecution stepExecution = jdbcStepExecutionDao.createStepExecution("step", jobExecution);
+
+		// then
+		Assertions.assertNotNull(stepExecution);
+		assertEquals(1, stepExecution.getId());
+		assertEquals(jobExecution, stepExecution.getJobExecution());
+		int stepExecutionsCount = JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_STEP_EXECUTION");
+		assertEquals(1, stepExecutionsCount);
 	}
 
 	/**
-	 * Long exit descriptions are truncated on both save and update.
+	 * Long exit descriptions are truncated on update.
 	 */
-	@Transactional
 	@Test
 	void testTruncateExitDescription() {
+		jdbcStepExecutionDao.setExitMessageLength(250);
 
 		StringBuilder sb = new StringBuilder();
 		sb.append("too long exit description".repeat(100));
@@ -56,50 +107,55 @@ class JdbcStepExecutionDaoTests extends AbstractStepExecutionDaoTests {
 
 		ExitStatus exitStatus = ExitStatus.FAILED.addExitDescription(longDescription);
 
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = jdbcJobInstanceDao.createJobInstance("job", jobParameters);
+		JobExecution jobExecution = jdbcJobExecutionDao.createJobExecution(jobInstance, jobParameters);
+
+		// when
+		StepExecution stepExecution = jdbcStepExecutionDao.createStepExecution("step", jobExecution);
+
 		stepExecution.setExitStatus(exitStatus);
 
-		((JdbcStepExecutionDao) dao).setExitMessageLength(250);
-		dao.saveStepExecution(stepExecution);
+		jdbcStepExecutionDao.updateStepExecution(stepExecution);
 
-		StepExecution retrievedAfterSave = dao.getStepExecution(jobExecution, stepExecution.getId());
-
-		assertTrue(retrievedAfterSave.getExitStatus().getExitDescription().length() < stepExecution.getExitStatus()
-			.getExitDescription()
-			.length(), "Exit description should be truncated");
-
-		dao.updateStepExecution(stepExecution);
-
-		StepExecution retrievedAfterUpdate = dao.getStepExecution(jobExecution, stepExecution.getId());
+		StepExecution retrievedAfterUpdate = jdbcStepExecutionDao.getStepExecution(stepExecution.getId());
 
 		assertTrue(retrievedAfterUpdate.getExitStatus().getExitDescription().length() < stepExecution.getExitStatus()
 			.getExitDescription()
 			.length(), "Exit description should be truncated");
+
 	}
 
-	@Transactional
 	@Test
 	void testCountStepExecutions() {
 		// Given
-		dao.saveStepExecution(stepExecution);
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = jdbcJobInstanceDao.createJobInstance("job", jobParameters);
+		JobExecution jobExecution = jdbcJobExecutionDao.createJobExecution(jobInstance, jobParameters);
+		jdbcStepExecutionDao.createStepExecution("step1", jobExecution);
+		jdbcStepExecutionDao.createStepExecution("step2", jobExecution);
+		jdbcStepExecutionDao.createStepExecution("step2", jobExecution);
 
-		// When
-		long result = dao.countStepExecutions(jobInstance, stepExecution.getStepName());
+		// when
+		long result = jdbcStepExecutionDao.countStepExecutions(jobInstance, "step2");
 
 		// Then
-		assertEquals(1, result);
+		assertEquals(2, result);
 	}
 
-	@Transactional
 	@Test
 	void testDeleteStepExecution() {
 		// Given
-		dao.saveStepExecution(stepExecution);
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = jdbcJobInstanceDao.createJobInstance("job", jobParameters);
+		JobExecution jobExecution = jdbcJobExecutionDao.createJobExecution(jobInstance, jobParameters);
+		StepExecution stepExecution = jdbcStepExecutionDao.createStepExecution("step", jobExecution);
 
 		// When
-		dao.deleteStepExecution(stepExecution);
+		jdbcStepExecutionDao.deleteStepExecution(stepExecution);
 
 		// Then
-		assertNull(dao.getStepExecution(jobExecution, stepExecution.getId()));
+		Assertions.assertEquals(0, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_STEP_EXECUTION"));
 	}
 
 }

@@ -31,9 +31,9 @@ public class JobExecution {
 
 	private String id;
 
-	private Long jobExecutionId;
+	private long jobExecutionId;
 
-	private Long jobInstanceId;
+	private long jobInstanceId;
 
 	private Map<String, JobParameter<?>> jobParameters = new HashMap<>();
 
@@ -60,19 +60,19 @@ public class JobExecution {
 		return id;
 	}
 
-	public Long getJobInstanceId() {
+	public long getJobInstanceId() {
 		return jobInstanceId;
 	}
 
-	public void setJobInstanceId(Long jobInstanceId) {
+	public void setJobInstanceId(long jobInstanceId) {
 		this.jobInstanceId = jobInstanceId;
 	}
 
-	public Long getJobExecutionId() {
+	public long getJobExecutionId() {
 		return jobExecutionId;
 	}
 
-	public void setJobExecutionId(Long jobExecutionId) {
+	public void setJobExecutionId(long jobExecutionId) {
 		this.jobExecutionId = jobExecutionId;
 	}
 

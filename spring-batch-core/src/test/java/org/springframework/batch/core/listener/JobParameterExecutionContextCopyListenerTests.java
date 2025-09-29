@@ -39,7 +39,7 @@ class JobParameterExecutionContextCopyListenerTests {
 	@BeforeEach
 	void createExecution() {
 		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "bar").toJobParameters();
-		stepExecution = new StepExecution("foo", new JobExecution(new JobInstance(123L, "job"), jobParameters));
+		stepExecution = new StepExecution("foo", new JobExecution(1L, new JobInstance(123L, "job"), jobParameters));
 	}
 
 	@Test

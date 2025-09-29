@@ -27,6 +27,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.partition.support.DefaultStepExecutionAggregator;
@@ -34,6 +35,7 @@ import org.springframework.batch.core.partition.support.SimplePartitioner;
 import org.springframework.batch.core.partition.support.SimpleStepExecutionSplitter;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.JdbcJobRepositoryFactoryBean;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
@@ -75,13 +77,17 @@ class PartitionStepTests {
 			for (StepExecution execution : executions) {
 				execution.setStatus(BatchStatus.COMPLETED);
 				execution.setExitStatus(ExitStatus.COMPLETED);
+				jobRepository.update(execution);
+				jobRepository.updateExecutionContext(execution);
 			}
 			return executions;
 		});
 		step.afterPropertiesSet();
-		JobExecution jobExecution = jobRepository.createJobExecution("vanillaJob", new JobParameters());
-		StepExecution stepExecution = jobExecution.createStepExecution("foo");
-		jobRepository.add(stepExecution);
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = jobRepository.createJobInstance("vanillaJob", jobParameters);
+		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
+				new ExecutionContext());
+		StepExecution stepExecution = jobRepository.createStepExecution("foo", jobExecution);
 		step.execute(stepExecution);
 		// one manager and two workers
 		assertEquals(3, stepExecution.getJobExecution().getStepExecutions().size());
@@ -97,13 +103,17 @@ class PartitionStepTests {
 			for (StepExecution execution : executions) {
 				execution.setStatus(BatchStatus.FAILED);
 				execution.setExitStatus(ExitStatus.FAILED);
+				jobRepository.update(execution);
+				jobRepository.updateExecutionContext(execution);
 			}
 			return executions;
 		});
 		step.afterPropertiesSet();
-		JobExecution jobExecution = jobRepository.createJobExecution("vanillaJob", new JobParameters());
-		StepExecution stepExecution = jobExecution.createStepExecution("foo");
-		jobRepository.add(stepExecution);
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = jobRepository.createJobInstance("vanillaJob", jobParameters);
+		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
+				new ExecutionContext());
+		StepExecution stepExecution = jobRepository.createStepExecution("foo", jobExecution);
 		step.execute(stepExecution);
 		// one manager and two workers
 		assertEquals(3, stepExecution.getJobExecution().getStepExecutions().size());
@@ -138,21 +148,26 @@ class PartitionStepTests {
 			return executions;
 		});
 		step.afterPropertiesSet();
-		JobExecution jobExecution = jobRepository.createJobExecution("vanillaJob", new JobParameters());
-		StepExecution stepExecution = jobExecution.createStepExecution("foo");
-		jobRepository.add(stepExecution);
+		JobParameters jobParameters = new JobParameters();
+		ExecutionContext executionContext = new ExecutionContext();
+		JobInstance jobInstance = jobRepository.createJobInstance("vanillaJob", jobParameters);
+		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters, executionContext);
+		StepExecution stepExecution = jobRepository.createStepExecution("foo", jobExecution);
 		step.execute(stepExecution);
 		jobExecution.setStatus(BatchStatus.FAILED);
 		jobExecution.setEndTime(LocalDateTime.now());
 		jobRepository.update(jobExecution);
-		// Now restart...
-		jobExecution = jobRepository.createJobExecution("vanillaJob", new JobParameters());
-		stepExecution = jobExecution.createStepExecution("foo");
-		jobRepository.add(stepExecution);
-		step.execute(stepExecution);
 		// one manager and two workers
-		assertEquals(3, stepExecution.getJobExecution().getStepExecutions().size());
-		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
+		assertEquals(3, jobExecution.getStepExecutions().size());
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
+
+		// Now restart...
+		JobExecution jobExecution2 = jobRepository.createJobExecution(jobInstance, jobParameters, executionContext);
+		StepExecution stepExecution2 = jobRepository.createStepExecution("foo", jobExecution2);
+		step.execute(stepExecution2);
+		// one manager and two workers
+		assertEquals(3, jobExecution2.getStepExecutions().size());
+		assertEquals(BatchStatus.COMPLETED, stepExecution2.getStatus());
 	}
 
 	@Test
@@ -168,9 +183,11 @@ class PartitionStepTests {
 			return executions;
 		});
 		step.afterPropertiesSet();
-		JobExecution jobExecution = jobRepository.createJobExecution("vanillaJob", new JobParameters());
-		StepExecution stepExecution = jobExecution.createStepExecution("foo");
-		jobRepository.add(stepExecution);
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = jobRepository.createJobInstance("vanillaJob", jobParameters);
+		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
+				new ExecutionContext());
+		StepExecution stepExecution = jobRepository.createStepExecution("foo", jobExecution);
 		step.execute(stepExecution);
 		// one manager and two workers
 		assertEquals(3, stepExecution.getJobExecution().getStepExecutions().size());
@@ -190,9 +207,11 @@ class PartitionStepTests {
 				new SimpleStepExecutionSplitter(jobRepository, true, step.getName(), new SimplePartitioner()));
 		step.setPartitionHandler((stepSplitter, stepExecution) -> Arrays.asList(stepExecution));
 		step.afterPropertiesSet();
-		JobExecution jobExecution = jobRepository.createJobExecution("vanillaJob", new JobParameters());
-		StepExecution stepExecution = jobExecution.createStepExecution("foo");
-		jobRepository.add(stepExecution);
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = jobRepository.createJobInstance("vanillaJob", jobParameters);
+		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
+				new ExecutionContext());
+		StepExecution stepExecution = jobRepository.createStepExecution("foo", jobExecution);
 		step.execute(stepExecution);
 		assertEquals(true, stepExecution.getExecutionContext().get("aggregated"));
 	}

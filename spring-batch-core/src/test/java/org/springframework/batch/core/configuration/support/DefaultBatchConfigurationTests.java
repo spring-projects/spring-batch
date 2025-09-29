@@ -26,8 +26,8 @@ import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.repository.support.ResourcelessJobRepository;
 import org.springframework.batch.core.step.Step;
-import org.springframework.batch.core.configuration.xml.DummyJobRepository;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.repository.JobRepository;
@@ -68,7 +68,7 @@ class DefaultBatchConfigurationTests {
 		Map<String, JobRepository> jobRepositories = context.getBeansOfType(JobRepository.class);
 		Assertions.assertEquals(1, jobRepositories.size());
 		JobRepository jobRepository = jobRepositories.entrySet().iterator().next().getValue();
-		Assertions.assertInstanceOf(DummyJobRepository.class, jobRepository);
+		Assertions.assertInstanceOf(ResourcelessJobRepository.class, jobRepository);
 	}
 
 	@Test
@@ -120,7 +120,7 @@ class DefaultBatchConfigurationTests {
 		@Bean
 		@Override
 		public JobRepository jobRepository() {
-			return new DummyJobRepository();
+			return new ResourcelessJobRepository();
 		}
 
 	}

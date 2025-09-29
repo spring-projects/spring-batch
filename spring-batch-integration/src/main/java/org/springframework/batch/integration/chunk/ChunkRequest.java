@@ -47,7 +47,7 @@ public class ChunkRequest<T> implements Serializable {
 		this.stepContribution = stepContribution;
 	}
 
-	public long getJobId() {
+	public long getJobInstanceId() {
 		return jobId;
 	}
 

@@ -42,8 +42,9 @@ class ExecutionContextTestUtilsTests {
 		Date date = new Date();
 		JobExecution jobExecution = MetaDataInstanceFactory.createJobExecutionWithStepExecutions(123L,
 				Arrays.asList("foo", "bar"));
-		StepExecution stepExecution = jobExecution.createStepExecution("spam");
+		StepExecution stepExecution = MetaDataInstanceFactory.createStepExecution(jobExecution, "spam", 1L);
 		stepExecution.getExecutionContext().put("foo", date);
+		jobExecution.addStepExecution(stepExecution);
 		Date result = ExecutionContextTestUtils.getValueFromStepInJob(jobExecution, "spam", "foo");
 		assertEquals(date, result);
 	}

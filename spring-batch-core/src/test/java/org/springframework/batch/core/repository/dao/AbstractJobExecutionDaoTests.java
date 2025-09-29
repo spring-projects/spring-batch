@@ -74,7 +74,7 @@ public abstract class AbstractJobExecutionDaoTests {
 		dao = getJobExecutionDao();
 		jobParameters = new JobParameters();
 		jobInstance = getJobInstanceDao().createJobInstance("execTestJob", jobParameters);
-		execution = new JobExecution(jobInstance, new JobParameters());
+		execution = new JobExecution(1L, jobInstance, new JobParameters());
 	}
 
 	/**
@@ -88,7 +88,7 @@ public abstract class AbstractJobExecutionDaoTests {
 		execution.setLastUpdated(LocalDateTime.now());
 		execution.setExitStatus(ExitStatus.UNKNOWN);
 		execution.setEndTime(LocalDateTime.now());
-		dao.saveJobExecution(execution);
+		dao.updateJobExecution(execution);
 
 		List<JobExecution> executions = dao.findJobExecutions(jobInstance);
 		assertEquals(1, executions.size());
@@ -106,10 +106,10 @@ public abstract class AbstractJobExecutionDaoTests {
 		List<JobExecution> execs = new ArrayList<>();
 
 		for (int i = 0; i < 10; i++) {
-			JobExecution exec = new JobExecution(jobInstance, jobParameters);
+			JobExecution exec = new JobExecution(1L, jobInstance, jobParameters);
 			exec.setCreateTime(LocalDateTime.now().plus(i, ChronoUnit.SECONDS));
 			execs.add(exec);
-			dao.saveJobExecution(exec);
+			dao.updateJobExecution(exec);
 		}
 
 		List<JobExecution> retrieved = dao.findJobExecutions(jobInstance);
@@ -140,7 +140,7 @@ public abstract class AbstractJobExecutionDaoTests {
 
 		assertNull(execution.getId());
 		assertNull(execution.getVersion());
-		dao.saveJobExecution(execution);
+		dao.updateJobExecution(execution);
 		assertNotNull(execution.getId());
 		assertNotNull(execution.getVersion());
 	}
@@ -152,7 +152,7 @@ public abstract class AbstractJobExecutionDaoTests {
 	@Test
 	void testUpdateExecution() {
 		execution.setStatus(BatchStatus.STARTED);
-		dao.saveJobExecution(execution);
+		dao.updateJobExecution(execution);
 
 		execution.setLastUpdated(LocalDateTime.now());
 		execution.setStatus(BatchStatus.COMPLETED);
@@ -170,15 +170,15 @@ public abstract class AbstractJobExecutionDaoTests {
 	@Transactional
 	@Test
 	void testGetLastExecution() {
-		JobExecution exec1 = new JobExecution(jobInstance, jobParameters);
+		JobExecution exec1 = new JobExecution(1L, jobInstance, jobParameters);
 		LocalDateTime now = LocalDateTime.now();
 		exec1.setCreateTime(now);
 
-		JobExecution exec2 = new JobExecution(jobInstance, jobParameters);
+		JobExecution exec2 = new JobExecution(1L, jobInstance, jobParameters);
 		exec2.setCreateTime(now.plus(1, ChronoUnit.SECONDS));
 
-		dao.saveJobExecution(exec1);
-		dao.saveJobExecution(exec2);
+		dao.updateJobExecution(exec1);
+		dao.updateJobExecution(exec2);
 
 		JobExecution last = dao.getLastJobExecution(jobInstance);
 		assertEquals(exec2, last);
@@ -201,42 +201,42 @@ public abstract class AbstractJobExecutionDaoTests {
 	@Test
 	void testFindRunningExecutions() {
 		// Normally completed JobExecution as EndTime is populated
-		JobExecution exec = new JobExecution(jobInstance, jobParameters);
+		JobExecution exec = new JobExecution(1L, jobInstance, jobParameters);
 		LocalDateTime now = LocalDateTime.now();
 		exec.setCreateTime(now);
 		exec.setStartTime(now.plus(1, ChronoUnit.SECONDS));
 		exec.setEndTime(now.plus(2, ChronoUnit.SECONDS));
 		exec.setStatus(BatchStatus.COMPLETED);
 		exec.setLastUpdated(now.plus(3, ChronoUnit.SECONDS));
-		dao.saveJobExecution(exec);
+		dao.updateJobExecution(exec);
 
 		// BATCH-2675
 		// Abnormal JobExecution as both StartTime and EndTime are null
 		// This can occur when TaskExecutorJobLauncher#run() submission to taskExecutor
 		// throws a TaskRejectedException
-		exec = new JobExecution(jobInstance, jobParameters);
+		exec = new JobExecution(1L, jobInstance, jobParameters);
 		exec.setLastUpdated(now.plus(3, ChronoUnit.SECONDS));
-		dao.saveJobExecution(exec);
+		dao.updateJobExecution(exec);
 
 		// Stopping JobExecution as status is STOPPING
-		exec = new JobExecution(jobInstance, jobParameters);
+		exec = new JobExecution(1L, jobInstance, jobParameters);
 		exec.setStartTime(now.plus(6, ChronoUnit.SECONDS));
 		exec.setStatus(BatchStatus.STOPPING);
 		exec.setLastUpdated(now.plus(7, ChronoUnit.SECONDS));
-		dao.saveJobExecution(exec);
+		dao.updateJobExecution(exec);
 
 		// Running JobExecution as StartTime is populated but EndTime is null
-		exec = new JobExecution(jobInstance, jobParameters);
+		exec = new JobExecution(1L, jobInstance, jobParameters);
 		exec.setStartTime(now.plus(2, ChronoUnit.SECONDS));
 		exec.setStatus(BatchStatus.STARTED);
 		exec.setLastUpdated(now.plus(3, ChronoUnit.SECONDS));
-		exec.createStepExecution("step");
-		dao.saveJobExecution(exec);
+
+		dao.updateJobExecution(exec);
 
 		StepExecutionDao stepExecutionDao = getStepExecutionDao();
 		if (stepExecutionDao != null) {
 			for (StepExecution stepExecution : exec.getStepExecutions()) {
-				stepExecutionDao.saveStepExecution(stepExecution);
+				stepExecutionDao.updateStepExecution(stepExecution);
 			}
 		}
 
@@ -268,15 +268,16 @@ public abstract class AbstractJobExecutionDaoTests {
 	@Transactional
 	@Test
 	void testGetExecution() {
-		JobExecution exec = new JobExecution(jobInstance, jobParameters);
+		JobExecution exec = new JobExecution(1L, jobInstance, jobParameters);
+		StepExecution stepExec = new StepExecution(1L, "step", exec);
+		exec.addStepExecution(stepExec);
 		exec.setCreateTime(LocalDateTime.now());
-		exec.createStepExecution("step");
 
-		dao.saveJobExecution(exec);
+		dao.updateJobExecution(exec);
 		StepExecutionDao stepExecutionDao = getStepExecutionDao();
 		if (stepExecutionDao != null) {
 			for (StepExecution stepExecution : exec.getStepExecutions()) {
-				stepExecutionDao.saveStepExecution(stepExecution);
+				stepExecutionDao.updateStepExecution(stepExecution);
 			}
 		}
 		JobExecution value = dao.getJobExecution(exec.getId());
@@ -303,11 +304,10 @@ public abstract class AbstractJobExecutionDaoTests {
 	@Test
 	void testConcurrentModificationException() {
 
-		JobExecution exec1 = new JobExecution(jobInstance, jobParameters);
-		dao.saveJobExecution(exec1);
+		JobExecution exec1 = new JobExecution(1L, jobInstance, jobParameters);
+		dao.updateJobExecution(exec1);
 
-		JobExecution exec2 = new JobExecution(jobInstance, jobParameters);
-		exec2.setId(exec1.getId());
+		JobExecution exec2 = new JobExecution(1L, jobInstance, jobParameters);
 
 		exec2.incrementVersion();
 		assertEquals((Integer) 0, exec1.getVersion());
@@ -326,13 +326,12 @@ public abstract class AbstractJobExecutionDaoTests {
 	@Test
 	void testSynchronizeStatusUpgrade() {
 
-		JobExecution exec1 = new JobExecution(jobInstance, jobParameters);
+		JobExecution exec1 = new JobExecution(1L, jobInstance, jobParameters);
 		exec1.setStatus(BatchStatus.STOPPING);
-		dao.saveJobExecution(exec1);
+		dao.updateJobExecution(exec1);
 
-		JobExecution exec2 = new JobExecution(jobInstance, jobParameters);
+		JobExecution exec2 = new JobExecution(1L, jobInstance, jobParameters);
 		assertNotNull(exec1.getId());
-		exec2.setId(exec1.getId());
 
 		exec2.setStatus(BatchStatus.STARTED);
 		exec2.setVersion(7);
@@ -353,13 +352,12 @@ public abstract class AbstractJobExecutionDaoTests {
 	@Test
 	void testSynchronizeStatusDowngrade() {
 
-		JobExecution exec1 = new JobExecution(jobInstance, jobParameters);
+		JobExecution exec1 = new JobExecution(1L, jobInstance, jobParameters);
 		exec1.setStatus(BatchStatus.STARTED);
-		dao.saveJobExecution(exec1);
+		dao.updateJobExecution(exec1);
 
-		JobExecution exec2 = new JobExecution(jobInstance, jobParameters);
+		JobExecution exec2 = new JobExecution(1L, jobInstance, jobParameters);
 		assertNotNull(exec1.getId());
-		exec2.setId(exec1.getId());
 
 		exec2.setStatus(BatchStatus.UNKNOWN);
 		exec2.setVersion(7);

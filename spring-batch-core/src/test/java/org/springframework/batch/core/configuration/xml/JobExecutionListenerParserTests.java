@@ -20,10 +20,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.batch.core.annotation.AfterJob;
 import org.springframework.batch.core.annotation.BeforeJob;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
@@ -46,8 +49,11 @@ public class JobExecutionListenerParserTests {
 
 	@Test
 	void testListeners() throws Exception {
-		JobExecution jobExecution = jobRepository.createJobExecution("testJob",
-				new JobParametersBuilder().addLong("now", System.currentTimeMillis()).toJobParameters());
+		JobParameters jobParameters = new JobParametersBuilder().addLong("now", System.currentTimeMillis())
+			.toJobParameters();
+		JobInstance jobInstance = jobRepository.createJobInstance("testJob", jobParameters);
+		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
+				new ExecutionContext());
 		job.execute(jobExecution);
 		assertTrue(beforeCalled);
 		assertTrue(afterCalled);

@@ -21,6 +21,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.batch.item.ExecutionContext;
@@ -54,7 +56,8 @@ public class StepScopeProxyTargetClassIntegrationTests implements BeanFactoryAwa
 	void start() {
 
 		StepSynchronizationManager.close();
-		stepExecution = new StepExecution("foo", new JobExecution(11L), 123L);
+		stepExecution = new StepExecution(123L, "foo",
+				new JobExecution(11L, new JobInstance(1L, "job"), new JobParameters()));
 
 		ExecutionContext executionContext = new ExecutionContext();
 		executionContext.put("foo", "bar");

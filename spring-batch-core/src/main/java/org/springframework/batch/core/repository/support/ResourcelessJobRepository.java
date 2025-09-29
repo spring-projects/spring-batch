@@ -16,13 +16,14 @@
 package org.springframework.batch.core.repository.support;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
@@ -82,7 +83,7 @@ public class ResourcelessJobRepository implements JobRepository {
 
 	@Override
 	@Nullable
-	public JobInstance getJobInstance(@Nullable Long instanceId) {
+	public JobInstance getJobInstance(long instanceId) {
 		return this.jobInstance;
 	}
 
@@ -124,7 +125,7 @@ public class ResourcelessJobRepository implements JobRepository {
 
 	@Override
 	@Nullable
-	public JobExecution getJobExecution(Long executionId) {
+	public JobExecution getJobExecution(long executionId) {
 		return this.jobExecution;
 	}
 
@@ -149,11 +150,11 @@ public class ResourcelessJobRepository implements JobRepository {
 	}
 
 	@Override
-	public JobExecution createJobExecution(String jobName, JobParameters jobParameters) {
-		if (this.jobInstance == null) {
-			createJobInstance(jobName, jobParameters);
-		}
-		this.jobExecution = new JobExecution(this.jobInstance, 1L, jobParameters);
+	public JobExecution createJobExecution(JobInstance jobInstance, JobParameters jobParameters,
+			ExecutionContext executionContext) {
+		this.jobExecution = new JobExecution(1L, this.jobInstance, jobParameters);
+		this.jobExecution.setExecutionContext(executionContext);
+		this.jobInstance.addJobExecution(this.jobExecution);
 		return this.jobExecution;
 	}
 
@@ -175,14 +176,25 @@ public class ResourcelessJobRepository implements JobRepository {
 	 */
 
 	@Override
+	public StepExecution createStepExecution(String stepName, JobExecution jobExecution) {
+		StepExecution stepExecution = new StepExecution(++stepExecutionIdIncrementer, stepName, jobExecution);
+		stepExecution.setStartTime(LocalDateTime.now());
+		stepExecution.setStatus(BatchStatus.STARTING);
+		stepExecution.setLastUpdated(LocalDateTime.now());
+		stepExecution.incrementVersion();
+		jobExecution.addStepExecution(stepExecution);
+		return stepExecution;
+	}
+
+	@Override
 	@Nullable
-	public StepExecution getStepExecution(Long jobExecutionId, Long stepExecutionId) {
-		if (this.jobExecution == null || !this.jobExecution.getId().equals(jobExecutionId)) {
+	public StepExecution getStepExecution(long jobExecutionId, long stepExecutionId) {
+		if (this.jobExecution == null || !(this.jobExecution.getId() == jobExecutionId)) {
 			return null;
 		}
 		return this.jobExecution.getStepExecutions()
 			.stream()
-			.filter(stepExecution -> stepExecution.getId().equals(stepExecutionId))
+			.filter(stepExecution -> stepExecution.getId() == stepExecutionId)
 			.findFirst()
 			.orElse(null);
 	}
@@ -190,7 +202,7 @@ public class ResourcelessJobRepository implements JobRepository {
 	@Override
 	@Nullable
 	public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
-		if (this.jobExecution == null || !this.jobExecution.getJobInstance().getId().equals(jobInstance.getId())) {
+		if (this.jobExecution == null || !(this.jobExecution.getJobInstance().getId() == jobInstance.getId())) {
 			return null;
 		}
 		return this.jobExecution.getStepExecutions()
@@ -206,18 +218,6 @@ public class ResourcelessJobRepository implements JobRepository {
 			.stream()
 			.filter(stepExecution -> stepExecution.getStepName().equals(stepName))
 			.count();
-	}
-
-	@Override
-	public void add(StepExecution stepExecution) {
-		stepExecution.setId(this.stepExecutionIdIncrementer++);
-	}
-
-	@Override
-	public void addAll(Collection<StepExecution> stepExecutions) {
-		for (StepExecution stepExecution : stepExecutions) {
-			this.add(stepExecution);
-		}
 	}
 
 	@Override

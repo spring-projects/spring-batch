@@ -210,8 +210,6 @@ public abstract class AbstractStep implements StoppableStep, InitializingBean, B
 			throws JobInterruptedException, UnexpectedJobExecutionException {
 
 		Assert.notNull(stepExecution, "stepExecution must not be null");
-		Assert.state(stepExecution.getId() != null,
-				"StepExecution has no id. It must be saved before it can be executed.");
 		stepExecution.getExecutionContext().put(SpringBatchVersion.BATCH_VERSION_KEY, SpringBatchVersion.getVersion());
 
 		if (logger.isDebugEnabled()) {
@@ -225,7 +223,8 @@ public abstract class AbstractStep implements StoppableStep, InitializingBean, B
 		stepExecution.setStatus(BatchStatus.STARTED);
 		Observation observation = MicrometerMetrics
 			.createObservation(BatchMetrics.METRICS_PREFIX + "step", this.observationRegistry)
-			.highCardinalityKeyValue(BatchMetrics.METRICS_PREFIX + "step.executionId", stepExecution.getId().toString())
+			.highCardinalityKeyValue(BatchMetrics.METRICS_PREFIX + "step.executionId",
+					String.valueOf(stepExecution.getId()))
 			.lowCardinalityKeyValue(BatchMetrics.METRICS_PREFIX + "step.name", stepExecution.getStepName())
 			.lowCardinalityKeyValue(BatchMetrics.METRICS_PREFIX + "step.type", getClass().getName())
 			.lowCardinalityKeyValue(BatchMetrics.METRICS_PREFIX + "step.job.name",

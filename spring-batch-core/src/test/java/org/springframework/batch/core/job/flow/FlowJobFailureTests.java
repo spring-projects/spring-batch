@@ -25,6 +25,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.JobInterruptedException;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.step.StepExecution;
@@ -36,6 +37,7 @@ import org.springframework.batch.core.job.flow.support.state.StepState;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.JdbcJobRepositoryFactoryBean;
 import org.springframework.batch.core.step.StepSupport;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
@@ -66,7 +68,10 @@ class FlowJobFailureTests {
 		factory.afterPropertiesSet();
 		JobRepository jobRepository = factory.getObject();
 		job.setJobRepository(jobRepository);
-		execution = jobRepository.createJobExecution("job", new JobParameters());
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = jobRepository.createJobInstance("job", jobParameters);
+		execution = jobRepository.createJobExecution(jobInstance, jobParameters, new ExecutionContext());
+
 	}
 
 	@Test

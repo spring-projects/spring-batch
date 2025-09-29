@@ -42,8 +42,8 @@ class StepContextTests {
 
 	private final List<String> list = new ArrayList<>();
 
-	private StepExecution stepExecution = new StepExecution("step",
-			new JobExecution(new JobInstance(2L, "job"), 0L, null), 1L);
+	private StepExecution stepExecution = new StepExecution(1L, "step",
+			new JobExecution(0L, new JobInstance(2L, "job"), new JobParameters()));
 
 	private StepContext context = new StepContext(stepExecution);
 
@@ -151,7 +151,7 @@ class StepContextTests {
 	void testJobParameters() {
 		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "bar").toJobParameters();
 		JobInstance instance = stepExecution.getJobExecution().getJobInstance();
-		stepExecution = new StepExecution("step", new JobExecution(instance, jobParameters));
+		stepExecution = new StepExecution("step", new JobExecution(1L, instance, jobParameters));
 		context = new StepContext(stepExecution);
 		assertEquals("bar", context.getJobParameters().get("foo"));
 	}
@@ -159,12 +159,6 @@ class StepContextTests {
 	@Test
 	void testContextId() {
 		assertEquals("execution#1", context.getId());
-	}
-
-	@Test
-	void testIllegalContextId() {
-		context = new StepContext(new StepExecution("foo", new JobExecution(0L)));
-		assertThrows(IllegalStateException.class, context::getId);
 	}
 
 }

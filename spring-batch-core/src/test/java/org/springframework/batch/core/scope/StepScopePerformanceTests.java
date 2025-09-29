@@ -21,6 +21,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.batch.item.ExecutionContext;
@@ -49,7 +51,8 @@ public class StepScopePerformanceTests implements ApplicationContextAware {
 		int count = doTest("vanilla", "warmup");
 		logger.info("Item count: " + count);
 		StepSynchronizationManager.close();
-		StepSynchronizationManager.register(new StepExecution("step", new JobExecution(0L), 1L));
+		StepSynchronizationManager
+			.register(new StepExecution("step", new JobExecution(0L, new JobInstance(1L, "job"), new JobParameters())));
 	}
 
 	@AfterEach

@@ -113,7 +113,7 @@ instance is returned depends on the provided
 `JobExecution` instance is returned
 immediately. You can then take the `id` of
 `JobExecution` instance
-(with `JobExecution.getJobId()`) and query the
+(with `JobExecution.getJobInstanceId()`) and query the
 `JobRepository` for the job's updated status
 using the `JobExplorer`. For more
 information, see

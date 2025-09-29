@@ -28,6 +28,7 @@ import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.JdbcJobRepositoryFactoryBean;
 import org.springframework.batch.core.step.StepSupport;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
@@ -56,7 +57,9 @@ class SimpleStepHandlerTests {
 		factory.setTransactionManager(new JdbcTransactionManager(embeddedDatabase));
 		factory.afterPropertiesSet();
 		jobRepository = factory.getObject();
-		jobExecution = jobRepository.createJobExecution("job", new JobParameters());
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = jobRepository.createJobInstance("job", jobParameters);
+		jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters, new ExecutionContext());
 		stepHandler = new SimpleStepHandler(jobRepository);
 		stepHandler.afterPropertiesSet();
 	}

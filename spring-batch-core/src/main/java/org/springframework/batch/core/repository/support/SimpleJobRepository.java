@@ -36,7 +36,6 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -70,82 +69,59 @@ public class SimpleJobRepository extends SimpleJobExplorer implements JobReposit
 		super(jobInstanceDao, jobExecutionDao, stepExecutionDao, ecDao);
 	}
 
-	@Override
-	public JobExecution createJobExecution(String jobName, JobParameters jobParameters)
+	/**
+	 * Create a new {@link JobExecution} for the given {@link JobInstance} and
+	 * {@link JobParameters}, and associate the provided {@link ExecutionContext} with the
+	 * new {@link JobExecution}.
+	 * @param jobInstance the job instance to which the execution belongs
+	 * @param jobParameters the runtime parameters for the job
+	 * @param executionContext the execution context to associate with the job execution
+	 * @return the new job execution
+	 * @throws JobExecutionAlreadyRunningException
+	 * @throws JobRestartException
+	 * @throws JobInstanceAlreadyCompleteException
+	 * @since 6.0
+	 */
+	public JobExecution createJobExecution(JobInstance jobInstance, JobParameters jobParameters,
+			ExecutionContext executionContext)
 			throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
 
-		Assert.notNull(jobName, "Job name must not be null.");
-		Assert.notNull(jobParameters, "JobParameters must not be null.");
-
-		/*
-		 * Find all jobs matching the runtime information.
-		 *
-		 * If this method is transactional, and the isolation level is REPEATABLE_READ or
-		 * better, another launcher trying to start the same job in another thread or
-		 * process will block until this transaction has finished.
-		 */
-
-		JobInstance jobInstance = jobInstanceDao.getJobInstance(jobName, jobParameters);
-		ExecutionContext executionContext;
-
-		// existing job instance found
-		if (jobInstance != null) {
-
-			List<JobExecution> executions = jobExecutionDao.findJobExecutions(jobInstance);
-
-			if (executions.isEmpty()) {
-				throw new IllegalStateException("Cannot find any job execution for job instance: " + jobInstance);
-			}
-
-			// check for running executions and find the last started
-			for (JobExecution execution : executions) {
-				if (execution.isRunning()) {
-					throw new JobExecutionAlreadyRunningException(
-							"A job execution for this job is already running: " + jobInstance);
-				}
-				BatchStatus status = execution.getStatus();
-				if (status == BatchStatus.UNKNOWN) {
-					throw new JobRestartException("Cannot restart job from UNKNOWN status. "
-							+ "The last execution ended with a failure that could not be rolled back, "
-							+ "so it may be dangerous to proceed. Manual intervention is probably necessary.");
-				}
-				JobParameters allJobParameters = execution.getJobParameters();
-				JobParameters identifyingJobParameters = new JobParameters(allJobParameters.getIdentifyingParameters());
-				if (!identifyingJobParameters.isEmpty()
-						&& (status == BatchStatus.COMPLETED || status == BatchStatus.ABANDONED)) {
-					throw new JobInstanceAlreadyCompleteException(
-							"A job instance already exists and is complete for identifying parameters="
-									+ identifyingJobParameters + ".  If you want to run this job again, "
-									+ "change the parameters.");
-				}
-			}
-			executionContext = ecDao.getExecutionContext(jobExecutionDao.getLastJobExecution(jobInstance));
-		}
-		else {
-			// no job found, create one
-			jobInstance = jobInstanceDao.createJobInstance(jobName, jobParameters);
-			executionContext = new ExecutionContext();
-		}
-
-		JobExecution jobExecution = new JobExecution(jobInstance, jobParameters);
+		JobExecution jobExecution = jobExecutionDao.createJobExecution(jobInstance, jobParameters);
 		jobExecution.setExecutionContext(executionContext);
-		jobExecution.setLastUpdated(LocalDateTime.now());
-
-		// Save the JobExecution so that it picks up an ID (useful for clients
-		// monitoring asynchronous executions):
-		jobExecutionDao.saveJobExecution(jobExecution);
 		ecDao.saveExecutionContext(jobExecution);
 
-		return jobExecution;
+		// add the jobExecution to the jobInstance
+		jobInstance.addJobExecution(jobExecution);
 
+		return jobExecution;
+	}
+
+	/**
+	 * Create a new {@link StepExecution} for the given {@link JobExecution} and step
+	 * name, associate a new {@link ExecutionContext} with the new {@link StepExecution},
+	 * and add the new {@link StepExecution} to the {@link JobExecution}.
+	 * @param stepName the name of the step
+	 * @param jobExecution the job execution to which the step execution belongs
+	 * @return the new step execution
+	 * @since 6.0
+	 */
+	public StepExecution createStepExecution(String stepName, JobExecution jobExecution) {
+		Assert.notNull(jobExecution, "JobExecution must not be null.");
+		Assert.notNull(stepName, "Step name must not be null.");
+
+		StepExecution stepExecution = stepExecutionDao.createStepExecution(stepName, jobExecution);
+		ecDao.saveExecutionContext(stepExecution);
+		jobExecution.addStepExecution(stepExecution);
+
+		// TODO check if this update is necessary
+		jobExecutionDao.updateJobExecution(jobExecution);
+		return stepExecution;
 	}
 
 	@Override
 	public void update(JobExecution jobExecution) {
 
 		Assert.notNull(jobExecution, "JobExecution cannot be null.");
-		Assert.notNull(jobExecution.getJobId(), "JobExecution must have a Job ID set.");
-		Assert.notNull(jobExecution.getId(), "JobExecution must be already saved (have an id assigned).");
 
 		jobExecution.setLastUpdated(LocalDateTime.now());
 
@@ -157,26 +133,6 @@ public class SimpleJobRepository extends SimpleJobExplorer implements JobReposit
 			jobExecution.upgradeStatus(BatchStatus.STOPPED);
 		}
 		jobExecutionDao.updateJobExecution(jobExecution);
-	}
-
-	@Override
-	public void add(StepExecution stepExecution) {
-		validateStepExecution(stepExecution);
-
-		stepExecution.setLastUpdated(LocalDateTime.now());
-		stepExecutionDao.saveStepExecution(stepExecution);
-		ecDao.saveExecutionContext(stepExecution);
-	}
-
-	@Override
-	public void addAll(Collection<StepExecution> stepExecutions) {
-		Assert.notNull(stepExecutions, "Attempt to save a null collection of step executions");
-		for (StepExecution stepExecution : stepExecutions) {
-			validateStepExecution(stepExecution);
-			stepExecution.setLastUpdated(LocalDateTime.now());
-		}
-		stepExecutionDao.saveStepExecutions(stepExecutions);
-		ecDao.saveExecutionContexts(stepExecutions);
 	}
 
 	@Override

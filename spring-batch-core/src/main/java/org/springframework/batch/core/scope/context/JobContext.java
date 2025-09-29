@@ -182,8 +182,6 @@ public class JobContext extends SynchronizedAttributeAccessor {
 	 * @return unique identifier for this context based on the step execution
 	 */
 	public String getId() {
-		Assert.state(jobExecution.getId() != null,
-				"JobExecution has no id.  " + "It must be saved before it can be used in job scope.");
 		return "jobExecution#" + jobExecution.getId();
 	}
 
