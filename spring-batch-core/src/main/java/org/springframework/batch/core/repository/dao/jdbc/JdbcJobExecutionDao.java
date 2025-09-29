@@ -39,20 +39,10 @@ import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameter;
 import org.springframework.batch.core.job.parameters.JobParameters;
-import org.springframework.batch.core.converter.DateToStringConverter;
-import org.springframework.batch.core.converter.LocalDateTimeToStringConverter;
-import org.springframework.batch.core.converter.LocalDateToStringConverter;
-import org.springframework.batch.core.converter.LocalTimeToStringConverter;
-import org.springframework.batch.core.converter.StringToDateConverter;
-import org.springframework.batch.core.converter.StringToLocalDateConverter;
-import org.springframework.batch.core.converter.StringToLocalDateTimeConverter;
-import org.springframework.batch.core.converter.StringToLocalTimeConverter;
 import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDao;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.dao.NoSuchObjectException;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.core.convert.support.ConfigurableConversionService;
-import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.jdbc.core.RowCallbackHandler;
@@ -157,22 +147,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 
 	private DataFieldMaxValueIncrementer jobExecutionIncrementer;
 
-	private ConfigurableConversionService conversionService;
-
 	private final Lock lock = new ReentrantLock();
-
-	public JdbcJobExecutionDao() {
-		DefaultConversionService conversionService = new DefaultConversionService();
-		conversionService.addConverter(new DateToStringConverter());
-		conversionService.addConverter(new StringToDateConverter());
-		conversionService.addConverter(new LocalDateToStringConverter());
-		conversionService.addConverter(new StringToLocalDateConverter());
-		conversionService.addConverter(new LocalTimeToStringConverter());
-		conversionService.addConverter(new StringToLocalTimeConverter());
-		conversionService.addConverter(new LocalDateTimeToStringConverter());
-		conversionService.addConverter(new StringToLocalDateTimeConverter());
-		this.conversionService = conversionService;
-	}
 
 	/**
 	 * Public setter for the exit message length in database. Do not set this if you
@@ -190,15 +165,6 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	 */
 	public void setJobExecutionIncrementer(DataFieldMaxValueIncrementer jobExecutionIncrementer) {
 		this.jobExecutionIncrementer = jobExecutionIncrementer;
-	}
-
-	/**
-	 * Set the conversion service to use to convert job parameters from String literals to
-	 * typed values and vice versa.
-	 */
-	public void setConversionService(@NonNull ConfigurableConversionService conversionService) {
-		Assert.notNull(conversionService, "conversionService must not be null");
-		this.conversionService = conversionService;
 	}
 
 	@Override
@@ -432,7 +398,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 
 		String identifyingFlag = identifying ? "Y" : "N";
 
-		String stringValue = this.conversionService.convert(value, String.class);
+		String stringValue = getConversionService().convert(value, String.class);
 
 		preparedStatement.setLong(1, executionId);
 		preparedStatement.setString(2, key);
@@ -459,7 +425,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 				throw new RuntimeException(e);
 			}
 			String stringValue = rs.getString("PARAMETER_VALUE");
-			Object typedValue = conversionService.convert(stringValue, parameterType);
+			Object typedValue = getConversionService().convert(stringValue, parameterType);
 
 			boolean identifying = rs.getString("IDENTIFYING").equalsIgnoreCase("Y");
 

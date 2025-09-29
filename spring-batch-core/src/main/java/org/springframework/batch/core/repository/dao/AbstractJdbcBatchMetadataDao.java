@@ -18,7 +18,10 @@ package org.springframework.batch.core.repository.dao;
 
 import java.sql.Types;
 
+import org.springframework.batch.core.converter.*;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.core.convert.support.ConfigurableConversionService;
+import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -46,6 +49,8 @@ public abstract class AbstractJdbcBatchMetadataDao implements InitializingBean {
 	private int clobTypeToUse = Types.CLOB;
 
 	private JdbcOperations jdbcTemplate;
+
+	private ConfigurableConversionService conversionService;
 
 	protected String getQuery(String base) {
 		return StringUtils.replace(base, "%PREFIX%", tablePrefix);
@@ -80,9 +85,34 @@ public abstract class AbstractJdbcBatchMetadataDao implements InitializingBean {
 		this.clobTypeToUse = clobTypeToUse;
 	}
 
+	/**
+	 * Set the conversion service to use to convert job parameters from String literals to
+	 * typed values and vice versa.
+	 */
+	public void setConversionService(ConfigurableConversionService conversionService) {
+		Assert.notNull(conversionService, "conversionService must not be null");
+		this.conversionService = conversionService;
+	}
+
+	public ConfigurableConversionService getConversionService() {
+		return conversionService;
+	}
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(jdbcTemplate != null, "JdbcOperations is required");
+		if (this.conversionService == null) {
+			DefaultConversionService conversionService = new DefaultConversionService();
+			conversionService.addConverter(new DateToStringConverter());
+			conversionService.addConverter(new StringToDateConverter());
+			conversionService.addConverter(new LocalDateToStringConverter());
+			conversionService.addConverter(new StringToLocalDateConverter());
+			conversionService.addConverter(new LocalTimeToStringConverter());
+			conversionService.addConverter(new StringToLocalTimeConverter());
+			conversionService.addConverter(new LocalDateTimeToStringConverter());
+			conversionService.addConverter(new StringToLocalDateTimeConverter());
+			this.conversionService = conversionService;
+		}
 	}
 
 }
