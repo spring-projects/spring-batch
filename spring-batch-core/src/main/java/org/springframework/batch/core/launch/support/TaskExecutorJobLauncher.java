@@ -102,10 +102,16 @@ public class TaskExecutorJobLauncher implements JobLauncher, InitializingBean {
 	public JobExecution run(final Job job, final JobParameters jobParameters)
 			throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException,
 			JobParametersInvalidException {
-
 		Assert.notNull(job, "The Job must not be null.");
 		Assert.notNull(jobParameters, "The JobParameters must not be null.");
+		JobExecution jobExecution = createJobExecution(job, jobParameters);
+		launchJobExecution(job, jobExecution);
+		return jobExecution;
+	}
 
+	private JobExecution createJobExecution(Job job, JobParameters jobParameters)
+			throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException,
+			JobParametersInvalidException {
 		JobInstance jobInstance = jobRepository.getJobInstance(job.getName(), jobParameters);
 		ExecutionContext executionContext;
 		if (jobInstance == null) { // fresh start
@@ -189,8 +195,17 @@ public class TaskExecutorJobLauncher implements JobLauncher, InitializingBean {
 		 * execution for this instance between the last assertion and the next method
 		 * returning successfully.
 		 */
-		final JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
-				executionContext);
+		return jobRepository.createJobExecution(jobInstance, jobParameters, executionContext);
+	}
+
+	/**
+	 * Launch the job execution using the task executor.
+	 * @param job the job to be executed.
+	 * @param jobExecution the job execution to be used for this run.
+	 * @since 6.0
+	 */
+	protected void launchJobExecution(Job job, JobExecution jobExecution) {
+		JobParameters jobParameters = jobExecution.getJobParameters();
 		try {
 			taskExecutor.execute(new Runnable() {
 
@@ -237,10 +252,11 @@ public class TaskExecutorJobLauncher implements JobLauncher, InitializingBean {
 			if (jobExecution.getExitStatus().equals(ExitStatus.UNKNOWN)) {
 				jobExecution.setExitStatus(ExitStatus.FAILED.addExitDescription(e));
 			}
-			jobRepository.update(jobExecution); // FIXME should be in finally block
-		}
 
-		return jobExecution;
+		}
+		finally {
+			this.jobRepository.update(jobExecution);
+		}
 	}
 
 	/**
