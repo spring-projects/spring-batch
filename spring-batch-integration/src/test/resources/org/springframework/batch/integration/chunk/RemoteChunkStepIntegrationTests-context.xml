@@ -51,9 +51,9 @@
 	<integration:channel id="replies">
 		<integration:queue />
 	</integration:channel>
-	<integration:service-activator input-channel="requests" output-channel="replies" ref="chunkHandler" />
+	<integration:service-activator input-channel="requests" output-channel="replies" ref="chunkRequestHandler" />
 
-	<bean id="chunkHandler" class="org.springframework.batch.integration.chunk.RemoteChunkHandlerFactoryBean">
+	<bean id="chunkRequestHandler" class="org.springframework.batch.integration.chunk.RemoteChunkHandlerFactoryBean">
 		<property name="chunkWriter" ref="chunkWriter" />
 		<property name="step" ref="step" />
 	</bean>

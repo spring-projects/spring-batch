@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,22 +22,23 @@ package org.springframework.batch.integration.chunk;
  * response needs to be generated containing a summary of the result.
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  * @param <T> the type of the items to be processed (it is recommended to use a Memento
  * like a primary key)
  */
-public interface ChunkHandler<T> {
+public interface ChunkRequestHandler<T> {
 
 	/**
-	 * Handle the chunk, processing all the items and returning a response summarising the
-	 * result. If the result is a failure then the response should say so. The handler
-	 * only throws an exception if it needs to roll back a transaction and knows that the
-	 * request will be re-delivered (if not to the same handler then to one processing the
-	 * same Step).
+	 * Handle the chunk request, processing all the items and returning a response
+	 * summarising the result. If the result is a failure then the response should say so.
+	 * The handler only throws an exception if it needs to roll back a transaction and
+	 * knows that the request will be re-delivered (if not to the same handler then to one
+	 * processing the same Step).
 	 * @param chunk a request containing the chunk to process
 	 * @return a response summarising the result
 	 * @throws Exception if the handler needs to roll back a transaction and have the
 	 * chunk re-delivered
 	 */
-	ChunkResponse handleChunk(ChunkRequest<T> chunk) throws Exception;
+	ChunkResponse handle(ChunkRequest<T> chunk) throws Exception;
 
 }

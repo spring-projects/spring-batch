@@ -88,13 +88,13 @@
 	<integration:channel id="replies">
 		<integration:queue message-store="messageStore" />
 	</integration:channel>
-	<integration:service-activator input-channel="requests" output-channel="replies" ref="chunkHandler">
+	<integration:service-activator input-channel="requests" output-channel="replies" ref="chunkRequestHandler">
 		<integration:poller fixed-delay="100">
 			<integration:transactional isolation="READ_COMMITTED" />
 		</integration:poller>
 	</integration:service-activator>
 
-	<bean id="chunkHandler" class="org.springframework.batch.integration.chunk.RemoteChunkHandlerFactoryBean">
+	<bean id="chunkRequestHandler" class="org.springframework.batch.integration.chunk.RemoteChunkHandlerFactoryBean">
 		<property name="chunkWriter" ref="chunkWriter" />
 		<property name="step" ref="step" />
 	</bean>

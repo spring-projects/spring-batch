@@ -17,7 +17,7 @@
 	</channel>
 	<beans:bean id="transactionManager" class="org.springframework.batch.support.transaction.ResourcelessTransactionManager" />
 	<tx:annotation-driven />
-	<beans:bean id="chunkHandler" class="org.springframework.batch.integration.chunk.ChunkProcessorChunkHandler">
+	<beans:bean id="chunkRequestHandler" class="org.springframework.batch.integration.chunk.ChunkProcessorChunkRequestHandler">
 		<beans:property name="chunkProcessor">
 			<beans:bean class="org.springframework.batch.core.step.item.SimpleChunkProcessor">
 				<beans:property name="itemWriter">
@@ -29,5 +29,5 @@
 			</beans:bean>
 		</beans:property>
 	</beans:bean>
-	<service-activator input-channel="requests" output-channel="replies" ref="chunkHandler" />
+	<service-activator input-channel="requests" output-channel="replies" ref="chunkRequestHandler" />
 </beans:beans>

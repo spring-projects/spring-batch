@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2023 the original author or authors.
+ * Copyright 2008-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,9 +24,9 @@ import org.springframework.batch.test.MetaDataInstanceFactory;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class ChunkProcessorChunkHandlerTests {
+class ChunkProcessorChunkRequestHandlerTests {
 
-	private final ChunkProcessorChunkHandler<Object> handler = new ChunkProcessorChunkHandler<>();
+	private final ChunkProcessorChunkRequestHandler<Object> handler = new ChunkProcessorChunkRequestHandler<>();
 
 	protected int count = 0;
 
@@ -39,7 +39,7 @@ class ChunkProcessorChunkHandlerTests {
 		ChunkRequest chunkRequest = new ChunkRequest<>(0, items, 12L, stepContribution);
 
 		// when
-		ChunkResponse response = handler.handleChunk(chunkRequest);
+		ChunkResponse response = handler.handle(chunkRequest);
 
 		// then
 		assertEquals(stepContribution, response.getStepContribution());

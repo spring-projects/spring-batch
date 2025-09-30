@@ -49,7 +49,7 @@ import org.springframework.util.ReflectionUtils;
  * @author Mahmoud Ben Hassine
  *
  */
-public class RemoteChunkHandlerFactoryBean<T> implements FactoryBean<ChunkHandler<T>> {
+public class RemoteChunkHandlerFactoryBean<T> implements FactoryBean<ChunkRequestHandler<T>> {
 
 	private static final Log logger = LogFactory.getLog(RemoteChunkHandlerFactoryBean.class);
 
@@ -87,13 +87,14 @@ public class RemoteChunkHandlerFactoryBean<T> implements FactoryBean<ChunkHandle
 	}
 
 	/**
-	 * The type of object created by this factory. Returns {@link ChunkHandler} class.
+	 * The type of object created by this factory. Returns {@link ChunkRequestHandler}
+	 * class.
 	 *
 	 * @see FactoryBean#getObjectType()
 	 */
 	@Override
 	public Class<?> getObjectType() {
-		return ChunkHandler.class;
+		return ChunkRequestHandler.class;
 	}
 
 	/**
@@ -107,14 +108,15 @@ public class RemoteChunkHandlerFactoryBean<T> implements FactoryBean<ChunkHandle
 	}
 
 	/**
-	 * Builds a {@link ChunkHandler} from the {@link ChunkProcessor} extracted from the
-	 * {@link #setStep(TaskletStep) step} provided. Also modifies the step to send chunks
-	 * to the chunk handler via the {@link #setChunkWriter(ItemWriter) chunk writer}.
+	 * Builds a {@link ChunkRequestHandler} from the {@link ChunkProcessor} extracted from
+	 * the {@link #setStep(TaskletStep) step} provided. Also modifies the step to send
+	 * chunks to the chunk handler via the {@link #setChunkWriter(ItemWriter) chunk
+	 * writer}.
 	 *
 	 * @see FactoryBean#getObject()
 	 */
 	@Override
-	public ChunkHandler<T> getObject() throws Exception {
+	public ChunkRequestHandler<T> getObject() throws Exception {
 
 		if (stepContributionSource == null) {
 			Assert.state(chunkWriter instanceof StepContributionSource,
@@ -143,7 +145,7 @@ public class RemoteChunkHandlerFactoryBean<T> implements FactoryBean<ChunkHandle
 			step.registerStepExecutionListener(stepExecutionListener);
 		}
 
-		ChunkProcessorChunkHandler<T> handler = new ChunkProcessorChunkHandler<>();
+		ChunkProcessorChunkRequestHandler<T> handler = new ChunkProcessorChunkRequestHandler<>();
 		setNonBuffering(chunkProcessor);
 		handler.setChunkProcessor(chunkProcessor);
 		// TODO: create step context for the processor in case it has

@@ -63,4 +63,4 @@ and message-oriented middleware (JMS, AQ, MQ, Tibco etc.) gives us a lot of resi
 a system where there is feedback between downstream and upstream stages, so the number of consumers can be adjusted to account for the amount of demand.
 So how does this fit into Spring Batch? The spring-batch-integration project has this pattern implemented in Spring Integration,
 and can be used to scale up the remote processing of any step with many items to process.
-See in particular the "chunk" package, and the `ItemWriter` and `ChunkHandler` implementations in there.
+See in particular the "chunk" package, and the `ItemWriter` and `ChunkRequestHandler` implementations in there.

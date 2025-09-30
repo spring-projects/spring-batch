@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 the original author or authors.
+ * Copyright 2018-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,12 +27,13 @@ import org.springframework.util.Assert;
  * Builder for a worker in a remote chunking setup. This builder:
  *
  * <ul>
- * <li>creates a {@link ChunkProcessorChunkHandler} with the provided item processor and
- * writer. If no item processor is provided, a {@link PassThroughItemProcessor} will be
- * used</li>
- * <li>creates an {@link IntegrationFlow} with the {@link ChunkProcessorChunkHandler} as a
- * service activator which listens to incoming requests on <code>inputChannel</code> and
- * sends replies on <code>outputChannel</code></li>
+ * <li>creates a {@link ChunkProcessorChunkRequestHandler} with the provided item
+ * processor and writer. If no item processor is provided, a
+ * {@link PassThroughItemProcessor} will be used</li>
+ * <li>creates an {@link IntegrationFlow} with the
+ * {@link ChunkProcessorChunkRequestHandler} as a service activator which listens to
+ * incoming requests on <code>inputChannel</code> and sends replies on
+ * <code>outputChannel</code></li>
  * </ul>
  *
  * @param <I> type of input items
@@ -42,7 +43,7 @@ import org.springframework.util.Assert;
  */
 public class RemoteChunkingWorkerBuilder<I, O> {
 
-	private static final String SERVICE_ACTIVATOR_METHOD_NAME = "handleChunk";
+	private static final String SERVICE_ACTIVATOR_METHOD_NAME = "handle";
 
 	private ItemProcessor<I, O> itemProcessor;
 
@@ -97,7 +98,7 @@ public class RemoteChunkingWorkerBuilder<I, O> {
 	}
 
 	/**
-	 * Create an {@link IntegrationFlow} with a {@link ChunkProcessorChunkHandler}
+	 * Create an {@link IntegrationFlow} with a {@link ChunkProcessorChunkRequestHandler}
 	 * configured as a service activator listening to the input channel and replying on
 	 * the output channel.
 	 * @return the integration flow
@@ -113,11 +114,11 @@ public class RemoteChunkingWorkerBuilder<I, O> {
 		}
 		SimpleChunkProcessor<I, O> chunkProcessor = new SimpleChunkProcessor<>(this.itemProcessor, this.itemWriter);
 
-		ChunkProcessorChunkHandler<I> chunkProcessorChunkHandler = new ChunkProcessorChunkHandler<>();
-		chunkProcessorChunkHandler.setChunkProcessor(chunkProcessor);
+		ChunkProcessorChunkRequestHandler<I> chunkProcessorChunkRequestHandler = new ChunkProcessorChunkRequestHandler<>();
+		chunkProcessorChunkRequestHandler.setChunkProcessor(chunkProcessor);
 
 		return IntegrationFlow.from(this.inputChannel)
-			.handle(chunkProcessorChunkHandler, SERVICE_ACTIVATOR_METHOD_NAME)
+			.handle(chunkProcessorChunkRequestHandler, SERVICE_ACTIVATOR_METHOD_NAME)
 			.channel(this.outputChannel)
 			.get();
 	}

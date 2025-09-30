@@ -545,7 +545,7 @@ XML::
 The following example shows the worker configuration in XML:
 +
 .XML Configuration
-[source, xml]
+[source,xml]
 ----
 <bean id="connectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
   <property name="brokerURL" value="tcp://localhost:61616"/>
@@ -570,7 +570,7 @@ The following example shows the worker configuration in XML:
     method="handleChunk"/>
 
 <bean id="chunkProcessorChunkHandler"
-    class="org.springframework.batch.integration.chunk.ChunkProcessorChunkHandler">
+    class="org.springframework.batch.integration.chunk.ChunkProcessorChunkRequestHandler">
   <property name="chunkProcessor">
     <bean class="org.springframework.batch.core.step.item.SimpleChunkProcessor">
       <property name="itemWriter">
@@ -593,7 +593,7 @@ manager configuration. Workers do not need access to
 the Spring Batch `JobRepository` nor
 to the actual job configuration file. The main bean of interest
 is the `chunkProcessorChunkHandler`. The
-`chunkProcessor` property of `ChunkProcessorChunkHandler` takes a
+`chunkProcessor` property of `ChunkProcessorChunkRequestHandler` takes a
 configured `SimpleChunkProcessor`, which is where you would provide a reference to your
 `ItemWriter` (and, optionally, your
 `ItemProcessor`) that will run on the worker
@@ -627,12 +627,12 @@ You need not explicitly configure `ChunkMessageChannelItemWriter` and the `Messa
 On the worker side, the `RemoteChunkingWorkerBuilder` lets you configure a worker to:
 
 * Listen to requests sent by the manager on the input channel ("`Incoming requests`")
-* Call the `handleChunk` method of `ChunkProcessorChunkHandler` for each request
+* Call the `handleChunk` method of `ChunkProcessorChunkRequestHandler` for each request
 with the configured `ItemProcessor` and `ItemWriter`
 * Send replies on the output channel ("`Outgoing replies`") to the manager
 
 You need not explicitly configure the `SimpleChunkProcessor`
-and the `ChunkProcessorChunkHandler`. (You can still explicitly configure them if you find
+and the `ChunkProcessorChunkRequestHandler`. (You can still explicitly configure them if you find
    a reason to do so).
 
 The following example shows how to use these APIs:

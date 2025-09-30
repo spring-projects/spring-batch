@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2023 the original author or authors.
+ * Copyright 2014-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package org.springframework.batch.integration.config.xml;
 import org.w3c.dom.Element;
 
 import org.springframework.batch.core.step.item.SimpleChunkProcessor;
-import org.springframework.batch.integration.chunk.ChunkProcessorChunkHandler;
+import org.springframework.batch.integration.chunk.ChunkProcessorChunkRequestHandler;
 import org.springframework.batch.item.support.PassThroughItemProcessor;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
@@ -60,7 +60,7 @@ public class RemoteChunkingWorkerParser extends AbstractBeanDefinitionParser {
 
 	private static final String CHUNK_PROCESSOR_PROPERTY_NAME = "chunkProcessor";
 
-	private static final String CHUNK_PROCESSOR_CHUNK_HANDLER_BEAN_NAME_PREFIX = "chunkProcessorChunkHandler_";
+	private static final String CHUNK_PROCESSOR_CHUNK_HANDLER_BEAN_NAME_PREFIX = "chunkProcessorChunkRequestHandler_";
 
 	@Override
 	protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext) {
@@ -92,7 +92,7 @@ public class RemoteChunkingWorkerParser extends AbstractBeanDefinitionParser {
 		}
 
 		BeanDefinition chunkProcessorChunkHandler = BeanDefinitionBuilder
-			.genericBeanDefinition(ChunkProcessorChunkHandler.class)
+			.genericBeanDefinition(ChunkProcessorChunkRequestHandler.class)
 			.addPropertyValue(CHUNK_PROCESSOR_PROPERTY_NAME, chunkProcessorBuilder.getBeanDefinition())
 			.getBeanDefinition();
 
@@ -110,9 +110,9 @@ public class RemoteChunkingWorkerParser extends AbstractBeanDefinitionParser {
 
 		private static final String TARGET_OBJECT_PROPERTY_NAME = "targetObject";
 
-		private static final String HANDLE_CHUNK_METHOD_NAME = "handleChunk";
+		private static final String HANDLE_CHUNK_METHOD_NAME = "handle";
 
-		private static final String CHUNK_PROCESSOR_CHUNK_HANDLER_BEAN_NAME_PREFIX = "chunkProcessorChunkHandler_";
+		private static final String CHUNK_PROCESSOR_CHUNK_HANDLER_BEAN_NAME_PREFIX = "chunkProcessorChunkRequestHandler_";
 
 		private final String id;
 

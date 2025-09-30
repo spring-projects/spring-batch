@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,10 +33,10 @@ import org.springframework.retry.RetryException;
 import org.springframework.util.Assert;
 
 /**
- * A {@link ChunkHandler} based on a {@link ChunkProcessor}. Knows how to distinguish
- * between a processor that is fault tolerant, and one that is not. If the processor is
- * fault tolerant then exceptions can be propagated on the assumption that there will be a
- * roll back and the request will be re-delivered.
+ * A {@link ChunkRequestHandler} based on a {@link ChunkProcessor}. Knows how to
+ * distinguish between a processor that is fault tolerant, and one that is not. If the
+ * processor is fault tolerant then exceptions can be propagated on the assumption that
+ * there will be a roll back and the request will be re-delivered.
  *
  * @author Dave Syer
  * @author Michael Minella
@@ -44,9 +44,9 @@ import org.springframework.util.Assert;
  * @param <S> the type of the items in the chunk to be handled
  */
 @MessageEndpoint
-public class ChunkProcessorChunkHandler<S> implements ChunkHandler<S>, InitializingBean {
+public class ChunkProcessorChunkRequestHandler<S> implements ChunkRequestHandler<S>, InitializingBean {
 
-	private static final Log logger = LogFactory.getLog(ChunkProcessorChunkHandler.class);
+	private static final Log logger = LogFactory.getLog(ChunkProcessorChunkRequestHandler.class);
 
 	private ChunkProcessor<S> chunkProcessor;
 
@@ -65,11 +65,11 @@ public class ChunkProcessorChunkHandler<S> implements ChunkHandler<S>, Initializ
 
 	/**
 	 *
-	 * @see ChunkHandler#handleChunk(ChunkRequest)
+	 * @see ChunkRequestHandler#handle(ChunkRequest)
 	 */
 	@Override
 	@ServiceActivator
-	public ChunkResponse handleChunk(ChunkRequest<S> chunkRequest) throws Exception {
+	public ChunkResponse handle(ChunkRequest<S> chunkRequest) throws Exception {
 
 		if (logger.isDebugEnabled()) {
 			logger.debug("Handling chunk: " + chunkRequest);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2022 the original author or authors.
+ * Copyright 2014-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,9 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.step.item.ChunkProcessor;
 import org.springframework.batch.core.step.item.SimpleChunkProcessor;
-import org.springframework.batch.integration.chunk.ChunkHandler;
+import org.springframework.batch.integration.chunk.ChunkRequestHandler;
 import org.springframework.batch.integration.chunk.ChunkMessageChannelItemWriter;
-import org.springframework.batch.integration.chunk.ChunkProcessorChunkHandler;
+import org.springframework.batch.integration.chunk.ChunkProcessorChunkRequestHandler;
 import org.springframework.batch.integration.chunk.RemoteChunkHandlerFactoryBean;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemProcessor;
@@ -60,8 +60,8 @@ class RemoteChunkingParserTests {
 		ApplicationContext applicationContext = new ClassPathXmlApplicationContext(
 				"/org/springframework/batch/integration/config/xml/RemoteChunkingWorkerParserTests.xml");
 
-		ChunkHandler chunkHandler = applicationContext.getBean(ChunkProcessorChunkHandler.class);
-		ChunkProcessor chunkProcessor = (SimpleChunkProcessor) TestUtils.getPropertyValue(chunkHandler,
+		ChunkRequestHandler chunkRequestHandler = applicationContext.getBean(ChunkProcessorChunkRequestHandler.class);
+		ChunkProcessor chunkProcessor = (SimpleChunkProcessor) TestUtils.getPropertyValue(chunkRequestHandler,
 				"chunkProcessor");
 		assertNotNull(chunkProcessor, "ChunkProcessor must not be null");
 
@@ -84,10 +84,9 @@ class RemoteChunkingParserTests {
 
 		String targetMethodName = (String) TestUtils.getPropertyValue(serviceActivatorFactoryBean, "targetMethodName");
 		assertNotNull(targetMethodName, "Target method name must not be null");
-		assertEquals("handleChunk", targetMethodName,
-				"Target method name must be handleChunk, got: " + targetMethodName);
+		assertEquals("handle", targetMethodName, "Target method name must be handle, got: " + targetMethodName);
 
-		ChunkHandler targetObject = (ChunkHandler) TestUtils.getPropertyValue(serviceActivatorFactoryBean,
+		ChunkRequestHandler targetObject = (ChunkRequestHandler) TestUtils.getPropertyValue(serviceActivatorFactoryBean,
 				"targetObject");
 		assertNotNull(targetObject, "Target object must not be null");
 	}
@@ -98,8 +97,8 @@ class RemoteChunkingParserTests {
 		ApplicationContext applicationContext = new ClassPathXmlApplicationContext(
 				"/org/springframework/batch/integration/config/xml/RemoteChunkingWorkerParserNoProcessorTests.xml");
 
-		ChunkHandler chunkHandler = applicationContext.getBean(ChunkProcessorChunkHandler.class);
-		ChunkProcessor chunkProcessor = (SimpleChunkProcessor) TestUtils.getPropertyValue(chunkHandler,
+		ChunkRequestHandler chunkRequestHandler = applicationContext.getBean(ChunkProcessorChunkRequestHandler.class);
+		ChunkProcessor chunkProcessor = (SimpleChunkProcessor) TestUtils.getPropertyValue(chunkRequestHandler,
 				"chunkProcessor");
 		assertNotNull(chunkProcessor, "ChunkProcessor must not be null");
 
@@ -120,7 +119,7 @@ class RemoteChunkingParserTests {
 				"Messaging template must not be null");
 		assertNotNull(TestUtils.getPropertyValue(itemWriter, "replyChannel"), "Reply channel must not be null");
 
-		FactoryBean<ChunkHandler> remoteChunkingHandlerFactoryBean = applicationContext
+		FactoryBean<ChunkRequestHandler> remoteChunkingHandlerFactoryBean = applicationContext
 			.getBean(RemoteChunkHandlerFactoryBean.class);
 		assertNotNull(TestUtils.getPropertyValue(remoteChunkingHandlerFactoryBean, "chunkWriter"),
 				"Chunk writer must not be null");
