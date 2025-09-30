@@ -201,10 +201,30 @@ public class ResourcelessJobRepository implements JobRepository {
 		return stepExecution;
 	}
 
+	@Deprecated(since = "6.0", forRemoval = true)
 	@Override
 	@Nullable
 	public StepExecution getStepExecution(long jobExecutionId, long stepExecutionId) {
 		if (this.jobExecution == null || !(this.jobExecution.getId() == jobExecutionId)) {
+			return null;
+		}
+		return this.jobExecution.getStepExecutions()
+			.stream()
+			.filter(stepExecution -> stepExecution.getId() == stepExecutionId)
+			.findFirst()
+			.orElse(null);
+	}
+
+	/**
+	 * Retrieve a {@link StepExecution} by its id.
+	 * @param stepExecutionId the id of the step execution to retrieve
+	 * @return the {@link StepExecution} with the given id if it exists, null otherwise.
+	 * @since 6.0
+	 */
+	@Override
+	@Nullable
+	public StepExecution getStepExecution(long stepExecutionId) {
+		if (this.jobExecution == null) {
 			return null;
 		}
 		return this.jobExecution.getStepExecutions()

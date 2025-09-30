@@ -45,9 +45,8 @@ public class StepExecutionRequestHandler {
 	@ServiceActivator
 	public StepExecution handle(StepExecutionRequest request) {
 
-		Long jobExecutionId = request.getJobExecutionId();
 		Long stepExecutionId = request.getStepExecutionId();
-		StepExecution stepExecution = jobRepository.getStepExecution(jobExecutionId, stepExecutionId);
+		StepExecution stepExecution = jobRepository.getStepExecution(stepExecutionId);
 		if (stepExecution == null) {
 			throw new NoSuchStepException("No StepExecution could be located for this request: " + request);
 		}

@@ -249,6 +249,7 @@ public class SimpleJobExplorer implements JobExplorer {
 	 * ===================================================================================
 	 */
 
+	@Deprecated(since = "6.0", forRemoval = true)
 	@Nullable
 	@Override
 	public StepExecution getStepExecution(long jobExecutionId, long executionId) {

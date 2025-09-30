@@ -73,7 +73,7 @@ class JmsIntegrationTests {
 			// BATCH-1703: we are using a map dao so the step executions in the job
 			// execution are old and we need to
 			// pull them back out of the repository...
-			stepExecution = jobRepository.getStepExecution(jobExecution.getId(), stepExecution.getId());
+			stepExecution = jobRepository.getStepExecution(stepExecution.getId());
 			logger.debug(String.valueOf(stepExecution));
 			assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 		}

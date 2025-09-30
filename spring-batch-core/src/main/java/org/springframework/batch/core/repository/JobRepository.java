@@ -166,8 +166,8 @@ public interface JobRepository extends JobExplorer {
 	/**
 	 * Retrieve job executions by their job instance. The corresponding step executions
 	 * may not be fully hydrated (for example, their execution context may be missing),
-	 * depending on the implementation. In that case, use
-	 * {@link #getStepExecution(long, long)} to hydrate them.
+	 * depending on the implementation. In that case, use {@link #getStepExecution(long)}
+	 * to hydrate them.
 	 * @param jobInstance The {@link JobInstance} to query.
 	 * @return the list of all executions for the specified {@link JobInstance}.
 	 */
@@ -203,8 +203,7 @@ public interface JobRepository extends JobExplorer {
 	/**
 	 * Retrieve running job executions. The corresponding step executions may not be fully
 	 * hydrated (for example, their execution context may be missing), depending on the
-	 * implementation. In that case, use {@link #getStepExecution(long, long)} to hydrate
-	 * them.
+	 * implementation. In that case, use {@link #getStepExecution(long)} to hydrate them.
 	 * @param jobName The name of the job.
 	 * @return the set of running executions for jobs with the specified name.
 	 */
@@ -228,11 +227,24 @@ public interface JobRepository extends JobExplorer {
 	 * @return the {@link StepExecution} that has this ID or {@code null} if not found.
 	 *
 	 * @see #getJobExecution(long)
+	 * @deprecated since 6.0 in favor of {@link #getStepExecution(long)}
 	 */
-	// FIXME incorrect contract: stepExecutionId is globally unique, no need for
-	// jobExecutionId
+	@Deprecated(since = "6.0", forRemoval = true)
 	@Nullable
 	default StepExecution getStepExecution(long jobExecutionId, long stepExecutionId) {
+		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 * Retrieve a {@link StepExecution} by its ID. The execution context for the step
+	 * should be available in the result, and the parent job execution should have its
+	 * primitive properties, but it may not contain the job instance information.
+	 * @param stepExecutionId The step execution ID.
+	 * @return the {@link StepExecution} that has this ID or {@code null} if not found.
+	 * @since 6.0
+	 */
+	@Nullable
+	default StepExecution getStepExecution(long stepExecutionId) {
 		throw new UnsupportedOperationException();
 	}
 

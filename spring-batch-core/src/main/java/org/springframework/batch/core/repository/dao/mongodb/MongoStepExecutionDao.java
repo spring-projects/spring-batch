@@ -16,10 +16,11 @@
 package org.springframework.batch.core.repository.dao.mongodb;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+
+import org.jspecify.annotations.Nullable;
 
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
@@ -88,6 +89,8 @@ public class MongoStepExecutionDao implements StepExecutionDao {
 		this.mongoOperations.findAndReplace(query, stepExecutionToUpdate, STEP_EXECUTIONS_COLLECTION_NAME);
 	}
 
+	@Nullable
+	@Override
 	public StepExecution getStepExecution(long stepExecutionId) {
 		Query query = query(where("stepExecutionId").is(stepExecutionId));
 		org.springframework.batch.core.repository.persistence.StepExecution stepExecution = this.mongoOperations

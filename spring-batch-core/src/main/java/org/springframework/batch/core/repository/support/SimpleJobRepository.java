@@ -18,6 +18,8 @@ package org.springframework.batch.core.repository.support;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
@@ -78,6 +80,12 @@ public class SimpleJobRepository extends SimpleJobExplorer implements JobReposit
 	@Override
 	public List<JobInstance> findJobInstances(String jobName) {
 		return this.jobInstanceDao.getJobInstances(jobName);
+	}
+
+	@Nullable
+	@Override
+	public StepExecution getStepExecution(long executionId) {
+		return this.stepExecutionDao.getStepExecution(executionId);
 	}
 
 	/**

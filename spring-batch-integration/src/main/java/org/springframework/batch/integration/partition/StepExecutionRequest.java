@@ -32,6 +32,7 @@ public class StepExecutionRequest implements Serializable {
 
 	private String stepName;
 
+	// FIXME not used on the remote side, can we remove it?
 	private Long jobExecutionId;
 
 	private StepExecutionRequest() {
