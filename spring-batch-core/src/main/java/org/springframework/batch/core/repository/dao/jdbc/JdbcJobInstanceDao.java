@@ -114,6 +114,12 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 			ORDER BY JOB_INSTANCE_ID DESC
 			""";
 
+	private static final String FIND_JOB_INSTANCES_BY_JOB_NAME = """
+			SELECT JOB_INSTANCE_ID, JOB_NAME
+			FROM %PREFIX%JOB_INSTANCE
+			WHERE JOB_NAME LIKE ?
+			""";
+
 	private static final String FIND_LAST_JOB_INSTANCE_BY_JOB_NAME = """
 			SELECT JOB_INSTANCE_ID, JOB_NAME
 			FROM %PREFIX%JOB_INSTANCE I1
@@ -234,6 +240,17 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 		}
 
 		return getJdbcTemplate().query(getQuery(FIND_LAST_JOBS_BY_NAME), extractor, jobName);
+	}
+
+	/**
+	 * Fetch all job instances for the given job name.
+	 * @param jobName the job name
+	 * @return the job instances for the given name empty if none
+	 * @since 6.0
+	 */
+	@Override
+	public List<JobInstance> getJobInstances(String jobName) {
+		return getJdbcTemplate().query(getQuery(FIND_JOB_INSTANCES_BY_JOB_NAME), new JobInstanceRowMapper(), jobName);
 	}
 
 	@Override

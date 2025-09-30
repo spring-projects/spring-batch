@@ -81,7 +81,7 @@ class AmqpJobFunctionalTests {
 		this.jobOperatorTestUtils.startJob();
 
 		// when
-		int count = jobRepository.getJobInstances("amqp-example-job", 0, 1).size();
+		int count = jobRepository.findJobInstances("amqp-example-job").size();
 
 		// then
 		assertTrue(count > 0);
@@ -100,7 +100,7 @@ class AmqpJobFunctionalTests {
 
 		// then
 		JobRepository localJobRepository = context.getBean(JobRepository.class);
-		int count = localJobRepository.getJobInstances("amqp-config-job", 0, 1).size();
+		int count = localJobRepository.findJobInstances("amqp-config-job").size();
 		assertTrue(count > 0);
 	}
 

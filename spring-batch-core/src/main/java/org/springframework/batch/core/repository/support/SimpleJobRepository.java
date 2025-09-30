@@ -70,6 +70,17 @@ public class SimpleJobRepository extends SimpleJobExplorer implements JobReposit
 	}
 
 	/**
+	 * Fetch all {@link JobInstance} values for a given job name.
+	 * @param jobName The name of the job.
+	 * @return the {@link JobInstance} values.
+	 * @since 6.0
+	 */
+	@Override
+	public List<JobInstance> findJobInstances(String jobName) {
+		return this.jobInstanceDao.getJobInstances(jobName);
+	}
+
+	/**
 	 * Create a new {@link JobExecution} for the given {@link JobInstance} and
 	 * {@link JobParameters}, and associate the provided {@link ExecutionContext} with the
 	 * new {@link JobExecution}.

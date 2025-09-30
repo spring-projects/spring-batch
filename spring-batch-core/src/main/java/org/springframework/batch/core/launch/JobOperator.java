@@ -286,7 +286,7 @@ public interface JobOperator extends JobLauncher {
 	 * @throws NoSuchJobException is thrown if no {@link JobInstance}s for the jobName
 	 * exist.
 	 * @deprecated Since 6.0 in favor of
-	 * {@link org.springframework.batch.core.repository.JobRepository#getJobInstances(String, int, int)}.
+	 * {@link org.springframework.batch.core.repository.JobRepository#findJobInstances(String)}.
 	 * Scheduled for removal in 6.2 or later.
 	 */
 	@Deprecated(since = "6.0", forRemoval = true)

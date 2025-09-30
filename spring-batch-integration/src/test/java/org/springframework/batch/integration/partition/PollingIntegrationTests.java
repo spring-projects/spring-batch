@@ -55,9 +55,9 @@ class PollingIntegrationTests {
 
 	@Test
 	void testLaunchJob() throws Exception {
-		int before = jobRepository.getJobInstances(job.getName(), 0, 100).size();
+		int before = jobRepository.findJobInstances(job.getName()).size();
 		assertNotNull(jobOperator.start(job, new JobParameters()));
-		List<JobInstance> jobInstances = jobRepository.getJobInstances(job.getName(), 0, 100);
+		List<JobInstance> jobInstances = jobRepository.findJobInstances(job.getName());
 		int after = jobInstances.size();
 		assertEquals(1, after - before);
 		JobExecution jobExecution = jobRepository.getJobExecutions(jobInstances.get(jobInstances.size() - 1)).get(0);

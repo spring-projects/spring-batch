@@ -124,6 +124,32 @@ public class MongoJobInstanceDao implements JobInstanceDao {
 			.toList();
 	}
 
+	/**
+	 * Fetch all job instances for the given job name.
+	 * @param jobName the job name
+	 * @return the job instances for the given name empty if none
+	 * @since 6.0
+	 */
+	@Override
+	public List<JobInstance> getJobInstances(String jobName) {
+		Query query = query(where("jobName").is(jobName));
+		return this.mongoOperations
+			.find(query, org.springframework.batch.core.repository.persistence.JobInstance.class, COLLECTION_NAME)
+			.stream()
+			.map(this.jobInstanceConverter::toJobInstance)
+			.toList();
+	}
+
+	@Override
+	public List<Long> getJobInstanceIds(String jobName) {
+		Query query = query(where("jobName").is(jobName));
+		return this.mongoOperations
+			.find(query, org.springframework.batch.core.repository.persistence.JobInstance.class, COLLECTION_NAME)
+			.stream()
+			.map(org.springframework.batch.core.repository.persistence.JobInstance::getJobInstanceId)
+			.toList();
+	}
+
 	public List<JobInstance> findJobInstancesByName(String jobName) {
 		Query query = query(where("jobName").is(jobName));
 		return this.mongoOperations

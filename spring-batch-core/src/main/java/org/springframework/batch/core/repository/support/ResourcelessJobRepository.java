@@ -81,6 +81,21 @@ public class ResourcelessJobRepository implements JobRepository {
 		return Collections.singletonList(this.jobInstance);
 	}
 
+	/**
+	 * Find all {@link JobInstance}s for a given job name. In this implementation, only
+	 * one job instance is held, so if it is initialized, it is returned in a single-item
+	 * list.
+	 * @param jobName The name of the job to query.
+	 * @return a list of {@link JobInstance}s for the given job name.
+	 */
+	@Override
+	public List<JobInstance> findJobInstances(String jobName) {
+		if (this.jobInstance == null) {
+			return Collections.emptyList();
+		}
+		return Collections.singletonList(this.jobInstance);
+	}
+
 	@Override
 	@Nullable
 	public JobInstance getJobInstance(long instanceId) {

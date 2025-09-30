@@ -88,6 +88,16 @@ public interface JobRepository extends JobExplorer {
 	}
 
 	/**
+	 * Fetch all {@link JobInstance} values for a given job name.
+	 * @param jobName The name of the job.
+	 * @return the {@link JobInstance} values.
+	 * @since 6.0
+	 */
+	default List<JobInstance> findJobInstances(String jobName) {
+		return Collections.emptyList();
+	}
+
+	/**
 	 * @param jobInstanceId The ID for the {@link JobInstance} to obtain.
 	 * @return the {@code JobInstance} that has this ID, or {@code null} if not found.
 	 */

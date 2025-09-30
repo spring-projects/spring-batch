@@ -93,6 +93,16 @@ public interface JobInstanceDao {
 	List<JobInstance> getJobInstances(String jobName, int start, int count);
 
 	/**
+	 * Fetch all job instances for the given job name.
+	 * @param jobName the job name
+	 * @return the job instances for the given name empty if none
+	 * @since 6.0
+	 */
+	default List<JobInstance> getJobInstances(String jobName) {
+		return getJobInstanceIds(jobName).stream().map(jobInstanceId -> getJobInstance(jobInstanceId)).toList();
+	}
+
+	/**
 	 * Fetch the last job instance by Id for the given job.
 	 * @param jobName name of the job
 	 * @return the last job instance by Id if any or null otherwise
@@ -131,7 +141,7 @@ public interface JobInstanceDao {
 	 * @param count int containing the number of job instances to return.
 	 * @return a list of {@link JobInstance} for the job name requested.
 	 * @deprecated Since v6.0 and scheduled for removal in v6.2. Use
-	 * {@link #getJobInstances(String, int, int)}
+	 * {@link #getJobInstances(String)}
 	 */
 	@Deprecated(forRemoval = true)
 	List<JobInstance> findJobInstancesByName(String jobName, int start, int count);
