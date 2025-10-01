@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 the original author or authors.
+ * Copyright 2023-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,15 +22,21 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
 import org.springframework.batch.item.Chunk;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.SessionCallback;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+/**
+ * @author Mahmoud Ben Hassine
+ * @author Hyunwoo Jung
+ */
 @ExtendWith(MockitoExtension.class)
-public class RedisItemWriterTests {
+class RedisItemWriterTests {
 
 	@Mock(answer = Answers.RETURNS_DEEP_STUBS)
 	private RedisTemplate<String, String> redisTemplate;
@@ -38,16 +44,16 @@ public class RedisItemWriterTests {
 	private RedisItemWriter<String, String> redisItemWriter;
 
 	@BeforeEach
-	public void setup() {
+	void setup() {
 		this.redisItemWriter = new RedisItemWriter<>();
 		this.redisItemWriter.setRedisTemplate(this.redisTemplate);
 		this.redisItemWriter.setItemKeyMapper(new RedisItemKeyMapper());
-	}
 
-	@Test
-	void shouldWriteToRedisDatabaseUsingKeyValue() {
-		this.redisItemWriter.writeKeyValue("oneKey", "oneValue");
-		verify(this.redisTemplate.opsForValue()).set("oneKey", "oneValue");
+		when(this.redisTemplate.executePipelined(any(SessionCallback.class))).thenAnswer(invocation -> {
+			SessionCallback<?> sessionCallback = invocation.getArgument(0);
+			sessionCallback.execute(this.redisTemplate);
+			return null;
+		});
 	}
 
 	@Test
@@ -56,6 +62,15 @@ public class RedisItemWriterTests {
 		this.redisItemWriter.write(items);
 		verify(this.redisTemplate.opsForValue()).set(items.getItems().get(0), items.getItems().get(0));
 		verify(this.redisTemplate.opsForValue()).set(items.getItems().get(1), items.getItems().get(1));
+	}
+
+	@Test
+	void shouldDeleteAllItemsToRedis() throws Exception {
+		this.redisItemWriter.setDelete(true);
+		Chunk<String> items = new Chunk<>("val1", "val2");
+		this.redisItemWriter.write(items);
+		verify(this.redisTemplate).delete(items.getItems().get(0));
+		verify(this.redisTemplate).delete(items.getItems().get(0));
 	}
 
 	static class RedisItemKeyMapper implements Converter<String, String> {
