@@ -4,7 +4,7 @@
 
 As with other application styles, it is extremely important to unit test any code written
 as part of a batch job. The Spring core documentation covers how to unit and integration
-test with Spring in great detail, so it is not be repeated here. It is important, however,
+test with Spring in great detail, so it will not be repeated here. It is important, however,
 to think about how to "`end to end`" test a batch job, which is what this chapter covers.
 The `spring-batch-test` project includes classes that facilitate this end-to-end test
 approach.
