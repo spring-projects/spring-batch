@@ -37,26 +37,17 @@ import org.springframework.batch.item.file.transform.Name;
  */
 class PatternMatchingCompositeLineMapperTests {
 
-	private final PatternMatchingCompositeLineMapper<Name> mapper = new PatternMatchingCompositeLineMapper<>();
-
-	@Test
-	void testNoMappers() {
-		mapper.setTokenizers(Collections.singletonMap("", (LineTokenizer) new DelimitedLineTokenizer()));
-		Map<String, FieldSetMapper<Name>> fieldSetMappers = Collections.emptyMap();
-		assertThrows(IllegalArgumentException.class, () -> mapper.setFieldSetMappers(fieldSetMappers));
-	}
-
 	@Test
 	void testKeyFound() throws Exception {
 		Map<String, LineTokenizer> tokenizers = new HashMap<>();
 		tokenizers.put("foo*", line -> new DefaultFieldSet(new String[] { "a", "b" }));
 		tokenizers.put("bar*", line -> new DefaultFieldSet(new String[] { "c", "d" }));
-		mapper.setTokenizers(tokenizers);
 
 		Map<String, FieldSetMapper<Name>> fieldSetMappers = new HashMap<>();
 		fieldSetMappers.put("foo*", fs -> new Name(fs.readString(0), fs.readString(1), 0));
 		fieldSetMappers.put("bar*", fs -> new Name(fs.readString(1), fs.readString(0), 0));
-		mapper.setFieldSetMappers(fieldSetMappers);
+		PatternMatchingCompositeLineMapper<Name> mapper = new PatternMatchingCompositeLineMapper<>(tokenizers,
+				fieldSetMappers);
 
 		Name name = mapper.mapLine("bar", 1);
 		assertEquals(new Name("d", "c", 0), name);
@@ -67,11 +58,12 @@ class PatternMatchingCompositeLineMapperTests {
 		Map<String, LineTokenizer> tokenizers = new HashMap<>();
 		tokenizers.put("foo*", line -> new DefaultFieldSet(new String[] { "a", "b" }));
 		tokenizers.put("bar*", line -> new DefaultFieldSet(new String[] { "c", "d" }));
-		mapper.setTokenizers(tokenizers);
 
 		Map<String, FieldSetMapper<Name>> fieldSetMappers = new HashMap<>();
 		fieldSetMappers.put("foo*", fs -> new Name(fs.readString(0), fs.readString(1), 0));
-		mapper.setFieldSetMappers(fieldSetMappers);
+
+		PatternMatchingCompositeLineMapper<Name> mapper = new PatternMatchingCompositeLineMapper<>(tokenizers,
+				fieldSetMappers);
 
 		assertThrows(IllegalStateException.class, () -> mapper.mapLine("bar", 1));
 	}

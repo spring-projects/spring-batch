@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 the original author or authors.
+ * Copyright 2022-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package org.springframework.batch.core.converter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.jspecify.annotations.Nullable;
 
 import org.springframework.batch.core.job.parameters.JobParameter;
 import org.springframework.batch.core.job.parameters.JobParameters;
@@ -91,6 +92,10 @@ public class JsonJobParametersConverter extends DefaultJobParametersConverter {
 		Object parameterTypedValue = jobParameter.getValue();
 		boolean parameterIdentifying = jobParameter.isIdentifying();
 		String parameterStringValue = this.conversionService.convert(parameterTypedValue, String.class);
+		if (parameterStringValue == null) {
+			throw new JobParametersConversionException(
+					"Unable to encode job parameter of type " + parameterType + " with value " + parameterTypedValue);
+		}
 		try {
 			return this.objectMapper.writeValueAsString(new JobParameterDefinition(parameterStringValue,
 					parameterType.getName(), Boolean.toString(parameterIdentifying)));
@@ -122,7 +127,7 @@ public class JsonJobParametersConverter extends DefaultJobParametersConverter {
 		}
 	}
 
-	public record JobParameterDefinition(String value, String type, String identifying) {
+	public record JobParameterDefinition(String value, @Nullable String type, @Nullable String identifying) {
 	}
 
 }

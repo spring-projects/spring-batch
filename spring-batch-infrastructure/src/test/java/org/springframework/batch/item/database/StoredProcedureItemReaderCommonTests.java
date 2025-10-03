@@ -32,12 +32,9 @@ class StoredProcedureItemReaderCommonTests extends AbstractDatabaseItemStreamIte
 
 	@Override
 	protected ItemReader<Foo> getItemReader() throws Exception {
-		StoredProcedureItemReader<Foo> result = new StoredProcedureItemReader<>();
-		result.setDataSource(getDataSource());
-		result.setProcedureName("read_foos");
-		result.setRowMapper(new FooRowMapper());
+		StoredProcedureItemReader<Foo> result = new StoredProcedureItemReader<>(getDataSource(), "read_foos",
+				new FooRowMapper());
 		result.setVerifyCursorPosition(false);
-		result.afterPropertiesSet();
 		return result;
 	}
 
@@ -71,7 +68,6 @@ class StoredProcedureItemReaderCommonTests extends AbstractDatabaseItemStreamIte
 		});
 		reader.setRowMapper(new FooRowMapper());
 		reader.setVerifyCursorPosition(false);
-		reader.afterPropertiesSet();
 		reader.open(new ExecutionContext());
 	}
 

@@ -5,10 +5,10 @@
 	<import resource="classpath:/data-source-context.xml" />
 	
 	<bean id="jdbcPagingItemReader" class="org.springframework.batch.item.database.JdbcPagingItemReader">
-		<property name="dataSource" ref="dataSource"/>
+		<constructor-arg name="dataSource" ref="dataSource"/>
 		<property name="pageSize" value="1000"/>
 		<property name="fetchSize" value="100"/>
-        <property name="queryProvider">
+        <constructor-arg name="pagingQueryProvider">
         	<bean class="org.springframework.batch.item.database.support.HsqlPagingQueryProvider">
         		<property name="selectClause" value="select id"/>
         		<property name="fromClause" value="foo"/>
@@ -19,7 +19,7 @@
         			</map>
         		</property>
         	</bean>
-        </property>
+        </constructor-arg>
 	</bean>		
 
 </beans>

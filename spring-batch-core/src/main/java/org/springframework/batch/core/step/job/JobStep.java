@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.core.step.job;
 
+import org.jspecify.annotations.NullUnmarked;
+
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.Job;
@@ -40,6 +42,7 @@ import org.springframework.util.Assert;
  * @author Mahmoud Ben Hassine
  *
  */
+@NullUnmarked // FIXME to remove once default constructors are removed
 public class JobStep extends AbstractStep {
 
 	/**

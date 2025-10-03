@@ -22,7 +22,7 @@ import java.util.concurrent.Future;
 import io.micrometer.observation.Observation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jspecify.annotations.Nullable;
+import org.jspecify.annotations.NullUnmarked;
 
 import org.springframework.batch.core.job.JobInterruptedException;
 import org.springframework.batch.core.listener.ChunkListener;
@@ -87,6 +87,7 @@ import static org.springframework.batch.core.observability.BatchMetrics.METRICS_
  * @author Mahmoud Ben Hassine
  * @since 6.0
  */
+@NullUnmarked
 public class ChunkOrientedStep<I, O> extends AbstractStep {
 
 	private static final Log logger = LogFactory.getLog(ChunkOrientedStep.class.getName());
@@ -484,7 +485,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 		return chunk;
 	}
 
-	@Nullable private I readItem(StepContribution contribution) throws Exception {
+	private I readItem(StepContribution contribution) throws Exception {
 		ItemReadEvent itemReadEvent = new ItemReadEvent(contribution.getStepExecution().getStepName(),
 				contribution.getStepExecution().getId());
 		String fullyQualifiedMetricName = BatchMetrics.METRICS_PREFIX + "item.read";
@@ -528,11 +529,11 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 		return item;
 	}
 
-	@Nullable private I doRead() throws Exception {
+	private I doRead() throws Exception {
 		if (this.faultTolerant) {
 			Retryable<I> retryableRead = new Retryable<>() {
 				@Override
-				public @Nullable I execute() throws Throwable {
+				public I execute() throws Throwable {
 					return itemReader.read();
 				}
 
@@ -613,11 +614,11 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 		return processedItem;
 	}
 
-	@Nullable private O doProcess(I item) throws Exception {
+	private O doProcess(I item) throws Exception {
 		if (this.faultTolerant) {
 			Retryable<O> retryableProcess = new Retryable<>() {
 				@Override
-				public @Nullable O execute() throws Throwable {
+				public O execute() throws Throwable {
 					StepContext context = StepSynchronizationManager.getContext();
 					final StepExecution stepExecution = context == null ? null : context.getStepExecution();
 					if (isConcurrent() && stepExecution != null) {
@@ -706,7 +707,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 		if (this.faultTolerant) {
 			Retryable<Void> retryableWrite = new Retryable<>() {
 				@Override
-				public @Nullable Void execute() throws Throwable {
+				public Void execute() throws Throwable {
 					itemWriter.write(chunk);
 					return null;
 				}

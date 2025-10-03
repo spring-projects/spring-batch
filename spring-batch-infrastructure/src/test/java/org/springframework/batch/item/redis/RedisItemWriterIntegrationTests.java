@@ -71,9 +71,7 @@ class RedisItemWriterIntegrationTests {
 	@MethodSource("connectionFactories")
 	void testWriteWithLettuce(RedisConnectionFactory connectionFactory) throws Exception {
 		RedisTemplate<String, Person> redisTemplate = setUpRedisTemplate(connectionFactory);
-		this.writer = new RedisItemWriter<>();
-		this.writer.setRedisTemplate(redisTemplate);
-		this.writer.setItemKeyMapper(p -> "person:" + p.getId());
+		this.writer = new RedisItemWriter<>(p -> "person:" + p.getId(), redisTemplate);
 		this.writer.setDelete(false);
 
 		Chunk<Person> items = new Chunk<>(new Person(1, "foo"), new Person(2, "bar"), new Person(3, "baz"),
@@ -97,9 +95,7 @@ class RedisItemWriterIntegrationTests {
 		this.template.opsForValue().set("person:5", new Person(5, "quux"));
 
 		RedisTemplate<String, Person> redisTemplate = setUpRedisTemplate(connectionFactory);
-		this.writer = new RedisItemWriter<>();
-		this.writer.setRedisTemplate(redisTemplate);
-		this.writer.setItemKeyMapper(p -> "person:" + p.getId());
+		this.writer = new RedisItemWriter<>(p -> "person:" + p.getId(), redisTemplate);
 		this.writer.setDelete(true);
 
 		Chunk<Person> items = new Chunk<>(new Person(1, "foo"), new Person(2, "bar"), new Person(3, "baz"),

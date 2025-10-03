@@ -38,14 +38,7 @@ import org.jspecify.annotations.Nullable;
  */
 public class CompositeItemProcessor<I, O> implements ItemProcessor<I, O>, InitializingBean {
 
-	private @Nullable List<? extends ItemProcessor<?, ?>> delegates;
-
-	/**
-	 * Default constructor
-	 */
-	public CompositeItemProcessor() {
-
-	}
+	private List<? extends ItemProcessor<?, ?>> delegates;
 
 	/**
 	 * Convenience constructor for setting the delegates.
@@ -62,11 +55,11 @@ public class CompositeItemProcessor<I, O> implements ItemProcessor<I, O>, Initia
 	 * item.
 	 */
 	public CompositeItemProcessor(List<? extends ItemProcessor<?, ?>> delegates) {
-		setDelegates(delegates);
+		this.delegates = delegates;
 	}
 
 	@Override
-	@SuppressWarnings({ "unchecked", "DataFlowIssue" })
+	@SuppressWarnings({ "unchecked" })
 	public @Nullable O process(I item) throws Exception {
 		Object result = item;
 
@@ -93,7 +86,6 @@ public class CompositeItemProcessor<I, O> implements ItemProcessor<I, O>, Initia
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.state(delegates != null, "The 'delegates' may not be null");
 		Assert.state(!delegates.isEmpty(), "The 'delegates' may not be empty");
 	}
 

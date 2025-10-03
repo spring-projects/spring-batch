@@ -53,7 +53,7 @@ class Jaxb2NamespaceMarshallingTests {
 
 	private static final int MAX_WRITE = 100;
 
-	private final StaxEventItemWriter<QualifiedTrade> writer = new StaxEventItemWriter<>();
+	private StaxEventItemWriter<QualifiedTrade> writer;
 
 	private WritableResource resource;
 
@@ -104,13 +104,9 @@ class Jaxb2NamespaceMarshallingTests {
 		outputFile = File.createTempFile(ClassUtils.getShortName(this.getClass()), ".xml", directory);
 		resource = new FileSystemResource(outputFile);
 
-		writer.setResource(resource);
-
-		writer.setMarshaller(getMarshaller());
+		writer = new StaxEventItemWriter<>(resource, getMarshaller());
 		writer.setRootTagName("{urn:org.springframework.batch.io.oxm.domain}trades");
-
 		writer.afterPropertiesSet();
-
 		writer.open(new ExecutionContext());
 
 	}

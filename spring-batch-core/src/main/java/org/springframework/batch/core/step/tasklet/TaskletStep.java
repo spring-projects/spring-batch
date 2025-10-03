@@ -17,6 +17,8 @@ package org.springframework.batch.core.step.tasklet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.NullUnmarked;
+
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.listener.ChunkListener;
 import org.springframework.batch.core.job.JobInterruptedException;
@@ -73,6 +75,7 @@ import java.util.concurrent.Semaphore;
  * @author Will Schipp
  * @author Mahmoud Ben Hassine
  */
+@NullUnmarked // FIXME to remove once default constructors are removed
 public class TaskletStep extends AbstractStep {
 
 	private static final Log logger = LogFactory.getLog(TaskletStep.class);

@@ -37,10 +37,7 @@ class StaxEventItemReaderCommonTests extends AbstractItemStreamItemReaderTests {
 
 	@Override
 	protected ItemReader<Foo> getItemReader() throws Exception {
-		StaxEventItemReader<Foo> reader = new StaxEventItemReader<>();
-		reader.setResource(new ByteArrayResource(FOOS.getBytes()));
-		reader.setFragmentRootElementName("foo");
-		reader.setUnmarshaller(new Unmarshaller() {
+		Unmarshaller unmarshaller = new Unmarshaller() {
 			@Override
 			public Object unmarshal(Source source) throws XmlMappingException, IOException {
 				Attribute attr = null;
@@ -63,7 +60,10 @@ class StaxEventItemReaderCommonTests extends AbstractItemStreamItemReaderTests {
 				return true;
 			}
 
-		});
+		};
+		StaxEventItemReader<Foo> reader = new StaxEventItemReader<>(unmarshaller);
+		reader.setResource(new ByteArrayResource(FOOS.getBytes()));
+		reader.setFragmentRootElementName("foo");
 
 		reader.setSaveState(true);
 		reader.afterPropertiesSet();

@@ -138,7 +138,7 @@ class LdifReaderBuilderTests {
 	}
 
 	@Test
-	void testStrict() {
+	void testStrict() throws Exception {
 		// Test that strict when enabled will throw an exception.
 		this.ldifReader = new LdifReaderBuilder().resource(context.getResource("classpath:/teadsfst.ldif"))
 			.name("foo")

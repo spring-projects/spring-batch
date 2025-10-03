@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.core.listener;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * This {@link AbstractListenerFactoryBean} implementation is used to create a
  * {@link StepListener}.
@@ -28,7 +30,7 @@ package org.springframework.batch.core.listener;
 public class StepListenerFactoryBean extends AbstractListenerFactoryBean<StepListener> {
 
 	@Override
-	protected ListenerMetaData getMetaDataFromPropertyName(String propertyName) {
+	protected @Nullable ListenerMetaData getMetaDataFromPropertyName(String propertyName) {
 		return StepListenerMetaData.fromPropertyName(propertyName);
 	}
 

@@ -50,7 +50,7 @@ abstract class AbstractStaxEventWriterItemWriterTests {
 
 	private static final int MAX_WRITE = 100;
 
-	protected StaxEventItemWriter<Trade> writer = new StaxEventItemWriter<>();
+	protected StaxEventItemWriter<Trade> writer;
 
 	private WritableResource resource;
 
@@ -94,14 +94,13 @@ abstract class AbstractStaxEventWriterItemWriterTests {
 
 	@BeforeEach
 	void setUp() throws Exception {
-
 		File directory = new File("target/data");
 		directory.mkdirs();
 		outputFile = File.createTempFile(ClassUtils.getShortName(this.getClass()), ".xml", directory);
 		resource = new FileSystemResource(outputFile);
+		writer = new StaxEventItemWriter<>(getMarshaller());
 		writer.setResource(resource);
 
-		writer.setMarshaller(getMarshaller());
 		writer.afterPropertiesSet();
 
 		writer.open(new ExecutionContext());

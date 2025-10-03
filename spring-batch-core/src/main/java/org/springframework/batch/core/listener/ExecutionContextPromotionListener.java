@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.core.listener;
 
-import org.jspecify.annotations.Nullable;
+import org.jspecify.annotations.NullUnmarked;
 
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.Job;
@@ -42,6 +42,7 @@ import org.springframework.util.ObjectUtils;
  * @author Mahmoud Ben Hassine
  * @since 2.0
  */
+@NullUnmarked
 public class ExecutionContextPromotionListener implements StepExecutionListener, InitializingBean {
 
 	private String[] keys = null;
@@ -51,7 +52,7 @@ public class ExecutionContextPromotionListener implements StepExecutionListener,
 	private boolean strict = false;
 
 	@Override
-	public @Nullable ExitStatus afterStep(StepExecution stepExecution) {
+	public ExitStatus afterStep(StepExecution stepExecution) {
 		ExecutionContext stepContext = stepExecution.getExecutionContext();
 		ExecutionContext jobContext = stepExecution.getJobExecution().getExecutionContext();
 		String exitCode = stepExecution.getExitStatus().getExitCode();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2017-2025 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -169,14 +169,13 @@ public class MappingLdifReaderBuilder<T> {
 	 * Returns a fully constructed {@link MappingLdifReader}.
 	 * @return a new {@link org.springframework.batch.item.ldif.MappingLdifReader}
 	 */
-	public MappingLdifReader<T> build() {
+	public MappingLdifReader<T> build() throws Exception {
 		Assert.notNull(this.resource, "Resource is required.");
 		Assert.notNull(this.recordMapper, "RecordMapper is required.");
 		if (this.saveState) {
 			Assert.hasText(this.name, "A name is required when saveState is set to true");
 		}
-		MappingLdifReader<T> reader = new MappingLdifReader<>();
-		reader.setResource(this.resource);
+		MappingLdifReader<T> reader = new MappingLdifReader<>(this.resource);
 		reader.setRecordsToSkip(this.recordsToSkip);
 		reader.setSaveState(saveState);
 		reader.setCurrentItemCount(this.currentItemCount);
@@ -189,7 +188,7 @@ public class MappingLdifReaderBuilder<T> {
 			reader.setSkippedRecordsCallback(this.skippedRecordsCallback);
 		}
 		reader.setStrict(this.strict);
-
+		reader.afterPropertiesSet();
 		return reader;
 	}
 

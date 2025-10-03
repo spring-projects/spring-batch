@@ -27,17 +27,15 @@ class MultiResourceItemReaderFlatFileTests extends AbstractItemStreamItemReaderT
 	@Override
 	protected ItemReader<Foo> getItemReader() throws Exception {
 
-		MultiResourceItemReader<Foo> multiReader = new MultiResourceItemReader<>();
-		FlatFileItemReader<Foo> fileReader = new FlatFileItemReader<>();
-
-		fileReader.setLineMapper((line, lineNumber) -> {
+		LineMapper<Foo> fooLineMapper = (line, lineNumber) -> {
 			Foo foo = new Foo();
 			foo.setValue(Integer.parseInt(line));
 			return foo;
-		});
+		};
+		FlatFileItemReader<Foo> fileReader = new FlatFileItemReader<>(fooLineMapper);
 		fileReader.setSaveState(true);
 
-		multiReader.setDelegate(fileReader);
+		MultiResourceItemReader<Foo> multiReader = new MultiResourceItemReader<>(fileReader);
 
 		Resource r1 = new ByteArrayResource("1\n2\n".getBytes());
 		Resource r2 = new ByteArrayResource("".getBytes());

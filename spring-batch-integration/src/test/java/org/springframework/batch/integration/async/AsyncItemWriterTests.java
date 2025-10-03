@@ -55,12 +55,11 @@ class AsyncItemWriterTests {
 	void setup() {
 		taskExecutor = new SimpleAsyncTaskExecutor();
 		writtenItems = new ArrayList<>();
-		writer = new AsyncItemWriter<>();
+		writer = new AsyncItemWriter<>(new ListItemWriter(writtenItems));
 	}
 
 	@Test
 	void testRoseyScenario() throws Exception {
-		writer.setDelegate(new ListItemWriter(writtenItems));
 		Chunk<FutureTask<String>> processedItems = new Chunk<>();
 
 		processedItems.add(new FutureTask<>(() -> "foo"));
@@ -80,7 +79,6 @@ class AsyncItemWriterTests {
 
 	@Test
 	void testFilteredItem() throws Exception {
-		writer.setDelegate(new ListItemWriter(writtenItems));
 		Chunk<FutureTask<String>> processedItems = new Chunk<>();
 
 		processedItems.add(new FutureTask<>(() -> "foo"));
@@ -99,7 +97,6 @@ class AsyncItemWriterTests {
 
 	@Test
 	void testException() {
-		writer.setDelegate(new ListItemWriter(writtenItems));
 		Chunk<FutureTask<String>> processedItems = new Chunk<>();
 
 		processedItems.add(new FutureTask<>(() -> "foo"));
@@ -118,8 +115,6 @@ class AsyncItemWriterTests {
 
 	@Test
 	void testExecutionException() {
-		ListItemWriter delegate = new ListItemWriter(writtenItems);
-		writer.setDelegate(delegate);
 		Chunk<Future<String>> processedItems = new Chunk<>();
 
 		processedItems.add(new Future<>() {

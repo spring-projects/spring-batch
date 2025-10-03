@@ -27,11 +27,10 @@ import org.springframework.jms.core.JmsOperations;
  */
 class JmsMethodInvocationRecovererTests {
 
-	private final JmsMethodInvocationRecoverer<String> itemReader = new JmsMethodInvocationRecoverer<>();
-
 	@Test
 	void testRecoverWithNoDestination() {
 		JmsOperations jmsTemplate = mock();
+		JmsMethodInvocationRecoverer<String> itemReader = new JmsMethodInvocationRecoverer<>(jmsTemplate);
 		jmsTemplate.convertAndSend("foo");
 
 		itemReader.setJmsTemplate(jmsTemplate);

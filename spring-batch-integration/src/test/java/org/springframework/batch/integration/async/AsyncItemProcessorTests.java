@@ -33,18 +33,13 @@ import org.springframework.core.task.SimpleAsyncTaskExecutor;
 
 class AsyncItemProcessorTests {
 
-	private final AsyncItemProcessor<String, String> processor = new AsyncItemProcessor<>();
+	private AsyncItemProcessor<String, String> processor;
 
 	private ItemProcessor<String, String> delegate = item -> item + item;
 
 	@Test
-	void testNoDelegate() {
-		assertThrows(IllegalStateException.class, processor::afterPropertiesSet);
-	}
-
-	@Test
 	void testExecution() throws Exception {
-		processor.setDelegate(delegate);
+		processor = new AsyncItemProcessor<>(delegate);
 		Future<String> result = processor.process("foo");
 		assertEquals("foofoo", result.get());
 	}
@@ -56,7 +51,7 @@ class AsyncItemProcessorTests {
 			assertTrue(context != null && context.getStepExecution() != null);
 			return item + item;
 		};
-		processor.setDelegate(delegate);
+		processor = new AsyncItemProcessor<>(delegate);
 		Future<String> result = StepScopeTestUtils.doInStepScope(MetaDataInstanceFactory.createStepExecution(),
 				() -> processor.process("foo"));
 		assertEquals("foofoo", result.get());
@@ -64,7 +59,7 @@ class AsyncItemProcessorTests {
 
 	@Test
 	void testMultiExecution() throws Exception {
-		processor.setDelegate(delegate);
+		processor = new AsyncItemProcessor<>(delegate);
 		processor.setTaskExecutor(new SimpleAsyncTaskExecutor());
 		List<Future<String>> list = new ArrayList<>();
 		for (int count = 0; count < 10; count++) {

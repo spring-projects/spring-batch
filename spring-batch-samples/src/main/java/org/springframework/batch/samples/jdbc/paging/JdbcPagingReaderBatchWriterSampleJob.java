@@ -40,7 +40,7 @@ public class JdbcPagingReaderBatchWriterSampleJob extends JdbcReaderBatchWriterS
 	@Bean
 	@StepScope
 	public JdbcPagingItemReader<CustomerCredit> itemReader(DataSource dataSource,
-			@Value("#{jobParameters['credit']}") Double credit) {
+			@Value("#{jobParameters['credit']}") Double credit) throws Exception {
 		Map<String, Object> parameterValues = new HashMap<>();
 		parameterValues.put("statusCode", "PE");
 		parameterValues.put("credit", credit);

@@ -62,7 +62,9 @@ public class CompositeStepExecutionListener implements StepExecutionListener {
 		for (Iterator<StepExecutionListener> iterator = list.reverse(); iterator.hasNext();) {
 			StepExecutionListener listener = iterator.next();
 			ExitStatus close = listener.afterStep(stepExecution);
-			stepExecution.setExitStatus(stepExecution.getExitStatus().and(close));
+			if (close != null) {
+				stepExecution.setExitStatus(stepExecution.getExitStatus().and(close));
+			}
 		}
 		return stepExecution.getExitStatus();
 	}

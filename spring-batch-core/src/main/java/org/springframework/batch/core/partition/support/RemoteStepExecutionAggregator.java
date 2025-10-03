@@ -25,7 +25,6 @@ import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.partition.StepExecutionAggregator;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
 /**
@@ -35,17 +34,11 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * @since 2.1
  */
-public class RemoteStepExecutionAggregator implements StepExecutionAggregator, InitializingBean {
+public class RemoteStepExecutionAggregator implements StepExecutionAggregator {
 
 	private StepExecutionAggregator delegate = new DefaultStepExecutionAggregator();
 
 	private JobRepository jobRepository;
-
-	/**
-	 * Create a new instance (useful for configuration purposes).
-	 */
-	public RemoteStepExecutionAggregator() {
-	}
 
 	/**
 	 * Create a new instance with a job repository that can be used to refresh the data
@@ -69,14 +62,6 @@ public class RemoteStepExecutionAggregator implements StepExecutionAggregator, I
 	 */
 	public void setDelegate(StepExecutionAggregator delegate) {
 		this.delegate = delegate;
-	}
-
-	/**
-	 * @throws Exception if the job explorer is not provided
-	 */
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		Assert.state(jobRepository != null, "A JobRepository must be provided");
 	}
 
 	/**

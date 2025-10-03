@@ -69,7 +69,7 @@
 
 	<bean id="playerFileItemReader" class="org.springframework.batch.item.file.FlatFileItemReader">
 		<property name="resource" value="classpath:data/football/${player.file.name}" />
-		<property name="lineMapper">
+		<constructor-arg name="lineMapper">
 			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
 				<property name="lineTokenizer">
 					<bean class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
@@ -80,12 +80,12 @@
 					<bean class="org.springframework.batch.core.test.football.internal.PlayerFieldSetMapper" />
 				</property>
 			</bean>
-		</property>
+		</constructor-arg>
 	</bean>
 
 	<bean id="gameFileItemReader" class="org.springframework.batch.item.file.FlatFileItemReader">
 		<property name="resource" value="classpath:data/football/${games.file.name}" />
-		<property name="lineMapper">
+		<constructor-arg name="lineMapper">
 			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
 				<property name="lineTokenizer">
 					<bean class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
@@ -97,16 +97,16 @@
 					<bean class="org.springframework.batch.core.test.football.internal.GameFieldSetMapper" />
 				</property>
 			</bean>
-		</property>
+		</constructor-arg>
 	</bean>
 
 	<bean id="playerSummarizationSource" class="org.springframework.batch.item.database.JdbcCursorItemReader">
-		<property name="dataSource" ref="dataSource" />
+		<constructor-arg name="dataSource" ref="dataSource" />
 		<property name="verifyCursorPosition" value="true" />
-		<property name="rowMapper">
+		<constructor-arg name="rowMapper">
 			<bean class="org.springframework.batch.core.test.football.internal.PlayerSummaryMapper" />
-		</property>
-		<property name="sql">
+		</constructor-arg>
+		<constructor-arg name="sql">
 			<value>
 				SELECT GAMES.player_id, GAMES.year_no, SUM(COMPLETES),
 				SUM(ATTEMPTS), SUM(PASSING_YARDS), SUM(PASSING_TD),
@@ -116,7 +116,7 @@
 				PLAYERS where PLAYERS.player_id =
 				GAMES.player_id group by GAMES.player_id, GAMES.year_no
 			</value>
-		</property>
+		</constructor-arg>
 	</bean>
 
 	<bean id="footballProperties" class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">

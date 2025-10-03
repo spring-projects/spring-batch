@@ -147,7 +147,7 @@ class MappingLdifReaderBuilderTests {
 	}
 
 	@Test
-	void testStrict() {
+	void testStrict() throws Exception {
 		// Test that strict when enabled will throw an exception.
 		this.mappingLdifReader = new MappingLdifReaderBuilder<LdapAttributes>().recordMapper(new TestMapper())
 			.resource(context.getResource("classpath:/teadsfst.ldif"))

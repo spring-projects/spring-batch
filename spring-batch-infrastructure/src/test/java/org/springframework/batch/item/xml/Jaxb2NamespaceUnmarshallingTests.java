@@ -38,16 +38,16 @@ import org.springframework.util.ClassUtils;
 
 class Jaxb2NamespaceUnmarshallingTests {
 
-	private final StaxEventItemReader<QualifiedTrade> reader = new StaxEventItemReader<>();
+	private StaxEventItemReader<QualifiedTrade> reader;
 
 	private final Resource resource = new ClassPathResource(
 			ClassUtils.addResourcePathToPackagePath(getClass(), "domain/trades.xml"));
 
 	@BeforeEach
 	void setUp() throws Exception {
+		reader = new StaxEventItemReader<>(getUnmarshaller());
 		reader.setResource(resource);
 		reader.setFragmentRootElementName("{urn:org.springframework.batch.io.oxm.domain}trade");
-		reader.setUnmarshaller(getUnmarshaller());
 		reader.afterPropertiesSet();
 		reader.open(new ExecutionContext());
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2024 the original author or authors.
+ * Copyright 2020-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ import org.springframework.util.StringUtils;
  */
 public class JpaCursorItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> implements InitializingBean {
 
-	private @Nullable EntityManagerFactory entityManagerFactory;
+	private EntityManagerFactory entityManagerFactory;
 
 	private @Nullable EntityManager entityManager;
 
@@ -67,8 +67,12 @@ public class JpaCursorItemReader<T> extends AbstractItemCountingItemStreamItemRe
 
 	/**
 	 * Create a new {@link JpaCursorItemReader}.
+	 * @param entityManagerFactory the JPA entity manager factory.
+	 * @since 6.0
 	 */
-	public JpaCursorItemReader() {
+	public JpaCursorItemReader(EntityManagerFactory entityManagerFactory) {
+		Assert.notNull(entityManagerFactory, "EntityManagerFactory must not be null.");
+		this.entityManagerFactory = entityManagerFactory;
 		setName(ClassUtils.getShortName(JpaCursorItemReader.class));
 	}
 
@@ -118,7 +122,6 @@ public class JpaCursorItemReader<T> extends AbstractItemCountingItemStreamItemRe
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.state(this.entityManagerFactory != null, "EntityManagerFactory is required");
 		if (this.queryProvider == null) {
 			Assert.state(StringUtils.hasLength(this.queryString),
 					"Query string is required when queryProvider is null");
@@ -126,7 +129,7 @@ public class JpaCursorItemReader<T> extends AbstractItemCountingItemStreamItemRe
 	}
 
 	@Override
-	@SuppressWarnings({ "unchecked", "DataFlowIssue" })
+	@SuppressWarnings({ "unchecked" })
 	protected void doOpen() throws Exception {
 		this.entityManager = this.entityManagerFactory.createEntityManager();
 		if (this.entityManager == null) {

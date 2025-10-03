@@ -31,14 +31,8 @@ class CallableTaskletAdapterTests {
 
 	@Test
 	void testHandleWithSetter() throws Exception {
-		CallableTaskletAdapter adapter = new CallableTaskletAdapter();
-		adapter.setCallable(() -> RepeatStatus.FINISHED);
+		CallableTaskletAdapter adapter = new CallableTaskletAdapter(() -> RepeatStatus.FINISHED);
 		assertEquals(RepeatStatus.FINISHED, adapter.execute(null, null));
-	}
-
-	@Test
-	void testAfterPropertiesSet() {
-		assertThrows(IllegalStateException.class, new CallableTaskletAdapter()::afterPropertiesSet);
 	}
 
 }

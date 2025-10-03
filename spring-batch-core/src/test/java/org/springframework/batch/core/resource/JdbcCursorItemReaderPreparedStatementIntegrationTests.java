@@ -47,13 +47,10 @@ public class JdbcCursorItemReaderPreparedStatementIntegrationTests {
 	@BeforeEach
 	void onSetUpInTransaction() {
 
-		itemReader = new JdbcCursorItemReader<>();
-		itemReader.setDataSource(dataSource);
-		itemReader.setSql("select ID, NAME, VALUE from T_FOOS where ID > ? and ID < ?");
+		itemReader = new JdbcCursorItemReader<>(dataSource,
+				"select ID, NAME, VALUE from T_FOOS where ID > ? and ID < ?", new FooRowMapper());
 		itemReader.setIgnoreWarnings(true);
 		itemReader.setVerifyCursorPosition(true);
-
-		itemReader.setRowMapper(new FooRowMapper());
 		itemReader.setFetchSize(10);
 		itemReader.setMaxRows(100);
 		itemReader.setQueryTimeout(1000);

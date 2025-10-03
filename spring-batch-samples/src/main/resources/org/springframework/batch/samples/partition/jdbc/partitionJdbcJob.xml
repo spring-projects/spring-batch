@@ -34,11 +34,11 @@
 	</bean>
 
 	<bean id="itemReader" scope="step" autowire-candidate="false" class="org.springframework.batch.item.database.JdbcPagingItemReader">
-		<property name="dataSource" ref="dataSource" />
+		<constructor-arg name="dataSource" ref="dataSource" />
 		<property name="rowMapper">
 			<bean class="org.springframework.batch.samples.domain.trade.internal.CustomerCreditRowMapper" />
 		</property>
-		<property name="queryProvider">
+		<constructor-arg name="pagingQueryProvider">
 			<bean class="org.springframework.batch.item.database.support.SqlPagingQueryProviderFactoryBean">
 				<property name="dataSource" ref="dataSource"/>
 				<property name="fromClause" value="CUSTOMER"/>
@@ -50,7 +50,7 @@
 				</property>
 				<property name="whereClause" value="ID &gt;= :minId and ID &lt;= :maxId"/>
 			</bean>
-		</property>
+		</constructor-arg>
 		<property name="parameterValues">
 			<map>
 				<entry key="minId" value="#{stepExecutionContext[minValue]}"/>
@@ -65,7 +65,7 @@
 	</bean>
 
 	<bean id="testItemReader" class="org.springframework.batch.item.file.FlatFileItemReader">
-		<property name="lineMapper">
+		<constructor-arg name="lineMapper">
 			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
 				<property name="lineTokenizer">
 					<bean class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
@@ -79,28 +79,28 @@
 					</bean>
 				</property>
 			</bean>
-		</property>
+		</constructor-arg>
 	</bean>
 
 	<bean id="inputTestReader" class="org.springframework.batch.item.database.JdbcCursorItemReader">
-		<property name="sql">
+		<constructor-arg name="sql">
 			<value>
                 <![CDATA[
                     select ID,NAME,CREDIT from CUSTOMER
                 ]]>
 			</value>
-		</property>
-		<property name="dataSource" ref="dataSource" />
-		<property name="rowMapper">
+		</constructor-arg>
+		<constructor-arg name="dataSource" ref="dataSource" />
+		<constructor-arg name="rowMapper">
 			<bean class="org.springframework.batch.samples.domain.trade.internal.CustomerCreditRowMapper" />
-		</property>
+		</constructor-arg>
 	</bean>
 
 	<bean id="itemProcessor" class="org.springframework.batch.samples.domain.trade.internal.CustomerCreditIncreaseProcessor" />
 
 	<bean id="itemWriter" class="org.springframework.batch.item.file.FlatFileItemWriter" scope="step">
 		<property name="resource" value="#{stepExecutionContext[outputFile]}" />
-		<property name="lineAggregator">
+		<constructor-arg name="lineAggregator">
 			<bean class="org.springframework.batch.item.file.transform.DelimitedLineAggregator">
 				<property name="delimiter" value="," />
 				<property name="fieldExtractor">
@@ -109,6 +109,6 @@
 					</bean>
 				</property>
 			</bean>
-		</property>
+		</constructor-arg>
 	</bean>
 </beans>

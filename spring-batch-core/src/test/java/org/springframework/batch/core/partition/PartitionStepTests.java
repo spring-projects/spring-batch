@@ -70,8 +70,10 @@ class PartitionStepTests {
 
 	@Test
 	void testVanillaStepExecution() throws Exception {
-		step.setStepExecutionSplitter(
-				new SimpleStepExecutionSplitter(jobRepository, true, step.getName(), new SimplePartitioner()));
+		SimpleStepExecutionSplitter stepExecutionSplitter = new SimpleStepExecutionSplitter(jobRepository,
+				step.getName(), new SimplePartitioner());
+		stepExecutionSplitter.setAllowStartIfComplete(true);
+		step.setStepExecutionSplitter(stepExecutionSplitter);
 		step.setPartitionHandler((stepSplitter, stepExecution) -> {
 			Set<StepExecution> executions = stepSplitter.split(stepExecution, 2);
 			for (StepExecution execution : executions) {
@@ -96,8 +98,10 @@ class PartitionStepTests {
 
 	@Test
 	void testFailedStepExecution() throws Exception {
-		step.setStepExecutionSplitter(
-				new SimpleStepExecutionSplitter(jobRepository, true, step.getName(), new SimplePartitioner()));
+		SimpleStepExecutionSplitter stepExecutionSplitter = new SimpleStepExecutionSplitter(jobRepository,
+				step.getName(), new SimplePartitioner());
+		stepExecutionSplitter.setAllowStartIfComplete(true);
+		step.setStepExecutionSplitter(stepExecutionSplitter);
 		step.setPartitionHandler((stepSplitter, stepExecution) -> {
 			Set<StepExecution> executions = stepSplitter.split(stepExecution, 2);
 			for (StepExecution execution : executions) {
@@ -123,8 +127,10 @@ class PartitionStepTests {
 	@Test
 	void testRestartStepExecution() throws Exception {
 		final AtomicBoolean started = new AtomicBoolean(false);
-		step.setStepExecutionSplitter(
-				new SimpleStepExecutionSplitter(jobRepository, true, step.getName(), new SimplePartitioner()));
+		SimpleStepExecutionSplitter stepExecutionSplitter = new SimpleStepExecutionSplitter(jobRepository,
+				step.getName(), new SimplePartitioner());
+		stepExecutionSplitter.setAllowStartIfComplete(true);
+		step.setStepExecutionSplitter(stepExecutionSplitter);
 		step.setPartitionHandler((stepSplitter, stepExecution) -> {
 			Set<StepExecution> executions = stepSplitter.split(stepExecution, 2);
 			if (!started.get()) {
@@ -172,8 +178,10 @@ class PartitionStepTests {
 
 	@Test
 	void testStoppedStepExecution() throws Exception {
-		step.setStepExecutionSplitter(
-				new SimpleStepExecutionSplitter(jobRepository, true, step.getName(), new SimplePartitioner()));
+		SimpleStepExecutionSplitter stepExecutionSplitter = new SimpleStepExecutionSplitter(jobRepository,
+				step.getName(), new SimplePartitioner());
+		stepExecutionSplitter.setAllowStartIfComplete(true);
+		step.setStepExecutionSplitter(stepExecutionSplitter);
 		step.setPartitionHandler((stepSplitter, stepExecution) -> {
 			Set<StepExecution> executions = stepSplitter.split(stepExecution, 2);
 			for (StepExecution execution : executions) {
@@ -203,8 +211,10 @@ class PartitionStepTests {
 				result.getExecutionContext().put("aggregated", true);
 			}
 		});
-		step.setStepExecutionSplitter(
-				new SimpleStepExecutionSplitter(jobRepository, true, step.getName(), new SimplePartitioner()));
+		SimpleStepExecutionSplitter stepExecutionSplitter = new SimpleStepExecutionSplitter(jobRepository,
+				step.getName(), new SimplePartitioner());
+		stepExecutionSplitter.setAllowStartIfComplete(true);
+		step.setStepExecutionSplitter(stepExecutionSplitter);
 		step.setPartitionHandler((stepSplitter, stepExecution) -> Arrays.asList(stepExecution));
 		step.afterPropertiesSet();
 		JobParameters jobParameters = new JobParameters();

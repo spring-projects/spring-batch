@@ -49,7 +49,7 @@
 	<bean id="testItemReader" parent="itemReaderParent" />
 
 	<bean id="itemReaderParent" class="org.springframework.batch.item.file.FlatFileItemReader" abstract="true">
-		<property name="lineMapper">
+		<constructor-arg name="lineMapper">
 			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
 				<property name="lineTokenizer">
 					<bean class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
@@ -63,14 +63,14 @@
 					</bean>
 				</property>
 			</bean>
-		</property>
+		</constructor-arg>
 	</bean>
 
 	<bean id="itemProcessor" class="org.springframework.batch.samples.domain.trade.internal.CustomerCreditIncreaseProcessor" />
 
 	<bean id="itemWriter" class="org.springframework.batch.item.file.FlatFileItemWriter" scope="step">
 		<property name="resource" value="#{stepExecutionContext[outputFile]}" />
-		<property name="lineAggregator">
+		<constructor-arg name="lineAggregator">
 			<bean class="org.springframework.batch.item.file.transform.DelimitedLineAggregator">
 				<property name="delimiter" value="," />
 				<property name="fieldExtractor">
@@ -79,6 +79,6 @@
 					</bean>
 				</property>
 			</bean>
-		</property>
+		</constructor-arg>
 	</bean>
 </beans>

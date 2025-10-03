@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,8 @@ package org.springframework.batch.item.mail;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.mail.MailException;
 import org.springframework.mail.MailSendException;
 import org.springframework.mail.MailSender;
@@ -55,11 +53,21 @@ import org.springframework.util.Assert;
  * @since 2.1
  *
  */
-public class SimpleMailMessageItemWriter implements ItemWriter<SimpleMailMessage>, InitializingBean {
+public class SimpleMailMessageItemWriter implements ItemWriter<SimpleMailMessage> {
 
-	private @Nullable MailSender mailSender;
+	private MailSender mailSender;
 
 	private MailErrorHandler mailErrorHandler = new DefaultMailErrorHandler();
+
+	/**
+	 * Create a new {@link SimpleMailMessageItemWriter} with the given {@link MailSender}.
+	 * @param mailSender the mail sender to use
+	 * @since 6.0
+	 */
+	public SimpleMailMessageItemWriter(MailSender mailSender) {
+		Assert.notNull(mailSender, "The MailSender must not be null");
+		this.mailSender = mailSender;
+	}
 
 	/**
 	 * A {@link MailSender} to be used to send messages in {@link #write(Chunk)}.
@@ -78,21 +86,9 @@ public class SimpleMailMessageItemWriter implements ItemWriter<SimpleMailMessage
 	}
 
 	/**
-	 * Check mandatory properties (mailSender).
-	 * @throws IllegalStateException if the mandatory properties are not set
-	 *
-	 * @see InitializingBean#afterPropertiesSet()
-	 */
-	@Override
-	public void afterPropertiesSet() throws IllegalStateException {
-		Assert.state(mailSender != null, "A MailSender must be provided.");
-	}
-
-	/**
 	 * @param chunk the chunk of items to send
 	 * @see ItemWriter#write(Chunk)
 	 */
-	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public void write(Chunk<? extends SimpleMailMessage> chunk) throws MailException {
 		try {

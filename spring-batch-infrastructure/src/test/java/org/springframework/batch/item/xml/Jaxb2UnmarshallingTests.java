@@ -23,8 +23,6 @@ class Jaxb2UnmarshallingTests extends AbstractStaxEventReaderItemReaderTests {
 
 	@Override
 	protected Unmarshaller getUnmarshaller() throws Exception {
-		reader.setFragmentRootElementName("trade");
-
 		Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
 		marshaller.setClassesToBeBound(new Class<?>[] { Trade.class });
 		// marshaller.setSchema(new ClassPathResource("trade.xsd", Trade.class));

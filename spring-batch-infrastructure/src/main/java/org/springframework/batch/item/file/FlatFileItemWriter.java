@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,11 @@
 
 package org.springframework.batch.item.file;
 
-import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.file.transform.LineAggregator;
 import org.springframework.batch.item.support.AbstractFileItemWriter;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.WritableResource;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
@@ -41,11 +41,36 @@ import org.springframework.util.ClassUtils;
  * @author Mahmoud Ben Hassine
  * @author Stefano Cordio
  */
+// FIXME the design of creating a flat file writer with an optional resource (to support
+// the multi-resource case) is broken.
+// FIXME The multi-resource writer should create the delegate with the current resource
 public class FlatFileItemWriter<T> extends AbstractFileItemWriter<T> {
 
-	protected @Nullable LineAggregator<T> lineAggregator;
+	protected LineAggregator<T> lineAggregator;
 
-	public FlatFileItemWriter() {
+	/**
+	 * Create a new {@link FlatFileItemWriter} with the {@link LineAggregator} specified.
+	 * @param lineAggregator to use to convert items to lines of text
+	 * @since 6.0
+	 */
+	public FlatFileItemWriter(LineAggregator<T> lineAggregator) {
+		Assert.notNull(lineAggregator, "LineAggregator must not be null");
+		this.lineAggregator = lineAggregator;
+		this.setExecutionContextName(ClassUtils.getShortName(FlatFileItemWriter.class));
+	}
+
+	/**
+	 * Create a new {@link FlatFileItemWriter} with the {@link WritableResource} and
+	 * {@link LineAggregator} specified.
+	 * @param resource to write to
+	 * @param lineAggregator to use to convert items to lines of text
+	 * @since 6.0
+	 */
+	public FlatFileItemWriter(WritableResource resource, LineAggregator<T> lineAggregator) {
+		Assert.notNull(resource, "Resource must not be null");
+		Assert.notNull(lineAggregator, "LineAggregator must not be null");
+		this.resource = resource;
+		this.lineAggregator = lineAggregator;
 		this.setExecutionContextName(ClassUtils.getShortName(FlatFileItemWriter.class));
 	}
 
@@ -56,7 +81,6 @@ public class FlatFileItemWriter<T> extends AbstractFileItemWriter<T> {
 	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.state(lineAggregator != null, "A LineAggregator must be provided.");
 		if (append) {
 			shouldDeleteIfExists = false;
 		}
@@ -71,7 +95,6 @@ public class FlatFileItemWriter<T> extends AbstractFileItemWriter<T> {
 		this.lineAggregator = lineAggregator;
 	}
 
-	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public String doWrite(Chunk<? extends T> items) {
 		StringBuilder lines = new StringBuilder();

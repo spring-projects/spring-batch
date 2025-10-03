@@ -33,12 +33,12 @@
 
 	<bean id="itemReader" class="org.springframework.batch.item.file.FlatFileItemReader" scope="step">
 		<property name="resource" value="#{jobParameters['input.file']}" />
-		<property name="lineMapper">
+		<constructor-arg name="lineMapper">
 			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
 				<property name="lineTokenizer" ref="fixedFileTokenizer" />
 				<property name="fieldSetMapper" ref="fieldSetMapper" />
 			</bean>
-		</property>
+		</constructor-arg>
 		<property name="saveState" value="true" />
 	</bean>
 

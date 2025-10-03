@@ -39,12 +39,7 @@ class MultiResourceItemReaderXmlTests extends AbstractItemStreamItemReaderTests 
 
 	@Override
 	protected ItemReader<Foo> getItemReader() throws Exception {
-		MultiResourceItemReader<Foo> multiReader = new MultiResourceItemReader<>();
-
-		StaxEventItemReader<Foo> reader = new StaxEventItemReader<>();
-
-		reader.setFragmentRootElementName("foo");
-		reader.setUnmarshaller(new Unmarshaller() {
+		Unmarshaller unmarshaller = new Unmarshaller() {
 			@Override
 			public Object unmarshal(Source source) throws XmlMappingException, IOException {
 
@@ -68,16 +63,18 @@ class MultiResourceItemReaderXmlTests extends AbstractItemStreamItemReaderTests 
 				return true;
 			}
 
-		});
-
+		};
+		StaxEventItemReader<Foo> reader = new StaxEventItemReader<>(unmarshaller);
+		reader.setFragmentRootElementName("foo");
+		reader.setUnmarshaller(unmarshaller);
 		reader.setSaveState(true);
 
+		MultiResourceItemReader<Foo> multiReader = new MultiResourceItemReader<>(reader);
 		Resource r1 = new ByteArrayResource("<foos> <foo value=\"1\"/> <foo value=\"2\"/> </foos>".getBytes());
 		Resource r2 = new ByteArrayResource("<foos> </foos>".getBytes());
 		Resource r3 = new ByteArrayResource("<foos> <foo value=\"3\"/> </foos>".getBytes());
 		Resource r4 = new ByteArrayResource("<foos> <foo value=\"4\"/> <foo value=\"5\"/> </foos>".getBytes());
 
-		multiReader.setDelegate(reader);
 		multiReader.setResources(new Resource[] { r1, r2, r3, r4 });
 		multiReader.setSaveState(true);
 		multiReader.setComparator((arg0, arg1) -> {

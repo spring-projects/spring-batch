@@ -22,12 +22,12 @@
 	<bean id="itemReader" class="org.springframework.batch.item.xml.StaxEventItemReader" scope="step">
 		<property name="fragmentRootElementName" value="customer" />
 		<property name="resource" value="#{jobParameters[inputFile]}" />
-		<property name="unmarshaller" ref="customerCreditMarshaller" />
+		<constructor-arg name="unmarshaller" ref="customerCreditMarshaller" />
 	</bean>
 
 	<bean id="itemWriter" class="org.springframework.batch.item.xml.StaxEventItemWriter" scope="step">
 		<property name="resource" value="#{jobParameters[outputFile]}" />
-		<property name="marshaller" ref="customerCreditMarshaller" />
+		<constructor-arg name="marshaller" ref="customerCreditMarshaller" />
 		<property name="rootTagName" value="customers" />
 		<property name="overwriteOutput" value="true" />
 	</bean>

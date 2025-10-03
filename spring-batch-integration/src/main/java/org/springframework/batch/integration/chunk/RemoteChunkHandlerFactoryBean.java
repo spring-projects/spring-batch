@@ -20,6 +20,8 @@ import java.lang.reflect.Field;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.NullUnmarked;
+
 import org.springframework.batch.core.step.StepContribution;
 import org.springframework.batch.core.listener.StepExecutionListener;
 import org.springframework.batch.item.Chunk;
@@ -49,6 +51,7 @@ import org.springframework.util.ReflectionUtils;
  * @author Mahmoud Ben Hassine
  *
  */
+@NullUnmarked
 public class RemoteChunkHandlerFactoryBean<T> implements FactoryBean<ChunkRequestHandler<T>> {
 
 	private static final Log logger = LogFactory.getLog(RemoteChunkHandlerFactoryBean.class);

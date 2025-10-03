@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2024 the original author or authors.
+ * Copyright 2016-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -355,7 +355,7 @@ public class JdbcCursorItemReaderBuilder<T> {
 		Assert.notNull(this.dataSource, "A datasource is required");
 		Assert.notNull(this.rowMapper, "A rowmapper is required");
 
-		JdbcCursorItemReader<T> reader = new JdbcCursorItemReader<>();
+		JdbcCursorItemReader<T> reader = new JdbcCursorItemReader<>(this.dataSource, this.sql, this.rowMapper);
 
 		if (StringUtils.hasText(this.name)) {
 			reader.setName(this.name);
@@ -365,10 +365,7 @@ public class JdbcCursorItemReaderBuilder<T> {
 		if (this.preparedStatementSetter != null) {
 			reader.setPreparedStatementSetter(this.preparedStatementSetter);
 		}
-		reader.setRowMapper(this.rowMapper);
-		reader.setSql(this.sql);
 		reader.setCurrentItemCount(this.currentItemCount);
-		reader.setDataSource(this.dataSource);
 		reader.setDriverSupportsAbsolute(this.driverSupportsAbsolute);
 		reader.setFetchSize(this.fetchSize);
 		reader.setIgnoreWarnings(this.ignoreWarnings);

@@ -42,9 +42,9 @@ import org.springframework.test.util.ReflectionTestUtils;
  */
 class MultiResourceItemReaderIntegrationTests {
 
-	private final MultiResourceItemReader<String> tested = new MultiResourceItemReader<>();
+	private MultiResourceItemReader<String> tested;
 
-	private final FlatFileItemReader<String> itemReader = new FlatFileItemReader<>();
+	private FlatFileItemReader<String> itemReader;
 
 	private final ExecutionContext ctx = new ExecutionContext();
 
@@ -64,10 +64,8 @@ class MultiResourceItemReaderIntegrationTests {
 	 */
 	@BeforeEach
 	void setUp() {
-
-		itemReader.setLineMapper(new PassThroughLineMapper());
-
-		tested.setDelegate(itemReader);
+		itemReader = new FlatFileItemReader<>(new PassThroughLineMapper());
+		tested = new MultiResourceItemReader<>(itemReader);
 		tested.setComparator((o1, o2) -> {
 			return 0; // do not change ordering
 		});

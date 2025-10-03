@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.integration.config.annotation;
 
+import org.jspecify.annotations.NullUnmarked;
+
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.integration.chunk.RemoteChunkingManagerStepBuilderFactory;
 import org.springframework.batch.integration.chunk.RemoteChunkingWorkerBuilder;
@@ -33,6 +35,7 @@ import org.springframework.transaction.PlatformTransactionManager;
  * @author Mahmoud Ben Hassine
  */
 @Configuration(proxyBeanMethods = false)
+@NullUnmarked
 public class BatchIntegrationConfiguration<I, O> implements InitializingBean {
 
 	private final JobRepository jobRepository;

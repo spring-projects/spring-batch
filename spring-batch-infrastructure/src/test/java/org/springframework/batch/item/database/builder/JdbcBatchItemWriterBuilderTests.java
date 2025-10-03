@@ -78,8 +78,6 @@ class JdbcBatchItemWriterBuilderTests {
 			.sql("INSERT INTO FOO (first, second, third) VALUES (:first, :second, :third)")
 			.build();
 
-		writer.afterPropertiesSet();
-
 		Chunk<Map<String, Object>> chunk = buildMapItems();
 		writer.write(chunk);
 
@@ -96,8 +94,6 @@ class JdbcBatchItemWriterBuilderTests {
 			.sql("INSERT INTO FOO (first, second, third) VALUES (:first, :second, :third)")
 			.build();
 
-		writer.afterPropertiesSet();
-
 		Chunk<Map<String, Object>> items = buildMapItems();
 		writer.write(items);
 
@@ -113,8 +109,6 @@ class JdbcBatchItemWriterBuilderTests {
 			.dataSource(this.dataSource)
 			.sql("INSERT INTO FOO (first, second, third) VALUES (:first, :second, :third)")
 			.build();
-
-		writer.afterPropertiesSet();
 
 		Chunk<Foo> items = new Chunk<>();
 
@@ -135,8 +129,6 @@ class JdbcBatchItemWriterBuilderTests {
 			.assertUpdates(true)
 			.build();
 
-		writer.afterPropertiesSet();
-
 		Chunk<Foo> items = new Chunk<>();
 
 		items.add(new Foo(1, "two", "three"));
@@ -156,8 +148,6 @@ class JdbcBatchItemWriterBuilderTests {
 			.sql("INSERT INTO FOO (first, second, third) VALUES (:first, :second, :third)")
 			.build();
 
-		writer.afterPropertiesSet();
-
 		Chunk<Map<String, Object>> items = buildMapItems();
 		writer.write(items);
 
@@ -171,8 +161,6 @@ class JdbcBatchItemWriterBuilderTests {
 			.dataSource(this.dataSource)
 			.sql("INSERT INTO FOO (first, second, third) VALUES (:first, :second, :third)")
 			.build();
-
-		writer.afterPropertiesSet();
 
 		Chunk<Map<String, Object>> items = buildMapItems();
 		writer.write(items);

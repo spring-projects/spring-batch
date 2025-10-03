@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2023 the original author or authors.
+ * Copyright 2019-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,21 +61,18 @@ public class AvroItemWriter<T> extends AbstractItemStreamItemWriter<T> {
 
 	private final WritableResource resource;
 
-	private final @Nullable Resource schemaResource;
+	private @Nullable Resource schemaResource;
 
 	private final Class<T> clazz;
-
-	private boolean embedSchema = true;
 
 	/**
 	 * @param resource a {@link WritableResource} to which the objects will be serialized.
 	 * @param schema a {@link Resource} containing the Avro schema.
 	 * @param clazz the data type to be serialized.
 	 */
-	public AvroItemWriter(WritableResource resource, @Nullable Resource schema, Class<T> clazz) {
+	public AvroItemWriter(WritableResource resource, Resource schema, Class<T> clazz) {
+		this(resource, clazz);
 		this.schemaResource = schema;
-		this.resource = resource;
-		this.clazz = clazz;
 	}
 
 	/**
@@ -84,8 +81,8 @@ public class AvroItemWriter<T> extends AbstractItemStreamItemWriter<T> {
 	 * @param clazz the data type to be serialized.
 	 */
 	public AvroItemWriter(WritableResource resource, Class<T> clazz) {
-		this(resource, null, clazz);
-		embedSchema = false;
+		this.resource = resource;
+		this.clazz = clazz;
 	}
 
 	@SuppressWarnings("DataFlowIssue")
@@ -140,8 +137,7 @@ public class AvroItemWriter<T> extends AbstractItemStreamItemWriter<T> {
 		Assert.notNull(this.resource, "'resource' is required.");
 		Assert.notNull(this.clazz, "'class' is required.");
 
-		if (this.embedSchema) {
-			Assert.notNull(this.schemaResource, "'schema' is required.");
+		if (this.schemaResource != null) {
 			Assert.state(this.schemaResource.exists(),
 					"'schema' " + this.schemaResource.getFilename() + " does not exist.");
 			Schema schema;

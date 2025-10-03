@@ -39,7 +39,7 @@ public class JpaPagingItemReaderNamedQueryIntegrationTests extends AbstractPagin
 
 		String namedQuery = "foosStartingFrom2";
 
-		JpaPagingItemReader<Foo> reader = new JpaPagingItemReader<>();
+		JpaPagingItemReader<Foo> reader = new JpaPagingItemReader<>(entityManagerFactory);
 
 		// creating a named query provider as it would be created in configuration
 		JpaNamedQueryProvider<Foo> jpaNamedQueryProvider = new JpaNamedQueryProvider<>();

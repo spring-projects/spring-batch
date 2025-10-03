@@ -19,6 +19,7 @@ import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationRegistry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.NullUnmarked;
 
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.job.Job;
@@ -62,6 +63,7 @@ import static org.springframework.batch.core.observability.BatchMetrics.METRICS_
  * @since 6.0
  */
 @SuppressWarnings("removal")
+@NullUnmarked
 public class TaskExecutorJobOperator extends SimpleJobOperator {
 
 	private static final Log logger = LogFactory.getLog(TaskExecutorJobOperator.class.getName());

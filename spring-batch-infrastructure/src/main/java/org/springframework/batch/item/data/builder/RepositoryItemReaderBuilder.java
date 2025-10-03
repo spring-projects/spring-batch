@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2024 the original author or authors.
+ * Copyright 2017-2025 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -135,7 +135,7 @@ public class RepositoryItemReaderBuilder<T> {
 	 * order.
 	 * @param sorts the fields to sort by and the directions.
 	 * @return The current instance of the builder.
-	 * @see RepositoryItemReader#setSort(Map)
+	 * @see RepositoryItemReader#setSorts(Map)
 	 */
 	public RepositoryItemReaderBuilder<T> sorts(Map<String, Sort.Direction> sorts) {
 		this.sorts = sorts;
@@ -194,7 +194,7 @@ public class RepositoryItemReaderBuilder<T> {
 			Assert.state(StringUtils.hasText(this.name), "A name is required when saveState is set to true.");
 		}
 
-		RepositoryItemReader<T> reader = new RepositoryItemReader<>();
+		RepositoryItemReader<T> reader = new RepositoryItemReader<>(this.repository, this.sorts);
 		if (this.arguments != null) {
 			reader.setArguments(this.arguments);
 		}
@@ -204,7 +204,6 @@ public class RepositoryItemReaderBuilder<T> {
 		reader.setCurrentItemCount(this.currentItemCount);
 		reader.setMaxItemCount(this.maxItemCount);
 		reader.setSaveState(this.saveState);
-		reader.setSort(this.sorts);
 		if (this.name != null) {
 			reader.setName(this.name);
 		}

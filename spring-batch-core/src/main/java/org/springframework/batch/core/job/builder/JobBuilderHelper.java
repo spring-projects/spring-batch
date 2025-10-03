@@ -25,6 +25,7 @@ import java.util.Set;
 import io.micrometer.observation.ObservationRegistry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.NullUnmarked;
 
 import org.springframework.batch.core.listener.JobExecutionListener;
 import org.springframework.batch.core.job.parameters.JobParametersIncrementer;
@@ -45,6 +46,7 @@ import org.springframework.batch.support.ReflectionUtils;
  * @author Taeik Lim
  * @since 2.2
  */
+@NullUnmarked // FIXME to remove once default constructors are removed
 public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 
 	protected final Log logger = LogFactory.getLog(getClass());

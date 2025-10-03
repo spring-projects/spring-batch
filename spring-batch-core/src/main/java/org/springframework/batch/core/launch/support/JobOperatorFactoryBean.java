@@ -20,6 +20,8 @@ import java.lang.reflect.Method;
 import io.micrometer.observation.ObservationRegistry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.NullUnmarked;
+
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.batch.core.configuration.BatchConfigurationException;
 import org.springframework.batch.core.configuration.DuplicateJobException;
@@ -56,6 +58,7 @@ import org.springframework.util.Assert;
  * @author Mahmoud Ben Hassine
  * @since 5.0
  */
+@NullUnmarked
 public class JobOperatorFactoryBean implements FactoryBean<JobOperator>, ApplicationContextAware, InitializingBean {
 
 	protected static final Log logger = LogFactory.getLog(JobOperatorFactoryBean.class);

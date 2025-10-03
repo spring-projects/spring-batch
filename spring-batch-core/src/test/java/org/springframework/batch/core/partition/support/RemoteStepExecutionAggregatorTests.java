@@ -37,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class RemoteStepExecutionAggregatorTests {
 
-	private final RemoteStepExecutionAggregator aggregator = new RemoteStepExecutionAggregator();
+	private RemoteStepExecutionAggregator aggregator;
 
 	private StepExecution result;
 
@@ -57,7 +57,7 @@ class RemoteStepExecutionAggregatorTests {
 		factory.setTransactionManager(transactionManager);
 		factory.afterPropertiesSet();
 		JobRepository jobRepository = factory.getObject();
-		aggregator.setJobRepository(jobRepository);
+		aggregator = new RemoteStepExecutionAggregator(jobRepository);
 		JobParameters jobParameters = new JobParameters();
 		JobInstance jobInstance = jobRepository.createJobInstance("job", jobParameters);
 		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,

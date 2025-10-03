@@ -55,49 +55,19 @@ class MongoCursorItemReaderTest {
 
 	@BeforeEach
 	void setUp() {
-		reader = new MongoCursorItemReader<>();
+		reader = new MongoCursorItemReader<>(template, String.class);
 
 		sortOptions = new HashMap<>();
 		sortOptions.put("name", Sort.Direction.DESC);
 
-		reader.setTemplate(template);
-		reader.setTargetType(String.class);
 		reader.setQuery("{ }");
 		reader.setSort(sortOptions);
 		reader.afterPropertiesSet();
 	}
 
 	@Test
-	void testAfterPropertiesSetForQueryString() {
-		reader = new MongoCursorItemReader<>();
-		Exception exception = assertThrows(IllegalStateException.class, reader::afterPropertiesSet);
-		assertEquals("An implementation of MongoOperations is required.", exception.getMessage());
-
-		reader.setTemplate(template);
-
-		exception = assertThrows(IllegalStateException.class, reader::afterPropertiesSet);
-		assertEquals("A targetType to convert the input into is required.", exception.getMessage());
-
-		reader.setTargetType(String.class);
-
-		exception = assertThrows(IllegalStateException.class, reader::afterPropertiesSet);
-		assertEquals("A query is required.", exception.getMessage());
-
-		reader.setQuery("");
-
-		exception = assertThrows(IllegalStateException.class, reader::afterPropertiesSet);
-		assertEquals("A sort is required.", exception.getMessage());
-
-		reader.setSort(sortOptions);
-		reader.afterPropertiesSet();
-	}
-
-	@Test
 	void testAfterPropertiesSetForQueryObject() {
-		reader = new MongoCursorItemReader<>();
-
-		reader.setTemplate(template);
-		reader.setTargetType(String.class);
+		reader = new MongoCursorItemReader<>(template, String.class);
 
 		Query query = new Query().with(Sort.by(new Sort.Order(Sort.Direction.ASC, "_id")));
 		reader.setQuery(query);
@@ -241,12 +211,10 @@ class MongoCursorItemReaderTest {
 
 	@Test
 	void testQueryObject() throws Exception {
-		reader = new MongoCursorItemReader<>();
-		reader.setTemplate(template);
+		reader = new MongoCursorItemReader<>(template, String.class);
 
 		Query query = new Query().with(Sort.by(new Sort.Order(Sort.Direction.ASC, "_id")));
 		reader.setQuery(query);
-		reader.setTargetType(String.class);
 
 		reader.afterPropertiesSet();
 
@@ -263,12 +231,10 @@ class MongoCursorItemReaderTest {
 
 	@Test
 	void testQueryObjectWithCollection() throws Exception {
-		reader = new MongoCursorItemReader<>();
-		reader.setTemplate(template);
+		reader = new MongoCursorItemReader<>(template, String.class);
 
 		Query query = new Query().with(Sort.by(new Sort.Order(Sort.Direction.ASC, "_id")));
 		reader.setQuery(query);
-		reader.setTargetType(String.class);
 		reader.setCollection("collection");
 
 		reader.afterPropertiesSet();
@@ -290,7 +256,7 @@ class MongoCursorItemReaderTest {
 	@Test
 	void testSortThrowsExceptionWhenInvokedWithNull() {
 		// given
-		reader = new MongoCursorItemReader<>();
+		reader = new MongoCursorItemReader<>(template, String.class);
 
 		// when + then
 		assertThatIllegalArgumentException().isThrownBy(() -> reader.setSort(null))

@@ -80,7 +80,6 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests {
 	@Transactional
 	@DirtiesContext
 	void testNormalProcessing() throws Exception {
-		getAsInitializingBean(reader).afterPropertiesSet();
 		getAsItemStream(reader).open(executionContext);
 
 		Foo foo1 = reader.read();

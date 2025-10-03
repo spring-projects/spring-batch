@@ -24,6 +24,7 @@ import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationRegistry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.NullUnmarked;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
@@ -59,6 +60,7 @@ import org.springframework.util.ClassUtils;
  * @author Mahmoud Ben Hassine
  * @author Jinwoo Bae
  */
+@NullUnmarked // FIXME to remove once deprecated code is removed
 public abstract class AbstractStep implements StoppableStep, InitializingBean, BeanNameAware {
 
 	private static final Log logger = LogFactory.getLog(AbstractStep.class);

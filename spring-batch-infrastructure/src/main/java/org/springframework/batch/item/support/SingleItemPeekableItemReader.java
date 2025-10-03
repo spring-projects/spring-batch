@@ -25,6 +25,7 @@ import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.batch.item.PeekableItemReader;
+import org.springframework.util.Assert;
 
 /**
  * <p>
@@ -44,11 +45,21 @@ import org.springframework.batch.item.PeekableItemReader;
  */
 public class SingleItemPeekableItemReader<T> implements ItemStreamReader<T>, PeekableItemReader<T> {
 
-	private @Nullable ItemReader<T> delegate;
+	private ItemReader<T> delegate;
 
 	private @Nullable T next;
 
 	private ExecutionContext executionContext = new ExecutionContext();
+
+	/**
+	 * Create a new {@link SingleItemPeekableItemReader} with the given delegate.
+	 * @param delegate the item reader to use as a delegate
+	 * @since 6.0
+	 */
+	public SingleItemPeekableItemReader(ItemReader<T> delegate) {
+		Assert.notNull(delegate, "The delegate item reader must not be null");
+		this.delegate = delegate;
+	}
 
 	/**
 	 * The item reader to use as a delegate. Items are read from the delegate and passed
@@ -64,7 +75,6 @@ public class SingleItemPeekableItemReader<T> implements ItemStreamReader<T>, Pee
 	 *
 	 * @see ItemReader#read()
 	 */
-	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public @Nullable T read() throws Exception {
 		if (next != null) {
@@ -82,7 +92,6 @@ public class SingleItemPeekableItemReader<T> implements ItemStreamReader<T>, Pee
 	 *
 	 * @see PeekableItemReader#peek()
 	 */
-	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public @Nullable T peek() throws Exception {
 		if (next == null) {

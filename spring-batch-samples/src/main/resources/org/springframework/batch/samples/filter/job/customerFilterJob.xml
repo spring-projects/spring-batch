@@ -24,12 +24,12 @@
 	<bean name="customerFileUploadReader"
 		class="org.springframework.batch.item.file.FlatFileItemReader">
 		<property name="resource" value="classpath:org/springframework/batch/samples/filter/data/customers.txt" />
-		<property name="lineMapper">
+		<constructor-arg name="lineMapper">
 			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
 				<property name="lineTokenizer" ref="customerTokenizer" />
 				<property name="fieldSetMapper" ref="customerMapper" />
 			</bean>
-		</property>
+		</constructor-arg>
 		<!-- skip the header -->
 		<property name="linesToSkip" value="1" />
 	</bean>

@@ -27,17 +27,17 @@
 		class="org.springframework.batch.item.data.RepositoryItemReader" scope="step">
 		<property name="pageSize" value="2"/>
 		<property name="methodName" value="findByCreditGreaterThan"/>
-		<property name="repository" ref="customerCreditPagingAndSortingRepository"/>
+		<constructor-arg name="repository" ref="customerCreditPagingAndSortingRepository"/>
 		<property name="arguments">
 			<list>
 				<value>#{new java.math.BigDecimal(jobParameters[credit])}</value>
 			</list>
 		</property>
- 		<property name="sort">
+ 		<constructor-arg name="sorts">
 			<map>
 				<entry key="id" value="ASC"/>
 			</map>
- 		</property>
+ 		</constructor-arg>
 	</bean>
 
 	<bean id="itemWriter"

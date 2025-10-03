@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2023 the original author or authors.
+ * Copyright 2020-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,10 @@ package org.springframework.batch.item.support;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemStreamWriter;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
 /**
@@ -47,11 +45,21 @@ import org.springframework.util.Assert;
  * @author Mahmoud Ben Hassine
  * @param <T> type of object being written
  */
-public class SynchronizedItemStreamWriter<T> implements ItemStreamWriter<T>, InitializingBean {
+public class SynchronizedItemStreamWriter<T> implements ItemStreamWriter<T> {
 
-	private @Nullable ItemStreamWriter<T> delegate;
+	private ItemStreamWriter<T> delegate;
 
 	private final Lock lock = new ReentrantLock();
+
+	/**
+	 * Create a new {@link SynchronizedItemStreamWriter} with the given delegate.
+	 * @param delegate the item writer to use as a delegate
+	 * @since 6.0
+	 */
+	public SynchronizedItemStreamWriter(ItemStreamWriter<T> delegate) {
+		Assert.notNull(delegate, "The delegate item writer must not be null");
+		this.delegate = delegate;
+	}
 
 	/**
 	 * Set the delegate {@link ItemStreamWriter}.
@@ -64,7 +72,6 @@ public class SynchronizedItemStreamWriter<T> implements ItemStreamWriter<T>, Ini
 	/**
 	 * This method delegates to the {@code write} method of the {@code delegate}.
 	 */
-	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public void write(Chunk<? extends T> items) throws Exception {
 		this.lock.lock();
@@ -76,27 +83,19 @@ public class SynchronizedItemStreamWriter<T> implements ItemStreamWriter<T>, Ini
 		}
 	}
 
-	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
 		this.delegate.open(executionContext);
 	}
 
-	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
 		this.delegate.update(executionContext);
 	}
 
-	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public void close() throws ItemStreamException {
 		this.delegate.close();
-	}
-
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		Assert.state(this.delegate != null, "A delegate item writer is required");
 	}
 
 }

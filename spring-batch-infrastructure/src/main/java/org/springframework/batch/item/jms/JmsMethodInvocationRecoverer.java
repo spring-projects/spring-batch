@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.retry.interceptor.MethodInvocationRecoverer;
 import org.springframework.jms.JmsException;
 import org.springframework.jms.core.JmsOperations;
+import org.springframework.util.Assert;
 
 /**
  * @author Dave Syer
@@ -32,7 +33,18 @@ public class JmsMethodInvocationRecoverer<T> implements MethodInvocationRecovere
 
 	protected Log logger = LogFactory.getLog(getClass());
 
-	private @Nullable JmsOperations jmsTemplate;
+	private JmsOperations jmsTemplate;
+
+	/**
+	 * Create a new {@link JmsMethodInvocationRecoverer} with the provided
+	 * {@link JmsOperations}.
+	 * @param jmsTemplate a {@link JmsOperations} instance
+	 * @since 6.0
+	 */
+	public JmsMethodInvocationRecoverer(JmsOperations jmsTemplate) {
+		Assert.notNull(jmsTemplate, "jmsTemplate must not be null");
+		this.jmsTemplate = jmsTemplate;
+	}
 
 	/**
 	 * Setter for jms template.
@@ -48,7 +60,6 @@ public class JmsMethodInvocationRecoverer<T> implements MethodInvocationRecovere
 	 *
 	 * @see MethodInvocationRecoverer#recover(Object[], Throwable)
 	 */
-	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public @Nullable T recover(Object[] items, Throwable cause) {
 		try {

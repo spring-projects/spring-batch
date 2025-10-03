@@ -18,6 +18,7 @@ package org.springframework.batch.core.configuration.annotation;
 import io.micrometer.observation.ObservationRegistry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.Nullable;
 
 import org.springframework.batch.core.job.AbstractJob;
 import org.springframework.batch.core.launch.support.TaskExecutorJobOperator;
@@ -39,7 +40,7 @@ public class BatchObservabilityBeanPostProcessor implements BeanFactoryPostProce
 
 	private static final Log LOGGER = LogFactory.getLog(BatchObservabilityBeanPostProcessor.class);
 
-	private ConfigurableListableBeanFactory beanFactory;
+	private @Nullable ConfigurableListableBeanFactory beanFactory;
 
 	@Override
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
@@ -48,6 +49,10 @@ public class BatchObservabilityBeanPostProcessor implements BeanFactoryPostProce
 
 	@Override
 	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+		if (this.beanFactory == null) {
+			LOGGER.warn("BeanFactory is not initialized, skipping observation registry injection");
+			return bean;
+		}
 		try {
 			if (bean instanceof AbstractJob || bean instanceof AbstractStep
 					|| bean instanceof TaskExecutorJobOperator) {

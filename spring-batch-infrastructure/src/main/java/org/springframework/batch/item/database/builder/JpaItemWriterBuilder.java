@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2023 the original author or authors.
+ * Copyright 2018-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,8 +84,7 @@ public class JpaItemWriterBuilder<T> {
 	public JpaItemWriter<T> build() {
 		Assert.state(this.entityManagerFactory != null, "EntityManagerFactory must be provided");
 
-		JpaItemWriter<T> writer = new JpaItemWriter<>();
-		writer.setEntityManagerFactory(this.entityManagerFactory);
+		JpaItemWriter<T> writer = new JpaItemWriter<>(this.entityManagerFactory);
 		writer.setUsePersist(this.usePersist);
 		writer.setClearPersistenceContext(this.clearPersistenceContext);
 

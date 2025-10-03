@@ -43,23 +43,16 @@ import java.util.List;
  */
 public class CompositeItemWriter<T> implements ItemStreamWriter<T>, InitializingBean {
 
-	private @Nullable List<ItemWriter<? super T>> delegates;
+	private List<ItemWriter<? super T>> delegates;
 
 	private boolean ignoreItemStream = false;
-
-	/**
-	 * Default constructor
-	 */
-	public CompositeItemWriter() {
-
-	}
 
 	/**
 	 * Convenience constructor for setting the delegates.
 	 * @param delegates the list of delegates to use.
 	 */
 	public CompositeItemWriter(List<ItemWriter<? super T>> delegates) {
-		setDelegates(delegates);
+		this.delegates = delegates;
 	}
 
 	/**
@@ -83,7 +76,6 @@ public class CompositeItemWriter<T> implements ItemStreamWriter<T>, Initializing
 		this.ignoreItemStream = ignoreItemStream;
 	}
 
-	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public void write(Chunk<? extends T> chunk) throws Exception {
 		for (ItemWriter<? super T> writer : delegates) {
@@ -93,7 +85,6 @@ public class CompositeItemWriter<T> implements ItemStreamWriter<T>, Initializing
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.state(delegates != null, "The 'delegates' may not be null");
 		Assert.state(!delegates.isEmpty(), "The 'delegates' may not be empty");
 	}
 
@@ -113,7 +104,6 @@ public class CompositeItemWriter<T> implements ItemStreamWriter<T>, Initializing
 	 * exceptions thrown by delegates are added as suppressed exceptions into this one, in
 	 * the same order as delegates were registered.
 	 */
-	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public void close() throws ItemStreamException {
 		List<Exception> exceptions = new ArrayList<>();
@@ -137,7 +127,6 @@ public class CompositeItemWriter<T> implements ItemStreamWriter<T>, Initializing
 		}
 	}
 
-	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
 		for (ItemWriter<? super T> writer : delegates) {
@@ -147,7 +136,6 @@ public class CompositeItemWriter<T> implements ItemStreamWriter<T>, Initializing
 		}
 	}
 
-	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
 		for (ItemWriter<? super T> writer : delegates) {

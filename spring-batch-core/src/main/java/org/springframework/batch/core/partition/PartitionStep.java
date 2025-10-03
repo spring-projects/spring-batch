@@ -30,6 +30,8 @@ import org.springframework.util.Assert;
 
 import java.util.Collection;
 
+import org.jspecify.annotations.NullUnmarked;
+
 /**
  * Implementation of {@link Step} which partitions the execution and spreads the load
  * using a {@link PartitionHandler}.
@@ -38,6 +40,7 @@ import java.util.Collection;
  * @author Mahmoud Ben Hassine
  * @since 2.0
  */
+@NullUnmarked // FIXME to remove once default constructor in AbstractStep is removed
 public class PartitionStep extends AbstractStep {
 
 	private StepExecutionSplitter stepExecutionSplitter;

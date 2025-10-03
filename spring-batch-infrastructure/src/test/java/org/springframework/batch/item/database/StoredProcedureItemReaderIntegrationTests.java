@@ -27,10 +27,8 @@ public class StoredProcedureItemReaderIntegrationTests extends AbstractDataSourc
 
 	@Override
 	protected ItemReader<Foo> createItemReader() {
-		StoredProcedureItemReader<Foo> reader = new StoredProcedureItemReader<>();
-		reader.setDataSource(dataSource);
-		reader.setProcedureName("read_foos");
-		reader.setRowMapper(new FooRowMapper());
+		StoredProcedureItemReader<Foo> reader = new StoredProcedureItemReader<>(dataSource, "read_foos",
+				new FooRowMapper());
 		reader.setVerifyCursorPosition(false);
 		return reader;
 	}

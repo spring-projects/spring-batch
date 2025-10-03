@@ -48,7 +48,7 @@ import static org.mockito.hamcrest.MockitoHamcrest.argThat;
  */
 public class JdbcBatchItemWriterNamedParameterTests {
 
-	private JdbcBatchItemWriter<Foo> writer = new JdbcBatchItemWriter<>();
+	private JdbcBatchItemWriter<Foo> writer;
 
 	private NamedParameterJdbcOperations namedParameterJdbcOperations;
 
@@ -87,6 +87,7 @@ public class JdbcBatchItemWriterNamedParameterTests {
 	@BeforeEach
 	void setUp() {
 		namedParameterJdbcOperations = mock();
+		writer = new JdbcBatchItemWriter<>();
 		writer.setSql(sql);
 		writer.setJdbcTemplate(namedParameterJdbcOperations);
 		writer.setItemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>());

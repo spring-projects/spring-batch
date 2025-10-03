@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2024 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 package org.springframework.batch.support;
 
-import org.jspecify.annotations.Nullable;
 import org.springframework.jdbc.support.JdbcUtils;
 import org.springframework.jdbc.support.MetaDataAccessException;
+import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 import javax.sql.DataSource;
@@ -62,11 +62,12 @@ public enum DatabaseType {
 
 	/**
 	 * Static method to obtain a DatabaseType from the provided product name.
-	 * @param productName {@link String} containing the product name.
+	 * @param productName {@link String} containing the product name. Must not be null.
 	 * @return the {@link DatabaseType} for given product name.
 	 * @throws IllegalArgumentException if none is found.
 	 */
-	public static DatabaseType fromProductName(@Nullable String productName) {
+	public static DatabaseType fromProductName(String productName) {
+		Assert.notNull(productName, "Product name must not be null");
 		if (!DATABASE_TYPES.containsKey(productName)) {
 			throw new IllegalArgumentException("DatabaseType not found for product name: [" + productName + "]");
 		}
@@ -86,6 +87,9 @@ public enum DatabaseType {
 		if (StringUtils.hasText(databaseProductName) && databaseProductName.startsWith("DB2")) {
 			String databaseProductVersion = JdbcUtils.extractDatabaseMetaData(dataSource,
 					DatabaseMetaData::getDatabaseProductVersion);
+			if (!StringUtils.hasText(databaseProductVersion)) {
+				throw new MetaDataAccessException("Database product version not found for " + databaseProductName);
+			}
 			if (databaseProductVersion.startsWith("ARI")) {
 				databaseProductName = "DB2VSE";
 			}
@@ -106,6 +110,9 @@ public enum DatabaseType {
 		}
 		else {
 			databaseProductName = JdbcUtils.commonDatabaseName(databaseProductName);
+		}
+		if (!StringUtils.hasText(databaseProductName)) {
+			throw new MetaDataAccessException("Database product name not found for data source " + dataSource);
 		}
 		return fromProductName(databaseProductName);
 	}

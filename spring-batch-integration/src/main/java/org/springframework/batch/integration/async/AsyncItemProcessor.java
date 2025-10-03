@@ -26,7 +26,6 @@ import org.springframework.batch.core.scope.context.StepContext;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.util.Assert;
@@ -48,21 +47,21 @@ import org.springframework.util.Assert;
  * @param <O> the output object type (will be wrapped in a Future)
  * @see AsyncItemWriter
  */
-public class AsyncItemProcessor<I, O> implements ItemProcessor<I, Future<O>>, InitializingBean {
+public class AsyncItemProcessor<I, O> implements ItemProcessor<I, Future<O>> {
 
 	private ItemProcessor<I, O> delegate;
 
-	private TaskExecutor taskExecutor = new SyncTaskExecutor();
-
 	/**
-	 * Check mandatory properties (the {@link #setDelegate(ItemProcessor)}).
-	 *
-	 * @see InitializingBean#afterPropertiesSet()
+	 * Create a new {@link AsyncItemProcessor} with the delegate {@link ItemProcessor}.
+	 * @param delegate the {@link ItemProcessor} to use as a delegate
+	 * @since 6.0
 	 */
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		Assert.state(delegate != null, "The delegate must be set.");
+	public AsyncItemProcessor(ItemProcessor<I, O> delegate) {
+		Assert.notNull(delegate, "The delegate ItemProcessor must not be null");
+		this.delegate = delegate;
 	}
+
+	private TaskExecutor taskExecutor = new SyncTaskExecutor();
 
 	/**
 	 * The {@link ItemProcessor} to use to delegate processing to in a background thread.
@@ -88,6 +87,7 @@ public class AsyncItemProcessor<I, O> implements ItemProcessor<I, Future<O>>, In
 	 *
 	 * @see ItemProcessor#process(Object)
 	 */
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public @Nullable Future<O> process(I item) throws Exception {
 		final StepExecution stepExecution = getStepExecution();
@@ -111,7 +111,7 @@ public class AsyncItemProcessor<I, O> implements ItemProcessor<I, Future<O>>, In
 	/**
 	 * @return the current step execution if there is one
 	 */
-	private StepExecution getStepExecution() {
+	private @Nullable StepExecution getStepExecution() {
 		StepContext context = StepSynchronizationManager.getContext();
 		if (context == null) {
 			return null;

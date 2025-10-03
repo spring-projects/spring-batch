@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,6 @@ import org.springframework.batch.item.ReaderNotOpenException;
 import org.springframework.batch.item.file.separator.RecordSeparatorPolicy;
 import org.springframework.batch.item.file.separator.SimpleRecordSeparatorPolicy;
 import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
@@ -51,8 +50,11 @@ import org.springframework.util.StringUtils;
  * @author Mahmoud Ben Hassine
  * @author Stefano Cordio
  */
+// FIXME the design of creating a flat file reader with an optional resource (to support
+// the multi-resource case) is broken.
+// FIXME The multi-resource reader should create the delegate with the current resource
 public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemReader<T>
-		implements ResourceAwareItemReaderItemStream<T>, InitializingBean {
+		implements ResourceAwareItemReaderItemStream<T> {
 
 	private static final Log logger = LogFactory.getLog(FlatFileItemReader.class);
 
@@ -74,7 +76,7 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 
 	private String encoding = DEFAULT_CHARSET;
 
-	private @Nullable LineMapper<T> lineMapper;
+	private LineMapper<T> lineMapper;
 
 	private int linesToSkip = 0;
 
@@ -84,8 +86,28 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 
 	private BufferedReaderFactory bufferedReaderFactory = new DefaultBufferedReaderFactory();
 
-	public FlatFileItemReader() {
+	/**
+	 * Create a new {@link FlatFileItemReader} with a {@link LineMapper}.
+	 * @param lineMapper to use to map lines to items
+	 * @since 6.0
+	 */
+	public FlatFileItemReader(LineMapper<T> lineMapper) {
+		Assert.notNull(lineMapper, "A LineMapper is required");
+		this.lineMapper = lineMapper;
 		setName(ClassUtils.getShortName(FlatFileItemReader.class));
+	}
+
+	/**
+	 * Create a new {@link FlatFileItemReader} with a {@link Resource} and a
+	 * {@link LineMapper}.
+	 * @param resource the input resource
+	 * @param lineMapper to use to map lines to items
+	 * @since 6.0
+	 */
+	public FlatFileItemReader(Resource resource, LineMapper<T> lineMapper) {
+		this(lineMapper);
+		Assert.notNull(resource, "The resource must not be null");
+		this.resource = resource;
 	}
 
 	/**
@@ -166,7 +188,7 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 	/**
 	 * Public setter for the recordSeparatorPolicy. Used to determine where the line
 	 * endings are and do things like continue over a line ending if inside a quoted
-	 * string.
+	 * string. Defaults to {@link SimpleRecordSeparatorPolicy}.
 	 * @param recordSeparatorPolicy the recordSeparatorPolicy to set
 	 */
 	public void setRecordSeparatorPolicy(RecordSeparatorPolicy recordSeparatorPolicy) {
@@ -178,9 +200,10 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 	 * {@link #setRecordSeparatorPolicy(RecordSeparatorPolicy)} (might span multiple lines
 	 * in file).
 	 */
-	@SuppressWarnings("DataFlowIssue")
 	@Override
 	protected @Nullable T doRead() throws Exception {
+		Assert.notNull(resource, "Input resource must be set");
+
 		if (noInput) {
 			return null;
 		}
@@ -228,8 +251,13 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 			// Prevent IOException from recurring indefinitely
 			// if client keeps catching and re-calling
 			noInput = true;
-			throw new NonTransientFlatFileException("Unable to read from resource: [" + resource + "]", e, line,
-					lineCount);
+			if (line == null) {
+				throw new NonTransientFlatFileException("Unable to read from resource: [" + resource + "]", e);
+			}
+			else {
+				throw new NonTransientFlatFileException("Unable to read from resource: [" + resource + "]", e, line,
+						lineCount);
+			}
 		}
 		return line;
 	}
@@ -254,7 +282,6 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 	@Override
 	protected void doOpen() throws Exception {
 		Assert.notNull(resource, "Input resource must be set");
-		Assert.notNull(recordSeparatorPolicy, "RecordSeparatorPolicy must be set");
 
 		noInput = true;
 		if (!resource.exists()) {
@@ -285,20 +312,16 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 	}
 
 	@Override
-	public void afterPropertiesSet() throws Exception {
-		Assert.state(lineMapper != null, "LineMapper is required");
-	}
-
-	@Override
 	protected void jumpToItem(int itemIndex) throws Exception {
 		for (int i = 0; i < itemIndex; i++) {
 			readLine();
 		}
 	}
 
-	@SuppressWarnings("DataFlowIssue")
 	private String applyRecordSeparatorPolicy(String line) throws IOException {
-
+		if (reader == null) {
+			throw new ReaderNotOpenException("Reader must be open before it can be read.");
+		}
 		String record = line;
 		while (!recordSeparatorPolicy.isEndOfRecord(record)) {
 			line = this.reader.readLine();

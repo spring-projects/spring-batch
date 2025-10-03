@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import org.apache.commons.logging.LogFactory;
 import org.jspecify.annotations.Nullable;
 
 import org.springframework.batch.item.ItemReader;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jms.core.JmsOperations;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.util.Assert;
@@ -40,13 +39,29 @@ import jakarta.jms.Message;
  * @author Mahmoud Ben Hassine
  *
  */
-public class JmsItemReader<T> implements ItemReader<T>, InitializingBean {
+public class JmsItemReader<T> implements ItemReader<T> {
 
 	protected Log logger = LogFactory.getLog(getClass());
 
 	protected @Nullable Class<? extends T> itemType;
 
-	protected @Nullable JmsOperations jmsTemplate;
+	protected JmsOperations jmsTemplate;
+
+	/**
+	 * Create a new {@link JmsItemReader} with the provided {@link JmsOperations}.
+	 * @param jmsTemplate a {@link JmsOperations} instance
+	 * @since 6.0
+	 */
+	public JmsItemReader(JmsOperations jmsTemplate) {
+		Assert.notNull(jmsTemplate, "jmsTemplate must not be null");
+		this.jmsTemplate = jmsTemplate;
+		if (jmsTemplate instanceof JmsTemplate template) {
+			Assert.isTrue(template.getReceiveTimeout() != JmsTemplate.RECEIVE_TIMEOUT_INDEFINITE_WAIT,
+					"JmsTemplate must have a receive timeout!");
+			Assert.isTrue(template.getDefaultDestination() != null || template.getDefaultDestinationName() != null,
+					"JmsTemplate must have a defaultDestination or defaultDestinationName!");
+		}
+	}
 
 	/**
 	 * Setter for JMS template.
@@ -74,7 +89,7 @@ public class JmsItemReader<T> implements ItemReader<T>, InitializingBean {
 	}
 
 	@Override
-	@SuppressWarnings({ "unchecked", "DataFlowIssue" })
+	@SuppressWarnings({ "unchecked" })
 	public @Nullable T read() {
 		if (itemType != null && itemType.isAssignableFrom(Message.class)) {
 			return (T) jmsTemplate.receive();
@@ -85,11 +100,6 @@ public class JmsItemReader<T> implements ItemReader<T>, InitializingBean {
 					"Received message payload of wrong type: expected [" + itemType + "]");
 		}
 		return (T) result;
-	}
-
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		Assert.state(this.jmsTemplate != null, "The 'jmsTemplate' is required.");
 	}
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,6 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ReaderNotOpenException;
 import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
@@ -43,7 +42,6 @@ import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.jdbc.support.JdbcUtils;
 import org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator;
 import org.springframework.jdbc.support.SQLExceptionTranslator;
-import org.springframework.jdbc.support.SQLStateSQLExceptionTranslator;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
 
@@ -114,8 +112,7 @@ import org.springframework.util.Assert;
  * @author Mahmoud Ben Hassine
  * @author Stefano Cordio
  */
-public abstract class AbstractCursorItemReader<T> extends AbstractItemCountingItemStreamItemReader<T>
-		implements InitializingBean {
+public abstract class AbstractCursorItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> {
 
 	/** Logger available to subclasses */
 	protected final Log log = LogFactory.getLog(getClass());
@@ -126,7 +123,7 @@ public abstract class AbstractCursorItemReader<T> extends AbstractItemCountingIt
 
 	protected @Nullable ResultSet rs;
 
-	private @Nullable DataSource dataSource;
+	private DataSource dataSource;
 
 	private int fetchSize = VALUE_NOT_SET;
 
@@ -151,12 +148,14 @@ public abstract class AbstractCursorItemReader<T> extends AbstractItemCountingIt
 	private boolean initialConnectionAutoCommit;
 
 	/**
-	 * Assert that mandatory properties are set.
-	 * @throws IllegalArgumentException if either data source or SQL properties not set.
+	 * Create a new {@link AbstractCursorItemReader} instance with the provided data
+	 * source.
+	 * @param dataSource the {@link DataSource} to be used
+	 * @since 6.0
 	 */
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		Assert.state(dataSource != null, "DataSource must be provided");
+	public AbstractCursorItemReader(DataSource dataSource) {
+		Assert.notNull(dataSource, "A DataSource is required.");
+		this.dataSource = dataSource;
 	}
 
 	/**
@@ -171,7 +170,7 @@ public abstract class AbstractCursorItemReader<T> extends AbstractItemCountingIt
 	 * Public getter for the data source.
 	 * @return the dataSource
 	 */
-	public @Nullable DataSource getDataSource() {
+	public DataSource getDataSource() {
 		return this.dataSource;
 	}
 
@@ -207,12 +206,7 @@ public abstract class AbstractCursorItemReader<T> extends AbstractItemCountingIt
 	protected SQLExceptionTranslator getExceptionTranslator() {
 		synchronized (this) {
 			if (exceptionTranslator == null) {
-				if (dataSource != null) {
-					exceptionTranslator = new SQLErrorCodeSQLExceptionTranslator(dataSource);
-				}
-				else {
-					exceptionTranslator = new SQLStateSQLExceptionTranslator();
-				}
+				exceptionTranslator = new SQLErrorCodeSQLExceptionTranslator(dataSource);
 			}
 		}
 		return exceptionTranslator;
@@ -370,7 +364,7 @@ public abstract class AbstractCursorItemReader<T> extends AbstractItemCountingIt
 		this.connectionAutoCommit = autoCommit;
 	}
 
-	public abstract @Nullable String getSql();
+	public abstract String getSql();
 
 	/**
 	 * Check the result set is in sync with the currentRow attribute. This is important to
@@ -434,10 +428,7 @@ public abstract class AbstractCursorItemReader<T> extends AbstractItemCountingIt
 		initialized = true;
 	}
 
-	@SuppressWarnings("DataFlowIssue")
 	protected void initializeConnection() {
-		Assert.state(getDataSource() != null, "DataSource must not be null.");
-
 		try {
 			if (useSharedExtendedConnection) {
 				if (!(getDataSource() instanceof ExtendedConnectionDataSourceProxy)) {

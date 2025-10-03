@@ -55,26 +55,6 @@ class StaxEventItemReaderBuilderTests {
 	private Resource resource;
 
 	@Test
-	void testValidation() {
-		Exception exception = assertThrows(IllegalStateException.class,
-				() -> new StaxEventItemReaderBuilder<Foo>().resource(this.resource).build());
-		assertEquals("A name is required when saveState is set to true.", exception.getMessage());
-
-		exception = assertThrows(IllegalArgumentException.class,
-				() -> new StaxEventItemReaderBuilder<Foo>().resource(this.resource).saveState(false).build());
-		assertEquals("At least one fragment root element is required", exception.getMessage());
-	}
-
-	@Test
-	void testBuildWithoutProvidingResource() {
-		StaxEventItemReader<Foo> reader = new StaxEventItemReaderBuilder<Foo>().name("fooReader")
-			.addFragmentRootElements("foo")
-			.build();
-
-		assertNotNull(reader);
-	}
-
-	@Test
 	void testConfiguration() throws Exception {
 		Jaxb2Marshaller unmarshaller = new Jaxb2Marshaller();
 		unmarshaller.setClassesToBeBound(Foo.class);

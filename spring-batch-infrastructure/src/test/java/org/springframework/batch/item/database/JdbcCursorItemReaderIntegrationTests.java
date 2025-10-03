@@ -27,13 +27,10 @@ class JdbcCursorItemReaderIntegrationTests extends AbstractGenericDataSourceItem
 
 	@Override
 	protected ItemReader<Foo> createItemReader() {
-		JdbcCursorItemReader<Foo> result = new JdbcCursorItemReader<>();
-		result.setDataSource(dataSource);
-		result.setSql("select ID, NAME, VALUE from T_FOOS");
+		JdbcCursorItemReader<Foo> result = new JdbcCursorItemReader<>(dataSource, "select ID, NAME, VALUE from T_FOOS",
+				new FooRowMapper());
 		result.setIgnoreWarnings(true);
 		result.setVerifyCursorPosition(true);
-
-		result.setRowMapper(new FooRowMapper());
 		result.setFetchSize(10);
 		result.setMaxRows(100);
 		result.setQueryTimeout(1000);

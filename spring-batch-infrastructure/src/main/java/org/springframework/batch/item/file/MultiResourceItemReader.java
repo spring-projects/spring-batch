@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,9 +26,7 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
-import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.ResourceAware;
-import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.batch.item.support.AbstractItemStreamItemReader;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
@@ -52,7 +50,7 @@ public class MultiResourceItemReader<T> extends AbstractItemStreamItemReader<T> 
 
 	private static final String RESOURCE_KEY = "resourceIndex";
 
-	private @Nullable ResourceAwareItemReaderItemStream<? extends T> delegate;
+	private ResourceAwareItemReaderItemStream<? extends T> delegate;
 
 	private Resource @Nullable [] resources;
 
@@ -88,7 +86,14 @@ public class MultiResourceItemReader<T> extends AbstractItemStreamItemReader<T> 
 
 	};
 
-	public MultiResourceItemReader() {
+	/**
+	 * Create a new {@link MultiResourceItemReader} instance with the given delegate.
+	 * @param delegate the delegate {@link ResourceAwareItemReaderItemStream} to use
+	 * @since 6.0
+	 */
+	public MultiResourceItemReader(ResourceAwareItemReaderItemStream<? extends T> delegate) {
+		Assert.notNull(delegate, "The delegate reader must not be null");
+		this.delegate = delegate;
 		this.setExecutionContextName(ClassUtils.getShortName(MultiResourceItemReader.class));
 	}
 
@@ -155,7 +160,6 @@ public class MultiResourceItemReader<T> extends AbstractItemStreamItemReader<T> 
 	 * Close the {@link #setDelegate(ResourceAwareItemReaderItemStream)} reader and reset
 	 * instance variable values.
 	 */
-	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public void close() throws ItemStreamException {
 		super.close();
@@ -171,7 +175,6 @@ public class MultiResourceItemReader<T> extends AbstractItemStreamItemReader<T> 
 	 * Figure out which resource to start with in case of restart, open the delegate and
 	 * restore delegate's position in the resource.
 	 */
-	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
 		super.open(executionContext);
@@ -211,7 +214,6 @@ public class MultiResourceItemReader<T> extends AbstractItemStreamItemReader<T> 
 	/**
 	 * Store the current resource index and position in the resource.
 	 */
-	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
 		super.update(executionContext);

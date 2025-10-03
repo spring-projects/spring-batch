@@ -39,9 +39,8 @@ class AbstractMultiResourceItemWriterTests {
 	protected ExecutionContext executionContext = new ExecutionContext();
 
 	protected void setUp(ResourceAwareItemWriterItemStream<String> delegate) {
-		tested = new MultiResourceItemWriter<>();
+		tested = new MultiResourceItemWriter<>(delegate);
 		tested.setResource(new FileSystemResource(file));
-		tested.setDelegate(delegate);
 		tested.setResourceSuffixCreator(suffixCreator);
 		tested.setItemCountLimitPerResource(2);
 		tested.setSaveState(true);

@@ -18,6 +18,8 @@ package org.springframework.batch.integration.chunk;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.NullUnmarked;
+
 import org.springframework.batch.core.job.JobInterruptedException;
 import org.springframework.batch.core.step.StepContribution;
 import org.springframework.batch.item.Chunk;
@@ -44,6 +46,7 @@ import org.springframework.util.Assert;
  * @param <S> the type of the items in the chunk to be handled
  */
 @MessageEndpoint
+@NullUnmarked
 public class ChunkProcessorChunkRequestHandler<S> implements ChunkRequestHandler<S>, InitializingBean {
 
 	private static final Log logger = LogFactory.getLog(ChunkProcessorChunkRequestHandler.class);

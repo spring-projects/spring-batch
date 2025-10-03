@@ -35,9 +35,8 @@ public class JpaPagingItemReaderCommonTests extends AbstractItemStreamItemReader
 
 		String jpqlQuery = "select f from Foo f";
 
-		JpaPagingItemReader<Foo> reader = new JpaPagingItemReader<>();
+		JpaPagingItemReader<Foo> reader = new JpaPagingItemReader<>(entityManagerFactory);
 		reader.setQueryString(jpqlQuery);
-		reader.setEntityManagerFactory(entityManagerFactory);
 		reader.setPageSize(3);
 		reader.afterPropertiesSet();
 		reader.setSaveState(true);

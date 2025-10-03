@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,6 @@ import org.springframework.batch.core.step.StepContribution;
 import org.jspecify.annotations.Nullable;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.util.Assert;
 
 /**
  * Adapts a {@link Callable}&lt;{@link RepeatStatus}&gt; to the {@link Tasklet} interface.
@@ -32,16 +30,9 @@ import org.springframework.util.Assert;
  * @author Mahmoud Ben Hassine
  *
  */
-public class CallableTaskletAdapter implements Tasklet, InitializingBean {
+public class CallableTaskletAdapter implements Tasklet {
 
 	private Callable<RepeatStatus> callable;
-
-	/**
-	 * Create a new {@link CallableTaskletAdapter} instance.
-	 * @since 5.1
-	 */
-	public CallableTaskletAdapter() {
-	}
 
 	/**
 	 * Create a new {@link CallableTaskletAdapter} instance.
@@ -49,8 +40,7 @@ public class CallableTaskletAdapter implements Tasklet, InitializingBean {
 	 * @since 5.1
 	 */
 	public CallableTaskletAdapter(Callable<RepeatStatus> callable) {
-		setCallable(callable);
-		afterPropertiesSet();
+		this.callable = callable;
 	}
 
 	/**
@@ -59,16 +49,6 @@ public class CallableTaskletAdapter implements Tasklet, InitializingBean {
 	 */
 	public void setCallable(Callable<RepeatStatus> callable) {
 		this.callable = callable;
-	}
-
-	/**
-	 * Assert that the callable is set.
-	 *
-	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
-	 */
-	@Override
-	public void afterPropertiesSet() {
-		Assert.state(callable != null, "A Callable is required");
 	}
 
 	/**

@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.core.repository.support;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.batch.core.repository.dao.mongodb.MongoExecutionContextDao;
 import org.springframework.batch.core.repository.dao.mongodb.MongoJobExecutionDao;
 import org.springframework.batch.core.repository.dao.mongodb.MongoJobInstanceDao;
@@ -37,7 +39,7 @@ import org.springframework.util.Assert;
  */
 public class MongoJobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean implements InitializingBean {
 
-	private MongoOperations mongoOperations;
+	private @Nullable MongoOperations mongoOperations;
 
 	public void setMongoOperations(MongoOperations mongoOperations) {
 		this.mongoOperations = mongoOperations;

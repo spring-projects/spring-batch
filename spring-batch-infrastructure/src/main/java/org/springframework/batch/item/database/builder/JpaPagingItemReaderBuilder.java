@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2024 the original author or authors.
+ * Copyright 2017-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -217,7 +217,7 @@ public class JpaPagingItemReaderBuilder<T> {
 			Assert.hasLength(this.queryString, "Query string is required when queryProvider is null");
 		}
 
-		JpaPagingItemReader<T> reader = new JpaPagingItemReader<>();
+		JpaPagingItemReader<T> reader = new JpaPagingItemReader<>(this.entityManagerFactory);
 
 		if (this.queryString != null) {
 			reader.setQueryString(this.queryString);
@@ -232,7 +232,6 @@ public class JpaPagingItemReaderBuilder<T> {
 			reader.setName(this.name);
 		}
 		reader.setPageSize(this.pageSize);
-		reader.setEntityManagerFactory(this.entityManagerFactory);
 		if (this.queryProvider != null) {
 			reader.setQueryProvider(this.queryProvider);
 		}

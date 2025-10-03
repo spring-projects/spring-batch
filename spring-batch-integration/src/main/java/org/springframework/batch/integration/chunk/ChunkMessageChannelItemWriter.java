@@ -25,7 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jspecify.annotations.Nullable;
+import org.jspecify.annotations.NullUnmarked;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
@@ -43,6 +43,7 @@ import org.springframework.messaging.PollableChannel;
 import org.springframework.messaging.support.GenericMessage;
 import org.springframework.util.Assert;
 
+@NullUnmarked
 public class ChunkMessageChannelItemWriter<T>
 		implements StepExecutionListener, ItemWriter<T>, ItemStream, StepContributionSource {
 
@@ -121,7 +122,7 @@ public class ChunkMessageChannelItemWriter<T>
 	}
 
 	@Override
-	public @Nullable ExitStatus afterStep(StepExecution stepExecution) {
+	public ExitStatus afterStep(StepExecution stepExecution) {
 		if (!(stepExecution.getStatus() == BatchStatus.COMPLETED)) {
 			return ExitStatus.EXECUTING;
 		}

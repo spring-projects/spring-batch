@@ -56,8 +56,7 @@ class MultiResourceItemWriterBuilderTests {
 
 	@BeforeEach
 	void setUp() throws Exception {
-		this.delegate = new FlatFileItemWriter<>();
-		this.delegate.setLineAggregator(new PassThroughLineAggregator<>());
+		this.delegate = new FlatFileItemWriter<>(new PassThroughLineAggregator<>());
 		this.file = File.createTempFile(MultiResourceItemWriterFlatFileTests.class.getSimpleName(), null);
 		this.writer = null;
 	}

@@ -60,12 +60,6 @@ public class JobRepositoryTestUtils {
 	};
 
 	/**
-	 * Default constructor.
-	 */
-	public JobRepositoryTestUtils() {
-	}
-
-	/**
 	 * Create a {@link JobRepositoryTestUtils} with all its mandatory properties.
 	 * @param jobRepository a {@link JobRepository}.
 	 */

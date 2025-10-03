@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2022 the original author or authors.
+ * Copyright 2017-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -261,12 +261,13 @@ public class StaxEventItemWriterBuilder<T> {
 	 */
 	public StaxEventItemWriter<T> build() {
 		Assert.notNull(this.marshaller, "A marshaller is required");
+		Assert.notNull(this.resource, "A resource is required");
 
 		if (this.saveState) {
 			Assert.notNull(this.name, "A name is required");
 		}
 
-		StaxEventItemWriter<T> writer = new StaxEventItemWriter<>();
+		StaxEventItemWriter<T> writer = new StaxEventItemWriter<>(this.resource, this.marshaller);
 
 		writer.setEncoding(this.encoding);
 		if (this.footerCallback != null) {
@@ -276,11 +277,7 @@ public class StaxEventItemWriterBuilder<T> {
 		if (this.headerCallback != null) {
 			writer.setHeaderCallback(this.headerCallback);
 		}
-		writer.setMarshaller(this.marshaller);
 		writer.setOverwriteOutput(this.overwriteOutput);
-		if (this.resource != null) {
-			writer.setResource(this.resource);
-		}
 		if (this.rootElementAttributes != null) {
 			writer.setRootElementAttributes(this.rootElementAttributes);
 		}

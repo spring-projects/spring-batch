@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2020 the original author or authors.
+ * Copyright 2018-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import org.apache.commons.logging.LogFactory;
 import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.json.JsonItemReader;
 import org.springframework.batch.item.json.JsonObjectReader;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -150,14 +151,13 @@ public class JsonItemReaderBuilder<T> {
 			Assert.state(StringUtils.hasText(this.name), "A name is required when saveState is set to true.");
 		}
 
-		JsonItemReader<T> reader = new JsonItemReader<>();
-		if (this.resource != null) {
-			reader.setResource(this.resource);
-		}
-		else {
+		if (this.resource == null) {
 			logger.debug("The resource is null. This is only a valid scenario when "
 					+ "injecting it later as in when using the MultiResourceItemReader");
+			// TODO check if this is feasible
+			this.resource = new ByteArrayResource(new byte[0]);
 		}
+		JsonItemReader<T> reader = new JsonItemReader<>(this.resource, this.jsonObjectReader);
 		reader.setJsonObjectReader(this.jsonObjectReader);
 		if (this.name != null) {
 			reader.setName(this.name);

@@ -136,7 +136,6 @@ class JpaCursorItemReaderBuilderTests {
 		JpaNamedQueryProvider<Foo> namedQueryProvider = new JpaNamedQueryProvider<>();
 		namedQueryProvider.setNamedQuery("allFoos");
 		namedQueryProvider.setEntityClass(Foo.class);
-		namedQueryProvider.afterPropertiesSet();
 
 		JpaCursorItemReader<Foo> reader = new JpaCursorItemReaderBuilder<Foo>().name("fooReader")
 			.entityManagerFactory(this.entityManagerFactory)

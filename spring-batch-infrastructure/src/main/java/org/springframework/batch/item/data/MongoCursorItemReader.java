@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 the original author or authors.
+ * Copyright 2023-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,9 +49,9 @@ import org.springframework.util.StringUtils;
  */
 public class MongoCursorItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> implements InitializingBean {
 
-	private @Nullable MongoOperations template;
+	private MongoOperations template;
 
-	private @Nullable Class<? extends T> targetType;
+	private Class<? extends T> targetType;
 
 	private @Nullable String collection;
 
@@ -77,8 +77,15 @@ public class MongoCursorItemReader<T> extends AbstractItemCountingItemStreamItem
 
 	/**
 	 * Create a new {@link MongoCursorItemReader}.
+	 * @param template the {@link MongoOperations} to use
+	 * @param targetType the target type
+	 * @since 6.0
 	 */
-	public MongoCursorItemReader() {
+	public MongoCursorItemReader(MongoOperations template, Class<? extends T> targetType) {
+		Assert.notNull(template, "MongoOperations must not be null");
+		Assert.notNull(targetType, "Target type must not be null");
+		this.template = template;
+		this.targetType = targetType;
 		setName(ClassUtils.getShortName(MongoCursorItemReader.class));
 	}
 
@@ -197,8 +204,6 @@ public class MongoCursorItemReader<T> extends AbstractItemCountingItemStreamItem
 	 */
 	@Override
 	public void afterPropertiesSet() {
-		Assert.state(template != null, "An implementation of MongoOperations is required.");
-		Assert.state(targetType != null, "A targetType to convert the input into is required.");
 		Assert.state(queryString != null || query != null, "A query is required.");
 
 		if (queryString != null) {

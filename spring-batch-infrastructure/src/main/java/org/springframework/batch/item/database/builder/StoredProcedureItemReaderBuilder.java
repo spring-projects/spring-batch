@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 the original author or authors.
+ * Copyright 2017-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -314,14 +314,13 @@ public class StoredProcedureItemReaderBuilder<T> {
 		Assert.notNull(this.dataSource, "A datasource is required");
 		Assert.notNull(this.rowMapper, "A rowmapper is required");
 
-		StoredProcedureItemReader<T> itemReader = new StoredProcedureItemReader<>();
+		StoredProcedureItemReader<T> itemReader = new StoredProcedureItemReader<>(this.dataSource, this.procedureName,
+				this.rowMapper);
 
 		if (StringUtils.hasText(this.name)) {
 			itemReader.setName(this.name);
 		}
 
-		itemReader.setProcedureName(this.procedureName);
-		itemReader.setRowMapper(this.rowMapper);
 		itemReader.setParameters(this.parameters);
 		if (this.preparedStatementSetter != null) {
 			itemReader.setPreparedStatementSetter(this.preparedStatementSetter);
@@ -329,7 +328,6 @@ public class StoredProcedureItemReaderBuilder<T> {
 		itemReader.setFunction(this.function);
 		itemReader.setRefCursorPosition(this.refCursorPosition);
 		itemReader.setCurrentItemCount(this.currentItemCount);
-		itemReader.setDataSource(this.dataSource);
 		itemReader.setDriverSupportsAbsolute(this.driverSupportsAbsolute);
 		itemReader.setFetchSize(this.fetchSize);
 		itemReader.setIgnoreWarnings(this.ignoreWarnings);

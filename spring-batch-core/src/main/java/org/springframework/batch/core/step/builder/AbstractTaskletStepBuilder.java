@@ -20,6 +20,8 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import org.jspecify.annotations.NullUnmarked;
+
 import org.springframework.batch.core.listener.ChunkListener;
 import org.springframework.batch.core.listener.StepExecutionListener;
 import org.springframework.batch.core.annotation.AfterChunk;
@@ -53,6 +55,7 @@ import org.springframework.transaction.interceptor.TransactionAttribute;
  * @since 2.2
  * @param <B> the type of builder represented
  */
+@NullUnmarked // FIXME to remove once default constructors are removed
 public abstract class AbstractTaskletStepBuilder<B extends AbstractTaskletStepBuilder<B>> extends StepBuilderHelper<B> {
 
 	protected Set<ChunkListener> chunkListeners = new LinkedHashSet<>();

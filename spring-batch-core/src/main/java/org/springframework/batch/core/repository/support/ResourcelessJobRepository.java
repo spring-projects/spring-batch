@@ -19,6 +19,8 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
@@ -27,7 +29,6 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
-import org.springframework.lang.Nullable;
 
 /**
  * A {@link JobRepository} implementation that does not use or store batch meta-data. It
@@ -47,9 +48,9 @@ import org.springframework.lang.Nullable;
  */
 public class ResourcelessJobRepository implements JobRepository {
 
-	private JobInstance jobInstance;
+	private @Nullable JobInstance jobInstance;
 
-	private JobExecution jobExecution;
+	private @Nullable JobExecution jobExecution;
 
 	private long stepExecutionIdIncrementer = 0L;
 
@@ -97,20 +98,17 @@ public class ResourcelessJobRepository implements JobRepository {
 	}
 
 	@Override
-	@Nullable
-	public JobInstance getJobInstance(long instanceId) {
+	@Nullable public JobInstance getJobInstance(long instanceId) {
 		return this.jobInstance;
 	}
 
 	@Override
-	@Nullable
-	public JobInstance getLastJobInstance(String jobName) {
+	@Nullable public JobInstance getLastJobInstance(String jobName) {
 		return this.jobInstance;
 	}
 
 	@Override
-	@Nullable
-	public JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
+	@Nullable public JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
 		return this.jobInstance;
 	}
 
@@ -123,6 +121,7 @@ public class ResourcelessJobRepository implements JobRepository {
 
 	@Override
 	public long getJobInstanceCount(String jobName) {
+		// FIXME should return 0 if jobInstance is null or the name is not matching
 		return 1;
 	}
 
@@ -139,20 +138,20 @@ public class ResourcelessJobRepository implements JobRepository {
 	 */
 
 	@Override
-	@Nullable
-	public JobExecution getJobExecution(long executionId) {
+	@Nullable public JobExecution getJobExecution(long executionId) {
+		// FIXME should return null if the id is not matching
 		return this.jobExecution;
 	}
 
 	@Override
-	@Nullable
-	public JobExecution getLastJobExecution(String jobName, JobParameters jobParameters) {
+	@Nullable public JobExecution getLastJobExecution(String jobName, JobParameters jobParameters) {
+		// FIXME should return null if the job name is not matching
 		return this.jobExecution;
 	}
 
 	@Override
-	@Nullable
-	public JobExecution getLastJobExecution(JobInstance jobInstance) {
+	@Nullable public JobExecution getLastJobExecution(JobInstance jobInstance) {
+		// FIXME should return null if the job instance is not matching
 		return this.jobExecution;
 	}
 
@@ -167,6 +166,10 @@ public class ResourcelessJobRepository implements JobRepository {
 	@Override
 	public JobExecution createJobExecution(JobInstance jobInstance, JobParameters jobParameters,
 			ExecutionContext executionContext) {
+		if (this.jobInstance == null || !(this.jobInstance.getId() == jobInstance.getId())) {
+			throw new IllegalStateException(
+					"The job instance passed as a parameter is not recognized by this job repository");
+		}
 		this.jobExecution = new JobExecution(1L, this.jobInstance, jobParameters);
 		this.jobExecution.setExecutionContext(executionContext);
 		this.jobInstance.addJobExecution(this.jobExecution);
@@ -203,8 +206,7 @@ public class ResourcelessJobRepository implements JobRepository {
 
 	@Deprecated(since = "6.0", forRemoval = true)
 	@Override
-	@Nullable
-	public StepExecution getStepExecution(long jobExecutionId, long stepExecutionId) {
+	@Nullable public StepExecution getStepExecution(long jobExecutionId, long stepExecutionId) {
 		if (this.jobExecution == null || !(this.jobExecution.getId() == jobExecutionId)) {
 			return null;
 		}
@@ -222,8 +224,7 @@ public class ResourcelessJobRepository implements JobRepository {
 	 * @since 6.0
 	 */
 	@Override
-	@Nullable
-	public StepExecution getStepExecution(long stepExecutionId) {
+	@Nullable public StepExecution getStepExecution(long stepExecutionId) {
 		if (this.jobExecution == null) {
 			return null;
 		}
@@ -235,8 +236,7 @@ public class ResourcelessJobRepository implements JobRepository {
 	}
 
 	@Override
-	@Nullable
-	public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
+	@Nullable public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
 		if (this.jobExecution == null || !(this.jobExecution.getJobInstance().getId() == jobInstance.getId())) {
 			return null;
 		}
@@ -249,6 +249,10 @@ public class ResourcelessJobRepository implements JobRepository {
 
 	@Override
 	public long getStepExecutionCount(JobInstance jobInstance, String stepName) {
+		if (this.jobExecution == null || !(this.jobExecution.getJobInstance().getId() == jobInstance.getId())) {
+			throw new IllegalStateException(
+					"The job instance passed as a parameter is not recognized by this job repository");
+		}
 		return this.jobExecution.getStepExecutions()
 			.stream()
 			.filter(stepExecution -> stepExecution.getStepName().equals(stepName))
@@ -258,7 +262,7 @@ public class ResourcelessJobRepository implements JobRepository {
 	@Override
 	public void update(StepExecution stepExecution) {
 		stepExecution.setLastUpdated(LocalDateTime.now());
-		if (this.jobExecution.isStopping()) {
+		if (this.jobExecution != null && this.jobExecution.isStopping()) {
 			stepExecution.setTerminateOnly();
 		}
 	}

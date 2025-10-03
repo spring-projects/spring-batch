@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,12 +20,10 @@ import java.util.Map.Entry;
 
 import jakarta.mail.internet.MimeMessage;
 
-import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.mail.DefaultMailErrorHandler;
 import org.springframework.batch.item.mail.MailErrorHandler;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.mail.MailException;
 import org.springframework.mail.MailSendException;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -61,9 +59,19 @@ import org.springframework.util.Assert;
  */
 public class MimeMessageItemWriter implements ItemWriter<MimeMessage> {
 
-	private @Nullable JavaMailSender mailSender;
+	private JavaMailSender mailSender;
 
 	private MailErrorHandler mailErrorHandler = new DefaultMailErrorHandler();
+
+	/**
+	 * Create a new {@link MimeMessageItemWriter} with the given {@link JavaMailSender}.
+	 * @param mailSender service for doing the work of sending a MIME message
+	 * @since 6.0
+	 */
+	public MimeMessageItemWriter(JavaMailSender mailSender) {
+		Assert.notNull(mailSender, "JavaMailSender must not be null");
+		this.mailSender = mailSender;
+	}
 
 	/**
 	 * A {@link JavaMailSender} to be used to send messages in {@link #write(Chunk)}.
@@ -82,20 +90,9 @@ public class MimeMessageItemWriter implements ItemWriter<MimeMessage> {
 	}
 
 	/**
-	 * Check mandatory properties (mailSender).
-	 * @throws IllegalStateException if the mandatory properties are not set
-	 *
-	 * @see InitializingBean#afterPropertiesSet()
-	 */
-	public void afterPropertiesSet() throws IllegalStateException {
-		Assert.state(mailSender != null, "A MailSender must be provided.");
-	}
-
-	/**
 	 * @param chunk the chunk of items to send
 	 * @see ItemWriter#write(Chunk)
 	 */
-	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public void write(Chunk<? extends MimeMessage> chunk) throws MailException {
 		try {

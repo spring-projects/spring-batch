@@ -59,7 +59,7 @@ public class MappingLdifReader<T> extends AbstractItemCountingItemStreamItemRead
 
 	private static final Log LOG = LogFactory.getLog(MappingLdifReader.class);
 
-	private @Nullable Resource resource;
+	private Resource resource;
 
 	private @Nullable LdifParser ldifParser;
 
@@ -73,7 +73,14 @@ public class MappingLdifReader<T> extends AbstractItemCountingItemStreamItemRead
 
 	private @Nullable RecordMapper<T> recordMapper;
 
-	public MappingLdifReader() {
+	/**
+	 * Create a new {@link MappingLdifReader} instance with the provided resource.
+	 * @param resource the resource to read from
+	 * @since 6.0
+	 */
+	public MappingLdifReader(Resource resource) {
+		Assert.notNull(resource, "The resource must not be null");
+		this.resource = resource;
 		setName(ClassUtils.getShortName(MappingLdifReader.class));
 	}
 
@@ -126,9 +133,6 @@ public class MappingLdifReader<T> extends AbstractItemCountingItemStreamItemRead
 	@SuppressWarnings("DataFlowIssue")
 	@Override
 	protected void doOpen() throws Exception {
-		if (resource == null)
-			throw new IllegalStateException("A resource has not been set.");
-
 		if (!resource.exists()) {
 			if (strict) {
 				throw new IllegalStateException("Input resource must exist (reader is in 'strict' mode): " + resource);
@@ -175,13 +179,13 @@ public class MappingLdifReader<T> extends AbstractItemCountingItemStreamItemRead
 	@Override
 	public void setResource(Resource resource) {
 		this.resource = resource;
-		this.ldifParser = new LdifParser(resource);
 	}
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.state(resource != null, "A resource is required to parse.");
-		Assert.state(ldifParser != null, "A parser is required");
+		if (this.ldifParser == null) {
+			this.ldifParser = new LdifParser(this.resource);
+		}
 	}
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ public class ChunkResponse implements Serializable {
 
 	private final boolean status;
 
-	private final String message;
+	private @Nullable final String message;
 
 	private final boolean redelivered;
 
@@ -93,7 +93,7 @@ public class ChunkResponse implements Serializable {
 		return redelivered;
 	}
 
-	public String getMessage() {
+	public @Nullable String getMessage() {
 		return message;
 	}
 

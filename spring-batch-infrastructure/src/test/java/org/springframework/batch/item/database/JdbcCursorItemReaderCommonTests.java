@@ -28,13 +28,10 @@ class JdbcCursorItemReaderCommonTests extends AbstractDatabaseItemStreamItemRead
 	@Override
 	protected ItemReader<Foo> getItemReader() throws Exception {
 
-		JdbcCursorItemReader<Foo> result = new JdbcCursorItemReader<>();
-		result.setDataSource(getDataSource());
-		result.setSql("select ID, NAME, VALUE from T_FOOS");
-		result.setIgnoreWarnings(true);
+		JdbcCursorItemReader<Foo> result = new JdbcCursorItemReader<>(getDataSource(),
+				"select ID, NAME, VALUE from T_FOOS", new FooRowMapper());
 		result.setVerifyCursorPosition(true);
 
-		result.setRowMapper(new FooRowMapper());
 		result.setFetchSize(10);
 		result.setMaxRows(100);
 		result.setQueryTimeout(1000);
@@ -58,7 +55,6 @@ class JdbcCursorItemReaderCommonTests extends AbstractDatabaseItemStreamItemRead
 		JdbcCursorItemReader<Foo> reader = (JdbcCursorItemReader<Foo>) tested;
 		reader.close();
 		reader.setSql("select ID from T_FOOS where ID < 0");
-		reader.afterPropertiesSet();
 		reader.open(new ExecutionContext());
 	}
 

@@ -26,7 +26,7 @@
 
 	<bean id="reader" class="org.springframework.batch.item.file.FlatFileItemReader">
 		<property name="resource" ref="inputResource" />
-		<property name="lineMapper">
+		<constructor-arg name="lineMapper">
 			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
 				<property name="lineTokenizer">
 					<bean
@@ -39,16 +39,16 @@
 						class="org.springframework.batch.item.file.mapping.PassThroughFieldSetMapper" />
 				</property>
 			</bean>
-		</property>
+		</constructor-arg>
 		<property name="skippedLinesCallback" ref="headerCopier" />
 		<property name="linesToSkip" value="1" />
 	</bean>
 	<bean id="writer" class="org.springframework.batch.item.file.FlatFileItemWriter">
 		<property name="resource" ref="outputResource" />
-		<property name="lineAggregator">
+		<constructor-arg name="lineAggregator">
 			<bean
 				class="org.springframework.batch.item.file.transform.PassThroughLineAggregator" />
-		</property>
+		</constructor-arg>
 		<property name="headerCallback" ref="headerCopier" />
 		<property name="footerCallback" ref="footerCallback" />
 	</bean>

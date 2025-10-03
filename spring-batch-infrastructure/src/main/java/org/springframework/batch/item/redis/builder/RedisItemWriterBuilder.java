@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 the original author or authors.
+ * Copyright 2023-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 package org.springframework.batch.item.redis.builder;
+
+import org.jspecify.annotations.NonNull;
 
 import org.springframework.batch.item.redis.RedisItemWriter;
 import org.springframework.core.convert.converter.Converter;
@@ -30,7 +32,7 @@ public class RedisItemWriterBuilder<K, V> {
 
 	private RedisTemplate<K, V> redisTemplate;
 
-	private Converter<V, K> itemKeyMapper;
+	private Converter<@NonNull V, @NonNull K> itemKeyMapper;
 
 	private boolean delete;
 
@@ -51,7 +53,7 @@ public class RedisItemWriterBuilder<K, V> {
 	 * @return The current instance of the builder.
 	 * @see RedisItemWriter#setItemKeyMapper(Converter)
 	 */
-	public RedisItemWriterBuilder<K, V> itemKeyMapper(Converter<V, K> itemKeyMapper) {
+	public RedisItemWriterBuilder<K, V> itemKeyMapper(Converter<@NonNull V, @NonNull K> itemKeyMapper) {
 		this.itemKeyMapper = itemKeyMapper;
 		return this;
 	}
@@ -71,13 +73,11 @@ public class RedisItemWriterBuilder<K, V> {
 	 * Validates and builds a {@link RedisItemWriter}.
 	 * @return a {@link RedisItemWriter}
 	 */
-	public RedisItemWriter<K, V> build() {
+	public RedisItemWriter<@NonNull K, @NonNull V> build() {
 		Assert.notNull(this.redisTemplate, "RedisTemplate is required.");
 		Assert.notNull(this.itemKeyMapper, "itemKeyMapper is required.");
 
-		RedisItemWriter<K, V> writer = new RedisItemWriter<>();
-		writer.setRedisTemplate(this.redisTemplate);
-		writer.setItemKeyMapper(this.itemKeyMapper);
+		RedisItemWriter<@NonNull K, @NonNull V> writer = new RedisItemWriter<>(this.itemKeyMapper, this.redisTemplate);
 		writer.setDelete(this.delete);
 		return writer;
 	}

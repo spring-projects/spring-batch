@@ -51,11 +51,6 @@ class JsonFileItemWriterTests {
 	}
 
 	@Test
-	void resourceMustNotBeNull() {
-		assertThrows(IllegalArgumentException.class, () -> new JsonFileItemWriter<>(null, this.jsonObjectMarshaller));
-	}
-
-	@Test
 	void jsonObjectMarshallerMustNotBeNull() {
 		assertThrows(IllegalArgumentException.class, () -> new JsonFileItemWriter<>(this.resource, null));
 	}

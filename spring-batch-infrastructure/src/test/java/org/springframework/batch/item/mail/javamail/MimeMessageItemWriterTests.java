@@ -47,7 +47,7 @@ import static org.mockito.Mockito.when;
  */
 class MimeMessageItemWriterTests {
 
-	private final MimeMessageItemWriter writer = new MimeMessageItemWriter();
+	private MimeMessageItemWriter writer;
 
 	private final JavaMailSender mailSender = mock();
 
@@ -55,7 +55,7 @@ class MimeMessageItemWriterTests {
 
 	@BeforeEach
 	void setUp() {
-		writer.setJavaMailSender(mailSender);
+		writer = new MimeMessageItemWriter(mailSender);
 	}
 
 	@Test

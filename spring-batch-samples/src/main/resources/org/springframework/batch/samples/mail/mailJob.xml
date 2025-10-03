@@ -17,17 +17,17 @@
 	</job>
 
 	<bean id="itemReader" class="org.springframework.batch.item.database.JdbcCursorItemReader">
-		<property name="sql" value="select ID, NAME, EMAIL from USERS" />
-		<property name="rowMapper">
+		<constructor-arg name="sql" value="select ID, NAME, EMAIL from USERS" />
+		<constructor-arg name="rowMapper">
 			<bean class="org.springframework.jdbc.core.BeanPropertyRowMapper">
 				<property name="mappedClass" value="org.springframework.batch.samples.mail.User" />
 			</bean>
-		</property>
-		<property name="dataSource" ref="dataSource" />
+		</constructor-arg>
+		<constructor-arg name="dataSource" ref="dataSource" />
 	</bean>
 
 	<bean id="itemWriter" class="org.springframework.batch.item.mail.SimpleMailMessageItemWriter">
-		<property name="mailSender" ref="mailSender" />
+		<constructor-arg name="mailSender" ref="mailSender" />
 		<property name="mailErrorHandler" ref="loggingMailErrorHandler" />
 	</bean>
 

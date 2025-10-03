@@ -25,19 +25,19 @@
 	</job>
 
 	<bean id="itemReader1" class="org.springframework.batch.item.ldif.LdifReader">
-		<property name="resource" value="classpath:/test.ldif" />
+		<constructor-arg name="resource" value="classpath:/test.ldif" />
 		<property name="recordsToSkip" value="1" />
 	</bean>
 
 	<bean id="itemReader2" class="org.springframework.batch.item.ldif.LdifReader">
-		<property name="resource" value="file:src/test/resources/missing.ldif" />
+		<constructor-arg name="resource" value="file:src/test/resources/missing.ldif" />
 		<property name="recordsToSkip" value="1" />
 	</bean>
 
 	<bean id="itemWriter" class="org.springframework.batch.item.file.FlatFileItemWriter">
 		<property name="resource" value="file:target/test-outputs/output.ldif" />
-		<property name="lineAggregator">
+		<constructor-arg name="lineAggregator">
 			<bean class="org.springframework.batch.item.file.transform.PassThroughLineAggregator" />
-		</property>
+		</constructor-arg>
 	</bean>
 </beans>

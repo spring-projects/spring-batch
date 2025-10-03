@@ -33,48 +33,40 @@ import org.junit.jupiter.api.Test;
  */
 class PatternMatchingCompositeLineTokenizerTests {
 
-	private final PatternMatchingCompositeLineTokenizer tokenizer = new PatternMatchingCompositeLineTokenizer();
+	private PatternMatchingCompositeLineTokenizer tokenizer;
 
 	@Test
-	void testNoTokenizers() {
-		assertThrows(IllegalStateException.class, tokenizer::afterPropertiesSet);
-	}
-
-	@Test
-	void testEmptyKeyMatchesAnyLine() throws Exception {
+	void testEmptyKeyMatchesAnyLine() {
 		Map<String, LineTokenizer> map = new HashMap<>();
 		map.put("*", new DelimitedLineTokenizer());
 		map.put("foo", line -> null);
-		tokenizer.setTokenizers(map);
-		tokenizer.afterPropertiesSet();
+		tokenizer = new PatternMatchingCompositeLineTokenizer(map);
 		FieldSet fields = tokenizer.tokenize("abc");
 		assertEquals(1, fields.getFieldCount());
 	}
 
 	@Test
-	void testEmptyKeyDoesNotMatchWhenAlternativeAvailable() throws Exception {
+	void testEmptyKeyDoesNotMatchWhenAlternativeAvailable() {
 
 		Map<String, LineTokenizer> map = new LinkedHashMap<>();
 		map.put("*", line -> null);
 		map.put("foo*", new DelimitedLineTokenizer());
-		tokenizer.setTokenizers(map);
-		tokenizer.afterPropertiesSet();
+		tokenizer = new PatternMatchingCompositeLineTokenizer(map);
 		FieldSet fields = tokenizer.tokenize("foo,bar");
 		assertEquals("bar", fields.readString(1));
 	}
 
 	@Test
-	void testNoMatch() throws Exception {
-		tokenizer.setTokenizers(Collections.singletonMap("foo", (LineTokenizer) new DelimitedLineTokenizer()));
-		tokenizer.afterPropertiesSet();
+	void testNoMatch() {
+		tokenizer = new PatternMatchingCompositeLineTokenizer(
+				Collections.singletonMap("foo", new DelimitedLineTokenizer()));
 		assertThrows(IllegalStateException.class, () -> tokenizer.tokenize("nomatch"));
 	}
 
 	@Test
-	void testMatchWithPrefix() throws Exception {
-		tokenizer.setTokenizers(
-				Collections.singletonMap("foo*", (LineTokenizer) line -> new DefaultFieldSet(new String[] { line })));
-		tokenizer.afterPropertiesSet();
+	void testMatchWithPrefix() {
+		tokenizer = new PatternMatchingCompositeLineTokenizer(
+				Collections.singletonMap("foo*", line -> new DefaultFieldSet(new String[] { line })));
 		FieldSet fields = tokenizer.tokenize("foo bar");
 		assertEquals(1, fields.getFieldCount());
 		assertEquals("foo bar", fields.readString(0));

@@ -53,7 +53,7 @@ public class MultiResourceItemWriter<T> extends AbstractItemStreamItemWriter<T> 
 
 	private @Nullable Resource resource;
 
-	private @Nullable ResourceAwareItemWriterItemStream<? super T> delegate;
+	private ResourceAwareItemWriterItemStream<? super T> delegate;
 
 	private int itemCountLimitPerResource = Integer.MAX_VALUE;
 
@@ -67,11 +67,17 @@ public class MultiResourceItemWriter<T> extends AbstractItemStreamItemWriter<T> 
 
 	private boolean opened = false;
 
-	public MultiResourceItemWriter() {
+	/**
+	 * Create a new {@link MultiResourceItemWriter} instance with the delegate to use.
+	 * @param delegate the delegate {@link ResourceAwareItemWriterItemStream} to use
+	 * @since 6.0
+	 */
+	public MultiResourceItemWriter(ResourceAwareItemWriterItemStream<? super T> delegate) {
+		Assert.notNull(delegate, "The delegate writer must not be null.");
+		this.delegate = delegate;
 		this.setExecutionContextName(ClassUtils.getShortName(MultiResourceItemWriter.class));
 	}
 
-	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public void write(Chunk<? extends T> items) throws Exception {
 		int writtenItems = 0;
@@ -146,7 +152,6 @@ public class MultiResourceItemWriter<T> extends AbstractItemStreamItemWriter<T> 
 		this.saveState = saveState;
 	}
 
-	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public void close() throws ItemStreamException {
 		super.close();
@@ -157,7 +162,6 @@ public class MultiResourceItemWriter<T> extends AbstractItemStreamItemWriter<T> 
 		}
 	}
 
-	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
 		super.open(executionContext);
@@ -181,7 +185,6 @@ public class MultiResourceItemWriter<T> extends AbstractItemStreamItemWriter<T> 
 		}
 	}
 
-	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
 		super.update(executionContext);

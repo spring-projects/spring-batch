@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2023 the original author or authors.
+ * Copyright 2013-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.core.scope.context;
 
-import org.jspecify.annotations.Nullable;
+import org.jspecify.annotations.NullUnmarked;
 
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
@@ -32,6 +32,7 @@ import org.springframework.batch.core.job.JobExecution;
  * @author Mahmoud Ben Hassine
  * @since 3.0
  */
+@NullUnmarked
 public class JobSynchronizationManager {
 
 	private static final SynchronizationManagerSupport<JobExecution, JobContext> manager = new SynchronizationManagerSupport<>() {
@@ -52,7 +53,7 @@ public class JobSynchronizationManager {
 	 * @return the current {@link JobContext} or {@code null} if there is none (if one has
 	 * not been registered for this thread).
 	 */
-	public static @Nullable JobContext getContext() {
+	public static JobContext getContext() {
 		return manager.getContext();
 	}
 

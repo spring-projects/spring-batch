@@ -138,13 +138,6 @@ class StaxEventItemWriterTests {
 	}
 
 	@Test
-	void testAssertWriterIsInitialized() {
-		StaxEventItemWriter<String> writer = new StaxEventItemWriter<>();
-
-		assertThrows(WriterNotOpenException.class, () -> writer.write(Chunk.of("foo")));
-	}
-
-	@Test
 	void testStandaloneDeclarationInHeaderWhenNotSet() throws Exception {
 		writer.open(executionContext);
 		writer.write(items);
@@ -992,11 +985,8 @@ class StaxEventItemWriterTests {
 	 * @return new instance of fully configured writer
 	 */
 	private StaxEventItemWriter<Object> createItemWriter() throws Exception {
-		StaxEventItemWriter<Object> source = new StaxEventItemWriter<>();
-		source.setResource(resource);
-
 		marshaller = new SimpleMarshaller();
-		source.setMarshaller(marshaller);
+		StaxEventItemWriter<Object> source = new StaxEventItemWriter<>(resource, marshaller);
 
 		source.setEncoding("UTF-8");
 		source.setRootTagName("root");

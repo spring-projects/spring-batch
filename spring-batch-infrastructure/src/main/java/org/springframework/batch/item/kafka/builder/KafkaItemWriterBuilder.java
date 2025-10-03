@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2021 the original author or authors.
+ * Copyright 2019-2025 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -96,7 +96,7 @@ public class KafkaItemWriterBuilder<K, V> {
 		Assert.notNull(this.kafkaTemplate, "kafkaTemplate is required.");
 		Assert.notNull(this.itemKeyMapper, "itemKeyMapper is required.");
 
-		KafkaItemWriter<K, V> writer = new KafkaItemWriter<>();
+		KafkaItemWriter<K, V> writer = new KafkaItemWriter<>(this.itemKeyMapper, this.kafkaTemplate);
 		writer.setKafkaTemplate(this.kafkaTemplate);
 		writer.setItemKeyMapper(this.itemKeyMapper);
 		writer.setDelete(this.delete);

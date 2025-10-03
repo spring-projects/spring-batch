@@ -33,23 +33,23 @@ import org.springframework.jms.core.JmsTemplate;
 
 class JmsItemReaderTests {
 
-	JmsItemReader<String> itemReader = new JmsItemReader<>();
+	JmsItemReader<String> itemReader;
 
 	@Test
 	void testNoItemTypeSunnyDay() {
 		JmsOperations jmsTemplate = mock();
+		JmsItemReader<String> itemReader = new JmsItemReader<>(jmsTemplate);
 		when(jmsTemplate.receiveAndConvert()).thenReturn("foo");
 
-		itemReader.setJmsTemplate(jmsTemplate);
 		assertEquals("foo", itemReader.read());
 	}
 
 	@Test
 	void testSetItemTypeSunnyDay() {
 		JmsOperations jmsTemplate = mock();
+		JmsItemReader<String> itemReader = new JmsItemReader<>(jmsTemplate);
 		when(jmsTemplate.receiveAndConvert()).thenReturn("foo");
 
-		itemReader.setJmsTemplate(jmsTemplate);
 		itemReader.setItemType(String.class);
 		assertEquals("foo", itemReader.read());
 	}
@@ -57,12 +57,10 @@ class JmsItemReaderTests {
 	@Test
 	void testSetItemSubclassTypeSunnyDay() {
 		JmsOperations jmsTemplate = mock();
-
 		Date date = new java.sql.Date(0L);
 		when(jmsTemplate.receiveAndConvert()).thenReturn(date);
 
-		JmsItemReader<Date> itemReader = new JmsItemReader<>();
-		itemReader.setJmsTemplate(jmsTemplate);
+		JmsItemReader<Date> itemReader = new JmsItemReader<>(jmsTemplate);
 		itemReader.setItemType(Date.class);
 		assertEquals(date, itemReader.read());
 
@@ -73,8 +71,7 @@ class JmsItemReaderTests {
 		JmsOperations jmsTemplate = mock();
 		when(jmsTemplate.receiveAndConvert()).thenReturn("foo");
 
-		JmsItemReader<Date> itemReader = new JmsItemReader<>();
-		itemReader.setJmsTemplate(jmsTemplate);
+		JmsItemReader<Date> itemReader = new JmsItemReader<>(jmsTemplate);
 		itemReader.setItemType(Date.class);
 		Exception exception = assertThrows(IllegalStateException.class, itemReader::read);
 		assertTrue(exception.getMessage().contains("wrong type"));
@@ -86,8 +83,7 @@ class JmsItemReaderTests {
 		Message message = mock();
 		when(jmsTemplate.receive()).thenReturn(message);
 
-		JmsItemReader<Message> itemReader = new JmsItemReader<>();
-		itemReader.setJmsTemplate(jmsTemplate);
+		JmsItemReader<Message> itemReader = new JmsItemReader<>(jmsTemplate);
 		itemReader.setItemType(Message.class);
 		assertEquals(message, itemReader.read());
 	}
@@ -96,14 +92,14 @@ class JmsItemReaderTests {
 	void testTemplateWithNoDefaultDestination() {
 		JmsTemplate jmsTemplate = new JmsTemplate();
 		jmsTemplate.setReceiveTimeout(100L);
-		assertThrows(IllegalArgumentException.class, () -> itemReader.setJmsTemplate(jmsTemplate));
+		assertThrows(IllegalArgumentException.class, () -> new JmsItemReader<>(jmsTemplate));
 	}
 
 	@Test
 	void testTemplateWithNoTimeout() {
 		JmsTemplate jmsTemplate = new JmsTemplate();
 		jmsTemplate.setDefaultDestinationName("foo");
-		assertThrows(IllegalArgumentException.class, () -> itemReader.setJmsTemplate(jmsTemplate));
+		assertThrows(IllegalArgumentException.class, () -> new JmsItemReader<>(jmsTemplate));
 	}
 
 }

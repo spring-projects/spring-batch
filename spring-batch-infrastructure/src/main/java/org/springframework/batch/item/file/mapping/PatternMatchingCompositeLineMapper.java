@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,10 @@ package org.springframework.batch.item.file.mapping;
 
 import java.util.Map;
 
-import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.file.LineMapper;
 import org.springframework.batch.item.file.transform.LineTokenizer;
 import org.springframework.batch.item.file.transform.PatternMatchingCompositeLineTokenizer;
 import org.springframework.batch.support.PatternMatcher;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
 /**
@@ -45,22 +43,30 @@ import org.springframework.util.Assert;
  * @author Mahmoud Ben Hassine
  * @since 2.0
  */
-public class PatternMatchingCompositeLineMapper<T> implements LineMapper<T>, InitializingBean {
+public class PatternMatchingCompositeLineMapper<T> implements LineMapper<T> {
 
-	private final PatternMatchingCompositeLineTokenizer tokenizer = new PatternMatchingCompositeLineTokenizer();
+	private final PatternMatchingCompositeLineTokenizer tokenizer;
 
-	private @Nullable PatternMatcher<FieldSetMapper<T>> patternMatcher;
+	private PatternMatcher<FieldSetMapper<T>> patternMatcher;
 
-	@SuppressWarnings("DataFlowIssue")
-	@Override
-	public T mapLine(String line, int lineNumber) throws Exception {
-		return patternMatcher.match(line).mapFieldSet(this.tokenizer.tokenize(line));
+	/**
+	 * Construct a {@link PatternMatchingCompositeLineMapper} with the provided maps of
+	 * tokenizers and field set mappers. Both maps must be non-empty.
+	 * @param tokenizers the map of patterns to tokenizers
+	 * @param fieldSetMappers the map of patterns to field set mappers
+	 * @since 6.0
+	 */
+	public PatternMatchingCompositeLineMapper(Map<String, LineTokenizer> tokenizers,
+			Map<String, FieldSetMapper<T>> fieldSetMappers) {
+		Assert.isTrue(!tokenizers.isEmpty(), "The 'tokenizers' property must be non-empty");
+		Assert.isTrue(!fieldSetMappers.isEmpty(), "The 'fieldSetMappers' property must be non-empty");
+		this.tokenizer = new PatternMatchingCompositeLineTokenizer(tokenizers);
+		this.patternMatcher = new PatternMatcher<>(fieldSetMappers);
 	}
 
 	@Override
-	public void afterPropertiesSet() throws Exception {
-		this.tokenizer.afterPropertiesSet();
-		Assert.state(this.patternMatcher != null, "The 'patternMatcher' property must be non-null");
+	public T mapLine(String line, int lineNumber) throws Exception {
+		return patternMatcher.match(line).mapFieldSet(this.tokenizer.tokenize(line));
 	}
 
 	public void setTokenizers(Map<String, LineTokenizer> tokenizers) {

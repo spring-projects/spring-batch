@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package org.springframework.batch.core.step;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.springframework.batch.core.BatchStatus;
@@ -64,13 +63,13 @@ public class StepExecution extends Entity {
 
 	private long filterCount = 0;
 
-	private LocalDateTime startTime = null;
+	private @Nullable LocalDateTime startTime = null;
 
 	private LocalDateTime createTime = LocalDateTime.now();
 
-	private LocalDateTime endTime = null;
+	private @Nullable LocalDateTime endTime = null;
 
-	private LocalDateTime lastUpdated = null;
+	private @Nullable LocalDateTime lastUpdated = null;
 
 	private ExecutionContext executionContext = new ExecutionContext();
 

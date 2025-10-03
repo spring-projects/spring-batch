@@ -28,6 +28,7 @@ import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.FlatFileItemWriter;
 import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
 import org.springframework.batch.item.file.builder.FlatFileItemWriterBuilder;
+import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.file.mapping.PatternMatchingCompositeLineMapper;
 import org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor;
 import org.springframework.batch.item.file.transform.FixedLengthTokenizer;
@@ -64,11 +65,11 @@ public class MultiRecordTypeJobConfiguration {
 
 	@Bean
 	public PatternMatchingCompositeLineMapper prefixMatchingLineMapper() {
-		PatternMatchingCompositeLineMapper mapper = new PatternMatchingCompositeLineMapper();
-		mapper.setTokenizers(Map.of("TRAD*", tradeLineTokenizer(), "CUST*", customerLineTokenizer()));
-		mapper.setFieldSetMappers(
-				Map.of("TRAD*", new TradeFieldSetMapper(), "CUST*", new CustomerCreditFieldSetMapper()));
-		return mapper;
+		Map<String, FixedLengthTokenizer> tokenizers = Map.of("TRAD*", tradeLineTokenizer(), "CUST*",
+				customerLineTokenizer());
+		Map<String, FieldSetMapper<?>> fieldSetMappers = Map.of("TRAD*", new TradeFieldSetMapper(), "CUST*",
+				new CustomerCreditFieldSetMapper());
+		return new PatternMatchingCompositeLineMapper(tokenizers, fieldSetMappers);
 	}
 
 	@Bean
@@ -109,21 +110,20 @@ public class MultiRecordTypeJobConfiguration {
 
 	@Bean
 	public FormatterLineAggregator<Trade> tradeLineAggregator() {
-		FormatterLineAggregator<Trade> formatterLineAggregator = new FormatterLineAggregator<>();
+		FormatterLineAggregator<Trade> formatterLineAggregator = new FormatterLineAggregator<>("TRAD%-12s%-3d%6s%-9s");
 		BeanWrapperFieldExtractor<Trade> fieldExtractor = new BeanWrapperFieldExtractor<>();
 		fieldExtractor.setNames(new String[] { "isin", "quantity", "price", "customer" });
 		formatterLineAggregator.setFieldExtractor(fieldExtractor);
-		formatterLineAggregator.setFormat("TRAD%-12s%-3d%6s%-9s");
 		return formatterLineAggregator;
 	}
 
 	@Bean
 	public FormatterLineAggregator<CustomerCredit> customerLineAggregator() {
-		FormatterLineAggregator<CustomerCredit> formatterLineAggregator = new FormatterLineAggregator<>();
+		FormatterLineAggregator<CustomerCredit> formatterLineAggregator = new FormatterLineAggregator<>(
+				"CUST%05d%-9s%08.0f");
 		BeanWrapperFieldExtractor<CustomerCredit> fieldExtractor = new BeanWrapperFieldExtractor<>();
 		fieldExtractor.setNames(new String[] { "id", "name", "credit" });
 		formatterLineAggregator.setFieldExtractor(fieldExtractor);
-		formatterLineAggregator.setFormat("CUST%05d%-9s%08.0f");
 		return formatterLineAggregator;
 	}
 

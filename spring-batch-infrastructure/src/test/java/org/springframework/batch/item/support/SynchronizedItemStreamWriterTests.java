@@ -15,12 +15,6 @@
  */
 package org.springframework.batch.item.support;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.InitializingBean;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 /**
  * @author Dimitrios Liapis
  *
@@ -29,16 +23,7 @@ class SynchronizedItemStreamWriterTests extends AbstractSynchronizedItemStreamWr
 
 	@Override
 	protected SynchronizedItemStreamWriter<Object> createNewSynchronizedItemStreamWriter() {
-		SynchronizedItemStreamWriter<Object> synchronizedItemStreamWriter = new SynchronizedItemStreamWriter<>();
-		synchronizedItemStreamWriter.setDelegate(delegate);
-		return synchronizedItemStreamWriter;
-	}
-
-	@Test
-	void testDelegateIsNotNullWhenPropertiesSet() {
-		final Exception expectedException = assertThrows(IllegalStateException.class,
-				() -> ((InitializingBean) new SynchronizedItemStreamWriter<>()).afterPropertiesSet());
-		assertEquals("A delegate item writer is required", expectedException.getMessage());
+		return new SynchronizedItemStreamWriter<>(delegate);
 	}
 
 }

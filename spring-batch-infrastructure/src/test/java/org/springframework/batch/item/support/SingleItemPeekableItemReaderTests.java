@@ -31,15 +31,14 @@ import org.springframework.batch.item.ExecutionContext;
  */
 class SingleItemPeekableItemReaderTests {
 
-	private final SingleItemPeekableItemReader<String> reader = new SingleItemPeekableItemReader<>();
-
 	/**
 	 * Test method for
 	 * {@link org.springframework.batch.item.support.SingleItemPeekableItemReader#read()}.
 	 */
 	@Test
 	void testRead() throws Exception {
-		reader.setDelegate(new CountingListItemReader<>(Arrays.asList("a", "b")));
+		SingleItemPeekableItemReader<String> reader = new SingleItemPeekableItemReader<>(
+				new CountingListItemReader<>(Arrays.asList("a", "b")));
 		assertEquals("a", reader.read());
 		assertEquals("b", reader.read());
 		assertNull(reader.read());
@@ -51,7 +50,8 @@ class SingleItemPeekableItemReaderTests {
 	 */
 	@Test
 	void testPeek() throws Exception {
-		reader.setDelegate(new CountingListItemReader<>(Arrays.asList("a", "b")));
+		SingleItemPeekableItemReader<String> reader = new SingleItemPeekableItemReader<>(
+				new CountingListItemReader<>(Arrays.asList("a", "b")));
 		assertEquals("a", reader.peek());
 		assertEquals("a", reader.read());
 		assertEquals("b", reader.read());
@@ -65,7 +65,8 @@ class SingleItemPeekableItemReaderTests {
 	 */
 	@Test
 	void testCloseAndOpenNoPeek() throws Exception {
-		reader.setDelegate(new CountingListItemReader<>(Arrays.asList("a", "b")));
+		SingleItemPeekableItemReader<String> reader = new SingleItemPeekableItemReader<>(
+				new CountingListItemReader<>(Arrays.asList("a", "b")));
 		assertEquals("a", reader.read());
 		ExecutionContext executionContext = new ExecutionContext();
 		reader.update(executionContext);
@@ -80,7 +81,8 @@ class SingleItemPeekableItemReaderTests {
 	 */
 	@Test
 	void testCloseAndOpenWithPeek() throws Exception {
-		reader.setDelegate(new CountingListItemReader<>(Arrays.asList("a", "b", "c")));
+		SingleItemPeekableItemReader<String> reader = new SingleItemPeekableItemReader<>(
+				new CountingListItemReader<>(Arrays.asList("a", "b", "c")));
 		assertEquals("a", reader.read());
 		assertEquals("b", reader.peek());
 		ExecutionContext executionContext = new ExecutionContext();
@@ -93,7 +95,8 @@ class SingleItemPeekableItemReaderTests {
 	@Test
 	void testCloseAndOpenWithPeekAndRead() throws Exception {
 		ExecutionContext executionContext = new ExecutionContext();
-		reader.setDelegate(new CountingListItemReader<>(Arrays.asList("a", "b", "c")));
+		SingleItemPeekableItemReader<String> reader = new SingleItemPeekableItemReader<>(
+				new CountingListItemReader<>(Arrays.asList("a", "b", "c")));
 		assertEquals("a", reader.read());
 		assertEquals("b", reader.peek());
 		reader.update(executionContext);

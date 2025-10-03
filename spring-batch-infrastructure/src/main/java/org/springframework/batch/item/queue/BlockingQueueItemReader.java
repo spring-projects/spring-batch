@@ -20,6 +20,9 @@ import org.springframework.batch.item.ItemReader;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This is an {@link ItemReader} that reads items from a {@link BlockingQueue}. It stops
  * reading (i.e., returns {@code null}) if no items are available in the queue after a
@@ -29,7 +32,7 @@ import java.util.concurrent.TimeUnit;
  * @author Mahmoud Ben Hassine
  * @since 5.2.0
  */
-public class BlockingQueueItemReader<T> implements ItemReader<T> {
+public class BlockingQueueItemReader<T> implements ItemReader<@NonNull T> {
 
 	private final BlockingQueue<T> queue;
 
@@ -56,7 +59,7 @@ public class BlockingQueueItemReader<T> implements ItemReader<T> {
 	}
 
 	@Override
-	public T read() throws Exception {
+	public @Nullable T read() throws Exception {
 		return this.queue.poll(this.timeout, this.timeUnit);
 	}
 

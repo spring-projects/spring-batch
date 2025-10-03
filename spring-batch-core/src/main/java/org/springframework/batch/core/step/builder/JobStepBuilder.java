@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.core.step.builder;
 
+import org.jspecify.annotations.NullUnmarked;
+
 import org.springframework.batch.core.configuration.support.MapJobRegistry;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.launch.JobOperator;
@@ -31,6 +33,7 @@ import org.springframework.batch.core.step.job.JobStep;
  * @author Mahmoud Ben Hassine
  * @since 2.2
  */
+@NullUnmarked // FIXME to remove once default constructors are removed
 public class JobStepBuilder extends StepBuilderHelper<JobStepBuilder> {
 
 	private Job job;

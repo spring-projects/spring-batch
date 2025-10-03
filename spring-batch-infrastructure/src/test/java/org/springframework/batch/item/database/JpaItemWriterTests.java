@@ -50,17 +50,8 @@ class JpaItemWriterTests {
 		if (TransactionSynchronizationManager.isSynchronizationActive()) {
 			TransactionSynchronizationManager.clearSynchronization();
 		}
-		writer = new JpaItemWriter<>();
 		emf = mock();
-		writer.setEntityManagerFactory(emf);
-	}
-
-	@Test
-	void testAfterPropertiesSet() {
-		writer = new JpaItemWriter<>();
-		Exception exception = assertThrows(IllegalStateException.class, writer::afterPropertiesSet);
-		String message = exception.getMessage();
-		assertTrue(message.contains("EntityManagerFactory"), "Wrong message for exception: " + message);
+		writer = new JpaItemWriter<>(emf);
 	}
 
 	@Test

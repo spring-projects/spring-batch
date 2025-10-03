@@ -24,6 +24,7 @@ import org.springframework.batch.item.AbstractItemStreamItemReaderTests;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.file.FlatFileItemReader;
+import org.springframework.batch.item.file.LineMapper;
 import org.springframework.batch.item.file.MultiResourceItemReader;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.core.io.ByteArrayResource;
@@ -42,13 +43,12 @@ class MultiResourceItemReaderBuilderTests extends AbstractItemStreamItemReaderTe
 	@Override
 	protected ItemReader<Foo> getItemReader() throws Exception {
 
-		FlatFileItemReader<Foo> fileReader = new FlatFileItemReader<>();
-
-		fileReader.setLineMapper((line, lineNumber) -> {
+		LineMapper<Foo> fooLineMapper = (line, lineNumber) -> {
 			Foo foo = new Foo();
 			foo.setValue(Integer.parseInt(line));
 			return foo;
-		});
+		};
+		FlatFileItemReader<Foo> fileReader = new FlatFileItemReader<>(fooLineMapper);
 		fileReader.setSaveState(true);
 
 		Resource r1 = new ByteArrayResource("1\n2\n".getBytes());

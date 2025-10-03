@@ -23,6 +23,8 @@ import jakarta.jms.Message;
 
 import org.junit.jupiter.api.Test;
 
+import org.springframework.jms.core.JmsTemplate;
+
 /**
  * @author Dave Syer
  * @author Will Schipp
@@ -36,9 +38,12 @@ class JmsMethodArgumentsKeyGeneratorTests {
 	@Test
 	void testGetKeyFromMessage() throws Exception {
 		Message message = mock();
+		JmsTemplate jmsTemplate = mock();
 		when(message.getJMSMessageID()).thenReturn("foo");
+		when(jmsTemplate.getReceiveTimeout()).thenReturn(1000L);
+		when(jmsTemplate.getDefaultDestinationName()).thenReturn("destination");
 
-		JmsItemReader<Message> itemReader = new JmsItemReader<>();
+		JmsItemReader<Message> itemReader = new JmsItemReader<>(jmsTemplate);
 		itemReader.setItemType(Message.class);
 		assertEquals("foo", methodArgumentsKeyGenerator.getKey(new Object[] { message }));
 

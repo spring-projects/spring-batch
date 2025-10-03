@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2024 the original author or authors.
+ * Copyright 2018-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jspecify.annotations.Nullable;
 
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.batch.item.file.ResourceAwareItemReaderItemStream;
 import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
@@ -55,9 +56,9 @@ public class JsonItemReader<T> extends AbstractItemCountingItemStreamItemReader<
 
 	private static final Log LOGGER = LogFactory.getLog(JsonItemReader.class);
 
-	private @Nullable Resource resource;
+	private Resource resource;
 
-	private @Nullable JsonObjectReader<T> jsonObjectReader;
+	private JsonObjectReader<T> jsonObjectReader;
 
 	private boolean strict = true;
 
@@ -75,13 +76,6 @@ public class JsonItemReader<T> extends AbstractItemCountingItemStreamItemReader<
 	}
 
 	/**
-	 * Create a new {@link JsonItemReader} instance.
-	 */
-	public JsonItemReader() {
-		setExecutionContextName(ClassUtils.getShortName(JsonItemReader.class));
-	}
-
-	/**
 	 * Set the {@link JsonObjectReader} to use to read and map Json fragments to domain
 	 * objects.
 	 * @param jsonObjectReader the json object reader to use
@@ -92,8 +86,7 @@ public class JsonItemReader<T> extends AbstractItemCountingItemStreamItemReader<
 
 	/**
 	 * In strict mode the reader will throw an exception on
-	 * {@link #open(org.springframework.batch.item.ExecutionContext)} if the input
-	 * resource does not exist.
+	 * {@link #open(ExecutionContext)} if the input resource does not exist.
 	 * @param strict true by default
 	 */
 	public void setStrict(boolean strict) {
@@ -105,7 +98,6 @@ public class JsonItemReader<T> extends AbstractItemCountingItemStreamItemReader<
 		this.resource = resource;
 	}
 
-	@SuppressWarnings("DataFlowIssue")
 	@Override
 	protected @Nullable T doRead() throws Exception {
 		return jsonObjectReader.read();
@@ -113,8 +105,6 @@ public class JsonItemReader<T> extends AbstractItemCountingItemStreamItemReader<
 
 	@Override
 	protected void doOpen() throws Exception {
-		Assert.notNull(this.resource, "The resource must not be null.");
-		Assert.notNull(this.jsonObjectReader, "The json object reader must not be null.");
 		if (!this.resource.exists()) {
 			if (this.strict) {
 				throw new IllegalStateException("Input resource must exist (reader is in 'strict' mode)");
@@ -132,13 +122,11 @@ public class JsonItemReader<T> extends AbstractItemCountingItemStreamItemReader<
 		this.jsonObjectReader.open(this.resource);
 	}
 
-	@SuppressWarnings("DataFlowIssue")
 	@Override
 	protected void doClose() throws Exception {
 		this.jsonObjectReader.close();
 	}
 
-	@SuppressWarnings("DataFlowIssue")
 	@Override
 	protected void jumpToItem(int itemIndex) throws Exception {
 		this.jsonObjectReader.jumpToItem(itemIndex);

@@ -87,18 +87,7 @@ class MongoItemWriterTests {
 		MappingMongoConverter mongoConverter = spy(new MappingMongoConverter(this.dbRefResolver, mappingContext));
 		when(this.template.getConverter()).thenReturn(mongoConverter);
 
-		writer = new MongoItemWriter<>();
-		writer.setTemplate(template);
-		writer.afterPropertiesSet();
-	}
-
-	@Test
-	void testAfterPropertiesSet() throws Exception {
-		writer = new MongoItemWriter<>();
-		assertThrows(IllegalStateException.class, writer::afterPropertiesSet);
-
-		writer.setTemplate(template);
-		writer.afterPropertiesSet();
+		writer = new MongoItemWriter<>(template);
 	}
 
 	@Test
@@ -277,7 +266,7 @@ class MongoItemWriterTests {
 				return null;
 			}).when(bulkOperations).replaceOne(any(Query.class), any(Document.class), any());
 
-			writers.add(i, new MongoItemWriter<>());
+			writers.add(i, new MongoItemWriter<>(mongoOperations));
 			writers.get(i).setTemplate(mongoOperations);
 		}
 

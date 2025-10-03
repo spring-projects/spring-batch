@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2023 the original author or authors.
+ * Copyright 2017-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,7 +63,7 @@ public class StaxEventItemReaderBuilder<T> {
 
 	private XMLInputFactory xmlInputFactory = StaxUtils.createDefensiveInputFactory();
 
-	private @Nullable String encoding = StaxEventItemReader.DEFAULT_ENCODING;
+	private String encoding = StaxEventItemReader.DEFAULT_ENCODING;
 
 	/**
 	 * Configure if the state of the
@@ -201,7 +201,7 @@ public class StaxEventItemReaderBuilder<T> {
 	 * @return the current instance of the builder
 	 * @see StaxEventItemReader#setEncoding(String)
 	 */
-	public StaxEventItemReaderBuilder<T> encoding(@Nullable String encoding) {
+	public StaxEventItemReaderBuilder<T> encoding(String encoding) {
 		this.encoding = encoding;
 
 		return this;
@@ -212,7 +212,8 @@ public class StaxEventItemReaderBuilder<T> {
 	 * @return a new instance of the {@link StaxEventItemReader}
 	 */
 	public StaxEventItemReader<T> build() {
-		StaxEventItemReader<T> reader = new StaxEventItemReader<>();
+		Assert.notNull(this.unmarshaller, "An unmarshaller is required");
+		StaxEventItemReader<T> reader = new StaxEventItemReader<>(this.unmarshaller);
 
 		if (this.resource != null) {
 			reader.setResource(this.resource);
@@ -234,9 +235,6 @@ public class StaxEventItemReaderBuilder<T> {
 		reader.setFragmentRootElementNames(this.fragmentRootElements.toArray(new String[0]));
 
 		reader.setStrict(this.strict);
-		if (this.unmarshaller != null) {
-			reader.setUnmarshaller(this.unmarshaller);
-		}
 		reader.setCurrentItemCount(this.currentItemCount);
 		reader.setMaxItemCount(this.maxItemCount);
 		reader.setXmlInputFactory(this.xmlInputFactory);

@@ -31,17 +31,15 @@ public class FlatFileItemReaderCommonTests extends AbstractItemStreamItemReaderT
 
 	@Override
 	protected ItemReader<Foo> getItemReader() throws Exception {
-		FlatFileItemReader<Foo> tested = new FlatFileItemReader<>();
 		Resource resource = new ByteArrayResource(FOOS.getBytes());
-		tested.setResource(resource);
-		tested.setLineMapper((line, lineNumber) -> {
+		LineMapper<Foo> fooLineMapper = (line, lineNumber) -> {
 			Foo foo = new Foo();
 			foo.setValue(Integer.parseInt(line.trim()));
 			return foo;
-		});
-
+		};
+		FlatFileItemReader<Foo> tested = new FlatFileItemReader<>(fooLineMapper);
+		tested.setResource(resource);
 		tested.setSaveState(true);
-		tested.afterPropertiesSet();
 		return tested;
 	}
 
@@ -51,7 +49,6 @@ public class FlatFileItemReaderCommonTests extends AbstractItemStreamItemReaderT
 		reader.close();
 
 		reader.setResource(new ByteArrayResource("".getBytes()));
-		reader.afterPropertiesSet();
 
 		reader.open(new ExecutionContext());
 

@@ -28,25 +28,6 @@ import org.springframework.messaging.support.GenericMessage;
 class MessageSourcePollerInterceptorTests {
 
 	@Test
-	void testMandatoryPropertiesUnset() {
-		MessageSourcePollerInterceptor interceptor = new MessageSourcePollerInterceptor();
-		assertThrows(IllegalStateException.class, interceptor::afterPropertiesSet);
-	}
-
-	@Test
-	void testMandatoryPropertiesSetViaConstructor() throws Exception {
-		MessageSourcePollerInterceptor interceptor = new MessageSourcePollerInterceptor(new TestMessageSource("foo"));
-		interceptor.afterPropertiesSet();
-	}
-
-	@Test
-	void testMandatoryPropertiesSet() throws Exception {
-		MessageSourcePollerInterceptor interceptor = new MessageSourcePollerInterceptor();
-		interceptor.setMessageSource(new TestMessageSource("foo"));
-		interceptor.afterPropertiesSet();
-	}
-
-	@Test
 	void testPreReceive() {
 		MessageSourcePollerInterceptor interceptor = new MessageSourcePollerInterceptor(new TestMessageSource("foo"));
 		QueueChannel channel = new QueueChannel();

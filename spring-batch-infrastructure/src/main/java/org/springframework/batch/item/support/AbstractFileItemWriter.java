@@ -81,7 +81,7 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 
 	private static final String RESTART_DATA_NAME = "current.count";
 
-	private @Nullable WritableResource resource;
+	protected @Nullable WritableResource resource;
 
 	protected @Nullable OutputState state;
 

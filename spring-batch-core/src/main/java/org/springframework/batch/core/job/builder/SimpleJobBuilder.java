@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2024 the original author or authors.
+ * Copyright 2012-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@ package org.springframework.batch.core.job.builder;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jspecify.annotations.NullUnmarked;
+
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.job.SimpleJob;
@@ -31,6 +33,7 @@ import org.springframework.util.Assert;
  * @since 2.2
  *
  */
+@NullUnmarked // FIXME to remove once default constructors are removed
 public class SimpleJobBuilder extends JobBuilderHelper<SimpleJobBuilder> {
 
 	private final List<Step> steps = new ArrayList<>();

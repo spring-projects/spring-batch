@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,14 +18,14 @@ package org.springframework.batch.core.job;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.NullUnmarked;
+
 import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.step.Step;
-import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.batch.core.step.Step;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.util.Assert;
 
 /**
  * Implementation of {@link StepHandler} that manages repository and restart concerns.
@@ -33,20 +33,14 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  *
  */
-public class SimpleStepHandler implements StepHandler, InitializingBean {
+@NullUnmarked
+public class SimpleStepHandler implements StepHandler {
 
 	private static final Log logger = LogFactory.getLog(SimpleStepHandler.class);
 
 	private JobRepository jobRepository;
 
 	private ExecutionContext executionContext;
-
-	/**
-	 * Convenient default constructor for configuration usage.
-	 */
-	public SimpleStepHandler() {
-		this(null);
-	}
 
 	/**
 	 * @param jobRepository a
@@ -65,16 +59,6 @@ public class SimpleStepHandler implements StepHandler, InitializingBean {
 	public SimpleStepHandler(JobRepository jobRepository, ExecutionContext executionContext) {
 		this.jobRepository = jobRepository;
 		this.executionContext = executionContext;
-	}
-
-	/**
-	 * Check mandatory properties (jobRepository).
-	 *
-	 * @see InitializingBean#afterPropertiesSet()
-	 */
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		Assert.state(jobRepository != null, "A JobRepository must be provided");
 	}
 
 	/**

@@ -21,7 +21,7 @@ import java.util.concurrent.FutureTask;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jspecify.annotations.Nullable;
+import org.jspecify.annotations.NullUnmarked;
 
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.JobExecution;
@@ -63,6 +63,7 @@ import org.springframework.util.StringUtils;
  * @author Injae Kim
  * @author Hyunsang Han
  */
+@NullUnmarked // FIXME to remove once default constructors are removed
 public class SystemCommandTasklet implements StepExecutionListener, StoppableTasklet, InitializingBean {
 
 	protected static final Log logger = LogFactory.getLog(SystemCommandTasklet.class);
@@ -98,7 +99,7 @@ public class SystemCommandTasklet implements StepExecutionListener, StoppableTas
 	 * {@link SystemProcessExitCodeMapper}.
 	 */
 	@Override
-	public @Nullable RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 
 		FutureTask<Integer> systemCommandTask = new FutureTask<>(() -> {
 			Process process = commandRunner.exec(cmdArray, environmentParams, workingDirectory);

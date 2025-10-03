@@ -31,8 +31,8 @@ class GroupAwareJobTests {
 
 	@Test
 	void testCreateJob() {
-		GroupAwareJob result = new GroupAwareJob(job);
-		assertEquals("foo", result.getName());
+		GroupAwareJob result = new GroupAwareJob("group", job);
+		assertEquals("group.foo", result.getName());
 	}
 
 	@Test

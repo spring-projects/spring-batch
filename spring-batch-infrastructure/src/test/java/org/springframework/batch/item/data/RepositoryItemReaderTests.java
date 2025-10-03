@@ -63,44 +63,9 @@ class RepositoryItemReaderTests {
 
 	@BeforeEach
 	void setUp() {
-		reader = new RepositoryItemReader<>();
-		reader.setRepository(repository);
+		reader = new RepositoryItemReader<>(repository, sorts);
 		reader.setPageSize(1);
-		reader.setSort(sorts);
 		reader.setMethodName("findAll");
-	}
-
-	@Test
-	void testAfterPropertiesSet() throws Exception {
-		reader = new RepositoryItemReader<>();
-		assertThrows(IllegalStateException.class, reader::afterPropertiesSet);
-
-		reader = new RepositoryItemReader<>();
-		reader.setRepository(repository);
-		assertThrows(IllegalStateException.class, reader::afterPropertiesSet);
-
-		reader = new RepositoryItemReader<>();
-		reader.setRepository(repository);
-		reader.setPageSize(-1);
-		assertThrows(IllegalStateException.class, reader::afterPropertiesSet);
-
-		reader = new RepositoryItemReader<>();
-		reader.setRepository(repository);
-		reader.setPageSize(1);
-		assertThrows(IllegalStateException.class, reader::afterPropertiesSet);
-
-		reader = new RepositoryItemReader<>();
-		reader.setRepository(repository);
-		reader.setPageSize(1);
-		reader.setSort(sorts);
-		assertThrows(IllegalStateException.class, reader::afterPropertiesSet);
-
-		reader = new RepositoryItemReader<>();
-		reader.setRepository(repository);
-		reader.setPageSize(1);
-		reader.setSort(sorts);
-		reader.setMethodName("findAll");
-		reader.afterPropertiesSet();
 	}
 
 	@Test
@@ -229,11 +194,9 @@ class RepositoryItemReaderTests {
 	@Test
 	void testDifferentTypes() throws Exception {
 		TestRepository differentRepository = mock();
-		RepositoryItemReader<String> reader = new RepositoryItemReader<>();
 		sorts = Collections.singletonMap("id", Direction.ASC);
-		reader.setRepository(differentRepository);
+		RepositoryItemReader<String> reader = new RepositoryItemReader<>(differentRepository, sorts);
 		reader.setPageSize(1);
-		reader.setSort(sorts);
 		reader.setMethodName("findFirstNames");
 
 		ArgumentCaptor<PageRequest> pageRequestContainer = ArgumentCaptor.forClass(PageRequest.class);

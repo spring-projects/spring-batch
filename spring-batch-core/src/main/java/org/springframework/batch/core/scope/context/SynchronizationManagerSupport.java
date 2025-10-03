@@ -20,7 +20,7 @@ import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.jspecify.annotations.Nullable;
+import org.jspecify.annotations.NullUnmarked;
 
 /**
  * Central convenience class for framework use in managing the scope context.
@@ -31,6 +31,7 @@ import org.jspecify.annotations.Nullable;
  * @author Yanming Zhou
  * @since 3.0
  */
+@NullUnmarked
 public abstract class SynchronizationManagerSupport<E, C> {
 
 	/*
@@ -63,7 +64,7 @@ public abstract class SynchronizationManagerSupport<E, C> {
 	 * @return the current context or {@code null} if there is none (if one has not been
 	 * registered for this thread).
 	 */
-	public @Nullable C getContext() {
+	public C getContext() {
 		if (getCurrent().isEmpty()) {
 			return null;
 		}
@@ -79,7 +80,7 @@ public abstract class SynchronizationManagerSupport<E, C> {
 	 * @param execution the execution to register
 	 * @return a new context or the current one if it has the same execution
 	 */
-	public @Nullable C register(@Nullable E execution) {
+	public C register(E execution) {
 		if (execution == null) {
 			return null;
 		}

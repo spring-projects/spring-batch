@@ -31,13 +31,13 @@
 	<jpa:repositories base-package="org.springframework.batch.item.sample.books.data"/>
 
 	<bean id="authorRepositoryItemReader" class="org.springframework.batch.item.data.RepositoryItemReader">
-		<property name="repository" ref="authorRepository"/>
+		<constructor-arg name="repository" ref="authorRepository"/>
 		<property name="methodName" value="findAll"/>
-		<property name="sort">
+		<constructor-arg name="sorts">
 			<map>
 				<entry key="id" value="ASC"/>
 			</map>
-		</property>
+		</constructor-arg>
 	</bean>
 
 </beans>

@@ -39,9 +39,7 @@ public class RedisItemWriterTests {
 
 	@BeforeEach
 	public void setup() {
-		this.redisItemWriter = new RedisItemWriter<>();
-		this.redisItemWriter.setRedisTemplate(this.redisTemplate);
-		this.redisItemWriter.setItemKeyMapper(new RedisItemKeyMapper());
+		this.redisItemWriter = new RedisItemWriter<>(new RedisItemKeyMapper(), this.redisTemplate);
 	}
 
 	@Test

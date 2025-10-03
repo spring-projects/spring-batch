@@ -19,7 +19,7 @@
 
 	<bean id="itemReader" class="org.springframework.batch.item.file.FlatFileItemReader" scope="step">
 		<property name="resource" value="#{jobParameters[inputFile]}" />
-		<property name="lineMapper">
+		<constructor-arg name="lineMapper">
 			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
 				<property name="lineTokenizer">
 					<bean
@@ -36,12 +36,12 @@
 					</bean>
 				</property>
 			</bean>
-		</property>
+		</constructor-arg>
 	</bean>
 
 	<bean id="itemWriter" class="org.springframework.batch.item.file.FlatFileItemWriter" scope="step">
 		<property name="resource" value="#{jobParameters[outputFile]}" />
-		<property name="lineAggregator">
+		<constructor-arg name="lineAggregator">
 			<bean
 				class="org.springframework.batch.item.file.transform.FormatterLineAggregator">
 				<property name="fieldExtractor">
@@ -50,9 +50,9 @@
 						<property name="names" value="name,credit" />
 					</bean>
 				</property>
-				<property name="format" value="%-9s%-2.0f" />
+				<constructor-arg name="format" value="%-9s%-2.0f" />
 			</bean>
-		</property>
+		</constructor-arg>
 	</bean>
 
 </beans>

@@ -20,7 +20,6 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SuffixRecordSeparatorPolicyTests {
@@ -62,21 +61,10 @@ class SuffixRecordSeparatorPolicyTests {
 	}
 
 	@Test
-	void testNullLineIsEndOfRecord() {
-		assertTrue(policy.isEndOfRecord(null));
-	}
-
-	@Test
 	void testPostProcessSunnyDay() {
 		String line = LINE;
 		String record = line + SuffixRecordSeparatorPolicy.DEFAULT_SUFFIX;
 		assertEquals(line, policy.postProcess(record));
-	}
-
-	@Test
-	void testPostProcessNullLine() {
-		String line = null;
-		assertNull(policy.postProcess(line));
 	}
 
 }

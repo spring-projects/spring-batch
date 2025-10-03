@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2023 the original author or authors.
+ * Copyright 2002-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -12,14 +12,17 @@
  */
 package org.springframework.batch.item;
 
-import org.jspecify.annotations.Nullable;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.util.Assert;
 
 /**
  * A base class to implement any {@link ItemWriter} that writes to a key value store using
- * a {@link Converter} to derive a key from an item
+ * a {@link Converter} to derive a key from an item. If a derived key is null, the item
+ * will be skipped and a warning logged.
  *
  * @author David Turanski
  * @author Mahmoud Ben Hassine
@@ -29,15 +32,31 @@ import org.springframework.util.Assert;
  */
 public abstract class KeyValueItemWriter<K, V> implements ItemWriter<V>, InitializingBean {
 
-	protected @Nullable Converter<V, K> itemKeyMapper;
+	private static final Log logger = LogFactory.getLog(KeyValueItemWriter.class);
+
+	protected Converter<V, K> itemKeyMapper;
 
 	protected boolean delete;
+
+	/**
+	 * Create a new {@link KeyValueItemWriter} instance.
+	 * @param itemKeyMapper the {@link Converter} used to derive a key from an item.
+	 * @since 6.0
+	 */
+	public KeyValueItemWriter(Converter<V, K> itemKeyMapper) {
+		Assert.notNull(itemKeyMapper, "itemKeyMapper must not be null");
+		this.itemKeyMapper = itemKeyMapper;
+	}
 
 	@Override
 	public void write(Chunk<? extends V> chunk) throws Exception {
 		for (V item : chunk) {
-			@SuppressWarnings("DataFlowIssue")
 			K key = itemKeyMapper.convert(item);
+			// TODO should we add a strict mode and throw an exception instead?
+			if (key == null) {
+				logger.warn("Derived Key is null for item = " + item + ". This item will be skipped.");
+				continue;
+			}
 			writeKeyValue(key, item);
 		}
 		flush();
@@ -55,7 +74,7 @@ public abstract class KeyValueItemWriter<K, V> implements ItemWriter<V>, Initial
 	 * @param key the key
 	 * @param value the item
 	 */
-	protected abstract void writeKeyValue(@Nullable K key, V value);
+	protected abstract void writeKeyValue(K key, V value);
 
 	/**
 	 * afterPropertiesSet() hook
@@ -81,7 +100,6 @@ public abstract class KeyValueItemWriter<K, V> implements ItemWriter<V>, Initial
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.state(itemKeyMapper != null, "itemKeyMapper requires a Converter type.");
 		init();
 	}
 

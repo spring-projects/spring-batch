@@ -79,7 +79,7 @@
 		<integration:queue />
 		<integration:interceptors>
 			<bean id="pollerInterceptor" class="org.springframework.batch.integration.chunk.MessageSourcePollerInterceptor">
-				<property name="messageSource">
+				<constructor-arg name="source">
 					<bean class="org.springframework.integration.jms.JmsDestinationPollingSource">
 						<constructor-arg>
 							<bean class="org.springframework.jms.core.JmsTemplate">
@@ -89,7 +89,7 @@
 							</bean>
 						</constructor-arg>
 					</bean>
-				</property>
+				</constructor-arg>
 				<property name="channel" ref="incoming" />
 			</bean>
 		</integration:interceptors>

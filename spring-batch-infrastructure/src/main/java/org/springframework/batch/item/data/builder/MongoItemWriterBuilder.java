@@ -114,8 +114,7 @@ public class MongoItemWriterBuilder<T> {
 	public MongoItemWriter<T> build() {
 		Assert.notNull(this.template, "template is required.");
 
-		MongoItemWriter<T> writer = new MongoItemWriter<>();
-		writer.setTemplate(this.template);
+		MongoItemWriter<T> writer = new MongoItemWriter<>(this.template);
 		writer.setMode(this.mode);
 		writer.setCollection(this.collection);
 

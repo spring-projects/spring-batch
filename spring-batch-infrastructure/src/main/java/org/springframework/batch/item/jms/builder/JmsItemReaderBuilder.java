@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2021 the original author or authors.
+ * Copyright 2017-2025 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -70,12 +70,11 @@ public class JmsItemReaderBuilder<T> {
 	 */
 	public JmsItemReader<T> build() {
 		Assert.notNull(this.jmsTemplate, "jmsTemplate is required.");
-		JmsItemReader<T> jmsItemReader = new JmsItemReader<>();
+		JmsItemReader<T> jmsItemReader = new JmsItemReader<>(this.jmsTemplate);
 
 		if (this.itemType != null) {
 			jmsItemReader.setItemType(this.itemType);
 		}
-		jmsItemReader.setJmsTemplate(this.jmsTemplate);
 		return jmsItemReader;
 	}
 

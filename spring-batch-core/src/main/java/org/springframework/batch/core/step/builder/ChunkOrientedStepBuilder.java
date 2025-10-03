@@ -22,6 +22,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import io.micrometer.observation.ObservationRegistry;
+import org.jspecify.annotations.NullUnmarked;
 
 import org.springframework.batch.core.annotation.AfterChunk;
 import org.springframework.batch.core.annotation.AfterProcess;
@@ -70,6 +71,7 @@ import org.springframework.util.Assert;
  * @author Mahmoud Ben Hassine
  * @since 6.0
  */
+@NullUnmarked
 public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrientedStepBuilder<I, O>> {
 
 	private final int chunkSize;

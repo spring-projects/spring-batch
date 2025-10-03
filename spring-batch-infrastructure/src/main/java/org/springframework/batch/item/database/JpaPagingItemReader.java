@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2024 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -86,7 +86,7 @@ import org.springframework.util.StringUtils;
  */
 public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
 
-	private @Nullable EntityManagerFactory entityManagerFactory;
+	private EntityManagerFactory entityManagerFactory;
 
 	private @Nullable EntityManager entityManager;
 
@@ -102,7 +102,14 @@ public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
 
 	private boolean transacted = true;// default value
 
-	public JpaPagingItemReader() {
+	/**
+	 * Create a new {@link JpaPagingItemReader} instance.
+	 * @param entityManagerFactory the JPA entity manager factory.
+	 * @since 6.0
+	 */
+	public JpaPagingItemReader(EntityManagerFactory entityManagerFactory) {
+		Assert.notNull(entityManagerFactory, "EntityManagerFactory must not be null.");
+		this.entityManagerFactory = entityManagerFactory;
 		setName(ClassUtils.getShortName(JpaPagingItemReader.class));
 	}
 
@@ -147,7 +154,8 @@ public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
 		super.afterPropertiesSet();
 
 		if (queryProvider == null) {
-			Assert.state(entityManagerFactory != null, "EntityManager is required when queryProvider is null");
+			// Assertion on EMF is wrong here since the EMF is called in doOpen regardless
+			// of whether the queryProvider is set or not.
 			Assert.state(StringUtils.hasLength(queryString), "Query string is required when queryProvider is null");
 		}
 	}
@@ -166,7 +174,6 @@ public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
 		this.queryProvider = queryProvider;
 	}
 
-	@SuppressWarnings("DataFlowIssue")
 	@Override
 	protected void doOpen() throws Exception {
 		super.doOpen();

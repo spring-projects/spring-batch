@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2023 the original author or authors.
+ * Copyright 2013-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 package org.springframework.batch.core.scope;
+
+import org.jspecify.annotations.NullUnmarked;
 
 import org.springframework.aop.scope.ScopedProxyUtils;
 import org.springframework.batch.core.scope.context.StepContext;
@@ -36,6 +38,7 @@ import org.springframework.util.Assert;
  * @author Mahmoud Ben Hassine
  * @since 3.0
  */
+@NullUnmarked
 public abstract class BatchScopeSupport implements Scope, BeanFactoryPostProcessor, Ordered {
 
 	private boolean autoProxy = true;

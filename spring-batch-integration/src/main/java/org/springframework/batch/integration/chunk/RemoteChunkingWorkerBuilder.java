@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.integration.chunk;
 
+import org.jspecify.annotations.NullUnmarked;
+
 import org.springframework.batch.core.step.item.SimpleChunkProcessor;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
@@ -41,6 +43,7 @@ import org.springframework.util.Assert;
  * @since 4.1
  * @author Mahmoud Ben Hassine
  */
+@NullUnmarked
 public class RemoteChunkingWorkerBuilder<I, O> {
 
 	private static final String SERVICE_ACTIVATOR_METHOD_NAME = "handle";

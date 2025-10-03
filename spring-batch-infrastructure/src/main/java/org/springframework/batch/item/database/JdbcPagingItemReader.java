@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2024 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -81,9 +81,9 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 
 	public static final int VALUE_NOT_SET = -1;
 
-	private @Nullable DataSource dataSource;
+	private DataSource dataSource;
 
-	private @Nullable PagingQueryProvider queryProvider;
+	private PagingQueryProvider queryProvider;
 
 	private @Nullable Map<String, Object> parameterValues;
 
@@ -101,7 +101,18 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 
 	private int fetchSize = VALUE_NOT_SET;
 
-	public JdbcPagingItemReader() {
+	/**
+	 * Create a new {@link JdbcPagingItemReader} instance. The DataSource and
+	 * PagingQueryProvider must be provided through their respective setters.
+	 * @param dataSource the DataSource to use
+	 * @param pagingQueryProvider the {@link PagingQueryProvider} to use
+	 * @since 6.0
+	 */
+	public JdbcPagingItemReader(DataSource dataSource, PagingQueryProvider pagingQueryProvider) {
+		Assert.notNull(dataSource, "DataSource must not be null");
+		Assert.notNull(pagingQueryProvider, "PagingQueryProvider must not be null");
+		this.dataSource = dataSource;
+		this.queryProvider = pagingQueryProvider;
 		setName(ClassUtils.getShortName(JdbcPagingItemReader.class));
 	}
 
@@ -157,14 +168,12 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
-		Assert.state(dataSource != null, "DataSource may not be null");
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 		if (fetchSize != VALUE_NOT_SET) {
 			jdbcTemplate.setFetchSize(fetchSize);
 		}
 		jdbcTemplate.setMaxRows(getPageSize());
 		namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
-		Assert.state(queryProvider != null, "QueryProvider may not be null");
 		queryProvider.init(dataSource);
 		this.firstPageSql = queryProvider.generateFirstPageQuery(getPageSize());
 		this.remainingPagesSql = queryProvider.generateRemainingPagesQuery(getPageSize());

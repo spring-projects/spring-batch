@@ -15,13 +15,6 @@
  */
 package org.springframework.batch.item.support;
 
-import org.junit.jupiter.api.Test;
-
-import org.springframework.beans.factory.InitializingBean;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 /**
  * @author Matthew Ouyang
  * @author Mahmoud Ben Hassine
@@ -32,16 +25,7 @@ public class SynchronizedItemStreamReaderTests extends AbstractSynchronizedItemS
 
 	@Override
 	protected SynchronizedItemStreamReader<Object> createNewSynchronizedItemStreamReader() {
-		SynchronizedItemStreamReader<Object> synchronizedItemStreamReader = new SynchronizedItemStreamReader<>();
-		synchronizedItemStreamReader.setDelegate(delegate);
-		return synchronizedItemStreamReader;
-	}
-
-	@Test
-	void testDelegateIsNotNullWhenPropertiesSet() {
-		final Exception expectedException = assertThrows(IllegalStateException.class,
-				() -> ((InitializingBean) new SynchronizedItemStreamReader<>()).afterPropertiesSet());
-		assertEquals("A delegate item reader is required", expectedException.getMessage());
+		return new SynchronizedItemStreamReader<>(delegate);
 	}
 
 }

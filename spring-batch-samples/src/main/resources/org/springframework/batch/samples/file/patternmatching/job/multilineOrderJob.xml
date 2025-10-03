@@ -35,14 +35,14 @@
 
 	<bean id="fileItemReader" class="org.springframework.batch.item.file.FlatFileItemReader">
 		<property name="resource" value="classpath:org/springframework/batch/samples/file/patternmatching/data/multilineOrderInput.txt" />
-		<property name="lineMapper">
+		<constructor-arg name="lineMapper">
 			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
 				<property name="lineTokenizer" ref="orderFileTokenizer" />
 				<property name="fieldSetMapper">
 					<bean class="org.springframework.batch.item.file.mapping.PassThroughFieldSetMapper" />
 				</property>
 			</bean>
-		</property>
+		</constructor-arg>
 	</bean>
 
 	<bean id="headerFieldSetMapper"    class="org.springframework.batch.samples.file.patternmatching.internal.mapper.HeaderFieldSetMapper" />
@@ -59,10 +59,10 @@
 
 	<bean id="fileItemWriter" class="org.springframework.batch.item.file.FlatFileItemWriter">
 		<property name="resource" value="file:target/test-outputs/multilineOrderOutput.txt" />
-		<property name="lineAggregator">
+		<constructor-arg name="lineAggregator">
 			<bean class="org.springframework.batch.samples.file.patternmatching.internal.OrderLineAggregator">
 				<property name="aggregators" ref="outputAggregators"/>
 			</bean>
-		</property>
+		</constructor-arg>
 	</bean>
 </beans>

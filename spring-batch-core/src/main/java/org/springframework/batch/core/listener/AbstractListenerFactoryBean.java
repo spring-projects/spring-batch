@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2024 the original author or authors.
+ * Copyright 2002-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.NullUnmarked;
 
 import org.springframework.aop.TargetSource;
 import org.springframework.aop.framework.Advised;
@@ -62,6 +63,7 @@ import org.springframework.util.Assert;
  * @since 2.0
  * @see ListenerMetaData
  */
+@NullUnmarked
 public abstract class AbstractListenerFactoryBean<T> implements FactoryBean<Object>, InitializingBean {
 
 	private static final Log logger = LogFactory.getLog(AbstractListenerFactoryBean.class);

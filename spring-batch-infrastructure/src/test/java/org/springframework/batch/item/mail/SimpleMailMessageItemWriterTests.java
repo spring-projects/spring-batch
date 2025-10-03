@@ -45,9 +45,9 @@ import static org.mockito.Mockito.when;
  */
 class SimpleMailMessageItemWriterTests {
 
-	private final SimpleMailMessageItemWriter writer = new SimpleMailMessageItemWriter();
-
 	private final MailSender mailSender = mock();
+
+	private final SimpleMailMessageItemWriter writer = new SimpleMailMessageItemWriter(mailSender);
 
 	@BeforeEach
 	void setUp() {

@@ -52,7 +52,7 @@ public class DefaultJobKeyGenerator implements JobKeyGenerator {
 		Collections.sort(keys);
 		for (String key : keys) {
 			JobParameter<?> jobParameter = props.get(key);
-			if (jobParameter.isIdentifying()) {
+			if (jobParameter != null && jobParameter.isIdentifying()) {
 				String value = jobParameter.toString();
 				stringBuffer.append(key).append("=").append(value).append(";");
 			}

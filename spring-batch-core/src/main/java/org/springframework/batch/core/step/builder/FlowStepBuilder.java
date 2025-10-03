@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.core.step.builder;
 
+import org.jspecify.annotations.NullUnmarked;
+
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.job.flow.Flow;
 import org.springframework.batch.core.job.flow.FlowStep;
@@ -27,6 +29,7 @@ import org.springframework.batch.core.job.flow.FlowStep;
  * @author Mahmoud Ben Hassine
  * @since 2.2
  */
+@NullUnmarked // FIXME to remove once default constructors are removed
 public class FlowStepBuilder extends StepBuilderHelper<FlowStepBuilder> {
 
 	private Flow flow;

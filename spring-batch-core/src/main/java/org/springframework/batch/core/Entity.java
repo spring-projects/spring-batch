@@ -19,6 +19,8 @@ package org.springframework.batch.core;
 import java.io.Serializable;
 import java.util.Objects;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.util.ClassUtils;
 
 /**
@@ -35,7 +37,7 @@ public class Entity implements Serializable {
 
 	private final long id;
 
-	private Integer version;
+	private @Nullable Integer version;
 
 	/**
 	 * The constructor for the {@link Entity} where the ID is established.
@@ -55,7 +57,7 @@ public class Entity implements Serializable {
 	/**
 	 * @return the version.
 	 */
-	public Integer getVersion() {
+	public @Nullable Integer getVersion() {
 		return version;
 	}
 

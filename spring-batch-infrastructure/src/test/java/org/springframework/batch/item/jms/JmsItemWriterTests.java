@@ -27,22 +27,20 @@ import static org.mockito.Mockito.mock;
 
 class JmsItemWriterTests {
 
-	JmsItemWriter<String> itemWriter = new JmsItemWriter<>();
-
 	@Test
 	void testNoItemTypeSunnyDay() throws Exception {
 		JmsOperations jmsTemplate = mock();
 		jmsTemplate.convertAndSend("foo");
 		jmsTemplate.convertAndSend("bar");
 
-		itemWriter.setJmsTemplate(jmsTemplate);
+		JmsItemWriter<String> itemWriter = new JmsItemWriter<>(jmsTemplate);
 		itemWriter.write(Chunk.of("foo", "bar"));
 	}
 
 	@Test
 	void testTemplateWithNoDefaultDestination() {
 		JmsTemplate jmsTemplate = new JmsTemplate();
-		assertThrows(IllegalArgumentException.class, () -> itemWriter.setJmsTemplate(jmsTemplate));
+		assertThrows(IllegalArgumentException.class, () -> new JmsItemWriter<>(jmsTemplate));
 	}
 
 }

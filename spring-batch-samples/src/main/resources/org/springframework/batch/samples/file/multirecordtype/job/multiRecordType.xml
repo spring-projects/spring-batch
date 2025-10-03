@@ -20,23 +20,23 @@
 
 	<bean id="itemReader" class="org.springframework.batch.item.file.FlatFileItemReader">
 		<property name="resource" ref="inputResource" />
-		<property name="lineMapper" ref="prefixMatchingLineMapper"/>
+		<constructor-arg name="lineMapper" ref="prefixMatchingLineMapper"/>
 	</bean>
 
 	<bean id="prefixMatchingLineMapper"
 		class="org.springframework.batch.item.file.mapping.PatternMatchingCompositeLineMapper">
-		<property name="tokenizers">
+		<constructor-arg name="tokenizers">
 			<map>
 				<entry key="TRAD*" value-ref="tradeLineTokenizer" />
 				<entry key="CUST*" value-ref="customerLineTokenizer" />
 			</map>
-		</property>
-		<property name="fieldSetMappers">
+		</constructor-arg>
+		<constructor-arg name="fieldSetMappers">
 			<map>
 				<entry key="TRAD*" value-ref="tradeFieldSetMapper" />
 				<entry key="CUST*" value-ref="customerFieldSetMapper" />
 			</map>
-		</property>
+		</constructor-arg>
 	</bean>
 
 	<bean id="tradeLineTokenizer"
@@ -60,12 +60,12 @@
 
 	<bean id="itemWriter" class="org.springframework.batch.item.file.FlatFileItemWriter" scope="step">
 		<property name="resource" value="#{jobParameters[outputFile]}" />
-		<property name="lineAggregator">
+		<constructor-arg name="lineAggregator">
 			<bean class="org.springframework.batch.samples.file.multirecordtype.DelegatingTradeLineAggregator">
 				<property name="tradeLineAggregator" ref="tradeLineAggregator" />
 				<property name="customerLineAggregator" ref="customerLineAggregator" />
 			</bean>
-		</property>
+		</constructor-arg>
 	</bean>
 
 	<bean id="tradeLineAggregator"
@@ -75,7 +75,7 @@
 				<property name="names" value="isin,quantity,price,customer" />
 			</bean>
 		</property>
-		<property name="format" value="TRAD%-12s%-3d%6s%-9s" />
+		<constructor-arg name="format" value="TRAD%-12s%-3d%6s%-9s" />
 	</bean>
 
 	<bean id="customerLineAggregator"
@@ -85,6 +85,6 @@
 				<property name="names" value="id,name,credit" />
 			</bean>
 		</property>
-		<property name="format" value="CUST%05d%-9s%08.0f" />
+		<constructor-arg name="format" value="CUST%05d%-9s%08.0f" />
 	</bean>
 </beans>

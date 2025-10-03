@@ -17,42 +17,42 @@
 	<bean id="baseAggregator" class="org.springframework.batch.item.file.transform.FormatterLineAggregator" abstract="true" />
 
 	<bean id="outputHeader" parent="baseAggregator">
-		<property name="format" value="%-12s%-10s%-30s"/>
+		<constructor-arg name="format" value="%-12s%-10s%-30s"/>
 		<property name="fieldExtractor">
 			<bean class="org.springframework.batch.samples.file.patternmatching.internal.extractor.HeaderFieldExtractor"/>
 		</property>
 	</bean>
 	
 	<bean id="outputFooter" parent="baseAggregator">
-		<property name="format" value="%-10s%20s"/>
+		<constructor-arg name="format" value="%-10s%20s"/>
 		<property name="fieldExtractor">
 			<bean class="org.springframework.batch.samples.file.patternmatching.internal.extractor.FooterFieldExtractor"/>
 		</property>
 	</bean>
 	
 	<bean id="outputCustomer" parent="baseAggregator">
-		<property name="format" value="%-9s%-10s%-10s%-10s%-10s"/>
+		<constructor-arg name="format" value="%-9s%-10s%-10s%-10s%-10s"/>
 		<property name="fieldExtractor">
 			<bean class="org.springframework.batch.samples.file.patternmatching.internal.extractor.CustomerFieldExtractor"/>
 		</property>
 	</bean>
 	
 	<bean id="outputAddress" parent="baseAggregator">
-		<property name="format" value="%-8s%-20s%-10s%-10s"/>
+		<constructor-arg name="format" value="%-8s%-20s%-10s%-10s"/>
 		<property name="fieldExtractor">
 			<bean class="org.springframework.batch.samples.file.patternmatching.internal.extractor.AddressFieldExtractor"/>
 		</property>
 	</bean>
 	
 	<bean id="outputBilling" parent="baseAggregator">
-		<property name="format" value="%-8s%-10s%-20s"/>
+		<constructor-arg name="format" value="%-8s%-10s%-20s"/>
 		<property name="fieldExtractor">
 			<bean class="org.springframework.batch.samples.file.patternmatching.internal.extractor.BillingInfoFieldExtractor"/>
 		</property>
 	</bean>
 	
 	<bean id="outputLineItem" parent="baseAggregator">
-		<property name="format" value="%-5s%-10s%-10s"/>
+		<constructor-arg name="format" value="%-5s%-10s%-10s"/>
 		<property name="fieldExtractor">
 			<bean class="org.springframework.batch.samples.file.patternmatching.internal.extractor.LineItemFieldExtractor"/>
 		</property>

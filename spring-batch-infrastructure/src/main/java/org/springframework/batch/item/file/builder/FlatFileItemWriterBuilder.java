@@ -33,6 +33,8 @@ import org.springframework.batch.item.file.transform.FieldExtractor;
 import org.springframework.batch.item.file.transform.FormatterLineAggregator;
 import org.springframework.batch.item.file.transform.LineAggregator;
 import org.springframework.batch.item.file.transform.RecordFieldExtractor;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.WritableResource;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -385,8 +387,7 @@ public class FlatFileItemWriterBuilder<T> {
 			Assert.isTrue(!this.names.isEmpty() || this.fieldExtractor != null,
 					"A list of field names or a field extractor is required");
 
-			FormatterLineAggregator<T> formatterLineAggregator = new FormatterLineAggregator<>();
-			formatterLineAggregator.setFormat(this.format);
+			FormatterLineAggregator<T> formatterLineAggregator = new FormatterLineAggregator<>(this.format);
 			formatterLineAggregator.setLocale(this.locale);
 			formatterLineAggregator.setMinimumLength(this.minimumLength);
 			formatterLineAggregator.setMaximumLength(this.maximumLength);
@@ -399,7 +400,6 @@ public class FlatFileItemWriterBuilder<T> {
 					BeanWrapperFieldExtractor<T> beanWrapperFieldExtractor = new BeanWrapperFieldExtractor<>();
 					beanWrapperFieldExtractor.setNames(this.names.toArray(new String[0]));
 					try {
-						beanWrapperFieldExtractor.afterPropertiesSet();
 						this.fieldExtractor = beanWrapperFieldExtractor;
 					}
 					catch (Exception e) {
@@ -517,7 +517,6 @@ public class FlatFileItemWriterBuilder<T> {
 					BeanWrapperFieldExtractor<T> beanWrapperFieldExtractor = new BeanWrapperFieldExtractor<>();
 					beanWrapperFieldExtractor.setNames(this.names.toArray(new String[0]));
 					try {
-						beanWrapperFieldExtractor.afterPropertiesSet();
 						this.fieldExtractor = beanWrapperFieldExtractor;
 					}
 					catch (Exception e) {
@@ -548,9 +547,22 @@ public class FlatFileItemWriterBuilder<T> {
 		if (this.resource == null) {
 			logger.debug("The resource is null. This is only a valid scenario when "
 					+ "injecting it later as in when using the MultiResourceItemWriter");
+			// FIXME this is wrong. Make resource optional
+			this.resource = new FileSystemResource("");
+		}
+		if (this.lineAggregator == null) {
+			Assert.state(this.delimitedBuilder == null || this.formattedBuilder == null,
+					"Either a DelimitedLineAggregator or a FormatterLineAggregator should be provided, but not both");
+			if (this.delimitedBuilder != null) {
+				this.lineAggregator = this.delimitedBuilder.build();
+			}
+			else {
+				Assert.state(this.formattedBuilder != null, "A FormattedBuilder is required");
+				this.lineAggregator = this.formattedBuilder.build();
+			}
 		}
 
-		FlatFileItemWriter<T> writer = new FlatFileItemWriter<>();
+		FlatFileItemWriter<T> writer = new FlatFileItemWriter<>(this.resource, this.lineAggregator);
 
 		if (this.name != null) {
 			writer.setName(this.name);
@@ -564,18 +576,6 @@ public class FlatFileItemWriterBuilder<T> {
 		if (this.headerCallback != null) {
 			writer.setHeaderCallback(this.headerCallback);
 		}
-		if (this.lineAggregator == null) {
-			Assert.state(this.delimitedBuilder == null || this.formattedBuilder == null,
-					"Either a DelimitedLineAggregator or a FormatterLineAggregator should be provided, but not both");
-			if (this.delimitedBuilder != null) {
-				this.lineAggregator = this.delimitedBuilder.build();
-			}
-			else {
-				Assert.state(this.formattedBuilder != null, "A FormattedBuilder is required");
-				this.lineAggregator = this.formattedBuilder.build();
-			}
-		}
-		writer.setLineAggregator(this.lineAggregator);
 		writer.setLineSeparator(this.lineSeparator);
 		if (this.resource != null) {
 			writer.setResource(this.resource);

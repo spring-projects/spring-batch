@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.integration.chunk;
 
+import org.jspecify.annotations.NullUnmarked;
+
 import org.springframework.batch.core.listener.ChunkListener;
 import org.springframework.batch.core.listener.ItemReadListener;
 import org.springframework.batch.core.listener.ItemWriteListener;
@@ -66,6 +68,7 @@ import org.springframework.util.Assert;
  * @since 4.2
  * @author Mahmoud Ben Hassine
  */
+@NullUnmarked
 public class RemoteChunkingManagerStepBuilder<I, O> extends FaultTolerantStepBuilder<I, O> {
 
 	private MessagingTemplate messagingTemplate;

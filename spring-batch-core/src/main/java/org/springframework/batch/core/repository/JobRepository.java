@@ -140,7 +140,7 @@ public interface JobRepository extends JobExplorer {
 	 * @throws NoSuchJobException thrown when there is no {@link JobInstance} for the
 	 * jobName specified.
 	 */
-	default long getJobInstanceCount(@Nullable String jobName) throws NoSuchJobException {
+	default long getJobInstanceCount(String jobName) throws NoSuchJobException {
 		throw new UnsupportedOperationException();
 	}
 
@@ -207,7 +207,7 @@ public interface JobRepository extends JobExplorer {
 	 * @param jobName The name of the job.
 	 * @return the set of running executions for jobs with the specified name.
 	 */
-	default Set<JobExecution> findRunningJobExecutions(@Nullable String jobName) {
+	default Set<JobExecution> findRunningJobExecutions(String jobName) {
 		return Collections.emptySet();
 	}
 

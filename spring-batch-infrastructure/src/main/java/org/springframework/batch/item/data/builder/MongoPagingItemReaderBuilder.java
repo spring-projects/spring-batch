@@ -271,7 +271,7 @@ public class MongoPagingItemReaderBuilder<T> {
 			Assert.notNull(this.sorts, "sorts map is required.");
 		}
 
-		MongoPagingItemReader<T> reader = new MongoPagingItemReader<>();
+		MongoPagingItemReader<T> reader = new MongoPagingItemReader<>(this.template, this.targetType);
 		reader.setTemplate(this.template);
 		reader.setTargetType(this.targetType);
 		if (StringUtils.hasText(this.jsonQuery)) {

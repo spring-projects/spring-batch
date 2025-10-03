@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ package org.springframework.batch.item.jms;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.jms.core.JmsOperations;
@@ -42,7 +41,21 @@ public class JmsItemWriter<T> implements ItemWriter<T> {
 
 	protected Log logger = LogFactory.getLog(getClass());
 
-	private @Nullable JmsOperations jmsTemplate;
+	private JmsOperations jmsTemplate;
+
+	/**
+	 * Create a new {@link JmsItemWriter} with the provided {@link JmsOperations}.
+	 * @param jmsTemplate a {@link JmsOperations} instance
+	 * @since 6.0
+	 */
+	public JmsItemWriter(JmsOperations jmsTemplate) {
+		Assert.notNull(jmsTemplate, "jmsTemplate must not be null");
+		this.jmsTemplate = jmsTemplate;
+		if (jmsTemplate instanceof JmsTemplate template) {
+			Assert.isTrue(template.getDefaultDestination() != null || template.getDefaultDestinationName() != null,
+					"JmsTemplate must have a defaultDestination or defaultDestinationName!");
+		}
+	}
 
 	/**
 	 * Setter for JMS template.
@@ -61,7 +74,6 @@ public class JmsItemWriter<T> implements ItemWriter<T> {
 	 *
 	 * @see org.springframework.batch.item.ItemWriter#write(Chunk)
 	 */
-	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public void write(Chunk<? extends T> items) throws Exception {
 

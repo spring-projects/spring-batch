@@ -41,12 +41,11 @@ class JdbcPagingItemReaderNamedParameterTests extends AbstractJdbcPagingItemRead
 
 	@Override
 	protected AbstractPagingItemReader<Foo> getItemReader() throws Exception {
-		JdbcPagingItemReader<Foo> reader = new JdbcPagingItemReader<>();
-		reader.setDataSource(dataSource);
 		HsqlPagingQueryProvider queryProvider = new HsqlPagingQueryProvider();
 		queryProvider.setSelectClause("select ID, NAME, VALUE");
 		queryProvider.setFromClause("from T_FOOS");
 		queryProvider.setWhereClause("where VALUE >= :limit");
+		JdbcPagingItemReader<Foo> reader = new JdbcPagingItemReader<>(dataSource, queryProvider);
 		Map<String, Order> sortKeys = new LinkedHashMap<>();
 		sortKeys.put("ID", Order.ASCENDING);
 		queryProvider.setSortKeys(sortKeys);

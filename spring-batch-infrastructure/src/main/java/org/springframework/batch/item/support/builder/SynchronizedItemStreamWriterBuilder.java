@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 the original author or authors.
+ * Copyright 2020-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,9 +48,7 @@ public class SynchronizedItemStreamWriterBuilder<T> {
 	public SynchronizedItemStreamWriter<T> build() {
 		Assert.notNull(this.delegate, "A delegate item writer is required");
 
-		SynchronizedItemStreamWriter<T> writer = new SynchronizedItemStreamWriter<>();
-		writer.setDelegate(this.delegate);
-		return writer;
+		return new SynchronizedItemStreamWriter<>(this.delegate);
 	}
 
 }

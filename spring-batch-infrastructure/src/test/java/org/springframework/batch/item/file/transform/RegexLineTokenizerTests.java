@@ -23,13 +23,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class RegexLineTokenizerTests {
 
-	private final RegexLineTokenizer tokenizer = new RegexLineTokenizer();
+	private RegexLineTokenizer tokenizer;
 
 	@Test
 	void testCapturingGroups() {
 		String line = "Liverpool, England: 53d 25m 0s N 3d 0m 0s";
-		tokenizer
-			.setRegex("([a-zA-Z]+), ([a-zA-Z]+): ([0-9]+). ([0-9]+). ([0-9]+). ([A-Z]) ([0-9]+). ([0-9]+). ([0-9]+).");
+		tokenizer = new RegexLineTokenizer(
+				"([a-zA-Z]+), ([a-zA-Z]+): ([0-9]+). ([0-9]+). ([0-9]+). ([A-Z]) ([0-9]+). ([0-9]+). ([0-9]+).");
 		List<String> tokens = tokenizer.doTokenize(line);
 		assertEquals(9, tokens.size());
 		assertEquals("England", tokens.get(1));
@@ -39,7 +39,7 @@ class RegexLineTokenizerTests {
 	@Test
 	void testNonCapturingGroups() {
 		String line = "Graham James Edward Miller";
-		tokenizer.setRegex("(.*?)(?: .*)* (.*)");
+		tokenizer = new RegexLineTokenizer("(.*?)(?: .*)* (.*)");
 		List<String> tokens = tokenizer.doTokenize(line);
 		assertEquals(2, tokens.size());
 		assertEquals("Graham", tokens.get(0));
@@ -48,7 +48,7 @@ class RegexLineTokenizerTests {
 
 	@Test
 	void testNoMatch() {
-		tokenizer.setRegex("([0-9]+).");
+		tokenizer = new RegexLineTokenizer("([0-9]+).");
 		List<String> tokens = tokenizer.doTokenize("noNumber");
 		assertEquals(0, tokens.size());
 	}

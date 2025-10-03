@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,10 +22,8 @@ import jakarta.persistence.EntityManagerFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.orm.jpa.EntityManagerFactoryUtils;
 import org.springframework.util.Assert;
@@ -47,15 +45,25 @@ import org.springframework.util.Assert;
  * @author Jinwoo Bae
  * @author Stefano Cordio
  */
-public class JpaItemWriter<T> implements ItemWriter<T>, InitializingBean {
+public class JpaItemWriter<T> implements ItemWriter<T> {
 
 	protected static final Log logger = LogFactory.getLog(JpaItemWriter.class);
 
-	private @Nullable EntityManagerFactory entityManagerFactory;
+	private EntityManagerFactory entityManagerFactory;
 
 	private boolean usePersist = false;
 
 	private boolean clearPersistenceContext = true;
+
+	/**
+	 * Create a new {@link JpaItemWriter} instance.
+	 * @param entityManagerFactory the entity manager factory to use
+	 * @since 6.0
+	 */
+	public JpaItemWriter(EntityManagerFactory entityManagerFactory) {
+		Assert.notNull(entityManagerFactory, "EntityManagerFactory must not be null");
+		this.entityManagerFactory = entityManagerFactory;
+	}
 
 	/**
 	 * Set the EntityManager to be used internally.
@@ -84,14 +92,6 @@ public class JpaItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	}
 
 	/**
-	 * Check mandatory properties - there must be an entityManagerFactory.
-	 */
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		Assert.state(entityManagerFactory != null, "An EntityManagerFactory is required");
-	}
-
-	/**
 	 * Merge all provided items that aren't already in the persistence context and then
 	 * flush the entity manager.
 	 *
@@ -99,7 +99,6 @@ public class JpaItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 */
 	@Override
 	public void write(Chunk<? extends T> items) {
-		@SuppressWarnings("DataFlowIssue")
 		EntityManager entityManager = EntityManagerFactoryUtils.getTransactionalEntityManager(entityManagerFactory);
 		if (entityManager == null) {
 			throw new DataAccessResourceFailureException("Unable to obtain a transactional EntityManager");

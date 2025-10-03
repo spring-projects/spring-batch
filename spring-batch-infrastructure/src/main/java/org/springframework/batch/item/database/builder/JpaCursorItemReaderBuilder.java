@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2024 the original author or authors.
+ * Copyright 2020-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -182,8 +182,7 @@ public class JpaCursorItemReaderBuilder<T> {
 			Assert.hasLength(this.queryString, "Query string is required when queryProvider is null");
 		}
 
-		JpaCursorItemReader<T> reader = new JpaCursorItemReader<>();
-		reader.setEntityManagerFactory(this.entityManagerFactory);
+		JpaCursorItemReader<T> reader = new JpaCursorItemReader<>(this.entityManagerFactory);
 		if (this.queryProvider != null) {
 			reader.setQueryProvider(this.queryProvider);
 		}

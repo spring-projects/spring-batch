@@ -47,19 +47,19 @@
 	</bean>
 
 	<bean id="tradeSqlItemReader" class="org.springframework.batch.item.database.JdbcCursorItemReader">
-		<property name="dataSource" ref="dataSource" />
-		<property name="sql" value="SELECT isin, quantity, price, customer, id, version from TRADE" />
-		<property name="rowMapper">
+		<constructor-arg name="dataSource" ref="dataSource" />
+		<constructor-arg name="sql" value="SELECT isin, quantity, price, customer, id, version from TRADE" />
+		<constructor-arg name="rowMapper">
 			<bean class="org.springframework.batch.samples.domain.trade.internal.TradeRowMapper" />
-		</property>
+		</constructor-arg>
 	</bean>
 
 	<bean id="customerSqlItemReader" class="org.springframework.batch.item.database.JdbcCursorItemReader">
-		<property name="dataSource" ref="dataSource" />
-		<property name="sql" value="SELECT id, name, credit FROM CUSTOMER " />
-		<property name="rowMapper">
+		<constructor-arg name="dataSource" ref="dataSource" />
+		<constructor-arg name="sql" value="SELECT id, name, credit FROM CUSTOMER " />
+		<constructor-arg name="rowMapper">
 			<bean class="org.springframework.batch.samples.domain.trade.internal.CustomerCreditRowMapper" />
-		</property>
+		</constructor-arg>
 	</bean>
 
 	<bean id="tradeDao" class="org.springframework.batch.samples.domain.trade.internal.JdbcTradeDao"
@@ -80,16 +80,16 @@
 		<property name="itemWriter">
 			<bean class="org.springframework.batch.item.file.FlatFileItemWriter">
 				<property name="resource" value="file:target/test-outputs/CustomerReportStep.TEMP.txt" />
-				<property name="lineAggregator">
+				<constructor-arg name="lineAggregator">
 					<bean class="org.springframework.batch.item.file.transform.PassThroughLineAggregator" />
-				</property>
+				</constructor-arg>
 			</bean>
 		</property>
 	</bean>
 
 	<bean id="fileItemReader" class="org.springframework.batch.item.file.FlatFileItemReader" scope="step">
 		<property name="resource" value="classpath:org/springframework/batch/samples/trade/data/ImportTradeDataStep.txt" />
-		<property name="lineMapper">
+		<constructor-arg name="lineMapper">
 			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
 				<property name="lineTokenizer">
 					<bean class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
@@ -100,7 +100,7 @@
 					<bean class="org.springframework.batch.samples.domain.trade.internal.TradeFieldSetMapper" />
 				</property>
 			</bean>
-		</property>
+		</constructor-arg>
 	</bean>
 
 	<bean id="tradeValidator" class="org.springframework.batch.item.validator.SpringValidator">

@@ -65,8 +65,6 @@ class JpaItemWriterBuilderTests {
 			.entityManagerFactory(this.entityManagerFactory)
 			.build();
 
-		itemWriter.afterPropertiesSet();
-
 		Chunk<String> chunk = Chunk.of("foo", "bar");
 
 		itemWriter.write(chunk);
@@ -90,8 +88,6 @@ class JpaItemWriterBuilderTests {
 			.usePersist(true)
 			.build();
 
-		itemWriter.afterPropertiesSet();
-
 		Chunk<String> chunk = Chunk.of("foo", "bar");
 
 		itemWriter.write(chunk);
@@ -106,8 +102,6 @@ class JpaItemWriterBuilderTests {
 		JpaItemWriter<String> itemWriter = new JpaItemWriterBuilder<String>().clearPersistenceContext(false)
 			.entityManagerFactory(this.entityManagerFactory)
 			.build();
-
-		itemWriter.afterPropertiesSet();
 
 		Chunk<String> chunk = Chunk.of("foo", "bar");
 

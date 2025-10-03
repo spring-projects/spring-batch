@@ -68,7 +68,7 @@ public class LdifReader extends AbstractItemCountingItemStreamItemReader<LdapAtt
 
 	private static final Log LOG = LogFactory.getLog(LdifReader.class);
 
-	private @Nullable Resource resource;
+	private Resource resource;
 
 	private @Nullable LdifParser ldifParser;
 
@@ -80,7 +80,14 @@ public class LdifReader extends AbstractItemCountingItemStreamItemReader<LdapAtt
 
 	private @Nullable RecordCallbackHandler skippedRecordsCallback;
 
-	public LdifReader() {
+	/**
+	 * Create a new {@link LdifReader} instance with no resource. A resource must be set
+	 * before calling {@link #open(org.springframework.batch.item.ExecutionContext)}.
+	 * @since 6.0
+	 */
+	public LdifReader(Resource resource) {
+		Assert.notNull(resource, "The resource must not be null");
+		this.resource = resource;
 		setName(ClassUtils.getShortName(LdifReader.class));
 	}
 
@@ -125,9 +132,6 @@ public class LdifReader extends AbstractItemCountingItemStreamItemReader<LdapAtt
 	@SuppressWarnings("DataFlowIssue")
 	@Override
 	protected void doOpen() throws Exception {
-		if (resource == null)
-			throw new IllegalStateException("A resource has not been set.");
-
 		if (!resource.exists()) {
 			if (strict) {
 				throw new IllegalStateException("Input resource must exist (reader is in 'strict' mode): " + resource);
@@ -148,7 +152,6 @@ public class LdifReader extends AbstractItemCountingItemStreamItemReader<LdapAtt
 		}
 	}
 
-	@SuppressWarnings("DataFlowIssue")
 	@Override
 	protected @Nullable LdapAttributes doRead() throws Exception {
 		LdapAttributes attributes = null;
@@ -183,8 +186,9 @@ public class LdifReader extends AbstractItemCountingItemStreamItemReader<LdapAtt
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.state(resource != null, "A resource is required to parse.");
-		Assert.state(ldifParser != null, "A parser is required");
+		if (this.ldifParser == null) {
+			this.ldifParser = new LdifParser(this.resource);
+		}
 	}
 
 }

@@ -31,9 +31,9 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class MultiResourceItemReaderResourceAwareTests {
 
-	private final MultiResourceItemReader<Foo> tested = new MultiResourceItemReader<>();
+	private MultiResourceItemReader<Foo> tested;
 
-	private final FlatFileItemReader<Foo> itemReader = new FlatFileItemReader<>();
+	private FlatFileItemReader<Foo> itemReader;
 
 	private final ExecutionContext ctx = new ExecutionContext();
 
@@ -53,10 +53,9 @@ class MultiResourceItemReaderResourceAwareTests {
 	 */
 	@BeforeEach
 	void setUp() {
+		itemReader = new FlatFileItemReader<>(new FooLineMapper());
 
-		itemReader.setLineMapper(new FooLineMapper());
-
-		tested.setDelegate(itemReader);
+		tested = new MultiResourceItemReader<>(itemReader);
 		tested.setComparator((o1, o2) -> {
 			return 0; // do not change ordering
 		});

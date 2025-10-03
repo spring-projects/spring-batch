@@ -5,7 +5,7 @@
  * @author Mahmoud Ben Hassine
  * @author Stefano Cordio
  */
-@NullMarked
+@NullUnmarked
 package org.springframework.batch.core.job.flow.support.state;
 
-import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.NullUnmarked;

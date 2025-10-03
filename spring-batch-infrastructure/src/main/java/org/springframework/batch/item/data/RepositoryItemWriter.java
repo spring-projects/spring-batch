@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2024 the original author or authors.
+ * Copyright 2012-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,9 +64,19 @@ public class RepositoryItemWriter<T> implements ItemWriter<T>, InitializingBean 
 
 	protected static final Log logger = LogFactory.getLog(RepositoryItemWriter.class);
 
-	private @Nullable CrudRepository<T, ?> repository;
+	private CrudRepository<T, ?> repository;
 
 	private @Nullable String methodName;
+
+	/**
+	 * Create a new {@link RepositoryItemWriter} instance with the provided repository.
+	 * @param repository the Spring Data repository to be used for persistence.
+	 * @since 6.0
+	 */
+	public RepositoryItemWriter(CrudRepository<T, ?> repository) {
+		Assert.notNull(repository, "The CrudRepository must not be null");
+		this.repository = repository;
+	}
 
 	/**
 	 * Specifies what method on the repository to call. This method must have the type of
@@ -104,7 +114,6 @@ public class RepositoryItemWriter<T> implements ItemWriter<T>, InitializingBean 
 	 * @param items the list of items to be persisted.
 	 * @throws Exception thrown if error occurs during writing.
 	 */
-	@SuppressWarnings("DataFlowIssue")
 	protected void doWrite(Chunk<? extends T> items) throws Exception {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Writing to the repository with " + items.size() + " items.");
@@ -128,7 +137,6 @@ public class RepositoryItemWriter<T> implements ItemWriter<T>, InitializingBean 
 	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.state(repository != null, "A CrudRepository implementation is required");
 		if (this.methodName != null) {
 			Assert.state(StringUtils.hasText(this.methodName), "methodName must not be empty.");
 		}

@@ -43,7 +43,6 @@ class CompositeItemProcessorTests {
 
 	private ItemProcessor<Object, Object> processor2;
 
-	@SuppressWarnings("unchecked")
 	@BeforeEach
 	void setUp() throws Exception {
 		processor1 = mock();
@@ -91,23 +90,6 @@ class CompositeItemProcessorTests {
 		when(processor2.process(5)).thenReturn("output");
 
 		assertEquals("output", composite.process("input"));
-
-	}
-
-	/**
-	 * The list of transformers must not be null or empty and can contain only instances
-	 * of {@link ItemProcessor}.
-	 */
-	@Test
-	void testAfterPropertiesSet() {
-
-		// value not set
-		composite.setDelegates(null);
-		assertThrows(IllegalStateException.class, composite::afterPropertiesSet);
-
-		// empty list
-		composite.setDelegates(new ArrayList<ItemProcessor<Object, Object>>());
-		assertThrows(IllegalStateException.class, composite::afterPropertiesSet);
 
 	}
 

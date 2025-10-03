@@ -32,12 +32,12 @@ import org.springframework.util.ClassUtils;
 
 abstract class AbstractStaxEventReaderItemReaderTests {
 
-	protected StaxEventItemReader<Trade> reader = new StaxEventItemReader<>();
+	protected StaxEventItemReader<Trade> reader;
 
 	@BeforeEach
 	void setUp() throws Exception {
+		reader = new StaxEventItemReader<>(getUnmarshaller());
 		reader.setFragmentRootElementName("trade");
-		reader.setUnmarshaller(getUnmarshaller());
 		reader.afterPropertiesSet();
 	}
 

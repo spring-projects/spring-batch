@@ -60,10 +60,7 @@ public class SuffixRecordSeparatorPolicy extends DefaultRecordSeparatorPolicy {
 	 * @see RecordSeparatorPolicy#isEndOfRecord(String)
 	 */
 	@Override
-	public boolean isEndOfRecord(@Nullable String line) {
-		if (line == null) {
-			return true;
-		}
+	public boolean isEndOfRecord(String line) {
 		String trimmed = ignoreWhitespace ? line.trim() : line;
 		return trimmed.endsWith(suffix);
 	}
@@ -74,10 +71,7 @@ public class SuffixRecordSeparatorPolicy extends DefaultRecordSeparatorPolicy {
 	 * @see SimpleRecordSeparatorPolicy#postProcess(String)
 	 */
 	@Override
-	public @Nullable String postProcess(@Nullable String record) {
-		if (record == null) {
-			return null;
-		}
+	public String postProcess(String record) {
 		return record.substring(0, record.lastIndexOf(suffix));
 	}
 

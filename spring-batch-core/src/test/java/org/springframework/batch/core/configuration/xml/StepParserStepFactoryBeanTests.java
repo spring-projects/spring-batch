@@ -152,7 +152,6 @@ class StepParserStepFactoryBeanTests {
 		fb.setTaskExecutor(new SyncTaskExecutor());
 		fb.setItemReader(new DummyItemReader());
 		fb.setItemWriter(new DummyItemWriter());
-		fb.setStreams(new ItemStream[] { new FlatFileItemReader<>() });
 		fb.setHasChunkElement(true);
 
 		assertThrows(IllegalStateException.class, fb::getObject);
@@ -176,7 +175,6 @@ class StepParserStepFactoryBeanTests {
 		fb.setTaskExecutor(new SyncTaskExecutor());
 		fb.setItemReader(new DummyItemReader());
 		fb.setItemWriter(new DummyItemWriter());
-		fb.setStreams(new ItemStream[] { new FlatFileItemReader<>() });
 		fb.setCacheCapacity(5);
 		fb.setIsReaderTransactionalQueue(true);
 		fb.setRetryLimit(5);
@@ -209,7 +207,6 @@ class StepParserStepFactoryBeanTests {
 		fb.setItemReader(new DummyItemReader());
 		fb.setItemProcessor(new PassThroughItemProcessor<>());
 		fb.setItemWriter(new DummyItemWriter());
-		fb.setStreams(new ItemStream[] { new FlatFileItemReader<>() });
 
 		Object step = fb.getObject();
 		assertTrue(step instanceof TaskletStep);
@@ -233,7 +230,6 @@ class StepParserStepFactoryBeanTests {
 		fb.setItemReader(new DummyItemReader());
 		fb.setItemProcessor(new PassThroughItemProcessor<>());
 		fb.setItemWriter(new DummyItemWriter());
-		fb.setStreams(new ItemStream[] { new FlatFileItemReader<>() });
 		fb.setCacheCapacity(5);
 		fb.setIsReaderTransactionalQueue(true);
 		fb.setRetryLimit(5);

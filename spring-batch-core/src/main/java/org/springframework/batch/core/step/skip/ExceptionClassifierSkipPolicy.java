@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@ package org.springframework.batch.core.step.skip;
 
 import java.util.Map;
 
+import org.jspecify.annotations.NullUnmarked;
+
 import org.springframework.classify.Classifier;
 import org.springframework.classify.SubclassClassifier;
 
@@ -28,6 +30,7 @@ import org.springframework.classify.SubclassClassifier;
  * @author Mahmoud Ben Hassine
  * @see SubclassClassifier
  */
+@NullUnmarked
 public class ExceptionClassifierSkipPolicy implements SkipPolicy {
 
 	private SubclassClassifier<Throwable, SkipPolicy> classifier;

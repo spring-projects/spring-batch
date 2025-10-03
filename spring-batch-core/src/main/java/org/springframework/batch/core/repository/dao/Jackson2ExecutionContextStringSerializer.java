@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2023 the original author or authors.
+ * Copyright 2008-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,6 +55,8 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.jspecify.annotations.NullUnmarked;
+
 import org.springframework.batch.core.job.parameters.JobParameter;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
@@ -65,7 +67,7 @@ import static com.fasterxml.jackson.core.JsonToken.START_OBJECT;
 
 /**
  * Implementation that uses Jackson2 to provide (de)serialization.
- *
+ * <p>
  * By default, this implementation trusts a limited set of classes to be deserialized from
  * the execution context. If a class is not trusted by default and is safe to deserialize,
  * you can add it to the base set of trusted classes at
@@ -107,6 +109,7 @@ import static com.fasterxml.jackson.core.JsonToken.START_OBJECT;
  * @since 3.0.7
  * @see ExecutionContextSerializer
  */
+@NullUnmarked
 public class Jackson2ExecutionContextStringSerializer implements ExecutionContextSerializer {
 
 	private static final String IDENTIFYING_KEY_NAME = "identifying";

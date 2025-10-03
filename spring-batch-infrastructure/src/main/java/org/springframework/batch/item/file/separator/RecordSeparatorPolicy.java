@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,6 @@
  */
 
 package org.springframework.batch.item.file.separator;
-
-import org.jspecify.annotations.Nullable;
 
 import java.io.BufferedReader;
 
@@ -38,14 +36,14 @@ public interface RecordSeparatorPolicy {
 	 * @param record a String without a newline character at the end.
 	 * @return true if this line is a complete record.
 	 */
-	boolean isEndOfRecord(@Nullable String record);
+	boolean isEndOfRecord(String record);
 
 	/**
 	 * Give the policy a chance to post-process a complete record, e.g. remove a suffix.
 	 * @param record the complete record.
 	 * @return a modified version of the record if desired, potentially null.
 	 */
-	@Nullable String postProcess(String record);
+	String postProcess(String record);
 
 	/**
 	 * Pre-process a record before another line is appended, in the case of a multi-line

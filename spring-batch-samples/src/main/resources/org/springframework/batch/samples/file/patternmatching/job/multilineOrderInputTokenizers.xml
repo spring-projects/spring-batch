@@ -4,7 +4,7 @@
        	https://www.springframework.org/schema/beans/spring-beans.xsd">
 
 	<bean id="orderFileTokenizer" class="org.springframework.batch.item.file.transform.PatternMatchingCompositeLineTokenizer">
-		<property name="tokenizers">
+		<constructor-arg name="tokenizers">
 			<map>
 				<entry key="HEA*" value-ref="headerRecordTokenizer" />
 				<entry key="FOT*" value-ref="footerRecordTokenizer" />
@@ -17,7 +17,7 @@
 				<entry key="LIT*" value-ref="itemLineTokenizer" />
 				<entry key="*"    value-ref="defaultLineTokenizer" />
 			</map>
-		</property>
+		</constructor-arg>
 	</bean>
 
 	<bean id="defaultLineTokenizer" class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer"/>

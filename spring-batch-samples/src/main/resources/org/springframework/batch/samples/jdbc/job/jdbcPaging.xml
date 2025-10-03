@@ -19,11 +19,11 @@
 		  class="org.springframework.batch.samples.domain.trade.internal.CustomerCreditIncreaseProcessor"/>
 
 	<bean id="itemReader" class="org.springframework.batch.item.database.JdbcPagingItemReader" scope="step">
-		<property name="dataSource" ref="dataSource" />
+		<constructor-arg name="dataSource" ref="dataSource" />
 		<property name="rowMapper">
 			<bean class="org.springframework.batch.samples.domain.trade.internal.CustomerCreditRowMapper" />
 		</property>
-		<property name="queryProvider">
+		<constructor-arg name="pagingQueryProvider">
 			<bean class="org.springframework.batch.item.database.support.SqlPagingQueryProviderFactoryBean">
 				<property name="dataSource" ref="dataSource" />
 				<property name="sortKeys">
@@ -36,7 +36,7 @@
 				<property name="fromClause" value="FROM CUSTOMER" />
 				<property name="whereClause" value="WHERE CREDIT > :credit" />
 			</bean>
-		</property>
+		</constructor-arg>
 		<property name="pageSize" value="2" />
 		<property name="parameterValues">
 			<map>

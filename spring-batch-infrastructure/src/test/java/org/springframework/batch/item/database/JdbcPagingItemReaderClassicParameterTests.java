@@ -36,8 +36,6 @@ class JdbcPagingItemReaderClassicParameterTests extends AbstractJdbcPagingItemRe
 
 	@Override
 	protected AbstractPagingItemReader<Foo> getItemReader() throws Exception {
-		JdbcPagingItemReader<Foo> reader = new JdbcPagingItemReader<>();
-		reader.setDataSource(dataSource);
 		HsqlPagingQueryProvider queryProvider = new HsqlPagingQueryProvider();
 		queryProvider.setSelectClause("select ID, NAME, VALUE");
 		queryProvider.setFromClause("from T_FOOS");
@@ -45,6 +43,7 @@ class JdbcPagingItemReaderClassicParameterTests extends AbstractJdbcPagingItemRe
 		Map<String, Order> sortKeys = new LinkedHashMap<>();
 		sortKeys.put("ID", Order.ASCENDING);
 		queryProvider.setSortKeys(sortKeys);
+		JdbcPagingItemReader<Foo> reader = new JdbcPagingItemReader<>(dataSource, queryProvider);
 		reader.setParameterValues(Collections.<String, Object>singletonMap("limit", 2));
 		reader.setQueryProvider(queryProvider);
 		reader.setRowMapper((rs, i) -> {

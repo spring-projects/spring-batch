@@ -22,7 +22,7 @@
 		<property name="delegate">
 			<bean class="org.springframework.batch.item.file.FlatFileItemReader">
 				<property name="resource" ref="inputResource" />
-				<property name="lineMapper">
+				<constructor-arg name="lineMapper">
 					<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
 						<property name="lineTokenizer">
 							<bean class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer" />
@@ -31,7 +31,7 @@
 							<bean class="org.springframework.batch.item.file.mapping.PassThroughFieldSetMapper" />
 						</property>
 					</bean>
-				</property>
+				</constructor-arg>
 			</bean>
 		</property>
 	</bean>
@@ -40,9 +40,9 @@
 		<property name="delegate">
 			<bean class="org.springframework.batch.item.file.FlatFileItemWriter">
 				<property name="resource" value="#{jobParameters[outputFile]}" />
-				<property name="lineAggregator">
+				<constructor-arg name="lineAggregator">
 					<bean class="org.springframework.batch.item.file.transform.PassThroughLineAggregator" />
-				</property>
+				</constructor-arg>
 			</bean>
 		</property>
 	</bean>

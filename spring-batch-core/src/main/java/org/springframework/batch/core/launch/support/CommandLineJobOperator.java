@@ -31,6 +31,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.core.log.LogAccessor;
+import org.springframework.util.Assert;
 
 import static org.springframework.batch.core.launch.support.ExitCodeMapper.JVM_EXITCODE_COMPLETED;
 import static org.springframework.batch.core.launch.support.ExitCodeMapper.JVM_EXITCODE_GENERIC_ERROR;
@@ -291,6 +292,8 @@ public class CommandLineJobOperator {
 			System.exit(2);
 		}
 
+		Assert.notNull(context, "Application context must not be null");
+
 		JobOperator jobOperator = null;
 		JobRepository jobRepository = null;
 		JobRegistry jobRegistry = null;
@@ -303,6 +306,11 @@ public class CommandLineJobOperator {
 			System.err.println("A required bean was not found in the application context: " + e.getMessage());
 			System.exit(1);
 		}
+
+		Assert.notNull(jobOperator, "JobOperator must not be null");
+		Assert.notNull(jobRepository, "JobRepository must not be null");
+		Assert.notNull(jobRegistry, "JobRegistry must not be null");
+
 		CommandLineJobOperator operator = new CommandLineJobOperator(jobOperator, jobRepository, jobRegistry);
 
 		int exitCode;

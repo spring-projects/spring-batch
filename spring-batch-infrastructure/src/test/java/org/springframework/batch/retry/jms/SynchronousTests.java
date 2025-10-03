@@ -146,10 +146,9 @@ public class SynchronousTests {
 
 		assertInitialState();
 
-		JmsItemReader<Object> provider = new JmsItemReader<>();
-		// provider.setItemType(Message.class);
 		jmsTemplate.setDefaultDestinationName("queue");
-		provider.setJmsTemplate(jmsTemplate);
+		JmsItemReader<Object> provider = new JmsItemReader<>(jmsTemplate);
+		// provider.setItemType(Message.class);
 
 		final String item = (String) provider.read();
 

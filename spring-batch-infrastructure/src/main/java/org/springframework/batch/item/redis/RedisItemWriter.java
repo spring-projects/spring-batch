@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 the original author or authors.
+ * Copyright 2023-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 package org.springframework.batch.item.redis;
 
-import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.KeyValueItemWriter;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.Assert;
 
@@ -34,9 +34,20 @@ import org.springframework.util.Assert;
  */
 public class RedisItemWriter<K, T> extends KeyValueItemWriter<K, T> {
 
-	private @Nullable RedisTemplate<K, T> redisTemplate;
+	private RedisTemplate<K, T> redisTemplate;
 
-	@SuppressWarnings("DataFlowIssue")
+	/**
+	 * Create a new {@link RedisItemWriter}.
+	 * @param itemKeyMapper the {@link Converter} used to derive a key from an item.
+	 * @param redisTemplate the {@link RedisTemplate} to use to interact with Redis.
+	 * @since 6.0
+	 */
+	public RedisItemWriter(Converter<T, K> itemKeyMapper, RedisTemplate<K, T> redisTemplate) {
+		super(itemKeyMapper);
+		Assert.notNull(redisTemplate, "RedisTemplate must not be null");
+		this.redisTemplate = redisTemplate;
+	}
+
 	@Override
 	protected void writeKeyValue(K key, T value) {
 		if (this.delete) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2023 the original author or authors.
+ * Copyright 2019-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package org.springframework.batch.item.kafka;
 import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.KeyValueItemWriter;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.util.Assert;
@@ -46,15 +47,26 @@ import java.util.concurrent.TimeUnit;
  */
 public class KafkaItemWriter<K, T> extends KeyValueItemWriter<K, T> {
 
-	protected @Nullable KafkaTemplate<K, T> kafkaTemplate;
+	protected KafkaTemplate<K, T> kafkaTemplate;
 
 	protected final List<CompletableFuture<SendResult<K, T>>> completableFutures = new ArrayList<>();
 
 	private long timeout = -1;
 
-	@SuppressWarnings("DataFlowIssue")
+	/**
+	 * Create a new {@link KafkaItemWriter}.
+	 * @param itemKeyMapper the {@link Converter} used to derive a key from an item.
+	 * @param kafkaTemplate the {@link KafkaTemplate} to use to interact with Kafka.
+	 * @since 6.0
+	 */
+	public KafkaItemWriter(Converter<T, K> itemKeyMapper, KafkaTemplate<K, T> kafkaTemplate) {
+		super(itemKeyMapper);
+		Assert.notNull(kafkaTemplate, "KafkaTemplate must not be null");
+		this.kafkaTemplate = kafkaTemplate;
+	}
+
 	@Override
-	protected void writeKeyValue(@Nullable K key, T value) {
+	protected void writeKeyValue(K key, T value) {
 		if (this.delete) {
 			this.completableFutures.add(this.kafkaTemplate.sendDefault(key, null));
 		}
@@ -63,7 +75,6 @@ public class KafkaItemWriter<K, T> extends KeyValueItemWriter<K, T> {
 		}
 	}
 
-	@SuppressWarnings("DataFlowIssue")
 	@Override
 	protected void flush() throws Exception {
 		this.kafkaTemplate.flush();
@@ -80,7 +91,6 @@ public class KafkaItemWriter<K, T> extends KeyValueItemWriter<K, T> {
 
 	@Override
 	protected void init() {
-		Assert.state(this.kafkaTemplate != null, "KafkaTemplate must not be null.");
 		Assert.state(this.kafkaTemplate.getDefaultTopic() != null, "KafkaTemplate must have the default topic set.");
 	}
 

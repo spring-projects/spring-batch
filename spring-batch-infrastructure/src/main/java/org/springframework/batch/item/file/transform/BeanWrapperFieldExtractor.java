@@ -32,9 +32,18 @@ import org.springframework.util.Assert;
  * @author Dan Garrette
  * @since 2.0
  */
-public class BeanWrapperFieldExtractor<T> implements FieldExtractor<T>, InitializingBean {
+public class BeanWrapperFieldExtractor<T> implements FieldExtractor<T> {
 
-	private String @Nullable [] names;
+	private String[] names;
+
+	/**
+	 * Create a new {@link BeanWrapperFieldExtractor} with the provided field names.
+	 * @param names field names to be extracted by the {@link #extract(Object)} method.
+	 * @since 6.0
+	 */
+	public BeanWrapperFieldExtractor(String... names) {
+		this.names = names;
+	}
 
 	/**
 	 * @param names field names to be extracted by the {@link #extract(Object)} method.
@@ -44,7 +53,6 @@ public class BeanWrapperFieldExtractor<T> implements FieldExtractor<T>, Initiali
 		this.names = names.clone();
 	}
 
-	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public Object[] extract(T item) {
 		List<@Nullable Object> values = new ArrayList<>();
@@ -54,11 +62,6 @@ public class BeanWrapperFieldExtractor<T> implements FieldExtractor<T>, Initiali
 			values.add(bw.getPropertyValue(propertyName));
 		}
 		return values.toArray();
-	}
-
-	@Override
-	public void afterPropertiesSet() {
-		Assert.state(names != null, "The 'names' property must be set.");
 	}
 
 }

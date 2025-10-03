@@ -18,6 +18,9 @@ package org.springframework.batch.core.listener;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.jspecify.annotations.Nullable;
+
+import org.springframework.batch.core.job.parameters.JobParameter;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
@@ -35,7 +38,7 @@ import org.springframework.batch.item.ExecutionContext;
  */
 public class JobParameterExecutionContextCopyListener implements StepExecutionListener {
 
-	private Collection<String> keys = null;
+	private @Nullable Collection<String> keys = null;
 
 	/**
 	 * @param keys A list of keys corresponding to items in the {@link JobParameters} that
@@ -61,7 +64,10 @@ public class JobParameterExecutionContextCopyListener implements StepExecutionLi
 		}
 		for (String key : keys) {
 			if (!stepContext.containsKey(key)) {
-				stepContext.put(key, jobParameters.getParameters().get(key).getValue());
+				JobParameter<?> jobParameter = jobParameters.getParameters().get(key);
+				if (jobParameter != null) {
+					stepContext.put(key, jobParameter.getValue());
+				}
 			}
 		}
 	}

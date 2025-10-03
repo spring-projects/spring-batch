@@ -27,7 +27,9 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.integration.async.AsyncItemProcessor;
 import org.springframework.batch.integration.async.AsyncItemWriter;
+import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.samples.common.DataSourceConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -55,24 +57,24 @@ public class JobConfigurationForAsynchronousItemProcessingWithVirtualThreads {
 
 	@Bean
 	public AsyncItemProcessor<Integer, Integer> itemProcessor() {
-		AsyncItemProcessor<Integer, Integer> asyncItemProcessor = new AsyncItemProcessor<>();
-		asyncItemProcessor.setDelegate(item -> {
+		ItemProcessor<Integer, Integer> delegate = item -> {
 			System.out.println(Thread.currentThread() + ": processing item " + item);
 			return item + 1;
-		});
+		};
+		AsyncItemProcessor<Integer, Integer> asyncItemProcessor = new AsyncItemProcessor<>(delegate);
 		asyncItemProcessor.setTaskExecutor(new VirtualThreadTaskExecutor("spring-batch-"));
 		return asyncItemProcessor;
 	}
 
 	@Bean
 	public AsyncItemWriter<Integer> itemWriter() {
-		AsyncItemWriter<Integer> asyncItemWriter = new AsyncItemWriter<>();
-		asyncItemWriter.setDelegate(items -> {
+		ItemWriter<Integer> delegate = items -> {
 			for (Integer item : items) {
 				System.out.println(Thread.currentThread() + ": writing item " + item);
 			}
-		});
-		return asyncItemWriter;
+		};
+
+		return new AsyncItemWriter<>(delegate);
 	}
 
 	@Bean

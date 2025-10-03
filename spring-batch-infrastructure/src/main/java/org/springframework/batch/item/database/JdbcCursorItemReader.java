@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Objects;
+
+import javax.sql.DataSource;
 
 import org.springframework.jdbc.core.PreparedStatementSetter;
 
@@ -66,11 +68,21 @@ public class JdbcCursorItemReader<T> extends AbstractCursorItemReader<T> {
 
 	private @Nullable PreparedStatementSetter preparedStatementSetter;
 
-	private @Nullable String sql;
+	private String sql;
 
-	private @Nullable RowMapper<T> rowMapper;
+	private RowMapper<T> rowMapper;
 
-	public JdbcCursorItemReader() {
+	/**
+	 * Create a new {@link JdbcCursorItemReader} instance. The DataSource, SQL query
+	 * string, and RowMapper must be provided through their respective setters.
+	 * @since 6.0
+	 */
+	public JdbcCursorItemReader(DataSource dataSource, String sql, RowMapper<T> rowMapper) {
+		super(dataSource);
+		Assert.notNull(sql, "The SQL query must not be null");
+		Assert.notNull(rowMapper, "RowMapper must not be null");
+		this.sql = sql;
+		this.rowMapper = rowMapper;
 		setName(ClassUtils.getShortName(JdbcCursorItemReader.class));
 	}
 
@@ -102,17 +114,6 @@ public class JdbcCursorItemReader<T> extends AbstractCursorItemReader<T> {
 		this.preparedStatementSetter = preparedStatementSetter;
 	}
 
-	/**
-	 * Assert that mandatory properties are set.
-	 * @throws IllegalArgumentException if either data source or SQL properties not set.
-	 */
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		super.afterPropertiesSet();
-		Assert.state(sql != null, "The SQL query must be provided");
-		Assert.state(rowMapper != null, "RowMapper must be provided");
-	}
-
 	@Override
 	protected void openCursor(Connection con) {
 		try {
@@ -137,7 +138,6 @@ public class JdbcCursorItemReader<T> extends AbstractCursorItemReader<T> {
 
 	}
 
-	@SuppressWarnings("DataFlowIssue")
 	@Override
 	protected @Nullable T readCursor(ResultSet rs, int currentRow) throws SQLException {
 		return rowMapper.mapRow(rs, currentRow);

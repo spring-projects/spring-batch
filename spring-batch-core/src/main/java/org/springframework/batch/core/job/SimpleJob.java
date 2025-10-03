@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.jspecify.annotations.NullUnmarked;
+
 import org.springframework.batch.core.BatchStatus;
 
-import org.jspecify.annotations.Nullable;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.repository.JobRestartException;
@@ -39,6 +40,7 @@ import org.springframework.batch.core.step.StepLocator;
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
  */
+@NullUnmarked // FIXME to remove once default constructors are removed
 public class SimpleJob extends AbstractJob {
 
 	private final List<Step> steps = new ArrayList<>();
@@ -93,7 +95,7 @@ public class SimpleJob extends AbstractJob {
 	}
 
 	@Override
-	public @Nullable Step getStep(String stepName) {
+	public Step getStep(String stepName) {
 		for (Step step : this.steps) {
 			if (step.getName().equals(stepName)) {
 				return step;

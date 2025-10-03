@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,7 +72,7 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 
 	private @Nullable XMLEventReader eventReader;
 
-	private @Nullable Unmarshaller unmarshaller;
+	private Unmarshaller unmarshaller;
 
 	private @Nullable Resource resource;
 
@@ -88,7 +88,15 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 
 	private @Nullable String encoding = DEFAULT_ENCODING;
 
-	public StaxEventItemReader() {
+	/**
+	 * Create a new {@link StaxEventItemReader} instance. The {@link Unmarshaller} must be
+	 * provided to map XML fragments to objects.
+	 * @param unmarshaller maps xml fragments corresponding to records to objects
+	 * @since 6.0
+	 */
+	public StaxEventItemReader(Unmarshaller unmarshaller) {
+		Assert.notNull(unmarshaller, "The Unmarshaller must not be null.");
+		this.unmarshaller = unmarshaller;
 		setName(ClassUtils.getShortName(StaxEventItemReader.class));
 	}
 
@@ -147,7 +155,7 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 	 * @param encoding the encoding to be used. Can be {@code null}, in which case, the
 	 * XML event reader will attempt to auto-detect the encoding from tht input file.
 	 */
-	public void setEncoding(@Nullable String encoding) {
+	public void setEncoding(String encoding) {
 		this.encoding = encoding;
 	}
 
@@ -162,7 +170,6 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.state(unmarshaller != null, "The Unmarshaller must not be null.");
 		Assert.state(!fragmentRootElementNames.isEmpty(), "The FragmentRootElementNames must not be empty");
 		for (QName fragmentRootElementName : fragmentRootElementNames) {
 			Assert.state(StringUtils.hasText(fragmentRootElementName.getLocalPart()),

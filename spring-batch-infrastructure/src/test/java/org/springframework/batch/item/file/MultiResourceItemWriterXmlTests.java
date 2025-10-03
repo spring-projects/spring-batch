@@ -49,8 +49,7 @@ class MultiResourceItemWriterXmlTests extends AbstractMultiResourceItemWriterTes
 	@BeforeEach
 	void setUp() throws Exception {
 		super.createFile();
-		delegate = new StaxEventItemWriter<>();
-		delegate.setMarshaller(new SimpleMarshaller());
+		delegate = new StaxEventItemWriter<>(new SimpleMarshaller());
 	}
 
 	/**

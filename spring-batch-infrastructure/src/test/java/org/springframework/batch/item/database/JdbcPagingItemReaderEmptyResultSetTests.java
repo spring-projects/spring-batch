@@ -48,14 +48,12 @@ class JdbcPagingItemReaderEmptyResultSetTests {
 	}
 
 	private ItemReader<Long> getItemReader() throws Exception {
-		JdbcPagingItemReader<Long> reader = new JdbcPagingItemReader<>();
-		reader.setDataSource(dataSource);
 		HsqlPagingQueryProvider queryProvider = new HsqlPagingQueryProvider();
 		queryProvider.setSelectClause("select ID");
 		queryProvider.setFromClause("from T_FOOS");
 		queryProvider.setWhereClause("1 = 0");
 		queryProvider.setSortKeys(Collections.singletonMap("ID", Order.ASCENDING));
-		reader.setQueryProvider(queryProvider);
+		JdbcPagingItemReader<Long> reader = new JdbcPagingItemReader<>(dataSource, queryProvider);
 		reader.setRowMapper(new SingleColumnRowMapper<>());
 		reader.setPageSize(PAGE_SIZE);
 		reader.afterPropertiesSet();

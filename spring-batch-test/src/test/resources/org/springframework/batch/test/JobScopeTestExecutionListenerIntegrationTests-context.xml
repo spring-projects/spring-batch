@@ -20,9 +20,9 @@
 	</job>
 
 	<bean id="reader" class="org.springframework.batch.item.file.FlatFileItemReader" scope="job">
-		<property name="lineMapper">
+		<constructor-arg name="lineMapper">
 			<bean class="org.springframework.batch.item.file.mapping.PassThroughLineMapper" />
-		</property>
+		</constructor-arg>
 		<property name="resource" value="#{jobExecutionContext['input.file']}" />
 	</bean>
 

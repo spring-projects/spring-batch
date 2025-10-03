@@ -34,8 +34,6 @@ public class JdbcPagingItemReaderOrderIntegrationTests extends AbstractGenericDa
 	@Override
 	protected ItemReader<Foo> createItemReader() throws Exception {
 
-		JdbcPagingItemReader<Foo> inputSource = new JdbcPagingItemReader<>();
-		inputSource.setDataSource(dataSource);
 		HsqlPagingQueryProvider queryProvider = new HsqlPagingQueryProvider();
 		queryProvider.setSelectClause("select ID, NAME, VALUE");
 		queryProvider.setFromClause("from T_FOOS");
@@ -43,6 +41,8 @@ public class JdbcPagingItemReaderOrderIntegrationTests extends AbstractGenericDa
 		sortKeys.put("VALUE", Order.ASCENDING);
 		sortKeys.put("NAME", Order.DESCENDING);
 		queryProvider.setSortKeys(sortKeys);
+		JdbcPagingItemReader<Foo> inputSource = new JdbcPagingItemReader<>(dataSource, queryProvider);
+
 		inputSource.setQueryProvider(queryProvider);
 		inputSource.setRowMapper((rs, i) -> {
 			Foo foo = new Foo();

@@ -25,7 +25,7 @@
 	<!-- INFRASTRUCTURE SETUP -->
 
 	<bean id="compositeWriter" class="org.springframework.batch.item.support.CompositeItemWriter">
-		<property name="delegates">
+		<constructor-arg name="delegates">
 			<list>
 				<bean class="org.springframework.batch.samples.domain.trade.internal.TradeWriter">
 					<property name="dao" ref="tradeDao" />
@@ -33,7 +33,7 @@
 				<ref bean="fileItemWriter1" />
 				<ref bean="fileItemWriter2" />
 			</list>
-		</property>
+		</constructor-arg>
 	</bean>
 
 	<bean id="processor" class="org.springframework.batch.item.validator.ValidatingItemProcessor">
@@ -43,12 +43,12 @@
 	<bean id="fileItemReader" class="org.springframework.batch.item.file.FlatFileItemReader">
 		<property name="resource"
 			value="classpath:org/springframework/batch/samples/compositewriter/data/ImportTradeDataStep.txt" />
-		<property name="lineMapper">
+		<constructor-arg name="lineMapper">
 			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
 				<property name="lineTokenizer" ref="fixedFileTokenizer" />
 				<property name="fieldSetMapper" ref="fieldSetMapper" />
 			</bean>
-		</property>
+		</constructor-arg>
 	</bean>
 
 	<bean id="fixedFileTokenizer" class="org.springframework.batch.item.file.transform.FixedLengthTokenizer">
@@ -76,17 +76,17 @@
 	<bean id="fileItemWriter1" class="org.springframework.batch.item.file.FlatFileItemWriter">
 		<property name="name" value="fw1" />
 		<property name="resource" value="file:target/test-outputs/CustomerReport1.txt" />
-		<property name="lineAggregator">
+		<constructor-arg name="lineAggregator">
 			<bean class="org.springframework.batch.item.file.transform.PassThroughLineAggregator" />
-		</property>
+		</constructor-arg>
 	</bean>
 
 	<bean id="fileItemWriter2" class="org.springframework.batch.item.file.FlatFileItemWriter">
 		<property name="name" value="fw2" />
 		<property name="resource" value="file:target/test-outputs/CustomerReport2.txt" />
-		<property name="lineAggregator">
+		<constructor-arg name="lineAggregator">
 			<bean class="org.springframework.batch.item.file.transform.PassThroughLineAggregator" />
-		</property>
+		</constructor-arg>
 	</bean>
 
 	<bean id="fieldSetMapper" class="org.springframework.batch.samples.domain.trade.internal.TradeFieldSetMapper" />

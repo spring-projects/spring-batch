@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,20 +49,11 @@ public class GroupAwareJob implements Job {
 	private final String groupName;
 
 	/**
-	 * Create a new {@link Job} with the delegate and no group name.
-	 * @param delegate a delegate for the features of a regular Job
-	 */
-	public GroupAwareJob(Job delegate) {
-		this(null, delegate);
-	}
-
-	/**
 	 * Create a new {@link Job} with the given group name and delegate.
 	 * @param groupName the group name to prepend (can be {@code null})
 	 * @param delegate a delegate for the features of a regular Job
 	 */
-	public GroupAwareJob(@Nullable String groupName, Job delegate) {
-		super();
+	public GroupAwareJob(String groupName, Job delegate) {
 		this.groupName = groupName;
 		this.delegate = delegate;
 	}
@@ -79,7 +70,7 @@ public class GroupAwareJob implements Job {
 	 */
 	@Override
 	public String getName() {
-		return groupName == null ? delegate.getName() : groupName + SEPARATOR + delegate.getName();
+		return groupName + SEPARATOR + delegate.getName();
 	}
 
 	@Override

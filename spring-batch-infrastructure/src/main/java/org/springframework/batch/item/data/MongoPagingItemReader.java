@@ -81,13 +81,13 @@ import org.springframework.util.StringUtils;
  */
 public class MongoPagingItemReader<T> extends AbstractPaginatedDataItemReader<T> implements InitializingBean {
 
-	protected @Nullable MongoOperations template;
+	protected MongoOperations template;
 
 	protected @Nullable Query query;
 
 	protected @Nullable String queryString;
 
-	protected @Nullable Class<? extends T> type;
+	protected Class<? extends T> type;
 
 	protected @Nullable Sort sort;
 
@@ -99,7 +99,17 @@ public class MongoPagingItemReader<T> extends AbstractPaginatedDataItemReader<T>
 
 	protected List<Object> parameterValues = new ArrayList<>();
 
-	public MongoPagingItemReader() {
+	/**
+	 * Create a new instance of {@link MongoPagingItemReader}.
+	 * @param template the {@link MongoOperations} to use
+	 * @param type the target type
+	 * @since 6.0
+	 */
+	public MongoPagingItemReader(MongoOperations template, Class<? extends T> type) {
+		Assert.notNull(template, "MongoOperations must not be null");
+		Assert.notNull(type, "Target type must not be null");
+		this.template = template;
+		this.type = type;
 		setName(ClassUtils.getShortName(MongoPagingItemReader.class));
 	}
 
@@ -228,8 +238,6 @@ public class MongoPagingItemReader<T> extends AbstractPaginatedDataItemReader<T>
 	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.state(template != null, "An implementation of MongoOperations is required.");
-		Assert.state(type != null, "A type to convert the input into is required.");
 		Assert.state(queryString != null || query != null, "A query is required.");
 
 		if (queryString != null) {

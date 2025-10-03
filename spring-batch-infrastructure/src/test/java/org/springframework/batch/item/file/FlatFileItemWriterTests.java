@@ -60,7 +60,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class FlatFileItemWriterTests {
 
 	// object under test
-	private FlatFileItemWriter<String> writer = new FlatFileItemWriter<>();
+	private FlatFileItemWriter<String> writer;
 
 	// String to be written into file by the FlatFileInputTemplate
 	private static final String TEST_STRING = "FlatFileOutputTemplateTest-OutputData";
@@ -79,12 +79,11 @@ class FlatFileItemWriterTests {
 	 */
 	@BeforeEach
 	void setUp() throws Exception {
-
+		writer = new FlatFileItemWriter<>(new PassThroughLineAggregator<>());
 		outputFile = File.createTempFile("flatfile-test-output-", ".tmp");
 
 		writer.setResource(new FileSystemResource(outputFile));
 		writer.setLineSeparator("\n");
-		writer.setLineAggregator(new PassThroughLineAggregator<>());
 		writer.afterPropertiesSet();
 		writer.setSaveState(true);
 		writer.setEncoding("UTF-8");
@@ -470,8 +469,7 @@ class FlatFileItemWriterTests {
 
 	@Test
 	void testOpenWithNonWritableFile() throws Exception {
-		writer = new FlatFileItemWriter<>();
-		writer.setLineAggregator(new PassThroughLineAggregator<>());
+		writer = new FlatFileItemWriter<>(new PassThroughLineAggregator<>());
 		FileSystemResource file = new FileSystemResource("target/no-such-file.foo");
 		writer.setResource(file);
 		new File(file.getFile().getParent()).mkdirs();
@@ -486,16 +484,9 @@ class FlatFileItemWriterTests {
 	}
 
 	@Test
-	void testAfterPropertiesSetChecksMandatory() {
-		writer = new FlatFileItemWriter<>();
-		assertThrows(IllegalStateException.class, writer::afterPropertiesSet);
-	}
-
-	@Test
 	void testDefaultStreamContext() throws Exception {
-		writer = new FlatFileItemWriter<>();
+		writer = new FlatFileItemWriter<>(new PassThroughLineAggregator<>());
 		writer.setResource(new FileSystemResource(outputFile));
-		writer.setLineAggregator(new PassThroughLineAggregator<>());
 		writer.afterPropertiesSet();
 		writer.setSaveState(true);
 		writer.open(executionContext);

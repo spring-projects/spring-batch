@@ -105,7 +105,7 @@ class JdbcPagingItemReaderAsyncTests {
 		}
 	}
 
-	private void doTest() throws Exception, InterruptedException, ExecutionException {
+	private void doTest() throws Exception {
 		final ItemReader<Foo> reader = getItemReader();
 		CompletionService<List<Foo>> completionService = new ExecutorCompletionService<>(
 				Executors.newFixedThreadPool(THREAD_COUNT));
@@ -140,16 +140,13 @@ class JdbcPagingItemReaderAsyncTests {
 	}
 
 	protected ItemReader<Foo> getItemReader() throws Exception {
-
-		JdbcPagingItemReader<Foo> reader = new JdbcPagingItemReader<>();
-		reader.setDataSource(dataSource);
 		HsqlPagingQueryProvider queryProvider = new HsqlPagingQueryProvider();
 		queryProvider.setSelectClause("select ID, NAME, VALUE");
 		queryProvider.setFromClause("from T_FOOS");
 		Map<String, Order> sortKeys = new LinkedHashMap<>();
 		sortKeys.put("ID", Order.ASCENDING);
 		queryProvider.setSortKeys(sortKeys);
-		reader.setQueryProvider(queryProvider);
+		JdbcPagingItemReader<Foo> reader = new JdbcPagingItemReader<>(dataSource, queryProvider);
 		reader.setRowMapper((rs, i) -> {
 			Foo foo = new Foo();
 			foo.setId(rs.getInt(1));

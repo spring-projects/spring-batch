@@ -51,9 +51,9 @@ class FlatFileItemReaderTests {
 	// common value used for writing to a file
 	private static final String TEST_STRING = "FlatFileInputTemplate-TestData";
 
-	private FlatFileItemReader<String> reader = new FlatFileItemReader<>();
+	private FlatFileItemReader<String> reader;
 
-	private final FlatFileItemReader<Item> itemReader = new FlatFileItemReader<>();
+	private FlatFileItemReader<Item> itemReader;
 
 	private final ExecutionContext executionContext = new ExecutionContext();
 
@@ -65,12 +65,10 @@ class FlatFileItemReaderTests {
 
 	@BeforeEach
 	void setUp() {
-
+		reader = new FlatFileItemReader<>(new PassThroughLineMapper());
 		reader.setResource(inputResource1);
-		reader.setLineMapper(new PassThroughLineMapper());
-
+		itemReader = new FlatFileItemReader<>(new ItemLineMapper());
 		itemReader.setResource(inputResource2);
-		itemReader.setLineMapper(new ItemLineMapper());
 	}
 
 	@Test
@@ -214,15 +212,14 @@ class FlatFileItemReaderTests {
 
 	@Test
 	void testCustomCommentDetectionLogic() throws Exception {
-		reader = new FlatFileItemReader<>() {
+		reader = new FlatFileItemReader<>(getInputResource("#testLine1\ntestLine2\n//testLine3\ntestLine4\n"),
+				new PassThroughLineMapper()) {
 			@Override
 			protected boolean isComment(String line) {
 				return super.isComment(line) || line.endsWith("2");
 			}
 		};
-		reader.setResource(getInputResource("#testLine1\ntestLine2\n//testLine3\ntestLine4\n"));
 		reader.setComments(new String[] { "#", "//" });
-		reader.setLineMapper(new PassThroughLineMapper());
 		reader.open(executionContext);
 
 		assertEquals("testLine4", reader.read());
@@ -349,10 +346,6 @@ class FlatFileItemReaderTests {
 
 		reader.setResource(resource);
 
-		// afterPropertiesSet should only throw an exception if the Resource is
-		// null
-		reader.afterPropertiesSet();
-
 		reader.setStrict(false);
 		reader.open(executionContext);
 		assertNull(reader.read());
@@ -394,7 +387,6 @@ class FlatFileItemReaderTests {
 		resource.getFile().mkdirs();
 		assertTrue(resource.getFile().isDirectory());
 		reader.setResource(resource);
-		reader.afterPropertiesSet();
 
 		reader.setStrict(false);
 		reader.open(executionContext);
@@ -408,10 +400,6 @@ class FlatFileItemReaderTests {
 		Resource resource = new NonExistentResource();
 
 		reader.setResource(resource);
-
-		// afterPropertiesSet should only throw an exception if the Resource is
-		// null
-		reader.afterPropertiesSet();
 
 		// replace the resource to simulate runtime resource creation
 		reader.setResource(getInputResource(TEST_STRING));
@@ -430,8 +418,6 @@ class FlatFileItemReaderTests {
 		reader.setResource(resource);
 		reader.setStrict(true);
 
-		reader.afterPropertiesSet();
-
 		assertThrows(ItemStreamException.class, () -> reader.open(executionContext));
 	}
 
@@ -448,7 +434,6 @@ class FlatFileItemReaderTests {
 			return line;
 		};
 		reader.setLineMapper(exceptionLineMapper);
-		reader.afterPropertiesSet();
 
 		reader.open(executionContext);
 		assertNotNull(reader.read());

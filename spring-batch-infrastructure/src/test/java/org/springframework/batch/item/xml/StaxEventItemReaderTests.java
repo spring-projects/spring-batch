@@ -120,18 +120,6 @@ class StaxEventItemReaderTests {
 		source.afterPropertiesSet();
 	}
 
-	@Test
-	void testAfterPropertiesSetException() {
-
-		source = createNewInputSource();
-		source.setFragmentRootElementName("");
-		assertThrows(IllegalStateException.class, source::afterPropertiesSet);
-
-		source = createNewInputSource();
-		source.setUnmarshaller(null);
-		assertThrows(IllegalStateException.class, source::afterPropertiesSet);
-	}
-
 	/**
 	 * Regular usage scenario. ItemReader should pass XML fragments to unmarshaller
 	 * wrapped with StartDocument and EndDocument events.
@@ -182,8 +170,7 @@ class StaxEventItemReaderTests {
 		XMLInputFactory xmlInputFactory = mock();
 		when(xmlInputFactory.createXMLEventReader(inputStream)).thenReturn(eventReader);
 
-		StaxEventItemReader<Object> reader = new StaxEventItemReader<>();
-		reader.setUnmarshaller(new MockFragmentUnmarshaller());
+		StaxEventItemReader<Object> reader = new StaxEventItemReader<>(new MockFragmentUnmarshaller());
 		reader.setFragmentRootElementName(FRAGMENT_ROOT_ELEMENT);
 		reader.setResource(resource);
 		reader.setEncoding(null);
@@ -493,12 +480,11 @@ class StaxEventItemReaderTests {
 
 	@Test
 	void testClose() throws Exception {
-		MockStaxEventItemReader newSource = new MockStaxEventItemReader();
+		MockStaxEventItemReader newSource = new MockStaxEventItemReader(unmarshaller);
 		Resource resource = new ByteArrayResource(xml.getBytes());
 		newSource.setResource(resource);
 
 		newSource.setFragmentRootElementName(FRAGMENT_ROOT_ELEMENT);
-		newSource.setUnmarshaller(unmarshaller);
 
 		newSource.open(executionContext);
 
@@ -615,10 +601,7 @@ class StaxEventItemReaderTests {
 		String xmlWithDtd = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<!DOCTYPE rohit [\n<!ENTITY entityex SYSTEM \"file://"
 				+ new File("src/test/resources/org/springframework/batch/support/existing.txt").getAbsolutePath()
 				+ "\">\n]>\n<abc>&entityex;</abc>";
-		StaxEventItemReader<String> reader = new StaxEventItemReader<>();
-		reader.setName("foo");
-		reader.setResource(new ByteArrayResource(xmlWithDtd.getBytes()));
-		reader.setUnmarshaller(new MockFragmentUnmarshaller() {
+		MockFragmentUnmarshaller unmarshaller = new MockFragmentUnmarshaller() {
 			@Override
 			public Object unmarshal(Source source) throws XmlMappingException {
 				try {
@@ -631,7 +614,10 @@ class StaxEventItemReaderTests {
 					throw new RuntimeException(e);
 				}
 			}
-		});
+		};
+		StaxEventItemReader<String> reader = new StaxEventItemReader<>(unmarshaller);
+		reader.setName("foo");
+		reader.setResource(new ByteArrayResource(xmlWithDtd.getBytes()));
 		reader.setFragmentRootElementName("abc");
 
 		reader.open(new ExecutionContext());
@@ -663,11 +649,10 @@ class StaxEventItemReaderTests {
 	private StaxEventItemReader<List<XMLEvent>> createNewInputSource() {
 		Resource resource = new ByteArrayResource(xml.getBytes());
 
-		StaxEventItemReader<List<XMLEvent>> newSource = new StaxEventItemReader<>();
+		StaxEventItemReader<List<XMLEvent>> newSource = new StaxEventItemReader<>(unmarshaller);
 		newSource.setResource(resource);
 
 		newSource.setFragmentRootElementName(FRAGMENT_ROOT_ELEMENT);
-		newSource.setUnmarshaller(unmarshaller);
 		newSource.setSaveState(true);
 
 		return newSource;
@@ -676,11 +661,11 @@ class StaxEventItemReaderTests {
 	private StaxEventItemReader<ItemCountAwareFragment> createNewItemCountAwareInputSource() {
 		Resource resource = new ByteArrayResource(xml.getBytes());
 
-		StaxEventItemReader<ItemCountAwareFragment> newSource = new StaxEventItemReader<>();
+		StaxEventItemReader<ItemCountAwareFragment> newSource = new StaxEventItemReader<>(
+				new ItemCountAwareMockFragmentUnmarshaller());
 		newSource.setResource(resource);
 
 		newSource.setFragmentRootElementName(FRAGMENT_ROOT_ELEMENT);
-		newSource.setUnmarshaller(new ItemCountAwareMockFragmentUnmarshaller());
 		newSource.setSaveState(true);
 
 		return newSource;
@@ -801,6 +786,10 @@ class StaxEventItemReaderTests {
 	private static class MockStaxEventItemReader extends StaxEventItemReader<List<XMLEvent>> {
 
 		private boolean openCalled = false;
+
+		public MockStaxEventItemReader(Unmarshaller unmarshaller) {
+			super(unmarshaller);
+		}
 
 		@Override
 		public void open(ExecutionContext executionContext) {

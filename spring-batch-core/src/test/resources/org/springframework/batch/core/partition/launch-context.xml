@@ -22,12 +22,12 @@
 				<property name="stepExecutionSplitter">
 					<bean
 						class="org.springframework.batch.core.partition.support.SimpleStepExecutionSplitter">
-						<property name="jobRepository" ref="jobRepository" />
-						<property name="stepName" value="step1" />
-						<property name="partitioner">
+						<constructor-arg name="jobRepository" ref="jobRepository" />
+						<constructor-arg name="stepName" value="step1" />
+						<constructor-arg name="partitioner">
 							<bean
 								class="org.springframework.batch.core.partition.MinMaxPartitioner" />
-						</property>
+						</constructor-arg>
 					</bean>
 				</property>
 				<property name="jobRepository" ref="jobRepository" />

@@ -67,9 +67,7 @@ class JpaItemWriterIntegrationTests {
 	@Test
 	void testMerge() throws Exception {
 		// given
-		JpaItemWriter<Person> writer = new JpaItemWriter<>();
-		writer.setEntityManagerFactory(this.entityManagerFactory);
-		writer.afterPropertiesSet();
+		JpaItemWriter<Person> writer = new JpaItemWriter<>(this.entityManagerFactory);
 		Chunk<Person> items = Chunk.of(new Person(1, "foo"), new Person(2, "bar"));
 
 		// when
@@ -82,10 +80,8 @@ class JpaItemWriterIntegrationTests {
 	@Test
 	void testPersist() throws Exception {
 		// given
-		JpaItemWriter<Person> writer = new JpaItemWriter<>();
-		writer.setEntityManagerFactory(this.entityManagerFactory);
+		JpaItemWriter<Person> writer = new JpaItemWriter<>(this.entityManagerFactory);
 		writer.setUsePersist(true);
-		writer.afterPropertiesSet();
 		Chunk<Person> items = Chunk.of(new Person(1, "foo"), new Person(2, "bar"));
 
 		// when

@@ -19,12 +19,13 @@ package org.springframework.batch.core.repository.support;
 import java.util.Properties;
 
 import org.aopalliance.intercept.MethodInterceptor;
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.aop.support.NameMatchMethodPointcut;
 import org.springframework.batch.core.job.DefaultJobKeyGenerator;
 import org.springframework.batch.core.job.JobKeyGenerator;
-import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.dao.ExecutionContextDao;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
@@ -55,9 +56,9 @@ import org.springframework.util.Assert;
  */
 public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean<JobRepository>, InitializingBean {
 
-	private PlatformTransactionManager transactionManager;
+	private @Nullable PlatformTransactionManager transactionManager;
 
-	private TransactionAttributeSource transactionAttributeSource;
+	private @Nullable TransactionAttributeSource transactionAttributeSource;
 
 	private final ProxyFactory proxyFactory = new ProxyFactory();
 
@@ -74,7 +75,7 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean<Jo
 	 */
 	private static final String DEFAULT_ISOLATION_LEVEL = TRANSACTION_ISOLATION_LEVEL_PREFIX + "SERIALIZABLE";
 
-	protected JobKeyGenerator jobKeyGenerator;
+	protected @Nullable JobKeyGenerator jobKeyGenerator;
 
 	/**
 	 * @return fully configured {@link JobInstanceDao} implementation.
@@ -160,7 +161,7 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean<Jo
 	 * to ensure that they are using the same instance.
 	 * @return the transactionManager
 	 */
-	public PlatformTransactionManager getTransactionManager() {
+	@Nullable public PlatformTransactionManager getTransactionManager() {
 		return transactionManager;
 	}
 
@@ -198,6 +199,7 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean<Jo
 	}
 
 	@Override
+	@SuppressWarnings("DataFlowIssue")
 	public JobRepository getObject() throws Exception {
 		TransactionInterceptor advice = new TransactionInterceptor((TransactionManager) this.transactionManager,
 				this.transactionAttributeSource);

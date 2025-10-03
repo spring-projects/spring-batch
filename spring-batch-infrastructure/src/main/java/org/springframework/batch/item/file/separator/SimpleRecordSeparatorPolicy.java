@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,6 @@
 
 package org.springframework.batch.item.file.separator;
 
-import org.jspecify.annotations.Nullable;
-
 /**
  * Simplest possible {@link RecordSeparatorPolicy} - treats all lines as record endings.
  *
@@ -32,7 +30,7 @@ public class SimpleRecordSeparatorPolicy implements RecordSeparatorPolicy {
 	 * @see org.springframework.batch.item.file.separator.RecordSeparatorPolicy#isEndOfRecord(java.lang.String)
 	 */
 	@Override
-	public boolean isEndOfRecord(@Nullable String line) {
+	public boolean isEndOfRecord(String line) {
 		return true;
 	}
 
@@ -41,7 +39,7 @@ public class SimpleRecordSeparatorPolicy implements RecordSeparatorPolicy {
 	 * @see org.springframework.batch.item.file.separator.RecordSeparatorPolicy#postProcess(java.lang.String)
 	 */
 	@Override
-	public @Nullable String postProcess(String record) {
+	public String postProcess(String record) {
 		return record;
 	}
 

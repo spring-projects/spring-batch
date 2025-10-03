@@ -5,7 +5,7 @@
  * @author Mahmoud Ben Hassine
  * @author Stefano Cordio
  */
-@NullMarked
+@NullUnmarked
 package org.springframework.batch.core.job.flow;
 
-import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.NullUnmarked;

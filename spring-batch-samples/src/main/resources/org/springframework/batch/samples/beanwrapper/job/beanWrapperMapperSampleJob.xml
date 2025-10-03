@@ -25,23 +25,23 @@
 	<bean id="tradeFileItemReader" class="org.springframework.batch.item.file.FlatFileItemReader">
 		<property name="resource"
 			value="classpath:org/springframework/batch/samples/beanwrapper/data/ImportTradeDataStep.txt" />
-		<property name="lineMapper">
+		<constructor-arg name="lineMapper">
 			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
 				<property name="lineTokenizer" ref="tradeTokenizer" />
 				<property name="fieldSetMapper" ref="tradeFieldSetMapper" />
 			</bean>
-		</property>
+		</constructor-arg>
 	</bean>
 
 	<bean id="personFileItemReader" class="org.springframework.batch.item.file.FlatFileItemReader">
 		<property name="resource"
 			value="classpath:org/springframework/batch/samples/beanwrapper/data/ImportPersonDataStep.txt" />
-		<property name="lineMapper">
+		<constructor-arg name="lineMapper">
 			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
 				<property name="lineTokenizer" ref="personTokenizer" />
 				<property name="fieldSetMapper" ref="personFieldSetMapper" />
 			</bean>
-		</property>
+		</constructor-arg>
 	</bean>
 
 	<bean id="tradeTokenizer" class="org.springframework.batch.item.file.transform.FixedLengthTokenizer">

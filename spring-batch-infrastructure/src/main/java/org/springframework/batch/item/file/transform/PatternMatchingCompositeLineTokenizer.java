@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,6 @@ import java.util.Map;
 
 import org.springframework.batch.support.PatternMatcher;
 
-import org.jspecify.annotations.Nullable;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
 /**
@@ -34,20 +32,26 @@ import org.springframework.util.Assert;
  * @author Ben Hale
  * @author Dan Garrette
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  */
-public class PatternMatchingCompositeLineTokenizer implements LineTokenizer, InitializingBean {
+public class PatternMatchingCompositeLineTokenizer implements LineTokenizer {
 
-	private @Nullable PatternMatcher<LineTokenizer> tokenizers;
+	private PatternMatcher<LineTokenizer> tokenizers;
 
-	@SuppressWarnings("DataFlowIssue")
-	@Override
-	public FieldSet tokenize(@Nullable String line) {
-		return tokenizers.match(line).tokenize(line);
+	/**
+	 * Construct a {@link PatternMatchingCompositeLineTokenizer} with the provided map of
+	 * tokenizers. The map must be non-empty.
+	 * @param tokenizers the map of patterns to tokenizers
+	 * @since 6.0
+	 */
+	public PatternMatchingCompositeLineTokenizer(Map<String, LineTokenizer> tokenizers) {
+		Assert.isTrue(!tokenizers.isEmpty(), "The 'tokenizers' property must be non-empty");
+		this.tokenizers = new PatternMatcher<>(tokenizers);
 	}
 
 	@Override
-	public void afterPropertiesSet() throws Exception {
-		Assert.state(this.tokenizers != null, "The 'tokenizers' property must be non-empty");
+	public FieldSet tokenize(String line) {
+		return tokenizers.match(line).tokenize(line);
 	}
 
 	public void setTokenizers(Map<String, LineTokenizer> tokenizers) {

@@ -22,6 +22,7 @@ import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.FlatFileItemReader;
+import org.springframework.batch.item.file.LineMapper;
 import org.springframework.batch.item.file.mapping.DefaultLineMapper;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
@@ -47,21 +48,19 @@ abstract class AbstractTradeBatchTests {
 	protected TradeItemReader provider;
 
 	@BeforeEach
-	void setUp() throws Exception {
-		provider = new TradeItemReader(resource);
+	void setUp() {
+		DefaultLineMapper<Trade> mapper = new DefaultLineMapper<>();
+		mapper.setLineTokenizer(new DelimitedLineTokenizer());
+		mapper.setFieldSetMapper(new TradeMapper());
+		provider = new TradeItemReader(mapper);
+		provider.setResource(resource);
 		provider.open(new ExecutionContext());
 	}
 
 	protected static class TradeItemReader extends FlatFileItemReader<Trade> {
 
-		protected TradeItemReader(Resource resource) throws Exception {
-			super();
-			setResource(resource);
-			DefaultLineMapper<Trade> mapper = new DefaultLineMapper<>();
-			mapper.setLineTokenizer(new DelimitedLineTokenizer());
-			mapper.setFieldSetMapper(new TradeMapper());
-			setLineMapper(mapper);
-			afterPropertiesSet();
+		public TradeItemReader(LineMapper<Trade> lineMapper) {
+			super(lineMapper);
 		}
 
 	}

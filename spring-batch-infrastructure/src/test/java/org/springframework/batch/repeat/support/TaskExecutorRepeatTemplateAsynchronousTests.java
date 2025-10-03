@@ -34,6 +34,10 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.file.LineMapper;
+import org.springframework.batch.item.file.mapping.DefaultLineMapper;
+import org.springframework.batch.item.file.mapping.PassThroughLineMapper;
+import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatStatus;
@@ -150,7 +154,6 @@ class TaskExecutorRepeatTemplateAsynchronousTests extends AbstractTradeBatchTest
 	}
 
 	@Test
-	@SuppressWarnings("removal")
 	void testThrottleLimit() {
 
 		int throttleLimit = 600;
@@ -173,7 +176,11 @@ class TaskExecutorRepeatTemplateAsynchronousTests extends AbstractTradeBatchTest
 				processor.write(Chunk.of(item));
 				// Do some more I/O
 				for (int i = 0; i < 10; i++) {
-					TradeItemReader provider = new TradeItemReader(resource);
+					DefaultLineMapper<Trade> mapper = new DefaultLineMapper<>();
+					mapper.setLineTokenizer(new DelimitedLineTokenizer());
+					mapper.setFieldSetMapper(new TradeMapper());
+					TradeItemReader provider = new TradeItemReader(mapper);
+					provider.setResource(resource);
 					provider.open(new ExecutionContext());
 					while (provider.read() != null)
 						continue;
@@ -212,7 +219,11 @@ class TaskExecutorRepeatTemplateAsynchronousTests extends AbstractTradeBatchTest
 				assertNotSame(threadName, Thread.currentThread().getName());
 				threadNames.add(Thread.currentThread().getName());
 				Thread.sleep(100);
-				TradeItemReader provider = new TradeItemReader(resource);
+				DefaultLineMapper<Trade> mapper = new DefaultLineMapper<>();
+				mapper.setLineTokenizer(new DelimitedLineTokenizer());
+				mapper.setFieldSetMapper(new TradeMapper());
+				TradeItemReader provider = new TradeItemReader(mapper);
+				provider.setResource(resource);
 				provider.open(new ExecutionContext());
 				while (provider.read() != null)
 					;

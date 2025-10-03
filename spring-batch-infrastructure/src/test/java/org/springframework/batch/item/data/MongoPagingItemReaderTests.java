@@ -62,13 +62,11 @@ class MongoPagingItemReaderTests {
 
 	@BeforeEach
 	void setUp() throws Exception {
-		reader = new MongoPagingItemReader<>();
+		reader = new MongoPagingItemReader<>(template, String.class);
 
 		sortOptions = new HashMap<>();
 		sortOptions.put("name", Sort.Direction.DESC);
 
-		reader.setTemplate(template);
-		reader.setTargetType(String.class);
 		reader.setQuery("{ }");
 		reader.setSort(sortOptions);
 		reader.afterPropertiesSet();
@@ -76,36 +74,9 @@ class MongoPagingItemReaderTests {
 	}
 
 	@Test
-	void testAfterPropertiesSetForQueryString() throws Exception {
-		reader = new MongoPagingItemReader<>();
-		Exception exception = assertThrows(IllegalStateException.class, reader::afterPropertiesSet);
-		assertEquals("An implementation of MongoOperations is required.", exception.getMessage());
-
-		reader.setTemplate(template);
-
-		exception = assertThrows(IllegalStateException.class, reader::afterPropertiesSet);
-		assertEquals("A type to convert the input into is required.", exception.getMessage());
-
-		reader.setTargetType(String.class);
-
-		exception = assertThrows(IllegalStateException.class, reader::afterPropertiesSet);
-		assertEquals("A query is required.", exception.getMessage());
-
-		reader.setQuery("");
-
-		exception = assertThrows(IllegalStateException.class, reader::afterPropertiesSet);
-		assertEquals("A sort is required.", exception.getMessage());
-
-		reader.setSort(sortOptions);
-		reader.afterPropertiesSet();
-	}
-
-	@Test
 	void testAfterPropertiesSetForQueryObject() throws Exception {
-		reader = new MongoPagingItemReader<>();
-
-		reader.setTemplate(template);
-		reader.setTargetType(String.class);
+		reader = new MongoPagingItemReader<>(template, String.class);
+		;
 
 		Query query1 = new Query().with(Sort.by(new Order(Sort.Direction.ASC, "_id")));
 		reader.setQuery(query1);
@@ -219,12 +190,10 @@ class MongoPagingItemReaderTests {
 
 	@Test
 	void testQueryObject() throws Exception {
-		reader = new MongoPagingItemReader<>();
-		reader.setTemplate(template);
+		reader = new MongoPagingItemReader<>(template, String.class);
 
 		Query query = new Query().with(Sort.by(new Order(Sort.Direction.ASC, "_id")));
 		reader.setQuery(query);
-		reader.setTargetType(String.class);
 
 		reader.afterPropertiesSet();
 
@@ -240,12 +209,10 @@ class MongoPagingItemReaderTests {
 
 	@Test
 	void testQueryObjectWithIgnoredPageSize() throws Exception {
-		reader = new MongoPagingItemReader<>();
-		reader.setTemplate(template);
+		reader = new MongoPagingItemReader<>(template, String.class);
 
 		Query query = new Query().with(Sort.by(new Order(Sort.Direction.ASC, "_id"))).with(PageRequest.of(0, 50));
 		reader.setQuery(query);
-		reader.setTargetType(String.class);
 
 		reader.afterPropertiesSet();
 
@@ -261,12 +228,10 @@ class MongoPagingItemReaderTests {
 
 	@Test
 	void testQueryObjectWithPageSize() throws Exception {
-		reader = new MongoPagingItemReader<>();
-		reader.setTemplate(template);
+		reader = new MongoPagingItemReader<>(template, String.class);
 
 		Query query = new Query().with(Sort.by(new Order(Sort.Direction.ASC, "_id"))).with(PageRequest.of(30, 50));
 		reader.setQuery(query);
-		reader.setTargetType(String.class);
 		reader.setPageSize(100);
 
 		reader.afterPropertiesSet();
@@ -283,11 +248,9 @@ class MongoPagingItemReaderTests {
 
 	@Test
 	void testQueryObjectWithoutLimit() throws Exception {
-		reader = new MongoPagingItemReader<>();
-		reader.setTemplate(template);
+		reader = new MongoPagingItemReader<>(template, String.class);
 
 		reader.setQuery(new Query());
-		reader.setTargetType(String.class);
 		reader.setPageSize(100);
 
 		reader.afterPropertiesSet();
@@ -301,11 +264,9 @@ class MongoPagingItemReaderTests {
 
 	@Test
 	void testQueryObjectWithoutLimitAndPageSize() throws Exception {
-		reader = new MongoPagingItemReader<>();
-		reader.setTemplate(template);
+		reader = new MongoPagingItemReader<>(template, String.class);
 
 		reader.setQuery(new Query());
-		reader.setTargetType(String.class);
 
 		reader.afterPropertiesSet();
 
@@ -318,12 +279,10 @@ class MongoPagingItemReaderTests {
 
 	@Test
 	void testQueryObjectWithCollection() throws Exception {
-		reader = new MongoPagingItemReader<>();
-		reader.setTemplate(template);
+		reader = new MongoPagingItemReader<>(template, String.class);
 
 		Query query = new Query().with(Sort.by(new Order(Sort.Direction.ASC, "_id")));
 		reader.setQuery(query);
-		reader.setTargetType(String.class);
 		reader.setCollection("collection");
 
 		reader.afterPropertiesSet();
@@ -342,7 +301,7 @@ class MongoPagingItemReaderTests {
 	@Test
 	void testSortThrowsExceptionWhenInvokedWithNull() {
 		// given
-		reader = new MongoPagingItemReader<>();
+		reader = new MongoPagingItemReader<>(template, String.class);
 
 		// when + then
 		assertThatIllegalArgumentException().isThrownBy(() -> reader.setSort(null))

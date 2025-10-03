@@ -26,7 +26,6 @@ import org.jspecify.annotations.Nullable;
 
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.data.mongodb.core.BulkOperations;
 import org.springframework.data.mongodb.core.BulkOperations.BulkMode;
 import org.springframework.data.mongodb.core.FindAndReplaceOptions;
@@ -60,7 +59,7 @@ import org.springframework.util.StringUtils;
  * @author Stefano Cordio
  *
  */
-public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
+public class MongoItemWriter<T> implements ItemWriter<T> {
 
 	/**
 	 * Operation mode of the item writer.
@@ -89,7 +88,7 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 
 	private static final String ID_KEY = "_id";
 
-	private @Nullable MongoOperations template;
+	private MongoOperations template;
 
 	private final Object bufferKey;
 
@@ -99,8 +98,15 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 
 	private List<String> primaryKeys = List.of(ID_KEY);
 
-	public MongoItemWriter() {
-		super();
+	/**
+	 * Create a new instance of {@link MongoItemWriter} with the provided
+	 * {@link MongoOperations} template. The template is required.
+	 * @param template the template implementation to be used. Must not be null.
+	 * @since 6.0
+	 */
+	public MongoItemWriter(MongoOperations template) {
+		Assert.notNull(template, "MongoOperations must not be null");
+		this.template = template;
 		this.bufferKey = new Object();
 	}
 
@@ -136,7 +142,7 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 * called by a subclass if necessary.
 	 * @return template the template implementation to be used.
 	 */
-	protected @Nullable MongoOperations getTemplate() {
+	protected MongoOperations getTemplate() {
 		return template;
 	}
 
@@ -312,11 +318,6 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 		}
 
 		return (Chunk<T>) TransactionSynchronizationManager.getResource(bufferKey);
-	}
-
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		Assert.state(template != null, "A MongoOperations implementation is required.");
 	}
 
 }

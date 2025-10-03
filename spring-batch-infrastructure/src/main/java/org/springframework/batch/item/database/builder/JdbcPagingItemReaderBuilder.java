@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2024 the original author or authors.
+ * Copyright 2017-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -312,7 +312,7 @@ public class JdbcPagingItemReaderBuilder<T> {
 	 * Provides a completely built instance of the {@link JdbcPagingItemReader}
 	 * @return a {@link JdbcPagingItemReader}
 	 */
-	public JdbcPagingItemReader<T> build() {
+	public JdbcPagingItemReader<T> build() throws Exception {
 		Assert.isTrue(pageSize > 0, "pageSize must be greater than zero");
 		Assert.notNull(dataSource, "dataSource is required");
 
@@ -320,7 +320,8 @@ public class JdbcPagingItemReaderBuilder<T> {
 			Assert.hasText(name, "A name is required when saveState is set to true");
 		}
 
-		JdbcPagingItemReader<T> reader = new JdbcPagingItemReader<>();
+		JdbcPagingItemReader<T> reader = new JdbcPagingItemReader<>(this.dataSource,
+				queryProvider == null ? determineQueryProvider(dataSource) : queryProvider);
 
 		reader.setMaxItemCount(maxItemCount);
 		reader.setCurrentItemCount(currentItemCount);
@@ -328,19 +329,16 @@ public class JdbcPagingItemReaderBuilder<T> {
 			reader.setName(name);
 		}
 		reader.setSaveState(saveState);
-		reader.setDataSource(dataSource);
 		reader.setFetchSize(fetchSize);
 		if (parameterValues != null) {
 			reader.setParameterValues(parameterValues);
 		}
 
-		reader.setQueryProvider(queryProvider == null ? determineQueryProvider(dataSource) : queryProvider);
-
 		if (rowMapper != null) {
 			reader.setRowMapper(rowMapper);
 		}
 		reader.setPageSize(pageSize);
-
+		reader.afterPropertiesSet();
 		return reader;
 	}
 

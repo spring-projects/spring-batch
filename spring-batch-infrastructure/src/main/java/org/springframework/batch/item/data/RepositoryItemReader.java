@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2024 the original author or authors.
+ * Copyright 2012-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -85,9 +85,9 @@ public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemR
 
 	protected Log logger = LogFactory.getLog(getClass());
 
-	private @Nullable PagingAndSortingRepository<?, ?> repository;
+	private PagingAndSortingRepository<?, ?> repository;
 
-	private @Nullable Sort sort;
+	private Map<String, Sort.Direction> sorts;
 
 	private volatile int page = 0;
 
@@ -103,7 +103,17 @@ public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemR
 
 	private @Nullable String methodName;
 
-	public RepositoryItemReader() {
+	/**
+	 * Create a new {@link RepositoryItemReader}.
+	 * @param repository the {@link PagingAndSortingRepository} to use
+	 * @param sorts the sort parameters to pass to the repository
+	 * @since 6.0
+	 */
+	public RepositoryItemReader(PagingAndSortingRepository<?, ?> repository, Map<String, Sort.Direction> sorts) {
+		Assert.notNull(repository, "A PagingAndSortingRepository is required.");
+		Assert.notNull(sorts, "A Map of sorts is required.");
+		this.repository = repository;
+		this.sorts = sorts;
 		setName(ClassUtils.getShortName(RepositoryItemReader.class));
 	}
 
@@ -121,8 +131,8 @@ public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemR
 	 * order.
 	 * @param sorts the fields to sort by and the directions
 	 */
-	public void setSort(Map<String, Sort.Direction> sorts) {
-		this.sort = convertToSort(sorts);
+	public void setSorts(Map<String, Sort.Direction> sorts) {
+		this.sorts = sorts;
 	}
 
 	/**
@@ -151,9 +161,7 @@ public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemR
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.state(repository != null, "A PagingAndSortingRepository is required");
 		Assert.state(pageSize > 0, "Page size must be greater than 0");
-		Assert.state(sort != null, "A sort is required");
 		Assert.state(this.methodName != null && !this.methodName.isEmpty(), "methodName is required.");
 		if (isSaveState()) {
 			Assert.state(StringUtils.hasText(getName()), "A name is required when saveState is set to true.");
@@ -221,7 +229,7 @@ public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemR
 	@SuppressWarnings("unchecked")
 	protected List<T> doPageRead() throws Exception {
 		@SuppressWarnings("DataFlowIssue")
-		Pageable pageRequest = PageRequest.of(page, pageSize, sort);
+		Pageable pageRequest = PageRequest.of(page, pageSize, convertToSort(sorts));
 
 		@SuppressWarnings("DataFlowIssue")
 		MethodInvoker invoker = createMethodInvoker(repository, methodName);

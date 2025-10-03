@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 the original author or authors.
+ * Copyright 2018-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package org.springframework.batch.item.json;
 
 import java.util.Iterator;
 
-import org.jspecify.annotations.Nullable;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.support.AbstractFileItemWriter;
 import org.springframework.core.io.WritableResource;
@@ -57,7 +56,7 @@ public class JsonFileItemWriter<T> extends AbstractFileItemWriter<T> {
 
 	private static final char JSON_ARRAY_STOP = ']';
 
-	private @Nullable JsonObjectMarshaller<T> jsonObjectMarshaller;
+	private JsonObjectMarshaller<T> jsonObjectMarshaller;
 
 	/**
 	 * Create a new {@link JsonFileItemWriter} instance.
@@ -65,10 +64,9 @@ public class JsonFileItemWriter<T> extends AbstractFileItemWriter<T> {
 	 * @param jsonObjectMarshaller used to marshal object into json representation
 	 */
 	public JsonFileItemWriter(WritableResource resource, JsonObjectMarshaller<T> jsonObjectMarshaller) {
-		Assert.notNull(resource, "resource must not be null");
+		this.resource = resource;
 		Assert.notNull(jsonObjectMarshaller, "json object marshaller must not be null");
-		setResource(resource);
-		setJsonObjectMarshaller(jsonObjectMarshaller);
+		this.jsonObjectMarshaller = jsonObjectMarshaller;
 		setHeaderCallback(writer -> writer.write(JSON_ARRAY_START));
 		setFooterCallback(writer -> writer.write(this.lineSeparator + JSON_ARRAY_STOP + this.lineSeparator));
 		setExecutionContextName(ClassUtils.getShortName(JsonFileItemWriter.class));

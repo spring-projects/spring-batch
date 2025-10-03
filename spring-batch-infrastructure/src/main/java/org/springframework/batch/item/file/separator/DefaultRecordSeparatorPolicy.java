@@ -87,7 +87,7 @@ public class DefaultRecordSeparatorPolicy extends SimpleRecordSeparatorPolicy {
 	 * @see RecordSeparatorPolicy#isEndOfRecord(String)
 	 */
 	@Override
-	public boolean isEndOfRecord(@Nullable String line) {
+	public boolean isEndOfRecord(String line) {
 		return !isQuoteUnterminated(line) && !isContinued(line);
 	}
 

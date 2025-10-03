@@ -144,8 +144,6 @@ class JdbcPagingRestartIntegrationTests {
 
 	protected ItemReader<Foo> getItemReader() throws Exception {
 
-		JdbcPagingItemReader<Foo> reader = new JdbcPagingItemReader<>();
-		reader.setDataSource(dataSource);
 		SqlPagingQueryProviderFactoryBean factory = new SqlPagingQueryProviderFactoryBean();
 		factory.setDataSource(dataSource);
 		factory.setSelectClause("select ID, NAME, VALUE");
@@ -153,7 +151,8 @@ class JdbcPagingRestartIntegrationTests {
 		Map<String, Order> sortKeys = new LinkedHashMap<>();
 		sortKeys.put("VALUE", Order.ASCENDING);
 		factory.setSortKeys(sortKeys);
-		reader.setQueryProvider(factory.getObject());
+		JdbcPagingItemReader<Foo> reader = new JdbcPagingItemReader<>(dataSource, factory.getObject());
+
 		reader.setRowMapper((rs, i) -> {
 			Foo foo = new Foo();
 			foo.setId(rs.getInt(1));

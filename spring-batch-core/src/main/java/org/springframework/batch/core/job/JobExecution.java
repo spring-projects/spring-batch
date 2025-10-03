@@ -26,11 +26,14 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.springframework.batch.core.*;
+import org.jspecify.annotations.Nullable;
+
+import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.Entity;
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.lang.Nullable;
 
 /**
  * Batch domain object representing the execution of a job.
@@ -54,11 +57,11 @@ public class JobExecution extends Entity {
 
 	private LocalDateTime createTime = LocalDateTime.now();
 
-	private LocalDateTime startTime = null;
+	private @Nullable LocalDateTime startTime = null;
 
-	private LocalDateTime endTime = null;
+	private @Nullable LocalDateTime endTime = null;
 
-	private LocalDateTime lastUpdated = null;
+	private @Nullable LocalDateTime lastUpdated = null;
 
 	private ExitStatus exitStatus = ExitStatus.UNKNOWN;
 
@@ -92,8 +95,7 @@ public class JobExecution extends Entity {
 	/**
 	 * @return The current end time.
 	 */
-	@Nullable
-	public LocalDateTime getEndTime() {
+	@Nullable public LocalDateTime getEndTime() {
 		return endTime;
 	}
 
@@ -116,8 +118,7 @@ public class JobExecution extends Entity {
 	/**
 	 * @return The current start time.
 	 */
-	@Nullable
-	public LocalDateTime getStartTime() {
+	@Nullable public LocalDateTime getStartTime() {
 		return startTime;
 	}
 
@@ -265,8 +266,7 @@ public class JobExecution extends Entity {
 	 * @return a {@link LocalDateTime} object representing the last time this
 	 * {@code JobExecution} was updated.
 	 */
-	@Nullable
-	public LocalDateTime getLastUpdated() {
+	@Nullable public LocalDateTime getLastUpdated() {
 		return lastUpdated;
 	}
 

@@ -110,7 +110,7 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T>
 	private @Nullable WritableResource resource;
 
 	// xml marshaller
-	private @Nullable Marshaller marshaller;
+	private Marshaller marshaller;
 
 	// encoding to be used while reading from the resource
 	private String encoding = DEFAULT_ENCODING;
@@ -172,8 +172,20 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T>
 	// closed
 	private List<QName> unclosedHeaderCallbackElements = Collections.emptyList();
 
-	public StaxEventItemWriter() {
+	/**
+	 * Create a new {@link StaxEventItemWriter} instance.
+	 * @param marshaller the Marshaller to be used for converting objects to XML
+	 * @since 6.0
+	 */
+	public StaxEventItemWriter(Marshaller marshaller) {
+		Assert.notNull(marshaller, "Marshaller must not be null");
+		this.marshaller = marshaller;
 		setExecutionContextName(ClassUtils.getShortName(StaxEventItemWriter.class));
+	}
+
+	public StaxEventItemWriter(WritableResource resource, Marshaller marshaller) {
+		this(marshaller);
+		this.resource = resource;
 	}
 
 	/**
@@ -371,7 +383,6 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T>
 	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.state(marshaller != null, "A Marshaller is required");
 		if (rootTagName.contains("{")) {
 			rootTagNamespace = rootTagName.replaceAll("\\{(.*)\\}.*", "$1");
 			rootTagName = rootTagName.replaceAll("\\{.*\\}(.*)", "$1");
@@ -392,9 +403,6 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T>
 	@Override
 	public void open(ExecutionContext executionContext) {
 		super.open(executionContext);
-
-		Assert.notNull(resource, "The resource must be set");
-
 		long startAtPosition = 0;
 
 		// if restart data is provided, restart from provided offset

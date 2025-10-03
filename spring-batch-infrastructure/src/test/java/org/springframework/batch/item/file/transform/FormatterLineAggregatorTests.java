@@ -30,25 +30,7 @@ import org.junit.jupiter.api.Test;
  */
 class FormatterLineAggregatorTests {
 
-	// object under test
-	private FormatterLineAggregator<String[]> aggregator;
-
 	private final FieldExtractor<String[]> defaultFieldExtractor = item -> item;
-
-	@BeforeEach
-	void setup() {
-		aggregator = new FormatterLineAggregator<>();
-		aggregator.setFieldExtractor(defaultFieldExtractor);
-	}
-
-	/**
-	 * If no ranges are specified, IllegalArgumentException is thrown
-	 */
-	@Test
-	void testAggregateNullRecordDescriptor() {
-		String[] args = { "does not matter what is here" };
-		assertThrows(IllegalArgumentException.class, () -> aggregator.aggregate(args));
-	}
 
 	/**
 	 * Text length exceeds the length of the column.
@@ -56,8 +38,9 @@ class FormatterLineAggregatorTests {
 	@Test
 	void testAggregateInvalidInputLength() {
 		String[] args = { "Oversize" };
+		FormatterLineAggregator<String[]> aggregator = new FormatterLineAggregator<>("%3s");
 		aggregator.setMaximumLength(3);
-		aggregator.setFormat("%3s");
+		aggregator.setFieldExtractor(defaultFieldExtractor);
 		assertThrows(IllegalStateException.class, () -> aggregator.aggregate(args));
 	}
 
@@ -67,7 +50,8 @@ class FormatterLineAggregatorTests {
 	@Test
 	void testAggregate() {
 		String[] args = { "Matchsize", "Smallsize" };
-		aggregator.setFormat("%9s%9s");
+		FormatterLineAggregator<String[]> aggregator = new FormatterLineAggregator<>("%9s%9s");
+		aggregator.setFieldExtractor(defaultFieldExtractor);
 		String result = aggregator.aggregate(args);
 		assertEquals("MatchsizeSmallsize", result);
 	}
@@ -78,7 +62,8 @@ class FormatterLineAggregatorTests {
 	@Test
 	void testAggregateWithLastRangeUnbound() {
 		String[] args = { "Matchsize", "Smallsize" };
-		aggregator.setFormat("%-12s%s");
+		FormatterLineAggregator<String[]> aggregator = new FormatterLineAggregator<>("%-12s%s");
+		aggregator.setFieldExtractor(defaultFieldExtractor);
 		String result = aggregator.aggregate(args);
 		assertEquals("Matchsize   Smallsize", result);
 	}
@@ -89,7 +74,8 @@ class FormatterLineAggregatorTests {
 	@Test
 	void testAggregateFormattedRight() {
 		String[] args = { "Matchsize", "Smallsize" };
-		aggregator.setFormat("%13s%10s");
+		FormatterLineAggregator<String[]> aggregator = new FormatterLineAggregator<>("%13s%10s");
+		aggregator.setFieldExtractor(defaultFieldExtractor);
 		String result = aggregator.aggregate(args);
 		assertEquals(23, result.length());
 		assertEquals("    Matchsize Smallsize", result);
@@ -102,7 +88,8 @@ class FormatterLineAggregatorTests {
 	void testAggregateFormattedCenter() {
 
 		String[] args = { "Matchsize", "Smallsize" };
-		aggregator.setFormat("%13s%12s");
+		FormatterLineAggregator<String[]> aggregator = new FormatterLineAggregator<>("%13s%12s");
+		aggregator.setFieldExtractor(defaultFieldExtractor);
 		aggregator.setMinimumLength(25);
 		aggregator.setMaximumLength(25);
 
@@ -135,7 +122,8 @@ class FormatterLineAggregatorTests {
 	@Test
 	void testAggregateWithCustomPadding() {
 		String[] args = { "Matchsize", "Smallsize" };
-		aggregator.setFormat("%13s%11s");
+		FormatterLineAggregator<String[]> aggregator = new FormatterLineAggregator<>("%13s%11s");
+		aggregator.setFieldExtractor(defaultFieldExtractor);
 		aggregator.setMinimumLength(24);
 		aggregator.setMaximumLength(24);
 
@@ -167,7 +155,8 @@ class FormatterLineAggregatorTests {
 	@Test
 	void testAggregateFormattedLeft() {
 		String[] args = { "Matchsize", "Smallsize" };
-		aggregator.setFormat("%-13s%-11s");
+		FormatterLineAggregator<String[]> aggregator = new FormatterLineAggregator<>("%-13s%-11s");
+		aggregator.setFieldExtractor(defaultFieldExtractor);
 		String result = aggregator.aggregate(args);
 		assertEquals("Matchsize    Smallsize  ", result);
 	}
@@ -179,7 +168,8 @@ class FormatterLineAggregatorTests {
 	@Test
 	void testAggregateNullArgument() {
 		String[] args = { "foo", null, "bar" };
-		aggregator.setFormat("%3s%3s%3s");
+		FormatterLineAggregator<String[]> aggregator = new FormatterLineAggregator<>("%3s%3s%3s");
+		aggregator.setFieldExtractor(defaultFieldExtractor);
 		assertEquals("foo   bar", aggregator.aggregate(args));
 	}
 

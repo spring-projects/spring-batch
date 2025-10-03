@@ -20,6 +20,8 @@ import org.springframework.batch.item.ItemWriter;
 
 import java.util.concurrent.BlockingQueue;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * This is an {@link ItemWriter} that writes items to a {@link BlockingQueue}.
  *
@@ -27,7 +29,7 @@ import java.util.concurrent.BlockingQueue;
  * @since 5.2.0
  * @author Mahmoud Ben Hassine
  */
-public class BlockingQueueItemWriter<T> implements ItemWriter<T> {
+public class BlockingQueueItemWriter<T> implements ItemWriter<@NonNull T> {
 
 	private final BlockingQueue<T> queue;
 
@@ -40,7 +42,7 @@ public class BlockingQueueItemWriter<T> implements ItemWriter<T> {
 	}
 
 	@Override
-	public void write(Chunk<? extends T> items) throws Exception {
+	public void write(Chunk<? extends @NonNull T> items) throws Exception {
 		for (T item : items) {
 			this.queue.put(item);
 		}

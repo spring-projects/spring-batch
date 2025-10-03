@@ -39,15 +39,6 @@ class SpringValidatorTests {
 	}
 
 	/**
-	 * Validator property is not set
-	 */
-	@Test
-	void testNullValidator() {
-		validator.setValidator(null);
-		assertThrows(IllegalStateException.class, validator::afterPropertiesSet);
-	}
-
-	/**
 	 * Validator does not know how to validate object of the given class
 	 */
 	@Test

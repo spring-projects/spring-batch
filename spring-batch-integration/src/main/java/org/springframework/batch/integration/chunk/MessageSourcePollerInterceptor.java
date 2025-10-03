@@ -17,6 +17,8 @@ package org.springframework.batch.integration.chunk;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.integration.core.MessageSource;
 import org.springframework.messaging.Message;
@@ -41,13 +43,7 @@ public class MessageSourcePollerInterceptor implements ChannelInterceptor, Initi
 
 	private MessageSource<?> source;
 
-	private MessageChannel channel;
-
-	/**
-	 * Convenient default constructor for configuration purposes.
-	 */
-	public MessageSourcePollerInterceptor() {
-	}
+	private @Nullable MessageChannel channel;
 
 	/**
 	 * @param source a message source to poll for messages on receive.

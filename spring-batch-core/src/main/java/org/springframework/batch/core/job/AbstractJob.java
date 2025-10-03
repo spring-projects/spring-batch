@@ -25,7 +25,7 @@ import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationRegistry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jspecify.annotations.Nullable;
+import org.jspecify.annotations.NullUnmarked;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
@@ -62,6 +62,7 @@ import org.springframework.util.ClassUtils;
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  */
+@NullUnmarked // FIXME to remove once default constructors are removed
 public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, InitializingBean {
 
 	protected static final Log logger = LogFactory.getLog(AbstractJob.class);
@@ -200,7 +201,7 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 	}
 
 	@Override
-	public @Nullable JobParametersIncrementer getJobParametersIncrementer() {
+	public JobParametersIncrementer getJobParametersIncrementer() {
 		return this.jobParametersIncrementer;
 	}
 

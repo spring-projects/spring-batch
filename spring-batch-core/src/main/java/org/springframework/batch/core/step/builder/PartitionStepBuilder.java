@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.core.step.builder;
 
+import org.jspecify.annotations.NullUnmarked;
+
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.partition.PartitionHandler;
 import org.springframework.batch.core.partition.StepExecutionSplitter;
@@ -36,6 +38,7 @@ import org.springframework.core.task.TaskExecutor;
  * @author Dimitrios Liapis
  * @since 2.2
  */
+@NullUnmarked // FIXME to remove once default constructors are removed
 public class PartitionStepBuilder extends StepBuilderHelper<PartitionStepBuilder> {
 
 	private TaskExecutor taskExecutor;
@@ -197,12 +200,9 @@ public class PartitionStepBuilder extends StepBuilderHelper<PartitionStepBuilder
 					}
 				}
 			}
-			SimpleStepExecutionSplitter splitter = new SimpleStepExecutionSplitter();
-			splitter.setPartitioner(partitioner);
-			splitter.setJobRepository(getJobRepository());
+			SimpleStepExecutionSplitter splitter = new SimpleStepExecutionSplitter(getJobRepository(), name,
+					partitioner);
 			splitter.setAllowStartIfComplete(allowStartIfComplete);
-			splitter.setStepName(name);
-			this.splitter = splitter;
 			step.setStepExecutionSplitter(splitter);
 
 		}

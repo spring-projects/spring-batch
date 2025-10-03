@@ -42,7 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @TestExecutionListeners(listeners = StepScopeTestExecutionListener.class, mergeMode = MergeMode.MERGE_WITH_DEFAULTS)
 class PollingAsyncItemProcessorMessagingGatewayTests {
 
-	private final AsyncItemProcessor<String, String> processor = new AsyncItemProcessor<>();
+	private AsyncItemProcessor<String, String> processor;
 
 	@Autowired
 	private ItemProcessor<String, String> delegate;
@@ -54,7 +54,7 @@ class PollingAsyncItemProcessorMessagingGatewayTests {
 
 	@Test
 	void testMultiExecution() throws Exception {
-		processor.setDelegate(delegate);
+		processor = new AsyncItemProcessor<>(delegate);
 		processor.setTaskExecutor(new SimpleAsyncTaskExecutor());
 		List<Future<String>> list = new ArrayList<>();
 		for (int count = 0; count < 10; count++) {

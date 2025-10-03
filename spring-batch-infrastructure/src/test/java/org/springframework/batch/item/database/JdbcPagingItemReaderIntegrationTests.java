@@ -34,14 +34,14 @@ class JdbcPagingItemReaderIntegrationTests extends AbstractGenericDataSourceItem
 	@Override
 	protected ItemReader<Foo> createItemReader() throws Exception {
 
-		JdbcPagingItemReader<Foo> itemReader = new JdbcPagingItemReader<>();
-		itemReader.setDataSource(dataSource);
 		HsqlPagingQueryProvider queryProvider = new HsqlPagingQueryProvider();
 		queryProvider.setSelectClause("select ID, NAME, VALUE");
 		queryProvider.setFromClause("from T_FOOS");
 		Map<String, Order> sortKeys = new LinkedHashMap<>();
 		sortKeys.put("ID", Order.ASCENDING);
 		queryProvider.setSortKeys(sortKeys);
+		JdbcPagingItemReader<Foo> itemReader = new JdbcPagingItemReader<>(dataSource, queryProvider);
+
 		itemReader.setQueryProvider(queryProvider);
 		itemReader.setRowMapper((rs, i) -> {
 			Foo foo = new Foo();

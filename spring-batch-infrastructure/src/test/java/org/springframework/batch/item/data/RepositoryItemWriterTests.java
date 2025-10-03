@@ -42,19 +42,12 @@ class RepositoryItemWriterTests {
 
 	@BeforeEach
 	void setUp() {
-		writer = new RepositoryItemWriter<>();
+		writer = new RepositoryItemWriter<>(repository);
 		writer.setMethodName("save");
-		writer.setRepository(repository);
 	}
 
 	@Test
-	void testAfterPropertiesSet() throws Exception {
-		writer.afterPropertiesSet();
-
-		writer.setRepository(null);
-		assertThrows(IllegalStateException.class, writer::afterPropertiesSet);
-
-		writer.setRepository(repository);
+	void testInvalidEmptyMethodName() {
 		writer.setMethodName("");
 
 		Exception exception = assertThrows(IllegalStateException.class, writer::afterPropertiesSet);

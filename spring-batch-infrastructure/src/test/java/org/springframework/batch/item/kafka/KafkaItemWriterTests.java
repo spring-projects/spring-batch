@@ -56,27 +56,10 @@ class KafkaItemWriterTests {
 		when(this.kafkaTemplate.getDefaultTopic()).thenReturn("defaultTopic");
 		when(this.kafkaTemplate.sendDefault(any(), any())).thenReturn(this.future);
 		this.itemKeyMapper = new KafkaItemKeyMapper();
-		this.writer = new KafkaItemWriter<>();
-		this.writer.setKafkaTemplate(this.kafkaTemplate);
-		this.writer.setItemKeyMapper(this.itemKeyMapper);
+		this.writer = new KafkaItemWriter<>(this.itemKeyMapper, this.kafkaTemplate);
 		this.writer.setDelete(false);
 		this.writer.setTimeout(10L);
 		this.writer.afterPropertiesSet();
-	}
-
-	@Test
-	void testAfterPropertiesSet() {
-		this.writer = new KafkaItemWriter<>();
-
-		Exception exception = assertThrows(IllegalStateException.class, () -> this.writer.afterPropertiesSet());
-		assertEquals("itemKeyMapper requires a Converter type.", exception.getMessage());
-
-		this.writer.setItemKeyMapper(this.itemKeyMapper);
-		exception = assertThrows(IllegalStateException.class, () -> this.writer.afterPropertiesSet());
-		assertEquals("KafkaTemplate must not be null.", exception.getMessage());
-
-		this.writer.setKafkaTemplate(this.kafkaTemplate);
-		assertDoesNotThrow(() -> this.writer.afterPropertiesSet());
 	}
 
 	@Test
@@ -108,13 +91,13 @@ class KafkaItemWriterTests {
 
 	@Test
 	void testKafkaTemplateCanBeReferencedFromSubclass() {
-		KafkaItemWriter<String, String> kafkaItemWriter = new KafkaItemWriter<>() {
+		KafkaItemWriter<String, String> kafkaItemWriter = new KafkaItemWriter<>(new KafkaItemKeyMapper(),
+				this.kafkaTemplate) {
 			@Override
 			protected void writeKeyValue(String key, String value) {
 				this.kafkaTemplate.sendDefault(key, value);
 			}
 		};
-		kafkaItemWriter.setKafkaTemplate(this.kafkaTemplate);
 		kafkaItemWriter.writeKeyValue("k", "v");
 		verify(this.kafkaTemplate).sendDefault("k", "v");
 	}

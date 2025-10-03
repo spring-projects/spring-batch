@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.Arrays;
+
+import javax.sql.DataSource;
 
 import org.springframework.jdbc.core.PreparedStatementSetter;
 
@@ -69,11 +71,11 @@ public class StoredProcedureItemReader<T> extends AbstractCursorItemReader<T> {
 
 	private @Nullable PreparedStatementSetter preparedStatementSetter;
 
-	private @Nullable String procedureName;
+	private String procedureName;
 
 	private @Nullable String callString;
 
-	private @Nullable RowMapper<T> rowMapper;
+	private RowMapper<T> rowMapper;
 
 	private SqlParameter[] parameters = new SqlParameter[0];
 
@@ -81,7 +83,19 @@ public class StoredProcedureItemReader<T> extends AbstractCursorItemReader<T> {
 
 	private int refCursorPosition = 0;
 
-	public StoredProcedureItemReader() {
+	/**
+	 * Create a new instance of the {@link StoredProcedureItemReader} class.
+	 * @param dataSource the DataSource to use
+	 * @param procedureName the name of the stored procedure to call
+	 * @param rowMapper the RowMapper to use to map the results
+	 * @since 6.0
+	 */
+	public StoredProcedureItemReader(DataSource dataSource, String procedureName, RowMapper<T> rowMapper) {
+		super(dataSource);
+		Assert.notNull(procedureName, "The stored procedure name must not be null");
+		Assert.notNull(rowMapper, "RowMapper must not be null");
+		this.procedureName = procedureName;
+		this.rowMapper = rowMapper;
 		setName(ClassUtils.getShortName(StoredProcedureItemReader.class));
 	}
 
@@ -140,22 +154,8 @@ public class StoredProcedureItemReader<T> extends AbstractCursorItemReader<T> {
 		this.refCursorPosition = refCursorPosition;
 	}
 
-	/**
-	 * Assert that mandatory properties are set.
-	 * @throws IllegalArgumentException if either data source or SQL properties not set.
-	 */
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		super.afterPropertiesSet();
-		Assert.state(procedureName != null, "The name of the stored procedure must be provided");
-		Assert.state(rowMapper != null, "RowMapper must be provided");
-	}
-
-	@SuppressWarnings("DataFlowIssue")
 	@Override
 	protected void openCursor(Connection con) {
-
-		Assert.state(procedureName != null, "Procedure Name must not be null.");
 		Assert.state(refCursorPosition >= 0, "invalid refCursorPosition specified as " + refCursorPosition
 				+ "; it can't be " + "specified as a negative number.");
 		Assert.state(refCursorPosition == 0 || refCursorPosition > 0, "invalid refCursorPosition specified as "
@@ -229,7 +229,6 @@ public class StoredProcedureItemReader<T> extends AbstractCursorItemReader<T> {
 
 	}
 
-	@SuppressWarnings("DataFlowIssue")
 	@Override
 	protected @Nullable T readCursor(ResultSet rs, int currentRow) throws SQLException {
 		return rowMapper.mapRow(rs, currentRow);

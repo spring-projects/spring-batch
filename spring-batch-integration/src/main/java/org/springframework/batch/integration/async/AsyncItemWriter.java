@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,18 +29,22 @@ import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemStreamWriter;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
-public class AsyncItemWriter<T> implements ItemStreamWriter<Future<T>>, InitializingBean {
+public class AsyncItemWriter<T> implements ItemStreamWriter<Future<T>> {
 
 	private static final Log logger = LogFactory.getLog(AsyncItemWriter.class);
 
 	private ItemWriter<T> delegate;
 
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		Assert.state(delegate != null, "A delegate ItemWriter must be provided.");
+	/**
+	 * Create a new instance of {@link AsyncItemWriter} with the provided delegate.
+	 * @param delegate the delegate item writer
+	 * @since 6.0
+	 */
+	public AsyncItemWriter(ItemWriter<T> delegate) {
+		Assert.notNull(delegate, "The delegate ItemWriter must not be null");
+		this.delegate = delegate;
 	}
 
 	/**

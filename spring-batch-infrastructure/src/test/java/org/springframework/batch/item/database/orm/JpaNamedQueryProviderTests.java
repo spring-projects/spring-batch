@@ -29,7 +29,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import org.springframework.batch.item.sample.Foo;
-import org.springframework.util.Assert;
 
 /**
  * Test for {@link JpaNamedQueryProvider}s.

@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.core.listener;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * This {@link AbstractListenerFactoryBean} implementation is used to create a
  * {@link JobExecutionListener}.
@@ -28,7 +30,7 @@ package org.springframework.batch.core.listener;
 public class JobListenerFactoryBean extends AbstractListenerFactoryBean<JobExecutionListener> {
 
 	@Override
-	protected ListenerMetaData getMetaDataFromPropertyName(String propertyName) {
+	protected @Nullable ListenerMetaData getMetaDataFromPropertyName(String propertyName) {
 		return JobListenerMetaData.fromPropertyName(propertyName);
 	}
 

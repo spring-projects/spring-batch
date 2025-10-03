@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 the original author or authors.
+ * Copyright 2016-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,6 +48,7 @@ import org.springframework.batch.item.file.transform.FixedLengthTokenizer;
 import org.springframework.batch.item.file.transform.LineTokenizer;
 import org.springframework.batch.item.file.transform.Range;
 import org.springframework.beans.factory.BeanFactory;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -425,22 +426,7 @@ public class FlatFileItemReaderBuilder<T> {
 		Assert.notNull(this.bufferedReaderFactory, "A BufferedReaderFactory is required.");
 		int validatorValue = this.tokenizerValidator.intValue();
 
-		FlatFileItemReader<T> reader = new FlatFileItemReader<>();
-
-		if (StringUtils.hasText(this.name)) {
-			reader.setName(this.name);
-		}
-
-		if (StringUtils.hasText(this.encoding)) {
-			reader.setEncoding(this.encoding);
-		}
-
-		reader.setResource(this.resource);
-
-		if (this.lineMapper != null) {
-			reader.setLineMapper(this.lineMapper);
-		}
-		else {
+		if (this.lineMapper == null) {
 			Assert.state(validatorValue == 0 || validatorValue == 1 || validatorValue == 2 || validatorValue == 4,
 					"Only one LineTokenizer option may be configured");
 
@@ -497,9 +483,18 @@ public class FlatFileItemReaderBuilder<T> {
 				throw new IllegalStateException("No FieldSetMapper implementation was provided.");
 			}
 
-			reader.setLineMapper(lineMapper);
+			this.lineMapper = lineMapper;
 		}
 
+		FlatFileItemReader<T> reader = new FlatFileItemReader<>(this.lineMapper);
+		reader.setResource(this.resource);
+		if (StringUtils.hasText(this.name)) {
+			reader.setName(this.name);
+		}
+
+		if (StringUtils.hasText(this.encoding)) {
+			reader.setEncoding(this.encoding);
+		}
 		reader.setLinesToSkip(this.linesToSkip);
 		reader.setComments(this.comments.toArray(new String[0]));
 

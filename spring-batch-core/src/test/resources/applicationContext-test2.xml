@@ -28,13 +28,13 @@
 	</job>
 
 	<bean id="itemReader1" class="org.springframework.batch.item.ldif.MappingLdifReader">
-		<property name="resource" value="file:src/test/resources/test.ldif" />
+		<constructor-arg name="resource" value="file:src/test/resources/test.ldif" />
 		<property name="recordsToSkip" value="1" />
 		<property name="recordMapper" ref="recordMapper" />
 	</bean>
 
 	<bean id="itemReader2" class="org.springframework.batch.item.ldif.MappingLdifReader">
-		<property name="resource" value="file:src/test/resources/missing.ldif" />
+		<constructor-arg name="resource" value="file:src/test/resources/missing.ldif" />
 		<property name="recordsToSkip" value="1" />
 		<property name="recordMapper" ref="recordMapper" />
 	</bean>
@@ -43,9 +43,9 @@
 
 	<bean id="itemWriter" class="org.springframework.batch.item.file.FlatFileItemWriter">
 		<property name="resource" value="file:target/test-outputs/output.ldif" />
-		<property name="lineAggregator">
+		<constructor-arg name="lineAggregator">
 			<bean class="org.springframework.batch.item.file.transform.PassThroughLineAggregator" />
-		</property>
+		</constructor-arg>
 	</bean>
 
 	<batch:job-repository id="jobRepository" table-prefix="BATCH_"/>

@@ -337,8 +337,6 @@ class JdbcCursorItemReaderBuilderTests {
 			.dataRowMapper(Bar.class)
 			.build();
 
-		reader.afterPropertiesSet();
-
 		reader.open(new ExecutionContext());
 
 		validateBar(reader.read(), 0, 1, "2", "3");

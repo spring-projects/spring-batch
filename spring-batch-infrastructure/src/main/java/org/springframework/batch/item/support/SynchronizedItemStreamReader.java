@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2024 the original author or authors.
+ * Copyright 2015-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,11 +40,21 @@ import org.springframework.util.Assert;
  * @since 3.0.4
  * @param <T> type of object being read
  */
-public class SynchronizedItemStreamReader<T> implements ItemStreamReader<T>, InitializingBean {
+public class SynchronizedItemStreamReader<T> implements ItemStreamReader<T> {
 
-	private @Nullable ItemStreamReader<T> delegate;
+	private ItemStreamReader<T> delegate;
 
 	private final Lock lock = new ReentrantLock();
+
+	/**
+	 * Create a new {@link SynchronizedItemStreamReader} with the given delegate.
+	 * @param delegate the item reader to use as a delegate
+	 * @since 6.0
+	 */
+	public SynchronizedItemStreamReader(ItemStreamReader<T> delegate) {
+		Assert.notNull(delegate, "The delegate item reader must not be null");
+		this.delegate = delegate;
+	}
 
 	public void setDelegate(ItemStreamReader<T> delegate) {
 		this.delegate = delegate;
@@ -53,7 +63,6 @@ public class SynchronizedItemStreamReader<T> implements ItemStreamReader<T>, Ini
 	/**
 	 * This delegates to the read method of the <code>delegate</code>
 	 */
-	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public @Nullable T read() throws Exception {
 		this.lock.lock();
@@ -65,27 +74,19 @@ public class SynchronizedItemStreamReader<T> implements ItemStreamReader<T>, Ini
 		}
 	}
 
-	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public void close() {
 		this.delegate.close();
 	}
 
-	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public void open(ExecutionContext executionContext) {
 		this.delegate.open(executionContext);
 	}
 
-	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public void update(ExecutionContext executionContext) {
 		this.delegate.update(executionContext);
-	}
-
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		Assert.state(this.delegate != null, "A delegate item reader is required");
 	}
 
 }

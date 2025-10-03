@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2023 the original author or authors.
+ * Copyright 2012-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.jspecify.annotations.NullUnmarked;
 
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.step.Step;
@@ -53,6 +55,7 @@ import org.springframework.core.task.TaskExecutor;
  * @param <Q> the type of object returned by the builder (by default a Flow)
  *
  */
+@NullUnmarked
 public class FlowBuilder<Q> {
 
 	private final String name;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import java.util.Map;
 
 import org.springframework.batch.core.ExitStatus;
 
-import org.jspecify.annotations.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -30,21 +29,23 @@ import org.springframework.util.Assert;
  * returned by the system process.
  *
  * @author Robert Kasanicky
+ * @author Mahmoud Ben Hassine
  */
 public class ConfigurableSystemProcessExitCodeMapper implements SystemProcessExitCodeMapper {
 
 	public static final String ELSE_KEY = "else";
 
-	private Map<Object, ExitStatus> mappings;
+	private Map<Object, ExitStatus> mappings = Map.of(ELSE_KEY, ExitStatus.UNKNOWN);
 
 	@Override
-	public @Nullable ExitStatus getExitStatus(int exitCode) {
+	public ExitStatus getExitStatus(int exitCode) {
 		ExitStatus exitStatus = mappings.get(exitCode);
 		if (exitStatus != null) {
 			return exitStatus;
 		}
 		else {
-			return mappings.get(ELSE_KEY);
+			ExitStatus status = mappings.get(ELSE_KEY);
+			return status == null ? ExitStatus.UNKNOWN : status;
 		}
 	}
 

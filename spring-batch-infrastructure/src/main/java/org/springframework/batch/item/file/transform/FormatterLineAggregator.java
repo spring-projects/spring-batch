@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,17 @@ import org.springframework.util.Assert;
  */
 public class FormatterLineAggregator<T> extends ExtractorLineAggregator<T> {
 
-	private @Nullable String format;
+	private String format;
+
+	/**
+	 * Create a new {@link FormatterLineAggregator} with the provided format.
+	 * @param format the format to use to aggregate fields
+	 * @since 6.0
+	 */
+	public FormatterLineAggregator(String format) {
+		Assert.notNull(format, "Format must not be null");
+		this.format = format;
+	}
 
 	private Locale locale = Locale.getDefault();
 
@@ -78,9 +88,6 @@ public class FormatterLineAggregator<T> extends ExtractorLineAggregator<T> {
 
 	@Override
 	protected String doAggregate(Object[] fields) {
-
-		Assert.notNull(format, "A format is required");
-
 		String value = String.format(locale, format, fields);
 
 		if (maximumLength > 0) {

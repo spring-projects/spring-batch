@@ -61,13 +61,6 @@ class SimpleStepHandlerTests {
 		JobInstance jobInstance = jobRepository.createJobInstance("job", jobParameters);
 		jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters, new ExecutionContext());
 		stepHandler = new SimpleStepHandler(jobRepository);
-		stepHandler.afterPropertiesSet();
-	}
-
-	@Test
-	void testAfterPropertiesSet() {
-		SimpleStepHandler stepHandler = new SimpleStepHandler();
-		assertThrows(IllegalStateException.class, stepHandler::afterPropertiesSet);
 	}
 
 	@Test

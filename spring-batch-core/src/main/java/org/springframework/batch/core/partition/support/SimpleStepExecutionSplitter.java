@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,8 +33,6 @@ import org.springframework.batch.core.partition.Partitioner;
 import org.springframework.batch.core.partition.StepExecutionSplitter;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.util.Assert;
 
 /**
  * Generic implementation of {@link StepExecutionSplitter} that delegates to a
@@ -49,7 +47,7 @@ import org.springframework.util.Assert;
  * @author Mahmoud Ben Hassine
  * @since 2.0
  */
-public class SimpleStepExecutionSplitter implements StepExecutionSplitter, InitializingBean {
+public class SimpleStepExecutionSplitter implements StepExecutionSplitter {
 
 	private static final String STEP_NAME_SEPARATOR = ":";
 
@@ -62,36 +60,15 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter, Initi
 	private JobRepository jobRepository;
 
 	/**
-	 * Default constructor for convenience in configuration.
-	 */
-	public SimpleStepExecutionSplitter() {
-	}
-
-	/**
 	 * Construct a {@link SimpleStepExecutionSplitter} from its mandatory properties.
 	 * @param jobRepository the {@link JobRepository}
-	 * @param allowStartIfComplete flag specifying preferences on restart
 	 * @param stepName the target step name
 	 * @param partitioner a {@link Partitioner} to use for generating input parameters
 	 */
-	public SimpleStepExecutionSplitter(JobRepository jobRepository, boolean allowStartIfComplete, String stepName,
-			Partitioner partitioner) {
+	public SimpleStepExecutionSplitter(JobRepository jobRepository, String stepName, Partitioner partitioner) {
 		this.jobRepository = jobRepository;
-		this.allowStartIfComplete = allowStartIfComplete;
 		this.partitioner = partitioner;
 		this.stepName = stepName;
-	}
-
-	/**
-	 * Check mandatory properties (step name, job repository and partitioner).
-	 *
-	 * @see InitializingBean#afterPropertiesSet()
-	 */
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		Assert.state(jobRepository != null, "A JobRepository is required");
-		Assert.state(stepName != null, "A step name is required");
-		Assert.state(partitioner != null, "A Partitioner is required");
 	}
 
 	/**

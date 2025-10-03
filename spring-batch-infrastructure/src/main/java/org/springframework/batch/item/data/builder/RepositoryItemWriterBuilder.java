@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2023 the original author or authors.
+ * Copyright 2017-2025 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -109,7 +109,7 @@ public class RepositoryItemWriterBuilder<T> {
 
 		Assert.notNull(this.repository, "repository is required.");
 
-		RepositoryItemWriter<T> writer = new RepositoryItemWriter<>();
+		RepositoryItemWriter<T> writer = new RepositoryItemWriter<>(this.repository);
 		writer.setRepository(this.repository);
 		if (this.methodName != null) {
 			Assert.hasText(this.methodName, "methodName must not be empty.");

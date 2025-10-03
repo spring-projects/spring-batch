@@ -67,8 +67,7 @@ public class MultiResourceItemWriterFlatFileTests extends AbstractMultiResourceI
 	@BeforeEach
 	void setUp() throws Exception {
 		super.createFile();
-		delegate = new FlatFileItemWriter<>();
-		delegate.setLineAggregator(new PassThroughLineAggregator<>());
+		delegate = new FlatFileItemWriter<>(new PassThroughLineAggregator<>());
 	}
 
 	@Test

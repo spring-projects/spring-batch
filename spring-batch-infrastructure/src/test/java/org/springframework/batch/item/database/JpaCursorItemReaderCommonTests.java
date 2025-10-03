@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.item.database;
 
+import jakarta.persistence.EntityManagerFactory;
+
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.sample.Foo;
@@ -33,11 +35,12 @@ public class JpaCursorItemReaderCommonTests extends AbstractDatabaseItemStreamIt
 		factoryBean.setPersistenceUnitName("foo");
 		factoryBean.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
 		factoryBean.afterPropertiesSet();
+		EntityManagerFactory entityManagerFactory = factoryBean.getObject();
 
 		String jpqlQuery = "from Foo";
-		JpaCursorItemReader<Foo> itemReader = new JpaCursorItemReader<>();
+		JpaCursorItemReader<Foo> itemReader = new JpaCursorItemReader<>(entityManagerFactory);
 		itemReader.setQueryString(jpqlQuery);
-		itemReader.setEntityManagerFactory(factoryBean.getObject());
+		itemReader.setEntityManagerFactory(entityManagerFactory);
 		itemReader.afterPropertiesSet();
 		itemReader.setSaveState(true);
 		return itemReader;

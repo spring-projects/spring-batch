@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@ package org.springframework.batch.core.scope;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.NullUnmarked;
+
 import org.springframework.batch.core.scope.context.JobContext;
 import org.springframework.batch.core.scope.context.JobSynchronizationManager;
 import org.springframework.beans.BeanWrapper;
@@ -55,6 +57,7 @@ import org.springframework.beans.factory.config.Scope;
  * @author Mahmoud Ben Hassine
  * @since 3.0
  */
+@NullUnmarked
 public class JobScope extends BatchScopeSupport {
 
 	private static final String TARGET_NAME_PREFIX = "jobScopedTarget.";

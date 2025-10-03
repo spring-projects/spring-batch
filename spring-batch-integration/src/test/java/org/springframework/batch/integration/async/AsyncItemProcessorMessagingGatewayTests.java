@@ -45,7 +45,7 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 @Disabled
 class AsyncItemProcessorMessagingGatewayTests {
 
-	private final AsyncItemProcessor<String, String> processor = new AsyncItemProcessor<>();
+	private AsyncItemProcessor<String, String> processor;
 
 	@Autowired
 	private ItemProcessor<String, String> delegate;
@@ -57,7 +57,7 @@ class AsyncItemProcessorMessagingGatewayTests {
 
 	@Test
 	void testMultiExecution() throws Exception {
-		processor.setDelegate(delegate);
+		processor = new AsyncItemProcessor<>(delegate);
 		processor.setTaskExecutor(new SimpleAsyncTaskExecutor());
 		List<Future<String>> list = new ArrayList<>();
 		for (int count = 0; count < 10; count++) {
