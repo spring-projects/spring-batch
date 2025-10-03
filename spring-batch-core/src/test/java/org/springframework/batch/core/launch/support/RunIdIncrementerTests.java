@@ -34,23 +34,25 @@ class RunIdIncrementerTests {
 
 	@Test
 	void testGetNext() {
-		JobParameters next = incrementer.getNext(null);
-		assertEquals(1, next.getLong("run.id").intValue());
-		assertEquals(2, incrementer.getNext(next).getLong("run.id").intValue());
+		JobParameters next = incrementer.getNext(new JobParameters());
+		assertEquals(1, next.getLong("run.id"));
+		JobParameters nextNext = incrementer.getNext(next);
+		assertEquals(2, nextNext.getLong("run.id"));
 	}
 
 	@Test
 	void testGetNextAppends() {
-		JobParameters next = incrementer.getNext(new JobParametersBuilder().addString("foo", "bar").toJobParameters());
-		assertEquals(1, next.getLong("run.id").intValue());
+		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "bar").toJobParameters();
+		JobParameters next = incrementer.getNext(jobParameters);
+		assertEquals(1, next.getLong("run.id"));
 		assertEquals("bar", next.getString("foo"));
 	}
 
 	@Test
 	void testGetNextNamed() {
 		incrementer.setKey("foo");
-		JobParameters next = incrementer.getNext(null);
-		assertEquals(1, next.getLong("foo").intValue());
+		JobParameters next = incrementer.getNext(new JobParameters());
+		assertEquals(1, next.getLong("foo"));
 	}
 
 	@Test

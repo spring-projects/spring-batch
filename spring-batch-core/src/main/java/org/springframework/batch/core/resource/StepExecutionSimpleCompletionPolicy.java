@@ -75,7 +75,7 @@ public class StepExecutionSimpleCompletionPolicy implements StepExecutionListene
 	@Override
 	public void beforeStep(StepExecution stepExecution) {
 		JobParameters jobParameters = stepExecution.getJobParameters();
-		Assert.state(jobParameters.getParameters().containsKey(keyName),
+		Assert.state(jobParameters.getParameter(keyName) != null,
 				"JobParameters do not contain Long parameter with key=[" + keyName + "]");
 		delegate = new SimpleCompletionPolicy(jobParameters.getLong(keyName).intValue());
 	}

@@ -16,7 +16,6 @@
 package org.springframework.batch.core;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Date;
@@ -32,62 +31,56 @@ import org.springframework.batch.core.job.parameters.JobParameter;
  */
 class JobParameterTests {
 
-	JobParameter jobParameter;
-
 	@Test
 	void testStringParameter() {
-		jobParameter = new JobParameter("test", String.class, true);
-		assertEquals("test", jobParameter.getValue());
-		assertEquals(String.class, jobParameter.getType());
-		assertTrue(jobParameter.isIdentifying());
-	}
-
-	@Test
-	void testNullStringParameter() {
-		assertThrows(IllegalArgumentException.class, () -> new JobParameter((String) null, String.class, true));
+		JobParameter<String> jobParameter = new JobParameter<>("param", "test", String.class, true);
+		assertEquals("param", jobParameter.name());
+		assertEquals("test", jobParameter.value());
+		assertEquals(String.class, jobParameter.type());
+		assertTrue(jobParameter.identifying());
 	}
 
 	@Test
 	void testLongParameter() {
-		jobParameter = new JobParameter(1L, Long.class, true);
-		assertEquals(1L, jobParameter.getValue());
-		assertEquals(Long.class, jobParameter.getType());
-		assertTrue(jobParameter.isIdentifying());
+		JobParameter<Long> jobParameter = new JobParameter<>("param", 1L, Long.class, true);
+		assertEquals("param", jobParameter.name());
+		assertEquals(1L, jobParameter.value());
+		assertEquals(Long.class, jobParameter.type());
+		assertTrue(jobParameter.identifying());
 	}
 
 	@Test
 	void testDoubleParameter() {
-		jobParameter = new JobParameter(1.1, Double.class, true);
-		assertEquals(1.1, jobParameter.getValue());
-		assertEquals(Double.class, jobParameter.getType());
-		assertTrue(jobParameter.isIdentifying());
+		JobParameter<Double> jobParameter = new JobParameter<>("param", 1.1, Double.class, true);
+		assertEquals("param", jobParameter.name());
+		assertEquals(1.1, jobParameter.value());
+		assertEquals(Double.class, jobParameter.type());
+		assertTrue(jobParameter.identifying());
 	}
 
 	@Test
 	void testDateParameter() {
 		Date epoch = new Date(0L);
-		jobParameter = new JobParameter(epoch, Date.class, true);
-		assertEquals(new Date(0L), jobParameter.getValue());
-		assertEquals(Date.class, jobParameter.getType());
-		assertTrue(jobParameter.isIdentifying());
+		JobParameter<Date> jobParameter = new JobParameter<>("param", epoch, Date.class, true);
+		assertEquals("param", jobParameter.name());
+		assertEquals(new Date(0L), jobParameter.value());
+		assertEquals(Date.class, jobParameter.type());
+		assertTrue(jobParameter.identifying());
 	}
 
-	@Test
-	void testNullDateParameter() {
-		assertThrows(IllegalArgumentException.class, () -> new JobParameter((Date) null, Date.class, true));
-	}
+	// Job parameters are equal if their names are equal
 
 	@Test
 	void testEquals() {
-		jobParameter = new JobParameter("test", String.class, true);
-		JobParameter testParameter = new JobParameter("test", String.class, true);
+		JobParameter<String> jobParameter = new JobParameter<>("param", "test1", String.class, true);
+		JobParameter<String> testParameter = new JobParameter<>("param", "test2", String.class, true);
 		assertEquals(jobParameter, testParameter);
 	}
 
 	@Test
 	void testHashcode() {
-		jobParameter = new JobParameter("test", String.class, true);
-		JobParameter testParameter = new JobParameter("test", String.class, true);
+		JobParameter<String> jobParameter = new JobParameter<>("param", "test1", String.class, true);
+		JobParameter<String> testParameter = new JobParameter<>("param", "test2", String.class, true);
 		assertEquals(testParameter.hashCode(), jobParameter.hashCode());
 	}
 

@@ -229,7 +229,8 @@ class SimpleJobExplorerIntegrationTests {
 		Assertions.assertEquals(2, jobExecutions.size());
 		JobParameters actualJobParameters1 = jobExecutions.get(0).getJobParameters();
 		JobParameters actualJobParameters2 = jobExecutions.get(1).getJobParameters();
-		Assertions.assertNotEquals(actualJobParameters1, actualJobParameters2);
+		Assertions.assertEquals(actualJobParameters1.getParameter("id"), actualJobParameters2.getParameter("id"));
+		Assertions.assertEquals(actualJobParameters1.getParameter("name"), actualJobParameters2.getParameter("name"));
 	}
 
 }

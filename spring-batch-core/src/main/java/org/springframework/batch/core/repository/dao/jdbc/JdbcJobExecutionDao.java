@@ -20,7 +20,10 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -390,18 +393,16 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	 * Convenience method that inserts all parameters from the provided JobParameters.
 	 *
 	 */
-	@SuppressWarnings(value = { "unchecked", "rawtypes" })
 	private void insertJobParameters(long executionId, JobParameters jobParameters) {
 
 		if (jobParameters.isEmpty()) {
 			return;
 		}
 
-		getJdbcTemplate().batchUpdate(getQuery(CREATE_JOB_PARAMETERS), jobParameters.getParameters().entrySet(), 100,
-				(ps, entry) -> {
-					JobParameter jobParameter = entry.getValue();
-					insertParameter(ps, executionId, jobParameter.getType(), entry.getKey(), jobParameter.getValue(),
-							jobParameter.isIdentifying());
+		getJdbcTemplate().batchUpdate(getQuery(CREATE_JOB_PARAMETERS), jobParameters.parameters(), 100,
+				(PreparedStatement ps, JobParameter<?> jobParameter) -> {
+					insertParameter(ps, executionId, jobParameter.name(), jobParameter.type(), jobParameter.value(),
+							jobParameter.identifying());
 				});
 	}
 
@@ -409,7 +410,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	 * Convenience method that inserts an individual records into the JobParameters table.
 	 * @throws SQLException if the driver throws an exception
 	 */
-	private <T> void insertParameter(PreparedStatement preparedStatement, long executionId, Class<T> type, String key,
+	private <T> void insertParameter(PreparedStatement preparedStatement, long executionId, String name, Class<?> type,
 			T value, boolean identifying) throws SQLException {
 
 		String identifyingFlag = identifying ? "Y" : "N";
@@ -417,7 +418,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		String stringValue = getConversionService().convert(value, String.class);
 
 		preparedStatement.setLong(1, executionId);
-		preparedStatement.setString(2, key);
+		preparedStatement.setString(2, name);
 		preparedStatement.setString(3, type.getName());
 		preparedStatement.setString(4, stringValue);
 		preparedStatement.setString(5, identifyingFlag);
@@ -429,7 +430,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	 */
 	@SuppressWarnings(value = { "unchecked", "rawtypes" })
 	public JobParameters getJobParameters(Long executionId) {
-		final Map<String, JobParameter<?>> map = new HashMap<>();
+		final Set<JobParameter<?>> jobParameters = new HashSet<>();
 		RowCallbackHandler handler = rs -> {
 			String parameterName = rs.getString("PARAMETER_NAME");
 
@@ -445,14 +446,14 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 
 			boolean identifying = rs.getString("IDENTIFYING").equalsIgnoreCase("Y");
 
-			JobParameter<?> jobParameter = new JobParameter(typedValue, parameterType, identifying);
+			JobParameter<?> jobParameter = new JobParameter(parameterName, typedValue, parameterType, identifying);
 
-			map.put(parameterName, jobParameter);
+			jobParameters.add(jobParameter);
 		};
 
 		getJdbcTemplate().query(getQuery(FIND_PARAMS_FROM_ID), handler, executionId);
 
-		return new JobParameters(map);
+		return new JobParameters(jobParameters);
 	}
 
 }

@@ -22,9 +22,8 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -56,17 +55,17 @@ class JobParametersTests {
 
 	private JobParameters getNewParameters() {
 
-		Map<String, JobParameter<?>> parameterMap = new HashMap<>();
-		parameterMap.put("string.key1", new JobParameter<>("value1", String.class, true));
-		parameterMap.put("string.key2", new JobParameter<>("value2", String.class, true));
-		parameterMap.put("long.key1", new JobParameter<>(1L, Long.class, true));
-		parameterMap.put("long.key2", new JobParameter<>(2L, Long.class, true));
-		parameterMap.put("double.key1", new JobParameter<>(1.1, Double.class, true));
-		parameterMap.put("double.key2", new JobParameter<>(2.2, Double.class, true));
-		parameterMap.put("date.key1", new JobParameter<>(date1, Date.class, true));
-		parameterMap.put("date.key2", new JobParameter<>(date2, Date.class, true));
+		Set<JobParameter<?>> jobParameters = new HashSet<>();
+		jobParameters.add(new JobParameter<>("string.key1", "value1", String.class, true));
+		jobParameters.add(new JobParameter<>("string.key2", "value2", String.class, true));
+		jobParameters.add(new JobParameter<>("long.key1", 1L, Long.class, true));
+		jobParameters.add(new JobParameter<>("long.key2", 2L, Long.class, true));
+		jobParameters.add(new JobParameter<>("double.key1", 1.1, Double.class, true));
+		jobParameters.add(new JobParameter<>("double.key2", 2.2, Double.class, true));
+		jobParameters.add(new JobParameter<>("date.key1", date1, Date.class, true));
+		jobParameters.add(new JobParameter<>("date.key2", date2, Date.class, true));
 
-		return new JobParameters(parameterMap);
+		return new JobParameters(jobParameters);
 	}
 
 	@Test
@@ -77,8 +76,8 @@ class JobParametersTests {
 
 	@Test
 	void testGetLong() {
-		assertEquals(1L, parameters.getLong("long.key1").longValue());
-		assertEquals(2L, parameters.getLong("long.key2").longValue());
+		assertEquals(1L, parameters.getLong("long.key1"));
+		assertEquals(2L, parameters.getLong("long.key2"));
 	}
 
 	@Test
@@ -104,12 +103,12 @@ class JobParametersTests {
 	}
 
 	@Test
-	void testIsEmptyWhenEmpty() throws Exception {
+	void testIsEmptyWhenEmpty() {
 		assertTrue(new JobParameters().isEmpty());
 	}
 
 	@Test
-	void testIsEmptyWhenNotEmpty() throws Exception {
+	void testIsEmptyWhenNotEmpty() {
 		assertFalse(parameters.isEmpty());
 	}
 
@@ -140,46 +139,13 @@ class JobParametersTests {
 	}
 
 	@Test
-	void testToStringOrder() {
-
-		Map<String, JobParameter<?>> props = parameters.getParameters();
-		StringBuilder stringBuilder = new StringBuilder();
-		for (Entry<String, JobParameter<?>> entry : props.entrySet()) {
-			stringBuilder.append(entry.toString()).append(";");
-		}
-
-		String string1 = stringBuilder.toString();
-
-		Map<String, JobParameter<?>> parameterMap = new HashMap<>();
-		parameterMap.put("string.key2", new JobParameter<>("value2", String.class, true));
-		parameterMap.put("string.key1", new JobParameter<>("value1", String.class, true));
-		parameterMap.put("long.key2", new JobParameter<>(2L, Long.class, true));
-		parameterMap.put("long.key1", new JobParameter<>(1L, Long.class, true));
-		parameterMap.put("double.key2", new JobParameter<>(2.2, Double.class, true));
-		parameterMap.put("double.key1", new JobParameter<>(1.1, Double.class, true));
-		parameterMap.put("date.key2", new JobParameter<>(date2, Date.class, true));
-		parameterMap.put("date.key1", new JobParameter<>(date1, Date.class, true));
-
-		JobParameters testProps = new JobParameters(parameterMap);
-
-		props = testProps.getParameters();
-		stringBuilder = new StringBuilder();
-		for (Entry<String, JobParameter<?>> entry : props.entrySet()) {
-			stringBuilder.append(entry.toString()).append(";");
-		}
-		String string2 = stringBuilder.toString();
-
-		assertEquals(string1, string2);
-	}
-
-	@Test
-	void testHashCodeEqualWhenEmpty() throws Exception {
+	void testHashCodeEqualWhenEmpty() {
 		int code = new JobParameters().hashCode();
 		assertEquals(code, new JobParameters().hashCode());
 	}
 
 	@Test
-	void testHashCodeEqualWhenNotEmpty() throws Exception {
+	void testHashCodeEqualWhenNotEmpty() {
 		int code = getNewParameters().hashCode();
 		assertEquals(code, parameters.hashCode());
 	}
@@ -193,20 +159,17 @@ class JobParametersTests {
 	@Test
 	void testGetIdentifyingParameters() {
 		// given
-		Map<String, JobParameter<?>> parametersMap = new HashMap<>();
-		JobParameter<String> jobParameter1 = new JobParameter<>("value1", String.class, true);
-		JobParameter<String> jobParameter2 = new JobParameter<>("value2", String.class, false);
-		parametersMap.put("key1", jobParameter1);
-		parametersMap.put("key2", jobParameter2);
-		JobParameters parameters = new JobParameters(parametersMap);
+		JobParameter<String> jobParameter1 = new JobParameter<>("key1", "value1", String.class, true);
+		JobParameter<String> jobParameter2 = new JobParameter<>("key2", "value2", String.class, false);
+		JobParameters parameters = new JobParameters(Set.of(jobParameter1, jobParameter2));
 
 		// when
-		Map<String, JobParameter<?>> identifyingParameters = parameters.getIdentifyingParameters();
+		Set<JobParameter<?>> identifyingParameters = parameters.getIdentifyingParameters();
 
 		// then
 		assertEquals(1, identifyingParameters.size());
-		JobParameter<?> key1 = identifyingParameters.get("key1");
-		assertEquals(jobParameter1, key1);
+		JobParameter<?> jobParameter = identifyingParameters.iterator().next();
+		assertEquals(jobParameter1, jobParameter);
 	}
 
 	@Test

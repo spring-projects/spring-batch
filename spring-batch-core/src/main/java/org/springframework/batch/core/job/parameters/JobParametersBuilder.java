@@ -20,8 +20,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.util.Assert;
@@ -29,10 +29,14 @@ import org.springframework.util.Assert;
 /**
  * Helper class for creating {@link JobParameters}. Useful because all
  * {@link JobParameter} objects are immutable and must be instantiated separately to
- * ensure type safety. Once created, it can be used in the same was a
+ * ensure type safety. Once created, it can be used in the same way as a
  * {@link java.lang.StringBuilder} (except that order is irrelevant), by adding various
- * parameter types and creating a valid {@link JobParameters} object once finished.<br>
- * <br>
+ * parameter types and creating a valid {@link JobParameters} object once finished.
+ * <p>
+ * Job parameters must have unique names within a {@link JobParameters} instance.
+ * Therefore, adding a parameter with the same name as an existing parameter will cause
+ * the existing parameter to be replaced with the new one.
+ * <p>
  * Using the {@code identifying} flag indicates if the parameter should be used in the
  * identification of a {@link JobInstance} object. That flag defaults to {@code true}.
  *
@@ -46,188 +50,217 @@ import org.springframework.util.Assert;
  */
 public class JobParametersBuilder {
 
-	private Map<String, JobParameter<?>> parameterMap;
+	private final Set<JobParameter<?>> parameters;
 
 	/**
 	 * Default constructor. Initializes the builder with empty parameters.
 	 */
 	public JobParametersBuilder() {
-		this.parameterMap = new HashMap<>();
+		this.parameters = new HashSet<>();
 	}
 
 	/**
-	 * Copy constructor. Initializes the builder with the supplied parameters.
+	 * Copy constructor. Initializes the builder with the supplied parameters. Existing
+	 * parameters with the same name will be overridden.
 	 * @param jobParameters {@link JobParameters} instance used to initialize the builder.
 	 */
 	public JobParametersBuilder(JobParameters jobParameters) {
-		this.parameterMap = new HashMap<>(jobParameters.getParameters());
+		this.parameters = new HashSet<>(jobParameters.parameters());
 	}
 
 	/**
-	 * Add a new identifying String parameter for the given key.
-	 * @param key The parameter accessor.
-	 * @param parameter The runtime parameter. Must not be {@code null}.
+	 * Add a new identifying String parameter for the given key. <strong>Note: Adding a
+	 * parameter with the same name as an existing parameter will cause the existing
+	 * parameter to be replaced with the new one.</strong>
+	 * @param name The parameter name.
+	 * @param value The parameter value.
 	 * @return a reference to this object.
 	 */
-	public JobParametersBuilder addString(String key, String parameter) {
-		return addString(key, parameter, true);
+	public JobParametersBuilder addString(String name, String value) {
+		return addString(name, value, true);
 	}
 
 	/**
-	 * Add a new String parameter for the given key.
-	 * @param key The parameter accessor.
-	 * @param parameter The runtime parameter. Must not be {@code null}.
+	 * Add a new String parameter for the given key. <strong>Note: Adding a parameter with
+	 * the same name as an existing parameter will cause the existing parameter to be
+	 * replaced with the new one.</strong>
+	 * @param name The parameter name.
+	 * @param value The parameter value.
 	 * @param identifying The indicates if the parameter is used as part of identifying a
 	 * job instance.
 	 * @return a reference to this object.
 	 */
-	public JobParametersBuilder addString(String key, String parameter, boolean identifying) {
-		Assert.notNull(parameter, "Value for parameter '" + key + "' must not be null");
-		this.parameterMap.put(key, new JobParameter<>(parameter, String.class, identifying));
+	public JobParametersBuilder addString(String name, String value, boolean identifying) {
+		Assert.notNull(value, "Value for parameter '" + name + "' must not be null");
+		addJobParameter(new JobParameter<>(name, value, String.class, identifying));
 		return this;
 	}
 
 	/**
-	 * Add a new identifying {@link Date} parameter for the given key.
-	 * @param key The parameter accessor.
-	 * @param parameter The runtime parameter. Must not be {@code null}.
+	 * Add a new identifying {@link Date} parameter for the given key. <strong>Note:
+	 * Adding a parameter with the same name as an existing parameter will cause the
+	 * existing parameter to be replaced with the new one.</strong>
+	 * @param name The parameter name.
+	 * @param value The parameter value.
 	 * @return a reference to this object.
 	 */
-	public JobParametersBuilder addDate(String key, Date parameter) {
-		return addDate(key, parameter, true);
+	public JobParametersBuilder addDate(String name, Date value) {
+		return addDate(name, value, true);
 	}
 
 	/**
-	 * Add a new {@link Date} parameter for the given key.
-	 * @param key The parameter accessor.
-	 * @param parameter The runtime parameter. Must not be {@code null}.
+	 * Add a new {@link Date} parameter for the given key. <strong>Note: Adding a
+	 * parameter with the same name as an existing parameter will cause the existing
+	 * parameter to be replaced with the new one.</strong>
+	 * @param name The parameter name.
+	 * @param value The parameter value.
 	 * @param identifying Indicates if the parameter is used as part of identifying a job
 	 * instance
 	 * @return a reference to this object.
 	 */
-	public JobParametersBuilder addDate(String key, Date parameter, boolean identifying) {
-		Assert.notNull(parameter, "Value for parameter '" + key + "' must not be null");
-		this.parameterMap.put(key, new JobParameter<>(parameter, Date.class, identifying));
+	public JobParametersBuilder addDate(String name, Date value, boolean identifying) {
+		Assert.notNull(value, "Value for parameter '" + name + "' must not be null");
+		addJobParameter(new JobParameter<>(name, value, Date.class, identifying));
 		return this;
 	}
 
 	/**
-	 * Add a new identifying {@link LocalDate} parameter for the given key.
-	 * @param key The parameter name.
-	 * @param parameter The runtime parameter. Must not be {@code null}.
+	 * Add a new identifying {@link LocalDate} parameter for the given key. <strong>Note:
+	 * Adding a parameter with the same name as an existing parameter will cause the
+	 * existing parameter to be replaced with the new one.</strong>
+	 * @param name The parameter name.
+	 * @param value The parameter value.
 	 * @return a reference to this object.
 	 */
-	public JobParametersBuilder addLocalDate(String key, LocalDate parameter) {
-		return addLocalDate(key, parameter, true);
+	public JobParametersBuilder addLocalDate(String name, LocalDate value) {
+		return addLocalDate(name, value, true);
 	}
 
 	/**
-	 * Add a new {@link LocalDate} parameter for the given key.
-	 * @param key The parameter name.
-	 * @param parameter The runtime parameter. Must not be {@code null}.
+	 * Add a new {@link LocalDate} parameter for the given key. <strong>Note: Adding a
+	 * parameter with the same name as an existing parameter will cause the existing
+	 * parameter to be replaced with the new one.</strong>
+	 * @param name The parameter name.
+	 * @param value The parameter value.
 	 * @param identifying Indicates if the parameter is used as part of identifying a job
 	 * instance
 	 * @return a reference to this object.
 	 */
-	public JobParametersBuilder addLocalDate(String key, LocalDate parameter, boolean identifying) {
-		Assert.notNull(parameter, "Value for parameter '" + key + "' must not be null");
-		this.parameterMap.put(key, new JobParameter<>(parameter, LocalDate.class, identifying));
+	public JobParametersBuilder addLocalDate(String name, LocalDate value, boolean identifying) {
+		Assert.notNull(value, "Value for parameter '" + name + "' must not be null");
+		addJobParameter(new JobParameter<>(name, value, LocalDate.class, identifying));
 		return this;
 	}
 
 	/**
-	 * Add a new identifying {@link LocalTime} parameter for the given key.
-	 * @param key The parameter name.
-	 * @param parameter The runtime parameter. Must not be {@code null}.
+	 * Add a new identifying {@link LocalTime} parameter for the given key. <strong>Note:
+	 * Adding a parameter with the same name as an existing parameter will cause the
+	 * existing parameter to be replaced with the new one.</strong>
+	 * @param name The parameter name.
+	 * @param value The parameter value.
 	 * @return a reference to this object.
 	 */
-	public JobParametersBuilder addLocalTime(String key, LocalTime parameter) {
-		return addLocalTime(key, parameter, true);
+	public JobParametersBuilder addLocalTime(String name, LocalTime value) {
+		return addLocalTime(name, value, true);
 	}
 
 	/**
-	 * Add a new {@link LocalTime} parameter for the given key.
-	 * @param key The parameter name.
-	 * @param parameter The runtime parameter. Must not be {@code null}.
+	 * Add a new {@link LocalTime} parameter for the given key. <strong>Note: Adding a
+	 * parameter with the same name as an existing parameter will cause the existing
+	 * parameter to be replaced with the new one.</strong>
+	 * @param name The parameter name.
+	 * @param value The parameter value.
 	 * @param identifying Indicates if the parameter is used as part of identifying a job
 	 * instance
 	 * @return a reference to this object.
 	 */
-	public JobParametersBuilder addLocalTime(String key, LocalTime parameter, boolean identifying) {
-		Assert.notNull(parameter, "Value for parameter '" + key + "' must not be null");
-		this.parameterMap.put(key, new JobParameter<>(parameter, LocalTime.class, identifying));
+	public JobParametersBuilder addLocalTime(String name, LocalTime value, boolean identifying) {
+		Assert.notNull(value, "Value for parameter '" + name + "' must not be null");
+		addJobParameter(new JobParameter<>(name, value, LocalTime.class, identifying));
 		return this;
 	}
 
 	/**
 	 * Add a new identifying {@link LocalDateTime} parameter for the given key.
-	 * @param key The parameter name.
-	 * @param parameter The runtime parameter. Must not be {@code null}.
+	 * <strong>Note: Adding a parameter with the same name as an existing parameter will
+	 * cause the existing parameter to be replaced with the new one.</strong>
+	 * @param name The parameter name.
+	 * @param value The parameter value.
 	 * @return a reference to this object.
 	 */
-	public JobParametersBuilder addLocalDateTime(String key, LocalDateTime parameter) {
-		return addLocalDateTime(key, parameter, true);
+	public JobParametersBuilder addLocalDateTime(String name, LocalDateTime value) {
+		return addLocalDateTime(name, value, true);
 	}
 
 	/**
-	 * Add a new {@link LocalDateTime} parameter for the given key.
-	 * @param key The parameter name.
-	 * @param parameter The runtime parameter. Must not be {@code null}.
+	 * Add a new {@link LocalDateTime} parameter for the given key. <strong>Note: Adding a
+	 * parameter with the same name as an existing parameter will cause the existing
+	 * parameter to be replaced with the new one.</strong>
+	 * @param name The parameter name.
+	 * @param value The parameter value.
 	 * @param identifying Indicates if the parameter is used as part of identifying a job
 	 * instance
 	 * @return a reference to this object.
 	 */
-	public JobParametersBuilder addLocalDateTime(String key, LocalDateTime parameter, boolean identifying) {
-		Assert.notNull(parameter, "Value for parameter '" + key + "' must not be null");
-		this.parameterMap.put(key, new JobParameter<>(parameter, LocalDateTime.class, identifying));
+	public JobParametersBuilder addLocalDateTime(String name, LocalDateTime value, boolean identifying) {
+		Assert.notNull(value, "Value for parameter '" + name + "' must not be null");
+		addJobParameter(new JobParameter<>(name, value, LocalDateTime.class, identifying));
 		return this;
 	}
 
 	/**
-	 * Add a new identifying {@link Long} parameter for the given key.
-	 * @param key The parameter accessor.
-	 * @param parameter The runtime parameter. Must not be {@code null}.
+	 * Add a new identifying {@link Long} parameter for the given key. <strong>Note:
+	 * Adding a parameter with the same name as an existing parameter will cause the
+	 * existing parameter to be replaced with the new one.</strong>
+	 * @param name The parameter name.
+	 * @param value The parameter value.
 	 * @return a reference to this object.
 	 */
-	public JobParametersBuilder addLong(String key, Long parameter) {
-		return addLong(key, parameter, true);
+	public JobParametersBuilder addLong(String name, Long value) {
+		return addLong(name, value, true);
 	}
 
 	/**
-	 * Add a new {@link Long} parameter for the given key.
-	 * @param key The parameter accessor.
-	 * @param parameter The runtime parameter. Must not be {@code null}.
+	 * Add a new {@link Long} parameter for the given key. <strong>Note: Adding a
+	 * parameter with the same name as an existing parameter will cause the existing
+	 * parameter to be replaced with the new one.</strong>
+	 * @param name The parameter name.
+	 * @param value The parameter value.
 	 * @param identifying Indicates if the parameter is used as part of identifying a job
 	 * instance.
 	 * @return a reference to this object.
 	 */
-	public JobParametersBuilder addLong(String key, Long parameter, boolean identifying) {
-		Assert.notNull(parameter, "Value for parameter '" + key + "' must not be null");
-		this.parameterMap.put(key, new JobParameter<>(parameter, Long.class, identifying));
+	public JobParametersBuilder addLong(String name, Long value, boolean identifying) {
+		Assert.notNull(value, "Value for parameter '" + name + "' must not be null");
+		addJobParameter(new JobParameter<>(name, value, Long.class, identifying));
 		return this;
 	}
 
 	/**
-	 * Add a new identifying {@link Double} parameter for the given key.
-	 * @param key The parameter accessor.
-	 * @param parameter The runtime parameter. Must not be {@code null}.
+	 * Add a new identifying {@link Double} parameter for the given key. <strong>Note:
+	 * Adding a parameter with the same name as an existing parameter will cause the
+	 * existing parameter to be replaced with the new one.</strong>
+	 * @param name The parameter name.
+	 * @param value The parameter value.
 	 * @return a reference to this object.
 	 */
-	public JobParametersBuilder addDouble(String key, Double parameter) {
-		return addDouble(key, parameter, true);
+	public JobParametersBuilder addDouble(String name, Double value) {
+		return addDouble(name, value, true);
 	}
 
 	/**
-	 * Add a new {@link Double} parameter for the given key.
-	 * @param key The parameter accessor.
-	 * @param parameter The runtime parameter. Must not be {@code null}.
+	 * Add a new {@link Double} parameter for the given key. <strong>Note: Adding a
+	 * parameter with the same name as an existing parameter will cause the existing
+	 * parameter to be replaced with the new one.</strong>
+	 * @param name The parameter name.
+	 * @param value The parameter value.
 	 * @param identifying Indicates if the parameter is used as part of identifying a job
 	 * instance.
 	 * @return a reference to this object.
 	 */
-	public JobParametersBuilder addDouble(String key, Double parameter, boolean identifying) {
-		Assert.notNull(parameter, "Value for parameter '" + key + "' must not be null");
-		this.parameterMap.put(key, new JobParameter<>(parameter, Double.class, identifying));
+	public JobParametersBuilder addDouble(String name, Double value, boolean identifying) {
+		Assert.notNull(value, "Value for parameter '" + name + "' must not be null");
+		addJobParameter(new JobParameter<>(name, value, Double.class, identifying));
 		return this;
 	}
 
@@ -237,25 +270,29 @@ public class JobParametersBuilder {
 	 * @return a valid {@link JobParameters} object.
 	 */
 	public JobParameters toJobParameters() {
-		return new JobParameters(this.parameterMap);
+		return new JobParameters(this.parameters);
 	}
 
 	/**
-	 * Add a new {@link JobParameter} for the given key.
-	 * @param key The parameter accessor.
+	 * Add a new {@link JobParameter} for the given key. <strong>Note: Adding a parameter
+	 * with the same name as an existing parameter will cause the existing parameter to be
+	 * replaced with the new one.</strong>
 	 * @param jobParameter The runtime parameter.
 	 * @return a reference to this object.
 	 */
-	public JobParametersBuilder addJobParameter(String key, JobParameter<?> jobParameter) {
+	public JobParametersBuilder addJobParameter(JobParameter<?> jobParameter) {
 		Assert.notNull(jobParameter, "JobParameter must not be null");
-		this.parameterMap.put(key, jobParameter);
+		this.parameters.remove(jobParameter);
+		this.parameters.add(jobParameter);
 		return this;
 	}
 
 	/**
-	 * Add a job parameter.
-	 * @param name the name of the parameter
-	 * @param value the value of the parameter. Must not be {@code null}.
+	 * Add a job parameter. <strong>Note: Adding a parameter with the same name as an
+	 * existing parameter will cause the existing parameter to be replaced with the new
+	 * parameter.</strong>
+	 * @param name The parameter name.
+	 * @param value The parameter value.
 	 * @param type the type of the parameter
 	 * @param identifying true if the parameter is identifying. false otherwise
 	 * @return a reference to this object.
@@ -264,13 +301,15 @@ public class JobParametersBuilder {
 	 */
 	public <T> JobParametersBuilder addJobParameter(String name, T value, Class<T> type, boolean identifying) {
 		Assert.notNull(value, "Value for parameter '" + name + "' must not be null");
-		return addJobParameter(name, new JobParameter<>(value, type, identifying));
+		return addJobParameter(new JobParameter<>(name, value, type, identifying));
 	}
 
 	/**
-	 * Add an identifying job parameter.
+	 * Add an identifying job parameter. <strong>Note: Adding a parameter with the same
+	 * name as an existing parameter will cause the existing parameter to be replaced with
+	 * the new one.</strong>
 	 * @param name the name of the parameter
-	 * @param value the value of the parameter. Must not be {@code null}.
+	 * @param value the value of the parameter.
 	 * @param type the type of the parameter
 	 * @return a reference to this object.
 	 * @param <T> the type of the parameter
@@ -281,15 +320,16 @@ public class JobParametersBuilder {
 	}
 
 	/**
-	 * Copy job parameters into the current state.
+	 * Copy job parameters into the current state. <strong>Note: Parameters with the same
+	 * name will be overridden.</strong>
 	 * @param jobParameters The parameters to copy in.
 	 * @return a reference to this object.
 	 */
 	public JobParametersBuilder addJobParameters(JobParameters jobParameters) {
 		Assert.notNull(jobParameters, "jobParameters must not be null");
-
-		this.parameterMap.putAll(jobParameters.getParameters());
-
+		for (JobParameter<?> jobParameter : jobParameters) {
+			addJobParameter(jobParameter);
+		}
 		return this;
 	}
 

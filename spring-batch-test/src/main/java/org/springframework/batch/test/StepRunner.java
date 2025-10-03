@@ -18,9 +18,9 @@ package org.springframework.batch.test;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -193,9 +193,7 @@ public class StepRunner {
 	 * timestamp, to ensure that the job instance will be unique
 	 */
 	private JobParameters makeUniqueJobParameters() {
-		Map<String, JobParameter<?>> parameters = new HashMap<>();
-		parameters.put("timestamp", new JobParameter<>(new Date().getTime(), Long.class));
-		return new JobParameters(parameters);
+		return new JobParameters(Set.of(new JobParameter<>("timestamp", new Date().getTime(), Long.class)));
 	}
 
 }

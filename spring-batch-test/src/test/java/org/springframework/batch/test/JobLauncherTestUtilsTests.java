@@ -22,7 +22,6 @@ import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.configuration.annotation.EnableJdbcJobRepository;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
-import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepContribution;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -40,13 +39,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import javax.sql.DataSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
  * @author mminella
@@ -63,18 +58,6 @@ class JobLauncherTestUtilsTests {
 		JobExecution execution = testUtils.launchStep("step1");
 
 		assertEquals(ExitStatus.COMPLETED, execution.getExitStatus());
-	}
-
-	@Test
-	void getUniqueJobParameters_doesNotRepeatJobParameters() {
-		ApplicationContext context = new AnnotationConfigApplicationContext(TestJobConfiguration.class);
-		JobLauncherTestUtils testUtils = context.getBean(JobLauncherTestUtils.class);
-		Set<JobParameters> jobParametersSeen = new HashSet<>();
-		for (int i = 0; i < 10_000; i++) {
-			JobParameters jobParameters = testUtils.getUniqueJobParameters();
-			assertFalse(jobParametersSeen.contains(jobParameters));
-			jobParametersSeen.add(jobParameters);
-		}
 	}
 
 	@Configuration

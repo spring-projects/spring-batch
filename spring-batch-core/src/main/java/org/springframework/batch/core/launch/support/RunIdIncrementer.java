@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,11 @@
  */
 package org.springframework.batch.core.launch.support;
 
-import org.jspecify.annotations.Nullable;
-
 import org.springframework.batch.core.job.parameters.JobParameter;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.batch.core.job.parameters.JobParametersIncrementer;
+import org.springframework.util.Assert;
 
 /**
  * This incrementer increments a "run.id" parameter of type {@link Long} from the given
@@ -52,20 +51,23 @@ public class RunIdIncrementer implements JobParametersIncrementer {
 	 * @throws IllegalArgumentException if the previous value of run.id is invalid
 	 */
 	@Override
-	public JobParameters getNext(@Nullable JobParameters parameters) {
-
-		JobParameters params = (parameters == null) ? new JobParameters() : parameters;
-		JobParameter<?> runIdParameter = params.getParameters().get(this.key);
+	public JobParameters getNext(JobParameters parameters) {
+		Assert.notNull(parameters, "JobParameters must not be null");
+		JobParameter<?> runIdParameter = parameters.getParameter(this.key);
 		long id = 1;
+		boolean isIdentifying = false;
 		if (runIdParameter != null) {
 			try {
-				id = Long.parseLong(runIdParameter.getValue().toString()) + 1;
+				id = Long.parseLong(runIdParameter.value().toString()) + 1;
+				isIdentifying = runIdParameter.identifying();
 			}
 			catch (NumberFormatException exception) {
 				throw new IllegalArgumentException("Invalid value for parameter " + this.key, exception);
 			}
 		}
-		return new JobParametersBuilder(params).addLong(this.key, id).toJobParameters();
+		return new JobParametersBuilder(parameters)
+			.addJobParameter(new JobParameter<>(this.key, id, Long.class, isIdentifying))
+			.toJobParameters();
 	}
 
 }

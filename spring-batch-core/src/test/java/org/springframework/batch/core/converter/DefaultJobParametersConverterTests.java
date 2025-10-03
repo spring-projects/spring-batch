@@ -50,9 +50,9 @@ class DefaultJobParametersConverterTests {
 
 		JobParameters props = factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
 		assertNotNull(props);
-		assertTrue(props.getParameters().get("job.key").isIdentifying());
-		assertTrue(props.getParameters().get("schedule.date").isIdentifying());
-		assertTrue(props.getParameters().get("vendor.id").isIdentifying());
+		assertTrue(props.getParameter("job.key").identifying());
+		assertTrue(props.getParameter("schedule.date").identifying());
+		assertTrue(props.getParameter("vendor.id").identifying());
 	}
 
 	@Test
@@ -65,9 +65,9 @@ class DefaultJobParametersConverterTests {
 
 		JobParameters props = factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
 		assertNotNull(props);
-		assertTrue(props.getParameters().get("job.key").isIdentifying());
-		assertTrue(props.getParameters().get("schedule.date").isIdentifying());
-		assertTrue(props.getParameters().get("vendor.id").isIdentifying());
+		assertTrue(props.getParameter("job.key").identifying());
+		assertTrue(props.getParameter("schedule.date").identifying());
+		assertTrue(props.getParameter("vendor.id").identifying());
 	}
 
 	@Test
@@ -80,9 +80,9 @@ class DefaultJobParametersConverterTests {
 
 		JobParameters props = factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
 		assertNotNull(props);
-		assertFalse(props.getParameters().get("job.key").isIdentifying());
-		assertFalse(props.getParameters().get("schedule.date").isIdentifying());
-		assertFalse(props.getParameters().get("vendor.id").isIdentifying());
+		assertFalse(props.getParameter("job.key").identifying());
+		assertFalse(props.getParameter("schedule.date").identifying());
+		assertFalse(props.getParameter("vendor.id").identifying());
 	}
 
 	@Test
@@ -95,9 +95,9 @@ class DefaultJobParametersConverterTests {
 
 		JobParameters props = factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
 		assertNotNull(props);
-		assertTrue(props.getParameters().get("job.key").isIdentifying());
-		assertTrue(props.getParameters().get("schedule.date").isIdentifying());
-		assertFalse(props.getParameters().get("vendor.id").isIdentifying());
+		assertTrue(props.getParameter("job.key").identifying());
+		assertTrue(props.getParameter("schedule.date").identifying());
+		assertFalse(props.getParameter("vendor.id").identifying());
 	}
 
 	@Test
@@ -113,7 +113,7 @@ class DefaultJobParametersConverterTests {
 		assertEquals("myKey", props.getString("job.key"));
 		assertEquals(33243243L, props.getLong("vendor.id").longValue());
 		LocalDate expectedDate = LocalDate.of(2008, 1, 23);
-		assertEquals(expectedDate, props.getParameter("schedule.date").getValue());
+		assertEquals(expectedDate, props.getParameter("schedule.date").value());
 	}
 
 	@Test
@@ -139,11 +139,12 @@ class DefaultJobParametersConverterTests {
 		JobParameters jobParameters = factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
 
 		// then
-		assertEquals(1, jobParameters.getParameters().size());
-		JobParameter<?> parameter = jobParameters.getParameters().get("parameter");
-		assertEquals("", parameter.getValue());
-		assertEquals(String.class, parameter.getType());
-		assertTrue(parameter.isIdentifying());
+		assertEquals(1, jobParameters.parameters().size());
+		JobParameter<?> parameter = jobParameters.getParameter("parameter");
+		assertEquals("parameter", parameter.name());
+		assertEquals("", parameter.value());
+		assertEquals(String.class, parameter.type());
+		assertTrue(parameter.identifying());
 	}
 
 	@Test
@@ -257,13 +258,7 @@ class DefaultJobParametersConverterTests {
 	@Test
 	void testEmptyArgs() {
 		JobParameters props = factory.getJobParameters(new Properties());
-		assertTrue(props.getParameters().isEmpty());
-	}
-
-	@Test
-	void testNullArgs() {
-		assertEquals(new JobParameters(), factory.getJobParameters(null));
-		assertEquals(new Properties(), factory.getProperties(null));
+		assertTrue(props.parameters().isEmpty());
 	}
 
 }

@@ -17,8 +17,8 @@ package org.springframework.batch.test;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.batch.core.job.JobExecution;
 
@@ -54,7 +54,7 @@ public class JobRepositoryTestUtils {
 
 		@Override
 		public JobParameters getNext(@Nullable JobParameters parameters) {
-			return new JobParameters(Collections.singletonMap("count", new JobParameter<>(count++, Long.class)));
+			return new JobParameters(Set.of(new JobParameter<>("count", count++, Long.class)));
 		}
 
 	};

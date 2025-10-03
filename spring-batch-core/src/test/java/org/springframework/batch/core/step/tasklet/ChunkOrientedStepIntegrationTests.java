@@ -40,6 +40,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
@@ -97,7 +98,7 @@ class ChunkOrientedStepIntegrationTests {
 				}), chunkOperations));
 
 		JobParameters jobParameters = new JobParameters(
-				Collections.singletonMap("run.id", new JobParameter(getClass().getName() + ".1", Long.class)));
+				Set.of(new JobParameter("run.id", getClass().getName() + ".1", Long.class)));
 		JobInstance jobInstance = jobRepository.createJobInstance(job.getName(), jobParameters);
 		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
 				new ExecutionContext());

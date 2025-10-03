@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2023 the original author or authors.
+ * Copyright 2012-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jspecify.annotations.Nullable;
 
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
@@ -83,13 +83,12 @@ public class DefaultJobParametersValidator implements JobParametersValidator, In
 	 * @throws JobParametersInvalidException if the parameters are not valid
 	 */
 	@Override
-	public void validate(@Nullable JobParameters parameters) throws JobParametersInvalidException {
-
+	public void validate(JobParameters parameters) throws JobParametersInvalidException {
 		if (parameters == null) {
 			throw new JobParametersInvalidException("The JobParameters can not be null");
 		}
 
-		Set<String> keys = parameters.getParameters().keySet();
+		Set<String> keys = parameters.parameters().stream().map(JobParameter::name).collect(Collectors.toSet());
 
 		// If there are explicit optional keys then all keys must be in that
 		// group, or in the required group.

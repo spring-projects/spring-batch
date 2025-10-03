@@ -15,10 +15,7 @@
  */
 package org.springframework.batch.core.step.tasklet;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.junit.jupiter.api.AfterEach;
@@ -124,7 +121,7 @@ class AsyncChunkOrientedStepIntegrationTests {
 				getReader(new String[] { "a", "b", "c", "a", "b", "c", "a", "b", "c", "a", "b", "c" }),
 				data -> written.addAll(data.getItems()), chunkOperations));
 		JobParameters jobParameters = new JobParameters(
-				Collections.singletonMap("run.id", new JobParameter(getClass().getName() + ".1", Long.class)));
+				Set.of(new JobParameter<>("run.id", getClass().getName() + ".1", String.class)));
 		JobInstance jobInstance = jobRepository.createJobInstance(job.getName(), jobParameters);
 		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
 				new ExecutionContext());

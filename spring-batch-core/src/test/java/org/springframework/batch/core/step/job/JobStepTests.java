@@ -150,7 +150,7 @@ class JobStepTests {
 		step.setJob(new JobSupport("child") {
 			@Override
 			public void execute(JobExecution execution) throws UnexpectedJobExecutionException {
-				assertEquals(1, execution.getJobParameters().getParameters().size());
+				assertEquals(1, execution.getJobParameters().parameters().size());
 				execution.setStatus(BatchStatus.FAILED);
 				execution.setEndTime(LocalDateTime.now());
 				jobRepository.update(execution);
@@ -190,7 +190,7 @@ class JobStepTests {
 		step.setJob(new JobSupport("child") {
 			@Override
 			public void execute(JobExecution execution) {
-				assertEquals(1, execution.getJobParameters().getParameters().size());
+				assertEquals(1, execution.getJobParameters().parameters().size());
 				execution.setStatus(BatchStatus.STOPPED);
 				execution.setEndTime(LocalDateTime.now());
 				jobRepository.update(execution);

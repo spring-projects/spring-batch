@@ -167,7 +167,7 @@ class CommandLineJobRunnerTests {
 		});
 		CommandLineJobRunner.main(new String[] { jobPath, jobName });
 		assertEquals(0, StubSystemExiter.status);
-		assertEquals(0, StubJobLauncher.jobParameters.getParameters().size());
+		assertEquals(0, StubJobLauncher.jobParameters.parameters().size());
 	}
 
 	@Test
@@ -189,7 +189,7 @@ class CommandLineJobRunnerTests {
 		});
 		CommandLineJobRunner.main(new String[0]);
 		assertEquals(0, StubSystemExiter.status);
-		assertEquals(2, StubJobLauncher.jobParameters.getParameters().size());
+		assertEquals(2, StubJobLauncher.jobParameters.parameters().size());
 	}
 
 	@Test
@@ -211,7 +211,7 @@ class CommandLineJobRunnerTests {
 		});
 		CommandLineJobRunner.main(new String[0]);
 		assertEquals(0, StubSystemExiter.status);
-		assertEquals(2, StubJobLauncher.jobParameters.getParameters().size());
+		assertEquals(2, StubJobLauncher.jobParameters.parameters().size());
 	}
 
 	@Test
@@ -234,7 +234,7 @@ class CommandLineJobRunnerTests {
 		});
 		CommandLineJobRunner.main(args);
 		assertEquals(0, StubSystemExiter.status);
-		assertEquals(2, StubJobLauncher.jobParameters.getParameters().size());
+		assertEquals(2, StubJobLauncher.jobParameters.parameters().size());
 	}
 
 	@Test

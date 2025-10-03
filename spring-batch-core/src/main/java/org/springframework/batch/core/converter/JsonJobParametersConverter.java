@@ -17,7 +17,6 @@ package org.springframework.batch.core.converter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.jspecify.annotations.Nullable;
 
 import org.springframework.batch.core.job.parameters.JobParameter;
 import org.springframework.batch.core.job.parameters.JobParameters;
@@ -88,16 +87,17 @@ public class JsonJobParametersConverter extends DefaultJobParametersConverter {
 
 	@Override
 	protected String encode(JobParameter<?> jobParameter) {
-		Class<?> parameterType = jobParameter.getType();
-		Object parameterTypedValue = jobParameter.getValue();
-		boolean parameterIdentifying = jobParameter.isIdentifying();
+		Class<?> parameterType = jobParameter.type();
+		String parameterName = jobParameter.name();
+		Object parameterTypedValue = jobParameter.value();
+		boolean parameterIdentifying = jobParameter.identifying();
 		String parameterStringValue = this.conversionService.convert(parameterTypedValue, String.class);
 		if (parameterStringValue == null) {
 			throw new JobParametersConversionException(
 					"Unable to encode job parameter of type " + parameterType + " with value " + parameterTypedValue);
 		}
 		try {
-			return this.objectMapper.writeValueAsString(new JobParameterDefinition(parameterStringValue,
+			return this.objectMapper.writeValueAsString(new JobParameterDefinition(parameterName, parameterStringValue,
 					parameterType.getName(), Boolean.toString(parameterIdentifying)));
 		}
 		catch (JsonProcessingException e) {
@@ -107,7 +107,7 @@ public class JsonJobParametersConverter extends DefaultJobParametersConverter {
 
 	@SuppressWarnings(value = { "unchecked", "rawtypes" })
 	@Override
-	protected JobParameter decode(String encodedJobParameter) {
+	protected JobParameter decode(String parameterName, String encodedJobParameter) {
 		try {
 			JobParameterDefinition jobParameterDefinition = this.objectMapper.readValue(encodedJobParameter,
 					JobParameterDefinition.class);
@@ -120,14 +120,14 @@ public class JsonJobParametersConverter extends DefaultJobParametersConverter {
 				parameterIdentifying = Boolean.parseBoolean(jobParameterDefinition.identifying());
 			}
 			Object parameterTypedValue = this.conversionService.convert(jobParameterDefinition.value(), parameterType);
-			return new JobParameter(parameterTypedValue, parameterType, parameterIdentifying);
+			return new JobParameter(parameterName, parameterTypedValue, parameterType, parameterIdentifying);
 		}
 		catch (JsonProcessingException | ClassNotFoundException e) {
 			throw new JobParametersConversionException("Unable to decode job parameter " + encodedJobParameter, e);
 		}
 	}
 
-	public record JobParameterDefinition(String value, @Nullable String type, @Nullable String identifying) {
+	public record JobParameterDefinition(String name, String value, String type, String identifying) {
 	}
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 the original author or authors.
+ * Copyright 2024-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,5 +19,5 @@ package org.springframework.batch.core.repository.persistence;
  * @author Mahmoud Ben Hassine
  * @since 5.2.0
  */
-public record JobParameter<T>(T value, String type, boolean identifying) {
+public record JobParameter<T>(String name, T value, String type, boolean identifying) {
 }

@@ -17,6 +17,7 @@ package org.springframework.batch.core.listener;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 import org.jspecify.annotations.Nullable;
 
@@ -60,13 +61,13 @@ public class JobParameterExecutionContextCopyListener implements StepExecutionLi
 		JobParameters jobParameters = stepExecution.getJobParameters();
 		Collection<String> keys = this.keys;
 		if (keys == null) {
-			keys = jobParameters.getParameters().keySet();
+			keys = jobParameters.parameters().stream().map(JobParameter::name).collect(Collectors.toSet());
 		}
 		for (String key : keys) {
 			if (!stepContext.containsKey(key)) {
-				JobParameter<?> jobParameter = jobParameters.getParameters().get(key);
+				JobParameter<?> jobParameter = jobParameters.getParameter(key);
 				if (jobParameter != null) {
-					stepContext.put(key, jobParameter.getValue());
+					stepContext.put(key, jobParameter.value());
 				}
 			}
 		}

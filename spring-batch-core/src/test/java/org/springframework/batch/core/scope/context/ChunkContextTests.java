@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collections;
+import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -43,7 +44,7 @@ class ChunkContextTests {
 	void setUp() {
 		JobInstance jobInstance = new JobInstance(1L, "job");
 		JobExecution jobExecution = new JobExecution(1L, jobInstance,
-				new JobParameters(Collections.singletonMap("foo", new JobParameter<>("bar", String.class))));
+				new JobParameters(Set.of(new JobParameter<>("foo", "bar", String.class))));
 		StepExecution stepExecution = new StepExecution(1L, "foo", jobExecution);
 		context = new ChunkContext(new StepContext(stepExecution));
 	}
