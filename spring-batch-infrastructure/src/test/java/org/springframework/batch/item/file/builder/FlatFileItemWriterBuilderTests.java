@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 the original author or authors.
+ * Copyright 2016-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
 
@@ -48,6 +49,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Mahmoud Ben Hassine
  * @author Drummond Dawson
  * @author Glenn Renfro
+ * @author Hyunggeol Lee
  */
 class FlatFileItemWriterBuilderTests {
 
@@ -98,7 +100,7 @@ class FlatFileItemWriterBuilderTests {
 		writer.close();
 
 		assertEquals("HEADER$Foo{first=1, second=2, third='3'}$Foo{first=4, second=5, third='6'}$FOOTER",
-				readLine("UTF-16LE", output));
+			readLine("UTF-16LE", output));
 	}
 
 	@Test
@@ -219,7 +221,7 @@ class FlatFileItemWriterBuilderTests {
 			.lineSeparator("$")
 			.delimited()
 			.delimiter(" ")
-			.fieldExtractor(item -> new Object[] { item.getFirst(), item.getThird() })
+			.fieldExtractor(item -> new Object[]{item.getFirst(), item.getThird()})
 			.encoding("UTF-16LE")
 			.headerCallback(writer1 -> writer1.append("HEADER"))
 			.footerCallback(writer12 -> writer12.append("FOOTER"))
@@ -273,7 +275,7 @@ class FlatFileItemWriterBuilderTests {
 			.lineSeparator("$")
 			.formatted()
 			.format("%3s%3s")
-			.fieldExtractor(item -> new Object[] { item.getFirst(), item.getThird() })
+			.fieldExtractor(item -> new Object[]{item.getFirst(), item.getThird()})
 			.encoding("UTF-16LE")
 			.headerCallback(writer1 -> writer1.append("HEADER"))
 			.footerCallback(writer12 -> writer12.append("FOOTER"))
@@ -483,6 +485,135 @@ class FlatFileItemWriterBuilderTests {
 		Object fieldExtractor = ReflectionTestUtils.getField(lineAggregator, "fieldExtractor");
 		assertNotNull(fieldExtractor);
 		assertInstanceOf(BeanWrapperFieldExtractor.class, fieldExtractor);
+	}
+
+	// Issue #4916: RecordFieldExtractor should honor names() configuration
+	@Test
+	void testDelimitedWithRecordAndSelectedFields() throws IOException {
+		// 이유: DelimitedBuilder가 names() 설정을 RecordFieldExtractor에 전달하는지 확인
+		// 핵심 버그 수정 검증 테스트
+
+		WritableResource output = new FileSystemResource(File.createTempFile("delimited-selected", "csv"));
+		record Person(int id, String name, String email, int age) {}
+
+		FlatFileItemWriter<Person> writer = new FlatFileItemWriterBuilder<Person>()
+			.name("personWriter")
+			.resource(output)
+			.delimited()
+			.delimiter(",")
+			.sourceType(Person.class)
+			.names("name", "age")  // 특정 필드만 선택
+			.build();
+
+		// 타입 및 설정 검증
+		Object lineAggregator = ReflectionTestUtils.getField(writer, "lineAggregator");
+		assertNotNull(lineAggregator);
+		assertInstanceOf(DelimitedLineAggregator.class, lineAggregator);
+
+		Object fieldExtractor = ReflectionTestUtils.getField(lineAggregator, "fieldExtractor");
+		assertNotNull(fieldExtractor);
+		assertInstanceOf(RecordFieldExtractor.class, fieldExtractor);
+
+		// 핵심: names 설정이 전달되었는지 확인
+		Object names = ReflectionTestUtils.getField(fieldExtractor, "names");
+		assertEquals(Arrays.asList("name", "age"), names);
+	}
+
+	@Test
+	void testDelimitedWithRecordFieldReordering() throws IOException {
+		// 이유: 필드 순서 변경이 제대로 동작하는지 확인
+		// names()의 순서가 RecordFieldExtractor에 전달되는지 검증
+
+		WritableResource output = new FileSystemResource(File.createTempFile("delimited-reorder", "csv"));
+		record Employee(int id, String firstName, String lastName, String dept) {}
+
+		FlatFileItemWriter<Employee> writer = new FlatFileItemWriterBuilder<Employee>()
+			.name("employeeWriter")
+			.resource(output)
+			.delimited()
+			.delimiter("|")
+			.sourceType(Employee.class)
+			.names("lastName", "firstName", "id")  // 순서 변경 + dept 제외
+			.build();
+
+		Object lineAggregator = ReflectionTestUtils.getField(writer, "lineAggregator");
+		assertNotNull(lineAggregator);
+		assertInstanceOf(DelimitedLineAggregator.class, lineAggregator);
+
+		// delimiter 설정 확인
+		Object delimiter = ReflectionTestUtils.getField(lineAggregator, "delimiter");
+		assertEquals("|", delimiter);
+
+		Object fieldExtractor = ReflectionTestUtils.getField(lineAggregator, "fieldExtractor");
+		assertNotNull(fieldExtractor);
+		assertInstanceOf(RecordFieldExtractor.class, fieldExtractor);
+
+		// 순서 변경 및 필드 제외 확인
+		Object names = ReflectionTestUtils.getField(fieldExtractor, "names");
+		assertEquals(Arrays.asList("lastName", "firstName", "id"), names);
+	}
+
+	@Test
+	void testFormattedWithRecordAndSelectedFields() throws IOException {
+		// 이유: FormattedBuilder도 names() 설정을 RecordFieldExtractor에 전달하는지 확인
+		// FormattedBuilder가 DelimitedBuilder와 동일하게 동작하는지 검증
+
+		WritableResource output = new FileSystemResource(File.createTempFile("formatted-selected", "txt"));
+		record Person(int id, String name, String email) {}
+
+		FlatFileItemWriter<Person> writer = new FlatFileItemWriterBuilder<Person>()
+			.name("personWriter")
+			.resource(output)
+			.formatted()
+			.format("%-10s%3d")
+			.sourceType(Person.class)
+			.names("name", "id")  // email 제외, 순서 변경
+			.build();
+
+		Object lineAggregator = ReflectionTestUtils.getField(writer, "lineAggregator");
+		assertNotNull(lineAggregator);
+		assertInstanceOf(FormatterLineAggregator.class, lineAggregator);
+
+		// format 설정 확인
+		Object format = ReflectionTestUtils.getField(lineAggregator, "format");
+		assertEquals("%-10s%3d", format);
+
+		Object fieldExtractor = ReflectionTestUtils.getField(lineAggregator, "fieldExtractor");
+		assertNotNull(fieldExtractor);
+		assertInstanceOf(RecordFieldExtractor.class, fieldExtractor);
+
+		// FormattedBuilder도 names 설정을 전달하는지 확인
+		Object names = ReflectionTestUtils.getField(fieldExtractor, "names");
+		assertEquals(Arrays.asList("name", "id"), names);
+	}
+
+	@Test
+	void testDelimitedWithRecordAllFields() throws IOException {
+		// 이유: names()를 지정하지 않았을 때 모든 필드가 사용되는지 확인
+		// 기본 동작 검증 (backward compatibility)
+
+		WritableResource output = new FileSystemResource(File.createTempFile("delimited-all", "csv"));
+		record Product(String code, String name, double price) {}
+
+		FlatFileItemWriter<Product> writer = new FlatFileItemWriterBuilder<Product>()
+			.name("productWriter")
+			.resource(output)
+			.delimited()
+			.sourceType(Product.class)
+			.names("code", "name", "price")  // 모든 필드 명시
+			.build();
+
+		Object lineAggregator = ReflectionTestUtils.getField(writer, "lineAggregator");
+		assertNotNull(lineAggregator);
+		assertInstanceOf(DelimitedLineAggregator.class, lineAggregator);
+
+		Object fieldExtractor = ReflectionTestUtils.getField(lineAggregator, "fieldExtractor");
+		assertNotNull(fieldExtractor);
+		assertInstanceOf(RecordFieldExtractor.class, fieldExtractor);
+
+		// 모든 필드가 포함되었는지 확인
+		Object names = ReflectionTestUtils.getField(fieldExtractor, "names");
+		assertEquals(Arrays.asList("code", "name", "price"), names);
 	}
 
 	private void validateBuilderFlags(FlatFileItemWriter<Foo> writer, String encoding) {
