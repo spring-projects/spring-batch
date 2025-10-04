@@ -13,12 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.launch.support;
+package org.springframework.batch.core.job.parameters;
 
-import org.springframework.batch.core.job.parameters.JobParameter;
-import org.springframework.batch.core.job.parameters.JobParameters;
-import org.springframework.batch.core.job.parameters.JobParametersBuilder;
-import org.springframework.batch.core.job.parameters.JobParametersIncrementer;
 import org.springframework.util.Assert;
 
 /**

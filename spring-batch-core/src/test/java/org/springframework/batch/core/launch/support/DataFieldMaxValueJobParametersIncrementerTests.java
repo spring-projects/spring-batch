@@ -17,6 +17,7 @@ package org.springframework.batch.core.launch.support;
 
 import org.junit.jupiter.api.Test;
 
+import org.springframework.batch.core.job.parameters.DataFieldMaxValueJobParametersIncrementer;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;

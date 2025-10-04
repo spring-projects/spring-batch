@@ -22,6 +22,6 @@
 	<bean id="writer" class="org.springframework.batch.samples.misc.jmx.InfiniteLoopWriter" />
 
 	<bean id="jobParametersIncrementer"
-	            class="org.springframework.batch.core.launch.support.RunIdIncrementer"/>
+	            class="org.springframework.batch.core.job.parameters.RunIdIncrementer"/>
 
 </beans>

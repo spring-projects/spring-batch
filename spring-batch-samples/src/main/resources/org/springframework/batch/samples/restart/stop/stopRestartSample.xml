@@ -41,7 +41,7 @@
 
 	<bean id="infiniteLoopJob" parent="simpleJob">
 		<property name="jobParametersIncrementer">
-			<bean class="org.springframework.batch.core.launch.support.RunIdIncrementer" />
+			<bean class="org.springframework.batch.core.job.parameters.RunIdIncrementer" />
 		</property>
 		<property name="steps">
 			<bean id="infiniteStep" parent="simpleStep">
