@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
 
@@ -43,6 +44,7 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 
 /**
  * @author Michael Minella
@@ -50,6 +52,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Drummond Dawson
  * @author Glenn Renfro
  * @author Daeho Kwon
+ * @author Hyunggeol Lee
  */
 class FlatFileItemWriterBuilderTests {
 
@@ -537,6 +540,186 @@ class FlatFileItemWriterBuilderTests {
 		writer.close();
 
 		assertEquals("HEADER$  1  3$  4  6$FOOTER", readLine("UTF-16LE", output));
+	}
+
+	// Issue #4916: RecordFieldExtractor should honor names() configuration
+	@Test
+	void testDelimitedWithRecordAndSelectedFields() {
+		// given
+		record Person(int id, String name, String email, int age) {
+		}
+
+		// when
+		FlatFileItemWriter<Person> writer = new FlatFileItemWriterBuilder<Person>().name("personWriter")
+			.resource(mock())
+			.delimited()
+			.delimiter(",")
+			.sourceType(Person.class)
+			.names("name", "age")
+			.build();
+
+		// then
+		Object lineAggregator = ReflectionTestUtils.getField(writer, "lineAggregator");
+		assertNotNull(lineAggregator);
+		assertInstanceOf(DelimitedLineAggregator.class, lineAggregator);
+
+		Object fieldExtractor = ReflectionTestUtils.getField(lineAggregator, "fieldExtractor");
+		assertNotNull(fieldExtractor);
+		assertInstanceOf(RecordFieldExtractor.class, fieldExtractor);
+
+		Object names = ReflectionTestUtils.getField(fieldExtractor, "names");
+		assertEquals(Arrays.asList("name", "age"), names);
+	}
+
+	@Test
+	void testDelimitedWithRecordFieldReordering() {
+		// given
+		record Employee(int id, String firstName, String lastName, String dept) {
+		}
+
+		// when
+		FlatFileItemWriter<Employee> writer = new FlatFileItemWriterBuilder<Employee>().name("employeeWriter")
+			.resource(mock())
+			.delimited()
+			.delimiter("|")
+			.sourceType(Employee.class)
+			.names("lastName", "firstName", "id")
+			.build();
+
+		// then
+		Object lineAggregator = ReflectionTestUtils.getField(writer, "lineAggregator");
+		assertNotNull(lineAggregator);
+		assertInstanceOf(DelimitedLineAggregator.class, lineAggregator);
+
+		Object delimiter = ReflectionTestUtils.getField(lineAggregator, "delimiter");
+		assertEquals("|", delimiter);
+
+		Object fieldExtractor = ReflectionTestUtils.getField(lineAggregator, "fieldExtractor");
+		assertNotNull(fieldExtractor);
+		assertInstanceOf(RecordFieldExtractor.class, fieldExtractor);
+
+		Object names = ReflectionTestUtils.getField(fieldExtractor, "names");
+		assertEquals(Arrays.asList("lastName", "firstName", "id"), names);
+	}
+
+	@Test
+	void testDelimitedWithRecordAllFields() {
+		// given
+		record Product(String code, String name, double price) {
+		}
+
+		// when
+		FlatFileItemWriter<Product> writer = new FlatFileItemWriterBuilder<Product>().name("productWriter")
+			.resource(mock())
+			.delimited()
+			.sourceType(Product.class)
+			.names("code", "name", "price")
+			.build();
+
+		// then
+		Object lineAggregator = ReflectionTestUtils.getField(writer, "lineAggregator");
+		assertNotNull(lineAggregator);
+		assertInstanceOf(DelimitedLineAggregator.class, lineAggregator);
+
+		Object fieldExtractor = ReflectionTestUtils.getField(lineAggregator, "fieldExtractor");
+		assertNotNull(fieldExtractor);
+		assertInstanceOf(RecordFieldExtractor.class, fieldExtractor);
+
+		Object names = ReflectionTestUtils.getField(fieldExtractor, "names");
+		assertEquals(Arrays.asList("code", "name", "price"), names);
+	}
+
+	@Test
+	void testFormattedWithRecordAndSelectedFields() {
+		// given
+		record Person(int id, String name, String email) {
+		}
+
+		// when
+		FlatFileItemWriter<Person> writer = new FlatFileItemWriterBuilder<Person>().name("personWriter")
+			.resource(mock())
+			.formatted()
+			.format("%-10s%3d")
+			.sourceType(Person.class)
+			.names("name", "id")
+			.build();
+
+		// then
+		Object lineAggregator = ReflectionTestUtils.getField(writer, "lineAggregator");
+		assertNotNull(lineAggregator);
+		assertInstanceOf(FormatterLineAggregator.class, lineAggregator);
+
+		Object format = ReflectionTestUtils.getField(lineAggregator, "format");
+		assertEquals("%-10s%3d", format);
+
+		Object fieldExtractor = ReflectionTestUtils.getField(lineAggregator, "fieldExtractor");
+		assertNotNull(fieldExtractor);
+		assertInstanceOf(RecordFieldExtractor.class, fieldExtractor);
+
+		Object names = ReflectionTestUtils.getField(fieldExtractor, "names");
+		assertEquals(Arrays.asList("name", "id"), names);
+	}
+
+	@Test
+	void testFormattedWithRecordFieldReordering() {
+		// given
+		record Employee(int id, String firstName, String lastName, String dept) {
+		}
+
+		// when
+		FlatFileItemWriter<Employee> writer = new FlatFileItemWriterBuilder<Employee>().name("employeeWriter")
+			.resource(mock())
+			.formatted()
+			.format("%-15s%-15s%5d")
+			.sourceType(Employee.class)
+			.names("lastName", "firstName", "id")
+			.build();
+
+		// then
+		Object lineAggregator = ReflectionTestUtils.getField(writer, "lineAggregator");
+		assertNotNull(lineAggregator);
+		assertInstanceOf(FormatterLineAggregator.class, lineAggregator);
+
+		Object format = ReflectionTestUtils.getField(lineAggregator, "format");
+		assertEquals("%-15s%-15s%5d", format);
+
+		Object fieldExtractor = ReflectionTestUtils.getField(lineAggregator, "fieldExtractor");
+		assertNotNull(fieldExtractor);
+		assertInstanceOf(RecordFieldExtractor.class, fieldExtractor);
+
+		Object names = ReflectionTestUtils.getField(fieldExtractor, "names");
+		assertEquals(Arrays.asList("lastName", "firstName", "id"), names);
+	}
+
+	@Test
+	void testFormattedWithRecordAllFields() {
+		// given
+		record Product(String code, String name, double price) {
+		}
+
+		// when
+		FlatFileItemWriter<Product> writer = new FlatFileItemWriterBuilder<Product>().name("productWriter")
+			.resource(mock())
+			.formatted()
+			.format("%-10s%-20s%10.2f")
+			.sourceType(Product.class)
+			.names("code", "name", "price")
+			.build();
+
+		// then
+		Object lineAggregator = ReflectionTestUtils.getField(writer, "lineAggregator");
+		assertNotNull(lineAggregator);
+		assertInstanceOf(FormatterLineAggregator.class, lineAggregator);
+
+		Object format = ReflectionTestUtils.getField(lineAggregator, "format");
+		assertEquals("%-10s%-20s%10.2f", format);
+
+		Object fieldExtractor = ReflectionTestUtils.getField(lineAggregator, "fieldExtractor");
+		assertNotNull(fieldExtractor);
+		assertInstanceOf(RecordFieldExtractor.class, fieldExtractor);
+
+		Object names = ReflectionTestUtils.getField(fieldExtractor, "names");
+		assertEquals(Arrays.asList("code", "name", "price"), names);
 	}
 
 	private void validateBuilderFlags(FlatFileItemWriter<Foo> writer, String encoding) {

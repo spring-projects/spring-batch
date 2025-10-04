@@ -52,6 +52,7 @@ import org.springframework.util.StringUtils;
  * @author Drummond Dawson
  * @author Stefano Cordio
  * @author Daeho Kwon
+ * @author Hyunggeol Lee
  * @since 4.0
  * @see FlatFileItemWriter
  */
@@ -449,7 +450,11 @@ public class FlatFileItemWriterBuilder<T> {
 
 			if (this.fieldExtractor == null) {
 				if (this.sourceType != null && this.sourceType.isRecord()) {
-					this.fieldExtractor = new RecordFieldExtractor<>(this.sourceType);
+					RecordFieldExtractor<T> recordFieldExtractor = new RecordFieldExtractor<>(this.sourceType);
+					if (!this.names.isEmpty()) {
+						recordFieldExtractor.setNames(this.names.toArray(new String[0]));
+					}
+					this.fieldExtractor = recordFieldExtractor;
 				}
 				else {
 					BeanWrapperFieldExtractor<T> beanWrapperFieldExtractor = new BeanWrapperFieldExtractor<>();
@@ -566,7 +571,11 @@ public class FlatFileItemWriterBuilder<T> {
 
 			if (this.fieldExtractor == null) {
 				if (this.sourceType != null && this.sourceType.isRecord()) {
-					this.fieldExtractor = new RecordFieldExtractor<>(this.sourceType);
+					RecordFieldExtractor<T> recordFieldExtractor = new RecordFieldExtractor<>(this.sourceType);
+					if (!this.names.isEmpty()) {
+						recordFieldExtractor.setNames(this.names.toArray(new String[0]));
+					}
+					this.fieldExtractor = recordFieldExtractor;
 				}
 				else {
 					BeanWrapperFieldExtractor<T> beanWrapperFieldExtractor = new BeanWrapperFieldExtractor<>();
