@@ -28,7 +28,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.stream.Stream;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -68,6 +67,7 @@ import org.springframework.util.Assert;
  * @author Baris Cubukcuoglu
  * @author Minsoo Kim
  * @author Yanming Zhou
+ * @author Hyunsang Han
  * @see StepExecutionDao
  */
 public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implements StepExecutionDao, InitializingBean {
@@ -306,10 +306,12 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 	@Nullable
 	@Deprecated(since = "6.0", forRemoval = true)
 	public StepExecution getStepExecution(JobExecution jobExecution, long stepExecutionId) {
-		try (Stream<StepExecution> stream = getJdbcTemplate().queryForStream(getQuery(GET_STEP_EXECUTION),
-				new StepExecutionRowMapper(jobExecution), stepExecutionId)) {
-			return stream.findFirst().orElse(null);
-		}
+		List<StepExecution> executions = getJdbcTemplate().query(getQuery(GET_STEP_EXECUTION),
+				new StepExecutionRowMapper(jobExecution), stepExecutionId);
+
+		Assert.state(executions.size() <= 1,
+				"There can be at most one step execution with given name for single job execution");
+		return executions.isEmpty() ? null : executions.get(0);
 	}
 
 	@Override
