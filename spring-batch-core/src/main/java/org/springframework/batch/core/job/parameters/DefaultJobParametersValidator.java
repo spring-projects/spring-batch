@@ -80,12 +80,12 @@ public class DefaultJobParametersValidator implements JobParametersValidator, In
 	 * Otherwise all keys that are specified as required must be present.
 	 *
 	 * @see JobParametersValidator#validate(JobParameters)
-	 * @throws JobParametersInvalidException if the parameters are not valid
+	 * @throws InvalidJobParametersException if the parameters are not valid
 	 */
 	@Override
-	public void validate(JobParameters parameters) throws JobParametersInvalidException {
+	public void validate(JobParameters parameters) throws InvalidJobParametersException {
 		if (parameters == null) {
-			throw new JobParametersInvalidException("The JobParameters can not be null");
+			throw new InvalidJobParametersException("The JobParameters can not be null");
 		}
 
 		Set<String> keys = parameters.parameters().stream().map(JobParameter::name).collect(Collectors.toSet());
@@ -114,7 +114,7 @@ public class DefaultJobParametersValidator implements JobParametersValidator, In
 			}
 		}
 		if (!missingKeys.isEmpty()) {
-			throw new JobParametersInvalidException("The JobParameters do not contain required keys: " + missingKeys);
+			throw new InvalidJobParametersException("The JobParameters do not contain required keys: " + missingKeys);
 		}
 
 	}

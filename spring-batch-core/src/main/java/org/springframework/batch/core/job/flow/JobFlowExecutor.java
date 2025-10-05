@@ -23,11 +23,12 @@ import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInterruptedException;
 import org.springframework.batch.core.job.StartLimitExceededException;
+import org.springframework.batch.core.step.NoSuchStepException;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.job.StepHandler;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.batch.core.launch.JobRestartException;
 
 /**
  * Implementation of {@link FlowExecutor} for use in components that need to execute a
@@ -85,8 +86,13 @@ public class JobFlowExecutor implements FlowExecutor {
 	}
 
 	private boolean isStepRestart(Step step) {
-		long count = jobRepository.getStepExecutionCount(execution.getJobInstance(), step.getName());
-
+		long count = 0;
+		try {
+			count = jobRepository.getStepExecutionCount(execution.getJobInstance(), step.getName());
+		}
+		catch (NoSuchStepException e) {
+			return false;
+		}
 		return count > 0;
 	}
 

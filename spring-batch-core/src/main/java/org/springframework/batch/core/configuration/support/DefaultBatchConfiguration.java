@@ -112,6 +112,7 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 		}
 	}
 
+	// FIXME getter with side effect, see JobOperatorFactoryBean.populateJobRegistry
 	protected JobRegistry getJobRegistry() {
 		MapJobRegistry jobRegistry = new MapJobRegistry();
 		this.applicationContext.getBeansOfType(Job.class).values().forEach(job -> {

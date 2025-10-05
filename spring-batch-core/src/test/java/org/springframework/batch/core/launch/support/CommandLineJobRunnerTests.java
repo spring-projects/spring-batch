@@ -43,7 +43,7 @@ import org.springframework.batch.core.converter.JobParametersConverter;
 import org.springframework.batch.core.repository.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.NoSuchJobException;
-import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
+import org.springframework.batch.core.launch.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.step.JobRepositorySupport;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

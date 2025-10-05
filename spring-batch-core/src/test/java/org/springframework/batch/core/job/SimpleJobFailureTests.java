@@ -65,14 +65,14 @@ class SimpleJobFailureTests {
 	}
 
 	@Test
-	void testStepFailure() {
+	void testStepFailure() throws JobInterruptedException {
 		job.setSteps(Arrays.<Step>asList(new StepSupport("step")));
 		job.execute(execution);
 		assertEquals(BatchStatus.FAILED, execution.getStatus());
 	}
 
 	@Test
-	void testStepStatusUnknown() {
+	void testStepStatusUnknown() throws JobInterruptedException {
 		job.setSteps(Arrays.<Step>asList(new StepSupport("step1") {
 			@Override
 			public void execute(StepExecution stepExecution)

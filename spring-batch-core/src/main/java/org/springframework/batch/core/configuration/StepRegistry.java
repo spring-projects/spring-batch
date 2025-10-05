@@ -17,17 +17,19 @@ package org.springframework.batch.core.configuration;
 
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.job.Job;
-import org.springframework.batch.core.launch.NoSuchJobException;
-import org.springframework.batch.core.step.NoSuchStepException;
 
 import java.util.Collection;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * Registry keeping track of all the {@link Step} instances defined in a {@link Job}.
  *
  * @author Sebastien Gerard
  * @author Stephane Nicoll
+ * @deprecated as of 6.0 with no replacement. Scheduled for removal in 6.2.
  */
+@Deprecated(since = "6.0", forRemoval = true)
 public interface StepRegistry {
 
 	/**
@@ -52,10 +54,9 @@ public interface StepRegistry {
 	 * Returns the {@link Step} of the specified job based on its name.
 	 * @param jobName the name of the job
 	 * @param stepName the name of the step to retrieve
-	 * @return the step with the given name belonging to the mentioned job
-	 * @throws NoSuchJobException no such job with that name exists
-	 * @throws NoSuchStepException no such step with that name for that job exists
+	 * @return the step with the given name belonging to the mentioned job or null if the
+	 * job or the step do not exist
 	 */
-	Step getStep(String jobName, String stepName) throws NoSuchJobException, NoSuchStepException;
+	@Nullable Step getStep(String jobName, String stepName);
 
 }

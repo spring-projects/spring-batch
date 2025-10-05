@@ -110,6 +110,10 @@ public class CommandLineJobOperator {
 		logger.info(() -> "Starting job with name '" + jobName + "' and parameters: " + parameters);
 		try {
 			Job job = this.jobRegistry.getJob(jobName);
+			if (job == null) {
+				logger.error(() -> "Unable to find job " + jobName + " in the job registry");
+				return JVM_EXITCODE_GENERIC_ERROR;
+			}
 			JobParameters jobParameters = this.jobParametersConverter.getJobParameters(parameters);
 			JobExecution jobExecution = this.jobOperator.start(job, jobParameters);
 			return this.exitCodeMapper.intValue(jobExecution.getExitStatus().getExitCode());
@@ -129,6 +133,10 @@ public class CommandLineJobOperator {
 		logger.info(() -> "Starting next instance of job '" + jobName + "'");
 		try {
 			Job job = this.jobRegistry.getJob(jobName);
+			if (job == null) {
+				logger.error(() -> "Unable to find job " + jobName + " in the job registry");
+				return JVM_EXITCODE_GENERIC_ERROR;
+			}
 			JobExecution jobExecution = this.jobOperator.startNextInstance(job);
 			return this.exitCodeMapper.intValue(jobExecution.getExitStatus().getExitCode());
 		}
@@ -177,6 +185,7 @@ public class CommandLineJobOperator {
 				logger.error(() -> "No job execution found with ID: " + jobExecutionId);
 				return JVM_EXITCODE_GENERIC_ERROR;
 			}
+			// TODO should check and log error if the job execution did not fail
 			JobExecution restartedExecution = this.jobOperator.restart(jobExecution);
 			return this.exitCodeMapper.intValue(restartedExecution.getExitStatus().getExitCode());
 		}
@@ -199,6 +208,8 @@ public class CommandLineJobOperator {
 				logger.error(() -> "No job execution found with ID: " + jobExecutionId);
 				return JVM_EXITCODE_GENERIC_ERROR;
 			}
+			// TODO should throw JobExecutionNotStoppedException if the job execution is
+			// not stopped
 			JobExecution abandonedExecution = this.jobOperator.abandon(jobExecution);
 			return this.exitCodeMapper.intValue(abandonedExecution.getExitStatus().getExitCode());
 		}

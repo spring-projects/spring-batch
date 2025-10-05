@@ -5,7 +5,6 @@ import org.springframework.batch.core.job.JobInterruptedException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
-import org.springframework.batch.core.step.NoSuchStepException;
 import org.springframework.batch.core.step.StepLocator;
 import org.springframework.integration.annotation.MessageEndpoint;
 import org.springframework.integration.annotation.ServiceActivator;
@@ -48,13 +47,13 @@ public class StepExecutionRequestHandler {
 		Long stepExecutionId = request.getStepExecutionId();
 		StepExecution stepExecution = jobRepository.getStepExecution(stepExecutionId);
 		if (stepExecution == null) {
-			throw new NoSuchStepException("No StepExecution could be located for this request: " + request);
+			throw new RuntimeException("No StepExecution could be located for this request: " + request);
 		}
 
 		String stepName = request.getStepName();
 		Step step = stepLocator.getStep(stepName);
 		if (step == null) {
-			throw new NoSuchStepException(String.format("No Step with name [%s] could be located.", stepName));
+			throw new RuntimeException(String.format("No Step with name [%s] could be located.", stepName));
 		}
 
 		try {

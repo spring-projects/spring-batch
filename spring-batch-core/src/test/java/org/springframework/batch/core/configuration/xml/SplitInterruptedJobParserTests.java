@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInterruptedException;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
@@ -37,7 +38,14 @@ class SplitInterruptedJobParserTests extends AbstractJobParserTests {
 	void testSplitInterrupted() throws Exception {
 
 		final JobExecution jobExecution = createJobExecution();
-		new Thread(() -> job.execute(jobExecution)).start();
+		new Thread(() -> {
+			try {
+				job.execute(jobExecution);
+			}
+			catch (JobInterruptedException e) {
+				throw new RuntimeException(e);
+			}
+		}).start();
 
 		Thread.sleep(100L);
 		jobExecution.setStatus(BatchStatus.STOPPING);

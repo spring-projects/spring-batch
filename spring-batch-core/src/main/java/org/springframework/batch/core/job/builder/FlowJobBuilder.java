@@ -100,7 +100,7 @@ public class FlowJobBuilder extends JobBuilderHelper<FlowJobBuilder> {
 			job.afterPropertiesSet();
 		}
 		catch (Exception e) {
-			throw new StepBuilderException(e);
+			throw new JobBuilderException(e);
 		}
 		return job;
 	}

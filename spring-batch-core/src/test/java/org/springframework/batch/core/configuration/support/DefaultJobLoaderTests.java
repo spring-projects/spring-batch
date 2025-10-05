@@ -15,10 +15,6 @@
  */
 package org.springframework.batch.core.configuration.support;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -38,6 +34,8 @@ import org.springframework.batch.core.step.StepLocator;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.util.ReflectionTestUtils;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Dave Syer
@@ -185,13 +183,13 @@ class DefaultJobLoaderTests {
 
 	protected void assertStepExist(String jobName, String... stepNames) {
 		for (String stepName : stepNames) {
-			assertDoesNotThrow(() -> stepRegistry.getStep(jobName, stepName));
+			assertNotNull(stepRegistry.getStep(jobName, stepName));
 		}
 	}
 
 	protected void assertStepDoNotExist(String jobName, String... stepNames) {
 		for (String stepName : stepNames) {
-			assertThrows(NoSuchStepException.class, () -> stepRegistry.getStep(jobName, stepName));
+			assertNull(stepRegistry.getStep(jobName, stepName));
 		}
 	}
 
@@ -241,8 +239,8 @@ class DefaultJobLoaderTests {
 		}
 
 		@Override
-		public Step getStep(String stepName) throws NoSuchStepException {
-			throw new NoSuchStepException("Step [" + stepName + "] does not exist");
+		public Step getStep(String stepName) {
+			return null;
 		}
 
 	}

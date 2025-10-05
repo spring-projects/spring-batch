@@ -23,8 +23,9 @@ import org.springframework.batch.core.job.JobExecutionException;
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- *
+ * @deprecated as of 6.0 with no replacement. Scheduled for removal in 6.2.
  */
+@Deprecated(since = "6.0", forRemoval = true)
 public class NoSuchJobExecutionException extends JobExecutionException {
 
 	/**

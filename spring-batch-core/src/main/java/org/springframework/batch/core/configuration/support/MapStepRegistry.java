@@ -26,8 +26,6 @@ import org.springframework.batch.core.step.Step;
 import org.jspecify.annotations.Nullable;
 import org.springframework.batch.core.configuration.DuplicateJobException;
 import org.springframework.batch.core.configuration.StepRegistry;
-import org.springframework.batch.core.launch.NoSuchJobException;
-import org.springframework.batch.core.step.NoSuchStepException;
 import org.springframework.util.Assert;
 
 /**
@@ -36,7 +34,9 @@ import org.springframework.util.Assert;
  *
  * @author Sebastien Gerard
  * @author Stephane Nicoll
+ * @deprecated as of 6.0 with no replacement. Scheduled for removal in 6.2.
  */
+@Deprecated(since = "6.0", forRemoval = true)
 public class MapStepRegistry implements StepRegistry {
 
 	private final ConcurrentMap<String, Map<String, Step>> map = new ConcurrentHashMap<>();
@@ -64,11 +64,11 @@ public class MapStepRegistry implements StepRegistry {
 	}
 
 	@Override
-	public Step getStep(String jobName, String stepName) throws NoSuchJobException {
+	@Nullable public Step getStep(String jobName, String stepName) {
 		Assert.notNull(jobName, "The job name cannot be null.");
 		Assert.notNull(stepName, "The step name cannot be null.");
 		if (!map.containsKey(jobName)) {
-			throw new NoSuchJobException("No job configuration with the name [" + jobName + "] was registered");
+			return null;
 		}
 		else {
 			final Map<String, Step> jobSteps = map.get(jobName);
@@ -76,8 +76,7 @@ public class MapStepRegistry implements StepRegistry {
 				return jobSteps.get(stepName);
 			}
 			else {
-				throw new NoSuchStepException(
-						"The step called [" + stepName + "] does not exist in the job [" + jobName + "]");
+				return null;
 			}
 		}
 	}

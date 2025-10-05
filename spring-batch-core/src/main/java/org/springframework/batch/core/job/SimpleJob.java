@@ -26,7 +26,7 @@ import org.springframework.batch.core.BatchStatus;
 
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
-import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.batch.core.launch.JobRestartException;
 import org.springframework.batch.core.step.StepLocator;
 
 /**

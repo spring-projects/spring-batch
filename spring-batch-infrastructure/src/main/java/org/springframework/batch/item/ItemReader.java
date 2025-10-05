@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,17 +46,9 @@ public interface ItemReader<T> {
 	 * <strong>must</strong> return <code>null</code> at the end of the input data set. In
 	 * a transactional setting, caller might get the same item twice from successive calls
 	 * (or otherwise), if the first call was in a transaction that rolled back.
-	 * @throws ParseException if there is a problem parsing the current record (but the
-	 * next one may still be valid)
-	 * @throws NonTransientResourceException if there is a fatal exception in the
-	 * underlying resource. After throwing this exception implementations should endeavour
-	 * to return null from subsequent calls to read.
-	 * @throws UnexpectedInputException if there is an uncategorised problem with the
-	 * input data. Assume potentially transient, so subsequent calls to read might
-	 * succeed.
-	 * @throws Exception if an there is a non-specific error.
+	 * @throws Exception if an error occurs.
 	 * @return T the item to be processed or {@code null} if the data source is exhausted
 	 */
-	@Nullable T read() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException;
+	@Nullable T read() throws Exception;
 
 }

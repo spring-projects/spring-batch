@@ -24,6 +24,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInterruptedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
@@ -56,21 +57,21 @@ class JobScopeDestructionCallbackIntegrationTests {
 	}
 
 	@Test
-	void testDisposableScopedProxy() {
+	void testDisposableScopedProxy() throws JobInterruptedException {
 		assertNotNull(proxied);
 		proxied.execute(new JobExecution(1L, mock(), mock()));
 		assertEquals(1, StringUtils.countOccurrencesOf(TestDisposableCollaborator.message, "destroyed"));
 	}
 
 	@Test
-	void testDisposableInnerScopedProxy() {
+	void testDisposableInnerScopedProxy() throws JobInterruptedException {
 		assertNotNull(nested);
 		nested.execute(new JobExecution(1L, mock(), mock()));
 		assertEquals(1, StringUtils.countOccurrencesOf(TestDisposableCollaborator.message, "destroyed"));
 	}
 
 	@Test
-	void testProxiedScopedProxy() {
+	void testProxiedScopedProxy() throws JobInterruptedException {
 		assertNotNull(nested);
 		nested.execute(new JobExecution(1L, mock(), mock()));
 		assertEquals(4, TestAdvice.names.size());
@@ -79,7 +80,7 @@ class JobScopeDestructionCallbackIntegrationTests {
 	}
 
 	@Test
-	void testRefScopedProxy() {
+	void testRefScopedProxy() throws JobInterruptedException {
 		assertNotNull(ref);
 		ref.execute(new JobExecution(1L, mock(), mock()));
 		assertEquals(4, TestAdvice.names.size());

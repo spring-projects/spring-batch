@@ -363,11 +363,7 @@ public class CommandLineJobRunner {
 
 			Job job = null;
 			if (jobRegistry != null) {
-				try {
-					job = jobRegistry.getJob(jobName);
-				}
-				catch (NoSuchJobException ignored) {
-				}
+				job = jobRegistry.getJob(jobName);
 			}
 			if (job == null) {
 				job = context.getBean(jobName, Job.class);

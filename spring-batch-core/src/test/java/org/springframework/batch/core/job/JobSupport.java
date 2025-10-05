@@ -144,13 +144,8 @@ public class JobSupport implements BeanNameAware, Job, StepLocator {
 	}
 
 	@Override
-	public Step getStep(String stepName) throws NoSuchStepException {
-		final Step step = steps.get(stepName);
-		if (step == null) {
-			throw new NoSuchStepException(
-					"Step [" + stepName + "] does not exist for job with name [" + getName() + "]");
-		}
-		return step;
+	public Step getStep(String stepName) {
+		return steps.get(stepName);
 	}
 
 }

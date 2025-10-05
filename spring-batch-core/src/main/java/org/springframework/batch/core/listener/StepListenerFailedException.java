@@ -21,8 +21,11 @@ package org.springframework.batch.core.listener;
  * @author Dave Syer
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
- *
+ * @deprecated as of 6.0 with no replacement. Scheduled for removal in 6.2.
  */
+// The deprecation is based on the fact that a step listeners are not designed to throw
+// exceptions
+@Deprecated(since = "6.0", forRemoval = true)
 public class StepListenerFailedException extends RuntimeException {
 
 	/**

@@ -39,11 +39,9 @@ import org.springframework.batch.core.observability.jfr.events.job.JobExecutionE
 import org.springframework.batch.core.observability.micrometer.MicrometerMetrics;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
-import org.springframework.batch.core.launch.NoSuchJobException;
-import org.springframework.batch.core.launch.support.ExitCodeMapper;
 import org.springframework.batch.core.listener.CompositeJobExecutionListener;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.batch.core.launch.JobRestartException;
 import org.springframework.batch.core.scope.context.JobSynchronizationManager;
 import org.springframework.batch.core.step.StepLocator;
 import org.springframework.batch.repeat.RepeatException;
@@ -261,7 +259,7 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 	 * @throws StartLimitExceededException if start limit of one of the steps was exceeded
 	 */
 	@Override
-	public final void execute(JobExecution execution) {
+	public final void execute(JobExecution execution) throws JobInterruptedException {
 
 		Assert.notNull(execution, "jobExecution must not be null");
 		execution.getExecutionContext().put(SpringBatchVersion.BATCH_VERSION_KEY, SpringBatchVersion.getVersion());
@@ -322,13 +320,13 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 			if (logger.isDebugEnabled()) {
 				logger.debug("Full exception", e);
 			}
-			execution.setExitStatus(getDefaultExitStatusForFailure(e, execution));
+			execution.setExitStatus(getDefaultExitStatusForFailure(e));
 			execution.setStatus(BatchStatus.max(BatchStatus.STOPPED, e.getStatus()));
 			execution.addFailureException(e);
 		}
 		catch (Throwable t) {
 			logger.error("Encountered fatal error executing job", t);
-			execution.setExitStatus(getDefaultExitStatusForFailure(t, execution));
+			execution.setExitStatus(getDefaultExitStatusForFailure(t));
 			execution.setStatus(BatchStatus.FAILED);
 			execution.addFailureException(t);
 		}
@@ -404,16 +402,12 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 	/**
 	 * Default mapping from throwable to {@link ExitStatus}.
 	 * @param ex the cause of the failure
-	 * @param execution the {@link JobExecution} instance.
 	 * @return an {@link ExitStatus}
 	 */
-	protected ExitStatus getDefaultExitStatusForFailure(Throwable ex, JobExecution execution) {
+	protected ExitStatus getDefaultExitStatusForFailure(Throwable ex) {
 		ExitStatus exitStatus;
 		if (ex instanceof JobInterruptedException || ex.getCause() instanceof JobInterruptedException) {
 			exitStatus = ExitStatus.STOPPED.addExitDescription(JobInterruptedException.class.getName());
-		}
-		else if (ex instanceof NoSuchJobException || ex.getCause() instanceof NoSuchJobException) {
-			exitStatus = new ExitStatus(ExitCodeMapper.NO_SUCH_JOB, ex.getClass().getName());
 		}
 		else {
 			exitStatus = ExitStatus.FAILED.addExitDescription(ex);

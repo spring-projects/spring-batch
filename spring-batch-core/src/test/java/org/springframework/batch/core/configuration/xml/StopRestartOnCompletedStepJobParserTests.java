@@ -21,10 +21,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInterruptedException;
 import org.springframework.batch.core.step.StepExecution;
-import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
-import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
-import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.batch.core.launch.JobExecutionAlreadyRunningException;
+import org.springframework.batch.core.launch.JobInstanceAlreadyCompleteException;
+import org.springframework.batch.core.launch.JobRestartException;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 /**
@@ -50,8 +51,8 @@ class StopRestartOnCompletedStepJobParserTests extends AbstractJobParserTests {
 
 	}
 
-	private void launchAndAssert(String stepNames)
-			throws JobInstanceAlreadyCompleteException, JobRestartException, JobExecutionAlreadyRunningException {
+	private void launchAndAssert(String stepNames) throws JobInstanceAlreadyCompleteException, JobRestartException,
+			JobExecutionAlreadyRunningException, JobInterruptedException {
 		JobExecution jobExecution = createJobExecution();
 		job.execute(jobExecution);
 		assertEquals(stepNames, stepNamesList.toString());

@@ -17,6 +17,8 @@ package org.springframework.batch.core.step;
 
 import java.util.Collection;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Interface for locating a {@link Step} instance by name.
  *
@@ -27,6 +29,6 @@ public interface StepLocator {
 
 	Collection<String> getStepNames();
 
-	Step getStep(String stepName) throws NoSuchStepException;
+	@Nullable Step getStep(String stepName);
 
 }

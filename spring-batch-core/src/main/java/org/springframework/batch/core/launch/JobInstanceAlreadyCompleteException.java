@@ -13,30 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.repository;
+package org.springframework.batch.core.launch;
 
 import org.springframework.batch.core.job.JobExecutionException;
 
 /**
+ * An exception indicating an illegal attempt to restart a job that was already completed
+ * successfully.
+ *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  *
  */
-public class JobExecutionAlreadyRunningException extends JobExecutionException {
+public class JobInstanceAlreadyCompleteException extends JobExecutionException {
 
 	/**
-	 * @param msg the exception message.
+	 * @param string the message
 	 */
-	public JobExecutionAlreadyRunningException(String msg) {
-		super(msg);
+	public JobInstanceAlreadyCompleteException(String string) {
+		super(string);
 	}
 
 	/**
-	 * @param msg the exception message.
-	 * @param cause the cause of the exception.
+	 * @param msg the cause
+	 * @param t the message
 	 */
-	public JobExecutionAlreadyRunningException(String msg, Throwable cause) {
-		super(msg, cause);
+	public JobInstanceAlreadyCompleteException(String msg, Throwable t) {
+		super(msg, t);
 	}
 
 }

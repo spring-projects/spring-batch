@@ -27,13 +27,10 @@ import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersIncrementer;
-import org.springframework.batch.core.job.parameters.JobParametersInvalidException;
+import org.springframework.batch.core.job.parameters.InvalidJobParametersException;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.job.UnexpectedJobExecutionException;
 import org.springframework.batch.core.configuration.JobRegistry;
-import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
-import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
-import org.springframework.batch.core.repository.JobRestartException;
 
 /**
  * High level interface for operating batch jobs.
@@ -64,14 +61,14 @@ public interface JobOperator extends JobLauncher {
 	 * @throws NoSuchJobException if there is no {@link Job} with the specified name
 	 * @throws JobInstanceAlreadyExistsException if a job instance with this name and
 	 * parameters already exists
-	 * @throws JobParametersInvalidException thrown if any of the job parameters are
+	 * @throws InvalidJobParametersException thrown if any of the job parameters are
 	 * invalid.
 	 * @deprecated since 6.0 in favor of {@link #start(Job, JobParameters)}. Scheduled for
 	 * removal in 6.2 or later.
 	 */
 	@Deprecated(since = "6.0", forRemoval = true)
 	default Long start(String jobName, Properties parameters)
-			throws NoSuchJobException, JobInstanceAlreadyExistsException, JobParametersInvalidException {
+			throws NoSuchJobException, JobInstanceAlreadyExistsException, InvalidJobParametersException {
 		throw new UnsupportedOperationException();
 	}
 
@@ -82,19 +79,16 @@ public interface JobOperator extends JobLauncher {
 	 * @param job the {@link Job} to start
 	 * @param jobParameters the {@link JobParameters} to start the job with
 	 * @return the {@link JobExecution} that was started
-	 * @throws NoSuchJobException if the given {@link Job} is not registered
-	 * @throws JobParametersInvalidException thrown if any of the job parameters are
+	 * @throws InvalidJobParametersException thrown if any of the job parameters are
 	 * @throws JobExecutionAlreadyRunningException if the JobInstance identified by the
 	 * properties already has an execution running. invalid.
 	 * @throws JobRestartException if the execution would be a re-start, but a re-start is
 	 * either not allowed or not needed.
 	 * @throws JobInstanceAlreadyCompleteException if the job has been run before with the
 	 * same parameters and completed successfully
-	 * @throws IllegalArgumentException if the job or job parameters are null.
 	 */
-	default JobExecution start(Job job, JobParameters jobParameters)
-			throws NoSuchJobException, JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException,
-			JobRestartException, JobParametersInvalidException {
+	default JobExecution start(Job job, JobParameters jobParameters) throws JobInstanceAlreadyCompleteException,
+			JobExecutionAlreadyRunningException, InvalidJobParametersException, JobRestartException {
 		throw new UnsupportedOperationException();
 	}
 
@@ -112,13 +106,13 @@ public interface JobOperator extends JobLauncher {
 	 * corresponding {@link Job} is no longer available for launching
 	 * @throws JobRestartException if there is a non-specific error with the restart (e.g.
 	 * corrupt or inconsistent restart data)
-	 * @throws JobParametersInvalidException if the parameters are not valid for this job
+	 * @throws InvalidJobParametersException if the parameters are not valid for this job
 	 * @deprecated since 6.0 in favor of {@link #restart(JobExecution)}. Scheduled for
 	 * removal in 6.2 or later.
 	 */
 	@Deprecated(since = "6.0", forRemoval = true)
 	Long restart(long executionId) throws JobInstanceAlreadyCompleteException, NoSuchJobExecutionException,
-			NoSuchJobException, JobRestartException, JobParametersInvalidException;
+			NoSuchJobException, JobRestartException, InvalidJobParametersException;
 
 	/**
 	 * Restart a failed or stopped {@link JobExecution}. Fails with an exception if the
@@ -126,18 +120,11 @@ public interface JobOperator extends JobLauncher {
 	 * normal circumstances already completed successfully.
 	 * @param jobExecution the failed or stopped {@link JobExecution} to restart
 	 * @return the {@link JobExecution} that was started
-	 * @throws JobInstanceAlreadyCompleteException if the job was already successfully
-	 * completed
-	 * @throws NoSuchJobExecutionException if the id was not associated with any
-	 * {@link JobExecution}
-	 * @throws NoSuchJobException if the {@link JobExecution} was found, but its
-	 * corresponding {@link Job} is no longer available for launching
-	 * @throws JobRestartException if there is a non-specific error with the restart (e.g.
-	 * corrupt or inconsistent restart data)
-	 * @throws JobParametersInvalidException if the parameters are not valid for this job
+	 * @throws JobRestartException if the job execution is not restartable (not failed or
+	 * stopped) or if there is an error with the restart (e.g. corrupt or inconsistent
+	 * restart data)
 	 */
-	JobExecution restart(JobExecution jobExecution) throws JobInstanceAlreadyCompleteException,
-			NoSuchJobExecutionException, NoSuchJobException, JobRestartException, JobParametersInvalidException;
+	JobExecution restart(JobExecution jobExecution) throws JobRestartException;
 
 	/**
 	 * Launch the next in a sequence of {@link JobInstance} determined by the
@@ -155,7 +142,7 @@ public interface JobOperator extends JobLauncher {
 	 * launched
 	 * @throws NoSuchJobException if there is no such job definition available
 	 * @throws JobParametersNotFoundException if the parameters cannot be found
-	 * @throws JobParametersInvalidException thrown if some of the job parameters are
+	 * @throws InvalidJobParametersException thrown if some of the job parameters are
 	 * invalid.
 	 * @throws UnexpectedJobExecutionException if an unexpected condition arises
 	 * @throws JobRestartException thrown if a job is restarted illegally.
@@ -169,30 +156,18 @@ public interface JobOperator extends JobLauncher {
 	@Deprecated(since = "6.0", forRemoval = true)
 	Long startNextInstance(String jobName) throws NoSuchJobException, JobParametersNotFoundException,
 			JobRestartException, JobExecutionAlreadyRunningException, JobInstanceAlreadyCompleteException,
-			UnexpectedJobExecutionException, JobParametersInvalidException;
+			UnexpectedJobExecutionException, InvalidJobParametersException;
 
 	/**
 	 * Launch the next in a sequence of {@link JobInstance} determined by the
 	 * {@link JobParametersIncrementer} attached to the specified job. If the previous
 	 * instance is still in a failed state, this method should still create a new instance
 	 * and run it with different parameters (as long as the
-	 * {@link JobParametersIncrementer} is working).<br>
-	 * <br>
-	 *
-	 * The last three exception described below should be extremely unlikely, but cannot
-	 * be ruled out entirely. It points to some other thread or process trying to use this
-	 * method (or a similar one) at the same time.
+	 * {@link JobParametersIncrementer} is working as expected).
 	 * @param job the job to launch
 	 * @return the {@link JobExecution} created when the job is launched
-	 * @throws UnexpectedJobExecutionException if an unexpected condition arises
-	 * @throws JobRestartException thrown if a job is restarted illegally.
-	 * @throws JobExecutionAlreadyRunningException thrown if attempting to restart a job
-	 * that is already executing.
-	 * @throws JobInstanceAlreadyCompleteException thrown if attempting to restart a
-	 * completed job.
 	 */
-	JobExecution startNextInstance(Job job) throws JobRestartException, JobExecutionAlreadyRunningException,
-			JobInstanceAlreadyCompleteException, UnexpectedJobExecutionException;
+	JobExecution startNextInstance(Job job);
 
 	/**
 	 * Send a stop signal to the {@link JobExecution} with the supplied id. The signal is

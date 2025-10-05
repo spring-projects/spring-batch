@@ -33,8 +33,8 @@ public interface JobParametersValidator {
 	 * Check that the parameters meet whatever requirements are appropriate, and throw an
 	 * exception if not.
 	 * @param parameters some {@link JobParameters}
-	 * @throws JobParametersInvalidException if the parameters are invalid
+	 * @throws InvalidJobParametersException if the parameters are invalid
 	 */
-	void validate(JobParameters parameters) throws JobParametersInvalidException;
+	void validate(JobParameters parameters) throws InvalidJobParametersException;
 
 }

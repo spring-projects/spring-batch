@@ -27,14 +27,13 @@ import org.springframework.batch.core.job.UnexpectedJobExecutionException;
 import org.springframework.batch.core.job.flow.FlowJob;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersBuilder;
-import org.springframework.batch.core.job.parameters.JobParametersInvalidException;
+import org.springframework.batch.core.job.parameters.InvalidJobParametersException;
 import org.springframework.batch.core.launch.JobOperator;
-import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.listener.JobExecutionListener;
-import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
-import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
+import org.springframework.batch.core.launch.JobExecutionAlreadyRunningException;
+import org.springframework.batch.core.launch.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.batch.core.launch.JobRestartException;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepLocator;
 import org.springframework.batch.item.ExecutionContext;
@@ -224,8 +223,8 @@ public class JobOperatorTestUtils extends JobLauncherTestUtils {
 		try {
 			return this.jobOperator.start(job, jobParameters);
 		}
-		catch (NoSuchJobException | JobExecutionAlreadyRunningException | JobRestartException
-				| JobInstanceAlreadyCompleteException | JobParametersInvalidException e) {
+		catch (JobExecutionAlreadyRunningException | JobRestartException | JobInstanceAlreadyCompleteException
+				| InvalidJobParametersException e) {
 			throw new UnexpectedJobExecutionException("Step runner encountered exception.", e);
 		}
 	}

@@ -122,7 +122,7 @@ class SimpleJobTests {
 	 * Test method for {@link SimpleJob#setSteps(java.util.List)}.
 	 */
 	@Test
-	void testSetSteps() {
+	void testSetSteps() throws JobInterruptedException {
 		job.setSteps(Collections.singletonList((Step) new StepSupport("step")));
 		job.execute(jobExecution);
 		assertEquals(1, jobExecution.getStepExecutions().size());
@@ -140,7 +140,7 @@ class SimpleJobTests {
 	 * Test method for {@link SimpleJob#addStep(Step)}.
 	 */
 	@Test
-	void testAddStep() {
+	void testAddStep() throws JobInterruptedException {
 		job.setSteps(Collections.<Step>emptyList());
 		job.addStep(new StepSupport("step"));
 		job.execute(jobExecution);
@@ -149,7 +149,7 @@ class SimpleJobTests {
 
 	// Test to ensure the exit status returned by the last step is returned
 	@Test
-	void testExitStatusReturned() {
+	void testExitStatusReturned() throws JobInterruptedException {
 
 		final ExitStatus customStatus = new ExitStatus("test");
 
@@ -179,7 +179,7 @@ class SimpleJobTests {
 	}
 
 	@Test
-	void testRunNormally() {
+	void testRunNormally() throws JobInterruptedException {
 		step1.setStartLimit(5);
 		step2.setStartLimit(5);
 		job.execute(jobExecution);
@@ -198,7 +198,7 @@ class SimpleJobTests {
 	}
 
 	@Test
-	void testRunNormallyWithListener() {
+	void testRunNormallyWithListener() throws JobInterruptedException {
 		job.setJobExecutionListeners(new JobExecutionListener[] { new JobExecutionListener() {
 			@Override
 			public void beforeJob(JobExecution jobExecution) {
@@ -215,7 +215,7 @@ class SimpleJobTests {
 	}
 
 	@Test
-	void testRunWithSimpleStepExecutor() {
+	void testRunWithSimpleStepExecutor() throws JobInterruptedException {
 
 		job.setJobRepository(jobRepository);
 		// do not set StepExecutorFactory...
@@ -228,7 +228,7 @@ class SimpleJobTests {
 	}
 
 	@Test
-	void testExecutionContextIsSet() {
+	void testExecutionContextIsSet() throws JobInterruptedException {
 		testRunNormally();
 		assertEquals(jobInstance, jobExecution.getJobInstance());
 		assertEquals(2, jobExecution.getStepExecutions().size());
@@ -237,7 +237,7 @@ class SimpleJobTests {
 	}
 
 	@Test
-	void testInterrupted() {
+	void testInterrupted() throws JobInterruptedException {
 		step1.setStartLimit(5);
 		step2.setStartLimit(5);
 		final JobInterruptedException exception = new JobInterruptedException("Interrupt!");
@@ -250,7 +250,7 @@ class SimpleJobTests {
 	}
 
 	@Test
-	void testInterruptedAfterUnknownStatus() {
+	void testInterruptedAfterUnknownStatus() throws JobInterruptedException {
 		step1.setStartLimit(5);
 		step2.setStartLimit(5);
 		final JobInterruptedException exception = new JobInterruptedException("Interrupt!", BatchStatus.UNKNOWN);
@@ -263,7 +263,7 @@ class SimpleJobTests {
 	}
 
 	@Test
-	void testFailed() {
+	void testFailed() throws JobInterruptedException {
 		step1.setStartLimit(5);
 		step2.setStartLimit(5);
 		final RuntimeException exception = new RuntimeException("Foo!");
@@ -278,7 +278,7 @@ class SimpleJobTests {
 	}
 
 	@Test
-	void testFailedWithListener() {
+	void testFailedWithListener() throws JobInterruptedException {
 		job.setJobExecutionListeners(new JobExecutionListener[] { new JobExecutionListener() {
 			@Override
 			public void afterJob(JobExecution jobExecution) {
@@ -296,7 +296,7 @@ class SimpleJobTests {
 	}
 
 	@Test
-	void testFailedWithError() {
+	void testFailedWithError() throws JobInterruptedException {
 		step1.setStartLimit(5);
 		step2.setStartLimit(5);
 		final Error exception = new Error("Foo!");
@@ -310,7 +310,7 @@ class SimpleJobTests {
 	}
 
 	@Test
-	void testStepShouldNotStart() {
+	void testStepShouldNotStart() throws JobInterruptedException {
 		// Start policy will return false, keeping the step from being started.
 		step1.setStartLimit(0);
 
@@ -352,7 +352,7 @@ class SimpleJobTests {
 	}
 
 	@Test
-	void testNoSteps() {
+	void testNoSteps() throws JobInterruptedException {
 		job.setSteps(new ArrayList<>());
 
 		job.execute(jobExecution);
@@ -382,7 +382,7 @@ class SimpleJobTests {
 	}
 
 	@Test
-	void testInterruptWithListener() {
+	void testInterruptWithListener() throws JobInterruptedException {
 		step1.setProcessException(new JobInterruptedException("job interrupted!"));
 
 		JobExecutionListener listener = mock();

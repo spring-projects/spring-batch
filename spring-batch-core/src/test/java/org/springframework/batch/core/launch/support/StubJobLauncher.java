@@ -18,10 +18,10 @@ package org.springframework.batch.core.launch.support;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.parameters.JobParameters;
-import org.springframework.batch.core.job.parameters.JobParametersInvalidException;
-import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
-import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
-import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.batch.core.job.parameters.InvalidJobParametersException;
+import org.springframework.batch.core.launch.JobExecutionAlreadyRunningException;
+import org.springframework.batch.core.launch.JobInstanceAlreadyCompleteException;
+import org.springframework.batch.core.launch.JobRestartException;
 
 /**
  * Mock Job Launcher. Normally, something like EasyMock would be used to mock an
@@ -51,7 +51,7 @@ public class StubJobLauncher extends TaskExecutorJobOperator {
 
 	@Override
 	public JobExecution run(Job job, JobParameters jobParameters) throws JobExecutionAlreadyRunningException,
-			JobRestartException, JobInstanceAlreadyCompleteException, JobParametersInvalidException {
+			JobRestartException, JobInstanceAlreadyCompleteException, InvalidJobParametersException {
 		lastRunCalled = RUN_JOB_IDENTIFIER;
 		return returnValue;
 	}

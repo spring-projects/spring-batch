@@ -19,6 +19,7 @@ import org.jspecify.annotations.Nullable;
 
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInterruptedException;
 import org.springframework.batch.core.job.parameters.JobParametersIncrementer;
 import org.springframework.batch.core.job.parameters.JobParametersValidator;
 import org.springframework.util.ClassUtils;
@@ -59,7 +60,7 @@ public class GroupAwareJob implements Job {
 	}
 
 	@Override
-	public void execute(JobExecution execution) {
+	public void execute(JobExecution execution) throws JobInterruptedException {
 		delegate.execute(execution);
 	}
 
