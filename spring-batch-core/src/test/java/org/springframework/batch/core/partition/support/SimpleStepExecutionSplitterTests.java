@@ -35,6 +35,7 @@ import org.springframework.batch.core.partition.PartitionNameProvider;
 import org.springframework.batch.core.partition.Partitioner;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.JdbcJobRepositoryFactoryBean;
+import org.springframework.batch.core.repository.support.ResourcelessJobRepository;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.jdbc.support.JdbcTransactionManager;
@@ -43,6 +44,7 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SimpleStepExecutionSplitterTests {
@@ -198,6 +200,26 @@ class SimpleStepExecutionSplitterTests {
 			String message = e.getMessage();
 			assertTrue(message.contains("ABANDONED"), "Wrong message: " + message);
 		}
+	}
+
+	@Test
+	void testResourcelessJobRepositoryThrowsException() throws Exception {
+		// Create a ResourcelessJobRepository for testing
+		ResourcelessJobRepository resourcelessRepo = new ResourcelessJobRepository();
+		JobExecution jobExecution = resourcelessRepo.createJobExecution("job", new JobParameters());
+		StepExecution stepExecution = jobExecution.createStepExecution("bar");
+
+		// Create splitter with ResourcelessJobRepository
+		SimpleStepExecutionSplitter splitter = new SimpleStepExecutionSplitter(resourcelessRepo, true, step.getName(),
+				new SimplePartitioner());
+
+		// Verify that attempting to split with ResourcelessJobRepository throws
+		// appropriate exception
+		JobExecutionException exception = assertThrows(JobExecutionException.class,
+				() -> splitter.split(stepExecution, 2));
+
+		assertTrue(exception.getMessage().contains("ResourcelessJobRepository cannot be used with partitioned steps"));
+		assertTrue(exception.getMessage().contains("does not support execution context"));
 	}
 
 	private StepExecution update(Set<StepExecution> split, StepExecution stepExecution, BatchStatus status)
