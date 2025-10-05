@@ -18,8 +18,8 @@ package org.springframework.batch.samples.domain.trade.internal;
 
 import org.jspecify.annotations.Nullable;
 
-import org.springframework.batch.item.ItemProcessor;
-import org.springframework.batch.item.validator.ValidationException;
+import org.springframework.batch.infrastructure.item.ItemProcessor;
+import org.springframework.batch.infrastructure.item.validator.ValidationException;
 import org.springframework.batch.samples.domain.trade.Trade;
 
 /**

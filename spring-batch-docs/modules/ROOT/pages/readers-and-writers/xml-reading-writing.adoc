@@ -93,7 +93,7 @@ called `tradeMarshaller` in Java:
 public StaxEventItemReader itemReader() {
 	return new StaxEventItemReaderBuilder<Trade>()
 			.name("itemReader")
-			.resource(new FileSystemResource("org/springframework/batch/item/xml/domain/trades.xml"))
+			.resource(new FileSystemResource("org/springframework/batch/infrastructure/item/xml/domain/trades.xml"))
 			.addFragmentRootElements("trade")
 			.unmarshaller(tradeMarshaller())
 			.build();
@@ -108,11 +108,11 @@ element named `trade`, a resource of `data/iosample/input/input.xml`, and an unm
 called `tradeMarshaller` in XML:
 +
 .XML Configuration
-[source, xml]
+[source,xml]
 ----
-<bean id="itemReader" class="org.springframework.batch.item.xml.StaxEventItemReader">
+<bean id="itemReader" class="org.springframework.batch.infrastructure.item.xml.StaxEventItemReader">
     <property name="fragmentRootElementName" value="trade" />
-    <property name="resource" value="org/springframework/batch/item/xml/domain/trades.xml" />
+    <property name="resource" value="org/springframework/batch/infrastructure/item/xml/domain/trades.xml" />
     <property name="unmarshaller" ref="tradeMarshaller" />
 </bean>
 ----
@@ -262,9 +262,9 @@ XML::
 The following XML example uses the `MarshallingEventWriterSerializer`:
 +
 .XML Configuration
-[source, xml]
+[source,xml]
 ----
-<bean id="itemWriter" class="org.springframework.batch.item.xml.StaxEventItemWriter">
+<bean id="itemWriter" class="org.springframework.batch.infrastructure.item.xml.StaxEventItemWriter">
     <property name="resource" ref="outputResource" />
     <property name="marshaller" ref="tradeMarshaller" />
     <property name="rootTagName" value="trade" />

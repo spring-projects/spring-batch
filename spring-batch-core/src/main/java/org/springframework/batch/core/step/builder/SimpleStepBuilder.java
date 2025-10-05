@@ -46,15 +46,15 @@ import org.springframework.batch.core.step.item.SimpleChunkProcessor;
 import org.springframework.batch.core.step.item.SimpleChunkProvider;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
-import org.springframework.batch.item.ItemProcessor;
-import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.repeat.CompletionPolicy;
-import org.springframework.batch.repeat.RepeatOperations;
-import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
-import org.springframework.batch.repeat.support.RepeatTemplate;
-import org.springframework.batch.support.ReflectionUtils;
+import org.springframework.batch.infrastructure.item.ItemProcessor;
+import org.springframework.batch.infrastructure.item.ItemReader;
+import org.springframework.batch.infrastructure.item.ItemStream;
+import org.springframework.batch.infrastructure.item.ItemWriter;
+import org.springframework.batch.infrastructure.repeat.CompletionPolicy;
+import org.springframework.batch.infrastructure.repeat.RepeatOperations;
+import org.springframework.batch.infrastructure.repeat.policy.SimpleCompletionPolicy;
+import org.springframework.batch.infrastructure.repeat.support.RepeatTemplate;
+import org.springframework.batch.infrastructure.support.ReflectionUtils;
 import org.springframework.util.Assert;
 
 /**

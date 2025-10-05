@@ -54,7 +54,7 @@ public class JobExecutionConverter {
 		jobExecution.setExitStatus(new org.springframework.batch.core.ExitStatus(source.getExitStatus().exitCode(),
 				source.getExitStatus().exitDescription()));
 		jobExecution.setExecutionContext(
-				new org.springframework.batch.item.ExecutionContext(source.getExecutionContext().map()));
+				new org.springframework.batch.infrastructure.item.ExecutionContext(source.getExecutionContext().map()));
 		return jobExecution;
 	}
 
@@ -76,7 +76,7 @@ public class JobExecutionConverter {
 		jobExecution.setLastUpdated(source.getLastUpdated());
 		jobExecution.setExitStatus(
 				new ExitStatus(source.getExitStatus().getExitCode(), source.getExitStatus().getExitDescription()));
-		org.springframework.batch.item.ExecutionContext executionContext = source.getExecutionContext();
+		org.springframework.batch.infrastructure.item.ExecutionContext executionContext = source.getExecutionContext();
 		jobExecution.setExecutionContext(new ExecutionContext(executionContext.toMap(), executionContext.isDirty()));
 		return jobExecution;
 	}

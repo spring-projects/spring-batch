@@ -17,7 +17,7 @@ package org.springframework.batch.integration.chunk;
 
 import org.junit.jupiter.api.Test;
 
-import org.springframework.batch.item.Chunk;
+import org.springframework.batch.infrastructure.item.Chunk;
 import org.springframework.batch.test.MetaDataInstanceFactory;
 import org.springframework.util.SerializationUtils;
 

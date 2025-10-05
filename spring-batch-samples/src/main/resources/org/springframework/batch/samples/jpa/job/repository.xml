@@ -24,7 +24,7 @@
 	<bean id="itemProcessor" class="org.springframework.batch.samples.domain.trade.internal.CustomerCreditIncreaseProcessor" />
 
 	<bean id="itemReader"
-		class="org.springframework.batch.item.data.RepositoryItemReader" scope="step">
+          class="org.springframework.batch.infrastructure.item.data.RepositoryItemReader" scope="step">
 		<property name="pageSize" value="2"/>
 		<property name="methodName" value="findByCreditGreaterThan"/>
 		<constructor-arg name="repository" ref="customerCreditPagingAndSortingRepository"/>
@@ -41,7 +41,7 @@
 	</bean>
 
 	<bean id="itemWriter"
-		class="org.springframework.batch.item.data.RepositoryItemWriter">
+		class="org.springframework.batch.infrastructure.item.data.RepositoryItemWriter">
 		<property name="methodName" value="save"/>
 		<property name="repository" ref="customerCreditCrudRepository"/>
 	</bean>

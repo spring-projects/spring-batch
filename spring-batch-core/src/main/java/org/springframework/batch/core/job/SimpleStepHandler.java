@@ -26,7 +26,7 @@ import org.springframework.batch.core.launch.JobRestartException;
 import org.springframework.batch.core.step.NoSuchStepException;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
-import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.infrastructure.item.ExecutionContext;
 
 /**
  * Implementation of {@link StepHandler} that manages repository and restart concerns.
@@ -54,8 +54,7 @@ public class SimpleStepHandler implements StepHandler {
 	/**
 	 * @param jobRepository a
 	 * {@link org.springframework.batch.core.repository.JobRepository}
-	 * @param executionContext the {@link org.springframework.batch.item.ExecutionContext}
-	 * for the current Step
+	 * @param executionContext the {@link ExecutionContext} for the current Step
 	 */
 	public SimpleStepHandler(JobRepository jobRepository, ExecutionContext executionContext) {
 		this.jobRepository = jobRepository;

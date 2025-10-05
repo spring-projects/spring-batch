@@ -18,7 +18,7 @@
     <bean id="itemProcessor"
           class="org.springframework.batch.samples.domain.trade.internal.CustomerCreditIncreaseProcessor"/>
 
-    <bean id="itemReader" class="org.springframework.batch.item.database.JdbcCursorItemReader">
+    <bean id="itemReader" class="org.springframework.batch.infrastructure.item.database.JdbcCursorItemReader">
         <constructor-arg name="dataSource" ref="dataSource"/>
         <constructor-arg name="sql" value="select ID, NAME, CREDIT from CUSTOMER"/>
         <property name="verifyCursorPosition" value="true"/>
@@ -27,10 +27,10 @@
         </constructor-arg>
     </bean>
 
-    <bean id="itemWriter" class="org.springframework.batch.item.database.JdbcBatchItemWriter">
+    <bean id="itemWriter" class="org.springframework.batch.infrastructure.item.database.JdbcBatchItemWriter">
         <property name="assertUpdates" value="true"/>
         <property name="itemSqlParameterSourceProvider">
-            <bean class="org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider"/>
+            <bean class="org.springframework.batch.infrastructure.item.database.BeanPropertyItemSqlParameterSourceProvider"/>
         </property>
         <property name="sql" value="UPDATE CUSTOMER set credit = :credit where id = :id"/>
         <property name="dataSource" ref="dataSource"/>

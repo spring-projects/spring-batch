@@ -27,13 +27,13 @@
 		</step>
 	</job>
 
-	<bean id="itemReader1" class="org.springframework.batch.item.ldif.MappingLdifReader">
+	<bean id="itemReader1" class="org.springframework.batch.infrastructure.item.ldif.MappingLdifReader">
 		<constructor-arg name="resource" value="file:src/test/resources/test.ldif" />
 		<property name="recordsToSkip" value="1" />
 		<property name="recordMapper" ref="recordMapper" />
 	</bean>
 
-	<bean id="itemReader2" class="org.springframework.batch.item.ldif.MappingLdifReader">
+	<bean id="itemReader2" class="org.springframework.batch.infrastructure.item.ldif.MappingLdifReader">
 		<constructor-arg name="resource" value="file:src/test/resources/missing.ldif" />
 		<property name="recordsToSkip" value="1" />
 		<property name="recordMapper" ref="recordMapper" />
@@ -41,10 +41,10 @@
 
 	<bean id="recordMapper" class="org.springframework.batch.core.test.ldif.MyMapper" />
 
-	<bean id="itemWriter" class="org.springframework.batch.item.file.FlatFileItemWriter">
+	<bean id="itemWriter" class="org.springframework.batch.infrastructure.item.file.FlatFileItemWriter">
 		<property name="resource" value="file:target/test-outputs/output.ldif" />
 		<constructor-arg name="lineAggregator">
-			<bean class="org.springframework.batch.item.file.transform.PassThroughLineAggregator" />
+			<bean class="org.springframework.batch.infrastructure.item.file.transform.PassThroughLineAggregator" />
 		</constructor-arg>
 	</bean>
 

@@ -33,8 +33,8 @@ import org.springframework.batch.core.job.parameters.JobParameter;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.UnexpectedJobExecutionException;
 import org.springframework.batch.core.scope.StepScope;
-import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.repeat.context.SynchronizedAttributeAccessor;
+import org.springframework.batch.infrastructure.item.ExecutionContext;
+import org.springframework.batch.infrastructure.repeat.context.SynchronizedAttributeAccessor;
 import org.springframework.util.Assert;
 
 /**

@@ -19,14 +19,15 @@ package org.springframework.batch.samples.domain.person;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.batch.infrastructure.item.ItemReader;
+import org.springframework.batch.infrastructure.item.ItemWriter;
 import org.springframework.batch.samples.file.patternmatching.Address;
 
 import org.jspecify.annotations.Nullable;
 
 /**
  * Custom class that contains logic that would normally be be contained in
- * {@link org.springframework.batch.item.ItemReader} and
- * {@link org.springframework.batch.item.ItemWriter}.
+ * {@link ItemReader} and {@link ItemWriter}.
  *
  * @author tomas.slanina
  * @author Robert Kasanicky

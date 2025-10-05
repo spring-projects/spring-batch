@@ -36,9 +36,9 @@ import org.springframework.batch.core.repository.dao.jdbc.JdbcExecutionContextDa
 import org.springframework.batch.core.repository.dao.jdbc.JdbcJobExecutionDao;
 import org.springframework.batch.core.repository.dao.jdbc.JdbcStepExecutionDao;
 import org.springframework.batch.core.repository.support.JdbcJobRepositoryFactoryBean;
-import org.springframework.batch.item.database.support.DataFieldMaxValueIncrementerFactory;
-import org.springframework.batch.item.database.support.DefaultDataFieldMaxValueIncrementerFactory;
-import org.springframework.batch.support.DatabaseType;
+import org.springframework.batch.infrastructure.item.database.support.DataFieldMaxValueIncrementerFactory;
+import org.springframework.batch.infrastructure.item.database.support.DefaultDataFieldMaxValueIncrementerFactory;
+import org.springframework.batch.infrastructure.support.DatabaseType;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.support.ConfigurableConversionService;

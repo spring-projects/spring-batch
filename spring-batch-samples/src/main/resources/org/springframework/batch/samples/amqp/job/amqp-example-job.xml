@@ -18,13 +18,13 @@
         </batch:step>
     </batch:job>
 
-    <beans:bean id="amqpItemReader" class="org.springframework.batch.item.amqp.AmqpItemReader">
+    <beans:bean id="amqpItemReader" class="org.springframework.batch.infrastructure.item.amqp.AmqpItemReader">
         <beans:constructor-arg ref="inboundAmqpTemplate"/>
     </beans:bean>
 
     <beans:bean id="amqpItemProcessor" class="org.springframework.batch.samples.amqp.MessageProcessor"/>
 
-    <beans:bean id="amqpItemWriter" class="org.springframework.batch.item.amqp.AmqpItemWriter">
+    <beans:bean id="amqpItemWriter" class="org.springframework.batch.infrastructure.item.amqp.AmqpItemWriter">
         <beans:constructor-arg ref="outboundAmqpTemplate"/>
     </beans:bean>
 

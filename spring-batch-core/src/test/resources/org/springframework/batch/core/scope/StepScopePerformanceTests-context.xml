@@ -7,18 +7,18 @@
 		http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd
 		http://www.springframework.org/schema/tx https://www.springframework.org/schema/tx/spring-tx.xsd">
 
-	<bean id="vanilla" class="org.springframework.batch.item.file.FlatFileItemReader">
+	<bean id="vanilla" class="org.springframework.batch.infrastructure.item.file.FlatFileItemReader">
 		<constructor-arg name="lineMapper">
 			<bean
-				class="org.springframework.batch.item.file.mapping.PassThroughLineMapper" />
+				class="org.springframework.batch.infrastructure.item.file.mapping.PassThroughLineMapper" />
 		</constructor-arg>
 		<property name="resource" value="classpath:/org/springframework/batch/core/scope/StepScopePerformanceTests-input.txt"/>
 	</bean>
 
-	<bean id="proxied" class="org.springframework.batch.item.file.FlatFileItemReader" scope="step">
+	<bean id="proxied" class="org.springframework.batch.infrastructure.item.file.FlatFileItemReader" scope="step">
 		<constructor-arg name="lineMapper">
 			<bean
-				class="org.springframework.batch.item.file.mapping.PassThroughLineMapper" />
+				class="org.springframework.batch.infrastructure.item.file.mapping.PassThroughLineMapper" />
 		</constructor-arg>
 		<property name="resource" value="classpath:/org/springframework/batch/core/scope/StepScopePerformanceTests-input.txt"/>
 	</bean>

@@ -18,8 +18,8 @@ package org.springframework.batch.samples.football.internal;
 
 import org.jspecify.annotations.Nullable;
 
-import org.springframework.batch.item.file.mapping.FieldSetMapper;
-import org.springframework.batch.item.file.transform.FieldSet;
+import org.springframework.batch.infrastructure.item.file.mapping.FieldSetMapper;
+import org.springframework.batch.infrastructure.item.file.transform.FieldSet;
 import org.springframework.batch.samples.football.Game;
 
 public class GameFieldSetMapper implements FieldSetMapper<Game> {

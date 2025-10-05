@@ -108,7 +108,7 @@
 		</tasklet>
 	</step>
 
-	<beans:bean id="stream1" class="org.springframework.batch.item.support.CompositeItemStream"/>
+	<beans:bean id="stream1" class="org.springframework.batch.infrastructure.item.support.CompositeItemStream"/>
 	<beans:bean id="stream2" class="org.springframework.batch.core.configuration.xml.TestReader"/>
 
 </beans:beans>

@@ -69,8 +69,8 @@ import org.springframework.batch.core.step.StepContribution;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.scope.context.JobContext;
 import org.springframework.batch.core.scope.context.StepContext;
-import org.springframework.batch.item.Chunk;
-import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.infrastructure.item.Chunk;
+import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.core.DecoratingProxy;
 
 /**

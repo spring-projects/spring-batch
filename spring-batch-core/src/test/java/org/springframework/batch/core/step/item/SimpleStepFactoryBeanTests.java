@@ -47,11 +47,11 @@ import org.springframework.batch.core.repository.support.JdbcJobRepositoryFactor
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.core.step.factory.SimpleStepFactoryBean;
-import org.springframework.batch.item.*;
-import org.springframework.batch.item.support.ListItemReader;
-import org.springframework.batch.repeat.exception.SimpleLimitExceptionHandler;
-import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
-import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
+import org.springframework.batch.infrastructure.item.*;
+import org.springframework.batch.infrastructure.item.support.ListItemReader;
+import org.springframework.batch.infrastructure.repeat.exception.SimpleLimitExceptionHandler;
+import org.springframework.batch.infrastructure.repeat.policy.SimpleCompletionPolicy;
+import org.springframework.batch.infrastructure.support.transaction.ResourcelessTransactionManager;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;

@@ -19,7 +19,7 @@ package org.springframework.batch.samples.partitioning.remote;
 import java.util.Map;
 
 import org.springframework.batch.core.partition.support.SimplePartitioner;
-import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.infrastructure.item.ExecutionContext;
 
 /**
  * Simple partitioner for demonstration purpose.

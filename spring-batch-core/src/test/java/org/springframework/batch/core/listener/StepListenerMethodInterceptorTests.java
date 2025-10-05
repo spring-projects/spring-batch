@@ -28,9 +28,9 @@ import org.aopalliance.intercept.MethodInvocation;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.support.MethodInvoker;
-import org.springframework.batch.support.MethodInvokerUtils;
-import org.springframework.batch.support.SimpleMethodInvoker;
+import org.springframework.batch.infrastructure.support.MethodInvoker;
+import org.springframework.batch.infrastructure.support.MethodInvokerUtils;
+import org.springframework.batch.infrastructure.support.SimpleMethodInvoker;
 
 public class StepListenerMethodInterceptorTests {
 

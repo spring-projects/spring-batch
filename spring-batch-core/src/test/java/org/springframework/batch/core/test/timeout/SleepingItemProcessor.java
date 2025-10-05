@@ -17,7 +17,7 @@ package org.springframework.batch.core.test.timeout;
 
 import org.jspecify.annotations.Nullable;
 
-import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.infrastructure.item.ItemProcessor;
 
 public class SleepingItemProcessor<I> implements ItemProcessor<I, I> {
 

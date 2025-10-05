@@ -22,7 +22,7 @@ import org.springframework.batch.core.step.StepExecution;
 import org.jspecify.annotations.Nullable;
 import org.springframework.batch.core.scope.context.StepContext;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
-import org.springframework.batch.item.adapter.HippyMethodInvoker;
+import org.springframework.batch.infrastructure.item.adapter.HippyMethodInvoker;
 import org.springframework.test.context.TestContext;
 import org.springframework.test.context.TestExecutionListener;
 import org.springframework.util.ReflectionUtils;

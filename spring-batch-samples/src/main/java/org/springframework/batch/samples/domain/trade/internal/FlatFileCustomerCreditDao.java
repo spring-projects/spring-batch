@@ -16,10 +16,10 @@
 
 package org.springframework.batch.samples.domain.trade.internal;
 
-import org.springframework.batch.item.Chunk;
-import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.infrastructure.item.Chunk;
+import org.springframework.batch.infrastructure.item.ExecutionContext;
+import org.springframework.batch.infrastructure.item.ItemStream;
+import org.springframework.batch.infrastructure.item.ItemWriter;
 import org.springframework.batch.samples.domain.trade.CustomerCredit;
 import org.springframework.batch.samples.domain.trade.CustomerCreditDao;
 import org.springframework.beans.factory.DisposableBean;

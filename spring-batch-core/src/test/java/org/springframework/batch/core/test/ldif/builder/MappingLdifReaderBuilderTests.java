@@ -20,12 +20,12 @@ import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
-import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.ItemStreamException;
-import org.springframework.batch.item.ldif.MappingLdifReader;
-import org.springframework.batch.item.ldif.RecordCallbackHandler;
-import org.springframework.batch.item.ldif.RecordMapper;
-import org.springframework.batch.item.ldif.builder.MappingLdifReaderBuilder;
+import org.springframework.batch.infrastructure.item.ExecutionContext;
+import org.springframework.batch.infrastructure.item.ItemStreamException;
+import org.springframework.batch.infrastructure.item.ldif.MappingLdifReader;
+import org.springframework.batch.infrastructure.item.ldif.RecordCallbackHandler;
+import org.springframework.batch.infrastructure.item.ldif.RecordMapper;
+import org.springframework.batch.infrastructure.item.ldif.builder.MappingLdifReaderBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;

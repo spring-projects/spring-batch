@@ -56,9 +56,9 @@ public abstract class CoreNamespaceUtils {
 
 	private static final String CUSTOM_EDITOR_CONFIGURER_CLASS_NAME = "org.springframework.beans.factory.config.CustomEditorConfigurer";
 
-	private static final String RANGE_ARRAY_CLASS_NAME = "org.springframework.batch.item.file.transform.Range[]";
+	private static final String RANGE_ARRAY_CLASS_NAME = "org.springframework.batch.infrastructure.item.file.transform.Range[]";
 
-	private static final String RANGE_ARRAY_EDITOR_CLASS_NAME = "org.springframework.batch.item.file.transform.RangeArrayPropertyEditor";
+	private static final String RANGE_ARRAY_EDITOR_CLASS_NAME = "org.springframework.batch.infrastructure.item.file.transform.RangeArrayPropertyEditor";
 
 	private static final String CORE_NAMESPACE_POST_PROCESSOR_CLASS_NAME = "org.springframework.batch.core.configuration.xml.CoreNamespacePostProcessor";
 

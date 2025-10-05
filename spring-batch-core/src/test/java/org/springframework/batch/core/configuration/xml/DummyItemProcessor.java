@@ -17,7 +17,7 @@ package org.springframework.batch.core.configuration.xml;
 
 import org.jspecify.annotations.Nullable;
 
-import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.infrastructure.item.ItemProcessor;
 
 /**
  * @author Dave Syer

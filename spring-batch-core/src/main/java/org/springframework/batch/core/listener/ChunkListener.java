@@ -16,7 +16,7 @@
 package org.springframework.batch.core.listener;
 
 import org.springframework.batch.core.scope.context.ChunkContext;
-import org.springframework.batch.item.Chunk;
+import org.springframework.batch.infrastructure.item.Chunk;
 
 /**
  * Listener interface for the lifecycle of a chunk. A chunk can be thought of as a

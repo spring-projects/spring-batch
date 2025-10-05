@@ -25,7 +25,7 @@ import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.launch.JobOperator;
-import org.springframework.batch.item.support.ListItemWriter;
+import org.springframework.batch.infrastructure.item.support.ListItemWriter;
 import org.springframework.batch.samples.validation.domain.Person;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;

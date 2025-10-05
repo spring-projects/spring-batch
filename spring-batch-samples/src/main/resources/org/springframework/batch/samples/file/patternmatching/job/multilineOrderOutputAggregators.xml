@@ -14,7 +14,7 @@
 		<entry key="item"     value-ref="outputLineItem" />
 	</util:map>
 
-	<bean id="baseAggregator" class="org.springframework.batch.item.file.transform.FormatterLineAggregator" abstract="true" />
+	<bean id="baseAggregator" class="org.springframework.batch.infrastructure.item.file.transform.FormatterLineAggregator" abstract="true" />
 
 	<bean id="outputHeader" parent="baseAggregator">
 		<constructor-arg name="format" value="%-12s%-10s%-30s"/>

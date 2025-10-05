@@ -16,7 +16,7 @@
 package org.springframework.batch.core.annotation;
 
 import org.springframework.batch.core.listener.ChunkListener;
-import org.springframework.batch.item.Chunk;
+import org.springframework.batch.infrastructure.item.Chunk;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

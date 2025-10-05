@@ -19,7 +19,7 @@ package org.springframework.batch.samples.common;
 import javax.sql.DataSource;
 
 import org.springframework.batch.core.listener.StepListenerSupport;
-import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.infrastructure.item.ItemReader;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.jdbc.core.JdbcOperations;

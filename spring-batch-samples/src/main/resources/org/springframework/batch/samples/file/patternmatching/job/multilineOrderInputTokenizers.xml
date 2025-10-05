@@ -3,7 +3,7 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
        	https://www.springframework.org/schema/beans/spring-beans.xsd">
 
-	<bean id="orderFileTokenizer" class="org.springframework.batch.item.file.transform.PatternMatchingCompositeLineTokenizer">
+	<bean id="orderFileTokenizer" class="org.springframework.batch.infrastructure.item.file.transform.PatternMatchingCompositeLineTokenizer">
 		<constructor-arg name="tokenizers">
 			<map>
 				<entry key="HEA*" value-ref="headerRecordTokenizer" />
@@ -20,9 +20,9 @@
 		</constructor-arg>
 	</bean>
 
-	<bean id="defaultLineTokenizer" class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer"/>
+	<bean id="defaultLineTokenizer" class="org.springframework.batch.infrastructure.item.file.transform.DelimitedLineTokenizer"/>
 
-	<bean id="parentLineTokenizer" class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer" abstract="true">
+	<bean id="parentLineTokenizer" class="org.springframework.batch.infrastructure.item.file.transform.DelimitedLineTokenizer" abstract="true">
 		<property name="delimiter" value=";"/>
 	</bean>
 

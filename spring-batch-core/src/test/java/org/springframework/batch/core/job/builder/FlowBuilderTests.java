@@ -33,7 +33,7 @@ import org.springframework.batch.core.job.flow.FlowExecution;
 import org.springframework.batch.core.job.flow.JobFlowExecutor;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.StepSupport;
-import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.infrastructure.item.ExecutionContext;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;

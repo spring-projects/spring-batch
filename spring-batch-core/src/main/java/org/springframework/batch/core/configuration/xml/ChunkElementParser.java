@@ -20,7 +20,8 @@ import java.util.List;
 import org.w3c.dom.Element;
 
 import org.springframework.batch.core.listener.StepListenerMetaData;
-import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
+import org.springframework.batch.infrastructure.item.adapter.AbstractMethodInvokingDelegator;
+import org.springframework.batch.infrastructure.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.beans.BeanMetadataElement;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -59,11 +60,11 @@ public class ChunkElementParser {
 
 	private static final String REF_ELE = "ref";
 
-	private static final String ITEM_READER_ADAPTER_CLASS = "org.springframework.batch.item.adapter.ItemReaderAdapter";
+	private static final String ITEM_READER_ADAPTER_CLASS = "org.springframework.batch.infrastructure.item.adapter.ItemReaderAdapter";
 
-	private static final String ITEM_PROCESSOR_ADAPTER_CLASS = "org.springframework.batch.item.adapter.ItemProcessorAdapter";
+	private static final String ITEM_PROCESSOR_ADAPTER_CLASS = "org.springframework.batch.infrastructure.item.adapter.ItemProcessorAdapter";
 
-	private static final String ITEM_WRITER_ADAPTER_CLASS = "org.springframework.batch.item.adapter.ItemWriterAdapter";
+	private static final String ITEM_WRITER_ADAPTER_CLASS = "org.springframework.batch.infrastructure.item.adapter.ItemWriterAdapter";
 
 	private static final StepListenerParser stepListenerParser = new StepListenerParser(
 			StepListenerMetaData.itemListenerMetaData());
@@ -265,7 +266,7 @@ public class ChunkElementParser {
 
 	/**
 	 * Handle the adapter method attribute by using an
-	 * {@link org.springframework.batch.item.adapter.AbstractMethodInvokingDelegator}.
+	 * {@link AbstractMethodInvokingDelegator}.
 	 */
 	private void handleAdapterMethodAttribute(String propertyName, String adapterClassName,
 			MutablePropertyValues stepPvs, Element element) {

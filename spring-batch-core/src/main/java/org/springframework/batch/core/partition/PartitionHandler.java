@@ -19,7 +19,7 @@ package org.springframework.batch.core.partition;
 import java.util.Collection;
 
 import org.springframework.batch.core.step.StepExecution;
-import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.infrastructure.item.ExecutionContext;
 
 /**
  * Interface defining the responsibilities of controlling the execution of a partitioned

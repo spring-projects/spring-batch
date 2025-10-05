@@ -36,29 +36,29 @@
 		<property name="resource" value="#{stepExecutionContext[fileName]}" />
 	</bean>
 
-	<bean id="inputTestReader" class="org.springframework.batch.item.file.MultiResourceItemReader">
+	<bean id="inputTestReader" class="org.springframework.batch.infrastructure.item.file.MultiResourceItemReader">
 		<property name="resources" value="classpath:org/springframework/batch/samples/partition/file/data/delimited*.csv" />
 		<property name="delegate" ref="testItemReader" />
 	</bean>
 
-	<bean id="outputTestReader" class="org.springframework.batch.item.file.MultiResourceItemReader" scope="prototype">
+	<bean id="outputTestReader" class="org.springframework.batch.infrastructure.item.file.MultiResourceItemReader" scope="prototype">
 		<property name="resources" value="file:target/output/file/delimited*.csv" />
 		<property name="delegate" ref="testItemReader" />
 	</bean>
 
 	<bean id="testItemReader" parent="itemReaderParent" />
 
-	<bean id="itemReaderParent" class="org.springframework.batch.item.file.FlatFileItemReader" abstract="true">
+	<bean id="itemReaderParent" class="org.springframework.batch.infrastructure.item.file.FlatFileItemReader" abstract="true">
 		<constructor-arg name="lineMapper">
-			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+			<bean class="org.springframework.batch.infrastructure.item.file.mapping.DefaultLineMapper">
 				<property name="lineTokenizer">
-					<bean class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
+					<bean class="org.springframework.batch.infrastructure.item.file.transform.DelimitedLineTokenizer">
 						<property name="delimiter" value="," />
 						<property name="names" value="name,credit" />
 					</bean>
 				</property>
 				<property name="fieldSetMapper">
-					<bean class="org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper">
+					<bean class="org.springframework.batch.infrastructure.item.file.mapping.BeanWrapperFieldSetMapper">
 						<property name="targetType" value="org.springframework.batch.samples.domain.trade.CustomerCredit" />
 					</bean>
 				</property>
@@ -68,13 +68,13 @@
 
 	<bean id="itemProcessor" class="org.springframework.batch.samples.domain.trade.internal.CustomerCreditIncreaseProcessor" />
 
-	<bean id="itemWriter" class="org.springframework.batch.item.file.FlatFileItemWriter" scope="step">
+	<bean id="itemWriter" class="org.springframework.batch.infrastructure.item.file.FlatFileItemWriter" scope="step">
 		<property name="resource" value="#{stepExecutionContext[outputFile]}" />
 		<constructor-arg name="lineAggregator">
-			<bean class="org.springframework.batch.item.file.transform.DelimitedLineAggregator">
+			<bean class="org.springframework.batch.infrastructure.item.file.transform.DelimitedLineAggregator">
 				<property name="delimiter" value="," />
 				<property name="fieldExtractor">
-					<bean class="org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor">
+					<bean class="org.springframework.batch.infrastructure.item.file.transform.BeanWrapperFieldExtractor">
 						<property name="names" value="name,credit" />
 					</bean>
 				</property>

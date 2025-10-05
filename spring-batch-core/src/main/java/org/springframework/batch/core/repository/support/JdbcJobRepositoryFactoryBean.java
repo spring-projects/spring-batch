@@ -21,8 +21,9 @@ import org.springframework.batch.core.repository.dao.DefaultExecutionContextSeri
 import org.springframework.batch.core.repository.dao.jdbc.JdbcExecutionContextDao;
 import org.springframework.batch.core.repository.dao.jdbc.JdbcJobExecutionDao;
 import org.springframework.batch.core.repository.dao.jdbc.JdbcStepExecutionDao;
-import org.springframework.batch.item.database.support.DataFieldMaxValueIncrementerFactory;
-import org.springframework.batch.item.database.support.DefaultDataFieldMaxValueIncrementerFactory;
+import org.springframework.batch.infrastructure.item.ExecutionContext;
+import org.springframework.batch.infrastructure.item.database.support.DataFieldMaxValueIncrementerFactory;
+import org.springframework.batch.infrastructure.item.database.support.DefaultDataFieldMaxValueIncrementerFactory;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.core.convert.support.ConfigurableConversionService;
 import org.springframework.jdbc.core.JdbcOperations;
@@ -58,8 +59,7 @@ public class JdbcJobRepositoryFactoryBean extends JobRepositoryFactoryBean {
 	/**
 	 * A custom implementation of the {@link ExecutionContextSerializer}. The default, if
 	 * not injected, is the {@link DefaultExecutionContextSerializer}.
-	 * @param serializer used to serialize/deserialize
-	 * {@link org.springframework.batch.item.ExecutionContext}
+	 * @param serializer used to serialize/deserialize {@link ExecutionContext}
 	 * @see ExecutionContextSerializer
 	 */
 	@Override

@@ -24,7 +24,7 @@
 
 	<batch:job-repository/>
 
-	<bean id="itemReader" class="org.springframework.batch.item.support.ListItemReader">
+	<bean id="itemReader" class="org.springframework.batch.infrastructure.item.support.ListItemReader">
 		<constructor-arg>
 			<list>
 				<value>1</value>

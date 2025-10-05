@@ -498,11 +498,11 @@ XML::
 The following example shows how to implement a custom `ItemReader` in XML:
 +
 .XML Configuration
-[source, xml]
+[source,xml]
 ----
 <bean id="itemReader" class="org.spr...MultiLineTradeItemReader">
     <property name="delegate">
-        <bean class="org.springframework.batch.item.file.FlatFileItemReader">
+        <bean class="org.springframework.batch.infrastructure.item.file.FlatFileItemReader">
             <property name="resource" value="data/iosample/input/multiLine.txt" />
             <property name="lineMapper">
                 <bean class="org.spr...DefaultLineMapper">

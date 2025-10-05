@@ -18,7 +18,7 @@ package org.springframework.batch.core.partition;
 
 import java.util.Map;
 
-import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.infrastructure.item.ExecutionContext;
 
 /**
  * Central strategy interface for creating input parameters for a partitioned step in the

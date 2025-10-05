@@ -33,8 +33,8 @@
 	<bean id="customEditorConfigurer" class="org.springframework.beans.factory.config.CustomEditorConfigurer">
 		<property name="customEditors">
 			<map>
-				<entry key="int[]" value="org.springframework.batch.support.IntArrayPropertyEditor" />
-				<entry key="org.springframework.batch.item.file.transform.Range[]" value="org.springframework.batch.item.file.transform.RangeArrayPropertyEditor" />
+				<entry key="int[]" value="org.springframework.batch.infrastructure.support.IntArrayPropertyEditor" />
+				<entry key="org.springframework.batch.infrastructure.item.file.transform.Range[]" value="org.springframework.batch.infrastructure.item.file.transform.RangeArrayPropertyEditor" />
 			</map>
 		</property>
 	</bean>

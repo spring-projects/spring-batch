@@ -20,8 +20,8 @@ import org.jspecify.annotations.NullUnmarked;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.step.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
-import org.springframework.batch.item.adapter.AbstractMethodInvokingDelegator;
-import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.batch.infrastructure.item.adapter.AbstractMethodInvokingDelegator;
+import org.springframework.batch.infrastructure.repeat.RepeatStatus;
 
 /**
  * A {@link Tasklet} that wraps a method in a POJO. By default the return value is

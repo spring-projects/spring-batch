@@ -16,16 +16,16 @@
 	<integration:channel id="transforms" />
 	<integration:channel id="replies" />
 
-	<integration:gateway service-interface="org.springframework.batch.item.ItemProcessor" id="processor" default-reply-timeout="10"
-		default-request-timeout="100" default-request-channel="requests" default-reply-channel="replies" />
+	<integration:gateway service-interface="org.springframework.batch.infrastructure.item.ItemProcessor" id="processor" default-reply-timeout="10"
+                         default-request-timeout="100" default-request-channel="requests" default-reply-channel="replies" />
 
 	<integration:service-activator input-channel="requests" output-channel="transforms" ref="activator" />
 	<integration:service-activator input-channel="transforms" output-channel="replies" ref="activator" />
 
 	<bean id="activator" class="org.springframework.batch.integration.item.MessagingGatewayIntegrationTests$Activator" />
 
-	<integration:gateway service-interface="org.springframework.batch.item.ItemWriter" id="writer"
-		default-request-timeout="100" default-request-channel="inputs" />
+	<integration:gateway service-interface="org.springframework.batch.infrastructure.item.ItemWriter" id="writer"
+                         default-request-timeout="100" default-request-channel="inputs" />
 
 	<integration:channel id="inputs" />
 	<integration:channel id="outputs" />

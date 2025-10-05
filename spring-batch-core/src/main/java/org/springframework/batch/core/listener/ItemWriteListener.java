@@ -16,8 +16,8 @@
 package org.springframework.batch.core.listener;
 
 import org.springframework.batch.core.scope.context.ChunkContext;
-import org.springframework.batch.item.Chunk;
-import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.infrastructure.item.Chunk;
+import org.springframework.batch.infrastructure.item.ItemWriter;
 
 /**
  * <p>

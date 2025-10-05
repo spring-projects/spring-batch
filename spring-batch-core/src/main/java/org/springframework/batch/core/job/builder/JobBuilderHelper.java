@@ -35,7 +35,7 @@ import org.springframework.batch.core.annotation.BeforeJob;
 import org.springframework.batch.core.job.AbstractJob;
 import org.springframework.batch.core.listener.JobListenerFactoryBean;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.support.ReflectionUtils;
+import org.springframework.batch.infrastructure.support.ReflectionUtils;
 
 /**
  * A base class and utility for other job builders providing access to common properties

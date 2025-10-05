@@ -1,0 +1,56 @@
+/*
+ * Copyright 2006-2023 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.springframework.batch.infrastructure.item.database.support;
+
+import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
+
+/**
+ * Factory for creating {@link DataFieldMaxValueIncrementer} implementations based upon a
+ * provided string.
+ *
+ * @author Lucas Ward
+ * @author Mahmoud Ben Hassine
+ *
+ */
+public interface DataFieldMaxValueIncrementerFactory {
+
+	/**
+	 * Return the {@link DataFieldMaxValueIncrementer} for the provided database type.
+	 * @param databaseType string represented database type
+	 * @param incrementerName incrementer name to create. In many cases this may be the
+	 * sequence name
+	 * @return incrementer
+	 * @throws IllegalArgumentException if databaseType is invalid type, or
+	 * incrementerName is null.
+	 */
+	DataFieldMaxValueIncrementer getIncrementer(String databaseType, String incrementerName);
+
+	/**
+	 * Returns boolean indicated whether or not the provided string is supported by this
+	 * factory.
+	 * @param databaseType {@link String} containing the database type.
+	 * @return true if the incrementerType is supported by this database type. Else false
+	 * is returned.
+	 */
+	boolean isSupportedIncrementerType(String databaseType);
+
+	/**
+	 * Returns the list of supported database incrementer types
+	 * @return an array of {@link String}s containing the supported incrementer types.
+	 */
+	String[] getSupportedIncrementerTypes();
+
+}

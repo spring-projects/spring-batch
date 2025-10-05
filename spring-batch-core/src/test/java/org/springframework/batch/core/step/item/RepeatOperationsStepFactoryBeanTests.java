@@ -29,10 +29,10 @@ import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.launch.EmptyItemWriter;
 import org.springframework.batch.core.step.JobRepositorySupport;
 import org.springframework.batch.core.step.factory.SimpleStepFactoryBean;
-import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.support.ListItemReader;
-import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
+import org.springframework.batch.infrastructure.item.ExecutionContext;
+import org.springframework.batch.infrastructure.item.support.ListItemReader;
+import org.springframework.batch.infrastructure.repeat.RepeatStatus;
+import org.springframework.batch.infrastructure.support.transaction.ResourcelessTransactionManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;

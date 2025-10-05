@@ -12,9 +12,9 @@
 		<step id="step"><tasklet ref="reader" method="read"/></step>
 	</job>
 
-	<bean id="reader" class="org.springframework.batch.item.file.FlatFileItemReader" scope="step">
+	<bean id="reader" class="org.springframework.batch.infrastructure.item.file.FlatFileItemReader" scope="step">
 		<constructor-arg name="lineMapper">
-			<bean class="org.springframework.batch.item.file.mapping.PassThroughLineMapper" />
+			<bean class="org.springframework.batch.infrastructure.item.file.mapping.PassThroughLineMapper" />
 		</constructor-arg>
 		<property name="resource" value="#{stepExecutionContext['input.file']}" />
 	</bean>

@@ -21,7 +21,7 @@ import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.configuration.xml.DummyItemReader;
 import org.springframework.batch.core.configuration.xml.DummyItemWriter;
 import org.springframework.batch.core.configuration.xml.DummyJobRepository;
-import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
+import org.springframework.batch.infrastructure.support.transaction.ResourcelessTransactionManager;
 import java.lang.reflect.Field;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

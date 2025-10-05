@@ -18,8 +18,8 @@ package org.springframework.batch.core.test.football.internal;
 
 import org.springframework.batch.core.test.football.domain.Player;
 import org.springframework.batch.core.test.football.domain.PlayerDao;
-import org.springframework.batch.item.Chunk;
-import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.infrastructure.item.Chunk;
+import org.springframework.batch.infrastructure.item.ItemWriter;
 
 public class PlayerItemWriter implements ItemWriter<Player> {
 

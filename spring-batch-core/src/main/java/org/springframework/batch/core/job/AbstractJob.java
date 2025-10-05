@@ -44,7 +44,7 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.launch.JobRestartException;
 import org.springframework.batch.core.scope.context.JobSynchronizationManager;
 import org.springframework.batch.core.step.StepLocator;
-import org.springframework.batch.repeat.RepeatException;
+import org.springframework.batch.infrastructure.repeat.RepeatException;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;

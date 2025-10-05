@@ -23,7 +23,7 @@ import org.jspecify.annotations.NullUnmarked;
 
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
-import org.springframework.batch.item.file.FlatFileParseException;
+import org.springframework.batch.infrastructure.item.file.FlatFileParseException;
 import org.springframework.classify.BinaryExceptionClassifier;
 import org.springframework.classify.Classifier;
 

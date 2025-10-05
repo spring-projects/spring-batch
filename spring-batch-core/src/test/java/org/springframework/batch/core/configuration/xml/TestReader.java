@@ -18,12 +18,12 @@ package org.springframework.batch.core.configuration.xml;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.infrastructure.item.ExecutionContext;
 
 import org.jspecify.annotations.Nullable;
-import org.springframework.batch.item.ItemStreamReader;
-import org.springframework.batch.item.ParseException;
-import org.springframework.batch.item.UnexpectedInputException;
+import org.springframework.batch.infrastructure.item.ItemStreamReader;
+import org.springframework.batch.infrastructure.item.ParseException;
+import org.springframework.batch.infrastructure.item.UnexpectedInputException;
 
 public class TestReader extends AbstractTestComponent implements ItemStreamReader<String> {
 

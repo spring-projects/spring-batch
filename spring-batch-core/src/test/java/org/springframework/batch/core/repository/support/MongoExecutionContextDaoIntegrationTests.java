@@ -31,7 +31,7 @@ import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.repository.dao.ExecutionContextDao;
 import org.springframework.batch.core.repository.dao.mongodb.MongoExecutionContextDao;
 import org.springframework.batch.core.repository.support.MongoExecutionContextDaoIntegrationTests.ExecutionContextDaoConfiguration;
-import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

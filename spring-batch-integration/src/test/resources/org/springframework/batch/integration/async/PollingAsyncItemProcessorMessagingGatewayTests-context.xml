@@ -15,8 +15,8 @@
 	<channel id="replies">
 		<queue />
 	</channel>
-	<gateway service-interface="org.springframework.batch.item.ItemProcessor" id="processor" default-reply-timeout="1000"
-		default-request-channel="requests" default-reply-channel="replies" />
+	<gateway service-interface="org.springframework.batch.infrastructure.item.ItemProcessor" id="processor" default-reply-timeout="1000"
+             default-request-channel="requests" default-reply-channel="replies" />
 	<service-activator input-channel="requests" output-channel="replies" ref="doubler">
 		<poller fixed-rate="100" />
 	</service-activator>

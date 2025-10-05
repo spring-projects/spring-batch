@@ -23,8 +23,8 @@ import org.springframework.batch.core.ExitStatus;
 import org.jspecify.annotations.Nullable;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.scope.context.ChunkContext;
-import org.springframework.batch.item.Chunk;
-import org.springframework.batch.item.ItemStream;
+import org.springframework.batch.infrastructure.item.Chunk;
+import org.springframework.batch.infrastructure.item.ItemStream;
 
 /**
  * @author Dave Syer

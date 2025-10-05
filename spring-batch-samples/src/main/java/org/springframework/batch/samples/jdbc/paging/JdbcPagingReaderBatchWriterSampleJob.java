@@ -21,9 +21,9 @@ import java.util.Map;
 import javax.sql.DataSource;
 
 import org.springframework.batch.core.configuration.annotation.StepScope;
-import org.springframework.batch.item.database.JdbcPagingItemReader;
-import org.springframework.batch.item.database.Order;
-import org.springframework.batch.item.database.builder.JdbcPagingItemReaderBuilder;
+import org.springframework.batch.infrastructure.item.database.JdbcPagingItemReader;
+import org.springframework.batch.infrastructure.item.database.Order;
+import org.springframework.batch.infrastructure.item.database.builder.JdbcPagingItemReaderBuilder;
 import org.springframework.batch.samples.domain.trade.CustomerCredit;
 import org.springframework.batch.samples.domain.trade.internal.CustomerCreditRowMapper;
 import org.springframework.batch.samples.jdbc.JdbcReaderBatchWriterSampleJob;

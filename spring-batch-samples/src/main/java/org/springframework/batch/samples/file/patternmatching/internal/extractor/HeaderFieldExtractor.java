@@ -17,7 +17,7 @@ package org.springframework.batch.samples.file.patternmatching.internal.extracto
 
 import java.text.SimpleDateFormat;
 
-import org.springframework.batch.item.file.transform.FieldExtractor;
+import org.springframework.batch.infrastructure.item.file.transform.FieldExtractor;
 import org.springframework.batch.samples.file.patternmatching.Order;
 
 /**

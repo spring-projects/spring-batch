@@ -22,9 +22,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jspecify.annotations.Nullable;
 
-import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.file.mapping.FieldSetMapper;
-import org.springframework.batch.item.file.transform.FieldSet;
+import org.springframework.batch.infrastructure.item.ItemReader;
+import org.springframework.batch.infrastructure.item.file.mapping.FieldSetMapper;
+import org.springframework.batch.infrastructure.item.file.transform.FieldSet;
 import org.springframework.batch.samples.file.patternmatching.Address;
 import org.springframework.batch.samples.file.patternmatching.BillingInfo;
 import org.springframework.batch.samples.file.patternmatching.Customer;
@@ -60,7 +60,7 @@ public class OrderItemReader implements ItemReader<Order> {
 	private ItemReader<FieldSet> fieldSetReader;
 
 	/**
-	 * @see org.springframework.batch.item.ItemReader#read()
+	 * @see ItemReader#read()
 	 */
 	@Override
 	public @Nullable Order read() throws Exception {

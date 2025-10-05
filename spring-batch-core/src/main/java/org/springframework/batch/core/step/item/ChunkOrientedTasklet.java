@@ -23,8 +23,8 @@ import org.jspecify.annotations.NullUnmarked;
 import org.springframework.batch.core.step.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
-import org.springframework.batch.item.Chunk;
-import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.batch.infrastructure.item.Chunk;
+import org.springframework.batch.infrastructure.repeat.RepeatStatus;
 import org.springframework.lang.Nullable;
 
 /**

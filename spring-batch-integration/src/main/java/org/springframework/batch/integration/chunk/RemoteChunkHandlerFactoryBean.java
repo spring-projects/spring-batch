@@ -24,15 +24,15 @@ import org.jspecify.annotations.NullUnmarked;
 
 import org.springframework.batch.core.step.StepContribution;
 import org.springframework.batch.core.listener.StepExecutionListener;
-import org.springframework.batch.item.Chunk;
+import org.springframework.batch.infrastructure.item.Chunk;
 import org.springframework.batch.core.step.item.ChunkOrientedTasklet;
 import org.springframework.batch.core.step.item.ChunkProcessor;
 import org.springframework.batch.core.step.item.FaultTolerantChunkProcessor;
 import org.springframework.batch.core.step.item.SimpleChunkProcessor;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
-import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.support.PassThroughItemProcessor;
+import org.springframework.batch.infrastructure.item.ItemWriter;
+import org.springframework.batch.infrastructure.item.support.PassThroughItemProcessor;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;

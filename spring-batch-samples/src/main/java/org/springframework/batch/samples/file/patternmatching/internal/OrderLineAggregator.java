@@ -18,7 +18,7 @@ package org.springframework.batch.samples.file.patternmatching.internal;
 
 import java.util.Map;
 
-import org.springframework.batch.item.file.transform.LineAggregator;
+import org.springframework.batch.infrastructure.item.file.transform.LineAggregator;
 import org.springframework.batch.samples.file.patternmatching.LineItem;
 import org.springframework.batch.samples.file.patternmatching.Order;
 

@@ -425,7 +425,7 @@
 										</xsd:documentation>
 										<xsd:appinfo>
 											<tool:annotation kind="ref" />
-											<tool:expected-type type="org.springframework.batch.item.ItemStream" />
+											<tool:expected-type type="org.springframework.batch.infrastructure.item.ItemStream" />
 										</xsd:appinfo>
 									</xsd:annotation>
 								</xsd:attribute>
@@ -500,7 +500,7 @@
 				]]></xsd:documentation>
 				<xsd:appinfo>
 					<tool:annotation kind="ref" />
-					<tool:expected-type type="org.springframework.batch.item.ItemReader" />
+					<tool:expected-type type="org.springframework.batch.infrastructure.item.ItemReader" />
 				</xsd:appinfo>
 			</xsd:annotation>
 		</xsd:attribute>
@@ -511,7 +511,7 @@
 				]]></xsd:documentation>
 				<xsd:appinfo>
 					<tool:annotation kind="ref" />
-					<tool:expected-type type="org.springframework.batch.item.ItemProcessor" />
+					<tool:expected-type type="org.springframework.batch.infrastructure.item.ItemProcessor" />
 				</xsd:appinfo>
 			</xsd:annotation>
 		</xsd:attribute>
@@ -522,7 +522,7 @@
 				]]></xsd:documentation>
 				<xsd:appinfo>
 					<tool:annotation kind="ref" />
-					<tool:expected-type type="org.springframework.batch.item.ItemWriter" />
+					<tool:expected-type type="org.springframework.batch.infrastructure.item.ItemWriter" />
 				</xsd:appinfo>
 			</xsd:annotation>
 		</xsd:attribute>
@@ -585,7 +585,7 @@
 				]]></xsd:documentation>
 				<xsd:appinfo>
 					<tool:annotation kind="ref">
-						<tool:expected-type type="java:org.springframework.batch.repeat.CompletionPolicy" />
+						<tool:expected-type type="java:org.springframework.batch.infrastructure.repeat.CompletionPolicy" />
 					</tool:annotation>
 				</xsd:appinfo>
 			</xsd:annotation>

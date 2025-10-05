@@ -32,7 +32,7 @@ import org.springframework.batch.core.annotation.BeforeStep;
 import org.springframework.batch.core.listener.StepListenerFactoryBean;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.AbstractStep;
-import org.springframework.batch.support.ReflectionUtils;
+import org.springframework.batch.infrastructure.support.ReflectionUtils;
 
 /**
  * A base class and utility for other step builders providing access to common properties

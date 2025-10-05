@@ -34,6 +34,6 @@
 		class="org.springframework.batch.integration.retry.TransactionalPollingIntegrationTests" />
 
 	<bean id="transactionManager"
-		class="org.springframework.batch.support.transaction.ResourcelessTransactionManager" />
+		class="org.springframework.batch.infrastructure.support.transaction.ResourcelessTransactionManager" />
 
 </beans>

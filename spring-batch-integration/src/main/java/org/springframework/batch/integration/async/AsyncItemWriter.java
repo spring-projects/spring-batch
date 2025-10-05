@@ -23,12 +23,8 @@ import java.util.concurrent.Future;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.springframework.batch.item.Chunk;
-import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.ItemStreamException;
-import org.springframework.batch.item.ItemStreamWriter;
-import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.infrastructure.item.*;
+import org.springframework.batch.infrastructure.item.ItemStreamWriter;
 import org.springframework.util.Assert;
 
 public class AsyncItemWriter<T> implements ItemStreamWriter<Future<T>> {
@@ -58,9 +54,8 @@ public class AsyncItemWriter<T> implements ItemStreamWriter<Future<T>> {
 	 * In the processing of the {@link java.util.concurrent.Future}s passed, nulls are
 	 * <em>not</em> passed to the delegate since they are considered filtered out by the
 	 * {@link org.springframework.batch.integration.async.AsyncItemProcessor}'s delegated
-	 * {@link org.springframework.batch.item.ItemProcessor}. If the unwrapping of the
-	 * {@link Future} results in an {@link ExecutionException}, that will be unwrapped and
-	 * the cause will be thrown.
+	 * {@link ItemProcessor}. If the unwrapping of the {@link Future} results in an
+	 * {@link ExecutionException}, that will be unwrapped and the cause will be thrown.
 	 * @param items {@link java.util.concurrent.Future}s to be unwrapped and passed to the
 	 * delegate
 	 * @throws Exception The exception returned by the Future if one was thrown

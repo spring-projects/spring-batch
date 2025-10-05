@@ -38,16 +38,16 @@
 		class="org.springframework.batch.integration.retry.RepeatTransactionalPollingIntegrationTests" />
 
 	<bean id="transactionManager"
-		class="org.springframework.batch.support.transaction.ResourcelessTransactionManager" />
+		class="org.springframework.batch.infrastructure.support.transaction.ResourcelessTransactionManager" />
 
 	<tx:advice id="txAdvice">
 		<tx:attributes><tx:method name="*"/></tx:attributes>
 	</tx:advice>
-	<bean id="repeatAdvice" class="org.springframework.batch.repeat.interceptor.RepeatOperationsInterceptor">
+	<bean id="repeatAdvice" class="org.springframework.batch.infrastructure.repeat.interceptor.RepeatOperationsInterceptor">
 		<property name="repeatOperations">
-			<bean class="org.springframework.batch.repeat.support.RepeatTemplate">
+			<bean class="org.springframework.batch.infrastructure.repeat.support.RepeatTemplate">
 				<property name="completionPolicy">
-					<bean class="org.springframework.batch.repeat.policy.SimpleCompletionPolicy">
+					<bean class="org.springframework.batch.infrastructure.repeat.policy.SimpleCompletionPolicy">
 						<property name="chunkSize" value="2" />
 					</bean>
 				</property>

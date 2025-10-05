@@ -46,7 +46,7 @@ public class StepExecutionConverter {
 		stepExecution.setExitStatus(new org.springframework.batch.core.ExitStatus(source.getExitStatus().exitCode(),
 				source.getExitStatus().exitDescription()));
 		stepExecution.setExecutionContext(
-				new org.springframework.batch.item.ExecutionContext(source.getExecutionContext().map()));
+				new org.springframework.batch.infrastructure.item.ExecutionContext(source.getExecutionContext().map()));
 		if (source.isTerminateOnly()) {
 			stepExecution.setTerminateOnly();
 		}
@@ -74,7 +74,7 @@ public class StepExecutionConverter {
 		stepExecution.setLastUpdated(source.getLastUpdated());
 		stepExecution.setExitStatus(
 				new ExitStatus(source.getExitStatus().getExitCode(), source.getExitStatus().getExitDescription()));
-		org.springframework.batch.item.ExecutionContext executionContext = source.getExecutionContext();
+		org.springframework.batch.infrastructure.item.ExecutionContext executionContext = source.getExecutionContext();
 		stepExecution.setExecutionContext(new ExecutionContext(executionContext.toMap(), executionContext.isDirty()));
 		stepExecution.setTerminateOnly(source.isTerminateOnly());
 		return stepExecution;

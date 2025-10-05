@@ -22,13 +22,13 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.springframework.batch.core.listener.ItemWriteListener;
-import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.infrastructure.item.Chunk;
+import org.springframework.batch.infrastructure.item.ItemWriter;
 
 /**
  * Marks a method to be called before a chunk is passed to an {@link ItemWriter}. <br>
  * <br>
- * Expected signature: void beforeWrite({@link org.springframework.batch.item.Chunk}&lt;?
- * extends S&gt; items)
+ * Expected signature: void beforeWrite({@link Chunk}&lt;? extends S&gt; items)
  *
  * @author Lucas Ward
  * @author Mahmoud Ben Hassine

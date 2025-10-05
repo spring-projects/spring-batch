@@ -5,10 +5,10 @@
 
 	<persistence-unit name="foo" transaction-type="RESOURCE_LOCAL">
 
-        <class>org.springframework.batch.item.sample.Foo</class>
+        <class>org.springframework.batch.infrastructure.item.sample.Foo</class>
 		<exclude-unlisted-classes>true</exclude-unlisted-classes>
 		<mapping-file>
-			org/springframework/batch/item/database/Foo.hbm.xml
+			org/springframework/batch/infrastructure/item/database/Foo.hbm.xml
 		</mapping-file>
 	</persistence-unit>
 

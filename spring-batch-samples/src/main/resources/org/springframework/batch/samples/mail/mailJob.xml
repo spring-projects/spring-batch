@@ -16,7 +16,7 @@
 		</step>
 	</job>
 
-	<bean id="itemReader" class="org.springframework.batch.item.database.JdbcCursorItemReader">
+	<bean id="itemReader" class="org.springframework.batch.infrastructure.item.database.JdbcCursorItemReader">
 		<constructor-arg name="sql" value="select ID, NAME, EMAIL from USERS" />
 		<constructor-arg name="rowMapper">
 			<bean class="org.springframework.jdbc.core.BeanPropertyRowMapper">
@@ -26,7 +26,7 @@
 		<constructor-arg name="dataSource" ref="dataSource" />
 	</bean>
 
-	<bean id="itemWriter" class="org.springframework.batch.item.mail.SimpleMailMessageItemWriter">
+	<bean id="itemWriter" class="org.springframework.batch.infrastructure.item.mail.SimpleMailMessageItemWriter">
 		<constructor-arg name="mailSender" ref="mailSender" />
 		<property name="mailErrorHandler" ref="loggingMailErrorHandler" />
 	</bean>

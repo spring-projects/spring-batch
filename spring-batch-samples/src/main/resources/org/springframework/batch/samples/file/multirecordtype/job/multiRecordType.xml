@@ -18,13 +18,13 @@
         <constructor-arg type="java.lang.String" value="#{jobParameters[inputFile]}" />
     </bean>
 
-	<bean id="itemReader" class="org.springframework.batch.item.file.FlatFileItemReader">
+	<bean id="itemReader" class="org.springframework.batch.infrastructure.item.file.FlatFileItemReader">
 		<property name="resource" ref="inputResource" />
 		<constructor-arg name="lineMapper" ref="prefixMatchingLineMapper"/>
 	</bean>
 
 	<bean id="prefixMatchingLineMapper"
-		class="org.springframework.batch.item.file.mapping.PatternMatchingCompositeLineMapper">
+		class="org.springframework.batch.infrastructure.item.file.mapping.PatternMatchingCompositeLineMapper">
 		<constructor-arg name="tokenizers">
 			<map>
 				<entry key="TRAD*" value-ref="tradeLineTokenizer" />
@@ -40,13 +40,13 @@
 	</bean>
 
 	<bean id="tradeLineTokenizer"
-		class="org.springframework.batch.item.file.transform.FixedLengthTokenizer">
+		class="org.springframework.batch.infrastructure.item.file.transform.FixedLengthTokenizer">
 		<property name="names" value="isin,quantity,price,customer" />
 		<property name="columns" value="5-16,17-19,20-25,26-34" />
 	</bean>
 
 	<bean id="customerLineTokenizer"
-		class="org.springframework.batch.item.file.transform.FixedLengthTokenizer">
+		class="org.springframework.batch.infrastructure.item.file.transform.FixedLengthTokenizer">
 		<property name="names" value="id,name,credit" />
 		<property name="columns" value="5-9,10-18,19-26" />
 	</bean>
@@ -58,7 +58,7 @@
 		class="org.springframework.batch.samples.domain.trade.internal.CustomerCreditFieldSetMapper" />
 
 
-	<bean id="itemWriter" class="org.springframework.batch.item.file.FlatFileItemWriter" scope="step">
+	<bean id="itemWriter" class="org.springframework.batch.infrastructure.item.file.FlatFileItemWriter" scope="step">
 		<property name="resource" value="#{jobParameters[outputFile]}" />
 		<constructor-arg name="lineAggregator">
 			<bean class="org.springframework.batch.samples.file.multirecordtype.DelegatingTradeLineAggregator">
@@ -69,9 +69,9 @@
 	</bean>
 
 	<bean id="tradeLineAggregator"
-		class="org.springframework.batch.item.file.transform.FormatterLineAggregator">
+		class="org.springframework.batch.infrastructure.item.file.transform.FormatterLineAggregator">
 		<property name="fieldExtractor">
-			<bean class="org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor">
+			<bean class="org.springframework.batch.infrastructure.item.file.transform.BeanWrapperFieldExtractor">
 				<property name="names" value="isin,quantity,price,customer" />
 			</bean>
 		</property>
@@ -79,9 +79,9 @@
 	</bean>
 
 	<bean id="customerLineAggregator"
-		class="org.springframework.batch.item.file.transform.FormatterLineAggregator">
+		class="org.springframework.batch.infrastructure.item.file.transform.FormatterLineAggregator">
 		<property name="fieldExtractor">
-			<bean class="org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor">
+			<bean class="org.springframework.batch.infrastructure.item.file.transform.BeanWrapperFieldExtractor">
 				<property name="names" value="id,name,credit" />
 			</bean>
 		</property>

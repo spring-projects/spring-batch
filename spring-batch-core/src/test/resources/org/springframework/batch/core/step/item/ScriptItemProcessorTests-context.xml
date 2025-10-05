@@ -23,7 +23,7 @@
 		<beans:property name="jobRepository" ref="jobRepository" />
 	</beans:bean>
 
-	<beans:bean id="reader" class="org.springframework.batch.item.support.ListItemReader">
+	<beans:bean id="reader" class="org.springframework.batch.infrastructure.item.support.ListItemReader">
 		<beans:constructor-arg>
 			<beans:list>
 				<beans:value>blah</beans:value>
@@ -31,7 +31,7 @@
 		</beans:constructor-arg>
 	</beans:bean>
 
-	<beans:bean id="processor" class="org.springframework.batch.item.support.ScriptItemProcessor"
+	<beans:bean id="processor" class="org.springframework.batch.infrastructure.item.support.ScriptItemProcessor"
 				p:script="org/springframework/batch/core/step/item/processor-test-simple.js"/>
 
 	<beans:bean id="writer" class="org.springframework.batch.core.step.item.ScriptItemProcessorTests$TestItemWriter"/>

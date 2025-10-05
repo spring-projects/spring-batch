@@ -18,7 +18,7 @@ package org.springframework.batch.samples.misc.jmx;
 
 import org.jspecify.annotations.Nullable;
 
-import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.infrastructure.item.ItemReader;
 
 /**
  * ItemReader implementation that will continually return a new object. It's generally

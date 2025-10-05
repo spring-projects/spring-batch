@@ -21,8 +21,8 @@ import org.apache.commons.logging.LogFactory;
 
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.listener.StepExecutionListener;
-import org.springframework.batch.item.Chunk;
-import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.infrastructure.item.Chunk;
+import org.springframework.batch.infrastructure.item.ItemWriter;
 
 /**
  * Simple module implementation that will always return true to indicate that processing

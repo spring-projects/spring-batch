@@ -36,7 +36,7 @@ import org.springframework.batch.core.observability.BatchMetrics;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.builder.ChunkOrientedStepBuilder;
-import org.springframework.batch.item.support.ListItemReader;
+import org.springframework.batch.infrastructure.item.support.ListItemReader;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;

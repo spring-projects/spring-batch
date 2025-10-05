@@ -14,7 +14,7 @@
 	<bean class="org.springframework.beans.factory.config.CustomEditorConfigurer">
 		<property name="customEditors">
 			<map>
-				<entry key="double[]" value="org.springframework.batch.support.IntArrayPropertyEditor"/>
+				<entry key="double[]" value="org.springframework.batch.infrastructure.support.IntArrayPropertyEditor"/>
 			</map>
 		</property>
 	</bean>

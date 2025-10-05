@@ -15,7 +15,7 @@
 	<channel id="replies">
 		<queue/>
 	</channel>
-	<beans:bean id="transactionManager" class="org.springframework.batch.support.transaction.ResourcelessTransactionManager" />
+	<beans:bean id="transactionManager" class="org.springframework.batch.infrastructure.support.transaction.ResourcelessTransactionManager" />
 	<tx:annotation-driven />
 	<beans:bean id="chunkRequestHandler" class="org.springframework.batch.integration.chunk.ChunkProcessorChunkRequestHandler">
 		<beans:property name="chunkProcessor">
@@ -24,7 +24,7 @@
 					<beans:bean class="org.springframework.batch.integration.chunk.TestItemWriter" />
 				</beans:property>
 				<beans:property name="itemProcessor">
-					<beans:bean class="org.springframework.batch.item.support.PassThroughItemProcessor" />
+					<beans:bean class="org.springframework.batch.infrastructure.item.support.PassThroughItemProcessor" />
 				</beans:property>
 			</beans:bean>
 		</beans:property>

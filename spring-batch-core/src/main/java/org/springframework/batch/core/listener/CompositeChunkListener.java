@@ -20,7 +20,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.batch.core.scope.context.ChunkContext;
-import org.springframework.batch.item.Chunk;
+import org.springframework.batch.infrastructure.item.Chunk;
 import org.springframework.core.Ordered;
 
 /**

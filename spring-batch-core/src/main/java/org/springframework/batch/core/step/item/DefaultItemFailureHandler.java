@@ -20,7 +20,7 @@ import org.apache.commons.logging.LogFactory;
 import org.jspecify.annotations.NullUnmarked;
 
 import org.springframework.batch.core.listener.ItemListenerSupport;
-import org.springframework.batch.item.Chunk;
+import org.springframework.batch.infrastructure.item.Chunk;
 
 /**
  * Default implementation of the {@link ItemListenerSupport} class that writes all

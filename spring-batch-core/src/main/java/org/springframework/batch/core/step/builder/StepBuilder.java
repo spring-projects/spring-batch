@@ -21,7 +21,7 @@ import org.springframework.batch.core.job.flow.Flow;
 import org.springframework.batch.core.partition.Partitioner;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.tasklet.Tasklet;
-import org.springframework.batch.repeat.CompletionPolicy;
+import org.springframework.batch.infrastructure.repeat.CompletionPolicy;
 import org.springframework.transaction.PlatformTransactionManager;
 
 /**

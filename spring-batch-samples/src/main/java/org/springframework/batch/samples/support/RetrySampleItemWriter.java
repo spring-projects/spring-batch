@@ -16,8 +16,8 @@
 
 package org.springframework.batch.samples.support;
 
-import org.springframework.batch.item.Chunk;
-import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.infrastructure.item.Chunk;
+import org.springframework.batch.infrastructure.item.ItemWriter;
 
 /**
  * Simulates temporary output trouble - requires to retry 3 times to pass successfully.

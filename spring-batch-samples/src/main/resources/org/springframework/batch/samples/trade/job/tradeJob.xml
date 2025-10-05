@@ -30,7 +30,7 @@
 		</step>
 	</job>
 
-	<bean id="validatingProcessor" class="org.springframework.batch.item.validator.ValidatingItemProcessor">
+	<bean id="validatingProcessor" class="org.springframework.batch.infrastructure.item.validator.ValidatingItemProcessor">
 		<constructor-arg ref="tradeValidator" />
 	</bean>
 
@@ -46,7 +46,7 @@
 		<property name="dao" ref="customerReportItemWriter" />
 	</bean>
 
-	<bean id="tradeSqlItemReader" class="org.springframework.batch.item.database.JdbcCursorItemReader">
+	<bean id="tradeSqlItemReader" class="org.springframework.batch.infrastructure.item.database.JdbcCursorItemReader">
 		<constructor-arg name="dataSource" ref="dataSource" />
 		<constructor-arg name="sql" value="SELECT isin, quantity, price, customer, id, version from TRADE" />
 		<constructor-arg name="rowMapper">
@@ -54,7 +54,7 @@
 		</constructor-arg>
 	</bean>
 
-	<bean id="customerSqlItemReader" class="org.springframework.batch.item.database.JdbcCursorItemReader">
+	<bean id="customerSqlItemReader" class="org.springframework.batch.infrastructure.item.database.JdbcCursorItemReader">
 		<constructor-arg name="dataSource" ref="dataSource" />
 		<constructor-arg name="sql" value="SELECT id, name, credit FROM CUSTOMER " />
 		<constructor-arg name="rowMapper">
@@ -78,21 +78,21 @@
 
 	<bean id="customerReportItemWriter" class="org.springframework.batch.samples.domain.trade.internal.FlatFileCustomerCreditDao">
 		<property name="itemWriter">
-			<bean class="org.springframework.batch.item.file.FlatFileItemWriter">
+			<bean class="org.springframework.batch.infrastructure.item.file.FlatFileItemWriter">
 				<property name="resource" value="file:target/test-outputs/CustomerReportStep.TEMP.txt" />
 				<constructor-arg name="lineAggregator">
-					<bean class="org.springframework.batch.item.file.transform.PassThroughLineAggregator" />
+					<bean class="org.springframework.batch.infrastructure.item.file.transform.PassThroughLineAggregator" />
 				</constructor-arg>
 			</bean>
 		</property>
 	</bean>
 
-	<bean id="fileItemReader" class="org.springframework.batch.item.file.FlatFileItemReader" scope="step">
+	<bean id="fileItemReader" class="org.springframework.batch.infrastructure.item.file.FlatFileItemReader" scope="step">
 		<property name="resource" value="classpath:org/springframework/batch/samples/trade/data/ImportTradeDataStep.txt" />
 		<constructor-arg name="lineMapper">
-			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+			<bean class="org.springframework.batch.infrastructure.item.file.mapping.DefaultLineMapper">
 				<property name="lineTokenizer">
-					<bean class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
+					<bean class="org.springframework.batch.infrastructure.item.file.transform.DelimitedLineTokenizer">
 						<property name="names" value="ISIN, Quantity, Price, Customer" />
 					</bean>
 				</property>
@@ -103,7 +103,7 @@
 		</constructor-arg>
 	</bean>
 
-	<bean id="tradeValidator" class="org.springframework.batch.item.validator.SpringValidator">
+	<bean id="tradeValidator" class="org.springframework.batch.infrastructure.item.validator.SpringValidator">
 		<property name="validator">
             <bean class="org.springframework.batch.samples.domain.trade.internal.validator.TradeValidator"/>
 		</property>

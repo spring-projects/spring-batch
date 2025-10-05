@@ -19,11 +19,11 @@ package org.springframework.batch.core.step.item;
 import org.jspecify.annotations.NullUnmarked;
 
 import org.springframework.batch.core.step.StepContribution;
-import org.springframework.batch.item.Chunk;
+import org.springframework.batch.infrastructure.item.Chunk;
 
 /**
- * Interface for providing {@link org.springframework.batch.item.Chunk}s to be processed,
- * used by the {@link ChunkOrientedTasklet}
+ * Interface for providing {@link Chunk}s to be processed, used by the
+ * {@link ChunkOrientedTasklet}
  *
  * @since 2.0
  * @see ChunkOrientedTasklet

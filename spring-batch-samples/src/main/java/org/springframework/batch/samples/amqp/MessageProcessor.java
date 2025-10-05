@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.samples.amqp;
 
-import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.infrastructure.item.ItemProcessor;
 
 import java.util.Date;
 

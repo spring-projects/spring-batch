@@ -16,7 +16,7 @@
 
 package org.springframework.batch.integration.chunk;
 
-import org.springframework.batch.item.ItemWriterException;
+import org.springframework.batch.infrastructure.item.ItemWriterException;
 
 /**
  * Exception indicating that a failure or early completion condition was detected in a

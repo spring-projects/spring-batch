@@ -45,14 +45,14 @@ XML::
 The following XML example uses the `ItemReaderAdapter`:
 +
 .XML Configuration
-[source, xml]
+[source,xml]
 ----
-<bean id="itemReader" class="org.springframework.batch.item.adapter.ItemReaderAdapter">
+<bean id="itemReader" class="org.springframework.batch.infrastructure.item.adapter.ItemReaderAdapter">
     <property name="targetObject" ref="fooService" />
     <property name="targetMethod" value="generateFoo" />
 </bean>
 
-<bean id="fooService" class="org.springframework.batch.item.sample.FooService" />
+<bean id="fooService" class="org.springframework.batch.infrastructure.item.sample.FooService" />
 ----
 
 ====
@@ -96,14 +96,14 @@ XML::
 The following XML example uses the `ItemWriterAdapter`:
 +
 .XML Configuration
-[source, xml]
+[source,xml]
 ----
-<bean id="itemWriter" class="org.springframework.batch.item.adapter.ItemWriterAdapter">
+<bean id="itemWriter" class="org.springframework.batch.infrastructure.item.adapter.ItemWriterAdapter">
     <property name="targetObject" ref="fooService" />
     <property name="targetMethod" value="processFoo" />
 </bean>
 
-<bean id="fooService" class="org.springframework.batch.item.sample.FooService" />
+<bean id="fooService" class="org.springframework.batch.infrastructure.item.sample.FooService" />
 ----
 
 ====

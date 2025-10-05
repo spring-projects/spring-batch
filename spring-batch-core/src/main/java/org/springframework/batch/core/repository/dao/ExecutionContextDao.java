@@ -20,7 +20,7 @@ import java.util.Collection;
 
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.step.StepExecution;
-import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.infrastructure.item.ExecutionContext;
 
 /**
  * DAO interface for persisting and retrieving {@link ExecutionContext}s.

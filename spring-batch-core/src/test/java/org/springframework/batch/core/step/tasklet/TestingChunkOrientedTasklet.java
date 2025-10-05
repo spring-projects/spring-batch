@@ -18,13 +18,13 @@ package org.springframework.batch.core.step.tasklet;
 import org.springframework.batch.core.step.item.ChunkOrientedTasklet;
 import org.springframework.batch.core.step.item.SimpleChunkProcessor;
 import org.springframework.batch.core.step.item.SimpleChunkProvider;
-import org.springframework.batch.item.ItemProcessor;
-import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.support.PassThroughItemProcessor;
-import org.springframework.batch.repeat.RepeatOperations;
-import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
-import org.springframework.batch.repeat.support.RepeatTemplate;
+import org.springframework.batch.infrastructure.item.ItemProcessor;
+import org.springframework.batch.infrastructure.item.ItemReader;
+import org.springframework.batch.infrastructure.item.ItemWriter;
+import org.springframework.batch.infrastructure.item.support.PassThroughItemProcessor;
+import org.springframework.batch.infrastructure.repeat.RepeatOperations;
+import org.springframework.batch.infrastructure.repeat.policy.SimpleCompletionPolicy;
+import org.springframework.batch.infrastructure.repeat.support.RepeatTemplate;
 
 /**
  * Simplest possible implementation of {@link Tasklet} with no skipping or recovering or

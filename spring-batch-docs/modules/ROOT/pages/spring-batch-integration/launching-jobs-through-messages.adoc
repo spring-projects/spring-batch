@@ -235,9 +235,9 @@ XML::
 The following XML example shows the necessary bean configuration:
 +
 .XML Configuration
-[source, xml]
+[source,xml]
 ----
-<bean id="itemReader" class="org.springframework.batch.item.file.FlatFileItemReader"
+<bean id="itemReader" class="org.springframework.batch.infrastructure.item.file.FlatFileItemReader"
     scope="step">
   <property name="resource" value="file://#{jobParameters['input.file.name']}"/>
     ...

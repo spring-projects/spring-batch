@@ -16,7 +16,7 @@
 package org.springframework.batch.core.configuration.annotation;
 
 import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDao;
-import org.springframework.batch.support.DatabaseType;
+import org.springframework.batch.infrastructure.support.DatabaseType;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.transaction.PlatformTransactionManager;

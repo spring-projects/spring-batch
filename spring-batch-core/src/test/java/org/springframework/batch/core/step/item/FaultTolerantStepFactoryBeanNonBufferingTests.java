@@ -36,11 +36,11 @@ import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.step.JobRepositorySupport;
 import org.springframework.batch.core.step.factory.FaultTolerantStepFactoryBean;
-import org.springframework.batch.item.Chunk;
-import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.support.ListItemReader;
-import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
-import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
+import org.springframework.batch.infrastructure.item.Chunk;
+import org.springframework.batch.infrastructure.item.ItemWriter;
+import org.springframework.batch.infrastructure.item.support.ListItemReader;
+import org.springframework.batch.infrastructure.support.transaction.ResourcelessTransactionManager;
+import org.springframework.batch.infrastructure.support.transaction.TransactionAwareProxyFactory;
 import org.springframework.util.StringUtils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

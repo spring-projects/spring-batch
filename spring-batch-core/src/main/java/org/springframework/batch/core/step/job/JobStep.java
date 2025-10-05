@@ -28,7 +28,7 @@ import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.job.UnexpectedJobExecutionException;
 import org.springframework.batch.core.step.AbstractStep;
-import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.util.Assert;
 
 /**

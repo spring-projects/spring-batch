@@ -13,15 +13,15 @@
 		<jdbc:script location="classpath:/org/springframework/batch/core/schema-hsqldb.sql"/>
 	</jdbc:initialize-database>
 
-	<bean id="transactionManager" class="org.springframework.batch.support.transaction.ResourcelessTransactionManager"/>
+	<bean id="transactionManager" class="org.springframework.batch.infrastructure.support.transaction.ResourcelessTransactionManager"/>
 
 	<job id="job" xmlns="http://www.springframework.org/schema/batch">
 		<step id="step"><tasklet ref="reader" method="read"/></step>
 	</job>
 
-	<bean id="reader" class="org.springframework.batch.item.file.FlatFileItemReader" scope="job">
+	<bean id="reader" class="org.springframework.batch.infrastructure.item.file.FlatFileItemReader" scope="job">
 		<constructor-arg name="lineMapper">
-			<bean class="org.springframework.batch.item.file.mapping.PassThroughLineMapper" />
+			<bean class="org.springframework.batch.infrastructure.item.file.mapping.PassThroughLineMapper" />
 		</constructor-arg>
 		<property name="resource" value="#{jobExecutionContext['input.file']}" />
 	</bean>

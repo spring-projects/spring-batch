@@ -19,7 +19,7 @@ package org.springframework.batch.integration.chunk;
 import java.io.Serializable;
 
 import org.springframework.batch.core.step.StepContribution;
-import org.springframework.batch.item.Chunk;
+import org.springframework.batch.infrastructure.item.Chunk;
 
 /**
  * Encapsulation of a chunk of items to be processed remotely as part of a step execution.

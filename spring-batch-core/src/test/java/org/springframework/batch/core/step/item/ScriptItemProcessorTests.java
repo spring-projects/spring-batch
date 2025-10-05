@@ -20,16 +20,16 @@ import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.launch.JobOperator;
-import org.springframework.batch.item.Chunk;
-import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.infrastructure.item.support.ScriptItemProcessor;
+import org.springframework.batch.infrastructure.item.Chunk;
+import org.springframework.batch.infrastructure.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.util.Assert;
 
 /**
  * <p>
- * Test job utilizing a
- * {@link org.springframework.batch.item.support.ScriptItemProcessor}.
+ * Test job utilizing a {@link ScriptItemProcessor}.
  * </p>
  *
  * @author Chris Schaefer

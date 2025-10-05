@@ -25,10 +25,10 @@ import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.batch.item.ItemWriterException;
-import org.springframework.batch.item.WriteFailedException;
-import org.springframework.batch.item.WriterNotOpenException;
-import org.springframework.batch.item.file.FlatFileParseException;
+import org.springframework.batch.infrastructure.item.ItemWriterException;
+import org.springframework.batch.infrastructure.item.WriteFailedException;
+import org.springframework.batch.infrastructure.item.WriterNotOpenException;
+import org.springframework.batch.infrastructure.item.file.FlatFileParseException;
 
 /**
  * @author Lucas Ward

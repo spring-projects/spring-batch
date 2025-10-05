@@ -58,7 +58,7 @@ import org.springframework.batch.core.step.StepLocator;
 import org.springframework.batch.core.step.tasklet.StoppableTasklet;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
-import org.springframework.batch.support.PropertiesConverter;
+import org.springframework.batch.infrastructure.support.PropertiesConverter;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;

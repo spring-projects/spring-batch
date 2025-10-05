@@ -19,7 +19,7 @@
 			<bean id="step1"
 				class="org.springframework.batch.core.step.factory.SimpleStepFactoryBean">
 				<property name="itemReader">
-					<bean class="org.springframework.batch.item.support.ListItemReader">
+					<bean class="org.springframework.batch.infrastructure.item.support.ListItemReader">
 						<constructor-arg value="foo,bar,spam" />
 					</bean>
 				</property>
@@ -31,7 +31,7 @@
 				</property>
 				<property name="transactionManager">
 					<bean
-						class="org.springframework.batch.support.transaction.ResourcelessTransactionManager" />
+						class="org.springframework.batch.infrastructure.support.transaction.ResourcelessTransactionManager" />
 				</property>
 			</bean>
 		</property>

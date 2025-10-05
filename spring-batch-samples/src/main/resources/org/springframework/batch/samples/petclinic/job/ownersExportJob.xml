@@ -14,7 +14,7 @@
         </batch:step>
     </batch:job>
 
-    <bean id="ownersReader" class="org.springframework.batch.item.database.JdbcCursorItemReader">
+    <bean id="ownersReader" class="org.springframework.batch.infrastructure.item.database.JdbcCursorItemReader">
         <constructor-arg name="dataSource" ref="dataSource"/>
         <constructor-arg name="sql" value="select * from owners"/>
         <constructor-arg name="rowMapper">
@@ -24,13 +24,13 @@
         </constructor-arg>
     </bean>
 
-    <bean id="ownersWriter" class="org.springframework.batch.item.file.FlatFileItemWriter">
+    <bean id="ownersWriter" class="org.springframework.batch.infrastructure.item.file.FlatFileItemWriter">
         <property name="resource" value="file:owners.csv" />
         <constructor-arg name="lineAggregator">
-            <bean class="org.springframework.batch.item.file.transform.DelimitedLineAggregator">
+            <bean class="org.springframework.batch.infrastructure.item.file.transform.DelimitedLineAggregator">
                 <property name="delimiter" value=","/>
                 <property name="fieldExtractor">
-                    <bean class="org.springframework.batch.item.file.transform.RecordFieldExtractor">
+                    <bean class="org.springframework.batch.infrastructure.item.file.transform.RecordFieldExtractor">
                         <constructor-arg value="org.springframework.batch.samples.petclinic.Owner"/>
                         <property name="names" value="id,firstname,lastname,address,city,telephone"/>
                     </bean>

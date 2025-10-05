@@ -18,10 +18,10 @@ package org.springframework.batch.core.step.item;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.infrastructure.item.ItemProcessor;
 
 import org.jspecify.annotations.Nullable;
-import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
+import org.springframework.batch.infrastructure.support.transaction.TransactionAwareProxyFactory;
 
 /**
  * @author Dan Garrette

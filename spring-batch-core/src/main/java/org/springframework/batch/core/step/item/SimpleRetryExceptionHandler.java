@@ -19,9 +19,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jspecify.annotations.NullUnmarked;
 
-import org.springframework.batch.repeat.RepeatContext;
-import org.springframework.batch.repeat.exception.ExceptionHandler;
-import org.springframework.batch.repeat.support.RepeatSynchronizationManager;
+import org.springframework.batch.infrastructure.repeat.RepeatContext;
+import org.springframework.batch.infrastructure.repeat.exception.ExceptionHandler;
+import org.springframework.batch.infrastructure.repeat.support.RepeatSynchronizationManager;
 import org.springframework.classify.BinaryExceptionClassifier;
 import org.springframework.retry.RetryCallback;
 import org.springframework.retry.RetryContext;
@@ -77,8 +77,7 @@ public class SimpleRetryExceptionHandler implements RetryListener, ExceptionHand
 	 * retry is exhausted or the exception is on the fatal list, then handle using the
 	 * delegate.
 	 *
-	 * @see ExceptionHandler#handleException(org.springframework.batch.repeat.RepeatContext,
-	 * java.lang.Throwable)
+	 * @see ExceptionHandler#handleException(RepeatContext, java.lang.Throwable)
 	 */
 	@Override
 	public void handleException(RepeatContext context, Throwable throwable) throws Throwable {

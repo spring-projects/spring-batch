@@ -222,7 +222,7 @@
 							]]></xsd:documentation>
 					<xsd:appinfo>
 						<tool:annotation kind="ref">
-							<tool:expected-type type="org.springframework.batch.item.ItemProcessor"/>
+							<tool:expected-type type="org.springframework.batch.infrastructure.item.ItemProcessor"/>
 						</tool:annotation>
 					</xsd:appinfo>
 				</xsd:annotation>
@@ -234,7 +234,7 @@
 							]]></xsd:documentation>
 					<xsd:appinfo>
 						<tool:annotation kind="ref">
-							<tool:expected-type type="org.springframework.batch.item.ItemWriter"/>
+							<tool:expected-type type="org.springframework.batch.infrastructure.item.ItemWriter"/>
 						</tool:annotation>
 					</xsd:appinfo>
 				</xsd:annotation>
