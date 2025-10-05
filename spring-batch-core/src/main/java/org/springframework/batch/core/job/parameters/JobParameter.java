@@ -63,42 +63,6 @@ public record JobParameter<T>(String name, T value, Class<T> type, boolean ident
 		this(name, value, type, true);
 	}
 
-	/**
-	 * Get the name of the parameter.
-	 * @return the name
-	 * @since 6.0
-	 */
-	@Override
-	public String name() {
-		return name;
-	}
-
-	/**
-	 * @return The identifying flag. It is set to {@code true} if the job parameter is
-	 * identifying.
-	 */
-	@Override
-	public boolean identifying() {
-		return identifying;
-	}
-
-	/**
-	 * @return the value contained within this {@code JobParameter}.
-	 */
-	@Override
-	public T value() {
-		return value;
-	}
-
-	/**
-	 * Return the type of the parameter.
-	 * @return the type of the parameter
-	 */
-	@Override
-	public Class<T> type() {
-		return type;
-	}
-
 	@Override
 	public boolean equals(Object o) {
 		if (!(o instanceof JobParameter<?> that))
