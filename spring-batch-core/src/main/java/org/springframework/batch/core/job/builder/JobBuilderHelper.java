@@ -44,6 +44,7 @@ import org.springframework.batch.support.ReflectionUtils;
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  * @author Taeik Lim
+ * @author Minkuk Jo
  * @since 2.2
  */
 @NullUnmarked // FIXME to remove once default constructors are removed
@@ -164,6 +165,19 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 		return result;
 	}
 
+	/**
+	 * Add a description to the job.
+	 * @param description the job description
+	 * @return this to enable fluent chaining
+	 * @since 6.0
+	 */
+	public B description(String description) {
+		properties.description = description;
+		@SuppressWarnings("unchecked")
+		B result = (B) this;
+		return result;
+	}
+
 	protected String getName() {
 		return properties.name;
 	}
@@ -197,6 +211,11 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 			job.setRestartable(restartable);
 		}
 
+		String description = properties.getDescription();
+		if (description != null) {
+			job.setDescription(description);
+		}
+
 		List<JobExecutionListener> listeners = properties.getJobExecutionListeners();
 		if (!listeners.isEmpty()) {
 			job.setJobExecutionListeners(listeners.toArray(new JobExecutionListener[0]));
@@ -219,6 +238,8 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 
 		private JobParametersValidator jobParametersValidator;
 
+		private String description;
+
 		public CommonJobProperties() {
 		}
 
@@ -230,6 +251,7 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 			this.jobExecutionListeners = new LinkedHashSet<>(properties.jobExecutionListeners);
 			this.jobParametersIncrementer = properties.jobParametersIncrementer;
 			this.jobParametersValidator = properties.jobParametersValidator;
+			this.description = properties.description;
 		}
 
 		public JobParametersIncrementer getJobParametersIncrementer() {
@@ -290,6 +312,14 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 
 		public void setRestartable(boolean restartable) {
 			this.restartable = restartable;
+		}
+
+		public String getDescription() {
+			return description;
+		}
+
+		public void setDescription(String description) {
+			this.description = description;
 		}
 
 	}
