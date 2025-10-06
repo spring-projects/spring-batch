@@ -30,6 +30,7 @@ import static org.springframework.batch.support.DatabaseType.POSTGRES;
 import static org.springframework.batch.support.DatabaseType.SQLITE;
 import static org.springframework.batch.support.DatabaseType.SQLSERVER;
 import static org.springframework.batch.support.DatabaseType.SYBASE;
+import static org.springframework.batch.support.DatabaseType.KINGBASE;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -86,6 +87,7 @@ public class SqlPagingQueryProviderFactoryBean implements FactoryBean<PagingQuer
 		providers.put(MARIADB, new MariaDBPagingQueryProvider());
 		providers.put(ORACLE, new OraclePagingQueryProvider());
 		providers.put(POSTGRES, new PostgresPagingQueryProvider());
+		providers.put(KINGBASE, new KingbasePagingQueryProvider());
 		providers.put(SQLITE, new SqlitePagingQueryProvider());
 		providers.put(SQLSERVER, new SqlServerPagingQueryProvider());
 		providers.put(SYBASE, new SybasePagingQueryProvider());
