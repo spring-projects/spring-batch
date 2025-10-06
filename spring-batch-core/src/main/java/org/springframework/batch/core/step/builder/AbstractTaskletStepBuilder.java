@@ -55,7 +55,8 @@ import org.springframework.transaction.interceptor.TransactionAttribute;
  * @since 2.2
  * @param <B> the type of builder represented
  */
-@NullUnmarked // FIXME to remove once default constructors are removed
+// FIXME remove once default constructors (required by the XML namespace) are removed
+@NullUnmarked
 public abstract class AbstractTaskletStepBuilder<B extends AbstractTaskletStepBuilder<B>> extends StepBuilderHelper<B> {
 
 	protected Set<ChunkListener> chunkListeners = new LinkedHashSet<>();

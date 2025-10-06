@@ -40,7 +40,8 @@ import org.springframework.batch.core.step.StepLocator;
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
  */
-@NullUnmarked // FIXME to remove once default constructors are removed
+@NullUnmarked // FIXME to remove once default constructors (required by the batch XML
+				// namespace) are removed
 public class SimpleJob extends AbstractJob {
 
 	private final List<Step> steps = new ArrayList<>();

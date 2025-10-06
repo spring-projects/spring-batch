@@ -42,7 +42,8 @@ import org.springframework.util.Assert;
  * @author Mahmoud Ben Hassine
  *
  */
-@NullUnmarked // FIXME to remove once default constructors are removed
+// FIXME remove once default constructors (required by the XML namespace) are removed
+@NullUnmarked
 public class JobStep extends AbstractStep {
 
 	/**

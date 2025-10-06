@@ -47,7 +47,8 @@ import org.springframework.util.Assert;
  * @author Mahmoud Ben Hassine
  * @since 2.0
  */
-@NullUnmarked
+@NullUnmarked // FIXME to remove once default constructors (required by the batch XML
+				// namespace) are removed
 public class TaskExecutorPartitionHandler extends AbstractPartitionHandler implements StepHolder, InitializingBean {
 
 	private TaskExecutor taskExecutor = new SyncTaskExecutor();

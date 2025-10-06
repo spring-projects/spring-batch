@@ -60,7 +60,8 @@ import org.springframework.util.ClassUtils;
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  */
-@NullUnmarked // FIXME to remove once default constructors are removed
+@NullUnmarked // FIXME to remove once default constructors (required by the batch XML
+				// namespace) are removed
 public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, InitializingBean {
 
 	protected static final Log logger = LogFactory.getLog(AbstractJob.class);

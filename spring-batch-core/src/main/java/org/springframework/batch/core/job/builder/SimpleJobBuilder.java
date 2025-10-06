@@ -33,7 +33,8 @@ import org.springframework.util.Assert;
  * @since 2.2
  *
  */
-@NullUnmarked // FIXME to remove once default constructors are removed
+@NullUnmarked // FIXME to remove once default constructors (required by the batch XML
+				// namespace) are removed
 public class SimpleJobBuilder extends JobBuilderHelper<SimpleJobBuilder> {
 
 	private final List<Step> steps = new ArrayList<>();

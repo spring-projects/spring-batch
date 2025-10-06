@@ -40,7 +40,8 @@ import org.jspecify.annotations.NullUnmarked;
  * @author Mahmoud Ben Hassine
  * @since 2.0
  */
-@NullUnmarked // FIXME to remove once default constructor in AbstractStep is removed
+@NullUnmarked // FIXME to remove once default constructors (required by the batch XML
+				// namespace) are removed
 public class PartitionStep extends AbstractStep {
 
 	private StepExecutionSplitter stepExecutionSplitter;

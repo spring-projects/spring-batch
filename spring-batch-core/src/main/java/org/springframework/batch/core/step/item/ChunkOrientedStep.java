@@ -22,7 +22,7 @@ import java.util.concurrent.Future;
 import io.micrometer.observation.Observation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jspecify.annotations.NullUnmarked;
+import org.jspecify.annotations.Nullable;
 
 import org.springframework.batch.core.job.JobInterruptedException;
 import org.springframework.batch.core.listener.ChunkListener;
@@ -86,7 +86,6 @@ import static org.springframework.batch.core.observability.BatchMetrics.METRICS_
  * @author Mahmoud Ben Hassine
  * @since 6.0
  */
-@NullUnmarked
 public class ChunkOrientedStep<I, O> extends AbstractStep {
 
 	private static final Log logger = LogFactory.getLog(ChunkOrientedStep.class.getName());
@@ -117,11 +116,12 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 	/*
 	 * Transaction related parameters
 	 */
-	private PlatformTransactionManager transactionManager;
+	private @Nullable PlatformTransactionManager transactionManager;
 
+	@SuppressWarnings("NullAway.Init")
 	private TransactionTemplate transactionTemplate;
 
-	private TransactionAttribute transactionAttribute;
+	private @Nullable TransactionAttribute transactionAttribute;
 
 	/*
 	 * Chunk related parameters
@@ -139,7 +139,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 
 	private RetryPolicy retryPolicy = throwable -> false;
 
-	private RetryTemplate retryTemplate;
+	private final RetryTemplate retryTemplate = new RetryTemplate();
 
 	private final CompositeRetryListener compositeRetryListener = new CompositeRetryListener();
 
@@ -150,6 +150,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 	/*
 	 * Concurrency parameters
 	 */
+	@SuppressWarnings("NullAway.Init")
 	private AsyncTaskExecutor taskExecutor;
 
 	/**
@@ -337,7 +338,6 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 		}
 		this.transactionTemplate = new TransactionTemplate(this.transactionManager, this.transactionAttribute);
 		if (this.faultTolerant) {
-			this.retryTemplate = new RetryTemplate();
 			this.retryTemplate.setRetryPolicy(this.retryPolicy);
 			this.retryTemplate.setRetryListener(this.compositeRetryListener);
 		}
@@ -484,7 +484,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 		return chunk;
 	}
 
-	private I readItem(StepContribution contribution) throws Exception {
+	private @Nullable I readItem(StepContribution contribution) throws Exception {
 		ItemReadEvent itemReadEvent = new ItemReadEvent(contribution.getStepExecution().getStepName(),
 				contribution.getStepExecution().getId());
 		String fullyQualifiedMetricName = BatchMetrics.METRICS_PREFIX + "item.read";
@@ -528,7 +528,8 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 		return item;
 	}
 
-	private I doRead() throws Exception {
+	@SuppressWarnings("NullAway")
+	private @Nullable I doRead() throws Exception {
 		if (this.faultTolerant) {
 			Retryable<I> retryableRead = new Retryable<>() {
 				@Override
@@ -567,7 +568,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 		return processedChunk;
 	}
 
-	private O processItem(I item, StepContribution contribution) throws Exception {
+	private @Nullable O processItem(I item, StepContribution contribution) throws Exception {
 		ItemProcessEvent itemProcessEvent = new ItemProcessEvent(contribution.getStepExecution().getStepName(),
 				contribution.getStepExecution().getId());
 		String fullyQualifiedMetricName = METRICS_PREFIX + "item.process";
@@ -608,7 +609,8 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 		return processedItem;
 	}
 
-	private O doProcess(I item) throws Exception {
+	@SuppressWarnings("NullAway")
+	private @Nullable O doProcess(I item) throws Exception {
 		if (this.faultTolerant) {
 			Retryable<O> retryableProcess = new Retryable<>() {
 				@Override

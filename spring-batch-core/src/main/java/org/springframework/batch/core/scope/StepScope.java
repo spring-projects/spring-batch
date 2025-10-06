@@ -17,7 +17,7 @@ package org.springframework.batch.core.scope;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jspecify.annotations.NullUnmarked;
+import org.jspecify.annotations.Nullable;
 
 import org.springframework.batch.core.scope.context.StepContext;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
@@ -64,7 +64,6 @@ import org.springframework.beans.factory.config.Scope;
  * @author Mahmoud Ben Hassine
  * @since 2.0
  */
-@NullUnmarked
 public class StepScope extends BatchScopeSupport {
 
 	private static final String TARGET_NAME_PREFIX = "scopedTarget.";
@@ -79,13 +78,13 @@ public class StepScope extends BatchScopeSupport {
 	public static final String ID_KEY = "STEP_IDENTIFIER";
 
 	public StepScope() {
-		super();
-		setName("step");
+		super("step");
 	}
 
 	/**
 	 * This will be used to resolve expressions in step-scoped beans.
 	 */
+	@Nullable
 	@Override
 	public Object resolveContextualObject(String key) {
 		StepContext context = getContext();
@@ -147,6 +146,7 @@ public class StepScope extends BatchScopeSupport {
 	/**
 	 * @see Scope#remove(String)
 	 */
+	@Nullable
 	@Override
 	public Object remove(String name) {
 		StepContext context = getContext();

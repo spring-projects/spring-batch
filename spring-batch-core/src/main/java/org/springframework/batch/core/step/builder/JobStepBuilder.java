@@ -33,7 +33,8 @@ import org.springframework.batch.core.step.job.JobStep;
  * @author Mahmoud Ben Hassine
  * @since 2.2
  */
-@NullUnmarked // FIXME to remove once default constructors are removed
+// FIXME remove once default constructors (required by the XML namespace) are removed
+@NullUnmarked
 public class JobStepBuilder extends StepBuilderHelper<JobStepBuilder> {
 
 	private Job job;

@@ -17,7 +17,7 @@ package org.springframework.batch.core.scope;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jspecify.annotations.NullUnmarked;
+import org.jspecify.annotations.Nullable;
 
 import org.springframework.batch.core.scope.context.JobContext;
 import org.springframework.batch.core.scope.context.JobSynchronizationManager;
@@ -57,7 +57,6 @@ import org.springframework.beans.factory.config.Scope;
  * @author Mahmoud Ben Hassine
  * @since 3.0
  */
-@NullUnmarked
 public class JobScope extends BatchScopeSupport {
 
 	private static final String TARGET_NAME_PREFIX = "jobScopedTarget.";
@@ -72,13 +71,13 @@ public class JobScope extends BatchScopeSupport {
 	public static final String ID_KEY = "JOB_IDENTIFIER";
 
 	public JobScope() {
-		super();
-		setName("job");
+		super("job");
 	}
 
 	/**
 	 * This will be used to resolve expressions in job-scoped beans.
 	 */
+	@Nullable
 	@Override
 	public Object resolveContextualObject(String key) {
 		JobContext context = getContext();
@@ -140,6 +139,7 @@ public class JobScope extends BatchScopeSupport {
 	/**
 	 * @see Scope#remove(String)
 	 */
+	@Nullable
 	@Override
 	public Object remove(String name) {
 		JobContext context = getContext();

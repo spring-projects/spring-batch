@@ -22,7 +22,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import io.micrometer.observation.ObservationRegistry;
-import org.jspecify.annotations.NullUnmarked;
+import org.jspecify.annotations.Nullable;
 
 import org.springframework.batch.core.annotation.AfterChunk;
 import org.springframework.batch.core.annotation.AfterProcess;
@@ -71,16 +71,15 @@ import org.springframework.util.Assert;
  * @author Mahmoud Ben Hassine
  * @since 6.0
  */
-@NullUnmarked
 public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrientedStepBuilder<I, O>> {
 
 	private final int chunkSize;
 
-	private ItemReader<I> reader;
+	private @Nullable ItemReader<I> reader;
 
-	private ItemProcessor<I, O> processor;
+	private @Nullable ItemProcessor<I, O> processor;
 
-	private ItemWriter<O> writer;
+	private @Nullable ItemWriter<O> writer;
 
 	private PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
 
@@ -94,7 +93,7 @@ public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrien
 
 	private boolean faultTolerant;
 
-	private RetryPolicy retryPolicy;
+	private @Nullable RetryPolicy retryPolicy;
 
 	private final Set<RetryListener> retryListeners = new LinkedHashSet<>();
 
@@ -102,7 +101,7 @@ public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrien
 
 	private long retryLimit = -1;
 
-	private SkipPolicy skipPolicy;
+	private @Nullable SkipPolicy skipPolicy;
 
 	private final Set<SkipListener<I, O>> skipListeners = new LinkedHashSet<>();
 
@@ -110,9 +109,9 @@ public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrien
 
 	private long skipLimit = -1;
 
-	private AsyncTaskExecutor asyncTaskExecutor;
+	private @Nullable AsyncTaskExecutor asyncTaskExecutor;
 
-	private ObservationRegistry observationRegistry;
+	private @Nullable ObservationRegistry observationRegistry;
 
 	ChunkOrientedStepBuilder(StepBuilderHelper<?> parent, int chunkSize) {
 		super(parent);
@@ -379,6 +378,8 @@ public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrien
 
 	@SuppressWarnings("unchecked")
 	public ChunkOrientedStep<I, O> build() {
+		Assert.notNull(this.reader, "Item reader must not be null");
+		Assert.notNull(this.writer, "Item writer must not be null");
 		ChunkOrientedStep<I, O> chunkOrientedStep = new ChunkOrientedStep<>(this.getName(), this.chunkSize, this.reader,
 				this.writer, this.getJobRepository());
 		if (this.processor != null) {

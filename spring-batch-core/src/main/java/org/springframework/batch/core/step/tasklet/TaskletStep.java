@@ -75,7 +75,8 @@ import java.util.concurrent.Semaphore;
  * @author Will Schipp
  * @author Mahmoud Ben Hassine
  */
-@NullUnmarked // FIXME to remove once default constructors are removed
+// FIXME remove once default constructors (required by the XML namespace) are removed
+@NullUnmarked
 public class TaskletStep extends AbstractStep {
 
 	private static final Log logger = LogFactory.getLog(TaskletStep.class);

@@ -63,7 +63,8 @@ import org.springframework.util.StringUtils;
  * @author Injae Kim
  * @author Hyunsang Han
  */
-@NullUnmarked // FIXME to remove once default constructors are removed
+// FIXME remove once default constructors (required by the XML namespace) are removed
+@NullUnmarked
 public class SystemCommandTasklet implements StepExecutionListener, StoppableTasklet, InitializingBean {
 
 	protected static final Log logger = LogFactory.getLog(SystemCommandTasklet.class);

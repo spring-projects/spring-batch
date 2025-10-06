@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.core.scope;
 
-import org.jspecify.annotations.NullUnmarked;
+import org.jspecify.annotations.Nullable;
 
 import org.springframework.aop.scope.ScopedProxyUtils;
 import org.springframework.batch.core.scope.context.StepContext;
@@ -38,7 +38,6 @@ import org.springframework.util.Assert;
  * @author Mahmoud Ben Hassine
  * @since 3.0
  */
-@NullUnmarked
 public abstract class BatchScopeSupport implements Scope, BeanFactoryPostProcessor, Ordered {
 
 	private boolean autoProxy = true;
@@ -48,6 +47,10 @@ public abstract class BatchScopeSupport implements Scope, BeanFactoryPostProcess
 	private String name;
 
 	private int order = Ordered.LOWEST_PRECEDENCE;
+
+	public BatchScopeSupport(String name) {
+		this.name = name;
+	}
 
 	/**
 	 * @param order the order value to set priority of callback execution for the
@@ -183,8 +186,9 @@ public abstract class BatchScopeSupport implements Scope, BeanFactoryPostProcess
 			this.scoped = scoped;
 		}
 
+		@Nullable
 		@Override
-		protected Object resolveValue(Object value) {
+		protected Object resolveValue(@Nullable Object value) {
 
 			BeanDefinition definition = null;
 			String beanName = null;
@@ -197,7 +201,7 @@ public abstract class BatchScopeSupport implements Scope, BeanFactoryPostProcess
 				beanName = holder.getBeanName();
 			}
 
-			if (definition != null) {
+			if (definition != null && beanName != null) {
 				boolean nestedScoped = scope.equals(definition.getScope());
 				boolean scopeChangeRequiresProxy = !scoped && nestedScoped;
 				if (scopeChangeRequiresProxy) {

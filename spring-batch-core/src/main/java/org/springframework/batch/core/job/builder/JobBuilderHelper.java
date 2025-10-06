@@ -46,7 +46,8 @@ import org.springframework.batch.infrastructure.support.ReflectionUtils;
  * @author Taeik Lim
  * @since 2.2
  */
-@NullUnmarked // FIXME to remove once default constructors are removed
+@NullUnmarked // FIXME to remove once default constructors (required by the batch XML
+				// namespace) are removed
 public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 
 	protected final Log logger = LogFactory.getLog(getClass());

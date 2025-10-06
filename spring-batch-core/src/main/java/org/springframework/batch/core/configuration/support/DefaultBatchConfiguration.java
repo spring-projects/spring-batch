@@ -16,7 +16,6 @@
 package org.springframework.batch.core.configuration.support;
 
 import io.micrometer.observation.ObservationRegistry;
-import org.jspecify.annotations.NullUnmarked;
 
 import org.springframework.batch.core.configuration.DuplicateJobException;
 import org.springframework.batch.core.configuration.annotation.BatchObservabilityBeanPostProcessor;
@@ -79,9 +78,9 @@ import org.springframework.transaction.PlatformTransactionManager;
  */
 @Configuration(proxyBeanMethods = false)
 @Import({ ScopeConfiguration.class, BatchObservabilityBeanPostProcessor.class })
-@NullUnmarked
 public class DefaultBatchConfiguration implements ApplicationContextAware {
 
+	@SuppressWarnings("NullAway.Init")
 	protected ApplicationContext applicationContext;
 
 	@Override
