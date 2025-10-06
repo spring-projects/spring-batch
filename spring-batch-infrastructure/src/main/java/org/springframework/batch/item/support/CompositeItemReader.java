@@ -31,6 +31,7 @@ import org.springframework.batch.item.ItemStreamReader;
  *
  * @author Mahmoud Ben Hassine
  * @author Elimelec Burghelea
+ * @author Andrey Litvitski
  * @param <T> type of objects to read
  * @since 5.2
  */
@@ -38,7 +39,7 @@ public class CompositeItemReader<T> implements ItemStreamReader<T> {
 
 	private final List<ItemStreamReader<? extends T>> delegates;
 
-	private final Iterator<ItemStreamReader<? extends T>> delegatesIterator;
+	private Iterator<ItemStreamReader<? extends T>> delegatesIterator;
 
 	private @Nullable ItemStreamReader<? extends T> currentDelegate;
 
@@ -48,8 +49,7 @@ public class CompositeItemReader<T> implements ItemStreamReader<T> {
 	 */
 	public CompositeItemReader(List<ItemStreamReader<? extends T>> delegates) {
 		this.delegates = delegates;
-		this.delegatesIterator = this.delegates.iterator();
-		this.currentDelegate = this.delegatesIterator.hasNext() ? this.delegatesIterator.next() : null;
+		initIteratorAndCurrentDelegate();
 	}
 
 	// TODO: check if we need to open/close delegates on the fly in read() to avoid
@@ -59,6 +59,7 @@ public class CompositeItemReader<T> implements ItemStreamReader<T> {
 		for (ItemStreamReader<? extends T> delegate : delegates) {
 			delegate.open(executionContext);
 		}
+		initIteratorAndCurrentDelegate();
 	}
 
 	@Override
@@ -106,6 +107,11 @@ public class CompositeItemReader<T> implements ItemStreamReader<T> {
 			exceptions.forEach(holder::addSuppressed);
 			throw holder;
 		}
+	}
+
+	private void initIteratorAndCurrentDelegate() {
+		this.delegatesIterator = this.delegates.iterator();
+		this.currentDelegate = this.delegatesIterator.hasNext() ? this.delegatesIterator.next() : null;
 	}
 
 }
