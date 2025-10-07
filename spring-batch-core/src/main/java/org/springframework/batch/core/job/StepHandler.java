@@ -18,7 +18,7 @@ package org.springframework.batch.core.job;
 
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
-import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.batch.core.launch.JobRestartException;
 
 /**
  * Strategy interface for handling a {@link Step} on behalf of a {@link Job}.

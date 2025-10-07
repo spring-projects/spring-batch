@@ -47,8 +47,7 @@ The following XML example shows the annotations in use:
 [source, java]
 ----
 @SpringBatchTest
-@SpringJUnitConfig(locations = { "/simple-job-launcher-context.xml",
-                                    "/jobs/skipSampleJob.xml" })
+@SpringJUnitConfig(locations = { "/skip-sample-configuration.xml" })
 public class SkipSampleFunctionalTests { ... }
 ----
 
@@ -124,8 +123,7 @@ The following listing shows an example with JUnit 5 in XML configuration style:
 [source, java]
 ----
 @SpringBatchTest
-@SpringJUnitConfig(locations = { "/simple-job-launcher-context.xml",
-                                    "/jobs/skipSampleJob.xml" })
+@SpringJUnitConfig(locations = { "/skip-sample-configuration.xml" })
 public class SkipSampleFunctionalTests {
 
     @Autowired

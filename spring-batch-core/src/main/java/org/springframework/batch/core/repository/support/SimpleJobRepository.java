@@ -26,15 +26,12 @@ import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.repository.explore.support.SimpleJobExplorer;
-import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
-import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.core.repository.dao.ExecutionContextDao;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.dao.JobInstanceDao;
 import org.springframework.batch.core.repository.dao.StepExecutionDao;
-import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
@@ -96,14 +93,10 @@ public class SimpleJobRepository extends SimpleJobExplorer implements JobReposit
 	 * @param jobParameters the runtime parameters for the job
 	 * @param executionContext the execution context to associate with the job execution
 	 * @return the new job execution
-	 * @throws JobExecutionAlreadyRunningException
-	 * @throws JobRestartException
-	 * @throws JobInstanceAlreadyCompleteException
 	 * @since 6.0
 	 */
 	public JobExecution createJobExecution(JobInstance jobInstance, JobParameters jobParameters,
-			ExecutionContext executionContext)
-			throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
+			ExecutionContext executionContext) {
 
 		JobExecution jobExecution = jobExecutionDao.createJobExecution(jobInstance, jobParameters);
 		jobExecution.setExecutionContext(executionContext);

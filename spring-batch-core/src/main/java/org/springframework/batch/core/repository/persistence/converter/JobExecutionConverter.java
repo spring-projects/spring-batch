@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 the original author or authors.
+ * Copyright 2024-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  */
 package org.springframework.batch.core.repository.persistence.converter;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
@@ -37,11 +37,11 @@ public class JobExecutionConverter {
 
 	public org.springframework.batch.core.job.JobExecution toJobExecution(JobExecution source,
 			JobInstance jobInstance) {
-		Map<String, org.springframework.batch.core.job.parameters.JobParameter<?>> parameterMap = new HashMap<>();
+		Set<org.springframework.batch.core.job.parameters.JobParameter<?>> parameters = new HashSet<>();
 		source.getJobParameters()
-			.forEach((key, value) -> parameterMap.put(key, this.jobParameterConverter.toJobParameter(value)));
+			.forEach(parameter -> parameters.add(this.jobParameterConverter.toJobParameter(parameter)));
 		org.springframework.batch.core.job.JobExecution jobExecution = new org.springframework.batch.core.job.JobExecution(
-				source.getJobExecutionId(), jobInstance, new JobParameters(parameterMap));
+				source.getJobExecutionId(), jobInstance, new JobParameters(parameters));
 		jobExecution.addStepExecutions(source.getStepExecutions()
 			.stream()
 			.map(stepExecution -> this.stepExecutionConverter.toStepExecution(stepExecution, jobExecution))
@@ -54,7 +54,7 @@ public class JobExecutionConverter {
 		jobExecution.setExitStatus(new org.springframework.batch.core.ExitStatus(source.getExitStatus().exitCode(),
 				source.getExitStatus().exitDescription()));
 		jobExecution.setExecutionContext(
-				new org.springframework.batch.item.ExecutionContext(source.getExecutionContext().map()));
+				new org.springframework.batch.infrastructure.item.ExecutionContext(source.getExecutionContext().map()));
 		return jobExecution;
 	}
 
@@ -62,11 +62,11 @@ public class JobExecutionConverter {
 		JobExecution jobExecution = new JobExecution();
 		jobExecution.setJobExecutionId(source.getId());
 		jobExecution.setJobInstanceId(source.getJobInstance().getInstanceId());
-		Map<String, JobParameter<?>> parameterMap = new HashMap<>();
+		Set<JobParameter<?>> parameters = new HashSet<>();
 		source.getJobParameters()
-			.getParameters()
-			.forEach((key, value) -> parameterMap.put(key, this.jobParameterConverter.fromJobParameter(value)));
-		jobExecution.setJobParameters(parameterMap);
+			.parameters()
+			.forEach(parameter -> parameters.add(this.jobParameterConverter.fromJobParameter(parameter)));
+		jobExecution.setJobParameters(parameters);
 		jobExecution.setStepExecutions(
 				source.getStepExecutions().stream().map(this.stepExecutionConverter::fromStepExecution).toList());
 		jobExecution.setStatus(source.getStatus());
@@ -76,7 +76,7 @@ public class JobExecutionConverter {
 		jobExecution.setLastUpdated(source.getLastUpdated());
 		jobExecution.setExitStatus(
 				new ExitStatus(source.getExitStatus().getExitCode(), source.getExitStatus().getExitDescription()));
-		org.springframework.batch.item.ExecutionContext executionContext = source.getExecutionContext();
+		org.springframework.batch.infrastructure.item.ExecutionContext executionContext = source.getExecutionContext();
 		jobExecution.setExecutionContext(new ExecutionContext(executionContext.toMap(), executionContext.isDirty()));
 		return jobExecution;
 	}

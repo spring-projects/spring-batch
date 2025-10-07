@@ -16,8 +16,8 @@
 
 package org.springframework.batch.samples.file.patternmatching.internal.mapper;
 
-import org.springframework.batch.item.file.mapping.FieldSetMapper;
-import org.springframework.batch.item.file.transform.FieldSet;
+import org.springframework.batch.infrastructure.item.file.mapping.FieldSetMapper;
+import org.springframework.batch.infrastructure.item.file.transform.FieldSet;
 import org.springframework.batch.samples.file.patternmatching.LineItem;
 
 public class OrderItemFieldSetMapper implements FieldSetMapper<LineItem> {

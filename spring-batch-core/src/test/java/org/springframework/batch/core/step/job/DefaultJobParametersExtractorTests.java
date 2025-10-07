@@ -69,7 +69,7 @@ class DefaultJobParametersExtractorTests {
 		stepExecution.getExecutionContext().put("foo", "11,java.lang.Long");
 		extractor.setKeys(new String[] { "foo", "bar" });
 		JobParameters jobParameters = extractor.getJobParameters(null, stepExecution);
-		assertEquals(11L, jobParameters.getParameter("foo").getValue());
+		assertEquals(11L, jobParameters.getParameter("foo").value());
 	}
 
 	@Test
@@ -77,7 +77,7 @@ class DefaultJobParametersExtractorTests {
 		stepExecution.getExecutionContext().put("foo", "11.1,java.lang.Double");
 		extractor.setKeys(new String[] { "foo" });
 		JobParameters jobParameters = extractor.getJobParameters(null, stepExecution);
-		assertEquals(11.1, jobParameters.getParameter("foo").getValue());
+		assertEquals(11.1, jobParameters.getParameter("foo").value());
 	}
 
 	@Test
@@ -91,8 +91,8 @@ class DefaultJobParametersExtractorTests {
 		extractor.setKeys(new String[] { "foo" });
 		JobParameters jobParameters = extractor.getJobParameters(null, stepExecution);
 
-		assertNotNull(jobParameters.getParameter("parentParam").getValue());
-		assertNotNull(jobParameters.getParameter("foo").getValue());
+		assertNotNull(jobParameters.getParameter("parentParam").value());
+		assertNotNull(jobParameters.getParameter("foo").value());
 	}
 
 	@Test
@@ -110,7 +110,7 @@ class DefaultJobParametersExtractorTests {
 		JobParameters jobParameters = extractor.getJobParameters(null, stepExecution);
 
 		assertNull(jobParameters.getParameter("parentParam"));
-		assertNotNull(jobParameters.getParameter("foo").getValue());
+		assertNotNull(jobParameters.getParameter("foo").value());
 	}
 
 	@Test
@@ -129,7 +129,7 @@ class DefaultJobParametersExtractorTests {
 		JobParameters jobParameters = extractor.getJobParameters(null, stepExecution);
 
 		assertThat(jobParameters.getParameter("parentParam")).isNotNull()
-			.extracting(JobParameter::getValue)
+			.extracting(JobParameter::value)
 			.isEqualTo("val");
 		assertEquals(11.1, jobParameters.getDouble("foo"));
 	}

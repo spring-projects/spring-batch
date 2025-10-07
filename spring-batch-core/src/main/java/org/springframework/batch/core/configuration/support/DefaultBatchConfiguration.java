@@ -16,7 +16,6 @@
 package org.springframework.batch.core.configuration.support;
 
 import io.micrometer.observation.ObservationRegistry;
-import org.jspecify.annotations.NullUnmarked;
 
 import org.springframework.batch.core.configuration.DuplicateJobException;
 import org.springframework.batch.core.configuration.annotation.BatchObservabilityBeanPostProcessor;
@@ -30,7 +29,7 @@ import org.springframework.batch.core.launch.support.JobOperatorFactoryBean;
 import org.springframework.batch.core.launch.support.TaskExecutorJobOperator;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.ResourcelessJobRepository;
-import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
+import org.springframework.batch.infrastructure.support.transaction.ResourcelessTransactionManager;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -79,9 +78,9 @@ import org.springframework.transaction.PlatformTransactionManager;
  */
 @Configuration(proxyBeanMethods = false)
 @Import({ ScopeConfiguration.class, BatchObservabilityBeanPostProcessor.class })
-@NullUnmarked
 public class DefaultBatchConfiguration implements ApplicationContextAware {
 
+	@SuppressWarnings("NullAway.Init")
 	protected ApplicationContext applicationContext;
 
 	@Override
@@ -112,6 +111,7 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 		}
 	}
 
+	// FIXME getter with side effect, see JobOperatorFactoryBean.populateJobRegistry
 	protected JobRegistry getJobRegistry() {
 		MapJobRegistry jobRegistry = new MapJobRegistry();
 		this.applicationContext.getBeansOfType(Job.class).values().forEach(job -> {

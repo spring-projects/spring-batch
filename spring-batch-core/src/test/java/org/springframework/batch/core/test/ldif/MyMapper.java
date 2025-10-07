@@ -17,7 +17,7 @@ package org.springframework.batch.core.test.ldif;
 
 import org.jspecify.annotations.Nullable;
 
-import org.springframework.batch.item.ldif.RecordMapper;
+import org.springframework.batch.infrastructure.item.ldif.RecordMapper;
 import org.springframework.ldap.core.LdapAttributes;
 
 /**

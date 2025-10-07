@@ -33,13 +33,13 @@
 		<property name="shippingMapper" ref="shippingFieldSetMapper" />
 	</bean>
 
-	<bean id="fileItemReader" class="org.springframework.batch.item.file.FlatFileItemReader">
+	<bean id="fileItemReader" class="org.springframework.batch.infrastructure.item.file.FlatFileItemReader">
 		<property name="resource" value="classpath:org/springframework/batch/samples/file/patternmatching/data/multilineOrderInput.txt" />
 		<constructor-arg name="lineMapper">
-			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+			<bean class="org.springframework.batch.infrastructure.item.file.mapping.DefaultLineMapper">
 				<property name="lineTokenizer" ref="orderFileTokenizer" />
 				<property name="fieldSetMapper">
-					<bean class="org.springframework.batch.item.file.mapping.PassThroughFieldSetMapper" />
+					<bean class="org.springframework.batch.infrastructure.item.file.mapping.PassThroughFieldSetMapper" />
 				</property>
 			</bean>
 		</constructor-arg>
@@ -52,12 +52,12 @@
 	<bean id="orderItemFieldSetMapper" class="org.springframework.batch.samples.file.patternmatching.internal.mapper.OrderItemFieldSetMapper" />
 	<bean id="shippingFieldSetMapper"  class="org.springframework.batch.samples.file.patternmatching.internal.mapper.ShippingFieldSetMapper" />
 
-	<bean id="processor" class="org.springframework.batch.item.validator.ValidatingItemProcessor">
+	<bean id="processor" class="org.springframework.batch.infrastructure.item.validator.ValidatingItemProcessor">
 		<constructor-arg ref="validator" />
 		<property name="filter" value="true"/>
 	</bean>
 
-	<bean id="fileItemWriter" class="org.springframework.batch.item.file.FlatFileItemWriter">
+	<bean id="fileItemWriter" class="org.springframework.batch.infrastructure.item.file.FlatFileItemWriter">
 		<property name="resource" value="file:target/test-outputs/multilineOrderOutput.txt" />
 		<constructor-arg name="lineAggregator">
 			<bean class="org.springframework.batch.samples.file.patternmatching.internal.OrderLineAggregator">

@@ -239,9 +239,9 @@ XML::
 The following example shows how to use the `FieldExtractor` with a delimiter in XML:
 +
 .XML Configuration
-[source, xml]
+[source,xml]
 ----
-<bean id="itemWriter" class="org.springframework.batch.item.file.FlatFileItemWriter">
+<bean id="itemWriter" class="org.springframework.batch.infrastructure.item.file.FlatFileItemWriter">
     <property name="resource" ref="outputResource" />
     <property name="lineAggregator">
         <bean class="org.spr...DelimitedLineAggregator">
@@ -339,9 +339,9 @@ Using the same `CustomerCredit` domain object described above, it can be configu
 follows in XML:
 +
 .XML Configuration
-[source, xml]
+[source,xml]
 ----
-<bean id="itemWriter" class="org.springframework.batch.item.file.FlatFileItemWriter">
+<bean id="itemWriter" class="org.springframework.batch.infrastructure.item.file.FlatFileItemWriter">
     <property name="resource" ref="outputResource" />
     <property name="lineAggregator">
         <bean class="org.spr...FormatterLineAggregator">

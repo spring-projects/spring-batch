@@ -39,8 +39,7 @@ class MapJobRegistryTests {
 		registry.register(new JobSupport("foo"));
 		assertNotNull(registry.getJob("foo"));
 		registry.unregister("foo");
-		Exception exception = assertThrows(NoSuchJobException.class, () -> registry.getJob("foo"));
-		assertTrue(exception.getMessage().contains("foo"));
+		assertNull(registry.getJob("foo"));
 	}
 
 	@Test

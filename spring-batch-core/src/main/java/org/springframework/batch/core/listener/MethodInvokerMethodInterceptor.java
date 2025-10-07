@@ -24,7 +24,7 @@ import org.jspecify.annotations.Nullable;
 
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.step.StepExecution;
-import org.springframework.batch.support.MethodInvoker;
+import org.springframework.batch.infrastructure.support.MethodInvoker;
 
 /**
  * {@link MethodInterceptor} that, given a map of method names and {@link MethodInvoker}s,

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import java.util.Properties;
 
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersBuilder;
-import org.springframework.lang.Nullable;
 
 /**
  * A factory for {@link JobParameters} instances. A job can be executed with many possible
@@ -35,19 +34,19 @@ import org.springframework.lang.Nullable;
 public interface JobParametersConverter {
 
 	/**
-	 * Get a new {@link JobParameters} instance. If given null or an empty properties, an
-	 * empty JobParameters is returned.
+	 * Get a new {@link JobParameters} instance. If given an empty properties, an empty
+	 * JobParameters is returned.
 	 * @param properties The runtime parameters in the form of String literals.
 	 * @return a {@link JobParameters} object converted to the correct types.
 	 */
-	JobParameters getJobParameters(@Nullable Properties properties);
+	JobParameters getJobParameters(Properties properties);
 
 	/**
-	 * The inverse operation: get a {@link Properties} instance. If given null or empty
+	 * The inverse operation: get a {@link Properties} instance. If given empty
 	 * {@code JobParameters}, an empty {@code Properties} should be returned.
 	 * @param params The {@link JobParameters} instance to be converted.
 	 * @return a representation of the parameters as properties.
 	 */
-	Properties getProperties(@Nullable JobParameters params);
+	Properties getProperties(JobParameters params);
 
 }

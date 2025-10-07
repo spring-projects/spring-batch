@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.job.parameters.DefaultJobParametersValidator;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersBuilder;
-import org.springframework.batch.core.job.parameters.JobParametersInvalidException;
+import org.springframework.batch.core.job.parameters.InvalidJobParametersException;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -31,7 +31,7 @@ class DefaultJobParametersValidatorTests {
 
 	@Test
 	void testValidateNull() {
-		assertThrows(JobParametersInvalidException.class, () -> validator.validate(null));
+		assertThrows(InvalidJobParametersException.class, () -> validator.validate(null));
 	}
 
 	@Test
@@ -49,7 +49,7 @@ class DefaultJobParametersValidatorTests {
 	@Test
 	void testValidateRequiredValuesMissing() {
 		validator.setRequiredKeys(new String[] { "name", "value" });
-		assertThrows(JobParametersInvalidException.class, () -> validator.validate(new JobParameters()));
+		assertThrows(InvalidJobParametersException.class, () -> validator.validate(new JobParameters()));
 	}
 
 	@Test

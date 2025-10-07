@@ -24,7 +24,7 @@ import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.integration.config.annotation.EnableBatchIntegration;
 import org.springframework.batch.integration.partition.RemotePartitioningWorkerStepBuilderFactory;
-import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.batch.infrastructure.repeat.RepeatStatus;
 import org.springframework.batch.samples.partitioning.remote.BrokerConfiguration;
 import org.springframework.batch.samples.partitioning.remote.DataSourceConfiguration;
 import org.springframework.beans.factory.annotation.Value;

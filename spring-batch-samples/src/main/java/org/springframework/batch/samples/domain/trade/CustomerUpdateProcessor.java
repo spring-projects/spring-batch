@@ -18,7 +18,7 @@ package org.springframework.batch.samples.domain.trade;
 
 import static org.springframework.batch.samples.domain.trade.CustomerOperation.*;
 
-import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.infrastructure.item.ItemProcessor;
 
 import org.jspecify.annotations.Nullable;
 

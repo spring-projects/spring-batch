@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,8 @@ package org.springframework.batch.core.step;
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- *
  */
-public class NoSuchStepException extends RuntimeException {
+public class NoSuchStepException extends Exception {
 
 	/**
 	 * Create a new exception instance with the message provided.

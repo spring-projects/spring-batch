@@ -25,7 +25,7 @@ import java.util.Collection;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.parameters.JobParameters;
-import org.springframework.batch.core.job.parameters.JobParametersInvalidException;
+import org.springframework.batch.core.job.parameters.InvalidJobParametersException;
 import org.springframework.batch.core.job.parameters.JobParametersValidator;
 import org.springframework.batch.core.job.AbstractJob;
 import org.springframework.batch.core.job.parameters.DefaultJobParametersValidator;
@@ -59,7 +59,7 @@ class JobParserValidatorTests {
 		JobParametersValidator validator = (JobParametersValidator) ReflectionTestUtils.getField(job1,
 				"jobParametersValidator");
 		assertNotNull(validator);
-		assertThrows(JobParametersInvalidException.class, () -> validator.validate(new JobParameters()));
+		assertThrows(InvalidJobParametersException.class, () -> validator.validate(new JobParameters()));
 	}
 
 	@Test
@@ -68,7 +68,7 @@ class JobParserValidatorTests {
 		JobParametersValidator validator = (JobParametersValidator) ReflectionTestUtils.getField(job2,
 				"jobParametersValidator");
 		assertNotNull(validator);
-		assertThrows(JobParametersInvalidException.class, () -> validator.validate(new JobParameters()));
+		assertThrows(InvalidJobParametersException.class, () -> validator.validate(new JobParameters()));
 	}
 
 	@Test
@@ -77,7 +77,7 @@ class JobParserValidatorTests {
 		JobParametersValidator validator = (JobParametersValidator) ReflectionTestUtils.getField(job3,
 				"jobParametersValidator");
 		assertNotNull(validator);
-		assertThrows(JobParametersInvalidException.class, () -> validator.validate(new JobParameters()));
+		assertThrows(InvalidJobParametersException.class, () -> validator.validate(new JobParameters()));
 	}
 
 	@Test

@@ -28,9 +28,9 @@ import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.step.StepContribution;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy;
-import org.springframework.batch.item.Chunk;
-import org.springframework.batch.item.support.ListItemReader;
-import org.springframework.batch.repeat.support.RepeatTemplate;
+import org.springframework.batch.infrastructure.item.Chunk;
+import org.springframework.batch.infrastructure.item.support.ListItemReader;
+import org.springframework.batch.infrastructure.repeat.support.RepeatTemplate;
 
 class FaultTolerantChunkProviderTests {
 

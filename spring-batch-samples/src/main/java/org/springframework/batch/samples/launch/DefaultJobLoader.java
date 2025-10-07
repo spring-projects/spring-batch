@@ -23,7 +23,6 @@ import org.springframework.batch.core.job.Job;
 
 import org.jspecify.annotations.Nullable;
 import org.springframework.batch.core.configuration.JobRegistry;
-import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.PropertyAccessorUtils;
@@ -53,15 +52,13 @@ public class DefaultJobLoader implements JobLoader, ApplicationContextAware {
 	public Map<String, String> getConfigurations() {
 		Map<String, String> result = new HashMap<>(configurations);
 		for (String jobName : registry.getJobNames()) {
-			try {
-				Job configuration = registry.getJob(jobName);
-				String name = configuration.getName();
-				if (!configurations.containsKey(name)) {
-					result.put(name, "<unknown path>: " + configuration);
-				}
+			Job configuration = registry.getJob(jobName);
+			if (configuration == null) {
+				throw new IllegalStateException("Registry could not locate job " + jobName);
 			}
-			catch (NoSuchJobException e) {
-				throw new IllegalStateException("Registry could not locate its own job (NoSuchJobException).", e);
+			String name = configuration.getName();
+			if (!configurations.containsKey(name)) {
+				result.put(name, "<unknown path>: " + configuration);
 			}
 		}
 		return result;
@@ -80,12 +77,7 @@ public class DefaultJobLoader implements JobLoader, ApplicationContextAware {
 
 	@Override
 	public @Nullable Object getJobConfiguration(String name) {
-		try {
-			return registry.getJob(name);
-		}
-		catch (NoSuchJobException e) {
-			return null;
-		}
+		return registry.getJob(name);
 	}
 
 	@Override

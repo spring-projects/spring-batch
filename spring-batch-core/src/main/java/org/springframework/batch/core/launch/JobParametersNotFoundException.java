@@ -24,8 +24,9 @@ import org.springframework.batch.core.job.parameters.JobParametersIncrementer;
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- *
+ * @deprecated since 6.0 with not replacement. Scheduled for removal in 6.2 or later.
  */
+@Deprecated(since = "6.0", forRemoval = true)
 public class JobParametersNotFoundException extends JobExecutionException {
 
 	/**

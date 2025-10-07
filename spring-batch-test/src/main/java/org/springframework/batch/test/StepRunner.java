@@ -18,9 +18,9 @@ package org.springframework.batch.test;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -31,16 +31,16 @@ import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.listener.JobExecutionListener;
 import org.springframework.batch.core.job.parameters.JobParameter;
 import org.springframework.batch.core.job.parameters.JobParameters;
-import org.springframework.batch.core.job.parameters.JobParametersInvalidException;
+import org.springframework.batch.core.job.parameters.InvalidJobParametersException;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.job.UnexpectedJobExecutionException;
 import org.springframework.batch.core.job.SimpleJob;
 import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
-import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
+import org.springframework.batch.core.launch.JobExecutionAlreadyRunningException;
+import org.springframework.batch.core.launch.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.repository.JobRestartException;
-import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.core.launch.JobRestartException;
+import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.lang.Nullable;
 
 /**
@@ -183,7 +183,7 @@ public class StepRunner {
 			return this.launcher.run(job, jobParameters);
 		}
 		catch (JobExecutionAlreadyRunningException | JobRestartException | JobInstanceAlreadyCompleteException
-				| JobParametersInvalidException e) {
+				| InvalidJobParametersException e) {
 			throw new UnexpectedJobExecutionException("Step runner encountered exception.", e);
 		}
 	}
@@ -193,9 +193,7 @@ public class StepRunner {
 	 * timestamp, to ensure that the job instance will be unique
 	 */
 	private JobParameters makeUniqueJobParameters() {
-		Map<String, JobParameter<?>> parameters = new HashMap<>();
-		parameters.put("timestamp", new JobParameter<>(new Date().getTime(), Long.class));
-		return new JobParameters(parameters);
+		return new JobParameters(Set.of(new JobParameter<>("timestamp", new Date().getTime(), Long.class)));
 	}
 
 }

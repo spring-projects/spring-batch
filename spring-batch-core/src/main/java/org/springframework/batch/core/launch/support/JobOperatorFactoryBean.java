@@ -20,7 +20,7 @@ import java.lang.reflect.Method;
 import io.micrometer.observation.ObservationRegistry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jspecify.annotations.NullUnmarked;
+import org.jspecify.annotations.Nullable;
 
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.batch.core.configuration.BatchConfigurationException;
@@ -33,7 +33,7 @@ import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
+import org.springframework.batch.infrastructure.support.transaction.ResourcelessTransactionManager;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -58,26 +58,29 @@ import org.springframework.util.Assert;
  * @author Mahmoud Ben Hassine
  * @since 5.0
  */
-@NullUnmarked
 public class JobOperatorFactoryBean implements FactoryBean<JobOperator>, ApplicationContextAware, InitializingBean {
 
 	protected static final Log logger = LogFactory.getLog(JobOperatorFactoryBean.class);
 
+	@SuppressWarnings("NullAway.Init")
 	private ApplicationContext applicationContext;
 
-	private PlatformTransactionManager transactionManager;
+	private @Nullable PlatformTransactionManager transactionManager;
 
-	private TransactionAttributeSource transactionAttributeSource;
+	private @Nullable TransactionAttributeSource transactionAttributeSource;
 
+	@SuppressWarnings("NullAway.Init")
 	private JobRegistry jobRegistry;
 
+	@SuppressWarnings("NullAway.Init")
 	private JobRepository jobRepository;
 
 	private JobParametersConverter jobParametersConverter = new DefaultJobParametersConverter();
 
+	@SuppressWarnings("NullAway.Init")
 	private TaskExecutor taskExecutor;
 
-	private ObservationRegistry observationRegistry;
+	private @Nullable ObservationRegistry observationRegistry;
 
 	private final ProxyFactory proxyFactory = new ProxyFactory();
 
@@ -192,6 +195,7 @@ public class JobOperatorFactoryBean implements FactoryBean<JobOperator>, Applica
 		return true;
 	}
 
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public JobOperator getObject() throws Exception {
 		TransactionInterceptor advice = new TransactionInterceptor((TransactionManager) this.transactionManager,
@@ -203,7 +207,7 @@ public class JobOperatorFactoryBean implements FactoryBean<JobOperator>, Applica
 		return (JobOperator) this.proxyFactory.getProxy(getClass().getClassLoader());
 	}
 
-	@SuppressWarnings("removal")
+	@SuppressWarnings({ "removal" })
 	private TaskExecutorJobOperator getTarget() throws Exception {
 		TaskExecutorJobOperator taskExecutorJobOperator = new TaskExecutorJobOperator();
 		taskExecutorJobOperator.setJobRegistry(this.jobRegistry);

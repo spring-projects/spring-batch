@@ -18,8 +18,9 @@ package org.springframework.batch.integration.config.xml;
 import org.w3c.dom.Element;
 
 import org.springframework.batch.core.step.item.SimpleChunkProcessor;
+import org.springframework.batch.infrastructure.item.ItemProcessor;
 import org.springframework.batch.integration.chunk.ChunkProcessorChunkRequestHandler;
-import org.springframework.batch.item.support.PassThroughItemProcessor;
+import org.springframework.batch.infrastructure.item.support.PassThroughItemProcessor;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
@@ -34,10 +35,8 @@ import org.springframework.util.StringUtils;
 
 /**
  * <p>
- * Parser for the remote-chunking-worker namespace element. If an
- * {@link org.springframework.batch.item.ItemProcessor} is not provided, an
- * {@link org.springframework.batch.item.support.PassThroughItemProcessor} will be
- * configured.
+ * Parser for the remote-chunking-worker namespace element. If an {@link ItemProcessor} is
+ * not provided, an {@link PassThroughItemProcessor} will be configured.
  * </p>
  *
  * @author Chris Schaefer

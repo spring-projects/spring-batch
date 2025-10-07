@@ -19,7 +19,7 @@ import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import org.springframework.batch.item.database.ItemPreparedStatementSetter;
+import org.springframework.batch.infrastructure.item.database.ItemPreparedStatementSetter;
 import org.springframework.batch.samples.domain.trade.CustomerCredit;
 
 /**

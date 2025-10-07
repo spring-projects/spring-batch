@@ -15,13 +15,13 @@
  */
 package org.springframework.batch.core.step.tasklet;
 
-import org.jspecify.annotations.NullUnmarked;
+import org.jspecify.annotations.Nullable;
 
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.step.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
-import org.springframework.batch.item.adapter.AbstractMethodInvokingDelegator;
-import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.batch.infrastructure.item.adapter.AbstractMethodInvokingDelegator;
+import org.springframework.batch.infrastructure.repeat.RepeatStatus;
 
 /**
  * A {@link Tasklet} that wraps a method in a POJO. By default the return value is
@@ -34,7 +34,6 @@ import org.springframework.batch.repeat.RepeatStatus;
  * @author Mahmoud Ben Hassine
  *
  */
-@NullUnmarked
 public class MethodInvokingTaskletAdapter extends AbstractMethodInvokingDelegator<Object> implements Tasklet {
 
 	/**
@@ -59,7 +58,7 @@ public class MethodInvokingTaskletAdapter extends AbstractMethodInvokingDelegato
 	 * @param result the value returned by the delegate method
 	 * @return an {@link ExitStatus} consistent with the result
 	 */
-	protected ExitStatus mapResult(Object result) {
+	protected ExitStatus mapResult(@Nullable Object result) {
 		if (result instanceof ExitStatus exitStatus) {
 			return exitStatus;
 		}

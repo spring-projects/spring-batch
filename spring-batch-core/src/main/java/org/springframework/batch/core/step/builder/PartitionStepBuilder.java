@@ -38,7 +38,8 @@ import org.springframework.core.task.TaskExecutor;
  * @author Dimitrios Liapis
  * @since 2.2
  */
-@NullUnmarked // FIXME to remove once default constructors are removed
+// FIXME remove once default constructors (required by the XML namespace) are removed
+@NullUnmarked
 public class PartitionStepBuilder extends StepBuilderHelper<PartitionStepBuilder> {
 
 	private TaskExecutor taskExecutor;

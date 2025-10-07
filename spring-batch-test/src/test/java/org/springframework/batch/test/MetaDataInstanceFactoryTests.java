@@ -22,7 +22,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
-import org.springframework.batch.support.PropertiesConverter;
+import org.springframework.batch.infrastructure.support.PropertiesConverter;
 
 /**
  * @author Dave Syer

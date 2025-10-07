@@ -15,14 +15,14 @@
  */
 package org.springframework.batch.core.listener;
 
-import org.jspecify.annotations.NullUnmarked;
+import org.jspecify.annotations.Nullable;
 
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
-import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.support.PatternMatcher;
+import org.springframework.batch.infrastructure.item.ExecutionContext;
+import org.springframework.batch.infrastructure.support.PatternMatcher;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
@@ -42,10 +42,9 @@ import org.springframework.util.ObjectUtils;
  * @author Mahmoud Ben Hassine
  * @since 2.0
  */
-@NullUnmarked
 public class ExecutionContextPromotionListener implements StepExecutionListener, InitializingBean {
 
-	private String[] keys = null;
+	private String @Nullable [] keys = null;
 
 	private String[] statuses = new String[] { ExitStatus.COMPLETED.getExitCode() };
 
@@ -53,6 +52,9 @@ public class ExecutionContextPromotionListener implements StepExecutionListener,
 
 	@Override
 	public ExitStatus afterStep(StepExecution stepExecution) {
+		if (this.keys == null) {
+			return stepExecution.getExitStatus();
+		}
 		ExecutionContext stepContext = stepExecution.getExecutionContext();
 		ExecutionContext jobContext = stepExecution.getJobExecution().getExecutionContext();
 		String exitCode = stepExecution.getExitStatus().getExitCode();
@@ -73,7 +75,7 @@ public class ExecutionContextPromotionListener implements StepExecutionListener,
 			}
 		}
 
-		return null;
+		return stepExecution.getExitStatus();
 	}
 
 	@Override

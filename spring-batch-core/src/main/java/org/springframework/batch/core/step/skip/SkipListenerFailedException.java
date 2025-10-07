@@ -24,8 +24,11 @@ import org.springframework.batch.core.job.UnexpectedJobExecutionException;
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- *
+ * @deprecated as of 6.0 with no replacement. Scheduled for removal in 6.2.
  */
+// The deprecation is based on the fact that a SkipListener is not designed to throw
+// exceptions
+@Deprecated(since = "6.0", forRemoval = true)
 public class SkipListenerFailedException extends UnexpectedJobExecutionException {
 
 	/**

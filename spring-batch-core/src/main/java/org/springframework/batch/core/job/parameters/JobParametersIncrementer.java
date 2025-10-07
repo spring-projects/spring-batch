@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 package org.springframework.batch.core.job.parameters;
-
-import org.jspecify.annotations.Nullable;
 
 /**
  * Interface for obtaining the next {@link JobParameters} object in a sequence.
@@ -35,6 +33,6 @@ public interface JobParametersIncrementer {
 	 * @param parameters the last value used
 	 * @return the next value to use (never {@code null})
 	 */
-	JobParameters getNext(@Nullable JobParameters parameters);
+	JobParameters getNext(JobParameters parameters);
 
 }

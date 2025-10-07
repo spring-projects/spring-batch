@@ -229,7 +229,7 @@ public CompositeItemProcessor compositeProcessor() {
 XML::
 +
 .XML Configuration
-[source, xml]
+[source,xml]
 ----
 <job id="ioSampleJob">
     <step name="step1">
@@ -241,7 +241,7 @@ XML::
 </job>
 
 <bean id="compositeItemProcessor"
-      class="org.springframework.batch.item.support.CompositeItemProcessor">
+      class="org.springframework.batch.infrastructure.item.support.CompositeItemProcessor">
     <property name="delegates">
         <list>
             <bean class="..FooProcessor" />
@@ -336,11 +336,11 @@ XML::
 .XML Configuration
 [source,xml]
 ----
-<bean class="org.springframework.batch.item.validator.ValidatingItemProcessor">
+<bean class="org.springframework.batch.infrastructure.item.validator.ValidatingItemProcessor">
     <property name="validator" ref="validator" />
 </bean>
 
-<bean id="validator" class="org.springframework.batch.item.validator.SpringValidator">
+<bean id="validator" class="org.springframework.batch.infrastructure.item.validator.SpringValidator">
 	<property name="validator">
 		<bean class="org.springframework.batch.samples.domain.trade.internal.validator.TradeValidator"/>
 	</property>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,8 +33,8 @@ import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.job.UnexpectedJobExecutionException;
 import org.springframework.batch.core.scope.StepScope;
-import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.repeat.context.SynchronizedAttributeAccessor;
+import org.springframework.batch.infrastructure.item.ExecutionContext;
+import org.springframework.batch.infrastructure.repeat.context.SynchronizedAttributeAccessor;
 import org.springframework.util.Assert;
 
 /**
@@ -121,8 +121,8 @@ public class StepContext extends SynchronizedAttributeAccessor {
 	 */
 	public Map<String, Object> getJobParameters() {
 		Map<String, Object> result = new HashMap<>();
-		for (Entry<String, JobParameter<?>> entry : stepExecution.getJobParameters().getParameters().entrySet()) {
-			result.put(entry.getKey(), entry.getValue().getValue());
+		for (JobParameter<?> jobParameter : stepExecution.getJobParameters()) {
+			result.put(jobParameter.name(), jobParameter.value());
 		}
 		return Collections.unmodifiableMap(result);
 	}

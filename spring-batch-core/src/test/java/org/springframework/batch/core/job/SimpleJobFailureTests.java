@@ -28,7 +28,7 @@ import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.JdbcJobRepositoryFactoryBean;
 import org.springframework.batch.core.step.StepSupport;
-import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
@@ -65,14 +65,14 @@ class SimpleJobFailureTests {
 	}
 
 	@Test
-	void testStepFailure() {
+	void testStepFailure() throws JobInterruptedException {
 		job.setSteps(Arrays.<Step>asList(new StepSupport("step")));
 		job.execute(execution);
 		assertEquals(BatchStatus.FAILED, execution.getStatus());
 	}
 
 	@Test
-	void testStepStatusUnknown() {
+	void testStepStatusUnknown() throws JobInterruptedException {
 		job.setSteps(Arrays.<Step>asList(new StepSupport("step1") {
 			@Override
 			public void execute(StepExecution stepExecution)

@@ -16,7 +16,7 @@
 package org.springframework.batch.core.configuration.xml;
 
 import org.springframework.batch.core.annotation.AfterWrite;
-import org.springframework.batch.item.Chunk;
+import org.springframework.batch.infrastructure.item.Chunk;
 
 public class TestPojoListener extends AbstractTestComponent {
 

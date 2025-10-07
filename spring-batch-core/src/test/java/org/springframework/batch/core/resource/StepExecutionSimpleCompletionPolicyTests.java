@@ -25,7 +25,7 @@ import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.step.StepSupport;
-import org.springframework.batch.repeat.RepeatContext;
+import org.springframework.batch.infrastructure.repeat.RepeatContext;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.springframework.test.util.AssertionErrors.assertTrue;

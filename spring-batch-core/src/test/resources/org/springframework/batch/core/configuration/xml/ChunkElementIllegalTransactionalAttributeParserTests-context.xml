@@ -12,7 +12,7 @@
 				<chunk reader="reader" writer="writer" processor="processor" skip-limit="3" commit-interval="5"
 					processor-transactional="false" reader-transactional-queue="true">
 					<skippable-exception-classes>
-						<include class="org.springframework.batch.item.validator.ValidationException" />
+						<include class="org.springframework.batch.infrastructure.item.validator.ValidationException" />
 					</skippable-exception-classes>
 				</chunk>
 			</tasklet>

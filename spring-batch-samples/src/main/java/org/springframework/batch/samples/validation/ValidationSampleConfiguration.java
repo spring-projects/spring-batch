@@ -25,9 +25,9 @@ import org.springframework.batch.core.configuration.annotation.EnableBatchProces
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
-import org.springframework.batch.item.support.ListItemReader;
-import org.springframework.batch.item.support.ListItemWriter;
-import org.springframework.batch.item.validator.BeanValidatingItemProcessor;
+import org.springframework.batch.infrastructure.item.support.ListItemReader;
+import org.springframework.batch.infrastructure.item.support.ListItemWriter;
+import org.springframework.batch.infrastructure.item.validator.BeanValidatingItemProcessor;
 import org.springframework.batch.samples.common.DataSourceConfiguration;
 import org.springframework.batch.samples.validation.domain.Person;
 import org.springframework.context.annotation.Bean;

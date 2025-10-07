@@ -24,10 +24,11 @@ import org.jspecify.annotations.NullUnmarked;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.step.NoSuchStepException;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.lang.Nullable;
 
 /**
@@ -296,7 +297,7 @@ public interface JobExplorer {
 	 * @param stepName the name of the step execution that might have run.
 	 * @return the execution count of the step within the given job instance.
 	 */
-	default long getStepExecutionCount(JobInstance jobInstance, String stepName) {
+	default long getStepExecutionCount(JobInstance jobInstance, String stepName) throws NoSuchStepException {
 		throw new UnsupportedOperationException();
 	}
 

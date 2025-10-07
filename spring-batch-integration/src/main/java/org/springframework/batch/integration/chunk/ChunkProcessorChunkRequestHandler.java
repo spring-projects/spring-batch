@@ -22,7 +22,7 @@ import org.jspecify.annotations.NullUnmarked;
 
 import org.springframework.batch.core.job.JobInterruptedException;
 import org.springframework.batch.core.step.StepContribution;
-import org.springframework.batch.item.Chunk;
+import org.springframework.batch.infrastructure.item.Chunk;
 import org.springframework.batch.core.step.item.ChunkProcessor;
 import org.springframework.batch.core.step.item.FaultTolerantChunkProcessor;
 import org.springframework.batch.core.step.skip.NonSkippableReadException;

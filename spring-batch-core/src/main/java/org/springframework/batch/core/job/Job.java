@@ -53,11 +53,16 @@ public interface Job {
 	/**
 	 * Run the {@link JobExecution} and update the meta information, such as status and
 	 * statistics, as necessary. This method should not throw any exceptions for failed
-	 * execution. Clients should be careful to inspect the {@link JobExecution} status to
-	 * determine success or failure.
+	 * executions. Clients should be careful to inspect the {@link JobExecution} status to
+	 * determine success or failure. The only exception that can be thrown from this
+	 * method is {@link JobInterruptedException} which indicates that the job was
+	 * interrupted externally (for example by a user request). In this case the status of
+	 * the execution will be set to
+	 * {@link org.springframework.batch.core.BatchStatus#STOPPED} and the
+	 * {@link JobExecution} will be updated accordingly.
 	 * @param execution a {@link JobExecution}
 	 */
-	void execute(JobExecution execution);
+	void execute(JobExecution execution) throws JobInterruptedException;
 
 	/**
 	 * If clients need to generate new parameters for the next execution in a sequence,

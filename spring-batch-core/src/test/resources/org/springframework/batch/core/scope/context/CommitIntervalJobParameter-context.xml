@@ -28,7 +28,7 @@
 		</step>
 	</job>
 
-	<bean id="reader" class="org.springframework.batch.item.support.ListItemReader">
+	<bean id="reader" class="org.springframework.batch.infrastructure.item.support.ListItemReader">
 		<constructor-arg>
 			<list>
 				<value>foo</value>
@@ -37,7 +37,7 @@
 		</constructor-arg>
 	</bean>
 
-	<bean id="writer" class="org.springframework.batch.item.support.ListItemWriter"/>
+	<bean id="writer" class="org.springframework.batch.infrastructure.item.support.ListItemWriter"/>
 
 	<bean id="skipPolicy" class="org.springframework.batch.core.step.skip.AlwaysSkipItemSkipPolicy"/>
 

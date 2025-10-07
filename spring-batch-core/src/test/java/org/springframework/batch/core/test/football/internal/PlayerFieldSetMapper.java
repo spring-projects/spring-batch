@@ -19,8 +19,8 @@ package org.springframework.batch.core.test.football.internal;
 import org.jspecify.annotations.Nullable;
 
 import org.springframework.batch.core.test.football.domain.Player;
-import org.springframework.batch.item.file.mapping.FieldSetMapper;
-import org.springframework.batch.item.file.transform.FieldSet;
+import org.springframework.batch.infrastructure.item.file.mapping.FieldSetMapper;
+import org.springframework.batch.infrastructure.item.file.transform.FieldSet;
 
 public class PlayerFieldSetMapper implements FieldSetMapper<Player> {
 

@@ -18,7 +18,7 @@ package org.springframework.batch.integration.launch;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.parameters.JobParameters;
-import org.springframework.batch.core.job.parameters.JobParametersInvalidException;
+import org.springframework.batch.core.job.parameters.InvalidJobParametersException;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.integration.JobSupport;
 import org.springframework.integration.support.MessageBuilder;
@@ -48,7 +48,7 @@ class JobLaunchingGatewayTests {
 
 		final JobOperator jobOperator = mock();
 		when(jobOperator.start(any(Job.class), any(JobParameters.class)))
-			.thenThrow(new JobParametersInvalidException("This is a JobExecutionException."));
+			.thenThrow(new InvalidJobParametersException("This is a JobExecutionException."));
 
 		JobLaunchingGateway jobLaunchingGateway = new JobLaunchingGateway(jobOperator);
 		Exception exception = assertThrows(MessageHandlingException.class,

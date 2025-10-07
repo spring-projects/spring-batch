@@ -19,6 +19,7 @@ package org.springframework.batch.core.repository.explore.support;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.step.NoSuchStepException;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.repository.explore.JobExplorer;
 import org.springframework.batch.core.launch.NoSuchJobException;
@@ -27,7 +28,7 @@ import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.dao.JobInstanceDao;
 import org.springframework.batch.core.repository.dao.StepExecutionDao;
 import org.springframework.batch.core.repository.support.SimpleJobRepository;
-import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.lang.Nullable;
 
 import java.util.List;
@@ -282,7 +283,9 @@ public class SimpleJobExplorer implements JobExplorer {
 	 * @return number of executions of the step within given job instance
 	 */
 	@Override
-	public long getStepExecutionCount(JobInstance jobInstance, String stepName) {
+	public long getStepExecutionCount(JobInstance jobInstance, String stepName) throws NoSuchStepException {
+		// TODO verify that the step exists for the job instance and throw
+		// NoSuchStepException if not
 		return stepExecutionDao.countStepExecutions(jobInstance, stepName);
 	}
 

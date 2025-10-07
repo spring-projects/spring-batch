@@ -1,0 +1,90 @@
+/*
+ * Copyright 2006-2023 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.springframework.batch.infrastructure.repeat.support;
+
+import org.junit.jupiter.api.BeforeEach;
+
+import org.springframework.batch.infrastructure.item.Chunk;
+import org.springframework.batch.infrastructure.item.ExecutionContext;
+import org.springframework.batch.infrastructure.item.ItemWriter;
+import org.springframework.batch.infrastructure.item.file.FlatFileItemReader;
+import org.springframework.batch.infrastructure.item.file.LineMapper;
+import org.springframework.batch.infrastructure.item.file.mapping.DefaultLineMapper;
+import org.springframework.batch.infrastructure.item.file.mapping.FieldSetMapper;
+import org.springframework.batch.infrastructure.item.file.transform.DelimitedLineTokenizer;
+import org.springframework.batch.infrastructure.item.file.transform.FieldSet;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+
+/**
+ * Base class for simple tests with small trade data set.
+ *
+ * @author Dave Syer
+ * @author Mahmoud Ben Hassine
+ *
+ */
+abstract class AbstractTradeBatchTests {
+
+	public static final int NUMBER_OF_ITEMS = 5;
+
+	Resource resource = new ClassPathResource("trades.csv", getClass());
+
+	protected TradeWriter processor = new TradeWriter();
+
+	protected TradeItemReader provider;
+
+	@BeforeEach
+	void setUp() {
+		DefaultLineMapper<Trade> mapper = new DefaultLineMapper<>();
+		mapper.setLineTokenizer(new DelimitedLineTokenizer());
+		mapper.setFieldSetMapper(new TradeMapper());
+		provider = new TradeItemReader(mapper);
+		provider.setResource(resource);
+		provider.open(new ExecutionContext());
+	}
+
+	protected static class TradeItemReader extends FlatFileItemReader<Trade> {
+
+		public TradeItemReader(LineMapper<Trade> lineMapper) {
+			super(lineMapper);
+		}
+
+	}
+
+	protected static class TradeMapper implements FieldSetMapper<Trade> {
+
+		@Override
+		public Trade mapFieldSet(FieldSet fs) {
+			return new Trade(fs);
+		}
+
+	}
+
+	protected static class TradeWriter implements ItemWriter<Trade> {
+
+		int count = 0;
+
+		// This has to be synchronized because we are going to test the state
+		// (count) at the end of a concurrent batch run.
+		@Override
+		public synchronized void write(Chunk<? extends Trade> data) {
+			count++;
+		}
+
+	}
+
+}

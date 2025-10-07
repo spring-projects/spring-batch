@@ -17,7 +17,7 @@ package org.springframework.batch.samples.common;
 
 import javax.sql.DataSource;
 
-import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.infrastructure.item.ItemProcessor;
 
 import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.InitializingBean;

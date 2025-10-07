@@ -31,10 +31,10 @@
 		<property name="customEditors">
 			<map>
 				<entry key="int[]">
-					<bean class="org.springframework.batch.support.IntArrayPropertyEditor" />
+					<bean class="org.springframework.batch.infrastructure.support.IntArrayPropertyEditor" />
 				</entry>
-				<entry key="org.springframework.batch.item.file.transform.Range[]">
-					<bean class="org.springframework.batch.item.file.transform.RangeArrayPropertyEditor" />
+				<entry key="org.springframework.batch.infrastructure.item.file.transform.Range[]">
+					<bean class="org.springframework.batch.infrastructure.item.file.transform.RangeArrayPropertyEditor" />
 				</entry>
 				<entry key="java.util.Date">
 					<bean class="org.springframework.beans.propertyeditors.CustomDateEditor">

@@ -22,7 +22,7 @@ import org.springframework.batch.core.job.JobInterruptedException;
 import org.springframework.batch.core.job.StartLimitExceededException;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
-import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.batch.core.launch.JobRestartException;
 
 /**
  * Context and execution strategy for {@link FlowJob} to allow it to delegate its

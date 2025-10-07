@@ -18,10 +18,10 @@ package org.springframework.batch.samples.domain.trade;
 
 import java.math.BigDecimal;
 
-import org.springframework.batch.item.file.mapping.FieldSetMapper;
+import org.springframework.batch.infrastructure.item.file.mapping.FieldSetMapper;
 
 import org.jspecify.annotations.Nullable;
-import org.springframework.batch.item.file.transform.FieldSet;
+import org.springframework.batch.infrastructure.item.file.transform.FieldSet;
 
 /**
  * {@link FieldSetMapper} for mapping to a {@link CustomerUpdate}.

@@ -17,7 +17,7 @@ package org.springframework.batch.core.listener;
 
 import org.jspecify.annotations.Nullable;
 
-import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.infrastructure.item.ItemProcessor;
 
 /**
  * Listener interface for the processing of an item. Implementations of this interface are

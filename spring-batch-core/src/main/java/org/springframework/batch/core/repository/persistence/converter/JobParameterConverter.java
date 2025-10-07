@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 the original author or authors.
+ * Copyright 2024-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ public class JobParameterConverter {
 
 	public <T> org.springframework.batch.core.job.parameters.JobParameter<T> toJobParameter(JobParameter<T> source) {
 		try {
-			return new org.springframework.batch.core.job.parameters.JobParameter<>(source.value(),
+			return new org.springframework.batch.core.job.parameters.JobParameter<>(source.name(), source.value(),
 					(Class<T>) Class.forName(source.type()), source.identifying());
 		}
 		catch (ClassNotFoundException e) {
@@ -34,7 +34,7 @@ public class JobParameterConverter {
 	}
 
 	public <T> JobParameter<T> fromJobParameter(org.springframework.batch.core.job.parameters.JobParameter<T> source) {
-		return new JobParameter<>(source.getValue(), source.getType().getName(), source.isIdentifying());
+		return new JobParameter<>(source.name(), source.value(), source.type().getName(), source.identifying());
 	}
 
 }

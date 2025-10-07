@@ -19,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.File;
 import java.util.Collections;
+import java.util.Set;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -52,8 +53,8 @@ class RemoteChunkFaultTolerantStepJmsIntegrationTests {
 
 	@Test
 	void testFailedStep() throws Exception {
-		JobExecution jobExecution = jobOperator.start(job, new JobParameters(
-				Collections.singletonMap("item.three", new JobParameter<>("unsupported", String.class))));
+		JobExecution jobExecution = jobOperator.start(job,
+				new JobParameters(Set.of(new JobParameter<>("item.three", "unsupported", String.class))));
 		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
 		StepExecution stepExecution = jobExecution.getStepExecutions().iterator().next();
 		assertEquals(9, stepExecution.getReadCount());
@@ -64,7 +65,7 @@ class RemoteChunkFaultTolerantStepJmsIntegrationTests {
 	@Test
 	void testFailedStepOnError() throws Exception {
 		JobExecution jobExecution = jobOperator.start(job,
-				new JobParameters(Collections.singletonMap("item.three", new JobParameter<>("error", String.class))));
+				new JobParameters(Set.of(new JobParameter<>("item.three", "error", String.class))));
 		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
 		StepExecution stepExecution = jobExecution.getStepExecutions().iterator().next();
 		assertEquals(9, stepExecution.getReadCount());
@@ -75,7 +76,7 @@ class RemoteChunkFaultTolerantStepJmsIntegrationTests {
 	@Test
 	void testSunnyDayFaultTolerant() throws Exception {
 		JobExecution jobExecution = jobOperator.start(job,
-				new JobParameters(Collections.singletonMap("item.three", new JobParameter("3", Integer.class))));
+				new JobParameters(Set.of(new JobParameter("item.three", "3", Integer.class))));
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		StepExecution stepExecution = jobExecution.getStepExecutions().iterator().next();
 		assertEquals(9, stepExecution.getReadCount());

@@ -32,10 +32,10 @@ import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.listener.StepListener;
 import org.springframework.batch.core.listener.MulticasterBatchListener;
 import org.springframework.batch.core.observability.BatchMetrics;
-import org.springframework.batch.item.Chunk;
-import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.repeat.RepeatOperations;
-import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.batch.infrastructure.item.Chunk;
+import org.springframework.batch.infrastructure.item.ItemReader;
+import org.springframework.batch.infrastructure.repeat.RepeatOperations;
+import org.springframework.batch.infrastructure.repeat.RepeatStatus;
 import org.springframework.lang.Nullable;
 
 /**

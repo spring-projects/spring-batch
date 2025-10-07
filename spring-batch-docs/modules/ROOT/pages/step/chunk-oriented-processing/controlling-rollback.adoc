@@ -35,13 +35,13 @@ XML::
 In XML, you can control rollback as follows:
 +
 .XML Configuration
-[source, xml]
+[source,xml]
 ----
 <step id="step1">
    <tasklet>
       <chunk reader="itemReader" writer="itemWriter" commit-interval="2"/>
       <no-rollback-exception-classes>
-         <include class="org.springframework.batch.item.validator.ValidationException"/>
+         <include class="org.springframework.batch.infrastructure.item.validator.ValidationException"/>
       </no-rollback-exception-classes>
    </tasklet>
 </step>

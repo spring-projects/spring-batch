@@ -39,14 +39,14 @@ XML::
 The following XML example shows an example of using a skip limit:
 +
 .XML Configuration
-[source, xml]
+[source,xml]
 ----
 <step id="step1">
    <tasklet>
       <chunk reader="flatFileItemReader" writer="itemWriter"
              commit-interval="10" skip-limit="10">
          <skippable-exception-classes>
-            <include class="org.springframework.batch.item.file.FlatFileParseException"/>
+            <include class="org.springframework.batch.infrastructure.item.file.FlatFileParseException"/>
          </skippable-exception-classes>
       </chunk>
    </tasklet>

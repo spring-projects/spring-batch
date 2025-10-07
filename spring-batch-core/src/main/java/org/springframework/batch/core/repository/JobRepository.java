@@ -20,9 +20,10 @@ import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.launch.NoSuchJobException;
+import org.springframework.batch.core.step.NoSuchStepException;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.repository.explore.JobExplorer;
-import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.lang.Nullable;
 
 import java.util.Collections;
@@ -263,7 +264,7 @@ public interface JobRepository extends JobExplorer {
 	 * @param stepName the name of the step execution that might have run.
 	 * @return the execution count of the step within the given job instance.
 	 */
-	default long getStepExecutionCount(JobInstance jobInstance, String stepName) {
+	default long getStepExecutionCount(JobInstance jobInstance, String stepName) throws NoSuchStepException {
 		throw new UnsupportedOperationException();
 	}
 
@@ -302,14 +303,10 @@ public interface JobRepository extends JobExplorer {
 	 * @param jobParameters the runtime parameters for the job
 	 * @param executionContext the execution context to associate with the job execution
 	 * @return a valid {@link JobExecution} for the arguments provided
-	 * @throws JobExecutionAlreadyRunningException
-	 * @throws JobRestartException
-	 * @throws JobInstanceAlreadyCompleteException
 	 * @since 6.0
 	 */
 	default JobExecution createJobExecution(JobInstance jobInstance, JobParameters jobParameters,
-			ExecutionContext executionContext)
-			throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
+			ExecutionContext executionContext) {
 		throw new UnsupportedOperationException();
 	}
 

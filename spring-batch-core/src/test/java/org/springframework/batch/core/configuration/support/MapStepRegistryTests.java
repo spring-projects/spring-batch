@@ -15,9 +15,6 @@
  */
 package org.springframework.batch.core.configuration.support;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -29,6 +26,8 @@ import org.springframework.batch.core.configuration.StepRegistry;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.step.NoSuchStepException;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Sebastien Gerard
@@ -168,7 +167,7 @@ class MapStepRegistryTests {
 	}
 
 	protected void assertJobNotRegistered(StepRegistry stepRegistry, String jobName) {
-		assertThrows(NoSuchJobException.class, () -> stepRegistry.getStep(jobName, "a step"));
+		assertNull(stepRegistry.getStep(jobName, "a step"));
 	}
 
 	protected void assertStepsRegistered(StepRegistry stepRegistry, String jobName, Collection<Step> steps) {
@@ -184,7 +183,7 @@ class MapStepRegistryTests {
 	}
 
 	protected void assertStepNameNotRegistered(StepRegistry stepRegistry, String jobName, String stepName) {
-		assertThrows(NoSuchStepException.class, () -> stepRegistry.getStep(jobName, stepName));
+		assertNull(stepRegistry.getStep(jobName, stepName));
 	}
 
 }

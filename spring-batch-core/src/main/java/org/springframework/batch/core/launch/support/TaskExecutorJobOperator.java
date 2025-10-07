@@ -19,24 +19,21 @@ import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationRegistry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jspecify.annotations.NullUnmarked;
+import org.jspecify.annotations.Nullable;
 
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
-import org.springframework.batch.core.job.UnexpectedJobExecutionException;
 import org.springframework.batch.core.job.parameters.JobParameters;
-import org.springframework.batch.core.job.parameters.JobParametersInvalidException;
+import org.springframework.batch.core.job.parameters.InvalidJobParametersException;
 import org.springframework.batch.core.launch.JobExecutionNotRunningException;
 import org.springframework.batch.core.launch.JobOperator;
-import org.springframework.batch.core.launch.NoSuchJobException;
-import org.springframework.batch.core.launch.NoSuchJobExecutionException;
 import org.springframework.batch.core.observability.jfr.events.job.JobLaunchEvent;
 import org.springframework.batch.core.observability.micrometer.MicrometerMetrics;
-import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
-import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
+import org.springframework.batch.core.launch.JobExecutionAlreadyRunningException;
+import org.springframework.batch.core.launch.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.batch.core.launch.JobRestartException;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.util.Assert;
 
@@ -63,12 +60,11 @@ import static org.springframework.batch.core.observability.BatchMetrics.METRICS_
  * @since 6.0
  */
 @SuppressWarnings("removal")
-@NullUnmarked
 public class TaskExecutorJobOperator extends SimpleJobOperator {
 
 	private static final Log logger = LogFactory.getLog(TaskExecutorJobOperator.class.getName());
 
-	protected ObservationRegistry observationRegistry;
+	protected @Nullable ObservationRegistry observationRegistry;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -109,9 +105,8 @@ public class TaskExecutorJobOperator extends SimpleJobOperator {
 	}
 
 	@Override
-	public JobExecution start(Job job, JobParameters jobParameters)
-			throws NoSuchJobException, JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException,
-			JobRestartException, JobParametersInvalidException {
+	public JobExecution start(Job job, JobParameters jobParameters) throws JobInstanceAlreadyCompleteException,
+			JobExecutionAlreadyRunningException, JobRestartException, InvalidJobParametersException {
 		Assert.notNull(job, "Job must not be null");
 		Assert.notNull(jobParameters, "JobParameters must not be null");
 		new JobLaunchEvent(job.getName(), jobParameters.toString()).commit();
@@ -127,14 +122,13 @@ public class TaskExecutorJobOperator extends SimpleJobOperator {
 	}
 
 	@Override
-	public JobExecution restart(JobExecution jobExecution) throws JobInstanceAlreadyCompleteException,
-			NoSuchJobExecutionException, NoSuchJobException, JobRestartException, JobParametersInvalidException {
+	public JobExecution restart(JobExecution jobExecution) throws JobRestartException {
 		Assert.notNull(jobExecution, "JobExecution must not be null");
 		return super.restart(jobExecution);
 	}
 
 	@Override
-	public JobExecution startNextInstance(Job job) throws UnexpectedJobExecutionException {
+	public JobExecution startNextInstance(Job job) {
 		Assert.notNull(job, "Job must not be null");
 		return super.startNextInstance(job);
 	}

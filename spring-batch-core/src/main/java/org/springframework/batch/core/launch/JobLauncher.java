@@ -20,10 +20,7 @@ import org.jspecify.annotations.NullUnmarked;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.parameters.JobParameters;
-import org.springframework.batch.core.job.parameters.JobParametersInvalidException;
-import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
-import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
-import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.batch.core.job.parameters.InvalidJobParametersException;
 
 /**
  * Simple interface for controlling jobs, including possible ad-hoc executions, based on
@@ -59,14 +56,13 @@ public interface JobLauncher {
 	 * is asynchronous, the status might well be unknown.
 	 * @throws JobExecutionAlreadyRunningException if the JobInstance identified by the
 	 * properties already has an execution running.
-	 * @throws IllegalArgumentException if the job or jobInstanceProperties are null.
 	 * @throws JobRestartException if the job has been run before and circumstances that
 	 * preclude a re-start.
 	 * @throws JobInstanceAlreadyCompleteException if the job has been run before with the
 	 * same parameters and completed successfully
-	 * @throws JobParametersInvalidException if the parameters are not valid for this job
+	 * @throws InvalidJobParametersException if the parameters are not valid for this job
 	 */
 	JobExecution run(Job job, JobParameters jobParameters) throws JobExecutionAlreadyRunningException,
-			JobRestartException, JobInstanceAlreadyCompleteException, JobParametersInvalidException;
+			JobRestartException, JobInstanceAlreadyCompleteException, InvalidJobParametersException;
 
 }

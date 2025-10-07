@@ -67,12 +67,12 @@
 		<property name="dataSource" ref="dataSource" />
 	</bean>
 
-	<bean id="playerFileItemReader" class="org.springframework.batch.item.file.FlatFileItemReader">
+	<bean id="playerFileItemReader" class="org.springframework.batch.infrastructure.item.file.FlatFileItemReader">
 		<property name="resource" value="classpath:data/football/${player.file.name}" />
 		<constructor-arg name="lineMapper">
-			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+			<bean class="org.springframework.batch.infrastructure.item.file.mapping.DefaultLineMapper">
 				<property name="lineTokenizer">
-					<bean class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
+					<bean class="org.springframework.batch.infrastructure.item.file.transform.DelimitedLineTokenizer">
 						<property name="names" value="ID,lastName,firstName,position,birthYear,debutYear" />
 					</bean>
 				</property>
@@ -83,12 +83,12 @@
 		</constructor-arg>
 	</bean>
 
-	<bean id="gameFileItemReader" class="org.springframework.batch.item.file.FlatFileItemReader">
+	<bean id="gameFileItemReader" class="org.springframework.batch.infrastructure.item.file.FlatFileItemReader">
 		<property name="resource" value="classpath:data/football/${games.file.name}" />
 		<constructor-arg name="lineMapper">
-			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+			<bean class="org.springframework.batch.infrastructure.item.file.mapping.DefaultLineMapper">
 				<property name="lineTokenizer">
-					<bean class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
+					<bean class="org.springframework.batch.infrastructure.item.file.transform.DelimitedLineTokenizer">
 						<property name="names"
 							value="id,year,team,week,opponent,completes,attempts,passingYards,passingTd,interceptions,rushes,rushYards,receptions,receptionYards,totalTd" />
 					</bean>
@@ -100,7 +100,7 @@
 		</constructor-arg>
 	</bean>
 
-	<bean id="playerSummarizationSource" class="org.springframework.batch.item.database.JdbcCursorItemReader">
+	<bean id="playerSummarizationSource" class="org.springframework.batch.infrastructure.item.database.JdbcCursorItemReader">
 		<constructor-arg name="dataSource" ref="dataSource" />
 		<property name="verifyCursorPosition" value="true" />
 		<constructor-arg name="rowMapper">

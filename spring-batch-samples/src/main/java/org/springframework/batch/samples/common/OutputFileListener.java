@@ -18,7 +18,7 @@ package org.springframework.batch.samples.common;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.annotation.BeforeStep;
-import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.infrastructure.item.ExecutionContext;
 
 /**
  * @author Dave Syer

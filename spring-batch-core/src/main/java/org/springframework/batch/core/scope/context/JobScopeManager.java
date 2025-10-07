@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInterruptedException;
 
 /**
  * Convenient aspect to wrap a single threaded job execution, where the implementation of
@@ -27,13 +28,14 @@ import org.springframework.batch.core.job.JobExecution;
  *
  * @author Dave Syer
  * @author Jimmy Praet
+ * @author Mahmoud Ben Hassine
  * @since 3.0
  */
 @Aspect
 public class JobScopeManager {
 
 	@Around("execution(void org.springframework.batch.core.job.Job+.execute(*)) && target(job) && args(jobExecution)")
-	public void execute(Job job, JobExecution jobExecution) {
+	public void execute(Job job, JobExecution jobExecution) throws JobInterruptedException {
 		JobSynchronizationManager.register(jobExecution);
 		try {
 			job.execute(jobExecution);

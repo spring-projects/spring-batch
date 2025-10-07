@@ -17,12 +17,12 @@
 	<bean id="itemProcessor" class="org.springframework.batch.samples.domain.trade.internal.CustomerCreditIncreaseProcessor" />
 
 	<bean id="itemReader"
-		class="org.springframework.batch.item.database.JpaPagingItemReader">
+		class="org.springframework.batch.infrastructure.item.database.JpaPagingItemReader">
 		<property name="entityManagerFactory" ref="entityManagerFactory" />
 		<property name="queryString" value="select c from CustomerCredit c" />
 	</bean>
 
-	<bean id="itemWriter" class="org.springframework.batch.item.database.JpaItemWriter">
+	<bean id="itemWriter" class="org.springframework.batch.infrastructure.item.database.JpaItemWriter">
 		<property name="entityManagerFactory" ref="entityManagerFactory" />
 	</bean>
 

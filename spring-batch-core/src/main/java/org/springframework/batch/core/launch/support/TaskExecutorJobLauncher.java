@@ -29,15 +29,15 @@ import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
-import org.springframework.batch.core.job.parameters.JobParametersInvalidException;
+import org.springframework.batch.core.job.parameters.InvalidJobParametersException;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.observability.BatchMetrics;
-import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
-import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
+import org.springframework.batch.core.launch.JobExecutionAlreadyRunningException;
+import org.springframework.batch.core.launch.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.repository.JobRestartException;
-import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.core.launch.JobRestartException;
+import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
@@ -96,12 +96,12 @@ public class TaskExecutorJobLauncher implements JobLauncher, InitializingBean {
 	 * either not allowed or not needed.
 	 * @throws JobInstanceAlreadyCompleteException if this instance has already completed
 	 * successfully
-	 * @throws JobParametersInvalidException thrown if jobParameters is invalid.
+	 * @throws InvalidJobParametersException thrown if jobParameters is invalid.
 	 */
 	@Override
 	public JobExecution run(final Job job, final JobParameters jobParameters)
 			throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException,
-			JobParametersInvalidException {
+			InvalidJobParametersException {
 		Assert.notNull(job, "The Job must not be null.");
 		Assert.notNull(jobParameters, "The JobParameters must not be null.");
 		JobExecution jobExecution = createJobExecution(job, jobParameters);
@@ -109,9 +109,10 @@ public class TaskExecutorJobLauncher implements JobLauncher, InitializingBean {
 		return jobExecution;
 	}
 
+	// TODO Extract restartability checks to a separate method
 	private JobExecution createJobExecution(Job job, JobParameters jobParameters)
 			throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException,
-			JobParametersInvalidException {
+			InvalidJobParametersException {
 		JobInstance jobInstance = jobRepository.getJobInstance(job.getName(), jobParameters);
 		ExecutionContext executionContext;
 		if (jobInstance == null) { // fresh start

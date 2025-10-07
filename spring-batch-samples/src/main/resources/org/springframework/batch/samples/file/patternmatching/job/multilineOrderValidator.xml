@@ -4,7 +4,7 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
 	                    https://www.springframework.org/schema/beans/spring-beans.xsd">
 
-	<bean id="validator" class="org.springframework.batch.item.validator.SpringValidator">
+	<bean id="validator" class="org.springframework.batch.infrastructure.item.validator.SpringValidator">
 		<property name="validator">
 			<bean id="orderValidator" class="org.springframework.batch.samples.file.patternmatching.internal.validator.OrderValidator"/>
 		</property>

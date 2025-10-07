@@ -17,8 +17,9 @@ package org.springframework.batch.core.configuration;
 
 import java.util.Collection;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.batch.core.job.Job;
-import org.springframework.batch.core.launch.NoSuchJobException;
 
 /**
  * A runtime service registry interface for registering job configurations by
@@ -33,10 +34,9 @@ public interface JobRegistry {
 	/**
 	 * Returns a {@link Job} by name.
 	 * @param name the name of the {@link Job} which should be unique
-	 * @return a {@link Job} identified by the given name
-	 * @throws NoSuchJobException if the required configuration can not be found.
+	 * @return a {@link Job} identified by the given name, or null if no such job exists.
 	 */
-	Job getJob(String name) throws NoSuchJobException;
+	@Nullable Job getJob(String name);
 
 	/**
 	 * Provides the currently registered job names. The return value is unmodifiable and
@@ -54,8 +54,8 @@ public interface JobRegistry {
 	void register(Job job) throws DuplicateJobException;
 
 	/**
-	 * Unregisters a previously registered {@link Job}. If it was not previously
-	 * registered, there is no error.
+	 * Unregisters a previously registered {@link Job}. If the job is not found, this
+	 * method does nothing.
 	 * @param jobName the {@link Job} to unregister.
 	 */
 	void unregister(String jobName);

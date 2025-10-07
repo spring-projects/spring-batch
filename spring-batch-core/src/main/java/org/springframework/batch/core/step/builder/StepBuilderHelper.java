@@ -32,7 +32,7 @@ import org.springframework.batch.core.annotation.BeforeStep;
 import org.springframework.batch.core.listener.StepListenerFactoryBean;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.AbstractStep;
-import org.springframework.batch.support.ReflectionUtils;
+import org.springframework.batch.infrastructure.support.ReflectionUtils;
 
 /**
  * A base class and utility for other step builders providing access to common properties
@@ -44,7 +44,8 @@ import org.springframework.batch.support.ReflectionUtils;
  * @author Mahmoud Ben Hassine
  * @since 2.2
  */
-@NullUnmarked // FIXME to remove once default constructors are removed
+// FIXME remove once default constructors (required by the XML namespace) are removed
+@NullUnmarked
 public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 
 	protected final Log logger = LogFactory.getLog(getClass());

@@ -29,13 +29,14 @@ class JsonJobParametersConverterTests {
 	void testEncode() {
 		// given
 		JsonJobParametersConverter converter = new JsonJobParametersConverter();
-		JobParameter<String> jobParameter = new JobParameter<>("foo", String.class, false);
+		JobParameter<String> jobParameter = new JobParameter<>("name", "foo", String.class, false);
 
 		// when
 		String encodedJobParameter = converter.encode(jobParameter);
 
 		// then
-		Assertions.assertEquals("{\"value\":\"foo\",\"type\":\"java.lang.String\",\"identifying\":\"false\"}",
+		Assertions.assertEquals(
+				"{\"name\":\"name\",\"value\":\"foo\",\"type\":\"java.lang.String\",\"identifying\":\"false\"}",
 				encodedJobParameter);
 	}
 
@@ -43,13 +44,14 @@ class JsonJobParametersConverterTests {
 	void testEncodeWithDefaultIdentifyingFlag() {
 		// given
 		JsonJobParametersConverter converter = new JsonJobParametersConverter();
-		JobParameter<String> jobParameter = new JobParameter<>("foo", String.class);
+		JobParameter<String> jobParameter = new JobParameter<>("name", "foo", String.class);
 
 		// when
 		String encodedJobParameter = converter.encode(jobParameter);
 
 		// then
-		Assertions.assertEquals("{\"value\":\"foo\",\"type\":\"java.lang.String\",\"identifying\":\"true\"}",
+		Assertions.assertEquals(
+				"{\"name\":\"name\",\"value\":\"foo\",\"type\":\"java.lang.String\",\"identifying\":\"true\"}",
 				encodedJobParameter);
 	}
 
@@ -57,48 +59,49 @@ class JsonJobParametersConverterTests {
 	void testDecode() {
 		// given
 		JsonJobParametersConverter converter = new JsonJobParametersConverter();
-		String encodedJobParameter = "{\"value\":\"foo\",\"type\":\"java.lang.String\",\"identifying\":\"false\"}";
+		String encodedJobParameter = "{\"name\":\"name\",\"value\":\"foo\",\"type\":\"java.lang.String\",\"identifying\":\"false\"}";
 
 		// when
-		JobParameter<String> jobParameter = converter.decode(encodedJobParameter);
+		JobParameter<String> jobParameter = converter.decode("name", encodedJobParameter);
 
 		// then
 		Assertions.assertNotNull(jobParameter);
-		Assertions.assertEquals("foo", jobParameter.getValue());
-		Assertions.assertEquals(String.class, jobParameter.getType());
-		Assertions.assertFalse(jobParameter.isIdentifying());
+		Assertions.assertEquals("foo", jobParameter.value());
+		Assertions.assertEquals(String.class, jobParameter.type());
+		Assertions.assertFalse(jobParameter.identifying());
 	}
 
 	@Test
 	void testDecodeWithDefaultIdentifyingFlag() {
 		// given
 		JsonJobParametersConverter converter = new JsonJobParametersConverter();
-		String encodedJobParameter = "{\"value\":\"foo\",\"type\":\"java.lang.String\"}";
+		String encodedJobParameter = "{\"name\":\"name\",\"value\":\"foo\",\"type\":\"java.lang.String\"}";
 
 		// when
-		JobParameter<String> jobParameter = converter.decode(encodedJobParameter);
+		JobParameter<String> jobParameter = converter.decode("name", encodedJobParameter);
 
 		// then
 		Assertions.assertNotNull(jobParameter);
-		Assertions.assertEquals("foo", jobParameter.getValue());
-		Assertions.assertEquals(String.class, jobParameter.getType());
-		Assertions.assertTrue(jobParameter.isIdentifying());
+		Assertions.assertEquals("foo", jobParameter.value());
+		Assertions.assertEquals(String.class, jobParameter.type());
+		Assertions.assertTrue(jobParameter.identifying());
 	}
 
 	@Test
 	void testDecodeWithDefaultIdentifyingFlagAndDefaultType() {
 		// given
 		JsonJobParametersConverter converter = new JsonJobParametersConverter();
-		String encodedJobParameter = "{\"value\":\"foo\"}";
+		String encodedJobParameter = "{\"name\":\"name\",\"value\":\"foo\"}";
 
 		// when
-		JobParameter<String> jobParameter = converter.decode(encodedJobParameter);
+		JobParameter<String> jobParameter = converter.decode("name", encodedJobParameter);
 
 		// then
 		Assertions.assertNotNull(jobParameter);
-		Assertions.assertEquals("foo", jobParameter.getValue());
-		Assertions.assertEquals(String.class, jobParameter.getType());
-		Assertions.assertTrue(jobParameter.isIdentifying());
+		Assertions.assertEquals("name", jobParameter.name());
+		Assertions.assertEquals("foo", jobParameter.value());
+		Assertions.assertEquals(String.class, jobParameter.type());
+		Assertions.assertTrue(jobParameter.identifying());
 	}
 
 }

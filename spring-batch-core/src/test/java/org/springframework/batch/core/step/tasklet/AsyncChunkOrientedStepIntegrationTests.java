@@ -15,10 +15,7 @@
  */
 package org.springframework.batch.core.step.tasklet;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.junit.jupiter.api.AfterEach;
@@ -35,12 +32,12 @@ import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.support.ListItemReader;
-import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
-import org.springframework.batch.repeat.support.RepeatTemplate;
-import org.springframework.batch.repeat.support.TaskExecutorRepeatTemplate;
+import org.springframework.batch.infrastructure.item.ExecutionContext;
+import org.springframework.batch.infrastructure.item.ItemReader;
+import org.springframework.batch.infrastructure.item.support.ListItemReader;
+import org.springframework.batch.infrastructure.repeat.policy.SimpleCompletionPolicy;
+import org.springframework.batch.infrastructure.repeat.support.RepeatTemplate;
+import org.springframework.batch.infrastructure.repeat.support.TaskExecutorRepeatTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
@@ -124,7 +121,7 @@ class AsyncChunkOrientedStepIntegrationTests {
 				getReader(new String[] { "a", "b", "c", "a", "b", "c", "a", "b", "c", "a", "b", "c" }),
 				data -> written.addAll(data.getItems()), chunkOperations));
 		JobParameters jobParameters = new JobParameters(
-				Collections.singletonMap("run.id", new JobParameter(getClass().getName() + ".1", Long.class)));
+				Set.of(new JobParameter<>("run.id", getClass().getName() + ".1", String.class)));
 		JobInstance jobInstance = jobRepository.createJobInstance(job.getName(), jobParameters);
 		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
 				new ExecutionContext());

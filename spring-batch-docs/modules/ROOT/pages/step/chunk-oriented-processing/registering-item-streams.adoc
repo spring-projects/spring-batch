@@ -56,7 +56,7 @@ XML::
 The following example shows how to register a `stream` on a `step` in XML:
 +
 .XML Configuration
-[source, xml]
+[source,xml]
 ----
 <step id="step1">
     <tasklet>
@@ -70,7 +70,7 @@ The following example shows how to register a `stream` on a `step` in XML:
 </step>
 
 <beans:bean id="compositeWriter"
-            class="org.springframework.batch.item.support.CompositeItemWriter">
+            class="org.springframework.batch.infrastructure.item.support.CompositeItemWriter">
     <beans:property name="delegates">
         <beans:list>
             <beans:ref bean="fileItemWriter1" />

@@ -21,7 +21,7 @@ import java.io.Writer;
 
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.listener.StepExecutionListener;
-import org.springframework.batch.item.file.FlatFileFooterCallback;
+import org.springframework.batch.infrastructure.item.file.FlatFileFooterCallback;
 
 /**
  * Writes summary info in the footer of a file.

@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
-import org.springframework.batch.support.PropertiesConverter;
+import org.springframework.batch.infrastructure.support.PropertiesConverter;
 import org.springframework.batch.test.JobOperatorTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;

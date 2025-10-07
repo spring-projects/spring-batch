@@ -24,7 +24,6 @@ import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.FlowExecutor;
 import org.springframework.batch.core.job.flow.State;
-import org.springframework.batch.core.step.NoSuchStepException;
 import org.springframework.batch.core.step.StepHolder;
 import org.springframework.batch.core.step.StepLocator;
 
@@ -92,7 +91,7 @@ public class StepState extends AbstractState implements StepLocator, StepHolder 
 	}
 
 	@Override
-	public Step getStep(String stepName) throws NoSuchStepException {
+	public Step getStep(String stepName) {
 		Step result = null;
 
 		if (step.getName().equals(stepName)) {

@@ -17,8 +17,7 @@
 package org.springframework.batch.test;
 
 import java.security.SecureRandom;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -36,7 +35,7 @@ import org.springframework.batch.core.job.flow.FlowJob;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.StepLocator;
-import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.context.ApplicationContext;
 import org.springframework.lang.Nullable;
 
@@ -164,9 +163,7 @@ public class JobLauncherTestUtils {
 	 * of type {@code long}, to ensure that the job instance will be unique.
 	 */
 	public JobParameters getUniqueJobParameters() {
-		Map<String, JobParameter<?>> parameters = new HashMap<>();
-		parameters.put("random", new JobParameter<>(this.secureRandom.nextLong(), Long.class));
-		return new JobParameters(parameters);
+		return new JobParameters(Set.of(new JobParameter<>("random", this.secureRandom.nextLong(), Long.class)));
 	}
 
 	/**

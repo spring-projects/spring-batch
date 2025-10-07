@@ -169,21 +169,22 @@ Batch infrastructure. Because the input is flat-file based, a
 `FlatFileItemReader` is used:
 
 ```xml
+
 <bean id="playerFileItemReader"
-  class="org.springframework.batch.item.file.FlatFileItemReader">
-  <property name="resource"
-    value="classpath:data/footballjob/input/${player.file.name}" />
-  <property name="lineTokenizer">
-    <bean
-      class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
-      <property name="names"
-        value="ID,lastName,firstName,position,birthYear,debutYear" />
-    </bean>
-  </property>
-  <property name="fieldSetMapper">
-    <bean
-      class="org.springframework.batch.samples.football.internal.internal.PlayerFieldSetMapper" />
-  </property>
+      class="org.springframework.batch.infrastructure.item.file.FlatFileItemReader">
+    <property name="resource"
+              value="classpath:data/footballjob/input/${player.file.name}"/>
+    <property name="lineTokenizer">
+        <bean
+                class="org.springframework.batch.infrastructure.item.file.transform.DelimitedLineTokenizer">
+            <property name="names"
+                      value="ID,lastName,firstName,position,birthYear,debutYear"/>
+        </bean>
+    </property>
+    <property name="fieldSetMapper">
+        <bean
+                class="org.springframework.batch.samples.football.internal.internal.PlayerFieldSetMapper"/>
+    </property>
 </bean>
 ```
 
@@ -253,22 +254,24 @@ a writer. However, in this case, the input source is the database,
 not a file:
 
 ```xml
-<bean id="playerSummarizationSource" class="org.springframework.batch.item.database.JdbcCursorItemReader">
-  <property name="dataSource" ref="dataSource" />
-  <property name="mapper">
-      <bean
-          class="org.springframework.batch.samples.football.internal.internal.PlayerSummaryMapper" />
-  </property>
-  <property name="sql">
-    <value>
-        SELECT games.player_id, games.year_no, SUM(COMPLETES),
-        SUM(ATTEMPTS), SUM(PASSING_YARDS), SUM(PASSING_TD),
-        SUM(INTERCEPTIONS), SUM(RUSHES), SUM(RUSH_YARDS),
-        SUM(RECEPTIONS), SUM(RECEPTIONS_YARDS), SUM(TOTAL_TD)
-        from games, players where players.player_id =
-        games.player_id group by games.player_id, games.year_no
-    </value>
-  </property>
+
+<bean id="playerSummarizationSource"
+      class="org.springframework.batch.infrastructure.item.database.JdbcCursorItemReader">
+    <property name="dataSource" ref="dataSource"/>
+    <property name="mapper">
+        <bean
+                class="org.springframework.batch.samples.football.internal.internal.PlayerSummaryMapper"/>
+    </property>
+    <property name="sql">
+        <value>
+            SELECT games.player_id, games.year_no, SUM(COMPLETES),
+            SUM(ATTEMPTS), SUM(PASSING_YARDS), SUM(PASSING_TD),
+            SUM(INTERCEPTIONS), SUM(RUSHES), SUM(RUSH_YARDS),
+            SUM(RECEPTIONS), SUM(RECEPTIONS_YARDS), SUM(TOTAL_TD)
+            from games, players where players.player_id =
+            games.player_id group by games.player_id, games.year_no
+        </value>
+    </property>
 </bean>
 ```
 

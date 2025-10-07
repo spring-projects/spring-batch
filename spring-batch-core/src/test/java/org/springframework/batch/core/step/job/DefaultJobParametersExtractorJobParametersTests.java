@@ -28,9 +28,7 @@ import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.core.convert.support.DefaultConversionService;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Dave Syer
@@ -56,9 +54,9 @@ class DefaultJobParametersExtractorJobParametersTests {
 		StepExecution stepExecution = getStepExecution("foo=bar");
 		extractor.setKeys(new String[] { "foo", "bar" });
 		JobParameters jobParameters = extractor.getJobParameters(null, stepExecution);
-		assertTrue(jobParameters.getParameters().containsKey("foo"));
+		assertNotNull(jobParameters.getParameter("foo"));
 		assertEquals("bar", jobParameters.getString("foo"));
-		assertFalse(jobParameters.getParameters().containsKey("bar"));
+		assertNull(jobParameters.getParameter("bar"));
 	}
 
 	@Test
@@ -68,7 +66,7 @@ class DefaultJobParametersExtractorJobParametersTests {
 		JobParameters jobParameters = extractor.getJobParameters(null, stepExecution);
 		assertEquals("bar", jobParameters.getString("foo"));
 		assertEquals("bucket", jobParameters.getString("spam"));
-		assertFalse(jobParameters.getParameters().containsKey("bar"));
+		assertNull(jobParameters.getParameter("bar"));
 	}
 
 	@Test
@@ -100,7 +98,7 @@ class DefaultJobParametersExtractorJobParametersTests {
 		StepExecution stepExecution = getStepExecution("foo=2012-12-12,java.time.LocalDate");
 		extractor.setKeys(new String[] { "foo" });
 		JobParameters jobParameters = extractor.getJobParameters(null, stepExecution);
-		assertEquals(LocalDate.of(2012, 12, 12), jobParameters.getParameter("foo").getValue());
+		assertEquals(LocalDate.of(2012, 12, 12), jobParameters.getParameter("foo").value());
 	}
 
 	private StepExecution getStepExecution(String... parameters) {

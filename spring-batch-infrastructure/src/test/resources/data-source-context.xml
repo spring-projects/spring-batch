@@ -5,7 +5,7 @@
 	    http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd">
 
 	<jdbc:embedded-database id="dataSource" generate-name="true">
-		<jdbc:script location="org/springframework/batch/item/database/init-foo-schema.sql"/>
+		<jdbc:script location="org/springframework/batch/infrastructure/item/database/init-foo-schema.sql"/>
 	</jdbc:embedded-database>
 
 	<bean id="transactionManager" class="org.springframework.jdbc.support.JdbcTransactionManager">

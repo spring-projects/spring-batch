@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2024 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,22 +23,28 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import org.springframework.util.Assert;
 
 import org.jspecify.annotations.Nullable;
 
 /**
- * Value object representing runtime parameters to a batch job. Because the parameters
- * have no individual meaning outside of the {@code JobParameters} object they are
- * contained within, it is a value object rather than an entity. It is also extremely
- * important that a parameters object can be reliably compared to another for equality, in
- * order to determine if one {@code JobParameters} object equals another. Furthermore,
- * because these parameters need to be persisted, it is vital that the types added are
- * restricted.
+ * Value object representing runtime parameters of a batch job. Because the parameters
+ * have no individual meaning outside the {@code JobParameters} object they are contained
+ * within, it is a value object rather than an entity. It is also extremely important that
+ * a parameters object can be reliably compared to another for equality, in order to
+ * determine if one {@code JobParameters} object equals another. This class is a namespace
+ * of job parameters and all parameters should have a unique name within that namespace.
+ * <p>
+ * Furthermore, because these parameters need to be persisted, it is vital that the types
+ * added are restricted.
  * <p>
  * This class is immutable and, therefore, thread-safe.
  *
@@ -48,25 +54,30 @@ import org.jspecify.annotations.Nullable;
  * @author Taeik Lim
  * @since 1.0
  */
-public class JobParameters implements Serializable {
-
-	private final Map<String, JobParameter<?>> parameters;
+public record JobParameters(Set<JobParameter<?>> parameters) implements Serializable, Iterable<JobParameter<?>> {
 
 	/**
-	 * Default constructor.
+	 * Create a new empty {@link JobParameters} instance.
+	 *
+	 * @since 6.0
 	 */
+	//@formatter:off
+    // TODO this is questionable (does this even make sense since the class is immutable?),
+    // TODO but needed for the incrementer, otherwise we would have incrementer.getNext(null)
+    // TODO which is even worse
+    //@formatter:on
 	public JobParameters() {
-		this.parameters = new HashMap<>();
+		this(new HashSet<>());
 	}
 
 	/**
-	 * Constructor that is initialized with the content of a {@link Map} that contains a
-	 * {@code String} key and a {@link JobParameter} value.
-	 * @param parameters The {@link Map} that contains a {@code String} key and a
-	 * {@link JobParameter} value.
+	 * Create a new {@link JobParameters} instance.
+	 * @param parameters the set of job parameters, must not be {@code null} or empty
+	 * @since 6.0
 	 */
-	public JobParameters(Map<String, JobParameter<?>> parameters) {
-		this.parameters = new HashMap<>(parameters);
+	public JobParameters(Set<JobParameter<?>> parameters) {
+		Assert.notNull(parameters, "parameters must not be null");
+		this.parameters = new HashSet<>(parameters);
 	}
 
 	/**
@@ -75,14 +86,14 @@ public class JobParameters implements Serializable {
 	 * @return The {@link Long} value or {@code null} if the key is absent.
 	 */
 	public @Nullable Long getLong(String key) {
-		if (!parameters.containsKey(key)) {
+		JobParameter<?> jobParameter = getParameter(key);
+		if (jobParameter == null) {
 			return null;
 		}
-		JobParameter<?> jobParameter = parameters.get(key);
-		if (!jobParameter.getType().equals(Long.class)) {
+		if (!jobParameter.type().equals(Long.class)) {
 			throw new IllegalArgumentException("Key " + key + " is not of type Long");
 		}
-		return (Long) jobParameter.getValue();
+		return (Long) jobParameter.value();
 	}
 
 	/**
@@ -93,8 +104,8 @@ public class JobParameters implements Serializable {
 	 * @return the parameter represented by the provided key or, if that is missing, the
 	 * default value.
 	 */
-	public @Nullable Long getLong(String key, @Nullable Long defaultValue) {
-		if (parameters.containsKey(key)) {
+	public @Nullable Long getLong(String key, Long defaultValue) {
+		if (getParameter(key) != null) {
 			return getLong(key);
 		}
 		else {
@@ -108,14 +119,14 @@ public class JobParameters implements Serializable {
 	 * @return The {@link String} value or {@code null} if the key is absent.
 	 */
 	public @Nullable String getString(String key) {
-		if (!parameters.containsKey(key)) {
+		JobParameter<?> jobParameter = getParameter(key);
+		if (jobParameter == null) {
 			return null;
 		}
-		JobParameter<?> jobParameter = parameters.get(key);
-		if (!jobParameter.getType().equals(String.class)) {
+		if (!jobParameter.type().equals(String.class)) {
 			throw new IllegalArgumentException("Key " + key + " is not of type String");
 		}
-		return (String) jobParameter.getValue();
+		return (String) jobParameter.value();
 	}
 
 	/**
@@ -126,8 +137,8 @@ public class JobParameters implements Serializable {
 	 * @return the parameter represented by the provided key or, if that is missing, the
 	 * default value.
 	 */
-	public @Nullable String getString(String key, @Nullable String defaultValue) {
-		if (parameters.containsKey(key)) {
+	public @Nullable String getString(String key, String defaultValue) {
+		if (getParameter(key) != null) {
 			return getString(key);
 		}
 		else {
@@ -141,14 +152,14 @@ public class JobParameters implements Serializable {
 	 * @return The {@link Double} value or {@code null} if the key is absent.
 	 */
 	public @Nullable Double getDouble(String key) {
-		if (!parameters.containsKey(key)) {
+		JobParameter<?> jobParameter = getParameter(key);
+		if (jobParameter == null) {
 			return null;
 		}
-		JobParameter<?> jobParameter = parameters.get(key);
-		if (!jobParameter.getType().equals(Double.class)) {
+		if (!jobParameter.type().equals(Double.class)) {
 			throw new IllegalArgumentException("Key " + key + " is not of type Double");
 		}
-		return (Double) jobParameter.getValue();
+		return (Double) jobParameter.value();
 	}
 
 	/**
@@ -159,8 +170,8 @@ public class JobParameters implements Serializable {
 	 * @return the parameter represented by the provided key or, if that is missing, the
 	 * default value.
 	 */
-	public @Nullable Double getDouble(String key, @Nullable Double defaultValue) {
-		if (parameters.containsKey(key)) {
+	public @Nullable Double getDouble(String key, Double defaultValue) {
+		if (getParameter(key) != null) {
 			return getDouble(key);
 		}
 		else {
@@ -171,17 +182,17 @@ public class JobParameters implements Serializable {
 	/**
 	 * Typesafe getter for the {@link Date} represented by the provided key.
 	 * @param key The key for which to get a value.
-	 * @return the {@link java.util.Date} value or {@code null} if the key is absent.
+	 * @return the {@link Date} value or {@code null} if the key is absent.
 	 */
 	public @Nullable Date getDate(String key) {
-		if (!parameters.containsKey(key)) {
+		JobParameter<?> jobParameter = getParameter(key);
+		if (jobParameter == null) {
 			return null;
 		}
-		JobParameter<?> jobParameter = parameters.get(key);
-		if (!jobParameter.getType().equals(Date.class)) {
+		if (!jobParameter.type().equals(Date.class)) {
 			throw new IllegalArgumentException("Key " + key + " is not of type java.util.Date");
 		}
-		return (Date) jobParameter.getValue();
+		return (Date) jobParameter.value();
 	}
 
 	/**
@@ -192,8 +203,8 @@ public class JobParameters implements Serializable {
 	 * @return the parameter represented by the provided key or, if that is missing, the
 	 * default value.
 	 */
-	public @Nullable Date getDate(String key, @Nullable Date defaultValue) {
-		if (parameters.containsKey(key)) {
+	public @Nullable Date getDate(String key, Date defaultValue) {
+		if (getParameter(key) != null) {
 			return getDate(key);
 		}
 		else {
@@ -207,14 +218,14 @@ public class JobParameters implements Serializable {
 	 * @return the {@link LocalDate} value or {@code null} if the key is absent.
 	 */
 	public @Nullable LocalDate getLocalDate(String key) {
-		if (!parameters.containsKey(key)) {
+		JobParameter<?> jobParameter = getParameter(key);
+		if (jobParameter == null) {
 			return null;
 		}
-		JobParameter<?> jobParameter = parameters.get(key);
-		if (!jobParameter.getType().equals(LocalDate.class)) {
+		if (!jobParameter.type().equals(LocalDate.class)) {
 			throw new IllegalArgumentException("Key " + key + " is not of type java.time.LocalDate");
 		}
-		return (LocalDate) jobParameter.getValue();
+		return (LocalDate) jobParameter.value();
 	}
 
 	/**
@@ -225,8 +236,8 @@ public class JobParameters implements Serializable {
 	 * @return the parameter represented by the provided key or, if that is missing, the
 	 * default value.
 	 */
-	public @Nullable LocalDate getLocalDate(String key, @Nullable LocalDate defaultValue) {
-		if (parameters.containsKey(key)) {
+	public @Nullable LocalDate getLocalDate(String key, LocalDate defaultValue) {
+		if (getParameter(key) != null) {
 			return getLocalDate(key);
 		}
 		else {
@@ -240,14 +251,14 @@ public class JobParameters implements Serializable {
 	 * @return the {@link LocalTime} value or {@code null} if the key is absent.
 	 */
 	public @Nullable LocalTime getLocalTime(String key) {
-		if (!parameters.containsKey(key)) {
+		JobParameter<?> jobParameter = getParameter(key);
+		if (jobParameter == null) {
 			return null;
 		}
-		JobParameter<?> jobParameter = parameters.get(key);
-		if (!jobParameter.getType().equals(LocalTime.class)) {
+		if (!jobParameter.type().equals(LocalTime.class)) {
 			throw new IllegalArgumentException("Key " + key + " is not of type java.time.LocalTime");
 		}
-		return (LocalTime) jobParameter.getValue();
+		return (LocalTime) jobParameter.value();
 	}
 
 	/**
@@ -258,8 +269,8 @@ public class JobParameters implements Serializable {
 	 * @return the parameter represented by the provided key or, if that is missing, the
 	 * default value.
 	 */
-	public @Nullable LocalTime getLocalTime(String key, @Nullable LocalTime defaultValue) {
-		if (parameters.containsKey(key)) {
+	public @Nullable LocalTime getLocalTime(String key, LocalTime defaultValue) {
+		if (getParameter(key) != null) {
 			return getLocalTime(key);
 		}
 		else {
@@ -273,14 +284,14 @@ public class JobParameters implements Serializable {
 	 * @return the {@link LocalDateTime} value or {@code null} if the key is absent.
 	 */
 	public @Nullable LocalDateTime getLocalDateTime(String key) {
-		if (!parameters.containsKey(key)) {
+		JobParameter<?> jobParameter = getParameter(key);
+		if (jobParameter == null) {
 			return null;
 		}
-		JobParameter<?> jobParameter = parameters.get(key);
-		if (!jobParameter.getType().equals(LocalDateTime.class)) {
+		if (!jobParameter.type().equals(LocalDateTime.class)) {
 			throw new IllegalArgumentException("Key " + key + " is not of type java.time.LocalDateTime");
 		}
-		return (LocalDateTime) jobParameter.getValue();
+		return (LocalDateTime) jobParameter.value();
 	}
 
 	/**
@@ -291,8 +302,8 @@ public class JobParameters implements Serializable {
 	 * @return the parameter represented by the provided key or, if that is missing, the
 	 * default value.
 	 */
-	public @Nullable LocalDateTime getLocalDateTime(String key, @Nullable LocalDateTime defaultValue) {
-		if (parameters.containsKey(key)) {
+	public @Nullable LocalDateTime getLocalDateTime(String key, LocalDateTime defaultValue) {
+		if (getParameter(key) != null) {
 			return getLocalDateTime(key);
 		}
 		else {
@@ -302,30 +313,25 @@ public class JobParameters implements Serializable {
 
 	public @Nullable JobParameter<?> getParameter(String key) {
 		Assert.notNull(key, "key must not be null");
-		return parameters.get(key);
+		return this.parameters.stream().filter(parameter -> parameter.name().equals(key)).findFirst().orElse(null);
 	}
 
 	/**
-	 * Get a map of all parameters.
-	 * @return an unmodifiable map containing all parameters.
+	 * Get a set of all parameters.
+	 * @return an unmodifiable set containing all parameters.
 	 */
-	public Map<String, JobParameter<?>> getParameters() {
-		return Collections.unmodifiableMap(parameters);
+	@Override
+	public Set<JobParameter<?>> parameters() {
+		return Collections.unmodifiableSet(parameters);
 	}
 
 	/**
-	 * Get a map of identifying parameters.
+	 * Get a set of identifying parameters.
+	 * @return an unmodifiable set containing identifying parameters.
 	 * @since 5.1
-	 * @return an unmodifiable map containing identifying parameters.
 	 */
-	public Map<String, JobParameter<?>> getIdentifyingParameters() {
-		Map<String, JobParameter<?>> identifyingParameters = new HashMap<>();
-		for (Map.Entry<String, JobParameter<?>> entry : this.parameters.entrySet()) {
-			if (entry.getValue().isIdentifying()) {
-				identifyingParameters.put(entry.getKey(), entry.getValue());
-			}
-		}
-		return Collections.unmodifiableMap(identifyingParameters);
+	public Set<JobParameter<?>> getIdentifyingParameters() {
+		return this.parameters.stream().filter(JobParameter::identifying).collect(Collectors.toUnmodifiableSet());
 	}
 
 	/**
@@ -336,28 +342,27 @@ public class JobParameters implements Serializable {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (!(obj instanceof JobParameters rhs)) {
-			return false;
-		}
-
-		if (obj == this) {
-			return true;
-		}
-
-		return this.parameters.equals(rhs.parameters);
+	public Iterator<JobParameter<?>> iterator() {
+		return parameters.iterator();
 	}
 
 	@Override
-	public int hashCode() {
-		return 17 + 23 * parameters.hashCode();
+	public void forEach(Consumer<? super JobParameter<?>> action) {
+		Iterable.super.forEach(action);
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (!(o instanceof JobParameters that))
+			return false;
+		return Objects.equals(parameters, that.parameters);
 	}
 
 	@Override
 	public String toString() {
 		List<String> parameters = new ArrayList<>();
-		for (Map.Entry<String, JobParameter<?>> entry : this.parameters.entrySet()) {
-			parameters.add(String.format("'%s':'%s'", entry.getKey(), entry.getValue()));
+		for (JobParameter<?> parameter : this.parameters) {
+			parameters.add(parameter.toString());
 		}
 		return "{" + String.join(",", parameters) + "}";
 	}

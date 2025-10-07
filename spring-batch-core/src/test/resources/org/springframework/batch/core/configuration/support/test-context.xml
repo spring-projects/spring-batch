@@ -21,7 +21,7 @@
 	</bean>
 
 	<bean id="itemReader"
-		class="org.springframework.batch.item.support.ListItemReader">
+		class="org.springframework.batch.infrastructure.item.support.ListItemReader">
 		<constructor-arg value="foo,bar,spam" />
 	</bean>
 
@@ -32,7 +32,7 @@
 		class="org.springframework.batch.core.step.JobRepositorySupport" />
 
 	<bean id="transactionManager"
-		class="org.springframework.batch.support.transaction.ResourcelessTransactionManager" />
+		class="org.springframework.batch.infrastructure.support.transaction.ResourcelessTransactionManager" />
 
 	<bean id="test-job-with-name"
 		class="org.springframework.batch.core.job.JobSupport">

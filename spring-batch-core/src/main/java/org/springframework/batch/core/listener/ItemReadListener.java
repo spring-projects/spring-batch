@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.core.listener;
 
-import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.infrastructure.item.ItemReader;
 
 /**
  * Listener interface around the reading of an item.

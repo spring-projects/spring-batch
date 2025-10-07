@@ -18,7 +18,7 @@ package org.springframework.batch.samples.domain.trade.internal;
 
 import java.math.BigDecimal;
 
-import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.infrastructure.item.ItemReader;
 
 import org.jspecify.annotations.Nullable;
 import org.springframework.batch.samples.domain.trade.Trade;

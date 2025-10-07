@@ -26,7 +26,7 @@ import org.springframework.batch.core.BatchStatus;
 
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
-import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.batch.core.launch.JobRestartException;
 import org.springframework.batch.core.step.StepLocator;
 
 /**
@@ -40,7 +40,8 @@ import org.springframework.batch.core.step.StepLocator;
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
  */
-@NullUnmarked // FIXME to remove once default constructors are removed
+@NullUnmarked // FIXME to remove once default constructors (required by the batch XML
+				// namespace) are removed
 public class SimpleJob extends AbstractJob {
 
 	private final List<Step> steps = new ArrayList<>();

@@ -18,8 +18,8 @@ package org.springframework.batch.core.test.timeout;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.springframework.batch.item.Chunk;
-import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.infrastructure.item.Chunk;
+import org.springframework.batch.infrastructure.item.ItemWriter;
 
 public class LoggingItemWriter<T> implements ItemWriter<T> {
 

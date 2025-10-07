@@ -44,6 +44,7 @@ import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.dao.JobInstanceDao;
 import org.springframework.batch.core.repository.dao.StepExecutionDao;
 import org.springframework.batch.core.repository.support.JdbcJobRepositoryFactoryBean;
+import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.convert.support.ConfigurableConversionService;
@@ -93,7 +94,7 @@ public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean imple
 	 * A custom implementation of {@link ExecutionContextSerializer}. The default, if not
 	 * injected, is the {@link DefaultExecutionContextSerializer}.
 	 * @param serializer The serializer used to serialize or deserialize an
-	 * {@link org.springframework.batch.item.ExecutionContext}.
+	 * {@link ExecutionContext}.
 	 * @see ExecutionContextSerializer
 	 */
 	public void setSerializer(ExecutionContextSerializer serializer) {

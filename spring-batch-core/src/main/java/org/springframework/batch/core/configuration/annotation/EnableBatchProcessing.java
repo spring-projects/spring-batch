@@ -21,6 +21,7 @@ import org.springframework.batch.core.configuration.support.GroupAwareJob;
 import org.springframework.batch.core.configuration.support.ScopeConfiguration;
 import org.springframework.batch.core.converter.JobParametersConverter;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.infrastructure.support.transaction.ResourcelessTransactionManager;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.Documented;
@@ -60,8 +61,7 @@ import java.lang.annotation.Target;
  *
  * By default,this annotation configures a resouceless batch infrastructure (ie based on a
  * {@link org.springframework.batch.core.repository.support.ResourcelessJobRepository} and
- * a
- * {@link org.springframework.batch.support.transaction.ResourcelessTransactionManager}).
+ * a {@link ResourcelessTransactionManager}).
  *
  * Note that only one of your configuration classes needs to have the
  * <code>&#064;EnableBatchProcessing</code> annotation. Once you have an

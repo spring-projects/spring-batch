@@ -17,14 +17,14 @@
 		</step>
 	</job>
 
-	<bean id="reader" class="org.springframework.batch.item.file.FlatFileItemReader">
+	<bean id="reader" class="org.springframework.batch.infrastructure.item.file.FlatFileItemReader">
 		<property name="resource" value="classpath:/org/springframework/batch/integration/file/test.txt" />
 		<constructor-arg name="lineMapper">
-			<bean class="org.springframework.batch.item.file.mapping.PassThroughLineMapper" />
+			<bean class="org.springframework.batch.infrastructure.item.file.mapping.PassThroughLineMapper" />
 		</constructor-arg>
 	</bean>
 
-	<integration:gateway id="writer" service-interface="org.springframework.batch.item.ItemWriter"
+	<integration:gateway id="writer" service-interface="org.springframework.batch.infrastructure.item.ItemWriter"
 		default-request-channel="requests" />
 
 </beans>

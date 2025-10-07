@@ -1,0 +1,577 @@
+/*
+ * Copyright 2008-2023 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.springframework.batch.infrastructure.item.file;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.endsWith;
+import static org.hamcrest.Matchers.startsWith;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.io.IOException;
+import java.io.InputStream;
+
+import org.jspecify.annotations.Nullable;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import org.springframework.batch.infrastructure.item.ExecutionContext;
+import org.springframework.batch.infrastructure.item.ItemCountAware;
+import org.springframework.batch.infrastructure.item.ItemStreamException;
+import org.springframework.batch.infrastructure.item.file.FlatFileItemReader;
+import org.springframework.batch.infrastructure.item.file.FlatFileParseException;
+import org.springframework.batch.infrastructure.item.file.LineMapper;
+import org.springframework.batch.infrastructure.item.file.mapping.PassThroughLineMapper;
+import org.springframework.batch.infrastructure.item.file.separator.RecordSeparatorPolicy;
+import org.springframework.core.io.AbstractResource;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.util.ClassUtils;
+import org.springframework.util.StringUtils;
+
+/**
+ * Tests for {@link FlatFileItemReader}.
+ */
+class FlatFileItemReaderTests {
+
+	// common value used for writing to a file
+	private static final String TEST_STRING = "FlatFileInputTemplate-TestData";
+
+	private FlatFileItemReader<String> reader;
+
+	private FlatFileItemReader<Item> itemReader;
+
+	private final ExecutionContext executionContext = new ExecutionContext();
+
+	private final Resource inputResource2 = getInputResource(
+			"testLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6");
+
+	private final Resource inputResource1 = getInputResource(
+			"testLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6");
+
+	@BeforeEach
+	void setUp() {
+		reader = new FlatFileItemReader<>(new PassThroughLineMapper());
+		reader.setResource(inputResource1);
+		itemReader = new FlatFileItemReader<>(new ItemLineMapper());
+		itemReader.setResource(inputResource2);
+	}
+
+	@Test
+	void testRestartWithCustomRecordSeparatorPolicy() throws Exception {
+
+		reader.setRecordSeparatorPolicy(new RecordSeparatorPolicy() {
+			// 1 record = 2 lines
+			boolean pair = true;
+
+			@Override
+			public boolean isEndOfRecord(String line) {
+				pair = !pair;
+				return pair;
+			}
+
+			@Override
+			public String postProcess(String record) {
+				return record;
+			}
+
+			@Override
+			public String preProcess(String record) {
+				return record;
+			}
+		});
+
+		reader.open(executionContext);
+
+		assertEquals("testLine1testLine2", reader.read());
+		assertEquals("testLine3testLine4", reader.read());
+
+		reader.update(executionContext);
+
+		reader.close();
+
+		reader.open(executionContext);
+
+		assertEquals("testLine5testLine6", reader.read());
+	}
+
+	@Test
+	void testCustomRecordSeparatorPolicyEndOfFile() throws Exception {
+
+		reader.setRecordSeparatorPolicy(new RecordSeparatorPolicy() {
+			// 1 record = 2 lines
+			boolean pair = true;
+
+			@Override
+			public boolean isEndOfRecord(String line) {
+				pair = !pair;
+				return pair;
+			}
+
+			@Override
+			public String postProcess(String record) {
+				return record;
+			}
+
+			@Override
+			public String preProcess(String record) {
+				return record;
+			}
+		});
+
+		reader.setResource(getInputResource("testLine1\ntestLine2\ntestLine3\n"));
+		reader.open(executionContext);
+
+		assertEquals("testLine1testLine2", reader.read());
+
+		var exception = assertThrows(FlatFileParseException.class, reader::read);
+		// File ends in the middle of a record
+		assertEquals(3, exception.getLineNumber());
+		assertEquals("testLine3", exception.getInput());
+	}
+
+	@Test
+	void testCustomRecordSeparatorBlankLine() throws Exception {
+
+		reader.setRecordSeparatorPolicy(new RecordSeparatorPolicy() {
+
+			@Override
+			public boolean isEndOfRecord(String line) {
+				return StringUtils.hasText(line);
+			}
+
+			@Override
+			public String postProcess(String record) {
+				return StringUtils.hasText(record) ? record : null;
+			}
+
+			@Override
+			public String preProcess(String record) {
+				return record;
+			}
+		});
+
+		reader.setResource(getInputResource("testLine1\ntestLine2\ntestLine3\n\n"));
+		reader.open(executionContext);
+
+		assertEquals("testLine1", reader.read());
+		assertEquals("testLine2", reader.read());
+		assertEquals("testLine3", reader.read());
+		assertNull(reader.read());
+
+	}
+
+	@Test
+	void testCustomRecordSeparatorMultilineBlankLineAfterEnd() throws Exception {
+
+		reader.setRecordSeparatorPolicy(new RecordSeparatorPolicy() {
+
+			// 1 record = 2 lines
+			boolean pair = true;
+
+			@Override
+			public boolean isEndOfRecord(String line) {
+				if (StringUtils.hasText(line)) {
+					pair = !pair;
+				}
+				return pair;
+			}
+
+			@Override
+			public String postProcess(String record) {
+				return StringUtils.hasText(record) ? record : null;
+			}
+
+			@Override
+			public String preProcess(String record) {
+				return record;
+			}
+		});
+
+		reader.setResource(getInputResource("testLine1\ntestLine2\n\n"));
+		reader.open(executionContext);
+
+		assertEquals("testLine1testLine2", reader.read());
+		assertNull(reader.read());
+
+	}
+
+	@Test
+	void testCustomCommentDetectionLogic() throws Exception {
+		reader = new FlatFileItemReader<>(getInputResource("#testLine1\ntestLine2\n//testLine3\ntestLine4\n"),
+				new PassThroughLineMapper()) {
+			@Override
+			protected boolean isComment(String line) {
+				return super.isComment(line) || line.endsWith("2");
+			}
+		};
+		reader.setComments(new String[] { "#", "//" });
+		reader.open(executionContext);
+
+		assertEquals("testLine4", reader.read());
+		assertNull(reader.read());
+
+		reader.close();
+	}
+
+	@Test
+	void testRestartWithSkippedLines() throws Exception {
+
+		reader.setLinesToSkip(2);
+		reader.open(executionContext);
+
+		// read some records
+		reader.read();
+		reader.read();
+		// get restart data
+		reader.update(executionContext);
+		// read next two records
+		reader.read();
+		reader.read();
+
+		assertEquals(2, executionContext.getInt(ClassUtils.getShortName(FlatFileItemReader.class) + ".read.count"));
+		// close input
+		reader.close();
+
+		reader.setResource(
+				getInputResource("header\nignoreme\ntestLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6"));
+
+		// init for restart
+		reader.open(executionContext);
+
+		// read remaining records
+		assertEquals("testLine3", reader.read());
+		assertEquals("testLine4", reader.read());
+
+		reader.update(executionContext);
+		assertEquals(4, executionContext.getInt(ClassUtils.getShortName(FlatFileItemReader.class) + ".read.count"));
+	}
+
+	@Test
+	void testCurrentItemCount() throws Exception {
+
+		reader.setCurrentItemCount(2);
+		reader.open(executionContext);
+
+		// read some records
+		reader.read();
+		reader.read();
+		// get restart data
+		reader.update(executionContext);
+
+		assertEquals(4, executionContext.getInt(ClassUtils.getShortName(FlatFileItemReader.class) + ".read.count"));
+		// close input
+		reader.close();
+
+	}
+
+	@Test
+	void testMaxItemCount() throws Exception {
+
+		reader.setMaxItemCount(2);
+		reader.open(executionContext);
+
+		// read some records
+		reader.read();
+		reader.read();
+		// get restart data
+		reader.update(executionContext);
+		assertNull(reader.read());
+
+		assertEquals(2, executionContext.getInt(ClassUtils.getShortName(FlatFileItemReader.class) + ".read.count"));
+		// close input
+		reader.close();
+
+	}
+
+	@Test
+	void testMaxItemCountFromContext() throws Exception {
+
+		reader.setMaxItemCount(2);
+		executionContext.putInt(reader.getClass().getSimpleName() + ".read.count.max", Integer.MAX_VALUE);
+		reader.open(executionContext);
+		// read some records
+		reader.read();
+		reader.read();
+		assertNotNull(reader.read());
+		// close input
+		reader.close();
+
+	}
+
+	@Test
+	void testCurrentItemCountFromContext() throws Exception {
+
+		reader.setCurrentItemCount(2);
+		executionContext.putInt(reader.getClass().getSimpleName() + ".read.count", 3);
+		reader.open(executionContext);
+		// read some records
+		assertEquals("testLine4", reader.read());
+		// close input
+		reader.close();
+
+	}
+
+	@Test
+	void testMaxAndCurrentItemCount() throws Exception {
+
+		reader.setMaxItemCount(2);
+		reader.setCurrentItemCount(2);
+		reader.open(executionContext);
+		// read some records
+		assertNull(reader.read());
+		// close input
+		reader.close();
+
+	}
+
+	@Test
+	void testNonExistentResource() throws Exception {
+
+		Resource resource = new NonExistentResource();
+
+		reader.setResource(resource);
+
+		reader.setStrict(false);
+		reader.open(executionContext);
+		assertNull(reader.read());
+		reader.close();
+	}
+
+	@Test
+	void testOpenBadIOInput() throws Exception {
+
+		reader.setResource(new AbstractResource() {
+			@Override
+			public String getDescription() {
+				return null;
+			}
+
+			@Override
+			public InputStream getInputStream() throws IOException {
+				throw new IOException();
+			}
+
+			@Override
+			public boolean exists() {
+				return true;
+			}
+		});
+
+		assertThrows(ItemStreamException.class, () -> reader.open(executionContext));
+
+		// read() should then return a null
+		assertNull(reader.read());
+		reader.close();
+
+	}
+
+	@Test
+	void testDirectoryResource() throws Exception {
+
+		FileSystemResource resource = new FileSystemResource("target/data");
+		resource.getFile().mkdirs();
+		assertTrue(resource.getFile().isDirectory());
+		reader.setResource(resource);
+
+		reader.setStrict(false);
+		reader.open(executionContext);
+		assertNull(reader.read());
+
+	}
+
+	@Test
+	void testRuntimeFileCreation() throws Exception {
+
+		Resource resource = new NonExistentResource();
+
+		reader.setResource(resource);
+
+		// replace the resource to simulate runtime resource creation
+		reader.setResource(getInputResource(TEST_STRING));
+		reader.open(executionContext);
+		assertEquals(TEST_STRING, reader.read());
+	}
+
+	/**
+	 * In strict mode, resource must exist at the time reader is opened.
+	 */
+	@Test
+	void testStrictness() throws Exception {
+
+		Resource resource = new NonExistentResource();
+
+		reader.setResource(resource);
+		reader.setStrict(true);
+
+		assertThrows(ItemStreamException.class, () -> reader.open(executionContext));
+	}
+
+	/**
+	 * Exceptions from {@link LineMapper} are wrapped as {@link FlatFileParseException}
+	 * containing contextual info about the problematic line and its line number.
+	 */
+	@Test
+	void testMappingExceptionWrapping() throws Exception {
+		LineMapper<String> exceptionLineMapper = (line, lineNumber) -> {
+			if (lineNumber == 2) {
+				throw new Exception("Couldn't map line 2");
+			}
+			return line;
+		};
+		reader.setLineMapper(exceptionLineMapper);
+
+		reader.open(executionContext);
+		assertNotNull(reader.read());
+
+		var expected = assertThrows(FlatFileParseException.class, reader::read);
+		assertEquals(2, expected.getLineNumber());
+		assertEquals("testLine2", expected.getInput());
+		assertEquals("Couldn't map line 2", expected.getCause().getMessage());
+		assertThat(expected.getMessage(), startsWith("Parsing error at line: 2 in resource=["));
+		assertThat(expected.getMessage(), endsWith("], input=[testLine2]"));
+	}
+
+	@Test
+	void testItemCountAware() throws Exception {
+		itemReader.open(executionContext);
+		Item item1 = itemReader.read();
+		assertEquals("testLine1", item1.getValue());
+		assertEquals(1, item1.getItemCount());
+		Item item2 = itemReader.read();
+		assertEquals("testLine2", item2.getValue());
+		assertEquals(2, item2.getItemCount());
+		itemReader.update(executionContext);
+		itemReader.close();
+
+		itemReader.open(executionContext);
+		Item item3 = itemReader.read();
+		assertEquals("testLine3", item3.getValue());
+		assertEquals(3, item3.getItemCount());
+	}
+
+	@Test
+	void testItemCountAwareMultiLine() throws Exception {
+		itemReader.setRecordSeparatorPolicy(new RecordSeparatorPolicy() {
+
+			// 1 record = 2 lines
+			boolean pair = true;
+
+			@Override
+			public boolean isEndOfRecord(String line) {
+				if (StringUtils.hasText(line)) {
+					pair = !pair;
+				}
+				return pair;
+			}
+
+			@Override
+			public String postProcess(String record) {
+				return StringUtils.hasText(record) ? record : null;
+			}
+
+			@Override
+			public String preProcess(String record) {
+				return record;
+			}
+		});
+
+		itemReader.open(executionContext);
+		Item item1 = itemReader.read();
+		assertEquals("testLine1testLine2", item1.getValue());
+		assertEquals(1, item1.getItemCount());
+		Item item2 = itemReader.read();
+		assertEquals("testLine3testLine4", item2.getValue());
+		assertEquals(2, item2.getItemCount());
+		itemReader.update(executionContext);
+		itemReader.close();
+
+		itemReader.open(executionContext);
+		Item item3 = itemReader.read();
+		assertEquals("testLine5testLine6", item3.getValue());
+		assertEquals(3, item3.getItemCount());
+	}
+
+	private Resource getInputResource(String input) {
+		return new ByteArrayResource(input.getBytes());
+	}
+
+	private static class NonExistentResource extends AbstractResource {
+
+		public NonExistentResource() {
+		}
+
+		@Override
+		public boolean exists() {
+			return false;
+		}
+
+		@Override
+		public String getDescription() {
+			return "NonExistentResource";
+		}
+
+		@Override
+		public @Nullable InputStream getInputStream() throws IOException {
+			return null;
+		}
+
+	}
+
+	private static class Item implements ItemCountAware {
+
+		private String value;
+
+		private int itemCount;
+
+		public Item(String value) {
+			this.value = value;
+		}
+
+		@SuppressWarnings("unused")
+		public void setValue(String value) {
+			this.value = value;
+		}
+
+		public String getValue() {
+			return value;
+		}
+
+		@Override
+		public void setItemCount(int count) {
+			this.itemCount = count;
+		}
+
+		public int getItemCount() {
+			return itemCount;
+		}
+
+	}
+
+	private static final class ItemLineMapper implements LineMapper<Item> {
+
+		@Override
+		public Item mapLine(String line, int lineNumber) throws Exception {
+			return new Item(line);
+		}
+
+	}
+
+}

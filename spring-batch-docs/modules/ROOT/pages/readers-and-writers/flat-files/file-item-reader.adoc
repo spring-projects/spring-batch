@@ -332,10 +332,10 @@ Again using the football example, the `BeanWrapperFieldSetMapper` configuration 
 the following snippet in XML:
 +
 .XML Configuration
-[source, xml]
+[source,xml]
 ----
 <bean id="fieldSetMapper"
-      class="org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper">
+      class="org.springframework.batch.infrastructure.item.file.mapping.BeanWrapperFieldSetMapper">
     <property name="prototypeBeanName" value="player" />
 </bean>
 
@@ -411,10 +411,10 @@ The following example shows how to define ranges for the `FixedLengthLineTokeniz
 XML:
 +
 .XML Configuration
-[source, xml]
+[source,xml]
 ----
 <bean id="fixedLengthLineTokenizer"
-      class="org.springframework.batch.item.file.transform.FixedLengthTokenizer">
+      class="org.springframework.batch.infrastructure.item.file.transform.FixedLengthTokenizer">
     <property name="names" value="ISIN,Quantity,Price,Customer" />
     <property name="columns" value="1-12, 13-15, 16-20, 21-29" />
 </bean>

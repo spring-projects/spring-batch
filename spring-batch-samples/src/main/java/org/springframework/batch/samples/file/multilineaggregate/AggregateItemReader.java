@@ -23,7 +23,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jspecify.annotations.Nullable;
 
-import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.infrastructure.item.ItemReader;
 
 /**
  * An {@link ItemReader} that delivers a list as its item, storing up objects from the
@@ -52,7 +52,7 @@ public class AggregateItemReader<T> implements ItemReader<List<T>> {
 	/**
 	 * Get the next list of records.
 	 *
-	 * @see org.springframework.batch.item.ItemReader#read()
+	 * @see ItemReader#read()
 	 */
 	@Override
 	public @Nullable List<T> read() throws Exception {

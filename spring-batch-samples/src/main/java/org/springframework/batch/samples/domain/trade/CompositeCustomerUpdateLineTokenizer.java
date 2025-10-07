@@ -20,8 +20,8 @@ import org.jspecify.annotations.Nullable;
 
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.listener.StepExecutionListener;
-import org.springframework.batch.item.file.transform.FieldSet;
-import org.springframework.batch.item.file.transform.LineTokenizer;
+import org.springframework.batch.infrastructure.item.file.transform.FieldSet;
+import org.springframework.batch.infrastructure.item.file.transform.LineTokenizer;
 
 /**
  * Composite {@link LineTokenizer} that delegates the tokenization of a line to one of two

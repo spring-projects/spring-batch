@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.job.parameters.CompositeJobParametersValidator;
 import org.springframework.batch.core.job.parameters.JobParameters;
-import org.springframework.batch.core.job.parameters.JobParametersInvalidException;
+import org.springframework.batch.core.job.parameters.InvalidJobParametersException;
 import org.springframework.batch.core.job.parameters.JobParametersValidator;
 
 class CompositeJobParametersValidatorTests {
@@ -53,7 +53,7 @@ class CompositeJobParametersValidatorTests {
 	}
 
 	@Test
-	void testDelegateIsInvoked() throws JobParametersInvalidException {
+	void testDelegateIsInvoked() throws InvalidJobParametersException {
 		JobParametersValidator validator = mock();
 		validator.validate(parameters);
 		compositeJobParametersValidator.setValidators(Arrays.asList(validator));
@@ -61,7 +61,7 @@ class CompositeJobParametersValidatorTests {
 	}
 
 	@Test
-	void testDelegatesAreInvoked() throws JobParametersInvalidException {
+	void testDelegatesAreInvoked() throws InvalidJobParametersException {
 		JobParametersValidator validator = mock();
 		validator.validate(parameters);
 		validator.validate(parameters);

@@ -31,13 +31,13 @@ import org.springframework.batch.core.listener.StepListenerFactoryBean;
 import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
-import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.repeat.RepeatOperations;
-import org.springframework.batch.repeat.exception.DefaultExceptionHandler;
-import org.springframework.batch.repeat.exception.ExceptionHandler;
-import org.springframework.batch.repeat.support.RepeatTemplate;
-import org.springframework.batch.repeat.support.TaskExecutorRepeatTemplate;
-import org.springframework.batch.support.ReflectionUtils;
+import org.springframework.batch.infrastructure.item.ItemStream;
+import org.springframework.batch.infrastructure.repeat.RepeatOperations;
+import org.springframework.batch.infrastructure.repeat.exception.DefaultExceptionHandler;
+import org.springframework.batch.infrastructure.repeat.exception.ExceptionHandler;
+import org.springframework.batch.infrastructure.repeat.support.RepeatTemplate;
+import org.springframework.batch.infrastructure.repeat.support.TaskExecutorRepeatTemplate;
+import org.springframework.batch.infrastructure.support.ReflectionUtils;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -55,7 +55,8 @@ import org.springframework.transaction.interceptor.TransactionAttribute;
  * @since 2.2
  * @param <B> the type of builder represented
  */
-@NullUnmarked // FIXME to remove once default constructors are removed
+// FIXME remove once default constructors (required by the XML namespace) are removed
+@NullUnmarked
 public abstract class AbstractTaskletStepBuilder<B extends AbstractTaskletStepBuilder<B>> extends StepBuilderHelper<B> {
 
 	protected Set<ChunkListener> chunkListeners = new LinkedHashSet<>();

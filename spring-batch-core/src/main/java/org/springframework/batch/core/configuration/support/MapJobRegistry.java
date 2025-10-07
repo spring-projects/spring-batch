@@ -23,12 +23,11 @@ import java.util.concurrent.ConcurrentMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jspecify.annotations.NullUnmarked;
+import org.jspecify.annotations.Nullable;
 
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.configuration.DuplicateJobException;
 import org.springframework.batch.core.configuration.JobRegistry;
-import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.context.ApplicationContext;
@@ -44,7 +43,6 @@ import org.springframework.util.Assert;
  * @author Robert Fischer
  * @author Mahmoud Ben Hassine
  */
-@NullUnmarked // FIXME how to fix nullability checks for the applicationContext field?
 public class MapJobRegistry implements JobRegistry, SmartInitializingSingleton, ApplicationContextAware {
 
 	protected final Log logger = LogFactory.getLog(getClass());
@@ -54,6 +52,7 @@ public class MapJobRegistry implements JobRegistry, SmartInitializingSingleton, 
 	 */
 	private final ConcurrentMap<String, Job> map = new ConcurrentHashMap<>();
 
+	@SuppressWarnings("NullAway.Init")
 	private ApplicationContext applicationContext;
 
 	@Override
@@ -84,15 +83,10 @@ public class MapJobRegistry implements JobRegistry, SmartInitializingSingleton, 
 		this.map.remove(name);
 	}
 
+	@Nullable
 	@Override
-	public Job getJob(String name) throws NoSuchJobException {
-		Job job = this.map.get(name);
-		if (job == null) {
-			throw new NoSuchJobException("No job with the name [" + name + "] was registered");
-		}
-		else {
-			return job;
-		}
+	public Job getJob(String name) {
+		return this.map.get(name);
 	}
 
 	/**

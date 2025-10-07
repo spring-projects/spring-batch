@@ -18,12 +18,12 @@ package org.springframework.batch.samples.file.multiline;
 
 import org.jspecify.annotations.Nullable;
 
-import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.ItemStreamException;
-import org.springframework.batch.item.file.FlatFileItemReader;
-import org.springframework.batch.item.file.transform.FieldSet;
+import org.springframework.batch.infrastructure.item.ExecutionContext;
+import org.springframework.batch.infrastructure.item.ItemReader;
+import org.springframework.batch.infrastructure.item.ItemStream;
+import org.springframework.batch.infrastructure.item.ItemStreamException;
+import org.springframework.batch.infrastructure.item.file.FlatFileItemReader;
+import org.springframework.batch.infrastructure.item.file.transform.FieldSet;
 import org.springframework.util.Assert;
 
 /**
@@ -36,7 +36,7 @@ public class MultiLineTradeItemReader implements ItemReader<Trade>, ItemStream {
 	private FlatFileItemReader<FieldSet> delegate;
 
 	/**
-	 * @see org.springframework.batch.item.ItemReader#read()
+	 * @see ItemReader#read()
 	 */
 	@Override
 	public @Nullable Trade read() throws Exception {

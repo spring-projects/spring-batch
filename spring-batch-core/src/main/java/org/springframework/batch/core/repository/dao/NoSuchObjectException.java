@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,10 @@ package org.springframework.batch.core.repository.dao;
  *
  * @author Lucas Ward
  * @author Dave Syer
- *
+ * @deprecated as of 6.0 with no replacement. Scheduled for removal in 6.2.
  */
+// This exception has no value in the redesigned domain model of v6
+@Deprecated(since = "6.0", forRemoval = true)
 public class NoSuchObjectException extends RuntimeException {
 
 	private static final long serialVersionUID = 4399621765157283111L;

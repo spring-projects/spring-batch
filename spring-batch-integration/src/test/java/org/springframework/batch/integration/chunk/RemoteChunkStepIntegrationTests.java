@@ -18,6 +18,7 @@ package org.springframework.batch.integration.chunk;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Collections;
+import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
@@ -42,7 +43,7 @@ class RemoteChunkStepIntegrationTests {
 	@Test
 	void testSunnyDaySimpleStep() throws Exception {
 		JobExecution jobExecution = jobOperator.start(job,
-				new JobParameters(Collections.singletonMap("item.three", new JobParameter("3", Integer.class))));
+				new JobParameters(Set.of(new JobParameter("item.three", "3", Integer.class))));
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		StepExecution stepExecution = jobExecution.getStepExecutions().iterator().next();
 		assertEquals(9, stepExecution.getReadCount());
@@ -52,7 +53,7 @@ class RemoteChunkStepIntegrationTests {
 	@Test
 	void testFailedStep() throws Exception {
 		JobExecution jobExecution = jobOperator.start(job,
-				new JobParameters(Collections.singletonMap("item.three", new JobParameter<>("fail", String.class))));
+				new JobParameters(Set.of(new JobParameter<>("item.three", "fail", String.class))));
 		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
 		StepExecution stepExecution = jobExecution.getStepExecutions().iterator().next();
 		assertEquals(9, stepExecution.getReadCount());

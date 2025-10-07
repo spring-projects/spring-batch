@@ -24,7 +24,7 @@
 
 	<!-- INFRASTRUCTURE SETUP -->
 
-	<bean id="compositeWriter" class="org.springframework.batch.item.support.CompositeItemWriter">
+	<bean id="compositeWriter" class="org.springframework.batch.infrastructure.item.support.CompositeItemWriter">
 		<constructor-arg name="delegates">
 			<list>
 				<bean class="org.springframework.batch.samples.domain.trade.internal.TradeWriter">
@@ -36,27 +36,27 @@
 		</constructor-arg>
 	</bean>
 
-	<bean id="processor" class="org.springframework.batch.item.validator.ValidatingItemProcessor">
+	<bean id="processor" class="org.springframework.batch.infrastructure.item.validator.ValidatingItemProcessor">
 		<constructor-arg ref="fixedValidator" />
 	</bean>
 
-	<bean id="fileItemReader" class="org.springframework.batch.item.file.FlatFileItemReader">
+	<bean id="fileItemReader" class="org.springframework.batch.infrastructure.item.file.FlatFileItemReader">
 		<property name="resource"
 			value="classpath:org/springframework/batch/samples/compositewriter/data/ImportTradeDataStep.txt" />
 		<constructor-arg name="lineMapper">
-			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+			<bean class="org.springframework.batch.infrastructure.item.file.mapping.DefaultLineMapper">
 				<property name="lineTokenizer" ref="fixedFileTokenizer" />
 				<property name="fieldSetMapper" ref="fieldSetMapper" />
 			</bean>
 		</constructor-arg>
 	</bean>
 
-	<bean id="fixedFileTokenizer" class="org.springframework.batch.item.file.transform.FixedLengthTokenizer">
+	<bean id="fixedFileTokenizer" class="org.springframework.batch.infrastructure.item.file.transform.FixedLengthTokenizer">
 		<property name="names" value="ISIN, Quantity, Price, Customer" />
 		<property name="columns" value="1-12, 13-15, 16-20, 21-29" />
 	</bean>
 
-	<bean id="fixedValidator" class="org.springframework.batch.item.validator.SpringValidator">
+	<bean id="fixedValidator" class="org.springframework.batch.infrastructure.item.validator.SpringValidator">
 		<property name="validator">
             <bean class="org.springframework.batch.samples.domain.trade.internal.validator.TradeValidator"/>
 		</property>
@@ -73,19 +73,19 @@
 		</property>
 	</bean>
 
-	<bean id="fileItemWriter1" class="org.springframework.batch.item.file.FlatFileItemWriter">
+	<bean id="fileItemWriter1" class="org.springframework.batch.infrastructure.item.file.FlatFileItemWriter">
 		<property name="name" value="fw1" />
 		<property name="resource" value="file:target/test-outputs/CustomerReport1.txt" />
 		<constructor-arg name="lineAggregator">
-			<bean class="org.springframework.batch.item.file.transform.PassThroughLineAggregator" />
+			<bean class="org.springframework.batch.infrastructure.item.file.transform.PassThroughLineAggregator" />
 		</constructor-arg>
 	</bean>
 
-	<bean id="fileItemWriter2" class="org.springframework.batch.item.file.FlatFileItemWriter">
+	<bean id="fileItemWriter2" class="org.springframework.batch.infrastructure.item.file.FlatFileItemWriter">
 		<property name="name" value="fw2" />
 		<property name="resource" value="file:target/test-outputs/CustomerReport2.txt" />
 		<constructor-arg name="lineAggregator">
-			<bean class="org.springframework.batch.item.file.transform.PassThroughLineAggregator" />
+			<bean class="org.springframework.batch.infrastructure.item.file.transform.PassThroughLineAggregator" />
 		</constructor-arg>
 	</bean>
 

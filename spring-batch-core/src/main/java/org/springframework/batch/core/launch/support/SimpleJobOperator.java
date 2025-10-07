@@ -35,7 +35,7 @@ import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersIncrementer;
-import org.springframework.batch.core.job.parameters.JobParametersInvalidException;
+import org.springframework.batch.core.job.parameters.InvalidJobParametersException;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StoppableStep;
 import org.springframework.batch.core.step.StepExecution;
@@ -49,17 +49,16 @@ import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.launch.NoSuchJobExecutionException;
 import org.springframework.batch.core.launch.NoSuchJobInstanceException;
-import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
-import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
+import org.springframework.batch.core.launch.JobExecutionAlreadyRunningException;
+import org.springframework.batch.core.launch.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.batch.core.launch.JobRestartException;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
-import org.springframework.batch.core.step.NoSuchStepException;
 import org.springframework.batch.core.step.StepLocator;
 import org.springframework.batch.core.step.tasklet.StoppableTasklet;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
-import org.springframework.batch.support.PropertiesConverter;
+import org.springframework.batch.infrastructure.support.PropertiesConverter;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
@@ -134,7 +133,7 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 	@Override
 	@Deprecated(since = "6.0", forRemoval = true)
 	public Long start(String jobName, Properties parameters)
-			throws NoSuchJobException, JobInstanceAlreadyExistsException, JobParametersInvalidException {
+			throws NoSuchJobException, JobInstanceAlreadyExistsException, InvalidJobParametersException {
 		if (logger.isInfoEnabled()) {
 			logger.info("Checking status of job with name=" + jobName);
 		}
@@ -177,8 +176,7 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 	 * @param job the {@link Job} to start
 	 * @param jobParameters the {@link JobParameters} to start the job with
 	 * @return the {@link JobExecution} that was started
-	 * @throws NoSuchJobException if the given {@link Job} is not registered
-	 * @throws JobParametersInvalidException thrown if any of the job parameters are
+	 * @throws InvalidJobParametersException thrown if any of the job parameters are
 	 * @throws JobExecutionAlreadyRunningException if the JobInstance identified by the
 	 * properties already has an execution running. invalid.
 	 * @throws JobRestartException if the execution would be a re-start, but a re-start is
@@ -187,9 +185,8 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 	 * same parameters and completed successfully
 	 * @throws IllegalArgumentException if the job or job parameters are null.
 	 */
-	public JobExecution start(Job job, JobParameters jobParameters)
-			throws NoSuchJobException, JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException,
-			JobRestartException, JobParametersInvalidException {
+	public JobExecution start(Job job, JobParameters jobParameters) throws JobInstanceAlreadyCompleteException,
+			JobExecutionAlreadyRunningException, JobRestartException, InvalidJobParametersException {
 		Assert.notNull(job, "The Job must not be null.");
 		Assert.notNull(jobParameters, "The JobParameters must not be null.");
 		if (job.getJobParametersIncrementer() != null) {
@@ -206,7 +203,7 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 	@Override
 	@Deprecated(since = "6.0", forRemoval = true)
 	public Long restart(long executionId) throws JobInstanceAlreadyCompleteException, NoSuchJobExecutionException,
-			NoSuchJobException, JobRestartException, JobParametersInvalidException {
+			NoSuchJobException, JobRestartException, InvalidJobParametersException {
 
 		if (logger.isInfoEnabled()) {
 			logger.info("Checking status of job execution with id=" + executionId);
@@ -231,12 +228,15 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 	}
 
 	@Override
-	public JobExecution restart(JobExecution jobExecution) throws JobInstanceAlreadyCompleteException,
-			NoSuchJobExecutionException, NoSuchJobException, JobRestartException, JobParametersInvalidException {
+	public JobExecution restart(JobExecution jobExecution) throws JobRestartException {
 
 		String jobName = jobExecution.getJobInstance().getJobName();
 		Job job = jobRegistry.getJob(jobName);
 		JobParameters parameters = jobExecution.getJobParameters();
+
+		// TODO check and throw JobRestartException with specific messages
+		// - No failed or stopped execution found for job=" + jobIdentifier);
+		// - Job execution already running
 
 		if (logger.isInfoEnabled()) {
 			logger.info("Resuming job execution: " + jobExecution);
@@ -244,8 +244,8 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 		try {
 			return run(job, parameters);
 		}
-		catch (JobExecutionAlreadyRunningException e) {
-			throw new UnexpectedJobExecutionException(
+		catch (Exception e) {
+			throw new JobRestartException(
 					String.format(ILLEGAL_STATE_MSG, "job execution already running", jobName, parameters), e);
 		}
 
@@ -253,8 +253,7 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 
 	@Override
 	@Deprecated(since = "6.0", forRemoval = true)
-	public Long startNextInstance(String jobName)
-			throws NoSuchJobException, UnexpectedJobExecutionException, JobParametersInvalidException {
+	public Long startNextInstance(String jobName) throws UnexpectedJobExecutionException {
 		if (logger.isInfoEnabled()) {
 			logger.info("Locating parameters for next instance of job with name=" + jobName);
 		}
@@ -264,7 +263,7 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 	}
 
 	@Override
-	public JobExecution startNextInstance(Job job) throws UnexpectedJobExecutionException {
+	public JobExecution startNextInstance(Job job) {
 		Assert.notNull(job, "Job must not be null");
 		Assert.notNull(job.getJobParametersIncrementer(),
 				"No job parameters incrementer found for job=" + job.getName());
@@ -280,7 +279,7 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 			JobExecution previousExecution = jobRepository.getLastJobExecution(lastInstance);
 			if (previousExecution == null) {
 				// Normally this will not happen - an instance exists with no executions
-				nextParameters = incrementer.getNext(new JobParameters());
+				throw new IllegalStateException("Cannot find any job execution for job instance: " + lastInstance);
 			}
 			else {
 				nextParameters = incrementer.getNext(previousExecution.getJobParameters());
@@ -293,6 +292,14 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 		try {
 			return run(job, nextParameters);
 		}
+		//@formatter:off
+        /*
+         * The following exceptions should never happen as we are starting a new instance.
+         * This means there is an improvement to be made in the run method (currently there
+         * will be a double check of restartability conditions even on new instance, which is
+         * not harmful but unnecessary).
+         */
+        // @formatter:on
 		catch (JobExecutionAlreadyRunningException e) {
 			throw new UnexpectedJobExecutionException(
 					String.format(ILLEGAL_STATE_MSG, "job already running", job.getName(), nextParameters), e);
@@ -306,7 +313,7 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 					String.format(ILLEGAL_STATE_MSG, "job instance already complete", job.getName(), nextParameters),
 					e);
 		}
-		catch (JobParametersInvalidException e) {
+		catch (InvalidJobParametersException e) {
 			throw new UnexpectedJobExecutionException("Invalid job parameters " + nextParameters, e);
 		}
 
@@ -337,16 +344,16 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 		jobExecution.setStatus(BatchStatus.STOPPING);
 		jobRepository.update(jobExecution);
 
-		try {
-			Job job = jobRegistry.getJob(jobExecution.getJobInstance().getJobName());
+		Job job = jobRegistry.getJob(jobExecution.getJobInstance().getJobName());
+		if (job != null) {
 			if (job instanceof StepLocator stepLocator) {
 				// can only process as StepLocator is the only way to get the step object
 				// get the current stepExecution
 				for (StepExecution stepExecution : jobExecution.getStepExecutions()) {
 					if (stepExecution.getStatus().isRunning()) {
-						try {
-							// have the step execution that's running -> need to 'stop' it
-							Step step = stepLocator.getStep(stepExecution.getStepName());
+						// have the step execution that's running -> need to 'stop' it
+						Step step = stepLocator.getStep(stepExecution.getStepName());
+						if (step != null) {
 							if (step instanceof TaskletStep taskletStep) {
 								Tasklet tasklet = taskletStep.getTasklet();
 								if (tasklet instanceof StoppableTasklet stoppableTasklet) {
@@ -361,19 +368,13 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 								StepSynchronizationManager.release();
 							}
 						}
-						catch (NoSuchStepException e) {
-							logger.warn("Step not found", e);
-						}
 					}
 				}
 			}
-		}
-		catch (NoSuchJobException e) {
-			logger.warn(
-					"Cannot find Job object in the job registry. StoppableTasklet#stop(StepExecution stepExecution) will not be called",
-					e);
-		}
+			// TODO what if the job is not a StepLocator? ie a job with no steps?
+			// FIXME Job should provide a stop() method
 
+		}
 		return true;
 	}
 

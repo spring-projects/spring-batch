@@ -30,7 +30,6 @@ import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.configuration.DuplicateJobException;
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.configuration.StepRegistry;
-import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.step.StepLocator;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
@@ -198,14 +197,11 @@ public class DefaultJobLoader implements JobLoader, InitializingBean {
 
 		Collection<Job> result = new ArrayList<>();
 		for (String name : jobsRegistered) {
-			try {
-				result.add(jobRegistry.getJob(name));
+			Job job = jobRegistry.getJob(name);
+			if (job == null) {
+				throw new IllegalStateException("Could not retrieve job that was should have been registered");
 			}
-			catch (NoSuchJobException e) {
-				// should not happen;
-				throw new IllegalStateException("Could not retrieve job that was should have been registered", e);
-			}
-
+			result.add(job);
 		}
 
 		contextToJobNames.put(context, jobsRegistered);

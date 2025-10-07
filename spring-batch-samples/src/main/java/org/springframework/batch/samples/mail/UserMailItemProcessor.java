@@ -17,7 +17,7 @@ package org.springframework.batch.samples.mail;
 
 import java.util.Date;
 
-import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.infrastructure.item.ItemProcessor;
 
 import org.jspecify.annotations.Nullable;
 import org.springframework.mail.SimpleMailMessage;
@@ -30,7 +30,7 @@ import org.springframework.mail.SimpleMailMessage;
 public class UserMailItemProcessor implements ItemProcessor<User, SimpleMailMessage> {
 
 	/**
-	 * @see org.springframework.batch.item.ItemProcessor#process(java.lang.Object)
+	 * @see ItemProcessor#process(java.lang.Object)
 	 */
 	@Override
 	public @Nullable SimpleMailMessage process(User user) throws Exception {

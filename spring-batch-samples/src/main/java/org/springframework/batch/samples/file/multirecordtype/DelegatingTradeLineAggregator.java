@@ -16,7 +16,7 @@
 
 package org.springframework.batch.samples.file.multirecordtype;
 
-import org.springframework.batch.item.file.transform.LineAggregator;
+import org.springframework.batch.infrastructure.item.file.transform.LineAggregator;
 import org.springframework.batch.samples.domain.trade.CustomerCredit;
 import org.springframework.batch.samples.domain.trade.Trade;
 

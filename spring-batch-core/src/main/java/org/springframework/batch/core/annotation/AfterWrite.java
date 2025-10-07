@@ -22,15 +22,15 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.springframework.batch.core.listener.ItemWriteListener;
-import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.infrastructure.item.Chunk;
+import org.springframework.batch.infrastructure.item.ItemWriter;
 
 /**
  * Marks a method to be called after an item is passed to an {@link ItemWriter}. Note that
- * this annotation takes a {@link org.springframework.batch.item.Chunk} because Spring
- * Batch generally processes a group of items (for the sake of efficiency).<br>
+ * this annotation takes a {@link Chunk} because Spring Batch generally processes a group
+ * of items (for the sake of efficiency).<br>
  * <br>
- * Expected signature: void afterWrite({@link org.springframework.batch.item.Chunk}&lt;?
- * extends S&gt; items)
+ * Expected signature: void afterWrite({@link Chunk}&lt;? extends S&gt; items)
  *
  * @author Lucas Ward
  * @author Mahmoud Ben Hassine

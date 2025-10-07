@@ -28,12 +28,12 @@ individual items. Spring Batch is not tied to any particular JSON library.
 == `JsonItemReader`
 
 The `JsonItemReader` delegates JSON parsing and binding to implementations of the
-`org.springframework.batch.item.json.JsonObjectReader` interface. This interface
+`org.springframework.batch.infrastructure.item.json.JsonObjectReader` interface. This interface
 is intended to be implemented by using a streaming API to read JSON objects
 in chunks. Two implementations are currently provided:
 
-* link:$$https://github.com/FasterXML/jackson$$[Jackson] through the `org.springframework.batch.item.json.JacksonJsonObjectReader`
-* link:$$https://github.com/google/gson$$[Gson] through the `org.springframework.batch.item.json.GsonJsonObjectReader`
+* link:$$https://github.com/FasterXML/jackson$$[Jackson] through the `org.springframework.batch.infrastructure.item.json.JacksonJsonObjectReader`
+* link:$$https://github.com/google/gson$$[Gson] through the `org.springframework.batch.infrastructure.item.json.GsonJsonObjectReader`
 
 To be able to process JSON records, the following is needed:
 
@@ -41,7 +41,7 @@ To be able to process JSON records, the following is needed:
 * `JsonObjectReader`: A JSON object reader to parse and bind JSON objects to items
 
 The following example shows how to define a `JsonItemReader` that works with the
-previous JSON resource `org/springframework/batch/item/json/trades.json` and a
+previous JSON resource `org/springframework/batch/infrastructure/item/json/trades.json` and a
 `JsonObjectReader` based on Jackson:
 
 [source, java]
@@ -60,12 +60,12 @@ public JsonItemReader<Trade> jsonItemReader() {
 == `JsonFileItemWriter`
 
 The `JsonFileItemWriter` delegates the marshalling of items to the
-`org.springframework.batch.item.json.JsonObjectMarshaller` interface. The contract
+`org.springframework.batch.infrastructure.item.json.JsonObjectMarshaller` interface. The contract
 of this interface is to take an object and marshall it to a JSON `String`.
 Two implementations are currently provided:
 
-* link:$$https://github.com/FasterXML/jackson$$[Jackson] through the `org.springframework.batch.item.json.JacksonJsonObjectMarshaller`
-* link:$$https://github.com/google/gson$$[Gson] through the `org.springframework.batch.item.json.GsonJsonObjectMarshaller`
+* link:$$https://github.com/FasterXML/jackson$$[Jackson] through the `org.springframework.batch.infrastructure.item.json.JacksonJsonObjectMarshaller`
+* link:$$https://github.com/google/gson$$[Gson] through the `org.springframework.batch.infrastructure.item.json.GsonJsonObjectMarshaller`
 
 To be able to write JSON records, the following is needed:
 

@@ -24,30 +24,30 @@
 		</step>
 	</job>
 
-	<bean id="reader" class="org.springframework.batch.item.file.FlatFileItemReader">
+	<bean id="reader" class="org.springframework.batch.infrastructure.item.file.FlatFileItemReader">
 		<property name="resource" ref="inputResource" />
 		<constructor-arg name="lineMapper">
-			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+			<bean class="org.springframework.batch.infrastructure.item.file.mapping.DefaultLineMapper">
 				<property name="lineTokenizer">
 					<bean
-						class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
+						class="org.springframework.batch.infrastructure.item.file.transform.DelimitedLineTokenizer">
 						<property name="delimiter" value="," />
 					</bean>
 				</property>
 				<property name="fieldSetMapper">
 					<bean
-						class="org.springframework.batch.item.file.mapping.PassThroughFieldSetMapper" />
+						class="org.springframework.batch.infrastructure.item.file.mapping.PassThroughFieldSetMapper" />
 				</property>
 			</bean>
 		</constructor-arg>
 		<property name="skippedLinesCallback" ref="headerCopier" />
 		<property name="linesToSkip" value="1" />
 	</bean>
-	<bean id="writer" class="org.springframework.batch.item.file.FlatFileItemWriter">
+	<bean id="writer" class="org.springframework.batch.infrastructure.item.file.FlatFileItemWriter">
 		<property name="resource" ref="outputResource" />
 		<constructor-arg name="lineAggregator">
 			<bean
-				class="org.springframework.batch.item.file.transform.PassThroughLineAggregator" />
+				class="org.springframework.batch.infrastructure.item.file.transform.PassThroughLineAggregator" />
 		</constructor-arg>
 		<property name="headerCallback" ref="headerCopier" />
 		<property name="footerCallback" ref="footerCallback" />

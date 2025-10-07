@@ -21,10 +21,10 @@ import org.jspecify.annotations.NullUnmarked;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.listener.StepExecutionListener;
-import org.springframework.batch.repeat.CompletionPolicy;
-import org.springframework.batch.repeat.RepeatContext;
-import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
+import org.springframework.batch.infrastructure.repeat.CompletionPolicy;
+import org.springframework.batch.infrastructure.repeat.RepeatContext;
+import org.springframework.batch.infrastructure.repeat.RepeatStatus;
+import org.springframework.batch.infrastructure.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.util.Assert;
 
 /**
@@ -75,7 +75,7 @@ public class StepExecutionSimpleCompletionPolicy implements StepExecutionListene
 	@Override
 	public void beforeStep(StepExecution stepExecution) {
 		JobParameters jobParameters = stepExecution.getJobParameters();
-		Assert.state(jobParameters.getParameters().containsKey(keyName),
+		Assert.state(jobParameters.getParameter(keyName) != null,
 				"JobParameters do not contain Long parameter with key=[" + keyName + "]");
 		delegate = new SimpleCompletionPolicy(jobParameters.getLong(keyName).intValue());
 	}
@@ -94,7 +94,7 @@ public class StepExecutionSimpleCompletionPolicy implements StepExecutionListene
 
 	/**
 	 * @return if the commit interval has been reached
-	 * @see org.springframework.batch.repeat.CompletionPolicy#isComplete(org.springframework.batch.repeat.RepeatContext)
+	 * @see CompletionPolicy#isComplete(RepeatContext)
 	 */
 	@Override
 	public boolean isComplete(RepeatContext context) {
@@ -105,7 +105,7 @@ public class StepExecutionSimpleCompletionPolicy implements StepExecutionListene
 
 	/**
 	 * @return a new {@link RepeatContext}
-	 * @see org.springframework.batch.repeat.CompletionPolicy#start(org.springframework.batch.repeat.RepeatContext)
+	 * @see CompletionPolicy#start(RepeatContext)
 	 */
 	@Override
 	public RepeatContext start(RepeatContext parent) {
@@ -115,7 +115,7 @@ public class StepExecutionSimpleCompletionPolicy implements StepExecutionListene
 	}
 
 	/**
-	 * @see org.springframework.batch.repeat.CompletionPolicy#update(org.springframework.batch.repeat.RepeatContext)
+	 * @see CompletionPolicy#update(RepeatContext)
 	 */
 	@Override
 	public void update(RepeatContext context) {

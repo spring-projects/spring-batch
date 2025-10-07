@@ -17,8 +17,8 @@ package org.springframework.batch.test;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.batch.core.job.JobExecution;
 
@@ -28,11 +28,11 @@ import org.springframework.batch.core.job.parameters.JobParameter;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersIncrementer;
 import org.springframework.batch.core.step.StepExecution;
-import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
-import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
+import org.springframework.batch.core.launch.JobExecutionAlreadyRunningException;
+import org.springframework.batch.core.launch.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.repository.JobRestartException;
-import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.core.launch.JobRestartException;
+import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.dao.OptimisticLockingFailureException;
 
 /**
@@ -54,7 +54,7 @@ public class JobRepositoryTestUtils {
 
 		@Override
 		public JobParameters getNext(@Nullable JobParameters parameters) {
-			return new JobParameters(Collections.singletonMap("count", new JobParameter<>(count++, Long.class)));
+			return new JobParameters(Set.of(new JobParameter<>("count", count++, Long.class)));
 		}
 
 	};

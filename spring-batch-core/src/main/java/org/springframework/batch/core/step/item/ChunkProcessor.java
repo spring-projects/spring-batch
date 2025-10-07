@@ -19,10 +19,10 @@ package org.springframework.batch.core.step.item;
 import org.jspecify.annotations.NullUnmarked;
 
 import org.springframework.batch.core.step.StepContribution;
-import org.springframework.batch.item.Chunk;
+import org.springframework.batch.infrastructure.item.Chunk;
 
 /**
- * Interface defined for processing {@link org.springframework.batch.item.Chunk}s.
+ * Interface defined for processing {@link Chunk}s.
  *
  * @author Kyeonghoon Lee (Add FunctionalInterface annotation)
  * @since 2.0

@@ -16,6 +16,7 @@
 package org.springframework.batch.core.repository;
 
 import org.springframework.batch.core.AbstractExceptionTests;
+import org.springframework.batch.core.launch.JobInstanceAlreadyCompleteException;
 
 /**
  * @author Dave Syer

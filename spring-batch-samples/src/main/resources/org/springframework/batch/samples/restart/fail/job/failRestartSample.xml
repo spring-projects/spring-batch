@@ -16,7 +16,7 @@
 		</step>
 	</job>
 
-	<bean id="processor" class="org.springframework.batch.item.validator.ValidatingItemProcessor">
+	<bean id="processor" class="org.springframework.batch.infrastructure.item.validator.ValidatingItemProcessor">
 		<constructor-arg ref="fixedValidator" />
 	</bean>
 
@@ -28,10 +28,10 @@
 		<property name="delegate" ref="fileItemReader" />
 	</bean>
 
-	<bean id="fileItemReader" class="org.springframework.batch.item.file.FlatFileItemReader" scope="step">
+	<bean id="fileItemReader" class="org.springframework.batch.infrastructure.item.file.FlatFileItemReader" scope="step">
 		<property name="resource" value="#{jobParameters['input.file']}" />
 		<constructor-arg name="lineMapper">
-			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+			<bean class="org.springframework.batch.infrastructure.item.file.mapping.DefaultLineMapper">
 				<property name="lineTokenizer" ref="fixedFileTokenizer" />
 				<property name="fieldSetMapper" ref="fieldSetMapper" />
 			</bean>
@@ -39,12 +39,12 @@
 		<property name="saveState" value="true" />
 	</bean>
 
-	<bean id="fixedFileTokenizer" class="org.springframework.batch.item.file.transform.FixedLengthTokenizer">
+	<bean id="fixedFileTokenizer" class="org.springframework.batch.infrastructure.item.file.transform.FixedLengthTokenizer">
 		<property name="names" value="ISIN, Quantity, Price, Customer" />
 		<property name="columns" value="1-12, 13-15, 16-20, 21-29" />
 	</bean>
 
-	<bean id="fixedValidator" class="org.springframework.batch.item.validator.SpringValidator">
+	<bean id="fixedValidator" class="org.springframework.batch.infrastructure.item.validator.SpringValidator">
 		<property name="validator">
             <bean class="org.springframework.batch.samples.domain.trade.internal.validator.TradeValidator"/>
 		</property>

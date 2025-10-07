@@ -32,7 +32,8 @@ import org.springframework.batch.core.step.builder.StepBuilderException;
  * @author Mahmoud Ben Hassine
  * @since 2.2
  */
-@NullUnmarked // FIXME to remove once default constructors are removed
+@NullUnmarked // FIXME to remove once default constructors (required by the batch XML
+				// namespace) are removed
 public class FlowJobBuilder extends JobBuilderHelper<FlowJobBuilder> {
 
 	private Flow flow;
@@ -100,7 +101,7 @@ public class FlowJobBuilder extends JobBuilderHelper<FlowJobBuilder> {
 			job.afterPropertiesSet();
 		}
 		catch (Exception e) {
-			throw new StepBuilderException(e);
+			throw new JobBuilderException(e);
 		}
 		return job;
 	}

@@ -17,7 +17,6 @@ package org.springframework.batch.core.step.job;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
@@ -28,7 +27,7 @@ import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.batch.core.converter.JobParametersConverter;
-import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.util.Assert;
 
 /**
@@ -66,11 +65,11 @@ public class DefaultJobParametersExtractor implements JobParametersExtractor {
 	@Override
 	public JobParameters getJobParameters(Job job, StepExecution stepExecution) {
 		JobParametersBuilder builder = new JobParametersBuilder();
-		Map<String, JobParameter<?>> jobParameters = stepExecution.getJobParameters().getParameters();
+		JobParameters jobParameters = stepExecution.getJobParameters();
 		ExecutionContext executionContext = stepExecution.getExecutionContext();
 		if (useAllParentParameters) {
-			for (String key : jobParameters.keySet()) {
-				builder.addJobParameter(key, jobParameters.get(key));
+			for (JobParameter<?> jobParameter : jobParameters) {
+				builder.addJobParameter(jobParameter);
 			}
 		}
 		Properties properties = new Properties();
@@ -78,8 +77,8 @@ public class DefaultJobParametersExtractor implements JobParametersExtractor {
 			if (executionContext.containsKey(key)) {
 				properties.setProperty(key, executionContext.getString(key));
 			}
-			else if (jobParameters.containsKey(key)) {
-				builder.addJobParameter(key, jobParameters.get(key));
+			else if (jobParameters.getParameter(key) != null) {
+				builder.addJobParameter(jobParameters.getParameter(key));
 			}
 		}
 		builder.addJobParameters(convert(properties));

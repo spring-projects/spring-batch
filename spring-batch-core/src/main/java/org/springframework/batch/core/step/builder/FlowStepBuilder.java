@@ -29,7 +29,8 @@ import org.springframework.batch.core.job.flow.FlowStep;
  * @author Mahmoud Ben Hassine
  * @since 2.2
  */
-@NullUnmarked // FIXME to remove once default constructors are removed
+// FIXME remove once default constructors (required by the XML namespace) are removed
+@NullUnmarked
 public class FlowStepBuilder extends StepBuilderHelper<FlowStepBuilder> {
 
 	private Flow flow;

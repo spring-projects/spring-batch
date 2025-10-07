@@ -34,16 +34,16 @@ import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.core.step.FatalStepExecutionException;
 import org.springframework.batch.core.step.StepInterruptionPolicy;
 import org.springframework.batch.core.step.ThreadStepInterruptionPolicy;
-import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.support.CompositeItemStream;
-import org.springframework.batch.repeat.RepeatContext;
-import org.springframework.batch.repeat.RepeatOperations;
-import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.batch.repeat.support.RepeatTemplate;
-import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
+import org.springframework.batch.infrastructure.item.ExecutionContext;
+import org.springframework.batch.infrastructure.item.ItemReader;
+import org.springframework.batch.infrastructure.item.ItemStream;
+import org.springframework.batch.infrastructure.item.ItemWriter;
+import org.springframework.batch.infrastructure.item.support.CompositeItemStream;
+import org.springframework.batch.infrastructure.repeat.RepeatContext;
+import org.springframework.batch.infrastructure.repeat.RepeatOperations;
+import org.springframework.batch.infrastructure.repeat.RepeatStatus;
+import org.springframework.batch.infrastructure.repeat.support.RepeatTemplate;
+import org.springframework.batch.infrastructure.support.transaction.ResourcelessTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
@@ -75,7 +75,8 @@ import java.util.concurrent.Semaphore;
  * @author Will Schipp
  * @author Mahmoud Ben Hassine
  */
-@NullUnmarked // FIXME to remove once default constructors are removed
+// FIXME remove once default constructors (required by the XML namespace) are removed
+@NullUnmarked
 public class TaskletStep extends AbstractStep {
 
 	private static final Log logger = LogFactory.getLog(TaskletStep.class);

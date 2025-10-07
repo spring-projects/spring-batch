@@ -30,10 +30,10 @@ XML::
 The following example shows late binding in XML:
 +
 .XML Configuration
-[source, xml]
+[source,xml]
 ----
 <bean id="flatFileItemReader"
-      class="org.springframework.batch.item.file.FlatFileItemReader">
+      class="org.springframework.batch.infrastructure.item.file.FlatFileItemReader">
     <property name="resource"
               value="file://outputs/file.txt" />
 </bean>
@@ -75,10 +75,10 @@ XML::
 The following example shows how to read a file name from a property in XML:
 +
 .XML Configuration
-[source, xml]
+[source,xml]
 ----
 <bean id="flatFileItemReader"
-      class="org.springframework.batch.item.file.FlatFileItemReader">
+      class="org.springframework.batch.infrastructure.item.file.FlatFileItemReader">
     <property name="resource" value="${input.file.name}" />
 </bean>
 ----
@@ -125,10 +125,10 @@ XML::
 The following example shows how to parameterize a file name in XML:
 +
 .XML Configuration
-[source, xml]
+[source,xml]
 ----
 <bean id="flatFileItemReader" scope="step"
-      class="org.springframework.batch.item.file.FlatFileItemReader">
+      class="org.springframework.batch.infrastructure.item.file.FlatFileItemReader">
     <property name="resource" value="#{jobParameters['input.file.name']}" />
 </bean>
 ----
@@ -180,19 +180,19 @@ XML::
 The following example shows how to access the `ExecutionContext` in XML:
 +
 .XML Configuration
-[source, xml]
+[source,xml]
 ----
 <bean id="flatFileItemReader" scope="step"
-      class="org.springframework.batch.item.file.FlatFileItemReader">
+      class="org.springframework.batch.infrastructure.item.file.FlatFileItemReader">
     <property name="resource" value="#{jobExecutionContext['input.file.name']}" />
 </bean>
 ----
 +
 .XML Configuration
-[source, xml]
+[source,xml]
 ----
 <bean id="flatFileItemReader" scope="step"
-      class="org.springframework.batch.item.file.FlatFileItemReader">
+      class="org.springframework.batch.infrastructure.item.file.FlatFileItemReader">
     <property name="resource" value="#{stepExecutionContext['input.file.name']}" />
 </bean>
 ----
@@ -248,10 +248,10 @@ XML::
 The following example shows an example of binding to step scope in XML:
 +
 .XML Configuration
-[source, xml]
+[source,xml]
 ----
 <bean id="flatFileItemReader" scope="step"
-      class="org.springframework.batch.item.file.FlatFileItemReader">
+      class="org.springframework.batch.infrastructure.item.file.FlatFileItemReader">
     <property name="resource" value="#{jobParameters[input.file.name]}" />
 </bean>
 ----

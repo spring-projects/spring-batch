@@ -20,15 +20,15 @@
 
 	<bean id="itemReader" class="org.springframework.batch.samples.file.multiline.MultiLineTradeItemReader" scope="step">
 		<property name="delegate">
-			<bean class="org.springframework.batch.item.file.FlatFileItemReader">
+			<bean class="org.springframework.batch.infrastructure.item.file.FlatFileItemReader">
 				<property name="resource" ref="inputResource" />
 				<constructor-arg name="lineMapper">
-					<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+					<bean class="org.springframework.batch.infrastructure.item.file.mapping.DefaultLineMapper">
 						<property name="lineTokenizer">
-							<bean class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer" />
+							<bean class="org.springframework.batch.infrastructure.item.file.transform.DelimitedLineTokenizer" />
 						</property>
 						<property name="fieldSetMapper">
-							<bean class="org.springframework.batch.item.file.mapping.PassThroughFieldSetMapper" />
+							<bean class="org.springframework.batch.infrastructure.item.file.mapping.PassThroughFieldSetMapper" />
 						</property>
 					</bean>
 				</constructor-arg>
@@ -38,10 +38,10 @@
 
 	<bean id="itemWriter" class="org.springframework.batch.samples.file.multiline.MultiLineTradeItemWriter" scope="step">
 		<property name="delegate">
-			<bean class="org.springframework.batch.item.file.FlatFileItemWriter">
+			<bean class="org.springframework.batch.infrastructure.item.file.FlatFileItemWriter">
 				<property name="resource" value="#{jobParameters[outputFile]}" />
 				<constructor-arg name="lineAggregator">
-					<bean class="org.springframework.batch.item.file.transform.PassThroughLineAggregator" />
+					<bean class="org.springframework.batch.infrastructure.item.file.transform.PassThroughLineAggregator" />
 				</constructor-arg>
 			</bean>
 		</property>

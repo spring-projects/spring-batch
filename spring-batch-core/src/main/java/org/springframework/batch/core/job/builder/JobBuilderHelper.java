@@ -35,7 +35,7 @@ import org.springframework.batch.core.annotation.BeforeJob;
 import org.springframework.batch.core.job.AbstractJob;
 import org.springframework.batch.core.listener.JobListenerFactoryBean;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.support.ReflectionUtils;
+import org.springframework.batch.infrastructure.support.ReflectionUtils;
 
 /**
  * A base class and utility for other job builders providing access to common properties
@@ -46,7 +46,8 @@ import org.springframework.batch.support.ReflectionUtils;
  * @author Taeik Lim
  * @since 2.2
  */
-@NullUnmarked // FIXME to remove once default constructors are removed
+@NullUnmarked // FIXME to remove once default constructors (required by the batch XML
+				// namespace) are removed
 public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 
 	protected final Log logger = LogFactory.getLog(getClass());

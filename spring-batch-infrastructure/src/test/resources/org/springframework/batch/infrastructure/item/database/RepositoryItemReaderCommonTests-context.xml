@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+	   xmlns:tx="http://www.springframework.org/schema/tx"
+	   xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	   http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
+	   http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+	   http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd">
+
+	<jdbc:embedded-database id="dataSource" generate-name="true">
+		<jdbc:script location="org/springframework/batch/infrastructure/item/database/init-books-schema.sql"/>
+	</jdbc:embedded-database>
+
+	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+		<property name="entityManagerFactory" ref="entityManagerFactory" />
+	</bean>
+
+	<tx:annotation-driven/>
+
+	<bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+		<property name="dataSource" ref="dataSource"/>
+		<property name="jpaVendorAdapter">
+			<bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+				<property name="showSql" value="false"/>
+			</bean>
+		</property>
+		<property name="packagesToScan" value="org.springframework.batch.infrastructure.item.sample.books"/>
+	</bean>
+
+	<jpa:repositories base-package="org.springframework.batch.infrastructure.item.sample.books.data"/>
+
+	<bean id="authorRepositoryItemReader" class="org.springframework.batch.infrastructure.item.data.RepositoryItemReader">
+		<constructor-arg name="repository" ref="authorRepository"/>
+		<property name="methodName" value="findAll"/>
+		<constructor-arg name="sorts">
+			<map>
+				<entry key="id" value="ASC"/>
+			</map>
+		</constructor-arg>
+	</bean>
+
+</beans>

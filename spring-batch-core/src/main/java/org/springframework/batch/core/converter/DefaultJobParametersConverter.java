@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2024 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,12 @@
  */
 package org.springframework.batch.core.converter;
 
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.Set;
 
 import org.springframework.batch.core.job.parameters.JobParameter;
 
-import org.jspecify.annotations.Nullable;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.core.convert.support.ConfigurableConversionService;
@@ -93,16 +92,14 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 	 * @see org.springframework.batch.core.converter.JobParametersConverter#getJobParameters(java.util.Properties)
 	 */
 	@Override
-	public JobParameters getJobParameters(@Nullable Properties properties) {
-		if (properties == null || properties.isEmpty()) {
-			return new JobParameters();
-		}
+	public JobParameters getJobParameters(Properties properties) {
+		Assert.notNull(properties, "The properties must not be null");
 		JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
 		for (Entry<Object, Object> entry : properties.entrySet()) {
 			String parameterName = (String) entry.getKey();
 			String encodedJobParameter = (String) entry.getValue();
-			JobParameter<?> jobParameter = decode(encodedJobParameter);
-			jobParametersBuilder.addJobParameter(parameterName, jobParameter);
+			JobParameter<?> jobParameter = decode(parameterName, encodedJobParameter);
+			jobParametersBuilder.addJobParameter(jobParameter);
 		}
 		return jobParametersBuilder.toJobParameters();
 	}
@@ -111,16 +108,13 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 	 * @see org.springframework.batch.core.converter.JobParametersConverter#getProperties(JobParameters)
 	 */
 	@Override
-	public Properties getProperties(@Nullable JobParameters jobParameters) {
-		if (jobParameters == null || jobParameters.isEmpty()) {
-			return new Properties();
-		}
-		Map<String, JobParameter<?>> parameters = jobParameters.getParameters();
+	public Properties getProperties(JobParameters jobParameters) {
+		Set<JobParameter<?>> parameters = jobParameters.parameters();
 		Properties properties = new Properties();
-		for (Entry<String, JobParameter<?>> entry : parameters.entrySet()) {
-			String parameterName = entry.getKey();
-			JobParameter<?> jobParameter = entry.getValue();
-			properties.setProperty(parameterName, encode(jobParameter));
+		for (JobParameter<?> parameter : parameters) {
+			String parameterName = parameter.name();
+			String encodedParameterValue = encode(parameter);
+			properties.setProperty(parameterName, encodedParameterValue);
 		}
 		return properties;
 	}
@@ -141,9 +135,9 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 	 * @return the encoded job parameter
 	 */
 	protected String encode(JobParameter<?> jobParameter) {
-		Class<?> parameterType = jobParameter.getType();
-		boolean parameterIdentifying = jobParameter.isIdentifying();
-		Object parameterTypedValue = jobParameter.getValue();
+		Class<?> parameterType = jobParameter.type();
+		boolean parameterIdentifying = jobParameter.identifying();
+		Object parameterTypedValue = jobParameter.value();
 		String parameterStringValue = this.conversionService.convert(parameterTypedValue, String.class);
 		return String.join(",", parameterStringValue, parameterType.getName(), Boolean.toString(parameterIdentifying));
 	}
@@ -154,13 +148,13 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 	 * @return the decoded job parameter
 	 */
 	@SuppressWarnings(value = { "unchecked", "rawtypes" })
-	protected JobParameter<?> decode(String encodedJobParameter) {
+	protected JobParameter decode(String parameterName, String encodedJobParameter) {
 		String parameterStringValue = parseValue(encodedJobParameter);
 		Class<?> parameterType = parseType(encodedJobParameter);
 		boolean parameterIdentifying = parseIdentifying(encodedJobParameter);
 		try {
 			Object typedValue = this.conversionService.convert(parameterStringValue, parameterType);
-			return new JobParameter(typedValue, parameterType, parameterIdentifying);
+			return new JobParameter(parameterName, typedValue, parameterType, parameterIdentifying);
 		}
 		catch (Exception e) {
 			throw new JobParametersConversionException(

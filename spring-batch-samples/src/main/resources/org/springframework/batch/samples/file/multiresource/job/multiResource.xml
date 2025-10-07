@@ -18,22 +18,22 @@
 	<bean id="itemProcessor" class="org.springframework.batch.samples.domain.trade.internal.CustomerCreditIncreaseProcessor" />
 
 	<bean id="itemReader"
-		class="org.springframework.batch.item.file.MultiResourceItemReader" scope="step">
+          class="org.springframework.batch.infrastructure.item.file.MultiResourceItemReader" scope="step">
 		<property name="delegate">
-			<bean class="org.springframework.batch.item.file.FlatFileItemReader">
+			<bean class="org.springframework.batch.infrastructure.item.file.FlatFileItemReader">
 				<property name="lineMapper">
 					<bean
-						class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+						class="org.springframework.batch.infrastructure.item.file.mapping.DefaultLineMapper">
 						<property name="lineTokenizer">
 							<bean
-								class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
+								class="org.springframework.batch.infrastructure.item.file.transform.DelimitedLineTokenizer">
 								<property name="delimiter" value="," />
 								<property name="names" value="name,credit" />
 							</bean>
 						</property>
 						<property name="fieldSetMapper">
 							<bean
-								class="org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper">
+								class="org.springframework.batch.infrastructure.item.file.mapping.BeanWrapperFieldSetMapper">
 								<property name="targetType"
 									value="org.springframework.batch.samples.domain.trade.CustomerCredit" />
 							</bean>
@@ -46,21 +46,21 @@
 	</bean>
 
 	<bean id="itemWriter"
-		class="org.springframework.batch.item.file.MultiResourceItemWriter" scope="step">
+          class="org.springframework.batch.infrastructure.item.file.MultiResourceItemWriter" scope="step">
 		<property name="resource"
 			value="#{jobParameters['outputFiles']}" />
 		<property name="itemCountLimitPerResource" value="6" />
 		<property name="delegate" ref="delegateWriter" />
 	</bean>
 
-	<bean id="delegateWriter" class="org.springframework.batch.item.file.FlatFileItemWriter">
+	<bean id="delegateWriter" class="org.springframework.batch.infrastructure.item.file.FlatFileItemWriter">
 		<property name="lineAggregator">
 			<bean
-				class="org.springframework.batch.item.file.transform.DelimitedLineAggregator">
+				class="org.springframework.batch.infrastructure.item.file.transform.DelimitedLineAggregator">
 				<property name="delimiter" value="," />
 				<property name="fieldExtractor">
 					<bean
-						class="org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor">
+						class="org.springframework.batch.infrastructure.item.file.transform.BeanWrapperFieldExtractor">
 						<property name="names" value="name,credit" />
 					</bean>
 				</property>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,16 @@
 package org.springframework.batch.core.job.parameters;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 import org.springframework.util.Assert;
 
 /**
  * Domain representation of a parameter to a batch job. The identifying flag is used to
  * indicate if the parameter is to be used as part of the identification of a job
- * instance.
+ * instance. A job parameter only has a meaning within a {@link JobParameters} instance,
+ * which is a namespace of job parameters with unique names. Two job parameters are
+ * considered equal if they have the same name. Job parameters are immutable.
  *
  * @author Lucas Ward
  * @author Dave Syer
@@ -33,81 +36,49 @@ import org.springframework.util.Assert;
  * @since 2.0
  *
  */
-public class JobParameter<T> implements Serializable {
-
-	private final T value;
-
-	private final Class<T> type;
-
-	private final boolean identifying;
+public record JobParameter<T>(String name, T value, Class<T> type, boolean identifying) implements Serializable {
 
 	/**
 	 * Create a new {@link JobParameter}.
+	 * @param name the name of the parameter. Must not be {@code null}.
 	 * @param value the value of the parameter. Must not be {@code null}.
 	 * @param type the type of the parameter. Must not be {@code null}.
 	 * @param identifying true if the parameter is identifying. false otherwise.
+	 * @since 6.0
 	 */
-	public JobParameter(T value, Class<T> type, boolean identifying) {
+	public JobParameter {
+		Assert.notNull(value, "name must not be null");
 		Assert.notNull(value, "value must not be null");
 		Assert.notNull(type, "type must not be null");
-		this.value = value;
-		this.type = type;
-		this.identifying = identifying;
 	}
 
 	/**
 	 * Create a new identifying {@link JobParameter}.
+	 * @param name the name of the parameter. Must not be {@code null}.
 	 * @param value the value of the parameter. Must not be {@code null}.
 	 * @param type the type of the parameter. Must not be {@code null}.
+	 * @since 6.0
 	 */
-	public JobParameter(T value, Class<T> type) {
-		this(value, type, true);
-	}
-
-	/**
-	 * @return The identifying flag. It is set to {@code true} if the job parameter is
-	 * identifying.
-	 */
-	public boolean isIdentifying() {
-		return identifying;
-	}
-
-	/**
-	 * @return the value contained within this {@code JobParameter}.
-	 */
-	public T getValue() {
-		return value;
-	}
-
-	/**
-	 * Return the type of the parameter.
-	 * @return the type of the parameter
-	 */
-	public Class<T> getType() {
-		return type;
+	public JobParameter(String name, T value, Class<T> type) {
+		this(name, value, type, true);
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (!(obj instanceof JobParameter rhs)) {
+	public boolean equals(Object o) {
+		if (!(o instanceof JobParameter<?> that))
 			return false;
-		}
-
-		if (this == obj) {
-			return true;
-		}
-
-		return type == rhs.type && value.equals(rhs.value);
-	}
-
-	@Override
-	public String toString() {
-		return "{" + "value=" + value + ", type=" + type + ", identifying=" + identifying + '}';
+		return Objects.equals(name, that.name);
 	}
 
 	@Override
 	public int hashCode() {
-		return 7 + 21 * value.hashCode();
+		return Objects.hashCode(name);
+	}
+
+	@Override
+	public String toString() {
+		return "JobParameter{" + "name='" + name + '\'' + ", value=" + value + ", type=" + type + ", identifying="
+				+ identifying + '}';
 	}
 
 }

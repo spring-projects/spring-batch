@@ -37,10 +37,10 @@ public class CompositeJobParametersValidator implements JobParametersValidator, 
 	 * Validates the JobParameters according to the injected JobParameterValidators
 	 * Validation stops and exception is thrown on first validation error
 	 * @param parameters some {@link JobParameters}
-	 * @throws JobParametersInvalidException if the parameters are invalid
+	 * @throws InvalidJobParametersException if the parameters are invalid
 	 */
 	@Override
-	public void validate(@Nullable JobParameters parameters) throws JobParametersInvalidException {
+	public void validate(@Nullable JobParameters parameters) throws InvalidJobParametersException {
 		for (JobParametersValidator validator : validators) {
 			validator.validate(parameters);
 		}

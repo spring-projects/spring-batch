@@ -22,10 +22,10 @@
 	</bean>
 
 	<bean name="customerFileUploadReader"
-		class="org.springframework.batch.item.file.FlatFileItemReader">
+		class="org.springframework.batch.infrastructure.item.file.FlatFileItemReader">
 		<property name="resource" value="classpath:org/springframework/batch/samples/filter/data/customers.txt" />
 		<constructor-arg name="lineMapper">
-			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+			<bean class="org.springframework.batch.infrastructure.item.file.mapping.DefaultLineMapper">
 				<property name="lineTokenizer" ref="customerTokenizer" />
 				<property name="fieldSetMapper" ref="customerMapper" />
 			</bean>
@@ -41,13 +41,13 @@
 		class="org.springframework.batch.samples.domain.trade.CompositeCustomerUpdateLineTokenizer">
 		<property name="customerTokenizer">
 			<bean
-				class="org.springframework.batch.item.file.transform.FixedLengthTokenizer">
+				class="org.springframework.batch.infrastructure.item.file.transform.FixedLengthTokenizer">
 				<property name="columns" value="1,2-18,19-26" />
 			</bean>
 		</property>
 		<property name="footerTokenizer">
 			<bean
-				class="org.springframework.batch.item.file.transform.FixedLengthTokenizer">
+				class="org.springframework.batch.infrastructure.item.file.transform.FixedLengthTokenizer">
 				<property name="columns" value="1,2-8" />
 			</bean>
 		</property>

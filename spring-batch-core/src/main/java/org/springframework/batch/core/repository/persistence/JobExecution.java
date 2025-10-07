@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 the original author or authors.
+ * Copyright 2024-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@ package org.springframework.batch.core.repository.persistence;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 import org.springframework.batch.core.BatchStatus;
 
@@ -35,7 +35,7 @@ public class JobExecution {
 
 	private long jobInstanceId;
 
-	private Map<String, JobParameter<?>> jobParameters = new HashMap<>();
+	private Set<JobParameter<?>> jobParameters = new HashSet<>();
 
 	private List<StepExecution> stepExecutions = new ArrayList<>();
 
@@ -76,11 +76,11 @@ public class JobExecution {
 		this.jobExecutionId = jobExecutionId;
 	}
 
-	public Map<String, JobParameter<?>> getJobParameters() {
+	public Set<JobParameter<?>> getJobParameters() {
 		return jobParameters;
 	}
 
-	public void setJobParameters(Map<String, JobParameter<?>> jobParameters) {
+	public void setJobParameters(Set<JobParameter<?>> jobParameters) {
 		this.jobParameters = jobParameters;
 	}
 

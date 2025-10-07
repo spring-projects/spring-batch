@@ -16,10 +16,8 @@
 package org.springframework.batch.core.job;
 
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 import org.springframework.batch.core.job.parameters.JobParameter;
 import org.springframework.batch.core.job.parameters.JobParameters;
@@ -29,7 +27,7 @@ import org.springframework.util.DigestUtils;
 /**
  * Default implementation of the {@link JobKeyGenerator} interface. This implementation
  * provides a single hash value based on the {@link JobParameters} object passed in. Only
- * identifying parameters (as per {@link JobParameter#isIdentifying()}) are used in the
+ * identifying parameters (as per {@link JobParameter#identifying()}) are used in the
  * calculation of the key.
  *
  * @author Michael Minella
@@ -46,15 +44,13 @@ public class DefaultJobKeyGenerator implements JobKeyGenerator {
 	public String generateKey(JobParameters source) {
 
 		Assert.notNull(source, "source must not be null");
-		Map<String, JobParameter<?>> props = source.getParameters();
+		Set<JobParameter<?>> parameters = source.parameters();
 		StringBuilder stringBuffer = new StringBuilder();
-		List<String> keys = new ArrayList<>(props.keySet());
-		Collections.sort(keys);
+		List<String> keys = parameters.stream().map(JobParameter::name).sorted().toList();
 		for (String key : keys) {
-			JobParameter<?> jobParameter = props.get(key);
-			if (jobParameter != null && jobParameter.isIdentifying()) {
-				String value = jobParameter.toString();
-				stringBuffer.append(key).append("=").append(value).append(";");
+			JobParameter<?> jobParameter = source.getParameter(key);
+			if (jobParameter != null && jobParameter.identifying()) {
+				stringBuffer.append(jobParameter);
 			}
 		}
 		return DigestUtils.md5DigestAsHex(stringBuffer.toString().getBytes(StandardCharsets.UTF_8));

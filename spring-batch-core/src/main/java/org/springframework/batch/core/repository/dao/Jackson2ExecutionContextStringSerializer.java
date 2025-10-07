@@ -112,6 +112,8 @@ import static com.fasterxml.jackson.core.JsonToken.START_OBJECT;
 @NullUnmarked
 public class Jackson2ExecutionContextStringSerializer implements ExecutionContextSerializer {
 
+	private static final String NAME_KEY_NAME = "name";
+
 	private static final String IDENTIFYING_KEY_NAME = "identifying";
 
 	private static final String TYPE_KEY_NAME = "type";
@@ -206,11 +208,11 @@ public class Jackson2ExecutionContextStringSerializer implements ExecutionContex
 			public void serialize(JobParameter jobParameter, JsonGenerator jsonGenerator,
 					SerializerProvider serializerProvider) throws IOException {
 				jsonGenerator.writeFieldName(VALUE_KEY_NAME);
-				jsonGenerator.writeObject(jobParameter.getValue());
+				jsonGenerator.writeObject(jobParameter.value());
 				jsonGenerator.writeFieldName(TYPE_KEY_NAME);
-				jsonGenerator.writeString(jobParameter.getType().getName());
+				jsonGenerator.writeString(jobParameter.type().getName());
 				jsonGenerator.writeFieldName(IDENTIFYING_KEY_NAME);
-				jsonGenerator.writeObject(jobParameter.isIdentifying());
+				jsonGenerator.writeObject(jobParameter.identifying());
 			}
 
 		}
@@ -227,13 +229,14 @@ public class Jackson2ExecutionContextStringSerializer implements ExecutionContex
 			@Override
 			public JobParameter deserialize(JsonParser parser, DeserializationContext context) throws IOException {
 				JsonNode node = parser.readValueAsTree();
+				String name = node.get(NAME_KEY_NAME).asText();
 				boolean identifying = node.get(IDENTIFYING_KEY_NAME).asBoolean();
 				String type = node.get(TYPE_KEY_NAME).asText();
 				JsonNode value = node.get(VALUE_KEY_NAME);
 				try {
 					Class<?> parameterType = Class.forName(type);
 					Object typedValue = objectMapper.convertValue(value, parameterType);
-					return new JobParameter(typedValue, parameterType, identifying);
+					return new JobParameter(name, typedValue, parameterType, identifying);
 				}
 				catch (ClassNotFoundException e) {
 					throw new RuntimeException("Unable to deserialize job parameter " + value.asText(), e);

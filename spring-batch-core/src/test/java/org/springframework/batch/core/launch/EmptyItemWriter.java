@@ -21,9 +21,9 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.springframework.batch.item.Chunk;
-import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
+import org.springframework.batch.infrastructure.item.Chunk;
+import org.springframework.batch.infrastructure.item.ItemWriter;
+import org.springframework.batch.infrastructure.support.transaction.TransactionAwareProxyFactory;
 import org.springframework.beans.factory.InitializingBean;
 
 /**

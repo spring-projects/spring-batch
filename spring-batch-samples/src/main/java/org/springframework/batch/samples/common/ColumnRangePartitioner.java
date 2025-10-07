@@ -21,7 +21,7 @@ import java.util.Map;
 import javax.sql.DataSource;
 
 import org.springframework.batch.core.partition.Partitioner;
-import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 

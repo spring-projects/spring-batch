@@ -17,9 +17,9 @@ package org.springframework.batch.core.configuration.xml;
 
 import org.jspecify.annotations.Nullable;
 
-import org.springframework.batch.repeat.CompletionPolicy;
-import org.springframework.batch.repeat.RepeatContext;
-import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.batch.infrastructure.repeat.CompletionPolicy;
+import org.springframework.batch.infrastructure.repeat.RepeatContext;
+import org.springframework.batch.infrastructure.repeat.RepeatStatus;
 
 /**
  * @author Dan Garrette

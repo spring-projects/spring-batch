@@ -27,7 +27,8 @@ import org.springframework.transaction.PlatformTransactionManager;
  * @author Mahmoud Ben Hassine
  * @since 2.2
  */
-@NullUnmarked // FIXME to remove once default constructors are removed
+// FIXME remove once default constructors (required by the XML namespace) are removed
+@NullUnmarked
 public class TaskletStepBuilder extends AbstractTaskletStepBuilder<TaskletStepBuilder> {
 
 	private Tasklet tasklet;

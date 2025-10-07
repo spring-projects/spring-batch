@@ -19,12 +19,12 @@
 		</step>
 	</job>
 
-	<bean id="reader" class="org.springframework.batch.item.adapter.ItemReaderAdapter">
+	<bean id="reader" class="org.springframework.batch.infrastructure.item.adapter.ItemReaderAdapter">
 		<property name="targetObject" ref="delegateObject" />
 		<property name="targetMethod" value="getData" />
 	</bean>
 
-	<bean id="writer" class="org.springframework.batch.item.adapter.PropertyExtractingDelegatingItemWriter">
+	<bean id="writer" class="org.springframework.batch.infrastructure.item.adapter.PropertyExtractingDelegatingItemWriter">
 		<property name="targetObject" ref="delegateObject" />
 		<property name="targetMethod" value="processPerson" />
 		<property name="fieldsUsedAsTargetMethodArguments">

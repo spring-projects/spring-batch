@@ -490,11 +490,12 @@ invalidate the transaction, only the item.  This is done through the
 transaction attribute:
 
 ```xml
+
 <bean id="step2" parent="skipLimitStep">
-    <property name="skipLimit" value="1" />
+    <property name="skipLimit" value="1"/>
     <!-- No rollback for exceptions that are marked with "+" in the tx attributes -->
     <property name="transactionAttribute"
-        value="+org.springframework.batch.item.validator.ValidationException" />
+              value="+org.springframework.batch.infrastructure.item.validator.ValidationException"/>
     ....
 </bean>
 ```

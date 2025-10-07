@@ -39,9 +39,10 @@ import org.springframework.batch.core.repository.dao.jdbc.JdbcExecutionContextDa
 import org.springframework.batch.core.repository.dao.jdbc.JdbcJobExecutionDao;
 import org.springframework.batch.core.repository.dao.jdbc.JdbcJobInstanceDao;
 import org.springframework.batch.core.repository.dao.jdbc.JdbcStepExecutionDao;
-import org.springframework.batch.item.database.support.DataFieldMaxValueIncrementerFactory;
-import org.springframework.batch.item.database.support.DefaultDataFieldMaxValueIncrementerFactory;
-import org.springframework.batch.support.DatabaseType;
+import org.springframework.batch.infrastructure.item.ExecutionContext;
+import org.springframework.batch.infrastructure.item.database.support.DataFieldMaxValueIncrementerFactory;
+import org.springframework.batch.infrastructure.item.database.support.DefaultDataFieldMaxValueIncrementerFactory;
+import org.springframework.batch.infrastructure.support.DatabaseType;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.convert.support.ConfigurableConversionService;
@@ -57,7 +58,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.sql.Types;
 
-import static org.springframework.batch.support.DatabaseType.SYBASE;
+import static org.springframework.batch.infrastructure.support.DatabaseType.SYBASE;
 
 /**
  * A {@link FactoryBean} that automates the creation of a {@link SimpleJobRepository}
@@ -121,8 +122,7 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 	/**
 	 * A custom implementation of the {@link ExecutionContextSerializer}. The default, if
 	 * not injected, is the {@link DefaultExecutionContextSerializer}.
-	 * @param serializer used to serialize/deserialize
-	 * {@link org.springframework.batch.item.ExecutionContext}
+	 * @param serializer used to serialize/deserialize {@link ExecutionContext}
 	 * @see ExecutionContextSerializer
 	 */
 	public void setSerializer(ExecutionContextSerializer serializer) {

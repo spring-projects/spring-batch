@@ -17,8 +17,8 @@ package org.springframework.batch.samples.jdbc.cursor;
 
 import javax.sql.DataSource;
 
-import org.springframework.batch.item.database.JdbcCursorItemReader;
-import org.springframework.batch.item.database.builder.JdbcCursorItemReaderBuilder;
+import org.springframework.batch.infrastructure.item.database.JdbcCursorItemReader;
+import org.springframework.batch.infrastructure.item.database.builder.JdbcCursorItemReaderBuilder;
 import org.springframework.batch.samples.domain.trade.CustomerCredit;
 import org.springframework.batch.samples.domain.trade.internal.CustomerCreditRowMapper;
 import org.springframework.batch.samples.jdbc.JdbcReaderBatchWriterSampleJob;

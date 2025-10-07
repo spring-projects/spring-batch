@@ -44,12 +44,12 @@ import org.springframework.batch.core.job.flow.support.StateTransition;
 import org.springframework.batch.core.job.flow.support.state.EndState;
 import org.springframework.batch.core.job.flow.support.state.StepState;
 import org.springframework.batch.core.launch.JobOperator;
-import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
-import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
+import org.springframework.batch.core.launch.JobExecutionAlreadyRunningException;
+import org.springframework.batch.core.launch.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.batch.core.launch.JobRestartException;
 import org.springframework.batch.core.step.builder.StepBuilder;
-import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -229,7 +229,8 @@ class SimpleJobExplorerIntegrationTests {
 		Assertions.assertEquals(2, jobExecutions.size());
 		JobParameters actualJobParameters1 = jobExecutions.get(0).getJobParameters();
 		JobParameters actualJobParameters2 = jobExecutions.get(1).getJobParameters();
-		Assertions.assertNotEquals(actualJobParameters1, actualJobParameters2);
+		Assertions.assertEquals(actualJobParameters1.getParameter("id"), actualJobParameters2.getParameter("id"));
+		Assertions.assertEquals(actualJobParameters1.getParameter("name"), actualJobParameters2.getParameter("name"));
 	}
 
 }
