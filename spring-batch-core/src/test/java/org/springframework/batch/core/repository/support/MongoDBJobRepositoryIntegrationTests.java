@@ -50,7 +50,6 @@ public class MongoDBJobRepositoryIntegrationTests {
 	@Autowired
 	private MongoTemplate mongoTemplate;
 
-	@SuppressWarnings("removal")
 	@BeforeEach
 	public void setUp() {
 		// collections
@@ -67,21 +66,21 @@ public class MongoDBJobRepositoryIntegrationTests {
 			.insertOne(new Document(Map.of("_id", "BATCH_STEP_EXECUTION_SEQ", "count", 0L)));
 		// indices
 		mongoTemplate.indexOps("BATCH_JOB_INSTANCE")
-			.ensureIndex(new Index().on("jobName", Sort.Direction.ASC).named("job_name_idx"));
+			.createIndex(new Index().on("jobName", Sort.Direction.ASC).named("job_name_idx"));
 		mongoTemplate.indexOps("BATCH_JOB_INSTANCE")
-			.ensureIndex(new Index().on("jobName", Sort.Direction.ASC)
+			.createIndex(new Index().on("jobName", Sort.Direction.ASC)
 				.on("jobKey", Sort.Direction.ASC)
 				.named("job_name_key_idx"));
 		mongoTemplate.indexOps("BATCH_JOB_INSTANCE")
-			.ensureIndex(new Index().on("jobInstanceId", Sort.Direction.DESC).named("job_instance_idx"));
+			.createIndex(new Index().on("jobInstanceId", Sort.Direction.DESC).named("job_instance_idx"));
 		mongoTemplate.indexOps("BATCH_JOB_EXECUTION")
-			.ensureIndex(new Index().on("jobInstanceId", Sort.Direction.ASC).named("job_instance_idx"));
+			.createIndex(new Index().on("jobInstanceId", Sort.Direction.ASC).named("job_instance_idx"));
 		mongoTemplate.indexOps("BATCH_JOB_EXECUTION")
-			.ensureIndex(new Index().on("jobInstanceId", Sort.Direction.ASC)
+			.createIndex(new Index().on("jobInstanceId", Sort.Direction.ASC)
 				.on("status", Sort.Direction.ASC)
 				.named("job_instance_status_idx"));
 		mongoTemplate.indexOps("BATCH_STEP_EXECUTION")
-			.ensureIndex(new Index().on("stepExecutionId", Sort.Direction.ASC).named("step_execution_idx"));
+			.createIndex(new Index().on("stepExecutionId", Sort.Direction.ASC).named("step_execution_idx"));
 	}
 
 	@Test
