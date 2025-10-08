@@ -21,7 +21,9 @@ import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.util.ClassUtils;
 
 /**
- * Empty method implementation of {@link ItemStream}.
+ * Support class for {@link ItemStream}s. Provides a default name for components that can
+ * be used as a prefix for keys in the {@link ExecutionContext} and which can be
+ * overridden by the bean name if the component is a Spring managed bean.
  *
  * @author Dave Syer
  * @author Dean de Bree
@@ -57,7 +59,7 @@ public abstract class ItemStreamSupport implements ItemStream, BeanNameAware {
 	 * will only be used as name of the component in case it hasn't already been
 	 * explicitly set to a value other than the default. {@link #setName(String)}
 	 * @see BeanNameAware#setBeanName(String)
-     * @since 6.0
+	 * @since 6.0
 	 */
 	@Override
 	public void setBeanName(String name) {
