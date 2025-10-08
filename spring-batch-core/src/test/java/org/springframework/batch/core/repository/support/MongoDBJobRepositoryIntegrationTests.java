@@ -52,7 +52,7 @@ public class MongoDBJobRepositoryIntegrationTests {
 
 	@BeforeEach
 	public void setUp() throws IOException {
-		ClassPathResource resource = new ClassPathResource("org/springframework/batch/core/schema-mongodb.json");
+		ClassPathResource resource = new ClassPathResource("org/springframework/batch/core/schema-mongodb.jsonl");
 		Files.lines(resource.getFilePath()).forEach(line -> mongoTemplate.executeCommand(line));
 	}
 

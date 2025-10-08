@@ -1,7 +1,0 @@
-{create:'BATCH_JOB_INSTANCE'}
-{create:'BATCH_JOB_EXECUTION'}
-{create:'BATCH_STEP_EXECUTION'}
-{create:'BATCH_SEQUENCES'}
-{insert: "BATCH_SEQUENCES", documents: [ { _id: 'BATCH_JOB_INSTANCE_SEQ', count: NumberLong(0) } ]}
-{insert: "BATCH_SEQUENCES", documents: [ { _id: 'BATCH_JOB_EXECUTION_SEQ', count: NumberLong(0) } ]}
-{insert: "BATCH_SEQUENCES", documents: [ { _id: 'BATCH_STEP_EXECUTION_SEQ', count: NumberLong(0) } ]}
