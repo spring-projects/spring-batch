@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2023 the original author or authors.
+ * Copyright 2019-2025 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -35,7 +35,6 @@ import org.springframework.batch.infrastructure.item.ItemStreamException;
 import org.springframework.batch.infrastructure.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
 
 /**
  * An {@link ItemReader} that deserializes data from a {@link Resource} containing
@@ -48,6 +47,7 @@ import org.springframework.util.ClassUtils;
  * @author David Turanski
  * @author Mahmoud Ben Hassine
  * @author Song JaeGeun
+ * @author Jimmy Praet
  * @since 4.2
  */
 public class AvroItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> {
@@ -67,8 +67,6 @@ public class AvroItemReader<T> extends AbstractItemCountingItemStreamItemReader<
 	 * @param clazz the data type to be deserialized.
 	 */
 	public AvroItemReader(Resource resource, Class<T> clazz) {
-		setName(ClassUtils.getShortName(AvroItemReader.class));
-
 		Assert.notNull(resource, "'resource' is required.");
 		Assert.notNull(clazz, "'class' is required.");
 
@@ -86,8 +84,6 @@ public class AvroItemReader<T> extends AbstractItemCountingItemStreamItemReader<
 	 * @param schema the {@link Resource} containing the Avro schema.
 	 */
 	public AvroItemReader(Resource data, Resource schema) {
-		setName(ClassUtils.getShortName(AvroItemReader.class));
-
 		Assert.notNull(data, "'data' is required.");
 		Assert.state(data.exists(), "'data' " + data.getFilename() + " does not exist.");
 		Assert.notNull(schema, "'schema' is required");

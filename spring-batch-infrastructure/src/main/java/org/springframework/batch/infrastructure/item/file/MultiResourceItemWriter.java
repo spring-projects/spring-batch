@@ -27,7 +27,6 @@ import org.springframework.batch.infrastructure.item.support.AbstractItemStreamI
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
 
 /**
  * Wraps a {@link ResourceAwareItemWriterItemStream} and creates a new output resource
@@ -44,6 +43,7 @@ import org.springframework.util.ClassUtils;
  * @author Robert Kasanicky
  * @author Mahmoud Ben Hassine
  * @author Henning Pöttker
+ * @author Jimmy Praet
  */
 public class MultiResourceItemWriter<T> extends AbstractItemStreamItemWriter<T> {
 
@@ -75,7 +75,6 @@ public class MultiResourceItemWriter<T> extends AbstractItemStreamItemWriter<T> 
 	public MultiResourceItemWriter(ResourceAwareItemWriterItemStream<? super T> delegate) {
 		Assert.notNull(delegate, "The delegate writer must not be null.");
 		this.delegate = delegate;
-		this.setExecutionContextName(ClassUtils.getShortName(MultiResourceItemWriter.class));
 	}
 
 	@Override

@@ -29,7 +29,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.ldap.core.LdapAttributes;
 import org.springframework.ldap.ldif.parser.LdifParser;
 import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
 
 /**
  * The {@link MappingLdifReader MappingLdifReader} is an adaptation of the
@@ -54,6 +53,7 @@ import org.springframework.util.ClassUtils;
  *
  * @author Keith Barlow
  * @author Mahmoud Ben Hassine
+ * @author Jimmy Praet
  *
  */
 public class MappingLdifReader<T> extends AbstractItemCountingItemStreamItemReader<T>
@@ -83,7 +83,6 @@ public class MappingLdifReader<T> extends AbstractItemCountingItemStreamItemRead
 	public MappingLdifReader(Resource resource) {
 		Assert.notNull(resource, "The resource must not be null");
 		this.resource = resource;
-		setName(ClassUtils.getShortName(MappingLdifReader.class));
 	}
 
 	/**

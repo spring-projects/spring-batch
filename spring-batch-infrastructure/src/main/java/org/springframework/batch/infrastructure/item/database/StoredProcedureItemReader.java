@@ -34,7 +34,6 @@ import org.springframework.jdbc.core.SqlParameter;
 import org.springframework.jdbc.core.metadata.CallMetaDataContext;
 import org.springframework.jdbc.support.JdbcUtils;
 import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
 
 /**
  * <p>
@@ -64,6 +63,7 @@ import org.springframework.util.ClassUtils;
  *
  * @author Thomas Risberg
  * @author Mahmoud Ben Hassine
+ * @author Jimmy Praet
  */
 public class StoredProcedureItemReader<T> extends AbstractCursorItemReader<T> {
 
@@ -96,7 +96,6 @@ public class StoredProcedureItemReader<T> extends AbstractCursorItemReader<T> {
 		Assert.notNull(rowMapper, "RowMapper must not be null");
 		this.procedureName = procedureName;
 		this.rowMapper = rowMapper;
-		setName(ClassUtils.getShortName(StoredProcedureItemReader.class));
 	}
 
 	/**

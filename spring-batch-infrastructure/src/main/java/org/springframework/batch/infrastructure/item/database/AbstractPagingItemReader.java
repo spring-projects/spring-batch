@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,6 @@ import org.springframework.batch.infrastructure.item.ItemStreamReader;
 import org.springframework.batch.infrastructure.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
 
 /**
  * Abstract {@link ItemStreamReader} for to extend when reading database records in a
@@ -46,6 +45,7 @@ import org.springframework.util.ClassUtils;
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  * @author Stefano Cordio
+ * @author Jimmy Praet
  * @since 2.0
  */
 public abstract class AbstractPagingItemReader<T> extends AbstractItemCountingItemStreamItemReader<T>
@@ -66,7 +66,6 @@ public abstract class AbstractPagingItemReader<T> extends AbstractItemCountingIt
 	private final Lock lock = new ReentrantLock();
 
 	public AbstractPagingItemReader() {
-		setName(ClassUtils.getShortName(AbstractPagingItemReader.class));
 	}
 
 	/**

@@ -30,7 +30,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.ldap.core.LdapAttributes;
 import org.springframework.ldap.ldif.parser.LdifParser;
 import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
 
 /**
  * The {@link LdifReader LdifReader} is an adaptation of the {@link FlatFileItemReader
@@ -62,6 +61,7 @@ import org.springframework.util.ClassUtils;
  *
  * @author Keith Barlow
  * @author Mahmoud Ben Hassine
+ * @author Jimmy Praet
  *
  */
 public class LdifReader extends AbstractItemCountingItemStreamItemReader<LdapAttributes>
@@ -89,7 +89,6 @@ public class LdifReader extends AbstractItemCountingItemStreamItemReader<LdapAtt
 	public LdifReader(Resource resource) {
 		Assert.notNull(resource, "The resource must not be null");
 		this.resource = resource;
-		setName(ClassUtils.getShortName(LdifReader.class));
 	}
 
 	/**

@@ -45,7 +45,6 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.oxm.Unmarshaller;
 import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.util.xml.StaxUtils;
 
@@ -61,6 +60,7 @@ import org.springframework.util.xml.StaxUtils;
  * @author Robert Kasanicky
  * @author Mahmoud Ben Hassine
  * @author Glenn Renfro
+ * @author Jimmy Praet
  */
 public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemReader<T>
 		implements ResourceAwareItemReaderItemStream<T>, InitializingBean {
@@ -98,7 +98,6 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 	public StaxEventItemReader(Unmarshaller unmarshaller) {
 		Assert.notNull(unmarshaller, "The Unmarshaller must not be null.");
 		this.unmarshaller = unmarshaller;
-		setName(ClassUtils.getShortName(StaxEventItemReader.class));
 	}
 
 	/**

@@ -61,6 +61,7 @@ import org.springframework.util.ClassUtils;
  * @author Thomas Risberg
  * @author Mahmoud Ben Hassine
  * @author Stefano Cordio
+ * @author Jimmy Praet
  */
 public class JdbcCursorItemReader<T> extends AbstractCursorItemReader<T> {
 
@@ -83,7 +84,6 @@ public class JdbcCursorItemReader<T> extends AbstractCursorItemReader<T> {
 		Assert.notNull(rowMapper, "RowMapper must not be null");
 		this.sql = sql;
 		this.rowMapper = rowMapper;
-		setName(ClassUtils.getShortName(JdbcCursorItemReader.class));
 	}
 
 	/**

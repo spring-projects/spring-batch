@@ -33,7 +33,6 @@ import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.batch.infrastructure.item.database.orm.JpaQueryProvider;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
 /**
@@ -83,6 +82,7 @@ import org.springframework.util.StringUtils;
  * @author Will Schipp
  * @author Mahmoud Ben Hassine
  * @author Jinwoo Bae
+ * @author Jimmy Praet
  * @since 2.0
  */
 public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
@@ -111,7 +111,6 @@ public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
 	public JpaPagingItemReader(EntityManagerFactory entityManagerFactory) {
 		Assert.notNull(entityManagerFactory, "EntityManagerFactory must not be null.");
 		this.entityManagerFactory = entityManagerFactory;
-		setName(ClassUtils.getShortName(JpaPagingItemReader.class));
 	}
 
 	public void setEntityManagerFactory(EntityManagerFactory entityManagerFactory) {

@@ -22,7 +22,6 @@ import org.springframework.batch.infrastructure.item.Chunk;
 import org.springframework.batch.infrastructure.item.support.AbstractFileItemWriter;
 import org.springframework.core.io.WritableResource;
 import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
 
 /**
  * Item writer that writes data in json format to an output file. The location of the
@@ -46,6 +45,7 @@ import org.springframework.util.ClassUtils;
  * @see JacksonJsonObjectMarshaller
  * @param <T> type of object to write as json representation
  * @author Mahmoud Ben Hassine
+ * @author Jimmy Praet
  * @since 4.1
  */
 public class JsonFileItemWriter<T> extends AbstractFileItemWriter<T> {
@@ -69,7 +69,6 @@ public class JsonFileItemWriter<T> extends AbstractFileItemWriter<T> {
 		this.jsonObjectMarshaller = jsonObjectMarshaller;
 		setHeaderCallback(writer -> writer.write(JSON_ARRAY_START));
 		setFooterCallback(writer -> writer.write(this.lineSeparator + JSON_ARRAY_STOP + this.lineSeparator));
-		setExecutionContextName(ClassUtils.getShortName(JsonFileItemWriter.class));
 	}
 
 	/**

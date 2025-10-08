@@ -31,7 +31,6 @@ import org.springframework.batch.infrastructure.item.support.AbstractItemCountin
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
 /**
@@ -46,6 +45,7 @@ import org.springframework.util.StringUtils;
  * @author Mahmoud Ben Hassine
  * @author Jinwoo Bae
  * @author Stefano Cordio
+ * @author Jimmy Praet
  * @param <T> type of items to read
  * @since 4.3
  */
@@ -73,7 +73,6 @@ public class JpaCursorItemReader<T> extends AbstractItemCountingItemStreamItemRe
 	public JpaCursorItemReader(EntityManagerFactory entityManagerFactory) {
 		Assert.notNull(entityManagerFactory, "EntityManagerFactory must not be null.");
 		this.entityManagerFactory = entityManagerFactory;
-		setName(ClassUtils.getShortName(JpaCursorItemReader.class));
 	}
 
 	/**

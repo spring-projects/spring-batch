@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ import org.springframework.batch.infrastructure.item.UnexpectedInputException;
 /**
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- *
+ * @author Jimmy Praet
  */
 class ChunkMonitorTests {
 
@@ -96,7 +96,7 @@ class ChunkMonitorTests {
 	@Test
 	void testOpen() {
 		ExecutionContext executionContext = new ExecutionContext();
-		executionContext.putInt(ChunkMonitor.class.getName() + ".OFFSET", 2);
+		executionContext.putInt(monitor.getExecutionContextKey("OFFSET"), 2);
 		monitor.open(executionContext);
 		assertEquals(2, count);
 		assertEquals(0, monitor.getOffset());
@@ -120,7 +120,7 @@ class ChunkMonitorTests {
 			}
 		});
 		ExecutionContext executionContext = new ExecutionContext();
-		executionContext.putInt(ChunkMonitor.class.getName() + ".OFFSET", 2);
+		executionContext.putInt(monitor.getExecutionContextKey("OFFSET"), 2);
 		assertThrows(ItemStreamException.class, () -> monitor.open(executionContext));
 	}
 
@@ -131,7 +131,7 @@ class ChunkMonitorTests {
 		monitor.update(executionContext);
 		assertEquals(0, executionContext.size());
 
-		executionContext.put(ChunkMonitor.class.getName() + ".OFFSET", 3);
+		executionContext.put(monitor.getExecutionContextKey("OFFSET"), 3);
 		monitor.update(executionContext);
 		assertEquals(0, executionContext.size());
 	}

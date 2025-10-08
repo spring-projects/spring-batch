@@ -37,7 +37,6 @@ import org.springframework.data.mongodb.util.json.ParameterBindingDocumentCodec;
 import org.springframework.data.mongodb.util.json.ParameterBindingJsonReader;
 import org.springframework.data.util.CloseableIterator;
 import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
 /**
@@ -45,6 +44,7 @@ import org.springframework.util.StringUtils;
  *
  * @author LEE Juchan
  * @author Mahmoud Ben Hassine
+ * @author Jimmy Praet
  * @since 5.1
  */
 public class MongoCursorItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> implements InitializingBean {
@@ -86,7 +86,6 @@ public class MongoCursorItemReader<T> extends AbstractItemCountingItemStreamItem
 		Assert.notNull(targetType, "Target type must not be null");
 		this.template = template;
 		this.targetType = targetType;
-		setName(ClassUtils.getShortName(MongoCursorItemReader.class));
 	}
 
 	/**

@@ -22,7 +22,6 @@ import org.springframework.batch.infrastructure.item.support.AbstractFileItemWri
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.WritableResource;
 import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
 
 /**
  * This class is an item writer that writes data to a file or stream. The writer also
@@ -40,6 +39,7 @@ import org.springframework.util.ClassUtils;
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
  * @author Stefano Cordio
+ * @author Jimmy Praet
  */
 // FIXME the design of creating a flat file writer with an optional resource (to support
 // the multi-resource case) is broken.
@@ -56,7 +56,6 @@ public class FlatFileItemWriter<T> extends AbstractFileItemWriter<T> {
 	public FlatFileItemWriter(LineAggregator<T> lineAggregator) {
 		Assert.notNull(lineAggregator, "LineAggregator must not be null");
 		this.lineAggregator = lineAggregator;
-		this.setExecutionContextName(ClassUtils.getShortName(FlatFileItemWriter.class));
 	}
 
 	/**
@@ -71,7 +70,6 @@ public class FlatFileItemWriter<T> extends AbstractFileItemWriter<T> {
 		Assert.notNull(lineAggregator, "LineAggregator must not be null");
 		this.resource = resource;
 		this.lineAggregator = lineAggregator;
-		this.setExecutionContextName(ClassUtils.getShortName(FlatFileItemWriter.class));
 	}
 
 	/**

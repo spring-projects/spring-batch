@@ -79,6 +79,7 @@ import org.springframework.util.StringUtils;
  * @author Michael Minella
  * @author Antoine Kapps
  * @author Mahmoud Ben Hassine
+ * @author Jimmy Praet
  * @since 2.2
  */
 public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> implements InitializingBean {
@@ -114,7 +115,6 @@ public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemR
 		Assert.notNull(sorts, "A Map of sorts is required.");
 		this.repository = repository;
 		this.sorts = sorts;
-		setName(ClassUtils.getShortName(RepositoryItemReader.class));
 	}
 
 	/**

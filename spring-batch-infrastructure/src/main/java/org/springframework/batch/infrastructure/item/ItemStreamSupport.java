@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2024 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@ package org.springframework.batch.infrastructure.item;
 
 import org.jspecify.annotations.Nullable;
 import org.springframework.batch.infrastructure.item.util.ExecutionContextUserSupport;
+import org.springframework.beans.factory.BeanNameAware;
+import org.springframework.util.ClassUtils;
 
 /**
  * Empty method implementation of {@link ItemStream}.
@@ -25,11 +27,20 @@ import org.springframework.batch.infrastructure.item.util.ExecutionContextUserSu
  * @author Dean de Bree
  * @author Mahmoud Ben Hassine
  * @author Stefano Cordio
+ * @author Jimmy Praet
  *
  */
-public abstract class ItemStreamSupport implements ItemStream {
+public abstract class ItemStreamSupport implements ItemStream, BeanNameAware {
 
 	private final ExecutionContextUserSupport executionContextUserSupport = new ExecutionContextUserSupport();
+
+	private final String defaultName = ClassUtils.getShortName(getClass());
+
+	private @Nullable String name;
+
+	public ItemStreamSupport() {
+		setName(defaultName);
+	}
 
 	/**
 	 * The name of the component which will be used as a stem for keys in the
@@ -42,6 +53,20 @@ public abstract class ItemStreamSupport implements ItemStream {
 	}
 
 	/**
+	 * Set the name of the bean in the bean factory that created this bean. The bean name
+	 * will only be used as name of the component in case it hasn't already been
+	 * explicitly set to a value other than the default. {@link #setName(String)}
+	 * @see BeanNameAware#setBeanName(String)
+     * @since 6.0
+	 */
+	@Override
+	public void setBeanName(String name) {
+		if (defaultName.equals(this.name)) {
+			setName(name);
+		}
+	}
+
+	/**
 	 * Get the name of the component
 	 * @return the name of the component
 	 */
@@ -50,6 +75,7 @@ public abstract class ItemStreamSupport implements ItemStream {
 	}
 
 	protected void setExecutionContextName(String name) {
+		this.name = name;
 		executionContextUserSupport.setName(name);
 	}
 

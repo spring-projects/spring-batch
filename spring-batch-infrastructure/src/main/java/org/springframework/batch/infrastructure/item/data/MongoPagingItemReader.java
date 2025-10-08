@@ -78,6 +78,7 @@ import org.springframework.util.StringUtils;
  * @author Takaaki Iida
  * @author Mahmoud Ben Hassine
  * @author Parikshit Dutta
+ * @author Jimmy Praet
  */
 public class MongoPagingItemReader<T> extends AbstractPaginatedDataItemReader<T> implements InitializingBean {
 
@@ -110,7 +111,6 @@ public class MongoPagingItemReader<T> extends AbstractPaginatedDataItemReader<T>
 		Assert.notNull(type, "Target type must not be null");
 		this.template = template;
 		this.type = type;
-		setName(ClassUtils.getShortName(MongoPagingItemReader.class));
 	}
 
 	/**

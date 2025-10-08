@@ -26,7 +26,6 @@ import org.springframework.batch.infrastructure.item.file.ResourceAwareItemReade
 import org.springframework.batch.infrastructure.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
 
 /**
  * {@link ItemStreamReader} implementation that reads Json objects from a {@link Resource}
@@ -72,7 +71,6 @@ public class JsonItemReader<T> extends AbstractItemCountingItemStreamItemReader<
 		Assert.notNull(jsonObjectReader, "The json object reader must not be null.");
 		this.resource = resource;
 		this.jsonObjectReader = jsonObjectReader;
-		setExecutionContextName(ClassUtils.getShortName(JsonItemReader.class));
 	}
 
 	/**

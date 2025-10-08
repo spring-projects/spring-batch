@@ -32,7 +32,6 @@ import org.springframework.batch.infrastructure.item.file.separator.SimpleRecord
 import org.springframework.batch.infrastructure.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
 /**
@@ -50,6 +49,7 @@ import org.springframework.util.StringUtils;
  * @author Robert Kasanicky
  * @author Mahmoud Ben Hassine
  * @author Stefano Cordio
+ * @author Jimmy Praet
  */
 // FIXME the design of creating a flat file reader with an optional resource (to support
 // the multi-resource case) is broken.
@@ -95,7 +95,6 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 	public FlatFileItemReader(LineMapper<T> lineMapper) {
 		Assert.notNull(lineMapper, "A LineMapper is required");
 		this.lineMapper = lineMapper;
-		setName(ClassUtils.getShortName(FlatFileItemReader.class));
 	}
 
 	/**

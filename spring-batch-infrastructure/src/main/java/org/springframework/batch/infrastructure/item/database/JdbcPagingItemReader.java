@@ -74,6 +74,7 @@ import org.springframework.util.ClassUtils;
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
  * @author Stefano Cordio
+ * @author Jimmy Praet
  * @since 2.0
  */
 public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> implements InitializingBean {
@@ -114,7 +115,6 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 		Assert.notNull(pagingQueryProvider, "PagingQueryProvider must not be null");
 		this.dataSource = dataSource;
 		this.queryProvider = pagingQueryProvider;
-		setName(ClassUtils.getShortName(JdbcPagingItemReader.class));
 	}
 
 	public void setDataSource(DataSource dataSource) {

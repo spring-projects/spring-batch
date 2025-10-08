@@ -30,7 +30,6 @@ import org.springframework.batch.infrastructure.item.ResourceAware;
 import org.springframework.batch.infrastructure.item.support.AbstractItemStreamItemReader;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
 
 /**
  * Reads items from multiple resources sequentially - resource list is given by
@@ -43,6 +42,7 @@ import org.springframework.util.ClassUtils;
  * @author Robert Kasanicky
  * @author Lucas Ward
  * @author Mahmoud Ben Hassine
+ * @author Jimmy Praet
  */
 public class MultiResourceItemReader<T> extends AbstractItemStreamItemReader<T> {
 
@@ -93,7 +93,6 @@ public class MultiResourceItemReader<T> extends AbstractItemStreamItemReader<T> 
 	public MultiResourceItemReader(ResourceAwareItemReaderItemStream<? extends T> delegate) {
 		Assert.notNull(delegate, "The delegate reader must not be null");
 		this.delegate = delegate;
-		this.setExecutionContextName(ClassUtils.getShortName(MultiResourceItemReader.class));
 	}
 
 	/**

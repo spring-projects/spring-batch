@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2024 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,7 @@ import org.springframework.batch.infrastructure.item.support.CompositeItemStream
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  * @author Seungrae Kim
+ * @author Jimmy Praet
  * @since 2.0
  * @deprecated Since 6.0 with no replacement. Scheduled for removal in 7.0.
  */
@@ -68,7 +69,6 @@ public class ChunkMonitor extends ItemStreamSupport {
 	private ItemReader<?> reader;
 
 	public ChunkMonitor() {
-		this.setExecutionContextName(ChunkMonitor.class.getName());
 	}
 
 	/**

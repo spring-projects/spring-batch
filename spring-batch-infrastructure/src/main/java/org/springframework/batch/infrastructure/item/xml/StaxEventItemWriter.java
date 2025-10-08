@@ -55,7 +55,6 @@ import org.springframework.core.io.WritableResource;
 import org.springframework.oxm.Marshaller;
 import org.springframework.oxm.XmlMappingException;
 import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.util.xml.StaxUtils;
@@ -75,6 +74,7 @@ import org.springframework.util.xml.StaxUtils;
  * @author Parikshit Dutta
  * @author Mahmoud Ben Hassine
  * @author Elimelec Burghelea
+ * @author Jimmy Praet
  */
 public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T>
 		implements ResourceAwareItemWriterItemStream<T>, InitializingBean {
@@ -176,7 +176,6 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T>
 	public StaxEventItemWriter(Marshaller marshaller) {
 		Assert.notNull(marshaller, "Marshaller must not be null");
 		this.marshaller = marshaller;
-		setExecutionContextName(ClassUtils.getShortName(StaxEventItemWriter.class));
 	}
 
 	public StaxEventItemWriter(WritableResource resource, Marshaller marshaller) {
