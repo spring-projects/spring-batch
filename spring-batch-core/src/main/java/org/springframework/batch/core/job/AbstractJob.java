@@ -37,6 +37,7 @@ import org.springframework.batch.core.SpringBatchVersion;
 import org.springframework.batch.core.observability.BatchMetrics;
 import org.springframework.batch.core.observability.jfr.events.job.JobExecutionEvent;
 import org.springframework.batch.core.observability.micrometer.MicrometerMetrics;
+import org.springframework.batch.core.step.ListableStepLocator;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.listener.CompositeJobExecutionListener;
@@ -62,7 +63,7 @@ import org.springframework.util.ClassUtils;
  */
 @NullUnmarked // FIXME to remove once default constructors (required by the batch XML
 				// namespace) are removed
-public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, InitializingBean {
+public abstract class AbstractJob implements Job, ListableStepLocator, BeanNameAware, InitializingBean {
 
 	protected static final Log logger = LogFactory.getLog(AbstractJob.class);
 

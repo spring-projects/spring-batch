@@ -24,6 +24,7 @@ import org.jspecify.annotations.NullUnmarked;
 
 import org.springframework.batch.core.BatchStatus;
 
+import org.springframework.batch.core.step.ListableStepLocator;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.launch.JobRestartException;
@@ -80,7 +81,7 @@ public class SimpleJob extends AbstractJob {
 		for (Step step : steps) {
 			names.add(step.getName());
 
-			if (step instanceof StepLocator stepLocator) {
+			if (step instanceof ListableStepLocator stepLocator) {
 				names.addAll(stepLocator.getStepNames());
 			}
 		}

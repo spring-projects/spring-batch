@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,8 @@ import java.util.Map;
 
 import org.springframework.batch.core.job.parameters.DefaultJobParametersValidator;
 import org.springframework.batch.core.job.parameters.JobParametersValidator;
+import org.springframework.batch.core.step.ListableStepLocator;
 import org.springframework.batch.core.step.Step;
-import org.springframework.batch.core.step.NoSuchStepException;
-import org.springframework.batch.core.step.StepLocator;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.util.ClassUtils;
 
@@ -38,7 +37,7 @@ import org.springframework.util.ClassUtils;
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  */
-public class JobSupport implements BeanNameAware, Job, StepLocator {
+public class JobSupport implements BeanNameAware, Job, ListableStepLocator {
 
 	private final Map<String, Step> steps = new HashMap<>();
 

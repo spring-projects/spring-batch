@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2025 the original author or authors.
+ * Copyright 2025-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,17 @@
  */
 package org.springframework.batch.core.step;
 
-import org.jspecify.annotations.Nullable;
+import java.util.Collection;
 
 /**
- * Interface for locating a {@link Step} instance by name.
+ * Interface for listing {@link Step}s by name.
  *
- * @author Dave Syer
  * @author Mahmoud Ben Hassine
- *
+ * @since 6.0
+ * @see org.springframework.batch.core.step.StepLocator
  */
-public interface StepLocator {
+public interface ListableStepLocator extends StepLocator {
 
-	@Nullable Step getStep(String stepName);
+	Collection<String> getStepNames();
 
 }

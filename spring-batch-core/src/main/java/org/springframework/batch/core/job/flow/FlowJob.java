@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import org.springframework.batch.core.job.Job;
 import org.jspecify.annotations.Nullable;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobExecutionException;
+import org.springframework.batch.core.step.ListableStepLocator;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.job.AbstractJob;
 import org.springframework.batch.core.job.SimpleStepHandler;
@@ -93,7 +94,7 @@ public class FlowJob extends AbstractJob {
 	private void findSteps(Flow flow, Map<String, Step> map) {
 
 		for (State state : flow.getStates()) {
-			if (state instanceof StepLocator locator) {
+			if (state instanceof ListableStepLocator locator) {
 				for (String name : locator.getStepNames()) {
 					map.put(name, locator.getStep(name));
 				}

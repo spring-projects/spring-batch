@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.step.StepLocator;
+import org.springframework.batch.core.step.ListableStepLocator;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -58,7 +58,7 @@ class SplitJobParserTests {
 		job.execute(jobExecution);
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		assertEquals(4, jobExecution.getStepExecutions().size());
-		ArrayList<String> names = new ArrayList<>(((StepLocator) job).getStepNames());
+		ArrayList<String> names = new ArrayList<>(((ListableStepLocator) job).getStepNames());
 		Collections.sort(names);
 		assertEquals("[s1, s2, s3, s4]", names.toString());
 	}

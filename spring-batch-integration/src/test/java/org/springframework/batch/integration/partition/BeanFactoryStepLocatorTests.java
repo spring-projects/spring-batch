@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2023 the original author or authors.
+ * Copyright 2009-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
  */
 package org.springframework.batch.integration.partition;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.junit.jupiter.api.Test;
@@ -35,14 +34,6 @@ class BeanFactoryStepLocatorTests {
 		beanFactory.registerSingleton("foo", new StubStep("foo"));
 		stepLocator.setBeanFactory(beanFactory);
 		assertNotNull(stepLocator.getStep("foo"));
-	}
-
-	@Test
-	void testGetStepNames() {
-		beanFactory.registerSingleton("foo", new StubStep("foo"));
-		beanFactory.registerSingleton("bar", new StubStep("bar"));
-		stepLocator.setBeanFactory(beanFactory);
-		assertEquals(2, stepLocator.getStepNames().size());
 	}
 
 	private static final class StubStep implements Step {

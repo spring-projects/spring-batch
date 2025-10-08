@@ -29,7 +29,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.batch.core.job.Job;
-import org.springframework.batch.core.step.StepLocator;
+import org.springframework.batch.core.step.ListableStepLocator;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.parsing.BeanDefinitionParsingException;
 import org.springframework.context.ApplicationContext;
@@ -56,9 +56,9 @@ class StepNameTests {
 		if (context == null) {
 			return;
 		}
-		Map<String, StepLocator> stepLocators = context.getBeansOfType(StepLocator.class);
+		Map<String, ListableStepLocator> stepLocators = context.getBeansOfType(ListableStepLocator.class);
 		for (String name : stepLocators.keySet()) {
-			StepLocator stepLocator = stepLocators.get(name);
+			ListableStepLocator stepLocator = stepLocators.get(name);
 			Collection<String> stepNames = stepLocator.getStepNames();
 			Job job = context.getBean(name, Job.class);
 			String jobName = job.getName();

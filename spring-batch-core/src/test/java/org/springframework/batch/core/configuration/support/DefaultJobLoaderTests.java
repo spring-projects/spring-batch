@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,12 +25,11 @@ import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.parameters.JobParametersIncrementer;
 import org.springframework.batch.core.job.parameters.JobParametersValidator;
+import org.springframework.batch.core.step.ListableStepLocator;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.configuration.DuplicateJobException;
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.configuration.StepRegistry;
-import org.springframework.batch.core.step.NoSuchStepException;
-import org.springframework.batch.core.step.StepLocator;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -231,7 +230,7 @@ class DefaultJobLoaderTests {
 
 	}
 
-	public static class StubJob extends BasicStubJob implements StepLocator {
+	public static class StubJob extends BasicStubJob implements ListableStepLocator {
 
 		@Override
 		public Collection<String> getStepNames() {

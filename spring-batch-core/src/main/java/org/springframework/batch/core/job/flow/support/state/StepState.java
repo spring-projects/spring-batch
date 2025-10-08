@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.springframework.batch.core.step.ListableStepLocator;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.FlowExecutor;
@@ -36,7 +37,7 @@ import org.springframework.batch.core.step.StepLocator;
  * @author Mahmoud Ben Hassine
  * @since 2.0
  */
-public class StepState extends AbstractState implements StepLocator, StepHolder {
+public class StepState extends AbstractState implements ListableStepLocator, StepHolder {
 
 	private final Step step;
 
@@ -83,7 +84,7 @@ public class StepState extends AbstractState implements StepLocator, StepHolder 
 
 		names.add(step.getName());
 
-		if (step instanceof StepLocator stepLocator) {
+		if (step instanceof ListableStepLocator stepLocator) {
 			names.addAll(stepLocator.getStepNames());
 		}
 

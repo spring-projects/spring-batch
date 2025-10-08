@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2023 the original author or authors.
+ * Copyright 2009-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,20 +15,15 @@
  */
 package org.springframework.batch.integration.partition;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepLocator;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
-import org.springframework.beans.factory.ListableBeanFactory;
-import org.springframework.util.Assert;
 
 /**
  * A {@link StepLocator} implementation that just looks in its enclosing bean factory for
- * components of type {@link Step}.
+ * {@link Step}s by name.
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
@@ -50,17 +45,6 @@ public class BeanFactoryStepLocator implements StepLocator, BeanFactoryAware {
 	@Override
 	public Step getStep(String stepName) {
 		return beanFactory.getBean(stepName, Step.class);
-	}
-
-	/**
-	 * Look in the bean factory for all beans of type {@link Step}.
-	 * @throws IllegalStateException if the {@link BeanFactory} is not listable
-	 * @see StepLocator#getStepNames()
-	 */
-	@Override
-	public Collection<String> getStepNames() {
-		Assert.state(beanFactory instanceof ListableBeanFactory, "BeanFactory is not listable.");
-		return Arrays.asList(((ListableBeanFactory) beanFactory).getBeanNamesForType(Step.class));
 	}
 
 }

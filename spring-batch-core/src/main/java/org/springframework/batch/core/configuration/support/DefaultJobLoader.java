@@ -26,6 +26,7 @@ import org.apache.commons.logging.LogFactory;
 import org.jspecify.annotations.NullUnmarked;
 
 import org.springframework.batch.core.job.Job;
+import org.springframework.batch.core.step.ListableStepLocator;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.configuration.DuplicateJobException;
 import org.springframework.batch.core.configuration.JobRegistry;
@@ -220,7 +221,8 @@ public class DefaultJobLoader implements JobLoader, InitializingBean {
 	 * @return all the {@link Step} defined by the given step locator and context
 	 * @see StepLocator
 	 */
-	private Collection<Step> getSteps(final StepLocator stepLocator, final ApplicationContext jobApplicationContext) {
+	private Collection<Step> getSteps(final ListableStepLocator stepLocator,
+			final ApplicationContext jobApplicationContext) {
 		final Collection<String> stepNames = stepLocator.getStepNames();
 		final Collection<Step> result = new ArrayList<>();
 		for (String stepName : stepNames) {
@@ -253,7 +255,7 @@ public class DefaultJobLoader implements JobLoader, InitializingBean {
 		jobRegistry.register(job);
 
 		if (stepRegistry != null) {
-			if (!(job instanceof StepLocator stepLocator)) {
+			if (!(job instanceof ListableStepLocator stepLocator)) {
 				throw new UnsupportedOperationException("Cannot locate steps from a Job that is not a StepLocator: job="
 						+ job.getName() + " does not implement StepLocator");
 			}
