@@ -15,18 +15,15 @@
  */
 package org.springframework.batch.core.repository.support;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.time.LocalDateTime;
-import java.util.Map;
 
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.index.Index;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import org.springframework.batch.core.ExitStatus;
@@ -36,7 +33,10 @@ import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 /**
  * @author Mahmoud Ben Hassine
@@ -51,36 +51,9 @@ public class MongoDBJobRepositoryIntegrationTests {
 	private MongoTemplate mongoTemplate;
 
 	@BeforeEach
-	public void setUp() {
-		// collections
-		mongoTemplate.createCollection("BATCH_JOB_INSTANCE");
-		mongoTemplate.createCollection("BATCH_JOB_EXECUTION");
-		mongoTemplate.createCollection("BATCH_STEP_EXECUTION");
-		// sequences
-		mongoTemplate.createCollection("BATCH_SEQUENCES");
-		mongoTemplate.getCollection("BATCH_SEQUENCES")
-			.insertOne(new Document(Map.of("_id", "BATCH_JOB_INSTANCE_SEQ", "count", 0L)));
-		mongoTemplate.getCollection("BATCH_SEQUENCES")
-			.insertOne(new Document(Map.of("_id", "BATCH_JOB_EXECUTION_SEQ", "count", 0L)));
-		mongoTemplate.getCollection("BATCH_SEQUENCES")
-			.insertOne(new Document(Map.of("_id", "BATCH_STEP_EXECUTION_SEQ", "count", 0L)));
-		// indices
-		mongoTemplate.indexOps("BATCH_JOB_INSTANCE")
-			.createIndex(new Index().on("jobName", Sort.Direction.ASC).named("job_name_idx"));
-		mongoTemplate.indexOps("BATCH_JOB_INSTANCE")
-			.createIndex(new Index().on("jobName", Sort.Direction.ASC)
-				.on("jobKey", Sort.Direction.ASC)
-				.named("job_name_key_idx"));
-		mongoTemplate.indexOps("BATCH_JOB_INSTANCE")
-			.createIndex(new Index().on("jobInstanceId", Sort.Direction.DESC).named("job_instance_idx"));
-		mongoTemplate.indexOps("BATCH_JOB_EXECUTION")
-			.createIndex(new Index().on("jobInstanceId", Sort.Direction.ASC).named("job_instance_idx"));
-		mongoTemplate.indexOps("BATCH_JOB_EXECUTION")
-			.createIndex(new Index().on("jobInstanceId", Sort.Direction.ASC)
-				.on("status", Sort.Direction.ASC)
-				.named("job_instance_status_idx"));
-		mongoTemplate.indexOps("BATCH_STEP_EXECUTION")
-			.createIndex(new Index().on("stepExecutionId", Sort.Direction.ASC).named("step_execution_idx"));
+	public void setUp() throws IOException {
+		ClassPathResource resource = new ClassPathResource("org/springframework/batch/core/schema-mongodb.json");
+		Files.lines(resource.getFilePath()).forEach(line -> mongoTemplate.executeCommand(line));
 	}
 
 	@Test
