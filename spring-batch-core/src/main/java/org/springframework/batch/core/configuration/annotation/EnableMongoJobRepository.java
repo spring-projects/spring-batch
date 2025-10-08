@@ -77,4 +77,25 @@ public @interface EnableMongoJobRepository {
 	 */
 	String jobKeyGeneratorRef() default "jobKeyGenerator";
 
+	/**
+	 * The incrementer that will be used to generate unique ids for job instances.
+	 * @return the bean name of the job instance incrementer to use. Defaults to
+	 * {@literal jobInstanceIncrementer}.
+	 */
+	String jobInstanceIncrementerRef() default "jobInstanceIncrementer";
+
+	/**
+	 * The incrementer that will be used to generate unique ids for job executions.
+	 * @return the bean name of the job execution incrementer to use. Defaults to
+	 * {@literal jobExecutionIncrementer}.
+	 */
+	String jobExecutionIncrementerRef() default "jobExecutionIncrementer";
+
+	/**
+	 * The incrementer that will be used to generate unique ids for step executions.
+	 * @return the bean name of the step execution incrementer to use. Defaults to
+	 * {@literal stepExecutionIncrementer}.
+	 */
+	String stepExecutionIncrementerRef() default "stepExecutionIncrementer";
+
 }

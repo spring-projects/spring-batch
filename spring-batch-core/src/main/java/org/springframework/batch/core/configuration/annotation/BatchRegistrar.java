@@ -189,6 +189,22 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 		if (registry.containsBeanDefinition(jobKeyGeneratorRef)) {
 			beanDefinitionBuilder.addPropertyReference("jobKeyGenerator", jobKeyGeneratorRef);
 		}
+
+		String jobInstanceIncrementerRef = mongoJobRepositoryAnnotation.jobInstanceIncrementerRef();
+		if (registry.containsBeanDefinition(jobInstanceIncrementerRef)) {
+			beanDefinitionBuilder.addPropertyReference("jobInstanceIncrementer", jobInstanceIncrementerRef);
+		}
+
+		String jobExecutionIncrementerRef = mongoJobRepositoryAnnotation.jobExecutionIncrementerRef();
+		if (registry.containsBeanDefinition(jobExecutionIncrementerRef)) {
+			beanDefinitionBuilder.addPropertyReference("jobExecutionIncrementer", jobExecutionIncrementerRef);
+		}
+
+		String stepExecutionIncrementerRef = mongoJobRepositoryAnnotation.stepExecutionIncrementerRef();
+		if (registry.containsBeanDefinition(stepExecutionIncrementerRef)) {
+			beanDefinitionBuilder.addPropertyReference("stepExecutionIncrementer", stepExecutionIncrementerRef);
+		}
+
 		beanDefinitionBuilder.addPropertyValue("validateTransactionState",
 				mongoJobRepositoryAnnotation.validateTransactionState());
 

@@ -21,11 +21,13 @@ import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.JobKeyGenerator;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.repository.dao.mongodb.MongoSequenceIncrementer;
 import org.springframework.batch.core.repository.support.MongoJobRepositoryFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.MongoTransactionManager;
 import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.springframework.transaction.annotation.Isolation;
 
 /**
@@ -74,6 +76,9 @@ public class MongoDefaultBatchConfiguration extends DefaultBatchConfiguration {
 			jobRepositoryFactoryBean.setIsolationLevelForCreateEnum(getIsolationLevelForCreate());
 			jobRepositoryFactoryBean.setValidateTransactionState(getValidateTransactionState());
 			jobRepositoryFactoryBean.setJobKeyGenerator(getJobKeyGenerator());
+			jobRepositoryFactoryBean.setJobInstanceIncrementer(getJobInstanceIncrementer());
+			jobRepositoryFactoryBean.setJobExecutionIncrementer(getJobExecutionIncrementer());
+			jobRepositoryFactoryBean.setStepExecutionIncrementer(getStepExecutionIncrementer());
 			jobRepositoryFactoryBean.afterPropertiesSet();
 			return jobRepositoryFactoryBean.getObject();
 		}
@@ -146,6 +151,33 @@ public class MongoDefaultBatchConfiguration extends DefaultBatchConfiguration {
 	 */
 	protected JobKeyGenerator getJobKeyGenerator() {
 		return new DefaultJobKeyGenerator();
+	}
+
+	/**
+	 * Return the incrementer to be used to generate ids for new job instances.
+	 * @return the incrementer to be used to generate ids for new job instances
+	 * @since 6.0
+	 */
+	protected DataFieldMaxValueIncrementer getJobInstanceIncrementer() {
+		return new MongoSequenceIncrementer(getMongoOperations(), "BATCH_JOB_INSTANCE_SEQ");
+	}
+
+	/**
+	 * Return the incrementer to be used to generate ids for new job executions.
+	 * @return the incrementer to be used to generate ids for new job executions
+	 * @since 6.0
+	 */
+	protected DataFieldMaxValueIncrementer getJobExecutionIncrementer() {
+		return new MongoSequenceIncrementer(getMongoOperations(), "BATCH_JOB_EXECUTION_SEQ");
+	}
+
+	/**
+	 * Return the incrementer to be used to generate ids for new step executions.
+	 * @return the incrementer to be used to generate ids for new step executions
+	 * @since 6.0
+	 */
+	protected DataFieldMaxValueIncrementer getStepExecutionIncrementer() {
+		return new MongoSequenceIncrementer(getMongoOperations(), "BATCH_STEP_EXECUTION_SEQ");
 	}
 
 }

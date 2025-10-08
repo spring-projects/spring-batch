@@ -20,10 +20,12 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.batch.core.repository.dao.mongodb.MongoExecutionContextDao;
 import org.springframework.batch.core.repository.dao.mongodb.MongoJobExecutionDao;
 import org.springframework.batch.core.repository.dao.mongodb.MongoJobInstanceDao;
+import org.springframework.batch.core.repository.dao.mongodb.MongoSequenceIncrementer;
 import org.springframework.batch.core.repository.dao.mongodb.MongoStepExecutionDao;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
+import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.springframework.util.Assert;
 
 /**
@@ -41,8 +43,26 @@ public class MongoJobRepositoryFactoryBean extends AbstractJobRepositoryFactoryB
 
 	private @Nullable MongoOperations mongoOperations;
 
+	private @Nullable DataFieldMaxValueIncrementer jobInstanceIncrementer;
+
+	private @Nullable DataFieldMaxValueIncrementer jobExecutionIncrementer;
+
+	private @Nullable DataFieldMaxValueIncrementer stepExecutionIncrementer;
+
 	public void setMongoOperations(MongoOperations mongoOperations) {
 		this.mongoOperations = mongoOperations;
+	}
+
+	public void setJobInstanceIncrementer(DataFieldMaxValueIncrementer jobInstanceIncrementer) {
+		this.jobInstanceIncrementer = jobInstanceIncrementer;
+	}
+
+	public void setJobExecutionIncrementer(DataFieldMaxValueIncrementer jobExecutionIncrementer) {
+		this.jobExecutionIncrementer = jobExecutionIncrementer;
+	}
+
+	public void setStepExecutionIncrementer(DataFieldMaxValueIncrementer stepExecutionIncrementer) {
+		this.stepExecutionIncrementer = stepExecutionIncrementer;
 	}
 
 	@Override
@@ -60,17 +80,22 @@ public class MongoJobRepositoryFactoryBean extends AbstractJobRepositoryFactoryB
 	protected MongoJobInstanceDao createJobInstanceDao() {
 		MongoJobInstanceDao mongoJobInstanceDao = new MongoJobInstanceDao(this.mongoOperations);
 		mongoJobInstanceDao.setJobKeyGenerator(this.jobKeyGenerator);
+		mongoJobInstanceDao.setJobInstanceIncrementer(this.jobInstanceIncrementer);
 		return mongoJobInstanceDao;
 	}
 
 	@Override
 	protected MongoJobExecutionDao createJobExecutionDao() {
-		return new MongoJobExecutionDao(this.mongoOperations);
+		MongoJobExecutionDao mongoJobExecutionDao = new MongoJobExecutionDao(this.mongoOperations);
+		mongoJobExecutionDao.setJobExecutionIncrementer(this.jobExecutionIncrementer);
+		return mongoJobExecutionDao;
 	}
 
 	@Override
 	protected MongoStepExecutionDao createStepExecutionDao() {
-		return new MongoStepExecutionDao(this.mongoOperations);
+		MongoStepExecutionDao mongoStepExecutionDao = new MongoStepExecutionDao(this.mongoOperations);
+		mongoStepExecutionDao.setStepExecutionIncrementer(this.stepExecutionIncrementer);
+		return mongoStepExecutionDao;
 	}
 
 	@Override
@@ -82,6 +107,17 @@ public class MongoJobRepositoryFactoryBean extends AbstractJobRepositoryFactoryB
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
 		Assert.notNull(this.mongoOperations, "MongoOperations must not be null.");
+		if (this.jobInstanceIncrementer == null) {
+			this.jobInstanceIncrementer = new MongoSequenceIncrementer(this.mongoOperations, "BATCH_JOB_INSTANCE_SEQ");
+		}
+		if (this.jobExecutionIncrementer == null) {
+			this.jobExecutionIncrementer = new MongoSequenceIncrementer(this.mongoOperations,
+					"BATCH_JOB_EXECUTION_SEQ");
+		}
+		if (this.stepExecutionIncrementer == null) {
+			this.stepExecutionIncrementer = new MongoSequenceIncrementer(this.mongoOperations,
+					"BATCH_STEP_EXECUTION_SEQ");
+		}
 	}
 
 }
