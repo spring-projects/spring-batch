@@ -33,7 +33,8 @@ import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
@@ -52,7 +53,8 @@ public class MongoDBJobRepositoryIntegrationTests {
 
 	@BeforeEach
 	public void setUp() throws IOException {
-		ClassPathResource resource = new ClassPathResource("org/springframework/batch/core/schema-mongodb.jsonl");
+		Resource resource = new FileSystemResource(
+				"src/main/resources/org/springframework/batch/core/schema-mongodb.jsonl");
 		Files.lines(resource.getFilePath()).forEach(line -> mongoTemplate.executeCommand(line));
 	}
 

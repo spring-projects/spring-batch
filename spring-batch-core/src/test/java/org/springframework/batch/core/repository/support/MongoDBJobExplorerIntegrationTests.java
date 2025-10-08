@@ -15,10 +15,10 @@
  */
 package org.springframework.batch.core.repository.support;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.time.LocalDateTime;
-import java.util.Map;
 
-import org.bson.Document;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.job.Job;
@@ -29,6 +29,8 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
@@ -51,17 +53,10 @@ public class MongoDBJobExplorerIntegrationTests {
 	private JobRepository jobRepository;
 
 	@BeforeAll
-	static void setUp(@Autowired MongoTemplate mongoTemplate) {
-		mongoTemplate.createCollection("BATCH_JOB_INSTANCE");
-		mongoTemplate.createCollection("BATCH_JOB_EXECUTION");
-		mongoTemplate.createCollection("BATCH_STEP_EXECUTION");
-		mongoTemplate.createCollection("BATCH_SEQUENCES");
-		mongoTemplate.getCollection("BATCH_SEQUENCES")
-			.insertOne(new Document(Map.of("_id", "BATCH_JOB_INSTANCE_SEQ", "count", 0L)));
-		mongoTemplate.getCollection("BATCH_SEQUENCES")
-			.insertOne(new Document(Map.of("_id", "BATCH_JOB_EXECUTION_SEQ", "count", 0L)));
-		mongoTemplate.getCollection("BATCH_SEQUENCES")
-			.insertOne(new Document(Map.of("_id", "BATCH_STEP_EXECUTION_SEQ", "count", 0L)));
+	static void setUp(@Autowired MongoTemplate mongoTemplate) throws IOException {
+		Resource resource = new FileSystemResource(
+				"src/main/resources/org/springframework/batch/core/schema-mongodb.jsonl");
+		Files.lines(resource.getFilePath()).forEach(line -> mongoTemplate.executeCommand(line));
 	}
 
 	@Test
