@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2023 the original author or authors.
+ * Copyright 2002-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,9 @@
  */
 package org.springframework.batch.integration.config.xml;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import org.springframework.integration.config.xml.AbstractIntegrationNamespaceHandler;
 
 /**
@@ -27,8 +30,12 @@ import org.springframework.integration.config.xml.AbstractIntegrationNamespaceHa
  */
 public class BatchIntegrationNamespaceHandler extends AbstractIntegrationNamespaceHandler {
 
+	private static final Log LOGGER = LogFactory.getLog(BatchIntegrationNamespaceHandler.class);
+
 	@Override
 	public void init() {
+		LOGGER.info(
+				"DEPRECATION NOTE: The batch XML namespace is deprecated as of Spring Batch 6.0 and will be removed in version 7.0.");
 		this.registerBeanDefinitionParser("job-launching-gateway", new JobLaunchingGatewayParser());
 		RemoteChunkingManagerParser remoteChunkingManagerParser = new RemoteChunkingManagerParser();
 		this.registerBeanDefinitionParser("remote-chunking-manager", remoteChunkingManagerParser);

@@ -13,8 +13,8 @@
 
 	<xsd:annotation>
 		<xsd:documentation><![CDATA[
-			Defines the configuration elements for the Spring Batch Integration
-			Support.
+			Defines the configuration elements for the Spring Batch Integration Support.
+			NOTE: The batch XML namespace is deprecated as of Spring Batch 6.0 and will be removed in version 7.0.
 		]]></xsd:documentation>
 	</xsd:annotation>
 
