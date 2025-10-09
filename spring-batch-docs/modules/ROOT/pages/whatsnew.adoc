@@ -13,6 +13,7 @@ Spring Batch 6.0 includes the following features and improvements:
 * xref:whatsnew.adoc#ability-to-recover-failed-job-executions[Ability to recover failed job executions]
 * xref:whatsnew.adoc#ability-to-stop-all-kind-of-steps[Ability to stop all kinds of steps]
 * xref:whatsnew.adoc#observability-with-jfr[Observability support with the Java Flight Recorder (JFR)]
+* xref:whatsnew.adoc#jspecify[Null safety annotations with JSpecify]
 * xref:whatsnew.adoc#deprecations-and-pruning[Deprecations and pruning]
 
 [[dependencies-upgrade]]
@@ -183,6 +184,11 @@ In addition to the existing Micrometer metrics, Spring Batch 6.0 introduces supp
 JFR is a powerful profiling and event collection framework built into the Java Virtual Machine (JVM). It allows you to capture detailed information about the runtime behavior of your applications with minimal performance overhead.
 
 This release introduces several JFR events to monitor key aspects of a batch job execution, including job and step executions, item reads and writes, as well as transaction boundaries.
+
+[[jspecify]]
+== Null safety annotations with JSpecify
+
+Spring Batch 6.0 APIs are now annotated with https://jspecify.dev/[JSpecify] annotations to provide better null-safety guarantees and improve code quality.
 
 [[deprecations-and-pruning]]
 == Deprecations and pruning
