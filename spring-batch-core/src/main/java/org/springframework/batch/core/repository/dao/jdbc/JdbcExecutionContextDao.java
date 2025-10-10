@@ -31,7 +31,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.stream.Stream;
+import java.util.List;
 
 import org.springframework.batch.core.job.JobExecution;
 
@@ -59,6 +59,7 @@ import org.springframework.util.Assert;
  * @author David Turanski
  * @author Mahmoud Ben Hassine
  * @author Yanming Zhou
+ * @author Hyunsang Han
  */
 public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implements ExecutionContextDao {
 
@@ -154,10 +155,9 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 		Long executionId = jobExecution.getId();
 		Assert.notNull(executionId, "ExecutionId must not be null.");
 
-		try (Stream<ExecutionContext> stream = getJdbcTemplate().queryForStream(getQuery(FIND_JOB_EXECUTION_CONTEXT),
-				new ExecutionContextRowMapper(), executionId)) {
-			return stream.findFirst().orElseGet(ExecutionContext::new);
-		}
+		List<ExecutionContext> results = getJdbcTemplate().query(getQuery(FIND_JOB_EXECUTION_CONTEXT),
+				new ExecutionContextRowMapper(), executionId);
+		return !results.isEmpty() ? results.get(0) : new ExecutionContext();
 	}
 
 	@Override
@@ -165,10 +165,9 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 		Long executionId = stepExecution.getId();
 		Assert.notNull(executionId, "ExecutionId must not be null.");
 
-		try (Stream<ExecutionContext> stream = getJdbcTemplate().queryForStream(getQuery(FIND_STEP_EXECUTION_CONTEXT),
-				new ExecutionContextRowMapper(), executionId)) {
-			return stream.findFirst().orElseGet(ExecutionContext::new);
-		}
+		List<ExecutionContext> results = getJdbcTemplate().query(getQuery(FIND_STEP_EXECUTION_CONTEXT),
+				new ExecutionContextRowMapper(), executionId);
+		return !results.isEmpty() ? results.get(0) : new ExecutionContext();
 	}
 
 	@Override
