@@ -16,11 +16,19 @@
 
 package org.springframework.batch.infrastructure.item.redis;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.infrastructure.item.ItemWriter;
 import org.springframework.batch.infrastructure.item.KeyValueItemWriter;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.dao.DataAccessException;
+import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.SessionCallback;
+import org.springframework.data.util.Pair;
 import org.springframework.util.Assert;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>
@@ -30,11 +38,14 @@ import org.springframework.util.Assert;
  * @author Santiago Molano
  * @author Mahmoud Ben Hassine
  * @author Stefano Cordio
+ * @author Hyunwoo Jung
  * @since 5.1
  */
 public class RedisItemWriter<K, T> extends KeyValueItemWriter<K, T> {
 
 	private RedisTemplate<K, T> redisTemplate;
+
+	private final List<Pair<K, T>> buffer = new ArrayList<>();
 
 	/**
 	 * Create a new {@link RedisItemWriter}.
@@ -50,17 +61,23 @@ public class RedisItemWriter<K, T> extends KeyValueItemWriter<K, T> {
 
 	@Override
 	protected void writeKeyValue(K key, T value) {
-		if (this.delete) {
-			this.redisTemplate.delete(key);
-		}
-		else {
-			this.redisTemplate.opsForValue().set(key, value);
-		}
+		this.buffer.add(Pair.of(key, value));
 	}
 
 	@Override
 	protected void init() {
 		Assert.notNull(this.redisTemplate, "RedisTemplate must not be null");
+	}
+
+	@Override
+	protected void flush() throws Exception {
+		if (this.buffer.isEmpty()) {
+			return;
+		}
+
+		this.redisTemplate.executePipelined(sessionCallback());
+
+		this.buffer.clear();
 	}
 
 	/**
@@ -69,6 +86,35 @@ public class RedisItemWriter<K, T> extends KeyValueItemWriter<K, T> {
 	 */
 	public void setRedisTemplate(RedisTemplate<K, T> redisTemplate) {
 		this.redisTemplate = redisTemplate;
+	}
+
+	private SessionCallback<Object> sessionCallback() {
+		return new SessionCallback<>() {
+
+			@SuppressWarnings({ "unchecked", "NullAway" })
+			@Override
+			public @Nullable Object execute(RedisOperations operations) throws DataAccessException {
+				if (RedisItemWriter.this.delete) {
+					executeDeleteOperations(operations);
+				}
+				else {
+					executeSetOperations(operations);
+				}
+				return null;
+			}
+		};
+	}
+
+	private void executeDeleteOperations(RedisOperations<K, T> operations) {
+		for (Pair<K, T> item : this.buffer) {
+			operations.delete(item.getFirst());
+		}
+	}
+
+	private void executeSetOperations(RedisOperations<K, T> operations) {
+		for (Pair<K, T> item : this.buffer) {
+			operations.opsForValue().set(item.getFirst(), item.getSecond());
+		}
 	}
 
 }
