@@ -16,23 +16,31 @@
 
 package org.springframework.batch.core.step.item;
 
-import org.jspecify.annotations.NullUnmarked;
-
 import org.springframework.batch.core.step.StepContribution;
 import org.springframework.batch.infrastructure.item.Chunk;
 
 /**
  * Interface defined for processing {@link Chunk}s.
  *
+ * @author Mahmoud Ben Hassine
  * @author Kyeonghoon Lee (Add FunctionalInterface annotation)
  * @since 2.0
- * @deprecated Since 6.0 with no replacement. Scheduled for removal in 7.0.
  */
-@NullUnmarked
-@Deprecated(since = "6.0", forRemoval = true)
 @FunctionalInterface
 public interface ChunkProcessor<I> {
 
-	void process(StepContribution contribution, Chunk<I> chunk) throws Exception;
+	@Deprecated(since = "6.0", forRemoval = true)
+	default void process(StepContribution contribution, Chunk<I> chunk) throws Exception {
+		process(chunk, contribution);
+	}
+
+	/**
+	 * Process the given chunk and update the contribution.
+	 * @param chunk the chunk to process
+	 * @param contribution the current step contribution
+	 * @throws Exception if there is any error during processing
+	 * @since 6.0
+	 */
+	void process(Chunk<I> chunk, StepContribution contribution) throws Exception;
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,7 +52,7 @@ class ChunkOrientedTaskletTests {
 			@Override
 			public void postProcess(StepContribution contribution, Chunk<String> chunk) {
 			}
-		}, (contribution, chunk) -> contribution.incrementWriteCount(1));
+		}, (chunk, contribution) -> contribution.incrementWriteCount(1));
 		StepContribution contribution = new StepContribution(
 				new StepExecution("foo", new JobExecution(1L, new JobInstance(123L, "job"), new JobParameters())));
 		handler.execute(contribution, context);
@@ -95,7 +95,7 @@ class ChunkOrientedTaskletTests {
 			@Override
 			public void postProcess(StepContribution contribution, Chunk<String> chunk) {
 			}
-		}, (contribution, chunk) -> contribution.incrementWriteCount(1));
+		}, (chunk, contribution) -> contribution.incrementWriteCount(1));
 		StepContribution contribution = new StepContribution(
 				new StepExecution("foo", new JobExecution(1L, new JobInstance(123L, "job"), new JobParameters())));
 		ExitStatus expected = contribution.getExitStatus();

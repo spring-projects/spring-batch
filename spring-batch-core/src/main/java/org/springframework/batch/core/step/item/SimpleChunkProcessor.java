@@ -212,7 +212,7 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 	}
 
 	@Override
-	public final void process(StepContribution contribution, Chunk<I> inputs) throws Exception {
+	public final void process(Chunk<I> inputs, StepContribution contribution) throws Exception {
 
 		// Allow temporary state to be stored in the user data field
 		initializeUserData(inputs);

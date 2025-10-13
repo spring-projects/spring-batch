@@ -33,7 +33,7 @@ class ChunkProcessorChunkRequestHandlerTests {
 	@Test
 	void testVanillaHandleChunk() throws Exception {
 		// given
-		handler.setChunkProcessor((contribution, chunk) -> count += chunk.size());
+		handler.setChunkProcessor((chunk, contribution) -> count += chunk.size());
 		StepContribution stepContribution = MetaDataInstanceFactory.createStepExecution().createStepContribution();
 		Chunk items = Chunk.of("foo", "bar");
 		ChunkRequest chunkRequest = new ChunkRequest<>(0, items, 12L, stepContribution);

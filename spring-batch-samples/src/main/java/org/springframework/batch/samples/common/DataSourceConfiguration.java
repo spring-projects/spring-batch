@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2023 the original author or authors.
+ * Copyright 2021-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,10 @@ import javax.sql.DataSource;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.transaction.support.TransactionTemplate;
 
 /**
  * @author Mahmoud Ben Hassine
@@ -39,8 +41,18 @@ public class DataSourceConfiguration {
 	}
 
 	@Bean
+	public JdbcTemplate jdbcTemplate(DataSource dataSource) {
+		return new JdbcTemplate(dataSource);
+	}
+
+	@Bean
 	public JdbcTransactionManager transactionManager(DataSource dataSource) {
 		return new JdbcTransactionManager(dataSource);
+	}
+
+	@Bean
+	public TransactionTemplate transactionTemplate(JdbcTransactionManager transactionManager) {
+		return new TransactionTemplate(transactionManager);
 	}
 
 }
