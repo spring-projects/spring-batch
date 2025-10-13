@@ -41,6 +41,7 @@ import org.springframework.batch.core.listener.ItemProcessListener;
 import org.springframework.batch.core.listener.ItemReadListener;
 import org.springframework.batch.core.listener.ItemWriteListener;
 import org.springframework.batch.core.listener.SkipListener;
+import org.springframework.batch.core.listener.StepExecutionListener;
 import org.springframework.batch.core.listener.StepListener;
 import org.springframework.batch.core.listener.StepListenerFactoryBean;
 import org.springframework.batch.core.repository.JobRepository;
@@ -380,10 +381,19 @@ public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrien
 	public ChunkOrientedStep<I, O> build() {
 		Assert.notNull(this.reader, "Item reader must not be null");
 		Assert.notNull(this.writer, "Item writer must not be null");
+		if (this.reader instanceof StepExecutionListener listener) {
+			this.stepListeners.add(listener);
+		}
+		if (this.writer instanceof StepExecutionListener listener) {
+			this.stepListeners.add(listener);
+		}
 		ChunkOrientedStep<I, O> chunkOrientedStep = new ChunkOrientedStep<>(this.getName(), this.chunkSize, this.reader,
 				this.writer, this.getJobRepository());
 		if (this.processor != null) {
 			chunkOrientedStep.setItemProcessor(this.processor);
+		}
+		if (this.processor instanceof StepExecutionListener listener) {
+			this.stepListeners.add(listener);
 		}
 		chunkOrientedStep.setTransactionManager(this.transactionManager);
 		chunkOrientedStep.setTransactionAttribute(this.transactionAttribute);
@@ -416,17 +426,20 @@ public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrien
 		}
 		streams.forEach(chunkOrientedStep::registerItemStream);
 		stepListeners.forEach(stepListener -> {
-			if (stepListener instanceof ItemReadListener) {
-				chunkOrientedStep.registerItemReadListener((ItemReadListener<I>) stepListener);
+			if (stepListener instanceof ItemReadListener listener) {
+				chunkOrientedStep.registerItemReadListener(listener);
 			}
-			if (stepListener instanceof ItemProcessListener) {
-				chunkOrientedStep.registerItemProcessListener((ItemProcessListener<I, O>) stepListener);
+			if (stepListener instanceof ItemProcessListener listener) {
+				chunkOrientedStep.registerItemProcessListener(listener);
 			}
-			if (stepListener instanceof ItemWriteListener) {
-				chunkOrientedStep.registerItemWriteListener((ItemWriteListener<O>) stepListener);
+			if (stepListener instanceof ItemWriteListener listener) {
+				chunkOrientedStep.registerItemWriteListener(listener);
 			}
-			if (stepListener instanceof ChunkListener) {
-				chunkOrientedStep.registerChunkListener((ChunkListener<I, O>) stepListener);
+			if (stepListener instanceof ChunkListener listener) {
+				chunkOrientedStep.registerChunkListener(listener);
+			}
+			if (stepListener instanceof StepExecutionListener listener) {
+				chunkOrientedStep.registerStepExecutionListener(listener);
 			}
 		});
 		retryListeners.forEach(chunkOrientedStep::registerRetryListener);
