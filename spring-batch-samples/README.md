@@ -617,6 +617,31 @@ $>docker run --name mongodb --rm -d -p 27017:27017 mongo
 Once MongoDB is up and running, run the `org.springframework.batch.samples.mongodb.MongoDBSampleApp`
 class without any argument to start the sample.
 
+### Remote step sample
+
+This sample shows how to configure and run a remote step using Spring Integration. The sample consists of a manager application
+that launches a job with a remote step, and a worker application that executes the remote step.
+
+First, you need to start the shared job repository database:
+
+```
+$>cd spring-batch-samples/src/main/resources/org/springframework/batch/samples/remotestep
+$>docker-compose up -d
+```
+
+Then, you need to start the worker application. You can do this by running the `org.springframework.batch.samples.remotestep.WorkerConfiguration` class without any argument.
+
+Once the worker is up and running, you can start the manager application by running the `org.springframework.batch.samples.remotestep.ManagerConfiguration` class without any argument.
+
+You should see the manager application waiting for the worker step to finish, and the worker application processing the remote step.
+
+Once the remote step is finished, the manager application will complete the job.
+
+You can stop the docker container running the database by executing:
+
+```
+$>docker-compose down
+```
 ### PetClinic sample
 
 This sample uses the [PetClinic Spring application](https://github.com/spring-projects/spring-petclinic) to show how to use

@@ -203,6 +203,11 @@
 			<version>${mongodb-driver.version}</version>
 		</dependency>
         <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>${postgresql.version}</version>
+        </dependency>
+        <dependency>
             <groupId>io.prometheus</groupId>
             <artifactId>prometheus-metrics-exporter-pushgateway</artifactId>
 			<version>${prometheus-metrics-exporter-pushgateway}</version>
