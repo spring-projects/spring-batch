@@ -525,7 +525,7 @@ public class StepExecution extends Entity {
 	 */
 	public String getSummary() {
 		return super.toString() + String.format(
-				", name=%s, status=%s, exitStatus=%s, readCount=%d, filterCount=%d, writeCount=%d readSkipCount=%d, writeSkipCount=%d"
+				", name=%s, status=%s, exitStatus=%s, readCount=%d, filterCount=%d, writeCount=%d, readSkipCount=%d, writeSkipCount=%d"
 						+ ", processSkipCount=%d, commitCount=%d, rollbackCount=%d",
 				stepName, status, exitStatus.getExitCode(), readCount, filterCount, writeCount, readSkipCount,
 				writeSkipCount, processSkipCount, commitCount, rollbackCount);
