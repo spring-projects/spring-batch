@@ -41,6 +41,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
+import org.springframework.core.retry.RetryTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionManager;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
@@ -81,6 +82,8 @@ public class JobOperatorFactoryBean implements FactoryBean<JobOperator>, Applica
 	private TaskExecutor taskExecutor;
 
 	private @Nullable ObservationRegistry observationRegistry;
+
+	private @Nullable RetryTemplate retryTemplate;
 
 	private final ProxyFactory proxyFactory = new ProxyFactory();
 
@@ -168,6 +171,16 @@ public class JobOperatorFactoryBean implements FactoryBean<JobOperator>, Applica
 	}
 
 	/**
+	 * Set the retry template to use for retrying job starts. If not set, no retries will
+	 * be performed.
+	 * @param retryTemplate the retry template to use
+	 * @since 6.0
+	 */
+	public void setRetryTemplate(RetryTemplate retryTemplate) {
+		this.retryTemplate = retryTemplate;
+	}
+
+	/**
 	 * Setter for the transaction manager.
 	 * @param transactionManager the transaction manager to set
 	 */
@@ -217,6 +230,9 @@ public class JobOperatorFactoryBean implements FactoryBean<JobOperator>, Applica
 			taskExecutorJobOperator.setObservationRegistry(this.observationRegistry);
 		}
 		taskExecutorJobOperator.setJobParametersConverter(this.jobParametersConverter);
+		if (this.retryTemplate != null) {
+			taskExecutorJobOperator.setRetryTemplate(this.retryTemplate);
+		}
 		taskExecutorJobOperator.afterPropertiesSet();
 		return taskExecutorJobOperator;
 	}

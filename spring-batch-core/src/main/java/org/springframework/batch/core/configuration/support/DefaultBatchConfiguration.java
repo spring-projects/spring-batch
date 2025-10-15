@@ -16,6 +16,7 @@
 package org.springframework.batch.core.configuration.support;
 
 import io.micrometer.observation.ObservationRegistry;
+import org.jspecify.annotations.Nullable;
 
 import org.springframework.batch.core.configuration.DuplicateJobException;
 import org.springframework.batch.core.configuration.annotation.BatchObservabilityBeanPostProcessor;
@@ -36,6 +37,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.retry.RetryTemplate;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -101,6 +103,10 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 		jobOperatorFactoryBean.setTransactionManager(getTransactionManager());
 		jobOperatorFactoryBean.setObservationRegistry(getObservationRegistry());
 		jobOperatorFactoryBean.setJobParametersConverter(getJobParametersConverter());
+		RetryTemplate retryTemplate = getRetryTemplate();
+		if (retryTemplate != null) {
+			jobOperatorFactoryBean.setRetryTemplate(retryTemplate);
+		}
 		jobOperatorFactoryBean.setTaskExecutor(getTaskExecutor());
 		try {
 			jobOperatorFactoryBean.afterPropertiesSet();
@@ -163,6 +169,16 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 	@Deprecated(since = "6.0", forRemoval = true)
 	protected JobParametersConverter getJobParametersConverter() {
 		return new DefaultJobParametersConverter();
+	}
+
+	/**
+	 * Return the {@link RetryTemplate} to use for retrying job starts. If not set, no
+	 * retries will be performed.
+	 * @return the {@link RetryTemplate} to use for retrying job starts.
+	 * @since 6.0
+	 */
+	@Nullable protected RetryTemplate getRetryTemplate() {
+		return null;
 	}
 
 }

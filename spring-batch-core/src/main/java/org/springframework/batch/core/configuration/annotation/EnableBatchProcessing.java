@@ -23,6 +23,7 @@ import org.springframework.batch.core.converter.JobParametersConverter;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.infrastructure.support.transaction.ResourcelessTransactionManager;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.retry.RetryTemplate;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -200,5 +201,14 @@ public @interface EnableBatchProcessing {
 	 */
 	@Deprecated(since = "6.0", forRemoval = true)
 	String jobParametersConverterRef() default "jobParametersConverter";
+
+	/**
+	 * Set the {@link RetryTemplate} to use for retrying job starts. If not set, no
+	 * retries will be performed.
+	 * @return the bean name of the retry template to use. Defaults to
+	 * {@literal retryTemplate}
+	 * @since 6.0
+	 */
+	String retryTemplateRef() default "retryTemplate";
 
 }

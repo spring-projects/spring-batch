@@ -254,6 +254,11 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 			beanDefinitionBuilder.addPropertyReference("jobParametersConverter", jobParametersConverterRef);
 		}
 
+		String retryTemplateRef = batchAnnotation.retryTemplateRef();
+		if (registry.containsBeanDefinition(retryTemplateRef)) {
+			beanDefinitionBuilder.addPropertyReference("retryTemplate", retryTemplateRef);
+		}
+
 		registry.registerBeanDefinition(JOB_OPERATOR, beanDefinitionBuilder.getBeanDefinition());
 	}
 

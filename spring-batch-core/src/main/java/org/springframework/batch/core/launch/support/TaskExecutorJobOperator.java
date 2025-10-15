@@ -34,6 +34,9 @@ import org.springframework.batch.core.launch.JobExecutionAlreadyRunningException
 import org.springframework.batch.core.launch.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.launch.JobRestartException;
+import org.springframework.core.retry.RetryException;
+import org.springframework.core.retry.RetryTemplate;
+import org.springframework.core.retry.Retryable;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.util.Assert;
 
@@ -47,16 +50,16 @@ import static org.springframework.batch.core.observability.BatchMetrics.METRICS_
  * <li>{@link JobRepository}
  * <li>{@link JobRegistry}
  * </ul>
- *
+ * <p>
  * This class can be instantiated with a {@link JobOperatorFactoryBean} to create a
  * transactional proxy around the job operator.
  *
- * @see JobOperatorFactoryBean
  * @author Dave Syer
  * @author Lucas Ward
  * @author Will Schipp
  * @author Mahmoud Ben Hassine
  * @author Yejeong Ham
+ * @see JobOperatorFactoryBean
  * @since 6.0
  */
 @SuppressWarnings("removal")
@@ -65,6 +68,8 @@ public class TaskExecutorJobOperator extends SimpleJobOperator {
 	private static final Log logger = LogFactory.getLog(TaskExecutorJobOperator.class.getName());
 
 	protected @Nullable ObservationRegistry observationRegistry;
+
+	protected @Nullable RetryTemplate retryTemplate;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -104,6 +109,17 @@ public class TaskExecutorJobOperator extends SimpleJobOperator {
 		this.observationRegistry = observationRegistry;
 	}
 
+	/**
+	 * Set the retry template to use for retrying job starts. If not set, no retries will
+	 * be performed.
+	 * @param retryTemplate the retry template
+	 * @since 6.0
+	 */
+	public void setRetryTemplate(RetryTemplate retryTemplate) {
+		Assert.notNull(retryTemplate, "RetryTemplate must not be null");
+		this.retryTemplate = retryTemplate;
+	}
+
 	@Override
 	public JobExecution start(Job job, JobParameters jobParameters) throws JobInstanceAlreadyCompleteException,
 			JobExecutionAlreadyRunningException, JobRestartException, InvalidJobParametersException {
@@ -114,10 +130,33 @@ public class TaskExecutorJobOperator extends SimpleJobOperator {
 			.createObservation(METRICS_PREFIX + "job.launch.count", this.observationRegistry)
 			.start();
 		try (var scope = observation.openScope()) {
-			return super.start(job, jobParameters);
+			if (this.retryTemplate != null) {
+				return startWithRetry(job, jobParameters);
+			}
+			else {
+				return super.start(job, jobParameters);
+			}
 		}
 		finally {
 			observation.stop();
+		}
+	}
+
+	@SuppressWarnings("DataFlowIssue")
+	private JobExecution startWithRetry(Job job, JobParameters jobParameters) {
+		String retryErrorMessage = "Unable to start job " + job.getName();
+		try {
+			JobExecution jobExecution = this.retryTemplate
+				.execute(() -> TaskExecutorJobOperator.super.start(job, jobParameters));
+			if (jobExecution == null) {
+				throw new RuntimeException(retryErrorMessage);
+			}
+			else {
+				return jobExecution;
+			}
+		}
+		catch (RetryException e) {
+			throw new RuntimeException(retryErrorMessage, e);
 		}
 	}
 
