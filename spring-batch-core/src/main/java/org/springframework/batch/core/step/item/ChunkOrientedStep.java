@@ -421,6 +421,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			// apply contribution and update streams
 			stepExecution.apply(contribution);
 			this.compositeItemStream.update(stepExecution.getExecutionContext());
+			getJobRepository().updateExecutionContext(stepExecution);
 		}
 
 	}
@@ -451,6 +452,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			// apply contribution and update streams
 			stepExecution.apply(contribution);
 			compositeItemStream.update(stepExecution.getExecutionContext());
+			getJobRepository().updateExecutionContext(stepExecution);
 		}
 	}
 
