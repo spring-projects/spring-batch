@@ -15,6 +15,11 @@
  */
 package org.springframework.batch.core.step;
 
+import java.time.LocalDateTime;
+
+import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.ExitStatus;
+
 /**
  * Extension of the {@link Step} interface to be implemented by steps that support being
  * stopped.
@@ -25,13 +30,17 @@ package org.springframework.batch.core.step;
 public interface StoppableStep extends Step {
 
 	/**
-	 * Callback to signal the step to stop. The default implementation sets the
-	 * {@link StepExecution} to terminate only. Concrete implementations can override this
-	 * method to add custom stop logic.
+	 * Callback to signal the step to stop. The default implementation marks the
+	 * {@link StepExecution} as terminate only and set its status to stopped and its end
+	 * time to the current time. Concrete implementations can override this method to add
+	 * custom stop logic.
 	 * @param stepExecution the current step execution
 	 */
 	default void stop(StepExecution stepExecution) {
 		stepExecution.setTerminateOnly();
+		stepExecution.setStatus(BatchStatus.STOPPED);
+		stepExecution.setExitStatus(ExitStatus.STOPPED);
+		stepExecution.setEndTime(LocalDateTime.now());
 	}
 
 }

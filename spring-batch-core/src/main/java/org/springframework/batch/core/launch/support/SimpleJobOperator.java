@@ -30,6 +30,7 @@ import org.apache.commons.logging.LogFactory;
 import org.jspecify.annotations.NullUnmarked;
 
 import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
@@ -341,8 +342,12 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 		if (logger.isInfoEnabled()) {
 			logger.info("Stopping job execution: " + jobExecution);
 		}
-		jobExecution.setStatus(BatchStatus.STOPPING);
+		jobExecution.setStatus(BatchStatus.STOPPING); // will be upgraded to STOPPED in
+														// JobRepository.update
+		jobExecution.setExitStatus(ExitStatus.STOPPED);
+		jobExecution.setEndTime(LocalDateTime.now());
 		jobRepository.update(jobExecution);
+		jobRepository.updateExecutionContext(jobExecution);
 
 		Job job = jobRegistry.getJob(jobExecution.getJobInstance().getJobName());
 		if (job != null) {
@@ -359,12 +364,16 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 								if (tasklet instanceof StoppableTasklet stoppableTasklet) {
 									StepSynchronizationManager.register(stepExecution);
 									stoppableTasklet.stop(stepExecution);
+									jobRepository.update(stepExecution);
+									jobRepository.updateExecutionContext(stepExecution);
 									StepSynchronizationManager.release();
 								}
 							}
 							if (step instanceof StoppableStep stoppableStep) {
 								StepSynchronizationManager.register(stepExecution);
 								stoppableStep.stop(stepExecution);
+								jobRepository.update(stepExecution);
+								jobRepository.updateExecutionContext(stepExecution);
 								StepSynchronizationManager.release();
 							}
 						}
