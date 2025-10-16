@@ -24,24 +24,34 @@ import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.util.Assert;
 
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 import static org.springframework.data.mongodb.core.query.Query.query;
 
 /**
  * @author Mahmoud Ben Hassine
+ * @author Myeongha Shin
  * @since 5.2.0
  */
 public class MongoExecutionContextDao implements ExecutionContextDao {
 
-	private static final String STEP_EXECUTIONS_COLLECTION_NAME = "BATCH_STEP_EXECUTION";
+	private static final String STEP_EXECUTIONS_COLLECTION_NAME = "STEP_EXECUTION";
 
-	private static final String JOB_EXECUTIONS_COLLECTION_NAME = "BATCH_JOB_EXECUTION";
+	private static final String JOB_EXECUTIONS_COLLECTION_NAME = "JOB_EXECUTION";
 
 	private final MongoOperations mongoOperations;
 
-	public MongoExecutionContextDao(MongoOperations mongoOperations) {
+	private final String stepExecutionCollectionName;
+
+	private final String jobExecutionCollectionName;
+
+	public MongoExecutionContextDao(MongoOperations mongoOperations, String collectionPrefix) {
+		Assert.notNull(mongoOperations, "mongoOperations must not be null.");
+		Assert.notNull(collectionPrefix, "collectionPrefix must not be null.");
 		this.mongoOperations = mongoOperations;
+		this.stepExecutionCollectionName = collectionPrefix + STEP_EXECUTIONS_COLLECTION_NAME;
+		this.jobExecutionCollectionName = collectionPrefix + JOB_EXECUTIONS_COLLECTION_NAME;
 	}
 
 	@Override
@@ -49,7 +59,7 @@ public class MongoExecutionContextDao implements ExecutionContextDao {
 		Query query = query(where("jobExecutionId").is(jobExecution.getId()));
 		org.springframework.batch.core.repository.persistence.JobExecution execution = this.mongoOperations.findOne(
 				query, org.springframework.batch.core.repository.persistence.JobExecution.class,
-				JOB_EXECUTIONS_COLLECTION_NAME);
+				jobExecutionCollectionName);
 		if (execution == null) {
 			return new ExecutionContext();
 		}
@@ -61,7 +71,7 @@ public class MongoExecutionContextDao implements ExecutionContextDao {
 		Query query = query(where("stepExecutionId").is(stepExecution.getId()));
 		org.springframework.batch.core.repository.persistence.StepExecution execution = this.mongoOperations.findOne(
 				query, org.springframework.batch.core.repository.persistence.StepExecution.class,
-				STEP_EXECUTIONS_COLLECTION_NAME);
+				stepExecutionCollectionName);
 		if (execution == null) {
 			return new ExecutionContext();
 		}
@@ -77,8 +87,7 @@ public class MongoExecutionContextDao implements ExecutionContextDao {
 				new org.springframework.batch.core.repository.persistence.ExecutionContext(executionContext.toMap(),
 						executionContext.isDirty()));
 		this.mongoOperations.updateFirst(query, update,
-				org.springframework.batch.core.repository.persistence.JobExecution.class,
-				JOB_EXECUTIONS_COLLECTION_NAME);
+				org.springframework.batch.core.repository.persistence.JobExecution.class, jobExecutionCollectionName);
 	}
 
 	@Override
@@ -90,8 +99,7 @@ public class MongoExecutionContextDao implements ExecutionContextDao {
 				new org.springframework.batch.core.repository.persistence.ExecutionContext(executionContext.toMap(),
 						executionContext.isDirty()));
 		this.mongoOperations.updateFirst(query, update,
-				org.springframework.batch.core.repository.persistence.StepExecution.class,
-				STEP_EXECUTIONS_COLLECTION_NAME);
+				org.springframework.batch.core.repository.persistence.StepExecution.class, stepExecutionCollectionName);
 
 	}
 
