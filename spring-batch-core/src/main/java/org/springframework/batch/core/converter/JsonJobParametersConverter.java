@@ -15,15 +15,16 @@
  */
 package org.springframework.batch.core.converter;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.json.JsonMapper;
 
 import org.springframework.batch.core.job.parameters.JobParameter;
 import org.springframework.batch.core.job.parameters.JobParameters;
 
 /**
- * Converter for {@link JobParameters} instances that uses a JSON naming convention for
- * converting job parameters. The expected notation is the following:
+ * Converter for {@link JobParameters} instances based on Jackson 3 and that uses a JSON
+ * naming convention for converting job parameters. The expected notation is the
+ * following:
  * <p>
  * key='{"value": "parameterStringLiteralValue",
  * "type":"fully.qualified.name.of.the.parameter.Type", "identifying": "booleanValue"}'
@@ -67,22 +68,21 @@ import org.springframework.batch.core.job.parameters.JobParameters;
  */
 public class JsonJobParametersConverter extends DefaultJobParametersConverter {
 
-	private final ObjectMapper objectMapper;
+	private final JsonMapper jsonMapper;
 
 	/**
-	 * Create a new {@link JsonJobParametersConverter} with a default
-	 * {@link ObjectMapper}.
+	 * Create a new {@link JsonJobParametersConverter} with a default {@link JsonMapper}.
 	 */
 	public JsonJobParametersConverter() {
-		this(new ObjectMapper());
+		this(new JsonMapper());
 	}
 
 	/**
-	 * Create a new {@link JsonJobParametersConverter} with a custom {@link ObjectMapper}.
-	 * @param objectMapper the object mapper to use
+	 * Create a new {@link JsonJobParametersConverter} with a custom {@link JsonMapper}.
+	 * @param jsonMapper the object mapper to use
 	 */
-	public JsonJobParametersConverter(ObjectMapper objectMapper) {
-		this.objectMapper = objectMapper;
+	public JsonJobParametersConverter(JsonMapper jsonMapper) {
+		this.jsonMapper = jsonMapper;
 	}
 
 	@Override
@@ -97,10 +97,10 @@ public class JsonJobParametersConverter extends DefaultJobParametersConverter {
 					"Unable to encode job parameter of type " + parameterType + " with value " + parameterTypedValue);
 		}
 		try {
-			return this.objectMapper.writeValueAsString(new JobParameterDefinition(parameterName, parameterStringValue,
+			return this.jsonMapper.writeValueAsString(new JobParameterDefinition(parameterName, parameterStringValue,
 					parameterType.getName(), Boolean.toString(parameterIdentifying)));
 		}
-		catch (JsonProcessingException e) {
+		catch (JacksonException e) {
 			throw new JobParametersConversionException("Unable to encode job parameter " + jobParameter, e);
 		}
 	}
@@ -109,7 +109,7 @@ public class JsonJobParametersConverter extends DefaultJobParametersConverter {
 	@Override
 	protected JobParameter decode(String parameterName, String encodedJobParameter) {
 		try {
-			JobParameterDefinition jobParameterDefinition = this.objectMapper.readValue(encodedJobParameter,
+			JobParameterDefinition jobParameterDefinition = this.jsonMapper.readValue(encodedJobParameter,
 					JobParameterDefinition.class);
 			Class<?> parameterType = String.class;
 			if (jobParameterDefinition.type() != null) {
@@ -122,7 +122,7 @@ public class JsonJobParametersConverter extends DefaultJobParametersConverter {
 			Object parameterTypedValue = this.conversionService.convert(jobParameterDefinition.value(), parameterType);
 			return new JobParameter(parameterName, parameterTypedValue, parameterType, parameterIdentifying);
 		}
-		catch (JsonProcessingException | ClassNotFoundException e) {
+		catch (JacksonException | ClassNotFoundException e) {
 			throw new JobParametersConversionException("Unable to decode job parameter " + encodedJobParameter, e);
 		}
 	}

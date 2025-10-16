@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2022 the original author or authors.
+ * Copyright 2009-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,8 @@ package org.springframework.batch.infrastructure.item.file.mapping;
 
 import java.util.Map;
 
-import com.fasterxml.jackson.core.JsonParseException;
+import tools.jackson.core.exc.UnexpectedEndOfInputException;
 import org.junit.jupiter.api.Test;
-
-import org.springframework.batch.infrastructure.item.file.mapping.JsonLineMapper;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -45,7 +43,7 @@ class JsonLineMapperTests {
 
 	@Test
 	void testMappingError() {
-		assertThrows(JsonParseException.class, () -> mapper.mapLine("{\"foo\": 1", 1));
+		assertThrows(UnexpectedEndOfInputException.class, () -> mapper.mapLine("{\"foo\": 1", 1));
 	}
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 the original author or authors.
+ * Copyright 2018-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,9 @@
 
 package org.springframework.batch.infrastructure.item.json;
 
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.json.JsonMapper;
+
 import org.springframework.batch.infrastructure.item.sample.Foo;
 
 /**
@@ -25,7 +28,11 @@ class JacksonJsonItemReaderCommonTests extends JsonItemReaderCommonTests {
 
 	@Override
 	protected JsonObjectReader<Foo> getJsonObjectReader() {
-		return new JacksonJsonObjectReader<>(Foo.class);
+		JsonMapper jsonMapper = JsonMapper.builder()
+			.disable(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES)
+			.disable(DeserializationFeature.FAIL_ON_TRAILING_TOKENS)
+			.build();
+		return new JacksonJsonObjectReader<>(jsonMapper, Foo.class);
 	}
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2023 the original author or authors.
+ * Copyright 2009-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,7 @@ package org.springframework.batch.infrastructure.item.file.mapping;
 
 import java.util.Map;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.MappingJsonFactory;
+import tools.jackson.databind.json.JsonMapper;
 
 import org.springframework.batch.infrastructure.item.file.LineMapper;
 
@@ -38,11 +37,28 @@ import org.springframework.batch.infrastructure.item.file.LineMapper;
  * </pre>
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 public class JsonLineMapper implements LineMapper<Map<String, Object>> {
 
-	private final MappingJsonFactory factory = new MappingJsonFactory();
+	private final JsonMapper jsonMapper;
+
+	/**
+	 * Create a new {@link JsonLineMapper} with a default {@link JsonMapper}.
+	 */
+	public JsonLineMapper() {
+		this(new JsonMapper());
+	}
+
+	/**
+	 * Create a new {@link JsonLineMapper} with the provided {@link JsonMapper}.
+	 * @param jsonMapper the json mapper to use
+	 * @since 6.0
+	 */
+	public JsonLineMapper(JsonMapper jsonMapper) {
+		this.jsonMapper = jsonMapper;
+	}
 
 	/**
 	 * Interpret the line as a Json object and create a Map from it.
@@ -50,13 +66,9 @@ public class JsonLineMapper implements LineMapper<Map<String, Object>> {
 	 * @see LineMapper#mapLine(String, int)
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public Map<String, Object> mapLine(String line, int lineNumber) throws Exception {
-		Map<String, Object> result;
-		JsonParser parser = factory.createParser(line);
-		@SuppressWarnings("unchecked")
-		Map<String, Object> token = parser.readValueAs(Map.class);
-		result = token;
-		return result;
+		return this.jsonMapper.readValue(line, Map.class);
 	}
 
 }

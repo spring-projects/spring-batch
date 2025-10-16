@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 the original author or authors.
+ * Copyright 2018-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,9 @@
 
 package org.springframework.batch.infrastructure.item.json;
 
-import com.fasterxml.jackson.core.JsonParseException;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.json.JsonMapper;
 
 import org.springframework.batch.infrastructure.item.json.domain.Trade;
 
@@ -27,12 +29,16 @@ class JacksonJsonItemReaderFunctionalTests extends JsonItemReaderFunctionalTests
 
 	@Override
 	protected JsonObjectReader<Trade> getJsonObjectReader() {
-		return new JacksonJsonObjectReader<>(Trade.class);
+		JsonMapper jsonMapper = JsonMapper.builder()
+			.disable(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES)
+			.disable(DeserializationFeature.FAIL_ON_TRAILING_TOKENS)
+			.build();
+		return new JacksonJsonObjectReader<>(jsonMapper, Trade.class);
 	}
 
 	@Override
 	protected Class<? extends Exception> getJsonParsingException() {
-		return JsonParseException.class;
+		return JacksonException.class;
 	}
 
 }

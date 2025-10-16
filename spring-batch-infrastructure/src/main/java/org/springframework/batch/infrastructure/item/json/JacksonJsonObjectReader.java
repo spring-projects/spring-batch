@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2024 the original author or authors.
+ * Copyright 2018-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,12 @@
 
 package org.springframework.batch.infrastructure.item.json;
 
-import java.io.IOException;
 import java.io.InputStream;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonParser;
+import tools.jackson.core.JsonToken;
+import tools.jackson.databind.json.JsonMapper;
 import org.jspecify.annotations.Nullable;
 
 import org.springframework.batch.infrastructure.item.ParseException;
@@ -29,8 +29,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 
 /**
- * Implementation of {@link JsonObjectReader} based on
- * <a href="https://github.com/FasterXML/jackson">Jackson</a>.
+ * Implementation of {@link JsonObjectReader} based on Jackson 3.
  *
  * @param <T> type of the target object
  * @author Mahmoud Ben Hassine
@@ -41,7 +40,7 @@ public class JacksonJsonObjectReader<T> implements JsonObjectReader<T> {
 
 	private final Class<? extends T> itemType;
 
-	private ObjectMapper mapper;
+	private JsonMapper mapper;
 
 	private @Nullable JsonParser jsonParser;
 
@@ -52,20 +51,20 @@ public class JacksonJsonObjectReader<T> implements JsonObjectReader<T> {
 	 * @param itemType the target item type
 	 */
 	public JacksonJsonObjectReader(Class<? extends T> itemType) {
-		this(new ObjectMapper(), itemType);
+		this(new JsonMapper(), itemType);
 	}
 
-	public JacksonJsonObjectReader(ObjectMapper mapper, Class<? extends T> itemType) {
+	public JacksonJsonObjectReader(JsonMapper mapper, Class<? extends T> itemType) {
 		this.mapper = mapper;
 		this.itemType = itemType;
 	}
 
 	/**
-	 * Set the object mapper to use to map Json objects to domain objects.
+	 * Set the json mapper to use to map Json objects to domain objects.
 	 * @param mapper the object mapper to use
-	 * @see #JacksonJsonObjectReader(ObjectMapper, Class)
+	 * @see #JacksonJsonObjectReader(JsonMapper, Class)
 	 */
-	public void setMapper(ObjectMapper mapper) {
+	public void setMapper(JsonMapper mapper) {
 		Assert.notNull(mapper, "The mapper must not be null");
 		this.mapper = mapper;
 	}
@@ -74,7 +73,7 @@ public class JacksonJsonObjectReader<T> implements JsonObjectReader<T> {
 	public void open(Resource resource) throws Exception {
 		Assert.notNull(resource, "The resource must not be null");
 		this.inputStream = resource.getInputStream();
-		this.jsonParser = this.mapper.getFactory().createParser(this.inputStream);
+		this.jsonParser = this.mapper.createParser(this.inputStream);
 		Assert.state(this.jsonParser.nextToken() == JsonToken.START_ARRAY,
 				"The Json input stream must start with an array of Json objects");
 	}
@@ -87,7 +86,7 @@ public class JacksonJsonObjectReader<T> implements JsonObjectReader<T> {
 				return this.mapper.readValue(this.jsonParser, this.itemType);
 			}
 		}
-		catch (IOException e) {
+		catch (JacksonException e) {
 			throw new ParseException("Unable to read next JSON object", e);
 		}
 		return null;

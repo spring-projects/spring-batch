@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 the original author or authors.
+ * Copyright 2018-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,7 @@
 
 package org.springframework.batch.infrastructure.item.json;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import tools.jackson.databind.json.JsonMapper;
 
 import org.springframework.batch.infrastructure.item.json.domain.Trade;
 
@@ -33,9 +32,7 @@ class JacksonJsonFileItemWriterFunctionalTests extends JsonFileItemWriterFunctio
 
 	@Override
 	protected JsonObjectMarshaller<Trade> getJsonObjectMarshallerWithPrettyPrint() {
-		ObjectMapper objectMapper = new ObjectMapper();
-		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-		return new JacksonJsonObjectMarshaller<>(objectMapper);
+		return new JacksonJsonObjectMarshaller<>(new JsonMapper());
 	}
 
 	@Override

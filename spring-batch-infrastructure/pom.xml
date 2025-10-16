@@ -115,6 +115,12 @@
 			<version>${jackson.version}</version>
 			<optional>true</optional>
 		</dependency>
+        <dependency>
+            <groupId>tools.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson3.version}</version>
+            <optional>true</optional>
+        </dependency>
 		<dependency>
 			<groupId>org.hibernate.orm</groupId>
 			<artifactId>hibernate-core</artifactId>

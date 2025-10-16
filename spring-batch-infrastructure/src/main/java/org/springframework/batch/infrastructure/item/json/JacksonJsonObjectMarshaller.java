@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2021 the original author or authors.
+ * Copyright 2018-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,14 @@
 
 package org.springframework.batch.infrastructure.item.json;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.json.JsonMapper;
 
 import org.springframework.batch.infrastructure.item.ItemStreamException;
 
 /**
- * A json object marshaller that uses
- * <a href="https://github.com/FasterXML/jackson">Jackson</a> to marshal an object into a
- * json representation.
+ * A json object marshaller that uses Jackson 3 to marshal an object into a json
+ * representation.
  *
  * @param <T> type of objects to marshal
  * @author Mahmoud Ben Hassine
@@ -32,31 +31,31 @@ import org.springframework.batch.infrastructure.item.ItemStreamException;
  */
 public class JacksonJsonObjectMarshaller<T> implements JsonObjectMarshaller<T> {
 
-	private ObjectMapper objectMapper;
+	private JsonMapper jsonMapper;
 
 	public JacksonJsonObjectMarshaller() {
-		this(new ObjectMapper());
+		this(new JsonMapper());
 	}
 
-	public JacksonJsonObjectMarshaller(ObjectMapper objectMapper) {
-		this.objectMapper = objectMapper;
+	public JacksonJsonObjectMarshaller(JsonMapper jsonMapper) {
+		this.jsonMapper = jsonMapper;
 	}
 
 	/**
-	 * Set the {@link ObjectMapper} to use.
-	 * @param objectMapper to use
-	 * @see #JacksonJsonObjectMarshaller(ObjectMapper)
+	 * Set the {@link JsonMapper} to use.
+	 * @param jsonMapper to use
+	 * @see #JacksonJsonObjectMarshaller(JsonMapper)
 	 */
-	public void setObjectMapper(ObjectMapper objectMapper) {
-		this.objectMapper = objectMapper;
+	public void setJsonMapper(JsonMapper jsonMapper) {
+		this.jsonMapper = jsonMapper;
 	}
 
 	@Override
 	public String marshal(T item) {
 		try {
-			return objectMapper.writeValueAsString(item);
+			return this.jsonMapper.writeValueAsString(item);
 		}
-		catch (JsonProcessingException e) {
+		catch (JacksonException e) {
 			throw new ItemStreamException("Unable to marshal object " + item + " to Json", e);
 		}
 	}

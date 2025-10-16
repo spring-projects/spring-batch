@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 the original author or authors.
+ * Copyright 2018-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package org.springframework.batch.integration.partition;
 
 import java.io.IOException;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -29,9 +29,10 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  */
 class StepExecutionRequestTests {
 
-	private static final String SERIALIZED_REQUEST = "{\"stepExecutionId\":1,\"stepName\":\"step\",\"jobExecutionId\":1}";
+	private static final String SERIALIZED_REQUEST = """
+			{"stepName":"step","jobExecutionId":1,"stepExecutionId":1}""";
 
-	private final ObjectMapper objectMapper = new ObjectMapper();
+	private final JsonMapper jsonMapper = new JsonMapper();
 
 	@Test
 	void stepExecutionRequestShouldBeSerializableWithJackson() throws IOException {
@@ -39,7 +40,7 @@ class StepExecutionRequestTests {
 		StepExecutionRequest request = new StepExecutionRequest("step", 1L, 1L);
 
 		// when
-		String serializedRequest = this.objectMapper.writeValueAsString(request);
+		String serializedRequest = this.jsonMapper.writeValueAsString(request);
 
 		// then
 		assertEquals(SERIALIZED_REQUEST, serializedRequest);
@@ -48,7 +49,7 @@ class StepExecutionRequestTests {
 	@Test
 	void stepExecutionRequestShouldBeDeserializableWithJackson() throws IOException {
 		// when
-		StepExecutionRequest deserializedRequest = this.objectMapper.readValue(SERIALIZED_REQUEST,
+		StepExecutionRequest deserializedRequest = this.jsonMapper.readValue(SERIALIZED_REQUEST,
 				StepExecutionRequest.class);
 
 		// then
