@@ -38,16 +38,16 @@ import org.springframework.batch.core.repository.ExecutionContextSerializer;
  * @author Mahmoud Ben Hassine
  * @since 6.0.0
  */
-public class Jackson3ExecutionContextStringSerializer implements ExecutionContextSerializer {
+public class JacksonExecutionContextStringSerializer implements ExecutionContextSerializer {
 
 	private final JsonMapper jsonMapper;
 
 	/**
-	 * Create a new {@link Jackson3ExecutionContextStringSerializer} with default
+	 * Create a new {@link JacksonExecutionContextStringSerializer} with default
 	 * configuration (only classes from certain packages will be allowed to be
 	 * deserialized).
 	 */
-	public Jackson3ExecutionContextStringSerializer() {
+	public JacksonExecutionContextStringSerializer() {
 		PolymorphicTypeValidator polymorphicTypeValidator = BasicPolymorphicTypeValidator.builder()
 			.allowIfSubType("java.util.")
 			.allowIfSubType("java.sql.")
@@ -62,11 +62,11 @@ public class Jackson3ExecutionContextStringSerializer implements ExecutionContex
 	}
 
 	/**
-	 * Create a new {@link Jackson3ExecutionContextStringSerializer} with a custom
+	 * Create a new {@link JacksonExecutionContextStringSerializer} with a custom
 	 * {@link JsonMapper}.
 	 * @param jsonMapper the {@link JsonMapper} to use for serialization/deserialization
 	 */
-	public Jackson3ExecutionContextStringSerializer(JsonMapper jsonMapper) {
+	public JacksonExecutionContextStringSerializer(JsonMapper jsonMapper) {
 		this.jsonMapper = jsonMapper;
 	}
 

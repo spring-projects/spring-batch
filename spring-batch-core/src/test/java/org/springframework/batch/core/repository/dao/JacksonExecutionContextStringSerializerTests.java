@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Mahmoud Ben Hassine
  */
-class Jackson3ExecutionContextStringSerializerTests {
+class JacksonExecutionContextStringSerializerTests {
 
 	record Person(int id, String name) implements Serializable {
 	}
@@ -44,7 +44,7 @@ class Jackson3ExecutionContextStringSerializerTests {
 	void testSerializationDeserializationRoundTrip() throws IOException {
 		// given
 		JsonMapper jsonMapper = new JsonMapper();
-		Jackson3ExecutionContextStringSerializer serializer = new Jackson3ExecutionContextStringSerializer(jsonMapper);
+		JacksonExecutionContextStringSerializer serializer = new JacksonExecutionContextStringSerializer(jsonMapper);
 		Person person = new Person(1, "John Doe");
 		Map<String, Object> context = new HashMap<>();
 		context.put("person", person);
@@ -61,7 +61,7 @@ class Jackson3ExecutionContextStringSerializerTests {
 	@Test
 	void testSqlTimestampSerialization() throws IOException {
 		// given
-		Jackson3ExecutionContextStringSerializer serializer = new Jackson3ExecutionContextStringSerializer();
+		JacksonExecutionContextStringSerializer serializer = new JacksonExecutionContextStringSerializer();
 		Map<String, Object> context = new HashMap<>(1);
 		Timestamp timestamp = new Timestamp(Instant.now().toEpochMilli());
 		context.put("timestamp", timestamp);
@@ -80,7 +80,7 @@ class Jackson3ExecutionContextStringSerializerTests {
 	@Test
 	void testJavaTimeLocalDateSerialization() throws IOException {
 		// given
-		Jackson3ExecutionContextStringSerializer serializer = new Jackson3ExecutionContextStringSerializer();
+		JacksonExecutionContextStringSerializer serializer = new JacksonExecutionContextStringSerializer();
 		Map<String, Object> map = new HashMap<>();
 		LocalDate now = LocalDate.now();
 		map.put("now", now);

@@ -27,7 +27,7 @@ import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.launch.JobOperator;
-import org.springframework.batch.core.repository.dao.Jackson3ExecutionContextStringSerializer;
+import org.springframework.batch.core.repository.dao.JacksonExecutionContextStringSerializer;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepContribution;
@@ -43,7 +43,7 @@ import org.springframework.jdbc.support.JdbcTransactionManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class Jackson3ExecutionContextStringSerializerIntegrationTests {
+public class JacksonExecutionContextStringSerializerIntegrationTests {
 
 	@Test
 	void testExecutionContextSerializationDeserializationRoundTrip() throws Exception {
@@ -101,8 +101,8 @@ public class Jackson3ExecutionContextStringSerializerIntegrationTests {
 		}
 
 		@Bean
-		public Jackson3ExecutionContextStringSerializer serializer() {
-			return new Jackson3ExecutionContextStringSerializer();
+		public JacksonExecutionContextStringSerializer serializer() {
+			return new JacksonExecutionContextStringSerializer();
 		}
 
 		@Bean

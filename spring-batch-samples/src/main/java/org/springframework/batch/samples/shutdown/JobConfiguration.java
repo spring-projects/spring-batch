@@ -26,7 +26,7 @@ import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.repository.dao.Jackson3ExecutionContextStringSerializer;
+import org.springframework.batch.core.repository.dao.JacksonExecutionContextStringSerializer;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.infrastructure.item.database.JdbcBatchItemWriter;
@@ -112,7 +112,7 @@ class JobConfiguration {
 
 	@Bean
 	public ExecutionContextSerializer executionContextSerializer() {
-		return new Jackson3ExecutionContextStringSerializer();
+		return new JacksonExecutionContextStringSerializer();
 	}
 
 	// run jobs in background threads to allow the main thread to continue
