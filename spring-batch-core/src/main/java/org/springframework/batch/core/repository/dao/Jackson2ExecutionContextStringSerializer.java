@@ -108,7 +108,10 @@ import static com.fasterxml.jackson.core.JsonToken.START_OBJECT;
  * @author Mahmoud Ben Hassine
  * @since 3.0.7
  * @see ExecutionContextSerializer
+ * @deprecated Since 6.0 in favor of {@link JacksonExecutionContextStringSerializer}.
+ * Scheduled for removal in 7.0.
  */
+@Deprecated(since = "6.0", forRemoval = true)
 @NullUnmarked
 public class Jackson2ExecutionContextStringSerializer implements ExecutionContextSerializer {
 
