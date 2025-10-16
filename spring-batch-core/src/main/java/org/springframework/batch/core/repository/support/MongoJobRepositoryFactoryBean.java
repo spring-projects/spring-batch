@@ -37,6 +37,7 @@ import org.springframework.util.Assert;
  * "batch.version")</strong>
  *
  * @author Mahmoud Ben Hassine
+ * @author Myeongha Shin
  * @since 5.2.0
  */
 public class MongoJobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean implements InitializingBean {
@@ -48,6 +49,8 @@ public class MongoJobRepositoryFactoryBean extends AbstractJobRepositoryFactoryB
 	private @Nullable DataFieldMaxValueIncrementer jobExecutionIncrementer;
 
 	private @Nullable DataFieldMaxValueIncrementer stepExecutionIncrementer;
+
+	private @Nullable String collectionPrefix;
 
 	public void setMongoOperations(MongoOperations mongoOperations) {
 		this.mongoOperations = mongoOperations;
@@ -65,6 +68,10 @@ public class MongoJobRepositoryFactoryBean extends AbstractJobRepositoryFactoryB
 		this.stepExecutionIncrementer = stepExecutionIncrementer;
 	}
 
+	public void setCollectionPrefix(String collectionPrefix) {
+		this.collectionPrefix = collectionPrefix;
+	}
+
 	@Override
 	protected Object getTarget() throws Exception {
 		MongoJobInstanceDao jobInstanceDao = createJobInstanceDao();
@@ -78,7 +85,7 @@ public class MongoJobRepositoryFactoryBean extends AbstractJobRepositoryFactoryB
 
 	@Override
 	protected MongoJobInstanceDao createJobInstanceDao() {
-		MongoJobInstanceDao mongoJobInstanceDao = new MongoJobInstanceDao(this.mongoOperations);
+		MongoJobInstanceDao mongoJobInstanceDao = new MongoJobInstanceDao(this.mongoOperations, this.collectionPrefix);
 		mongoJobInstanceDao.setJobKeyGenerator(this.jobKeyGenerator);
 		mongoJobInstanceDao.setJobInstanceIncrementer(this.jobInstanceIncrementer);
 		return mongoJobInstanceDao;
@@ -86,21 +93,23 @@ public class MongoJobRepositoryFactoryBean extends AbstractJobRepositoryFactoryB
 
 	@Override
 	protected MongoJobExecutionDao createJobExecutionDao() {
-		MongoJobExecutionDao mongoJobExecutionDao = new MongoJobExecutionDao(this.mongoOperations);
+		MongoJobExecutionDao mongoJobExecutionDao = new MongoJobExecutionDao(this.mongoOperations,
+				this.collectionPrefix);
 		mongoJobExecutionDao.setJobExecutionIncrementer(this.jobExecutionIncrementer);
 		return mongoJobExecutionDao;
 	}
 
 	@Override
 	protected MongoStepExecutionDao createStepExecutionDao() {
-		MongoStepExecutionDao mongoStepExecutionDao = new MongoStepExecutionDao(this.mongoOperations);
+		MongoStepExecutionDao mongoStepExecutionDao = new MongoStepExecutionDao(this.mongoOperations,
+				this.collectionPrefix);
 		mongoStepExecutionDao.setStepExecutionIncrementer(this.stepExecutionIncrementer);
 		return mongoStepExecutionDao;
 	}
 
 	@Override
 	protected MongoExecutionContextDao createExecutionContextDao() {
-		return new MongoExecutionContextDao(this.mongoOperations);
+		return new MongoExecutionContextDao(this.mongoOperations, this.collectionPrefix);
 	}
 
 	@Override
