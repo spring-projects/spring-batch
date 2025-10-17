@@ -260,7 +260,7 @@ The manager component is a single process, and the workers are multiple remote p
 This pattern works best if the manager is not a bottleneck, so the processing must be more
 expensive than the reading of items (as is often the case in practice).
 
-The manager is an implementation of a Spring Batch `Step` with the `ItemWriter` replaced
+The manager is an implementation of a Spring Batch `Step` with the `ItemReader` replaced
 by a generic version that knows how to send chunks of items to the middleware as
 messages. The workers are standard listeners for whatever middleware is being used (for
 example, with JMS, they would be `MesssageListener` implementations), and their role is
