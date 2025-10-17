@@ -48,7 +48,9 @@ import java.util.Objects;
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  * @author Stefano Cordio
+ * @deprecated since 6.0 with no replacement, scheduled for removal in 7.0.
  */
+@Deprecated(since = "6.0", forRemoval = true)
 public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 
 	/**
