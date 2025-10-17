@@ -136,7 +136,7 @@ public class MongoExecutionContextDaoIntegrationTests {
 
 		@Bean
 		ExecutionContextDao executionContextDao(MongoOperations mongoOperations) {
-			return new MongoExecutionContextDao(mongoOperations);
+			return new MongoExecutionContextDao(mongoOperations, "BATCH_");
 		}
 
 	}
