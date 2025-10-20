@@ -94,7 +94,6 @@ public abstract class AbstractStep implements StoppableStep, InitializingBean, B
 	 */
 	@Deprecated(since = "6.0", forRemoval = true)
 	public AbstractStep(String name) {
-		Assert.notNull(name, "Step name must not be null");
 		this.name = name;
 	}
 

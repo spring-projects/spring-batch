@@ -31,7 +31,7 @@ public class HelloWorldJobConfiguration {
 
 	@Bean
 	public Step step(JobRepository jobRepository) {
-		return new StepBuilder("step", jobRepository).tasklet((contribution, chunkContext) -> {
+		return new StepBuilder(jobRepository).tasklet((contribution, chunkContext) -> {
 			System.out.println("Hello world!");
 			return RepeatStatus.FINISHED;
 		}).build();
@@ -39,7 +39,7 @@ public class HelloWorldJobConfiguration {
 
 	@Bean
 	public Job job(JobRepository jobRepository, Step step) {
-		return new JobBuilder("job", jobRepository).start(step).build();
+		return new JobBuilder(jobRepository).start(step).build();
 	}
 
 }
