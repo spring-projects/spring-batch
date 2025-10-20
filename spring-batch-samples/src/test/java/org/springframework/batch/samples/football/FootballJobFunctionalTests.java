@@ -72,4 +72,21 @@ class FootballJobFunctionalTests {
 		assertTrue(count > 0);
 	}
 
+	@Test
+	void testLaunchJobWithParallelStepsWithJavaConfiguration() throws Exception {
+		// given
+		ApplicationContext context = new AnnotationConfigApplicationContext(
+				FootballJobParallelStepsConfiguration.class);
+		JobOperator jobOperator = context.getBean(JobOperator.class);
+		Job job = context.getBean(Job.class);
+
+		// when
+		jobOperator.start(job, new JobParameters());
+
+		// then
+		int count = JdbcTestUtils.countRowsInTable(new JdbcTemplate(context.getBean(DataSource.class)),
+				"PLAYER_SUMMARY");
+		assertTrue(count > 0);
+	}
+
 }
