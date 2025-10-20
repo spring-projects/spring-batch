@@ -84,11 +84,14 @@ class MessageChannelPartitionHandlerTests {
 		Message message = mock();
 		// when
 		HashSet<StepExecution> stepExecutions = new HashSet<>();
-		stepExecutions
-			.add(new StepExecution(1L, "step1", new JobExecution(5L, new JobInstance(1L, "job"), new JobParameters())));
+		JobInstance jobInstance = new JobInstance(1L, "job");
+		JobExecution jobExecution = new JobExecution(5L, jobInstance, new JobParameters());
+		StepExecution stepExecution = new StepExecution(1L, "step1", jobExecution);
+		stepExecutions.add(stepExecution);
 		when(stepExecutionSplitter.split(any(StepExecution.class), eq(1))).thenReturn(stepExecutions);
 		when(message.getPayload()).thenReturn(Collections.emptySet());
 		when(operations.receive((PollableChannel) any())).thenReturn(message);
+		when(managerStepExecution.getJobExecution()).thenReturn(jobExecution);
 		// set
 		messageChannelPartitionHandler.setMessagingOperations(operations);
 
@@ -113,11 +116,14 @@ class MessageChannelPartitionHandlerTests {
 		PollableChannel replyChannel = mock();
 		// when
 		HashSet<StepExecution> stepExecutions = new HashSet<>();
-		stepExecutions
-			.add(new StepExecution(1L, "step1", new JobExecution(5L, new JobInstance(1L, "job"), new JobParameters())));
+		JobInstance jobInstance = new JobInstance(1L, "job");
+		JobExecution jobExecution = new JobExecution(5L, jobInstance, new JobParameters());
+		StepExecution stepExecution = new StepExecution(1L, "step1", jobExecution);
+		stepExecutions.add(stepExecution);
 		when(stepExecutionSplitter.split(any(StepExecution.class), eq(1))).thenReturn(stepExecutions);
 		when(message.getPayload()).thenReturn(Collections.emptySet());
 		when(operations.receive(replyChannel)).thenReturn(message);
+		when(managerStepExecution.getJobExecution()).thenReturn(jobExecution);
 		// set
 		messageChannelPartitionHandler.setMessagingOperations(operations);
 		messageChannelPartitionHandler.setReplyChannel(replyChannel);
@@ -141,8 +147,11 @@ class MessageChannelPartitionHandlerTests {
 		MessagingTemplate operations = mock();
 		// when
 		HashSet<StepExecution> stepExecutions = new HashSet<>();
-		stepExecutions
-			.add(new StepExecution(1L, "step1", new JobExecution(5L, new JobInstance(1L, "job"), new JobParameters())));
+		JobInstance jobInstance = new JobInstance(1L, "job");
+		JobExecution jobExecution = new JobExecution(5L, jobInstance, new JobParameters());
+		StepExecution stepExecution = new StepExecution(1L, "step1", jobExecution);
+		stepExecutions.add(stepExecution);
+		when(managerStepExecution.getJobExecution()).thenReturn(jobExecution);
 		when(stepExecutionSplitter.split(any(StepExecution.class), eq(1))).thenReturn(stepExecutions);
 		// set
 		messageChannelPartitionHandler.setMessagingOperations(operations);

@@ -210,10 +210,10 @@ public class MessageChannelPartitionHandler extends AbstractPartitionHandler imp
 
 		int count = 0;
 
+		long jobExecutionId = managerStepExecution.getJobExecution().getId();
 		for (StepExecution stepExecution : partitionStepExecutions) {
 			Message<StepExecutionRequest> request = createMessage(count++, partitionStepExecutions.size(),
-					new StepExecutionRequest(stepName, stepExecution.getJobExecutionId(), stepExecution.getId()),
-					replyChannel);
+					new StepExecutionRequest(stepName, stepExecution.getId()), jobExecutionId, replyChannel);
 			if (logger.isDebugEnabled()) {
 				logger.debug("Sending request: " + request);
 			}
@@ -279,11 +279,11 @@ public class MessageChannelPartitionHandler extends AbstractPartitionHandler imp
 	}
 
 	private Message<StepExecutionRequest> createMessage(int sequenceNumber, int sequenceSize,
-			StepExecutionRequest stepExecutionRequest, PollableChannel replyChannel) {
+			StepExecutionRequest stepExecutionRequest, long jobExecutionId, PollableChannel replyChannel) {
 		return MessageBuilder.withPayload(stepExecutionRequest)
 			.setSequenceNumber(sequenceNumber)
 			.setSequenceSize(sequenceSize)
-			.setCorrelationId(stepExecutionRequest.getJobExecutionId() + ":" + stepExecutionRequest.getStepName())
+			.setCorrelationId(jobExecutionId + ":" + stepExecutionRequest.getStepName())
 			.setReplyChannel(replyChannel)
 			.build();
 	}

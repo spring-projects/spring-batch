@@ -101,7 +101,7 @@ public class RemoteStep extends AbstractStep {
 		getJobRepository().updateExecutionContext(workerStepExecution);
 
 		// send step execution request and wait for the remote step to finish
-		StepExecutionRequest stepExecutionRequest = new StepExecutionRequest(this.remoteStepName, jobExecution.getId(),
+		StepExecutionRequest stepExecutionRequest = new StepExecutionRequest(this.remoteStepName,
 				workerStepExecution.getId());
 		this.messagingTemplate.convertAndSend(this.messageChannel, stepExecutionRequest);
 		StepExecution updatedWorkerExecution = pollRemoteStep(workerStepExecution);
