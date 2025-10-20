@@ -38,6 +38,7 @@ import org.springframework.batch.infrastructure.repeat.exception.ExceptionHandle
 import org.springframework.batch.infrastructure.repeat.support.RepeatTemplate;
 import org.springframework.batch.infrastructure.repeat.support.TaskExecutorRepeatTemplate;
 import org.springframework.batch.infrastructure.support.ReflectionUtils;
+import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -204,7 +205,14 @@ public abstract class AbstractTaskletStepBuilder<B extends AbstractTaskletStepBu
 	 * single-threaded (synchronous) executor.
 	 * @param taskExecutor the task executor to register
 	 * @return this for fluent chaining
+	 * @deprecated Since 6.0, concurrent executions of {@link Tasklet}s with
+	 * {@link TaskExecutorRepeatTemplate} is deprecated and scheduled for removal in v7.
+	 * Concurrency support for chunk-oriented steps is provided through
+	 * {@link ChunkOrientedStepBuilder#taskExecutor(AsyncTaskExecutor)}. For simple
+	 * tasklet steps, consider using a {@link TaskExecutor} on the tasklet implementation
+	 * instead.
 	 */
+	@Deprecated(since = "6.0", forRemoval = true)
 	public B taskExecutor(TaskExecutor taskExecutor) {
 		this.taskExecutor = taskExecutor;
 		return self();
@@ -275,11 +283,14 @@ public abstract class AbstractTaskletStepBuilder<B extends AbstractTaskletStepBu
 	/**
 	 * Convenience method for subclasses to determine if the step is concurrent.
 	 * @return true if the tasklet is going to be run in multiple threads
+	 * @deprecated Since 6.0 with no replacement and scheduled for removal in v7.
 	 */
+	@Deprecated(since = "6.0", forRemoval = true)
 	protected boolean concurrent() {
 		return taskExecutor != null && !(taskExecutor instanceof SyncTaskExecutor);
 	}
 
+	@Deprecated(since = "6.0", forRemoval = true)
 	protected TaskExecutor getTaskExecutor() {
 		return taskExecutor;
 	}
