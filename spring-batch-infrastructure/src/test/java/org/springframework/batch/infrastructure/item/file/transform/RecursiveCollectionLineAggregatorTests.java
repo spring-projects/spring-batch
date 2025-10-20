@@ -20,7 +20,6 @@ import java.util.Collections;
 
 import org.junit.jupiter.api.Test;
 
-import org.springframework.batch.infrastructure.item.file.transform.RecursiveCollectionLineAggregator;
 import org.springframework.util.StringUtils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -33,6 +32,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class RecursiveCollectionLineAggregatorTests {
 
 	private final RecursiveCollectionLineAggregator<String> aggregator = new RecursiveCollectionLineAggregator<>();
+
+	@Test
+	void testSetDelegateAndPassEmptyCollection() {
+		aggregator.setDelegate(item -> "bar");
+		assertEquals("", aggregator.aggregate(Collections.emptyList()));
+	}
 
 	@Test
 	void testSetDelegateAndPassInString() {

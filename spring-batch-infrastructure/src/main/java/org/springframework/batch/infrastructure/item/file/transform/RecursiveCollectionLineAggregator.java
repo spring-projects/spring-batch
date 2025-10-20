@@ -56,6 +56,9 @@ public class RecursiveCollectionLineAggregator<T> implements LineAggregator<Coll
 
 	@Override
 	public String aggregate(Collection<T> items) {
+		if (items.isEmpty()) {
+			return "";
+		}
 		StringBuilder builder = new StringBuilder();
 		for (T value : items) {
 			builder.append(delegate.aggregate(value)).append(lineSeparator);
