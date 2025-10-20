@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2018 the original author or authors.
+ * Copyright 2009-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,12 +28,9 @@ public class StepExecutionRequest implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private Long stepExecutionId;
+	private long stepExecutionId;
 
 	private String stepName;
-
-	// FIXME not used on the remote side, can we remove it?
-	private Long jobExecutionId;
 
 	private StepExecutionRequest() {
 		// For Jackson deserialization
@@ -42,17 +39,11 @@ public class StepExecutionRequest implements Serializable {
 	/**
 	 * Create a new {@link StepExecutionRequest} instance.
 	 * @param stepName the name of the step to execute
-	 * @param jobExecutionId the id of the job execution
 	 * @param stepExecutionId the id of the step execution
 	 */
-	public StepExecutionRequest(String stepName, Long jobExecutionId, Long stepExecutionId) {
+	public StepExecutionRequest(String stepName, long stepExecutionId) {
 		this.stepName = stepName;
-		this.jobExecutionId = jobExecutionId;
 		this.stepExecutionId = stepExecutionId;
-	}
-
-	public Long getJobExecutionId() {
-		return jobExecutionId;
 	}
 
 	public Long getStepExecutionId() {
@@ -65,8 +56,7 @@ public class StepExecutionRequest implements Serializable {
 
 	@Override
 	public String toString() {
-		return String.format("StepExecutionRequest: [jobExecutionId=%d, stepExecutionId=%d, stepName=%s]",
-				jobExecutionId, stepExecutionId, stepName);
+		return String.format("StepExecutionRequest: [stepExecutionId=%d, stepName=%s]", stepExecutionId, stepName);
 	}
 
 }

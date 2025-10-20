@@ -30,14 +30,14 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class StepExecutionRequestTests {
 
 	private static final String SERIALIZED_REQUEST = """
-			{"stepName":"step","jobExecutionId":1,"stepExecutionId":1}""";
+			{"stepName":"step","stepExecutionId":1}""";
 
 	private final JsonMapper jsonMapper = new JsonMapper();
 
 	@Test
 	void stepExecutionRequestShouldBeSerializableWithJackson() throws IOException {
 		// given
-		StepExecutionRequest request = new StepExecutionRequest("step", 1L, 1L);
+		StepExecutionRequest request = new StepExecutionRequest("step", 1L);
 
 		// when
 		String serializedRequest = this.jsonMapper.writeValueAsString(request);
@@ -55,7 +55,6 @@ class StepExecutionRequestTests {
 		// then
 		assertNotNull(deserializedRequest);
 		assertEquals("step", deserializedRequest.getStepName());
-		assertEquals(1L, deserializedRequest.getJobExecutionId().longValue());
 		assertEquals(1L, deserializedRequest.getStepExecutionId().longValue());
 	}
 
