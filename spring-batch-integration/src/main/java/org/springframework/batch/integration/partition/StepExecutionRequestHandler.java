@@ -6,6 +6,7 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.step.StepLocator;
+import org.springframework.batch.integration.support.StepExecutionShutdownHook;
 import org.springframework.integration.annotation.MessageEndpoint;
 import org.springframework.integration.annotation.ServiceActivator;
 
@@ -56,6 +57,8 @@ public class StepExecutionRequestHandler {
 			throw new RuntimeException(String.format("No Step with name [%s] could be located.", stepName));
 		}
 
+		// add shutdown hook to handle interruption signals. Should be configurable.
+		Runtime.getRuntime().addShutdownHook(new StepExecutionShutdownHook(stepName, stepExecution, this.stepLocator));
 		try {
 			step.execute(stepExecution);
 		}
