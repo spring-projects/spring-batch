@@ -55,7 +55,7 @@ public class JobExecutionShutdownHook extends Thread {
 			this.logger.info("Successfully stopped job execution " + jobExecutionId);
 		}
 		catch (Exception e) {
-			throw new RuntimeException("Unable to gracefully stop job execution " + jobExecutionId);
+			throw new RuntimeException("Unable to gracefully stop job execution " + jobExecutionId, e);
 		}
 	}
 
