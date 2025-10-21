@@ -125,8 +125,6 @@ public class SimpleJobRepository extends SimpleJobExplorer implements JobReposit
 		ecDao.saveExecutionContext(stepExecution);
 		jobExecution.addStepExecution(stepExecution);
 
-		// TODO check if this update is necessary
-		jobExecutionDao.updateJobExecution(jobExecution);
 		return stepExecution;
 	}
 
