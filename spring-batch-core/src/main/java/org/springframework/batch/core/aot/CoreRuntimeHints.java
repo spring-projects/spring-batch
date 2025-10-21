@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.aot;
 
+import java.lang.reflect.Method;
 import java.sql.Types;
 import java.time.Duration;
 import java.time.Instant;
@@ -33,6 +34,7 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
@@ -44,6 +46,7 @@ import java.util.stream.Stream;
 
 import org.springframework.aop.SpringProxy;
 import org.springframework.aop.framework.Advised;
+import org.springframework.aot.hint.ExecutableMode;
 import org.springframework.aot.hint.MemberCategory;
 import org.springframework.aot.hint.RuntimeHints;
 import org.springframework.aot.hint.RuntimeHintsRegistrar;
@@ -72,6 +75,8 @@ import org.springframework.batch.core.scope.context.StepContext;
 import org.springframework.batch.infrastructure.item.Chunk;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.core.DecoratingProxy;
+import org.springframework.util.Assert;
+import org.springframework.util.ReflectionUtils;
 
 /**
  * {@link RuntimeHintsRegistrar} for Spring Batch core module.
@@ -131,7 +136,7 @@ public class CoreRuntimeHints implements RuntimeHintsRegistrar {
 			.registerJdkProxy(builder -> builder.proxiedInterfaces(TypeReference.of(JobOperator.class))
 				.proxiedInterfaces(SpringProxy.class, Advised.class, DecoratingProxy.class));
 
-		// reflection hints
+		// reflection hints: types
 		hints.reflection().registerType(Types.class);
 		hints.reflection().registerType(JobContext.class);
 		hints.reflection().registerType(StepContext.class);
@@ -148,6 +153,15 @@ public class CoreRuntimeHints implements RuntimeHintsRegistrar {
 		jdkTypes.stream()
 			.map(TypeReference::of)
 			.forEach(type -> hints.reflection().registerType(type, MemberCategory.values()));
+
+		// reflection hints: methods
+		Method jobContextGetJobParametersMethod = ReflectionUtils.findMethod(JobContext.class, "getJobParameters");
+		Assert.state(jobContextGetJobParametersMethod != null, "JobContext#getJobParameters must not be null");
+		Method stepContextGetJobParametersMethod = ReflectionUtils.findMethod(StepContext.class, "getJobParameters");
+		Assert.state(stepContextGetJobParametersMethod != null, "StepContext#getJobParameters must not be null");
+
+		List<Method> methods = List.of(jobContextGetJobParametersMethod, stepContextGetJobParametersMethod);
+		methods.forEach(method -> hints.reflection().registerMethod(method, ExecutableMode.INVOKE));
 
 		// serialization hints
 		SerializationHints serializationHints = hints.serialization();
