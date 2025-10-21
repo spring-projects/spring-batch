@@ -103,9 +103,9 @@ public interface JobInstanceDao {
 	}
 
 	/**
-	 * Retrieve the names of all job instances sorted alphabetically - i.e. jobs that have
-	 * ever been executed.
-	 * @return the names of all job instances
+	 * Retrieve the names of all jobs for which job instances exist, sorted
+	 * alphabetically.
+	 * @return the names of all jobs with job instances
 	 */
 	List<String> getJobNames();
 
