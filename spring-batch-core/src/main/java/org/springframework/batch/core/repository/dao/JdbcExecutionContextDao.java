@@ -27,11 +27,11 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.stream.Stream;
 
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
@@ -57,7 +57,6 @@ import org.springframework.util.Assert;
  * @author Michael Minella
  * @author David Turanski
  * @author Mahmoud Ben Hassine
- * @author Yanming Zhou
  */
 public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implements ExecutionContextDao {
 
@@ -155,9 +154,13 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 		Long executionId = jobExecution.getId();
 		Assert.notNull(executionId, "ExecutionId must not be null.");
 
-		try (Stream<ExecutionContext> stream = getJdbcTemplate().queryForStream(getQuery(FIND_JOB_EXECUTION_CONTEXT),
-				new ExecutionContextRowMapper(), executionId)) {
-			return stream.findFirst().orElseGet(ExecutionContext::new);
+		List<ExecutionContext> results = getJdbcTemplate().query(getQuery(FIND_JOB_EXECUTION_CONTEXT),
+				new ExecutionContextRowMapper(), executionId);
+		if (!results.isEmpty()) {
+			return results.get(0);
+		}
+		else {
+			return new ExecutionContext();
 		}
 	}
 
@@ -166,9 +169,13 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 		Long executionId = stepExecution.getId();
 		Assert.notNull(executionId, "ExecutionId must not be null.");
 
-		try (Stream<ExecutionContext> stream = getJdbcTemplate().queryForStream(getQuery(FIND_STEP_EXECUTION_CONTEXT),
-				new ExecutionContextRowMapper(), executionId)) {
-			return stream.findFirst().orElseGet(ExecutionContext::new);
+		List<ExecutionContext> results = getJdbcTemplate().query(getQuery(FIND_STEP_EXECUTION_CONTEXT),
+				new ExecutionContextRowMapper(), executionId);
+		if (results.size() > 0) {
+			return results.get(0);
+		}
+		else {
+			return new ExecutionContext();
 		}
 	}
 
