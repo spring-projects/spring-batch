@@ -217,10 +217,8 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		Assert.notNull(jobInstance, "Job instance cannot be null.");
 		long jobInstanceId = jobInstance.getId();
 		// TODO optimize to a single query with a join if possible
-		List<Long> jobExecutionIds = getJdbcTemplate()
-			.queryForStream(getQuery(GET_JOB_EXECUTION_IDS_BY_INSTANCE_ID), (rs, rowNum) -> rs.getLong(1),
-					jobInstanceId)
-			.toList();
+		List<Long> jobExecutionIds = getJdbcTemplate().queryForList(getQuery(GET_JOB_EXECUTION_IDS_BY_INSTANCE_ID),
+				Long.class, jobInstanceId);
 		List<JobExecution> jobExecutions = new ArrayList<>(jobExecutionIds.size());
 		for (Long jobExecutionId : jobExecutionIds) {
 			jobExecutions.add(getJobExecution(jobExecutionId));
