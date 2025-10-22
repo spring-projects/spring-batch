@@ -21,18 +21,21 @@ The following Java example shows an example of using a skip limit:
 ----
 @Bean
 public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+    int skipLimit = 10;
+    var skippableExceptions = Set.of(FlatFileParseException.class);
+    SkipPolicy skipPolicy = new LimitCheckingExceptionHierarchySkipPolicy(skippableExceptions, skipLimit);
+
 	return new StepBuilder("step1", jobRepository)
 				.<String, String>chunk(10).transactionManager(transactionManager)
 				.reader(flatFileItemReader())
 				.writer(itemWriter())
 				.faultTolerant()
-				.skipLimit(10)
-				.skip(FlatFileParseException.class)
+				.skipPolicy(skipPolicy)
 				.build();
 }
 ----
 +
-Note: The `skipLimit` can be explicitly set using the `skipLimit()` method. If not specified, the default skip limit is set to 10.
+Note: The `skipLimit` can be explicitly set using the `skipLimit()` method.
 
 XML::
 +
@@ -55,8 +58,6 @@ The following XML example shows an example of using a skip limit:
 
 ====
 
-
-
 In the preceding example, a `FlatFileItemReader` is used. If, at any point, a
 `FlatFileParseException` is thrown, the item is skipped and counted against the total
 skip limit of 10. Exceptions (and their subclasses) that are declared might be thrown
@@ -66,81 +67,8 @@ the step execution, but the limit applies across all skips. Once the skip limit 
 reached, the next exception found causes the step to fail. In other words, the eleventh
 skip triggers the exception, not the tenth.
 
-One problem with the preceding example is that any other exception besides a
-`FlatFileParseException` causes the `Job` to fail. In certain scenarios, this may be the
-correct behavior. However, in other scenarios, it may be easier to identify which
-exceptions should cause failure and skip everything else.
-
-[tabs]
+[NOTE]
 ====
-Java::
-+
-The following Java example shows an example excluding a particular exception:
-+
-.Java Configuration
-[source, java]
-----
-@Bean
-public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
-	return new StepBuilder("step1", jobRepository)
-				.<String, String>chunk(10).transactionManager(transactionManager)
-				.reader(flatFileItemReader())
-				.writer(itemWriter())
-				.faultTolerant()
-				.skipLimit(10)
-				.skip(Exception.class)
-				.noSkip(FileNotFoundException.class)
-				.build();
-}
-----
-+
-Note: The `skipLimit` can be explicitly set using the `skipLimit()` method. If not specified, the default skip limit is set to 10.
-
-XML::
-+
-The following XML example shows an example excluding a particular exception:
-+
-.XML Configuration
-[source, xml]
-----
-<step id="step1">
-    <tasklet>
-        <chunk reader="flatFileItemReader" writer="itemWriter"
-               commit-interval="10" skip-limit="10">
-            <skippable-exception-classes>
-                <include class="java.lang.Exception"/>
-                <exclude class="java.io.FileNotFoundException"/>
-            </skippable-exception-classes>
-        </chunk>
-    </tasklet>
-</step>
-----
-
+The skip limit applies to all skips (read, process and write).
 ====
-
-
-
-By identifying `java.lang.Exception` as a skippable exception class, the configuration
-indicates that all `Exceptions` are skippable. However, by "`excluding`"
-`java.io.FileNotFoundException`, the configuration refines the list of skippable
-exception classes to be all `Exceptions` __except__ `FileNotFoundException`. Any excluded
-exception class is fatal if encountered (that is, they are not skipped).
-
-For any exception encountered, the skippability is determined by the nearest superclass
-in the class hierarchy. Any unclassified exception is treated as 'fatal'.
-
-
-[tabs]
-====
-Java::
-+
-The order of the `skip` and `noSkip` method calls does not matter.
-
-XML::
-+
-The order of the `<include/>` and `<exclude/>` elements does not matter.
-
-====
-
-
 

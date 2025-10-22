@@ -22,8 +22,10 @@ These break down into categories as well, as follows:
 
 * Multi-threaded Step (single-process)
 * Parallel Steps (single-process)
+* Local Chunking of Step (single-process)
 * Remote Chunking of Step (multi-process)
 * Partitioning a Step (single or multi-process)
+* Remote Step (multi-process)
 
 First, we review the single-process options. Then we review the multi-process options.
 
@@ -84,50 +86,7 @@ implementations. The simplest multi-threaded `TaskExecutor` is a
 The result of the preceding configuration is that the `Step` executes by reading, processing,
 and writing each chunk of items (each commit interval) in a separate thread of execution.
 Note that this means there is no fixed order for the items to be processed, and a chunk
-might contain items that are non-consecutive compared to the single-threaded case. In
-addition to any limits placed by the task executor (such as whether it is backed by a
-thread pool), the tasklet configuration has a throttle limit (default: 4).
-You may need to increase this limit to ensure that a thread pool is fully used.
-
-
-[tabs]
-====
-Java::
-+
-When using Java configuration, the builders provide access to the throttle limit, as
-follows:
-+
-.Java Configuration
-[source, java]
-----
-@Bean
-public Step sampleStep(TaskExecutor taskExecutor, JobRepository jobRepository, PlatformTransactionManager transactionManager) {
-	return new StepBuilder("sampleStep", jobRepository)
-				.<String, String>chunk(10).transactionManager(transactionManager)
-				.reader(itemReader())
-				.writer(itemWriter())
-				.taskExecutor(taskExecutor)
-				.throttleLimit(20)
-				.build();
-}
-----
-
-XML::
-+
-For example, you might increase the throttle-limit, as follows:
-+
-[source, xml]
-----
-<step id="loading"> <tasklet
-    task-executor="taskExecutor"
-    throttle-limit="20">...</tasklet>
-</step>
-----
-
-====
-
-
-
+might contain items that are non-consecutive compared to the single-threaded case.
 
 Note also that there may be limits placed on concurrency by any pooled resources used in
 your step, such as a `DataSource`. Be sure to make the pool in those resources at least
@@ -245,6 +204,63 @@ parallel. Note that the job ensures that every flow in the split completes befor
 aggregating the exit statuses and transitioning.
 
 See the section on xref:step/controlling-flow.adoc#split-flows[Split Flows] for more detail.
+
+[[localChunking]]
+== Local Chunking
+
+Local chunking is a new feature that allows you to process chunks of items in parallel, locally within the same JVM using multiple threads.
+This is particularly useful when you have a large number of items to process and want to take advantage of multi-core processors.
+With local chunking, you can configure a chunk-oriented step to use multiple threads to process chunks of items concurrently.
+Each thread will read, process and write its own chunk of items independently, while the step will manage the overall execution and commit the results.
+
+This feature is possible by using the `ChunkMessageChannelItemWriter`, which is an item writer that submits chunk
+requests to local workers from a `TaskExecutor`:
+
+[source, java]
+----
+@Bean
+public ChunkTaskExecutorItemWriter<Vet> itemWriter(ChunkProcessor<Vet> chunkProcessor) {
+    ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
+    taskExecutor.setCorePoolSize(4);
+    taskExecutor.setThreadNamePrefix("worker-thread-");
+    taskExecutor.setWaitForTasksToCompleteOnShutdown(true);
+    taskExecutor.afterPropertiesSet();
+    return new ChunkTaskExecutorItemWriter<>(chunkProcessor, taskExecutor);
+}
+----
+
+The `ChunkMessageChannelItemWriter` requires a `TaskExecutor` to process chunk concurrently
+as well as a `ChunkProcessor` to define what to do with each chunk. Here is an example of
+a chunk processor that writes each chunk of items to a relational database table:
+
+[source, java]
+----
+@Bean
+public ChunkProcessor<Vet> chunkProcessor(DataSource dataSource, TransactionTemplate transactionTemplate) {
+    String sql = "insert into vets (firstname, lastname) values (?, ?)";
+    JdbcBatchItemWriter<Vet> itemWriter = new JdbcBatchItemWriterBuilder<Vet>().dataSource(dataSource)
+        .sql(sql)
+        .itemPreparedStatementSetter((item, ps) -> {
+            ps.setString(1, item.firstname());
+            ps.setString(2, item.lastname());
+        })
+        .build();
+
+    return (chunk, contribution) -> transactionTemplate.executeWithoutResult(transactionStatus -> {
+        try {
+            itemWriter.write(chunk);
+            contribution.incrementWriteCount(chunk.size());
+            contribution.setExitStatus(ExitStatus.COMPLETED);
+        }
+        catch (Exception e) {
+            transactionStatus.setRollbackOnly();
+            contribution.setExitStatus(ExitStatus.FAILED.addExitDescription(e));
+        }
+    });
+}
+----
+
+You can find an example of this scaling technique in the https://github.com/spring-projects/spring-batch/tree/main/spring-batch-samples/src/main/java/org/springframework/batch/samples/chunking/local[Local Chunking Sample].
 
 [[remoteChunking]]
 == Remote Chunking
@@ -542,4 +558,63 @@ The following example shows how to define late binding in XML:
 ----
 
 ====
+
+[[remoteStep]]
+== Remote Step execution
+
+As of v6.0, Spring Batch provides support for remote step executions, allowing you to execute steps of a batch job on remote machines or clusters.
+This feature is particularly useful for large-scale batch processing scenarios where you want to distribute the workload across multiple nodes to improve performance and scalability.
+Remote step execution is provided by the `RemoteStep` class, which uses Spring Integration messaging channels to enable communication between the local job execution environment and the remote step executors.
+
+A `RemoteStep` is configured as a regular step by providing the remote step name and a messaging template to send step execution requests to remote workers:
+
+[source, java]
+----
+@Bean
+public Step step(MessagingTemplate messagingTemplate, JobRepository jobRepository) {
+    return new RemoteStep("step", "workerStep", jobRepository, messagingTemplate);
+}
+----
+
+On the worker side, you need to define the remote step to execute (`workerStep` in this example) and configure
+a Spring Integration flow to intercept step execution requests and invoke the `StepExecutionRequestHandler`:
+
+[source, java]
+----
+@Bean
+public Step workerStep(JobRepository jobRepository, JdbcTransactionManager transactionManager) {
+    return new StepBuilder("workerStep", jobRepository)
+        // define step logic
+        .build();
+}
+
+/*
+ * Configure inbound flow (requests coming from the manager)
+ */
+@Bean
+public DirectChannel requests() {
+    return new DirectChannel();
+}
+
+@Bean
+public IntegrationFlow inboundFlow(ActiveMQConnectionFactory connectionFactory, JobRepository jobRepository,
+        StepLocator stepLocator) {
+    StepExecutionRequestHandler stepExecutionRequestHandler = new StepExecutionRequestHandler();
+    stepExecutionRequestHandler.setJobRepository(jobRepository);
+    stepExecutionRequestHandler.setStepLocator(stepLocator);
+    return IntegrationFlow.from(Jms.messageDrivenChannelAdapter(connectionFactory).destination("requests"))
+        .channel(requests())
+        .handle(stepExecutionRequestHandler, "handle")
+        .get();
+}
+
+@Bean
+public StepLocator stepLocator(BeanFactory beanFactory) {
+    BeanFactoryStepLocator beanFactoryStepLocator = new BeanFactoryStepLocator();
+    beanFactoryStepLocator.setBeanFactory(beanFactory);
+    return beanFactoryStepLocator;
+}
+----
+
+You can find a complete example in the https://github.com/spring-projects/spring-batch/tree/main/spring-batch-samples/src/main/java/org/springframework/batch/samples/remotestep[Remote Step Sample].
 

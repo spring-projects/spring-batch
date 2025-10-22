@@ -161,6 +161,36 @@ framework, it sets the status of the current
 `BatchStatus.STOPPED`, saves it, and does the same
 for the `JobExecution` before finishing.
 
+[[graceful-shutdown]]
+== Handling external interruption signals
+
+As of v6.0+, Spring Batch provides a `JobExecutionShutdownHook` that you can attach to the JVM runtime
+in order to intercept external interruption signals and gracefully stop the job execution:
+
+[source, java]
+----
+Thread springBatchHook = new JobExecutionShutdownHook(jobExecution, jobOperator);
+Runtime.getRuntime().addShutdownHook(springBatchHook);
+----
+
+A `JobExecutionShutdownHook` requires the job execution to track as well as a reference to a job operator
+that will be used to stop the execution.
+
+[[recover-job]]
+== Recovering a job
+
+If a graceful shutdown is not performed properly (ie the JVM is shutdown abruptly), Spring Batch will not
+have a chance to update the execution state correctly in order to restart the failed job execution. In this
+case, the job execution will stay in a `STARTED` state which is not restartable. In this case, it is possible
+to recover such a job execution with the `JobOperator` API:
+
+[source, java]
+----
+JobExecution jobExecution = ...; // get the job execution to recover
+jobOperator.recover(jobExecution);
+jobOperator.restart(jobExecution);
+----
+
 [[aborting-a-job]]
 == Aborting a Job
 

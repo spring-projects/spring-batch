@@ -19,13 +19,20 @@ In Java, retry should be configured as follows:
 ----
 @Bean
 public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+    // retry policy configuration
+    int retryLimit = 3;
+    var retrybaleExceptions = Set.of(DeadlockLoserDataAccessException.class);
+    RetryPolicy retryPolicy = RetryPolicy.builder()
+        .maxAttempts(retryLimit)
+        .includes(retrybaleExceptions)
+        .build();
+
 	return new StepBuilder("step1", jobRepository)
 				.<String, String>chunk(2).transactionManager(transactionManager)
 				.reader(itemReader())
 				.writer(itemWriter())
 				.faultTolerant()
-				.retryLimit(3)
-				.retry(DeadlockLoserDataAccessException.class)
+				.retryPolicy(retryPolicy)
 				.build();
 }
 ----
@@ -53,6 +60,5 @@ In XML, retry should be configured as follows:
 
 
 The `Step` allows a limit for the number of times an individual item can be retried and a
-list of exceptions that are "`retryable`". You can find more details on how retry works in
-<<retry.adoc#retry, retry>>.
+list of exceptions that are "`retryable`".
 
