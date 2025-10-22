@@ -17,12 +17,18 @@
 package org.springframework.batch.infrastructure.item.support;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.InOrder;
 import org.springframework.batch.infrastructure.item.Chunk;
+import org.springframework.batch.infrastructure.item.ExecutionContext;
+import org.springframework.batch.infrastructure.item.ItemStreamWriter;
+import org.springframework.batch.infrastructure.item.ItemWriter;
 
 import java.util.function.Function;
 
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 /**
  * @author Stefano Cordio
@@ -33,7 +39,7 @@ class MappingItemWriterTests {
 	void testWithMapperAcceptingItemSuperclass() throws Exception {
 		// given
 		Function<Entity, String> mapper = Entity::name;
-		ListItemWriter<String> downstream = mock();
+		ItemWriter<String> downstream = mock();
 		MappingItemWriter<Person, String> underTest = new MappingItemWriter<>(mapper, downstream);
 
 		// when
@@ -47,7 +53,7 @@ class MappingItemWriterTests {
 	void testWithMapperProducingMappedItemSubclass() throws Exception {
 		// given
 		Function<Person, String> mapper = Person::name;
-		ListItemWriter<CharSequence> downstream = mock();
+		ItemWriter<CharSequence> downstream = mock();
 		MappingItemWriter<Person, CharSequence> underTest = new MappingItemWriter<>(mapper, downstream);
 
 		// when
@@ -61,7 +67,7 @@ class MappingItemWriterTests {
 	void testWithDownstreamAcceptingMappedItemSuperclass() throws Exception {
 		// given
 		Function<Person, String> mapper = Person::name;
-		ListItemWriter<CharSequence> downstream = mock();
+		ItemWriter<CharSequence> downstream = mock();
 		MappingItemWriter<Person, String> underTest = new MappingItemWriter<>(mapper, downstream);
 
 		// when
@@ -69,6 +75,41 @@ class MappingItemWriterTests {
 
 		// then
 		verify(downstream).write(Chunk.of("Foo"));
+	}
+
+	@Test
+	void testWithDownstreamNotImplementingItemStream() {
+		// given
+		ExecutionContext executionContext = mock();
+		ItemWriter<Object> downstream = mock();
+		MappingItemWriter<Object, Object> underTest = new MappingItemWriter<>(Function.identity(), downstream);
+
+		// when
+		underTest.open(executionContext);
+		underTest.update(executionContext);
+		underTest.close();
+
+		// then
+		verifyNoInteractions(downstream);
+	}
+
+	@Test
+	void testWithDownstreamImplementingItemStream() {
+		// given
+		ExecutionContext executionContext = mock();
+		ItemStreamWriter<Object> downstream = mock();
+		MappingItemWriter<Object, Object> underTest = new MappingItemWriter<>(Function.identity(), downstream);
+
+		// when
+		underTest.open(executionContext);
+		underTest.update(executionContext);
+		underTest.close();
+
+		// then
+		InOrder inOrder = inOrder(downstream);
+		inOrder.verify(downstream).open(executionContext);
+		inOrder.verify(downstream).update(executionContext);
+		inOrder.verify(downstream).close();
 	}
 
 	private interface Entity {

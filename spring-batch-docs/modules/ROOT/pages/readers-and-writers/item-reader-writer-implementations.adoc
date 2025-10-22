@@ -7,11 +7,9 @@ discussed in the previous sections.
 [[decorators]]
 == Decorators
 
-In some cases, a user needs specialized behavior to be appended to a pre-existing
-`ItemReader`.   Spring Batch offers some out of the box decorators that can add
-additional behavior to to your `ItemReader` and `ItemWriter` implementations.
-
-Spring Batch includes the following decorators:
+In some cases, you might need specialized behavior to be appended to a pre-existing
+`ItemReader` or `ItemWriter` implementation.
+For this purpose, Spring Batch offers the following out-of-the-box decorators:
 
 * xref:readers-and-writers/item-reader-writer-implementations.adoc#synchronizedItemStreamReader[`SynchronizedItemStreamReader`]
 * xref:readers-and-writers/item-reader-writer-implementations.adoc#singleItemPeekableItemReader[`SingleItemPeekableItemReader`]
@@ -113,10 +111,12 @@ through the provided `Classifier`. Spring Batch provides a
 
 The `MappingItemWriter` adapts an `ItemWriter` accepting items of a given type to one accepting
 items of another type by applying a mapping function to each item before writing.
+Thread-safety is guaranteed as long as the downstream item writer is thread-safe, and state
+management is honored with a downstream `ItemStream` item writer.
 
 This item writer is most useful when used in combination with a `CompositeItemWriter`, where the
 mapping function in front of the downstream writer can be a getter of the input item or a more
-complex transformation logic.
+complex transformation logic, effectively allowing deconstruction patterns.
 
 [[messagingReadersAndWriters]]
 == Messaging Readers And Writers
