@@ -12,8 +12,13 @@ Spring Batch 6.0 includes the following features and improvements:
 * xref:whatsnew.adoc#new-command-line-operator[New command line operator]
 * xref:whatsnew.adoc#ability-to-recover-failed-job-executions[Ability to recover failed job executions]
 * xref:whatsnew.adoc#ability-to-stop-all-kind-of-steps[Ability to stop all kinds of steps]
+* xref:whatsnew.adoc#graceful-shutdown[Graceful Shutdown support]
 * xref:whatsnew.adoc#observability-with-jfr[Observability support with the Java Flight Recorder (JFR)]
 * xref:whatsnew.adoc#jspecify[Null safety annotations with JSpecify]
+* xref:whatsnew.adoc#local-chunking[Local chunking support]
+* xref:whatsnew.adoc#seda-with-si[SEDA style with Spring Integration message channels]
+* xref:whatsnew.adoc#jackson-3-support[Jackson 3 support]
+* xref:whatsnew.adoc#remote-step-support[Remote step support]
 * xref:whatsnew.adoc#deprecations-and-pruning[Deprecations and pruning]
 
 [[dependencies-upgrade]]
@@ -176,6 +181,14 @@ If a custom `Step` implementation wants to handle external stop signals, it just
 
 This release adds a new interface, named `StoppableStep`, that extends `Step` and which can be implemented by any step that is able to handle stop signals.
 
+[[graceful-shutdown]]
+== Graceful Shutdown support
+
+Spring Batch 6.0 introduces support for graceful shutdown of batch jobs. This feature allows you to stop a running job execution in a controlled manner, ensuring that interruption signals are correctly sent to running steps.
+
+When a graceful shutdown is initiated, the job execution will stop currently active steps and updates the job repository with a consistent state that enables restartability. Once running steps have finished, the job execution will be marked as stopped, and any necessary cleanup operations will be performed.
+
+
 [[observability-with-jfr]]
 == Observability with the Java Flight Recorder (JFR)
 
@@ -190,6 +203,32 @@ This release introduces several JFR events to monitor key aspects of a batch job
 
 Spring Batch 6.0 APIs are now annotated with https://jspecify.dev/[JSpecify] annotations to provide better null-safety guarantees and improve code quality.
 
+[[local-chunking]]
+== Local chunking support
+
+Similar to remote chunking, local chunking is a new feature that allows you to process chunks of items in parallel, locally within the same JVM using multiple threads. This is particularly useful when you have a large number of items to process and want to take advantage of multi-core processors.
+With local chunking, you can configure a chunk-oriented step to use multiple threads to process chunks of items concurrently. Each thread will read, process and write its own chunk of items independently, while the step will manage the overall execution and commit the results.
+
+[[seda-with-si]]
+== SEDA style with Spring Integration message channels
+
+In Spring Batch 5.2, we introduced the concept of SEDA (Staged Event-Driven Architecture) style processing using local threads with the `BlockingQueueItemReader` and `BlockingQueueItemWriter` components. Building on that foundation,
+Spring Batch 6.0 introduces support for SEDA style processing at scale using Spring Integration messaging channels. This allows you to decouple the different stages of a batch job and process them asynchronously using message channels. By leveraging Spring Integration, you can easily configure and manage the messaging channels, as well as take advantage of features like message transformation, filtering, and routing.
+
+[[jackson-3-support]]
+== Jackson 3 support
+
+Spring Batch 6.0 has been upgraded to support Jackson 3.x for JSON processing. This upgrade ensures compatibility with the latest features and improvements in the Jackson library, while also providing better performance and security. All JSON-related components in Spring Batch, such as the `JsonItemReader` and `JsonFileItemWriter`, as well as the `JacksonExecutionContextStringSerializer` have been updated to use Jackson 3.x by default.
+
+The support for Jackson 2.x has been deprecated and will be removed in a future release. If you are currently using Jackson 2.x in your Spring Batch applications, it is recommended to upgrade to Jackson 3.x to take advantage of the latest features and improvements.
+
+[[remote-step-support]]
+== Remote step support
+
+This release introduces support for remote step executions, allowing you to execute steps of a batch job on remote machines or clusters.
+This feature is particularly useful for large-scale batch processing scenarios where you want to distribute the workload across multiple nodes to improve performance and scalability. Remote step execution is facilitated through the use of Spring Integration messaging channels, which enable communication between the local job execution environment and the remote step executors.
+
+
 [[deprecations-and-pruning]]
 == Deprecations and pruning
 
@@ -198,5 +237,8 @@ As with any major release, some features have been deprecated or removed in Spri
 * All deprecated APIs and features from previous versions have been removed
 * Modular configuration through `@EnableBatchProcessing(modular = true)` has been deprecated
 * Several APIs have been deprecated in this version, in order to simplify the core API and reduce its scope
+* Deprecate JUnit 4 support in the `spring-batch-test` module
+* Deprecate Jackson 2 support
+* Deprecate XML configuration through the `batch:...` namespace
 
 Fore more details, please refer to the https://github.com/spring-projects/spring-batch/wiki/Spring-Batch-6.0-Migration-Guide[migration guide].
