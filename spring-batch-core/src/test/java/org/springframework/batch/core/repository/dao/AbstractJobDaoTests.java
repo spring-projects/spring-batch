@@ -254,6 +254,8 @@ public abstract class AbstractJobDaoTests {
 	@Transactional
 	@Test
 	void testGetLastJobExecution() {
+		assertEquals(null, jobExecutionDao.getLastJobExecution(jobInstance));
+
 		JobExecution lastExecution = new JobExecution(1L, jobInstance, jobParameters);
 		lastExecution.setStatus(BatchStatus.STARTED);
 

@@ -312,10 +312,10 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	public JobExecution getLastJobExecution(JobInstance jobInstance) {
 		long jobInstanceId = jobInstance.getId();
 
-		long lastJobExecutionId = getJdbcTemplate().queryForObject(getQuery(GET_LAST_JOB_EXECUTION_ID),
-				(rs, rowNum) -> rs.getLong(1), jobInstanceId, jobInstanceId);
+		Long lastJobExecutionId = getJdbcTemplate().queryForObject(getQuery(GET_LAST_JOB_EXECUTION_ID), Long.class,
+				jobInstanceId, jobInstanceId);
 
-		return getJobExecution(lastJobExecutionId);
+		return lastJobExecutionId != null ? getJobExecution(lastJobExecutionId) : null;
 	}
 
 	@Override
