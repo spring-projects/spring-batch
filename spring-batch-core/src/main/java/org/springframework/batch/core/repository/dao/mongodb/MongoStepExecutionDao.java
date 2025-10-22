@@ -15,7 +15,6 @@
  */
 package org.springframework.batch.core.repository.dao.mongodb;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -110,24 +109,26 @@ public class MongoStepExecutionDao implements StepExecutionDao {
 		return stepExecution != null ? this.stepExecutionConverter.toStepExecution(stepExecution, jobExecution) : null;
 	}
 
+	@Nullable
 	@Override
 	public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
 		// TODO optimize the query
 		// get all step executions
-		List<org.springframework.batch.core.repository.persistence.StepExecution> stepExecutions = new ArrayList<>();
 		Query query = query(where("jobInstanceId").is(jobInstance.getId()));
 		List<org.springframework.batch.core.repository.persistence.JobExecution> jobExecutions = this.mongoOperations
 			.find(query, org.springframework.batch.core.repository.persistence.JobExecution.class,
 					JOB_EXECUTIONS_COLLECTION_NAME);
-		for (org.springframework.batch.core.repository.persistence.JobExecution jobExecution : jobExecutions) {
-			stepExecutions.addAll(jobExecution.getStepExecutions());
-		}
+		List<org.springframework.batch.core.repository.persistence.StepExecution> stepExecutions = this.mongoOperations
+			.find(query(where("jobExecutionId").in(jobExecutions.stream()
+				.map(org.springframework.batch.core.repository.persistence.JobExecution::getJobExecutionId)
+				.toList())), org.springframework.batch.core.repository.persistence.StepExecution.class,
+					STEP_EXECUTIONS_COLLECTION_NAME);
 		// sort step executions by creation date then id (see contract) and return the
-		// first one
+		// last one
 		Optional<org.springframework.batch.core.repository.persistence.StepExecution> lastStepExecution = stepExecutions
 			.stream()
 			.filter(stepExecution -> stepExecution.getName().equals(stepName))
-			.min(Comparator
+			.max(Comparator
 				.comparing(org.springframework.batch.core.repository.persistence.StepExecution::getCreateTime)
 				.thenComparing(org.springframework.batch.core.repository.persistence.StepExecution::getId));
 		if (lastStepExecution.isPresent()) {
