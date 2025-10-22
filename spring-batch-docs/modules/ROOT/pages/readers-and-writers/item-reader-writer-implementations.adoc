@@ -19,6 +19,7 @@ Spring Batch includes the following decorators:
 * xref:readers-and-writers/item-reader-writer-implementations.adoc#multiResourceItemWriter[`MultiResourceItemWriter`]
 * xref:readers-and-writers/item-reader-writer-implementations.adoc#classifierCompositeItemWriter[`ClassifierCompositeItemWriter`]
 * xref:readers-and-writers/item-reader-writer-implementations.adoc#classifierCompositeItemProcessor[`ClassifierCompositeItemProcessor`]
+* xref:readers-and-writers/item-reader-writer-implementations.adoc#mappingItemWriter[`MappingItemWriter`]
 
 [[synchronizedItemStreamReader]]
 === `SynchronizedItemStreamReader`
@@ -106,6 +107,16 @@ collection of `ItemProcessor` implementations, based on a router pattern impleme
 through the provided `Classifier`. Spring Batch provides a
 `ClassifierCompositeItemProcessorBuilder` to construct an instance of the
 `ClassifierCompositeItemProcessor`.
+
+[[mappingItemWriter]]
+=== `MappingItemWriter`
+
+The `MappingItemWriter` adapts an `ItemWriter` accepting items of a given type to one accepting
+items of another type by applying a mapping function to each item before writing.
+
+This item writer is most useful when used in combination with a `CompositeItemWriter`, where the
+mapping function in front of the downstream writer can be a getter of the input item or a more
+complex transformation logic.
 
 [[messagingReadersAndWriters]]
 == Messaging Readers And Writers
