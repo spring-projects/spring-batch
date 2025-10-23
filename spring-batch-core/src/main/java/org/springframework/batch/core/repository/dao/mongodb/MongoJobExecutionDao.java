@@ -15,6 +15,11 @@
  */
 package org.springframework.batch.core.repository.dao.mongodb;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -23,17 +28,20 @@ import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
+import org.springframework.batch.core.repository.persistence.JobParameter;
 import org.springframework.batch.core.repository.persistence.converter.JobExecutionConverter;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
+import org.springframework.util.CollectionUtils;
 
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 import static org.springframework.data.mongodb.core.query.Query.query;
 
 /**
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  * @since 5.2.0
  */
 public class MongoJobExecutionDao implements JobExecutionDao {
@@ -84,13 +92,12 @@ public class MongoJobExecutionDao implements JobExecutionDao {
 
 	@Override
 	public List<JobExecution> findJobExecutions(JobInstance jobInstance) {
-		Query query = query(where("jobInstanceId").is(jobInstance.getId()));
+		Query query = query(where("jobInstanceId").is(jobInstance.getId()))
+			.with(Sort.by(Sort.Direction.DESC, "jobExecutionId"));
 		List<org.springframework.batch.core.repository.persistence.JobExecution> jobExecutions = this.mongoOperations
 			.find(query, org.springframework.batch.core.repository.persistence.JobExecution.class,
 					JOB_EXECUTIONS_COLLECTION_NAME);
-		return jobExecutions.stream()
-			.map(jobExecution -> this.jobExecutionConverter.toJobExecution(jobExecution, jobInstance))
-			.toList();
+		return jobExecutions.stream().map(jobExecution -> convert(jobExecution, jobInstance)).toList();
 	}
 
 	@Override
@@ -101,7 +108,7 @@ public class MongoJobExecutionDao implements JobExecutionDao {
 				query.with(Sort.by(sortOrder)),
 				org.springframework.batch.core.repository.persistence.JobExecution.class,
 				JOB_EXECUTIONS_COLLECTION_NAME);
-		return jobExecution != null ? this.jobExecutionConverter.toJobExecution(jobExecution, jobInstance) : null;
+		return jobExecution != null ? convert(jobExecution, jobInstance) : null;
 	}
 
 	@Override
@@ -115,7 +122,7 @@ public class MongoJobExecutionDao implements JobExecutionDao {
 				.find(query, org.springframework.batch.core.repository.persistence.JobExecution.class,
 						JOB_EXECUTIONS_COLLECTION_NAME)
 				.stream()
-				.map(jobExecution -> this.jobExecutionConverter.toJobExecution(jobExecution, jobInstance))
+				.map(jobExecution -> convert(jobExecution, jobInstance))
 				.forEach(runningJobExecutions::add);
 		}
 		return runningJobExecutions;
@@ -132,7 +139,7 @@ public class MongoJobExecutionDao implements JobExecutionDao {
 		}
 		org.springframework.batch.core.job.JobInstance jobInstance = this.jobInstanceDao
 			.getJobInstance(jobExecution.getJobInstanceId());
-		return this.jobExecutionConverter.toJobExecution(jobExecution, jobInstance);
+		return convert(jobExecution, jobInstance);
 	}
 
 	@Override
@@ -144,6 +151,45 @@ public class MongoJobExecutionDao implements JobExecutionDao {
 		// TODO the contract mentions to update the version as well. Double check if this
 		// is needed as the version is not used in the tests following the call sites of
 		// synchronizeStatus
+	}
+
+	@Override
+	public void deleteJobExecution(JobExecution jobExecution) {
+		this.mongoOperations.remove(query(where("jobExecutionId").is(jobExecution.getId())),
+				JOB_EXECUTIONS_COLLECTION_NAME);
+
+	}
+
+	private JobExecution convert(org.springframework.batch.core.repository.persistence.JobExecution jobExecution,
+			org.springframework.batch.core.job.JobInstance jobInstance) {
+		Set<JobParameter<?>> parameters = jobExecution.getJobParameters();
+		if (!CollectionUtils.isEmpty(parameters)) {
+			// MongoDB restore temporal value as Date
+			Set<JobParameter<?>> converted = new HashSet<>();
+			for (JobParameter<?> parameter : parameters) {
+				if (LocalDate.class.getName().equals(parameter.type()) && parameter.value() instanceof Date date) {
+					converted.add(new JobParameter<>(parameter.name(),
+							date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate(), parameter.type(),
+							parameter.identifying()));
+				}
+				else if (LocalTime.class.getName().equals(parameter.type()) && parameter.value() instanceof Date date) {
+					converted.add(new JobParameter<>(parameter.name(),
+							date.toInstant().atZone(ZoneId.systemDefault()).toLocalTime(), parameter.type(),
+							parameter.identifying()));
+				}
+				else if (LocalDateTime.class.getName().equals(parameter.type())
+						&& parameter.value() instanceof Date date) {
+					converted.add(new JobParameter<>(parameter.name(),
+							date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime(), parameter.type(),
+							parameter.identifying()));
+				}
+				else {
+					converted.add(parameter);
+				}
+			}
+			jobExecution.setJobParameters(converted);
+		}
+		return this.jobExecutionConverter.toJobExecution(jobExecution, jobInstance);
 	}
 
 }

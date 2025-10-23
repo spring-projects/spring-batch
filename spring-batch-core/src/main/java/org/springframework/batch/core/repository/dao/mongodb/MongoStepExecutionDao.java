@@ -36,6 +36,7 @@ import static org.springframework.data.mongodb.core.query.Query.query;
 
 /**
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  * @since 5.2.0
  */
 public class MongoStepExecutionDao implements StepExecutionDao {
@@ -95,8 +96,8 @@ public class MongoStepExecutionDao implements StepExecutionDao {
 		org.springframework.batch.core.repository.persistence.StepExecution stepExecution = this.mongoOperations
 			.findOne(query, org.springframework.batch.core.repository.persistence.StepExecution.class,
 					STEP_EXECUTIONS_COLLECTION_NAME);
-		JobExecution jobExecution = jobExecutionDao.getJobExecution(stepExecution.getJobExecutionId());
-		return stepExecution != null ? this.stepExecutionConverter.toStepExecution(stepExecution, jobExecution) : null;
+		return stepExecution != null ? this.stepExecutionConverter.toStepExecution(stepExecution,
+				jobExecutionDao.getJobExecution(stepExecution.getJobExecutionId())) : null;
 	}
 
 	@Deprecated(since = "6.0", forRemoval = true)
@@ -163,24 +164,22 @@ public class MongoStepExecutionDao implements StepExecutionDao {
 
 	@Override
 	public long countStepExecutions(JobInstance jobInstance, String stepName) {
-		long count = 0;
-		// TODO optimize the count query
 		Query query = query(where("jobInstanceId").is(jobInstance.getId()));
 		List<org.springframework.batch.core.repository.persistence.JobExecution> jobExecutions = this.mongoOperations
 			.find(query, org.springframework.batch.core.repository.persistence.JobExecution.class,
 					JOB_EXECUTIONS_COLLECTION_NAME);
-		for (org.springframework.batch.core.repository.persistence.JobExecution jobExecution : jobExecutions) {
-			List<org.springframework.batch.core.repository.persistence.StepExecution> stepExecutions = jobExecution
-				.getStepExecutions();
-			for (org.springframework.batch.core.repository.persistence.StepExecution stepExecution : stepExecutions) {
-				if (stepExecution.getName().equals(stepName)) {
-					count++;
-				}
-			}
-		}
-		return count;
+		return this.mongoOperations.count(
+				query(where("jobExecutionId").in(jobExecutions.stream()
+					.map(org.springframework.batch.core.repository.persistence.JobExecution::getJobExecutionId)
+					.toList())),
+				org.springframework.batch.core.repository.persistence.StepExecution.class,
+				STEP_EXECUTIONS_COLLECTION_NAME);
 	}
 
-	// TODO implement deleteStepExecution(StepExecution stepExecution)
+	@Override
+	public void deleteStepExecution(StepExecution stepExecution) {
+		this.mongoOperations.remove(query(where("stepExecutionId").is(stepExecution.getId())),
+				STEP_EXECUTIONS_COLLECTION_NAME);
+	}
 
 }
