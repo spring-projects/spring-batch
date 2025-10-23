@@ -299,7 +299,7 @@ class MongoJobInstanceDaoIntegrationTests extends AbstractMongoDBDaoIntegrationT
 		assertThrows(IllegalStateException.class, () -> dao.createJobInstance(fooJob, fooParams));
 	}
 
-    @Disabled("Version is not persisted")
+	@Disabled("Version is not persisted")
 	@Test
 	void testCreationAddsVersion() {
 

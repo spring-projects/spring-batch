@@ -33,6 +33,11 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.stream.Stream;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Yanming Zhou
@@ -57,6 +62,16 @@ abstract class AbstractMongoDBDaoIntegrationTests {
 		try (Stream<String> lines = Files.lines(resource.getFilePath())) {
 			lines.forEach(mongoTemplate::executeCommand);
 		}
+	}
+
+	protected void assertTemporalEquals(LocalDateTime lhs, LocalDateTime rhs) {
+		assertEquals(lhs != null ? lhs.truncatedTo(ChronoUnit.MILLIS) : lhs,
+				rhs != null ? rhs.truncatedTo(ChronoUnit.MILLIS) : null);
+	}
+
+	protected void assertTemporalEquals(LocalTime lhs, LocalTime rhs) {
+		assertEquals(lhs != null ? lhs.truncatedTo(ChronoUnit.MILLIS) : lhs,
+				rhs != null ? rhs.truncatedTo(ChronoUnit.MILLIS) : null);
 	}
 
 	@Configuration
