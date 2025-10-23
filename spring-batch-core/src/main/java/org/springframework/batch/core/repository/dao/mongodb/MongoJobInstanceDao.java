@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.repository.dao.mongodb;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.batch.core.job.DefaultJobKeyGenerator;
@@ -36,6 +37,7 @@ import static org.springframework.data.mongodb.core.query.Query.query;
 
 /**
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  * @since 5.2.0
  */
 public class MongoJobInstanceDao implements JobInstanceDao {
@@ -117,7 +119,10 @@ public class MongoJobInstanceDao implements JobInstanceDao {
 					org.springframework.batch.core.repository.persistence.JobInstance.class, COLLECTION_NAME)
 			.stream()
 			.toList();
-		return jobInstances.subList(start, jobInstances.size())
+		if (jobInstances.size() <= start) {
+			return Collections.emptyList();
+		}
+		return jobInstances.subList(start, Math.min(jobInstances.size(), start + jobInstances.size()))
 			.stream()
 			.map(this.jobInstanceConverter::toJobInstance)
 			.limit(count)
@@ -196,6 +201,11 @@ public class MongoJobInstanceDao implements JobInstanceDao {
 		}
 		Query query = query(where("jobName").is(jobName));
 		return this.mongoOperations.count(query, COLLECTION_NAME);
+	}
+
+	@Override
+	public void deleteJobInstance(JobInstance jobInstance) {
+		this.mongoOperations.remove(query(where("jobInstanceId").is(jobInstance.getId())), COLLECTION_NAME);
 	}
 
 }
