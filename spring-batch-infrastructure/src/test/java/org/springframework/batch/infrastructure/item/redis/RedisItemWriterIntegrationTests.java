@@ -48,7 +48,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(SpringExtension.class)
 class RedisItemWriterIntegrationTests {
 
-	private static final DockerImageName REDIS_IMAGE = DockerImageName.parse("redis:8.0.3");
+	private static final DockerImageName REDIS_IMAGE = DockerImageName.parse("redis:8.2.2");
 
 	@Container
 	public static RedisContainer redis = new RedisContainer(REDIS_IMAGE);
