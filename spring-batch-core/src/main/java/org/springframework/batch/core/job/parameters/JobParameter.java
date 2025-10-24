@@ -47,7 +47,7 @@ public record JobParameter<T>(String name, T value, Class<T> type, boolean ident
 	 * @since 6.0
 	 */
 	public JobParameter {
-		Assert.notNull(value, "name must not be null");
+		Assert.notNull(name, "name must not be null");
 		Assert.notNull(value, "value must not be null");
 		Assert.notNull(type, "type must not be null");
 	}
