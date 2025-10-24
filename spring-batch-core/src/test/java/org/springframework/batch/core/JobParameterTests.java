@@ -15,14 +15,15 @@
  */
 package org.springframework.batch.core;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.util.Date;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.job.parameters.JobParameter;
+import org.springframework.batch.core.job.parameters.JobParametersBuilder;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Lucas Ward
@@ -82,6 +83,13 @@ class JobParameterTests {
 		JobParameter<String> jobParameter = new JobParameter<>("param", "test1", String.class, true);
 		JobParameter<String> testParameter = new JobParameter<>("param", "test2", String.class, true);
 		assertEquals(testParameter.hashCode(), jobParameter.hashCode());
+	}
+
+	@Test
+	void testAddingNullJobParameters() {
+		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+				() -> new JobParametersBuilder().addString("foo", null).toJobParameters());
+		Assertions.assertEquals("Value for parameter 'foo' must not be null", exception.getMessage());
 	}
 
 }
