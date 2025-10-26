@@ -86,7 +86,7 @@ public class JobOperatorTestUtils extends JobLauncherTestUtils {
 	 * @param jobRepository to use to access job metadata
 	 */
 	public JobOperatorTestUtils(JobOperator jobOperator, JobRepository jobRepository) {
-		Assert.notNull(jobOperator, "JobRepository must not be null");
+		Assert.notNull(jobOperator, "JobOperator must not be null");
 		Assert.notNull(jobRepository, "JobRepository must not be null");
 		this.jobOperator = jobOperator;
 		this.jobRepository = jobRepository;
