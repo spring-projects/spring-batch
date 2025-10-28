@@ -17,8 +17,6 @@
 package org.springframework.batch.infrastructure.item.json;
 
 import tools.jackson.core.JacksonException;
-import tools.jackson.databind.DeserializationFeature;
-import tools.jackson.databind.json.JsonMapper;
 
 import org.springframework.batch.infrastructure.item.json.domain.Trade;
 
@@ -29,11 +27,7 @@ class JacksonJsonItemReaderFunctionalTests extends JsonItemReaderFunctionalTests
 
 	@Override
 	protected JsonObjectReader<Trade> getJsonObjectReader() {
-		JsonMapper jsonMapper = JsonMapper.builder()
-			.disable(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES)
-			.disable(DeserializationFeature.FAIL_ON_TRAILING_TOKENS)
-			.build();
-		return new JacksonJsonObjectReader<>(jsonMapper, Trade.class);
+		return new JacksonJsonObjectReader<>(Trade.class);
 	}
 
 	@Override

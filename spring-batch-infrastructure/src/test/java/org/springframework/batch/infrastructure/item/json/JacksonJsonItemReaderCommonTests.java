@@ -16,9 +16,6 @@
 
 package org.springframework.batch.infrastructure.item.json;
 
-import tools.jackson.databind.DeserializationFeature;
-import tools.jackson.databind.json.JsonMapper;
-
 import org.springframework.batch.infrastructure.item.sample.Foo;
 
 /**
@@ -28,11 +25,7 @@ class JacksonJsonItemReaderCommonTests extends JsonItemReaderCommonTests {
 
 	@Override
 	protected JsonObjectReader<Foo> getJsonObjectReader() {
-		JsonMapper jsonMapper = JsonMapper.builder()
-			.disable(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES)
-			.disable(DeserializationFeature.FAIL_ON_TRAILING_TOKENS)
-			.build();
-		return new JacksonJsonObjectReader<>(jsonMapper, Foo.class);
+		return new JacksonJsonObjectReader<>(Foo.class);
 	}
 
 }

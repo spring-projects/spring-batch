@@ -21,6 +21,7 @@ import java.io.InputStream;
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.JsonParser;
 import tools.jackson.core.JsonToken;
+import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.databind.json.JsonMapper;
 import org.jspecify.annotations.Nullable;
 
@@ -47,13 +48,26 @@ public class JacksonJsonObjectReader<T> implements JsonObjectReader<T> {
 	private @Nullable InputStream inputStream;
 
 	/**
-	 * Create a new {@link JacksonJsonObjectReader} instance.
+	 * Create a new {@link JacksonJsonObjectReader} instance. This will initialize the
+	 * reader with a default {@link JsonMapper} having
+	 * {@link DeserializationFeature#FAIL_ON_TRAILING_TOKENS} and
+	 * {@link DeserializationFeature#FAIL_ON_NULL_FOR_PRIMITIVES} disabled by default. If
+	 * you want to customize the mapper, use
+	 * {@link #JacksonJsonObjectReader(JsonMapper, Class)}.
 	 * @param itemType the target item type
 	 */
 	public JacksonJsonObjectReader(Class<? extends T> itemType) {
-		this(new JsonMapper(), itemType);
+		this(JsonMapper.builder()
+			.disable(DeserializationFeature.FAIL_ON_TRAILING_TOKENS)
+			.disable(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES)
+			.build(), itemType);
 	}
 
+	/**
+	 * Create a new {@link JacksonJsonObjectReader} instance.
+	 * @param mapper the json mapper to use
+	 * @param itemType the target item type
+	 */
 	public JacksonJsonObjectReader(JsonMapper mapper, Class<? extends T> itemType) {
 		this.mapper = mapper;
 		this.itemType = itemType;
