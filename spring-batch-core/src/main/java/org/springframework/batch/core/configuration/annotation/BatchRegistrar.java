@@ -65,7 +65,7 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 		registerJobOperator(registry, batchAnnotation);
 		registerAutomaticJobRegistrar(registry, batchAnnotation);
 		watch.stop();
-		LOGGER.info(LogMessage.format("Finished Spring Batch infrastructure beans configuration in %s ms.",
+		LOGGER.debug(LogMessage.format("Finished Spring Batch infrastructure beans configuration in %s ms.",
 				watch.lastTaskInfo().getTimeMillis()));
 	}
 
@@ -80,7 +80,7 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 
 	private void registerJobRepository(BeanDefinitionRegistry registry, AnnotationMetadata importingClassMetadata) {
 		if (registry.containsBeanDefinition(JOB_REPOSITORY)) {
-			LOGGER.info("Bean jobRepository already defined in the application context, skipping"
+			LOGGER.debug("Bean jobRepository already defined in the application context, skipping"
 					+ " the registration of a jobRepository");
 			return;
 		}
@@ -219,7 +219,7 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 
 	private void registerJobOperator(BeanDefinitionRegistry registry, EnableBatchProcessing batchAnnotation) {
 		if (registry.containsBeanDefinition(JOB_OPERATOR)) {
-			LOGGER.info("Bean jobOperator already defined in the application context, skipping"
+			LOGGER.debug("Bean jobOperator already defined in the application context, skipping"
 					+ " the registration of a jobOperator");
 			return;
 		}
@@ -262,7 +262,7 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 			return;
 		}
 		if (registry.containsBeanDefinition("jobRegistrar")) {
-			LOGGER.info("Bean jobRegistrar already defined in the application context, skipping"
+			LOGGER.debug("Bean jobRegistrar already defined in the application context, skipping"
 					+ " the registration of a jobRegistrar");
 			return;
 		}

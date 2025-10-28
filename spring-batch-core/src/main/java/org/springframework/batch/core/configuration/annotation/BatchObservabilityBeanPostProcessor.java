@@ -50,7 +50,7 @@ public class BatchObservabilityBeanPostProcessor implements BeanFactoryPostProce
 	@Override
 	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
 		if (this.beanFactory == null) {
-			LOGGER.warn("BeanFactory is not initialized, skipping observation registry injection");
+			LOGGER.debug("BeanFactory is not initialized, skipping observation registry injection");
 			return bean;
 		}
 		try {
@@ -69,7 +69,7 @@ public class BatchObservabilityBeanPostProcessor implements BeanFactoryPostProce
 			}
 		}
 		catch (NoSuchBeanDefinitionException e) {
-			LOGGER.info("No Micrometer observation registry found, defaulting to ObservationRegistry.NOOP");
+			LOGGER.debug("No Micrometer observation registry found, defaulting to ObservationRegistry.NOOP");
 		}
 		return bean;
 	}

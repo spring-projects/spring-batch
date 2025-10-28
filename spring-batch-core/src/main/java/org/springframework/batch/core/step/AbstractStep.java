@@ -111,7 +111,7 @@ public abstract class AbstractStep implements StoppableStep, InitializingBean, B
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(jobRepository != null, "JobRepository is mandatory");
 		if (this.observationRegistry == null) {
-			logger.info("No ObservationRegistry has been set, defaulting to ObservationRegistry NOOP");
+			logger.debug("No ObservationRegistry has been set, defaulting to ObservationRegistry NOOP");
 			this.observationRegistry = ObservationRegistry.NOOP;
 		}
 	}

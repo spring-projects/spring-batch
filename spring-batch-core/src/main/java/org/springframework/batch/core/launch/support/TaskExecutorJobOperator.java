@@ -70,7 +70,7 @@ public class TaskExecutorJobOperator extends SimpleJobOperator {
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
 		if (this.observationRegistry == null) {
-			logger.info("No ObservationRegistry has been set, defaulting to ObservationRegistry NOOP");
+			logger.debug("No ObservationRegistry has been set, defaulting to ObservationRegistry NOOP");
 			this.observationRegistry = ObservationRegistry.NOOP;
 		}
 	}

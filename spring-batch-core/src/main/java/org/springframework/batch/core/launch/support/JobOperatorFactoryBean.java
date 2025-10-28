@@ -95,15 +95,15 @@ public class JobOperatorFactoryBean implements FactoryBean<JobOperator>, Applica
 		if (this.jobRegistry == null) {
 			this.jobRegistry = new MapJobRegistry();
 			populateJobRegistry();
-			logger.info(
+			logger.debug(
 					"No JobRegistry has been set, defaulting to a MapJobRegistry populated with jobs defined in the application context.");
 		}
 		if (this.transactionManager == null) {
 			this.transactionManager = new ResourcelessTransactionManager();
-			logger.info("No transaction manager has been set, defaulting to ResourcelessTransactionManager.");
+			logger.debug("No transaction manager has been set, defaulting to ResourcelessTransactionManager.");
 		}
 		if (this.taskExecutor == null) {
-			logger.info("No TaskExecutor has been set, defaulting to synchronous executor.");
+			logger.debug("No TaskExecutor has been set, defaulting to synchronous executor.");
 			this.taskExecutor = new SyncTaskExecutor();
 		}
 		if (this.transactionAttributeSource == null) {

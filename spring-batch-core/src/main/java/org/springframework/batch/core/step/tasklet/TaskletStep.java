@@ -139,7 +139,7 @@ public class TaskletStep extends AbstractStep {
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
 		if (this.transactionManager == null) {
-			logger.info("No transaction manager has been set.  Defaulting to ResourcelessTransactionManager.");
+			logger.debug("No transaction manager has been set.  Defaulting to ResourcelessTransactionManager.");
 			this.transactionManager = new ResourcelessTransactionManager();
 		}
 	}
