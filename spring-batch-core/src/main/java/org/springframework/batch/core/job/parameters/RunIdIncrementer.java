@@ -19,8 +19,9 @@ import org.springframework.util.Assert;
 
 /**
  * This incrementer increments a "run.id" parameter of type {@link Long} from the given
- * job parameters. If the parameter does not exist, it will be initialized to 1. The
- * parameter name can be configured using {@link #setKey(String)}.
+ * job parameters. If the parameter does not exist, it will be initialized to 1 and marked
+ * as an identifying job parameter. The parameter name can be configured using
+ * {@link #setKey(String)}.
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
@@ -51,7 +52,7 @@ public class RunIdIncrementer implements JobParametersIncrementer {
 		Assert.notNull(parameters, "JobParameters must not be null");
 		JobParameter<?> runIdParameter = parameters.getParameter(this.key);
 		long id = 1;
-		boolean isIdentifying = false;
+		boolean isIdentifying = true;
 		if (runIdParameter != null) {
 			try {
 				id = Long.parseLong(runIdParameter.value().toString()) + 1;
