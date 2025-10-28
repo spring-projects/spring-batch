@@ -482,6 +482,9 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			if (item != null) {
 				chunk.add(item);
 			}
+			else {
+				break;
+			}
 		}
 		return chunk;
 	}
