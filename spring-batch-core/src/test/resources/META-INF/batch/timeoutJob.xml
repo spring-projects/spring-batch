@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:aop="http://www.springframework.org/schema/aop"
-	xmlns:p="http://www.springframework.org/schema/p"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd
-		http://www.springframework.org/schema/batch https://www.springframework.org/schema/batch/spring-batch.xsd
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/batch https://www.springframework.org/schema/batch/spring-batch.xsd
 		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd">
 
 	<job id="chunkTimeoutJob" xmlns="http://www.springframework.org/schema/batch">
@@ -42,13 +39,13 @@
 		</constructor-arg>
 	</bean>
 	
-	<bean id="sleepingProcessor" class="org.springframework.batch.core.test.timeout.SleepingItemProcessor">
+	<bean id="sleepingProcessor" class="org.springframework.batch.core.timeout.SleepingItemProcessor">
 		<property name="millisToSleep" value="500" />
 	</bean>
 	
-	<bean id="loggingWriter" class="org.springframework.batch.core.test.timeout.LoggingItemWriter" />
+	<bean id="loggingWriter" class="org.springframework.batch.core.timeout.LoggingItemWriter" />
 	
-	<bean id="sleepingTasklet" class="org.springframework.batch.core.test.timeout.SleepingTasklet">
+	<bean id="sleepingTasklet" class="org.springframework.batch.core.timeout.SleepingTasklet">
 		<property name="millisToSleep" value="2000" />
 	</bean>
 

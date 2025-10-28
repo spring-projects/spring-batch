@@ -18,8 +18,11 @@ package org.springframework.batch.core.configuration.support;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
+
+import org.springframework.batch.core.configuration.DuplicateJobException;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.configuration.JobRegistry;
+import org.springframework.batch.core.job.SimpleJob;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
@@ -28,17 +31,15 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
  * @author Mahmoud Ben Hassine
  *
  */
-@SpringJUnitConfig
 class JobRegistryIntegrationTests {
 
-	@Autowired
-	private JobRegistry jobRegistry;
-
-	@Autowired
-	private Job job;
-
 	@Test
-	void testRegistry() {
+	void testRegistry() throws DuplicateJobException {
+		SimpleJob job = new SimpleJob("testJob");
+		JobRegistry jobRegistry = new MapJobRegistry();
+
+		jobRegistry.register(job);
+
 		assertEquals(1, jobRegistry.getJobNames().size());
 		assertEquals(job.getName(), jobRegistry.getJobNames().iterator().next());
 	}

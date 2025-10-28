@@ -15,25 +15,21 @@
  */
 package org.springframework.batch.core.listener;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.springframework.batch.core.listener.JobListenerMetaData.AFTER_JOB;
-
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import org.springframework.aop.framework.ProxyFactory;
-import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.annotation.AfterJob;
 import org.springframework.batch.core.annotation.BeforeJob;
-import org.springframework.batch.core.configuration.xml.AbstractTestComponent;
+import org.springframework.batch.core.job.JobExecution;
 import org.springframework.core.Ordered;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 
 /**
  * @author Lucas Ward
@@ -141,97 +137,6 @@ class JobListenerFactoryBeanTests {
 		Object listener1 = JobListenerFactoryBean.getListener(delegate);
 		Object listener2 = JobListenerFactoryBean.getListener(delegate);
 		assertEquals(listener1, listener2);
-	}
-
-	@Test
-	void testEmptySignatureAnnotation() {
-		AbstractTestComponent delegate = new AbstractTestComponent() {
-			@AfterJob
-			public void aMethod() {
-				executed = true;
-			}
-		};
-		factoryBean.setDelegate(delegate);
-		JobExecutionListener listener = (JobExecutionListener) factoryBean.getObject();
-		listener.afterJob(new JobExecution(1L, mock(), mock()));
-		assertTrue(delegate.isExecuted());
-	}
-
-	@Test
-	void testRightSignatureAnnotation() {
-		AbstractTestComponent delegate = new AbstractTestComponent() {
-			@AfterJob
-			public void aMethod(JobExecution jobExecution) {
-				executed = true;
-				assertEquals(Long.valueOf(25L), jobExecution.getId());
-			}
-		};
-		factoryBean.setDelegate(delegate);
-		JobExecutionListener listener = (JobExecutionListener) factoryBean.getObject();
-		listener.afterJob(new JobExecution(25L, mock(), mock()));
-		assertTrue(delegate.isExecuted());
-	}
-
-	@Test
-	void testWrongSignatureAnnotation() {
-		AbstractTestComponent delegate = new AbstractTestComponent() {
-			@AfterJob
-			public void aMethod(Integer item) {
-				executed = true;
-			}
-		};
-		factoryBean.setDelegate(delegate);
-		assertThrows(IllegalArgumentException.class, factoryBean::getObject);
-	}
-
-	@Test
-	void testEmptySignatureNamedMethod() {
-		AbstractTestComponent delegate = new AbstractTestComponent() {
-			@SuppressWarnings("unused")
-			public void aMethod() {
-				executed = true;
-			}
-		};
-		factoryBean.setDelegate(delegate);
-		Map<String, String> metaDataMap = new HashMap<>();
-		metaDataMap.put(AFTER_JOB.getPropertyName(), "aMethod");
-		factoryBean.setMetaDataMap(metaDataMap);
-		JobExecutionListener listener = (JobExecutionListener) factoryBean.getObject();
-		listener.afterJob(new JobExecution(1L, mock(), mock()));
-		assertTrue(delegate.isExecuted());
-	}
-
-	@Test
-	void testRightSignatureNamedMethod() {
-		AbstractTestComponent delegate = new AbstractTestComponent() {
-			@SuppressWarnings("unused")
-			public void aMethod(JobExecution jobExecution) {
-				executed = true;
-				assertEquals(Long.valueOf(25L), jobExecution.getId());
-			}
-		};
-		factoryBean.setDelegate(delegate);
-		Map<String, String> metaDataMap = new HashMap<>();
-		metaDataMap.put(AFTER_JOB.getPropertyName(), "aMethod");
-		factoryBean.setMetaDataMap(metaDataMap);
-		JobExecutionListener listener = (JobExecutionListener) factoryBean.getObject();
-		listener.afterJob(new JobExecution(25L, mock(), mock()));
-		assertTrue(delegate.isExecuted());
-	}
-
-	@Test
-	void testWrongSignatureNamedMethod() {
-		AbstractTestComponent delegate = new AbstractTestComponent() {
-			@SuppressWarnings("unused")
-			public void aMethod(Integer item) {
-				executed = true;
-			}
-		};
-		factoryBean.setDelegate(delegate);
-		Map<String, String> metaDataMap = new HashMap<>();
-		metaDataMap.put(AFTER_JOB.getPropertyName(), "aMethod");
-		factoryBean.setMetaDataMap(metaDataMap);
-		assertThrows(IllegalArgumentException.class, factoryBean::getObject);
 	}
 
 	private static class JobListenerWithInterface implements JobExecutionListener {

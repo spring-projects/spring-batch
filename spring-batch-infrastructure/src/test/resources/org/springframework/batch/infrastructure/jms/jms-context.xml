@@ -32,7 +32,7 @@
 		<property name="synchedLocalTransactionAllowed" value="true" />
 	</bean>
 
-	<bean id="container" class="org.springframework.batch.infrastructure.container.jms.BatchMessageListenerContainer"
+	<bean id="container" class="org.springframework.batch.infrastructure.jms.BatchMessageListenerContainer"
 		lazy-init="true">
 		<property name="recoveryInterval" value="500" />
 		<!-- We aren't adding a listener here (want to do it in unit test)
