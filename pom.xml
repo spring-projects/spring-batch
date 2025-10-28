@@ -95,7 +95,6 @@
 		<xmlunit.version>2.10.4</xmlunit.version>
 		<commons-io.version>2.20.0</commons-io.version>
 		<commons-dbcp2.version>2.13.0</commons-dbcp2.version>
-		<slf4j.version>2.0.17</slf4j.version>
 		<hsqldb.version>2.7.4</hsqldb.version>
 		<h2.version>2.4.240</h2.version>
 		<sqlite.version>3.50.3.0</sqlite.version>

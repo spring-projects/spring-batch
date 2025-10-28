@@ -110,7 +110,6 @@ class JpaPagingItemReaderAsyncTests {
 				do {
 					next = reader.read();
 					Thread.sleep(10L);
-					logger.debug("Reading item: " + next);
 					if (next != null) {
 						list.add(next);
 					}

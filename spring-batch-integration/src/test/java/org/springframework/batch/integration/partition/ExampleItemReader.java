@@ -45,7 +45,6 @@ public class ExampleItemReader implements ItemReader<String>, ItemStream {
 		if (index >= input.length) {
 			return null;
 		}
-		logger.info(String.format("Processing input index=%s, item=%s, in (%s)", index, input[index], this));
 		if (fail && index == 4) {
 			synchronized (ExampleItemReader.class) {
 				if (fail) {

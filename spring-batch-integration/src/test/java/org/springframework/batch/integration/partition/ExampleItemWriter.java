@@ -15,25 +15,19 @@
  */
 package org.springframework.batch.integration.partition;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import org.springframework.batch.infrastructure.item.Chunk;
 import org.springframework.batch.infrastructure.item.ItemWriter;
 
 /**
- * Dummy {@link ItemWriter} which only logs data it receives.
+ * Dummy {@link ItemWriter}.
  */
 public class ExampleItemWriter implements ItemWriter<Object> {
-
-	private static final Log log = LogFactory.getLog(ExampleItemWriter.class);
 
 	/**
 	 * @see ItemWriter#write(Chunk)
 	 */
 	@Override
-	public void write(Chunk<?> data) throws Exception {
-		log.info(data);
+	public void write(Chunk<?> data) {
 	}
 
 }

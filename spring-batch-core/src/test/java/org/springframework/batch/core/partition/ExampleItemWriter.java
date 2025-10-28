@@ -18,18 +18,13 @@ package org.springframework.batch.core.partition;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import org.springframework.batch.infrastructure.item.Chunk;
 import org.springframework.batch.infrastructure.item.ItemWriter;
 
 /**
- * Dummy {@link ItemWriter} which only logs data it receives.
+ * Dummy {@link ItemWriter}.
  */
 public class ExampleItemWriter implements ItemWriter<String> {
-
-	private static final Log log = LogFactory.getLog(ExampleItemWriter.class);
 
 	private static final List<String> items = new ArrayList<>();
 
@@ -46,7 +41,6 @@ public class ExampleItemWriter implements ItemWriter<String> {
 	 */
 	@Override
 	public void write(Chunk<? extends String> data) throws Exception {
-		log.info(data);
 		items.addAll(data.getItems());
 	}
 

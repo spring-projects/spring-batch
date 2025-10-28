@@ -97,10 +97,6 @@
 					<groupId>com.fasterxml.jackson.core</groupId>
 					<artifactId>jackson-core</artifactId>
 				</exclusion>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-api</artifactId>
-				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
@@ -150,12 +146,6 @@
 			<artifactId>spring-data-commons</artifactId>
 			<version>${spring-data-commons.version}</version>
 			<optional>true</optional>
-			<exclusions>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-api</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.data</groupId>
@@ -163,10 +153,6 @@
 			<version>${spring-data-mongodb.version}</version>
 			<optional>true</optional>
 			<exclusions>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-api</artifactId>
-				</exclusion>
 				<exclusion>
 					<groupId>org.springframework.data</groupId>
 					<artifactId>spring-data-commons</artifactId>
@@ -188,10 +174,6 @@
 			<optional>true</optional>
 			<exclusions>
 				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-api</artifactId>
-				</exclusion>
-				<exclusion>
 					<groupId>org.springframework</groupId>
 					<artifactId>spring-expression</artifactId>
 				</exclusion>
@@ -202,12 +184,6 @@
 			<artifactId>spring-data-redis</artifactId>
 			<version>${spring-data-redis.version}</version>
 			<optional>true</optional>
-			<exclusions>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-api</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.mongodb</groupId>
@@ -226,12 +202,6 @@
 			<artifactId>spring-ldap-core</artifactId>
 			<version>${spring-ldap.version}</version>
 			<optional>true</optional>
-			<exclusions>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-api</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.ldap</groupId>
@@ -307,12 +277,12 @@
 			<version>${commons-dbcp2.version}</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<version>${slf4j.version}</version>
-			<scope>test</scope>
-		</dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>${log4j.version}</version>
+            <scope>test</scope>
+        </dependency>
 		<dependency>
 			<groupId>org.hsqldb</groupId>
 			<artifactId>hsqldb</artifactId>

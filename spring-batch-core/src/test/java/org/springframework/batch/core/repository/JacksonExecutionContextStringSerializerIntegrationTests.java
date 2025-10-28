@@ -88,7 +88,6 @@ public class JacksonExecutionContextStringSerializerIntegrationTests {
 						contribution.getStepExecution().getExecutionContext().put("failed", true);
 						throw new Exception("Expected failure");
 					}
-					System.out.println("Hello world!");
 					contribution.getStepExecution().getExecutionContext().put("failed", false);
 					return RepeatStatus.FINISHED;
 				}

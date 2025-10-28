@@ -81,9 +81,9 @@ public class MongoDBJobRepositoryIntegrationTests {
 		Assertions.assertEquals(2, stepExecutionsCollection.countDocuments());
 
 		// dump results for inspection
-		dump(jobInstancesCollection, "job instance = ");
-		dump(jobExecutionsCollection, "job execution = ");
-		dump(stepExecutionsCollection, "step execution = ");
+		// dump(jobInstancesCollection, "job instance = ");
+		// dump(jobExecutionsCollection, "job execution = ");
+		// dump(stepExecutionsCollection, "step execution = ");
 	}
 
 	private static void dump(MongoCollection<Document> collection, String prefix) {
