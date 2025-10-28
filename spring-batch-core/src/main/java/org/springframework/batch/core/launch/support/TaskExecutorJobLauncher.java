@@ -283,7 +283,7 @@ public class TaskExecutorJobLauncher implements JobLauncher, InitializingBean {
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(jobRepository != null, "A JobRepository has not been set.");
 		if (taskExecutor == null) {
-			logger.info("No TaskExecutor has been set, defaulting to synchronous executor.");
+			logger.debug("No TaskExecutor has been set, defaulting to synchronous executor.");
 			taskExecutor = new SyncTaskExecutor();
 		}
 	}

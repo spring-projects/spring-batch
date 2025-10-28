@@ -317,11 +317,11 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
 		if (this.transactionManager == null) {
-			logger.info("No transaction manager has been set. Defaulting to ResourcelessTransactionManager.");
+			logger.debug("No transaction manager has been set. Defaulting to ResourcelessTransactionManager.");
 			this.transactionManager = new ResourcelessTransactionManager();
 		}
 		if (this.transactionAttribute == null) {
-			logger.info("No transaction attribute has been set. Defaulting to DefaultTransactionAttribute.");
+			logger.debug("No transaction attribute has been set. Defaulting to DefaultTransactionAttribute.");
 			this.transactionAttribute = new DefaultTransactionAttribute();
 		}
 		Assert.isTrue(this.chunkSize > 0, "Chunk size must be greater than 0");
