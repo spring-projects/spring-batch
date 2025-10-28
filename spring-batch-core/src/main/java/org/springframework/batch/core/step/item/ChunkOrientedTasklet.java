@@ -52,6 +52,8 @@ public class ChunkOrientedTasklet<I> implements Tasklet {
 	private static final Log logger = LogFactory.getLog(ChunkOrientedTasklet.class);
 
 	public ChunkOrientedTasklet(ChunkProvider<I> chunkProvider, ChunkProcessor<I> chunkProcessor) {
+		logger.info(
+				"DEPRECATION NOTE: The legacy implementation of the chunk-oriented processing model is deprecated as of Spring Batch 6.0 and will be removed in version 7.0.");
 		this.chunkProvider = chunkProvider;
 		this.chunkProcessor = chunkProcessor;
 	}
