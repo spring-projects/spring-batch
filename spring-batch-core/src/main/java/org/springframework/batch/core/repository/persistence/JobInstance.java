@@ -17,11 +17,10 @@ package org.springframework.batch.core.repository.persistence;
 
 /**
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  * @since 5.2.0
  */
 public class JobInstance {
-
-	private String id;
 
 	private long jobInstanceId;
 
@@ -30,10 +29,6 @@ public class JobInstance {
 	private String jobKey;
 
 	public JobInstance() {
-	}
-
-	public String getId() {
-		return id;
 	}
 
 	public long getJobInstanceId() {
@@ -62,8 +57,8 @@ public class JobInstance {
 
 	@Override
 	public String toString() {
-		return "JobInstance{" + "id='" + id + '\'' + ", jobInstanceId=" + jobInstanceId + ", jobName='" + jobName + '\''
-				+ ", jobKey='" + jobKey + '\'' + '}';
+		return "JobInstance{jobInstanceId=" + jobInstanceId + ", jobName='" + jobName + '\'' + ", jobKey='" + jobKey
+				+ '\'' + '}';
 	}
 
 }
