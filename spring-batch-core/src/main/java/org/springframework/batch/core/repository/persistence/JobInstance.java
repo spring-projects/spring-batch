@@ -28,9 +28,6 @@ public class JobInstance {
 
 	private String jobKey;
 
-	public JobInstance() {
-	}
-
 	public long getJobInstanceId() {
 		return jobInstanceId;
 	}

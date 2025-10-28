@@ -52,9 +52,6 @@ public class JobExecution {
 
 	private ExecutionContext executionContext;
 
-	public JobExecution() {
-	}
-
 	public long getJobInstanceId() {
 		return jobInstanceId;
 	}

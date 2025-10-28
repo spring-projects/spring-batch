@@ -64,9 +64,6 @@ public class StepExecution {
 
 	private boolean terminateOnly;
 
-	public StepExecution() {
-	}
-
 	public long getStepExecutionId() {
 		return stepExecutionId;
 	}
