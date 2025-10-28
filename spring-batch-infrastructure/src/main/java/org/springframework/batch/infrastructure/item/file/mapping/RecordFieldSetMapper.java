@@ -76,11 +76,15 @@ public class RecordFieldSetMapper<T> implements FieldSetMapper<T> {
 		Assert.isTrue(fieldSet.getFieldCount() == this.constructorParameterNames.length,
 				"Fields count must be equal to record components count");
 		Assert.isTrue(fieldSet.hasNames(), "Field names must be specified");
-		@Nullable Object[] args = new Object[this.constructorParameterNames.length];
+		Object[] args = new Object[this.constructorParameterNames.length];
 		for (int i = 0; i < args.length; i++) {
 			String name = this.constructorParameterNames[i];
 			Class<?> type = this.constructorParameterTypes[i];
-			args[i] = this.typeConverter.convertIfNecessary(fieldSet.readRawString(name), type);
+			Assert.notNull(name, "Constructor parameter names must not be null");
+			Object converted = this.typeConverter.convertIfNecessary(fieldSet.readRawString(name), type);
+			Assert.notNull(converted,
+					() -> String.format("Cannot convert field '%s' to required type '%s'", name, type.getName()));
+			args[i] = converted;
 		}
 		return BeanUtils.instantiateClass(this.mappedConstructor, args);
 	}

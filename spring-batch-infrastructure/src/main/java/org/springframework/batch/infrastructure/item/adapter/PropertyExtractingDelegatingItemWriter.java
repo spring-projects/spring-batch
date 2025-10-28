@@ -41,13 +41,12 @@ import org.springframework.util.ObjectUtils;
 public class PropertyExtractingDelegatingItemWriter<T> extends AbstractMethodInvokingDelegator<T>
 		implements ItemWriter<T> {
 
-	private @Nullable String @Nullable [] fieldsUsedAsTargetMethodArguments;
+	private String[] fieldsUsedAsTargetMethodArguments = new String[0];
 
 	/**
 	 * Extracts values from item's fields named in fieldsUsedAsTargetMethodArguments and
 	 * passes them as arguments to the delegate method.
 	 */
-	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public void write(Chunk<? extends T> items) throws Exception {
 		for (T item : items) {

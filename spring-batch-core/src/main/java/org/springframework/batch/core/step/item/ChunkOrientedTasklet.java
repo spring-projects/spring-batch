@@ -25,7 +25,7 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.infrastructure.item.Chunk;
 import org.springframework.batch.infrastructure.repeat.RepeatStatus;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A {@link Tasklet} implementing variations on read-process-write item handling.

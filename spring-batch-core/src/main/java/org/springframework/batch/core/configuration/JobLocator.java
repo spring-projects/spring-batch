@@ -19,7 +19,7 @@ import org.jspecify.annotations.NullUnmarked;
 
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.launch.NoSuchJobException;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A runtime service locator interface for retrieving job configurations by

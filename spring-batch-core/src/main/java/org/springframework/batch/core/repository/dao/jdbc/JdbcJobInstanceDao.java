@@ -37,7 +37,7 @@ import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -175,8 +175,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 	 * @throws IllegalArgumentException if any {@link JobParameters} fields are null.
 	 */
 	@Override
-	@Nullable
-	public JobInstance getJobInstance(final String jobName, final JobParameters jobParameters) {
+	@Nullable public JobInstance getJobInstance(final String jobName, final JobParameters jobParameters) {
 
 		Assert.notNull(jobName, "Job name must not be null.");
 		Assert.notNull(jobParameters, "JobParameters must not be null.");
@@ -203,8 +202,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 	}
 
 	@Override
-	@Nullable
-	public JobInstance getJobInstance(long instanceId) {
+	@Nullable public JobInstance getJobInstance(long instanceId) {
 
 		try {
 			return getJdbcTemplate().queryForObject(getQuery(GET_JOB_FROM_ID), new JobInstanceRowMapper(), instanceId);
@@ -267,8 +265,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 	}
 
 	@Override
-	@Nullable
-	public JobInstance getLastJobInstance(String jobName) {
+	@Nullable public JobInstance getLastJobInstance(String jobName) {
 		try {
 			return getJdbcTemplate().queryForObject(getQuery(FIND_LAST_JOB_INSTANCE_BY_JOB_NAME),
 					new JobInstanceRowMapper(), jobName, jobName);

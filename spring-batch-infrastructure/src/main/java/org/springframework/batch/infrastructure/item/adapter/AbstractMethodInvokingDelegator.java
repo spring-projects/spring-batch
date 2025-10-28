@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.jspecify.annotations.NullUnmarked;
 import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
@@ -44,6 +45,7 @@ import org.springframework.util.StringUtils;
  * @author Glenn Renfro
  * @author Stefano Cordio
  */
+@NullUnmarked // FIXME
 public abstract class AbstractMethodInvokingDelegator<T> implements InitializingBean {
 
 	private @Nullable Object targetObject;

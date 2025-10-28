@@ -43,7 +43,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -289,8 +289,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 	}
 
 	@Override
-	@Nullable
-	public StepExecution getStepExecution(long stepExecutionId) {
+	@Nullable public StepExecution getStepExecution(long stepExecutionId) {
 		long jobExecutionId = getJobExecutionId(stepExecutionId);
 		JobExecution jobExecution = this.jobExecutionDao.getJobExecution(jobExecutionId);
 		return getStepExecution(jobExecution, stepExecutionId);

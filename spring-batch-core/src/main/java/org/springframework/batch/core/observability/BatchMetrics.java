@@ -19,7 +19,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
 
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Central class for batch metrics. It provides some utility methods like calculating
@@ -53,8 +53,7 @@ public final class BatchMetrics {
 	 * @param endTime the end time
 	 * @return the duration between start time and end time
 	 */
-	@Nullable
-	public static Duration calculateDuration(@Nullable LocalDateTime startTime, @Nullable LocalDateTime endTime) {
+	@Nullable public static Duration calculateDuration(@Nullable LocalDateTime startTime, @Nullable LocalDateTime endTime) {
 		if (startTime == null || endTime == null) {
 			return null;
 		}

@@ -18,7 +18,7 @@ package org.springframework.batch.infrastructure.item;
 
 import org.jspecify.annotations.NullUnmarked;
 
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Wrapper for an item and its exception if it failed processing.
@@ -51,8 +51,7 @@ public class SkipWrapper<T> {
 	 * Public getter for the exception.
 	 * @return the exception
 	 */
-	@Nullable
-	public Throwable getException() {
+	@Nullable public Throwable getException() {
 		return exception;
 	}
 

@@ -49,7 +49,7 @@ public interface FieldSet {
 	/**
 	 * @return fields wrapped by this '<code>FieldSet</code>' instance as String values.
 	 */
-	@Nullable String[] getValues();
+	String[] getValues();
 
 	/**
 	 * Read the {@link String} value at index '<code>index</code>'.

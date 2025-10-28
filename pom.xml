@@ -80,9 +80,6 @@
 		<junit-jupiter.version>6.0.0</junit-jupiter.version>
 		<junit-platform-launcher.version>6.0.0</junit-platform-launcher.version>
 
-		<!-- provided dependencies -->
-		<jsr305.version>3.0.2</jsr305.version>
-
 		<!-- test dependencies -->
 		<micrometer-tracing.version>1.6.0-SNAPSHOT</micrometer-tracing.version>
 
@@ -183,7 +180,8 @@
 							-Xplugin:ErrorProne
 							<!-- Check JSpecify annotations -->
 							-Xep:NullAway:ERROR
-							-XepOpt:NullAway:OnlyNullMarked
+                            -XepOpt:NullAway:JSpecifyMode=true
+                            -XepOpt:NullAway:OnlyNullMarked
 							<!-- FIXME Remove once https://github.com/uber/NullAway/pull/1295 is released -->
 							-XepOpt:NullAway:CustomContractAnnotations=org.springframework.lang.Contract
 							-XepOpt:NullAway:SuppressionNameAliases=DataFlowIssue

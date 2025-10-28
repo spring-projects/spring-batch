@@ -22,7 +22,7 @@ import java.util.List;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.step.StepExecution;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public interface StepExecutionDao {
 
@@ -55,8 +55,7 @@ public interface StepExecutionDao {
 	 * @return a {@link StepExecution}
 	 * @since 6.0
 	 */
-	@Nullable
-	StepExecution getStepExecution(long stepExecutionId);
+	@Nullable StepExecution getStepExecution(long stepExecutionId);
 
 	/**
 	 * Retrieve a {@link StepExecution} from its id.
@@ -76,8 +75,7 @@ public interface StepExecutionDao {
 	 * @param stepName the name of the step
 	 * @return a {@link StepExecution}
 	 */
-	@Nullable
-	default StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
+	@Nullable default StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
 		throw new UnsupportedOperationException();
 	}
 

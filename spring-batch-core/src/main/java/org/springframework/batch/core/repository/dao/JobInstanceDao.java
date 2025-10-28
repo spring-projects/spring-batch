@@ -22,7 +22,7 @@ import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.launch.NoSuchJobException;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Data Access Object for job instances.
@@ -57,16 +57,14 @@ public interface JobInstanceDao {
 	 * @return {@link JobInstance} object matching the job name and {@link JobParameters}
 	 * or {@code null}
 	 */
-	@Nullable
-	JobInstance getJobInstance(String jobName, JobParameters jobParameters);
+	@Nullable JobInstance getJobInstance(String jobName, JobParameters jobParameters);
 
 	/**
 	 * Fetch the job instance with the provided identifier.
 	 * @param instanceId the job identifier
 	 * @return the job instance with this identifier or {@code null} if it doesn't exist
 	 */
-	@Nullable
-	JobInstance getJobInstance(long instanceId);
+	@Nullable JobInstance getJobInstance(long instanceId);
 
 	/**
 	 * Fetch the JobInstance for the provided JobExecution.
@@ -109,8 +107,7 @@ public interface JobInstanceDao {
 	 *
 	 * @since 4.2
 	 */
-	@Nullable
-	default JobInstance getLastJobInstance(String jobName) {
+	@Nullable default JobInstance getLastJobInstance(String jobName) {
 		throw new UnsupportedOperationException();
 	}
 

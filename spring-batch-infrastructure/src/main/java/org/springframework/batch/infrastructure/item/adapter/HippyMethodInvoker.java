@@ -17,6 +17,7 @@ package org.springframework.batch.infrastructure.item.adapter;
 
 import java.lang.reflect.Method;
 
+import org.jspecify.annotations.NullUnmarked;
 import org.jspecify.annotations.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
@@ -31,6 +32,7 @@ import org.springframework.util.ReflectionUtils;
  * @author Dave Syer
  * @since 2.1
  */
+@NullUnmarked // FIXME
 public class HippyMethodInvoker extends MethodInvoker {
 
 	@Override

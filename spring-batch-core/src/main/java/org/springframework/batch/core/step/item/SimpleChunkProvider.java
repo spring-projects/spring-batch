@@ -36,7 +36,7 @@ import org.springframework.batch.infrastructure.item.Chunk;
 import org.springframework.batch.infrastructure.item.ItemReader;
 import org.springframework.batch.infrastructure.repeat.RepeatOperations;
 import org.springframework.batch.infrastructure.repeat.RepeatStatus;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Simple implementation of the ChunkProvider interface that does basic chunk providing
@@ -109,8 +109,7 @@ public class SimpleChunkProvider<I> implements ChunkProvider<I> {
 	 * @return the item or {@code null} if the data source is exhausted
 	 * @throws Exception is thrown if error occurs during read.
 	 */
-	@Nullable
-	protected final I doRead() throws Exception {
+	@Nullable protected final I doRead() throws Exception {
 		try {
 			listener.beforeRead();
 			I item = itemReader.read();
@@ -185,8 +184,7 @@ public class SimpleChunkProvider<I> implements ChunkProvider<I> {
 	 * data (e.g. skips) and it wants to force a commit.
 	 * @throws Exception if there is a generic issue
 	 */
-	@Nullable
-	protected I read(StepContribution contribution, Chunk<I> chunk) throws SkipOverflowException, Exception {
+	@Nullable protected I read(StepContribution contribution, Chunk<I> chunk) throws SkipOverflowException, Exception {
 		return doRead();
 	}
 

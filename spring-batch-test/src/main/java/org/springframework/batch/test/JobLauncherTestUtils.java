@@ -37,7 +37,7 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.StepLocator;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.context.ApplicationContext;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * <p>

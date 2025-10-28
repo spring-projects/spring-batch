@@ -122,14 +122,6 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-
-		<!-- provided dependencies -->
-		<dependency>
-			<groupId>com.google.code.findbugs</groupId>
-			<artifactId>jsr305</artifactId>
-			<version>${jsr305.version}</version>
-			<scope>provided</scope>
-		</dependency>
 	</dependencies>
 
 </project>

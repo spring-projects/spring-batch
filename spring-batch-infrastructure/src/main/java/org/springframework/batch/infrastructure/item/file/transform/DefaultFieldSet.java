@@ -33,6 +33,7 @@ import java.util.Properties;
 
 import org.springframework.util.Assert;
 
+import org.jspecify.annotations.NullUnmarked;
 import org.jspecify.annotations.Nullable;
 import org.springframework.util.StringUtils;
 
@@ -47,6 +48,7 @@ import org.springframework.util.StringUtils;
  * @author Stefano Cordio
  * @author Choi Wang Gyu
  */
+@NullUnmarked // FIXME
 public class DefaultFieldSet implements FieldSet {
 
 	private final static String DEFAULT_DATE_PATTERN = "yyyy-MM-dd";

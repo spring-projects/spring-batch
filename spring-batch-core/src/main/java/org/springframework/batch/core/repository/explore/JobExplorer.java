@@ -19,8 +19,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import org.jspecify.annotations.NullUnmarked;
-
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
@@ -29,7 +27,7 @@ import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Entry point for browsing the executions of running or historical jobs and steps. Since
@@ -45,7 +43,7 @@ import org.springframework.lang.Nullable;
  * @deprecated since 6.0 in favor of {@link JobRepository}. Scheduled for removal in 6.2
  * or later.
  */
-@NullUnmarked
+// @NullUnmarked
 @Deprecated(since = "6.0", forRemoval = true)
 public interface JobExplorer {
 
@@ -133,8 +131,7 @@ public interface JobExplorer {
 	 * @param instanceId {@link Long} The ID for the {@link JobInstance} to obtain.
 	 * @return the {@code JobInstance} that has this ID, or {@code null} if not found.
 	 */
-	@Nullable
-	default JobInstance getJobInstance(long instanceId) {
+	@Nullable default JobInstance getJobInstance(long instanceId) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -145,8 +142,7 @@ public interface JobExplorer {
 	 *
 	 * @since 4.2
 	 */
-	@Nullable
-	default JobInstance getLastJobInstance(String jobName) {
+	@Nullable default JobInstance getLastJobInstance(String jobName) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -158,8 +154,7 @@ public interface JobExplorer {
 	 *
 	 * @since 5.0
 	 */
-	@Nullable
-	default JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
+	@Nullable default JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -172,7 +167,7 @@ public interface JobExplorer {
 	 * @throws NoSuchJobException thrown when there is no {@link JobInstance} for the
 	 * jobName specified.
 	 */
-	default long getJobInstanceCount(@Nullable String jobName) throws NoSuchJobException {
+	default long getJobInstanceCount(String jobName) throws NoSuchJobException {
 		throw new UnsupportedOperationException();
 	}
 
@@ -190,8 +185,7 @@ public interface JobExplorer {
 	 * @param executionId The job execution ID.
 	 * @return the {@link JobExecution} that has this ID or {@code null} if not found.
 	 */
-	@Nullable
-	default JobExecution getJobExecution(long executionId) {
+	@Nullable default JobExecution getJobExecution(long executionId) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -231,8 +225,7 @@ public interface JobExplorer {
 	 *
 	 * @since 4.2
 	 */
-	@Nullable
-	default JobExecution getLastJobExecution(JobInstance jobInstance) {
+	@Nullable default JobExecution getLastJobExecution(JobInstance jobInstance) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -241,8 +234,7 @@ public interface JobExplorer {
 	 * @param jobParameters parameters identifying the {@link JobInstance}
 	 * @return the last execution of job if exists, null otherwise
 	 */
-	@Nullable
-	default JobExecution getLastJobExecution(String jobName, JobParameters jobParameters) {
+	@Nullable default JobExecution getLastJobExecution(String jobName, JobParameters jobParameters) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -277,8 +269,7 @@ public interface JobExplorer {
 	 */
 	// FIXME incorrect contract: stepExecutionId is globally unique, no need for
 	// jobExecutionId
-	@Nullable
-	default StepExecution getStepExecution(long jobExecutionId, long stepExecutionId) {
+	@Nullable default StepExecution getStepExecution(long jobExecutionId, long stepExecutionId) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -287,8 +278,7 @@ public interface JobExplorer {
 	 * @param stepName the name of the step execution that might have run.
 	 * @return the last execution of step for the given job instance.
 	 */
-	@Nullable
-	default StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
+	@Nullable default StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
 		throw new UnsupportedOperationException();
 	}
 

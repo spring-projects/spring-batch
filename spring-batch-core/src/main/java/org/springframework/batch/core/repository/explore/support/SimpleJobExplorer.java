@@ -29,7 +29,7 @@ import org.springframework.batch.core.repository.dao.JobInstanceDao;
 import org.springframework.batch.core.repository.dao.StepExecutionDao;
 import org.springframework.batch.core.repository.support.SimpleJobRepository;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.Set;
@@ -190,8 +190,7 @@ public class SimpleJobExplorer implements JobExplorer {
 	}
 
 	@Override
-	@Nullable
-	public JobExecution getLastJobExecution(String jobName, JobParameters jobParameters) {
+	@Nullable public JobExecution getLastJobExecution(String jobName, JobParameters jobParameters) {
 		JobInstance jobInstance = jobInstanceDao.getJobInstance(jobName, jobParameters);
 		if (jobInstance == null) {
 			return null;
@@ -265,8 +264,7 @@ public class SimpleJobExplorer implements JobExplorer {
 	}
 
 	@Override
-	@Nullable
-	public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
+	@Nullable public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
 		StepExecution latest = stepExecutionDao.getLastStepExecution(jobInstance, stepName);
 
 		if (latest != null) {
