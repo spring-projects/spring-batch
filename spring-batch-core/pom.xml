@@ -69,7 +69,7 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
-			<version>${jackson.version}</version>
+			<version>${jackson2.version}</version>
 			<optional>true</optional>
 		</dependency>
         <dependency>
@@ -81,7 +81,7 @@
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
-            <version>${jackson.version}</version>
+            <version>${jackson2.version}</version>
             <optional>true</optional>
         </dependency>
 		<dependency>
