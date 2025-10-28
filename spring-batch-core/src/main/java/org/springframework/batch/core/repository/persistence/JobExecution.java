@@ -25,11 +25,10 @@ import org.springframework.batch.core.BatchStatus;
 
 /**
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  * @since 5.2.0
  */
 public class JobExecution {
-
-	private String id;
 
 	private long jobExecutionId;
 
@@ -52,13 +51,6 @@ public class JobExecution {
 	private ExitStatus exitStatus;
 
 	private ExecutionContext executionContext;
-
-	public JobExecution() {
-	}
-
-	public String getId() {
-		return id;
-	}
 
 	public long getJobInstanceId() {
 		return jobInstanceId;
@@ -150,11 +142,10 @@ public class JobExecution {
 
 	@Override
 	public String toString() {
-		return "JobExecution{" + "id='" + id + '\'' + ", jobExecutionId=" + jobExecutionId + ", jobInstanceId="
-				+ jobInstanceId + ", jobParameters=" + jobParameters + ", stepExecutions=" + stepExecutions
-				+ ", status=" + status + ", startTime=" + startTime + ", createTime=" + createTime + ", endTime="
-				+ endTime + ", lastUpdated=" + lastUpdated + ", exitStatus=" + exitStatus + ", executionContext="
-				+ executionContext + '}';
+		return "JobExecution{jobExecutionId=" + jobExecutionId + ", jobInstanceId=" + jobInstanceId + ", jobParameters="
+				+ jobParameters + ", stepExecutions=" + stepExecutions + ", status=" + status + ", startTime="
+				+ startTime + ", createTime=" + createTime + ", endTime=" + endTime + ", lastUpdated=" + lastUpdated
+				+ ", exitStatus=" + exitStatus + ", executionContext=" + executionContext + '}';
 	}
 
 }

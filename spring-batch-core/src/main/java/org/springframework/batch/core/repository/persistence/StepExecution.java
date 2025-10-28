@@ -21,11 +21,10 @@ import org.springframework.batch.core.BatchStatus;
 
 /**
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  * @since 5.2.0
  */
 public class StepExecution {
-
-	private String id;
 
 	private long stepExecutionId;
 
@@ -64,13 +63,6 @@ public class StepExecution {
 	private ExitStatus exitStatus;
 
 	private boolean terminateOnly;
-
-	public StepExecution() {
-	}
-
-	public String getId() {
-		return id;
-	}
 
 	public long getStepExecutionId() {
 		return stepExecutionId;
@@ -226,13 +218,13 @@ public class StepExecution {
 
 	@Override
 	public String toString() {
-		return "StepExecution{" + "id='" + id + '\'' + ", stepExecutionId=" + stepExecutionId + ", jobExecutionId='"
-				+ jobExecutionId + '\'' + ", name='" + name + '\'' + ", status=" + status + ", readCount=" + readCount
-				+ ", writeCount=" + writeCount + ", commitCount=" + commitCount + ", rollbackCount=" + rollbackCount
-				+ ", readSkipCount=" + readSkipCount + ", processSkipCount=" + processSkipCount + ", writeSkipCount="
-				+ writeSkipCount + ", filterCount=" + filterCount + ", startTime=" + startTime + ", createTime="
-				+ createTime + ", endTime=" + endTime + ", lastUpdated=" + lastUpdated + ", executionContext="
-				+ executionContext + ", exitStatus=" + exitStatus + ", terminateOnly=" + terminateOnly + '}';
+		return "StepExecution{stepExecutionId=" + stepExecutionId + ", jobExecutionId='" + jobExecutionId + '\''
+				+ ", name='" + name + '\'' + ", status=" + status + ", readCount=" + readCount + ", writeCount="
+				+ writeCount + ", commitCount=" + commitCount + ", rollbackCount=" + rollbackCount + ", readSkipCount="
+				+ readSkipCount + ", processSkipCount=" + processSkipCount + ", writeSkipCount=" + writeSkipCount
+				+ ", filterCount=" + filterCount + ", startTime=" + startTime + ", createTime=" + createTime
+				+ ", endTime=" + endTime + ", lastUpdated=" + lastUpdated + ", executionContext=" + executionContext
+				+ ", exitStatus=" + exitStatus + ", terminateOnly=" + terminateOnly + '}';
 	}
 
 }
