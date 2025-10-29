@@ -22,6 +22,7 @@ import java.util.Properties;
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.batch.core.converter.JobParametersConverter;
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.parameters.JobParameters;
@@ -52,6 +53,7 @@ import static org.springframework.batch.core.launch.support.ExitCodeMapper.JVM_E
  *
  * @author Mahmoud Ben Hassine
  * @author Yejeong Ham
+ * @author Cheolhwan Ihn
  * @since 6.0
  */
 public class CommandLineJobOperator {
@@ -185,7 +187,12 @@ public class CommandLineJobOperator {
 				logger.error(() -> "No job execution found with ID: " + jobExecutionId);
 				return JVM_EXITCODE_GENERIC_ERROR;
 			}
-			// TODO should check and log error if the job execution did not fail
+			BatchStatus status = jobExecution.getStatus();
+			if (status != BatchStatus.FAILED && status != BatchStatus.STOPPED) {
+				logger.error(() -> "Cannot restart job execution " + jobExecutionId + ": current status is " + status
+						+ " (must be FAILED or STOPPED).");
+				return JVM_EXITCODE_GENERIC_ERROR;
+			}
 			JobExecution restartedExecution = this.jobOperator.restart(jobExecution);
 			return this.exitCodeMapper.intValue(restartedExecution.getExitStatus().getExitCode());
 		}
@@ -208,8 +215,12 @@ public class CommandLineJobOperator {
 				logger.error(() -> "No job execution found with ID: " + jobExecutionId);
 				return JVM_EXITCODE_GENERIC_ERROR;
 			}
-			// TODO should throw JobExecutionNotStoppedException if the job execution is
-			// not stopped
+			BatchStatus status = jobExecution.getStatus();
+			if (status != BatchStatus.STOPPED) {
+				logger.error(() -> "Cannot abandon job execution " + jobExecutionId + ": current status is " + status
+						+ " (must be STOPPED).");
+				return JVM_EXITCODE_GENERIC_ERROR;
+			}
 			JobExecution abandonedExecution = this.jobOperator.abandon(jobExecution);
 			return this.exitCodeMapper.intValue(abandonedExecution.getExitStatus().getExitCode());
 		}
