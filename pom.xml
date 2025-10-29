@@ -118,7 +118,7 @@
 		<testcontainers.version>1.21.3</testcontainers.version>
 		<testcontainers-redis.version>2.2.4</testcontainers-redis.version>
 		<jsonassert.version>1.5.3</jsonassert.version>
-		<groovy-jsr223.version>5.0.2</groovy-jsr223.version>
+		<groovy-jsr223.version>4.0.29</groovy-jsr223.version>
 		<nashorn.version>15.7</nashorn.version>
 		<beanshell.version>2.0b6</beanshell.version>
 		<jruby.version>9.4.13.0</jruby.version>
