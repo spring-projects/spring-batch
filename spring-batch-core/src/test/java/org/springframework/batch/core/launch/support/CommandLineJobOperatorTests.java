@@ -17,10 +17,12 @@ package org.springframework.batch.core.launch.support;
 
 import java.util.Properties;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.converter.JobParametersConverter;
 import org.springframework.batch.core.job.Job;
@@ -30,12 +32,14 @@ import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.repository.JobRepository;
 
 import static org.mockito.Mockito.mock;
+import static org.springframework.batch.core.launch.support.ExitCodeMapper.JVM_EXITCODE_GENERIC_ERROR;
 
 /**
  * Tests for {@link CommandLineJobOperator}.
  *
  * @author Mahmoud Ben Hassine
  * @author Yejeong Ham
+ * @author Cheolhwan Ihn
  */
 class CommandLineJobOperatorTests {
 
@@ -111,6 +115,7 @@ class CommandLineJobOperatorTests {
 		// given
 		long jobExecutionId = 1;
 		JobExecution jobExecution = mock();
+		Mockito.when(jobExecution.getStatus()).thenReturn(BatchStatus.FAILED);
 
 		// when
 		Mockito.when(jobRepository.getJobExecution(jobExecutionId)).thenReturn(jobExecution);
@@ -121,17 +126,65 @@ class CommandLineJobOperatorTests {
 	}
 
 	@Test
+	void restartJobExecutionStopped() throws Exception {
+		// given
+		long jobExecutionId = 1;
+		JobExecution jobExecution = mock();
+		Mockito.when(jobExecution.getStatus()).thenReturn(BatchStatus.STOPPED);
+		Mockito.when(jobRepository.getJobExecution(jobExecutionId)).thenReturn(jobExecution);
+
+		// when
+		this.commandLineJobOperator.restart(jobExecutionId);
+
+		// then
+		Mockito.verify(jobOperator).restart(jobExecution);
+	}
+
+	@Test
+	void restartJobExecutionNotFailed() throws Exception {
+		// given
+		long jobExecutionId = 1;
+		JobExecution jobExecution = mock();
+		Mockito.when(jobExecution.getStatus()).thenReturn(BatchStatus.COMPLETED);
+		Mockito.when(jobRepository.getJobExecution(jobExecutionId)).thenReturn(jobExecution);
+
+		// when
+		int exitCode = this.commandLineJobOperator.restart(jobExecutionId);
+
+		// then
+		Assertions.assertEquals(JVM_EXITCODE_GENERIC_ERROR, exitCode);
+		Mockito.verify(jobOperator, Mockito.never()).restart(jobExecution);
+	}
+
+	@Test
 	void abandon() throws Exception {
 		// given
 		long jobExecutionId = 1;
 		JobExecution jobExecution = mock();
+		Mockito.when(jobExecution.getStatus()).thenReturn(BatchStatus.STOPPED);
+		Mockito.when(jobRepository.getJobExecution(jobExecutionId)).thenReturn(jobExecution);
 
 		// when
-		Mockito.when(jobRepository.getJobExecution(jobExecutionId)).thenReturn(jobExecution);
 		this.commandLineJobOperator.abandon(jobExecutionId);
 
 		// then
 		Mockito.verify(jobOperator).abandon(jobExecution);
+	}
+
+	@Test
+	void abandonJobExecutionNotStopped() throws Exception {
+		// given
+		long jobExecutionId = 1;
+		JobExecution jobExecution = mock();
+		Mockito.when(jobExecution.getStatus()).thenReturn(BatchStatus.COMPLETED);
+		Mockito.when(jobRepository.getJobExecution(jobExecutionId)).thenReturn(jobExecution);
+
+		// when
+		int exitCode = this.commandLineJobOperator.abandon(jobExecutionId);
+
+		// then
+		Assertions.assertEquals(ExitCodeMapper.JVM_EXITCODE_GENERIC_ERROR, exitCode); // JVM_EXITCODE_GENERIC_ERROR
+		Mockito.verify(jobOperator, Mockito.never()).abandon(jobExecution);
 	}
 
 	@Test
