@@ -63,6 +63,7 @@ import org.springframework.util.Assert;
  * @author Will Schipp
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ * @author Seungyong Hong
  * @since 1.0
  * @see JobRepository
  * @see TaskExecutor
@@ -144,8 +145,7 @@ public class TaskExecutorJobLauncher implements JobLauncher, InitializingBean {
 					JobParameters allJobParameters = execution.getJobParameters();
 					JobParameters identifyingJobParameters = new JobParameters(
 							allJobParameters.getIdentifyingParameters());
-					if (!identifyingJobParameters.isEmpty()
-							&& (status == BatchStatus.COMPLETED || status == BatchStatus.ABANDONED)) {
+					if (status == BatchStatus.COMPLETED || status == BatchStatus.ABANDONED) {
 						throw new JobInstanceAlreadyCompleteException(
 								"A job instance already exists and is complete for identifying parameters="
 										+ identifyingJobParameters + ".  If you want to run this job again, "
