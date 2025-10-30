@@ -15,11 +15,8 @@
  */
 package org.springframework.batch.core.repository.support;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.time.LocalDateTime;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
@@ -29,19 +26,8 @@ import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.repository.dao.ExecutionContextDao;
-import org.springframework.batch.core.repository.dao.mongodb.MongoExecutionContextDao;
-import org.springframework.batch.core.repository.support.MongoExecutionContextDaoIntegrationTests.ExecutionContextDaoConfiguration;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
-import org.springframework.data.mongodb.core.MongoOperations;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -51,17 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  * @author Henning Pöttker
  * @author Yanming Zhou
  */
-@DirtiesContext
-@Testcontainers(disabledWithoutDocker = true)
-@SpringJUnitConfig({ MongoDBIntegrationTestConfiguration.class, ExecutionContextDaoConfiguration.class })
-public class MongoExecutionContextDaoIntegrationTests {
-
-	@BeforeAll
-	static void setUp(@Autowired MongoTemplate mongoTemplate) throws IOException {
-		Resource resource = new FileSystemResource(
-				"src/main/resources/org/springframework/batch/core/schema-mongodb.jsonl");
-		Files.lines(resource.getFilePath()).forEach(line -> mongoTemplate.executeCommand(line));
-	}
+public class MongoExecutionContextDaoIntegrationTests extends AbstractMongoDBDaoIntegrationTests {
 
 	@Test
 	void testGetJobExecutionWithEmptyResult(@Autowired ExecutionContextDao executionContextDao) {
@@ -129,16 +105,6 @@ public class MongoExecutionContextDaoIntegrationTests {
 		// then
 		assertTrue(actual.containsKey("foo"));
 		assertEquals("bar", actual.get("foo"));
-	}
-
-	@Configuration
-	static class ExecutionContextDaoConfiguration {
-
-		@Bean
-		ExecutionContextDao executionContextDao(MongoOperations mongoOperations) {
-			return new MongoExecutionContextDao(mongoOperations);
-		}
-
 	}
 
 }
