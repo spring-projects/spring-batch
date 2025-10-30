@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2023 the original author or authors.
+ * Copyright 2019-2025 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -49,6 +49,7 @@ import org.springframework.util.Assert;
  *
  * @author Mathieu Ouellet
  * @author Mahmoud Ben Hassine
+ * @author Hyunwoo Jung
  * @since 4.2
  */
 public class KafkaItemReader<K, V> extends AbstractItemStreamItemReader<V> {
@@ -56,6 +57,8 @@ public class KafkaItemReader<K, V> extends AbstractItemStreamItemReader<V> {
 	private static final String TOPIC_PARTITION_OFFSETS = "topic.partition.offsets";
 
 	private static final long DEFAULT_POLL_TIMEOUT = 30L;
+
+	private final String topicName;
 
 	private final List<TopicPartition> topicPartitions;
 
@@ -111,6 +114,7 @@ public class KafkaItemReader<K, V> extends AbstractItemStreamItemReader<V> {
 				ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG + " property must be provided");
 		this.consumerProperties = consumerProperties;
 		Assert.hasLength(topicName, "Topic name must not be null or empty");
+		this.topicName = topicName;
 		Assert.isTrue(!partitions.isEmpty(), "At least one partition must be provided");
 		this.topicPartitions = new ArrayList<>();
 		for (Integer partition : partitions) {
@@ -175,10 +179,10 @@ public class KafkaItemReader<K, V> extends AbstractItemStreamItemReader<V> {
 			}
 		}
 		if (this.saveState && executionContext.containsKey(TOPIC_PARTITION_OFFSETS)) {
-			Map<TopicPartition, Long> offsets = (Map<TopicPartition, Long>) executionContext
-				.get(TOPIC_PARTITION_OFFSETS);
-			for (Map.Entry<TopicPartition, Long> entry : offsets.entrySet()) {
-				this.partitionOffsets.put(entry.getKey(), entry.getValue() == 0 ? 0 : entry.getValue() + 1);
+			Map<String, Long> offsets = (Map<String, Long>) executionContext.get(TOPIC_PARTITION_OFFSETS);
+			for (Map.Entry<String, Long> entry : offsets.entrySet()) {
+				this.partitionOffsets.put(new TopicPartition(this.topicName, Integer.parseInt(entry.getKey())),
+						entry.getValue() == 0 ? 0 : entry.getValue() + 1);
 			}
 		}
 		this.kafkaConsumer.assign(this.topicPartitions);
@@ -205,7 +209,11 @@ public class KafkaItemReader<K, V> extends AbstractItemStreamItemReader<V> {
 	@Override
 	public void update(ExecutionContext executionContext) {
 		if (this.saveState) {
-			executionContext.put(TOPIC_PARTITION_OFFSETS, new HashMap<>(this.partitionOffsets));
+			Map<String, Long> offsets = new HashMap<>();
+			for (Map.Entry<TopicPartition, Long> entry : this.partitionOffsets.entrySet()) {
+				offsets.put(String.valueOf(entry.getKey().partition()), entry.getValue());
+			}
+			executionContext.put(TOPIC_PARTITION_OFFSETS, offsets);
 		}
 		this.kafkaConsumer.commitSync();
 	}
