@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -63,6 +64,7 @@ import org.springframework.util.StringUtils;
  * @author Patrick Baumgartner
  * @author François Martin
  * @author Stefano Cordio
+ * @author Daeho Kwon
  * @since 4.0
  * @see FlatFileItemReader
  */
@@ -320,6 +322,34 @@ public class FlatFileItemReaderBuilder<T> {
 	}
 
 	/**
+	 * Configure a {@link DelimitedSpec} using a lambda.
+	 * @return the current builder instance
+	 */
+	public FlatFileItemReaderBuilder<T> delimited(Consumer<DelimitedSpec<T>> config) {
+		DelimitedSpecImpl<T> spec = new DelimitedSpecImpl<>();
+		config.accept(spec);
+
+		DelimitedBuilder<T> b = this.delimited();
+		if (spec.delimiter != null) {
+			b.delimiter(spec.delimiter);
+		}
+		if (spec.quoteCharacter != null) {
+			b.quoteCharacter(spec.quoteCharacter);
+		}
+		if (!spec.names.isEmpty()) {
+			b.names(spec.names.toArray(new String[0]));
+		}
+		if (!spec.included.isEmpty()) {
+			b.includedFields(spec.included.toArray(new Integer[0]));
+		}
+
+		b.fieldSetFactory(spec.fieldSetFactory);
+		b.strict(spec.strict);
+
+		return this;
+	}
+
+	/**
 	 * Returns an instance of a {@link FixedLengthBuilder} for building a
 	 * {@link FixedLengthTokenizer}. The {@link FixedLengthTokenizer} configured by this
 	 * builder will only be used if the {@link FlatFileItemReaderBuilder#lineTokenizer}
@@ -330,6 +360,29 @@ public class FlatFileItemReaderBuilder<T> {
 		this.fixedLengthBuilder = new FixedLengthBuilder<>(this);
 		this.tokenizerValidator = this.tokenizerValidator.flipBit(2);
 		return this.fixedLengthBuilder;
+	}
+
+	/**
+	 * Configure a {@link FixedLengthSpec} using a lambda.
+	 * @return the current builder instance
+	 */
+	public FlatFileItemReaderBuilder<T> fixedLength(Consumer<FixedLengthSpec<T>> config) {
+		FixedLengthSpecImpl<T> spec = new FixedLengthSpecImpl<>();
+		config.accept(spec);
+
+		FixedLengthBuilder<T> b = this.fixedLength();
+
+		if (!spec.ranges.isEmpty()) {
+			b.columns(spec.ranges.toArray(new Range[0]));
+		}
+		if (!spec.names.isEmpty()) {
+			b.names(spec.names.toArray(new String[0]));
+		}
+
+		b.fieldSetFactory(spec.fieldSetFactory);
+		b.strict(spec.strict);
+
+		return this;
 	}
 
 	/**
@@ -771,6 +824,146 @@ public class FlatFileItemReaderBuilder<T> {
 			tokenizer.setStrict(this.strict);
 
 			return tokenizer;
+		}
+
+	}
+
+	public interface DelimitedSpec<T> {
+
+		DelimitedSpec<T> delimiter(String delimiter);
+
+		DelimitedSpec<T> quoteCharacter(char quoteCharacter);
+
+		DelimitedSpec<T> includedFields(Integer... fields);
+
+		DelimitedSpec<T> addIncludedField(int field);
+
+		DelimitedSpec<T> names(String... names);
+
+		DelimitedSpec<T> fieldSetFactory(FieldSetFactory fieldSetFactory);
+
+		DelimitedSpec<T> strict(boolean strict);
+
+	}
+
+	public interface FixedLengthSpec<T> {
+
+		FixedLengthSpec<T> columns(Range... ranges);
+
+		FixedLengthSpec<T> addColumns(Range range);
+
+		FixedLengthSpec<T> addColumns(Range range, int index);
+
+		FixedLengthSpec<T> names(String... names);
+
+		FixedLengthSpec<T> fieldSetFactory(FieldSetFactory fieldSetFactory);
+
+		FixedLengthSpec<T> strict(boolean strict);
+
+	}
+
+	private static class DelimitedSpecImpl<T> implements DelimitedSpec<T> {
+
+		private final List<String> names = new ArrayList<>();
+
+		private @Nullable String delimiter;
+
+		private @Nullable Character quoteCharacter;
+
+		private final List<Integer> included = new ArrayList<>();
+
+		private FieldSetFactory fieldSetFactory = new DefaultFieldSetFactory();
+
+		private boolean strict = true;
+
+		@Override
+		public DelimitedSpec<T> delimiter(String delimiter) {
+			this.delimiter = delimiter;
+			return this;
+		}
+
+		@Override
+		public DelimitedSpec<T> quoteCharacter(char quoteCharacter) {
+			this.quoteCharacter = quoteCharacter;
+			return this;
+		}
+
+		@Override
+		public DelimitedSpec<T> includedFields(Integer... fields) {
+			this.included.addAll(Arrays.asList(fields));
+			return this;
+		}
+
+		@Override
+		public DelimitedSpec<T> addIncludedField(int field) {
+			this.included.add(field);
+			return this;
+		}
+
+		@Override
+		public DelimitedSpec<T> names(String... names) {
+			this.names.addAll(Arrays.asList(names));
+			return this;
+		}
+
+		@Override
+		public DelimitedSpec<T> fieldSetFactory(FieldSetFactory f) {
+			this.fieldSetFactory = f;
+			return this;
+		}
+
+		@Override
+		public DelimitedSpec<T> strict(boolean strict) {
+			this.strict = strict;
+			return this;
+		}
+
+	}
+
+	private static class FixedLengthSpecImpl<T> implements FixedLengthSpec<T> {
+
+		private final List<Range> ranges = new ArrayList<>();
+
+		private final List<String> names = new ArrayList<>();
+
+		private boolean strict = true;
+
+		private FieldSetFactory fieldSetFactory = new DefaultFieldSetFactory();
+
+		@Override
+		public FixedLengthSpec<T> columns(Range... ranges) {
+			this.ranges.addAll(Arrays.asList(ranges));
+			return this;
+		}
+
+		@Override
+		public FixedLengthSpec<T> addColumns(Range range) {
+			this.ranges.add(range);
+			return this;
+		}
+
+		@Override
+		public FixedLengthSpec<T> addColumns(Range range, int index) {
+			this.ranges.add(index, range);
+			return this;
+		}
+
+		@Override
+		public FixedLengthSpec<T> names(String... names) {
+			this.names.addAll(Arrays.asList(names));
+			return this;
+		}
+
+		@Override
+		public FixedLengthSpec<T> fieldSetFactory(FieldSetFactory f) {
+			this.fieldSetFactory = f;
+			return this;
+		}
+
+		@Override
+		public FixedLengthSpec<T> strict(boolean strict) {
+			this.strict = strict;
+			return this;
 		}
 
 	}

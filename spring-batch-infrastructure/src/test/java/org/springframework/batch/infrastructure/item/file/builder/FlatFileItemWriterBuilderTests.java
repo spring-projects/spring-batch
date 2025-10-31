@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 the original author or authors.
+ * Copyright 2016-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,6 +49,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Mahmoud Ben Hassine
  * @author Drummond Dawson
  * @author Glenn Renfro
+ * @author Daeho Kwon
  */
 class FlatFileItemWriterBuilderTests {
 
@@ -484,6 +485,58 @@ class FlatFileItemWriterBuilderTests {
 		Object fieldExtractor = ReflectionTestUtils.getField(lineAggregator, "fieldExtractor");
 		assertNotNull(fieldExtractor);
 		assertInstanceOf(BeanWrapperFieldExtractor.class, fieldExtractor);
+	}
+
+	@Test
+	void testDelimitedWithLambda() throws Exception {
+
+		WritableResource output = new FileSystemResource(File.createTempFile("foo", "txt"));
+
+		FlatFileItemWriter<Foo> writer = new FlatFileItemWriterBuilder<Foo>().name("foo")
+			.resource(output)
+			.lineSeparator("$")
+			.delimited(config -> config.delimiter(" ")
+				.fieldExtractor(item -> new Object[] { item.getFirst(), item.getThird() }))
+			.encoding("UTF-16LE")
+			.headerCallback(writer1 -> writer1.append("HEADER"))
+			.footerCallback(writer12 -> writer12.append("FOOTER"))
+			.build();
+
+		ExecutionContext executionContext = new ExecutionContext();
+
+		writer.open(executionContext);
+
+		writer.write(Chunk.of(new Foo(1, 2, "3"), new Foo(4, 5, "6")));
+
+		writer.close();
+
+		assertEquals("HEADER$1 3$4 6$FOOTER", readLine("UTF-16LE", output));
+	}
+
+	@Test
+	void testFormattedWithLambda() throws Exception {
+
+		WritableResource output = new FileSystemResource(File.createTempFile("foo", "txt"));
+
+		FlatFileItemWriter<Foo> writer = new FlatFileItemWriterBuilder<Foo>().name("foo")
+			.resource(output)
+			.lineSeparator("$")
+			.formatted(config -> config.format("%3s%3s")
+				.fieldExtractor(item -> new Object[] { item.getFirst(), item.getThird() }))
+			.encoding("UTF-16LE")
+			.headerCallback(writer1 -> writer1.append("HEADER"))
+			.footerCallback(writer12 -> writer12.append("FOOTER"))
+			.build();
+
+		ExecutionContext executionContext = new ExecutionContext();
+
+		writer.open(executionContext);
+
+		writer.write(Chunk.of(new Foo(1, 2, "3"), new Foo(4, 5, "6")));
+
+		writer.close();
+
+		assertEquals("HEADER$  1  3$  4  6$FOOTER", readLine("UTF-16LE", output));
 	}
 
 	private void validateBuilderFlags(FlatFileItemWriter<Foo> writer, String encoding) {
