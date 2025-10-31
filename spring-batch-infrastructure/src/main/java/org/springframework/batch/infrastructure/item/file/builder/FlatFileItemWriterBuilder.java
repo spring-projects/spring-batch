@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Consumer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -50,6 +51,7 @@ import org.springframework.util.StringUtils;
  * @author Mahmoud Ben Hassine
  * @author Drummond Dawson
  * @author Stefano Cordio
+ * @author Daeho Kwon
  * @since 4.0
  * @see FlatFileItemWriter
  */
@@ -264,6 +266,30 @@ public class FlatFileItemWriterBuilder<T> {
 	}
 
 	/**
+	 * Configure a {@link DelimitedSpec} using a lambda.
+	 * @return the current builder instance
+	 * @since 6.0
+	 */
+	public FlatFileItemWriterBuilder<T> delimited(Consumer<DelimitedSpec<T>> config) {
+		DelimitedSpecImpl<T> spec = new DelimitedSpecImpl<>();
+		config.accept(spec);
+
+		DelimitedBuilder<T> builder = this.delimited();
+		builder.delimiter(spec.delimiter);
+		builder.quoteCharacter(spec.quoteCharacter);
+		if (spec.sourceType != null) {
+			builder.sourceType(spec.sourceType);
+		}
+		if (spec.fieldExtractor != null) {
+			builder.fieldExtractor(spec.fieldExtractor);
+		}
+		if (!spec.names.isEmpty()) {
+			builder.names(spec.names.toArray(new String[0]));
+		}
+		return this;
+	}
+
+	/**
 	 * Returns an instance of a {@link FormattedBuilder} for building a
 	 * {@link FormatterLineAggregator}. The {@link FormatterLineAggregator} configured by
 	 * this builder will only be used if one is not explicitly configured via
@@ -274,6 +300,34 @@ public class FlatFileItemWriterBuilder<T> {
 	public FormattedBuilder<T> formatted() {
 		this.formattedBuilder = new FormattedBuilder<>(this);
 		return this.formattedBuilder;
+	}
+
+	/**
+	 * Configure a {@link FormattedSpec} using a lambda.
+	 * @return the current builder instance
+	 * @since 6.0
+	 */
+	public FlatFileItemWriterBuilder<T> formatted(Consumer<FormattedSpec<T>> config) {
+		FormattedSpecImpl<T> spec = new FormattedSpecImpl<>();
+		config.accept(spec);
+
+		FormattedBuilder<T> builder = this.formatted();
+		if (spec.format != null) {
+			builder.format(spec.format);
+		}
+		builder.locale(spec.locale);
+		builder.minimumLength(spec.minimumLength);
+		builder.maximumLength(spec.maximumLength);
+		if (spec.sourceType != null) {
+			builder.sourceType(spec.sourceType);
+		}
+		if (spec.fieldExtractor != null) {
+			builder.fieldExtractor(spec.fieldExtractor);
+		}
+		if (!spec.names.isEmpty()) {
+			builder.names(spec.names.toArray(new String[0]));
+		}
+		return this;
 	}
 
 	/**
@@ -587,6 +641,230 @@ public class FlatFileItemWriterBuilder<T> {
 		writer.setTransactional(this.transactional);
 
 		return writer;
+	}
+
+	/**
+	 * Specification for configuring a delimited line aggregator.
+	 *
+	 * @param <T> the type of object to aggregate
+	 * @since 6.0
+	 */
+	public interface DelimitedSpec<T> {
+
+		/**
+		 * Define the delimiter for the file.
+		 * @param delimiter String used as a delimiter between fields.
+		 * @return The instance of the specification for chaining.
+		 * @see DelimitedLineAggregator#setDelimiter(String)
+		 */
+		DelimitedSpec<T> delimiter(String delimiter);
+
+		/**
+		 * Define the quote character for each delimited field. Default is empty string.
+		 * @param quoteCharacter String used as a quote for the aggregate.
+		 * @return The instance of the specification for chaining.
+		 * @see DelimitedLineAggregator#setQuoteCharacter(String)
+		 */
+		DelimitedSpec<T> quoteCharacter(String quoteCharacter);
+
+		/**
+		 * Names of each of the fields within the fields that are returned in the order
+		 * they occur within the delimited file. These names will be used to create a
+		 * {@link BeanWrapperFieldExtractor} only if no explicit field extractor is set
+		 * via {@link DelimitedBuilder#fieldExtractor(FieldExtractor)}.
+		 * @param names names of each field
+		 * @return The instance of the specification for chaining.
+		 * @see BeanWrapperFieldExtractor#setNames(String[])
+		 */
+		DelimitedSpec<T> names(String... names);
+
+		/**
+		 * Set the {@link FieldExtractor} to use to extract fields from each item.
+		 * @param fieldExtractor to use to extract fields from each item
+		 * @return The instance of the specification for chaining.
+		 */
+		DelimitedSpec<T> fieldExtractor(FieldExtractor<T> fieldExtractor);
+
+		/**
+		 * Specify the type of items from which fields will be extracted. This is used to
+		 * configure the right {@link FieldExtractor} based on the given type (ie a record
+		 * or a regular class).
+		 * @param sourceType type of items from which fields will be extracted
+		 * @return The current specification of the builder.
+		 */
+		DelimitedSpec<T> sourceType(Class<T> sourceType);
+
+	}
+
+	/**
+	 * Specification for configuring a formatted line aggregator.
+	 *
+	 * @param <T> the type of object to aggregate
+	 * @since 6.0
+	 */
+	public interface FormattedSpec<T> {
+
+		/**
+		 * Set the format string used to aggregate items
+		 * @param format used to aggregate items
+		 * @return The instance of the specification for chaining.
+		 */
+		FormattedSpec<T> format(String format);
+
+		/**
+		 * Set the locale.
+		 * @param locale to use
+		 * @return The instance of the specification for chaining.
+		 */
+		FormattedSpec<T> locale(Locale locale);
+
+		/**
+		 * Set the minimum length of the formatted string. If this is not set the default
+		 * is to allow any length.
+		 * @param min of the formatted string
+		 * @return The instance of the specification for chaining.
+		 */
+		FormattedSpec<T> minimumLength(int min);
+
+		/**
+		 * Set the maximum length of the formatted string. If this is not set the default
+		 * is to allow any length.
+		 * @param max of the formatted string
+		 * @return The instance of the specification for chaining.
+		 */
+		FormattedSpec<T> maximumLength(int max);
+
+		/**
+		 * Names of each of the fields within the fields that are returned in the order
+		 * they occur within the formatted file. These names will be used to create a
+		 * {@link BeanWrapperFieldExtractor} only if no explicit field extractor is set
+		 * via {@link FormattedBuilder#fieldExtractor(FieldExtractor)}.
+		 * @param names names of each field
+		 * @return The instance of the specification for chaining.
+		 * @see BeanWrapperFieldExtractor#setNames(String[])
+		 */
+		FormattedSpec<T> names(String... names);
+
+		/**
+		 * Set the {@link FieldExtractor} to use to extract fields from each item.
+		 * @param fieldExtractor to use to extract fields from each item
+		 * @return The current instance of the specification
+		 */
+		FormattedSpec<T> fieldExtractor(FieldExtractor<T> fieldExtractor);
+
+		/**
+		 * Specify the type of items from which fields will be extracted. This is used to
+		 * configure the right {@link FieldExtractor} based on the given type (ie a record
+		 * or a regular class).
+		 * @param sourceType type of items from which fields will be extracted
+		 * @return The current instance of the specification.
+		 */
+		FormattedSpec<T> sourceType(Class<T> sourceType);
+
+	}
+
+	private static class DelimitedSpecImpl<T> implements DelimitedSpec<T> {
+
+		final List<String> names = new ArrayList<>();
+
+		String delimiter = ",";
+
+		String quoteCharacter = "";
+
+		@Nullable FieldExtractor<T> fieldExtractor;
+
+		@Nullable Class<T> sourceType;
+
+		@Override
+		public DelimitedSpec<T> delimiter(String d) {
+			this.delimiter = d;
+			return this;
+		}
+
+		@Override
+		public DelimitedSpec<T> quoteCharacter(String qc) {
+			this.quoteCharacter = qc;
+			return this;
+		}
+
+		@Override
+		public DelimitedSpec<T> names(String... n) {
+			this.names.addAll(Arrays.asList(n));
+			return this;
+		}
+
+		@Override
+		public DelimitedSpec<T> fieldExtractor(FieldExtractor<T> fe) {
+			this.fieldExtractor = fe;
+			return this;
+		}
+
+		@Override
+		public DelimitedSpec<T> sourceType(Class<T> st) {
+			this.sourceType = st;
+			return this;
+		}
+
+	}
+
+	private static class FormattedSpecImpl<T> implements FormattedSpec<T> {
+
+		@Nullable String format;
+
+		Locale locale = Locale.getDefault();
+
+		int minimumLength = 0;
+
+		int maximumLength = 0;
+
+		final List<String> names = new ArrayList<>();
+
+		@Nullable FieldExtractor<T> fieldExtractor;
+
+		@Nullable Class<T> sourceType;
+
+		@Override
+		public FormattedSpec<T> format(String f) {
+			this.format = f;
+			return this;
+		}
+
+		@Override
+		public FormattedSpec<T> locale(Locale l) {
+			this.locale = l;
+			return this;
+		}
+
+		@Override
+		public FormattedSpec<T> minimumLength(int min) {
+			this.minimumLength = min;
+			return this;
+		}
+
+		@Override
+		public FormattedSpec<T> maximumLength(int max) {
+			this.maximumLength = max;
+			return this;
+		}
+
+		@Override
+		public FormattedSpec<T> names(String... n) {
+			this.names.addAll(Arrays.asList(n));
+			return this;
+		}
+
+		@Override
+		public FormattedSpec<T> fieldExtractor(FieldExtractor<T> fe) {
+			this.fieldExtractor = fe;
+			return this;
+		}
+
+		@Override
+		public FormattedSpec<T> sourceType(Class<T> st) {
+			this.sourceType = st;
+			return this;
+		}
+
 	}
 
 }
