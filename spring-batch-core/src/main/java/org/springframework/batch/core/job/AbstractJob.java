@@ -346,6 +346,9 @@ public abstract class AbstractJob implements Job, ListableStepLocator, BeanNameA
 				jobExecutionEvent.commit();
 				execution.setEndTime(LocalDateTime.now());
 
+				// save status in job repository before calling listeners
+				jobRepository.update(execution);
+
 				try {
 					listener.afterJob(execution);
 				}
