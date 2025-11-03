@@ -286,11 +286,29 @@ public abstract class AbstractStep implements StoppableStep, InitializingBean, B
 				logger.info("Step: [" + stepExecution.getStepName() + "] executed in "
 						+ BatchMetrics.formatDuration(stepExecutionDuration));
 			}
+
+			// Update the step execution to the latest known value so the
+			// listeners can act on it
+			exitStatus = exitStatus.and(stepExecution.getExitStatus());
+			stepExecution.setExitStatus(exitStatus);
+
+			// save status in job repository before calling listeners
+			// https://github.com/spring-projects/spring-batch/issues/4362
 			try {
-				// Update the step execution to the latest known value so the
-				// listeners can act on it
-				exitStatus = exitStatus.and(stepExecution.getExitStatus());
-				stepExecution.setExitStatus(exitStatus);
+				getJobRepository().update(stepExecution);
+				getJobRepository().updateExecutionContext(stepExecution);
+			}
+			catch (Exception e) {
+				stepExecution.setStatus(BatchStatus.UNKNOWN);
+				stepExecution.setExitStatus(exitStatus.and(ExitStatus.UNKNOWN));
+				stepExecution.addFailureException(e);
+				logger.error(String.format(
+						"Encountered an error saving batch meta data for step %s in job %s. "
+								+ "This job is now in an unknown state and should not be restarted.",
+						name, stepExecution.getJobExecution().getJobInstance().getJobName()), e);
+			}
+
+			try {
 				exitStatus = exitStatus.and(getCompositeListener().afterStep(stepExecution));
 			}
 			catch (Exception e) {
@@ -298,25 +316,16 @@ public abstract class AbstractStep implements StoppableStep, InitializingBean, B
 						stepExecution.getJobExecution().getJobInstance().getJobName()), e);
 			}
 
-			try {
-				getJobRepository().updateExecutionContext(stepExecution);
-			}
-			catch (Exception e) {
-				stepExecution.setStatus(BatchStatus.UNKNOWN);
-				exitStatus = exitStatus.and(ExitStatus.UNKNOWN);
-				stepExecution.addFailureException(e);
-				logger.error(String.format(
-						"Encountered an error saving batch meta data for step %s in job %s. "
-								+ "This job is now in an unknown state and should not be restarted.",
-						name, stepExecution.getJobExecution().getJobInstance().getJobName()), e);
-			}
 			stepExecutionEvent.exitStatus = stepExecution.getExitStatus().getExitCode();
 			stepExecutionEvent.commit();
 			stopObservation(stepExecution, observation);
 			stepExecution.setExitStatus(exitStatus);
 
+			// save status in job repository after calling listeners (since afterStep
+			// might have changed it)
 			try {
 				getJobRepository().update(stepExecution);
+				getJobRepository().updateExecutionContext(stepExecution);
 			}
 			catch (Exception e) {
 				stepExecution.setStatus(BatchStatus.UNKNOWN);

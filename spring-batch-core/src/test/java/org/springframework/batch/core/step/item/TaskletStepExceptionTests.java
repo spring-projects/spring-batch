@@ -128,7 +128,7 @@ class TaskletStepExceptionTests {
 		taskletStep.execute(stepExecution);
 		assertEquals(FAILED, stepExecution.getStatus());
 		assertTrue(stepExecution.getFailureExceptions().contains(exception));
-		assertEquals(2, jobRepository.getUpdateCount());
+		assertEquals(3, jobRepository.getUpdateCount());
 	}
 
 	@Test
@@ -144,7 +144,7 @@ class TaskletStepExceptionTests {
 		taskletStep.execute(stepExecution);
 		assertEquals(FAILED, stepExecution.getStatus());
 		assertTrue(stepExecution.getFailureExceptions().contains(exception));
-		assertEquals(2, jobRepository.getUpdateCount());
+		assertEquals(3, jobRepository.getUpdateCount());
 	}
 
 	@Test
@@ -170,7 +170,7 @@ class TaskletStepExceptionTests {
 		taskletStep.execute(stepExecution);
 		assertEquals(COMPLETED, stepExecution.getStatus());
 		assertFalse(stepExecution.getFailureExceptions().contains(exception));
-		assertEquals(3, jobRepository.getUpdateCount());
+		assertEquals(4, jobRepository.getUpdateCount());
 	}
 
 	/*
@@ -191,7 +191,7 @@ class TaskletStepExceptionTests {
 		assertEquals(FAILED, stepExecution.getStatus());
 		assertTrue(stepExecution.getFailureExceptions().contains(taskletException));
 		assertFalse(stepExecution.getFailureExceptions().contains(exception));
-		assertEquals(2, jobRepository.getUpdateCount());
+		assertEquals(3, jobRepository.getUpdateCount());
 	}
 
 	@Test
@@ -210,7 +210,7 @@ class TaskletStepExceptionTests {
 		assertEquals(FAILED, stepExecution.getStatus());
 		assertEquals(stepExecution.getFailureExceptions().get(0), taskletException);
 		assertEquals(stepExecution.getFailureExceptions().get(1).getSuppressed()[0], exception);
-		assertEquals(2, jobRepository.getUpdateCount());
+		assertEquals(3, jobRepository.getUpdateCount());
 	}
 
 	@Test
