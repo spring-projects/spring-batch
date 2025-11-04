@@ -146,7 +146,7 @@
 		<maven-jar-plugin.version>3.4.2</maven-jar-plugin.version>
 		<spring-javaformat-maven-plugin.version>0.0.47</spring-javaformat-maven-plugin.version>
 		<error-prone.version>2.42.0</error-prone.version>
-		<nullaway.version>0.12.10</nullaway.version>
+		<nullaway.version>0.12.11</nullaway.version>
 	</properties>
 
 	<build>
@@ -182,8 +182,6 @@
 							-Xep:NullAway:ERROR
                             -XepOpt:NullAway:JSpecifyMode=true
                             -XepOpt:NullAway:OnlyNullMarked
-							<!-- FIXME Remove once https://github.com/uber/NullAway/pull/1295 is released -->
-							-XepOpt:NullAway:CustomContractAnnotations=org.springframework.lang.Contract
 							-XepOpt:NullAway:SuppressionNameAliases=DataFlowIssue
 							<!-- https://github.com/uber/NullAway/issues/162 -->
 							-XepExcludedPaths:.*/src/test/java/.*

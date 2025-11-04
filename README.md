@@ -163,14 +163,13 @@ Please see our [Security policy](https://github.com/spring-projects/spring-batch
 
 # Building from Source
 
-## Using the Command Line
-
 Clone the git repository using the URL on the Github home page:
 
     $ git clone git@github.com:spring-projects/spring-batch.git
     $ cd spring-batch
 
-Maven is the build tool used for Spring Batch. You can build the project with the following command:
+To build Spring Batch, you need a JDK 22+. Maven is the build tool used for Spring Batch.
+You can build the project with the following command:
 
     $ ./mvnw package
 
@@ -188,27 +187,6 @@ $ ../mvnw antora:antora
 ```
 
 The reference documentation can be found in `spring-batch-docs/target/anotra/site`.
-
-## Using Docker
-
-If you want to build the project in a Docker container, you can proceed as follows:
-
-```
-$> docker run -it --mount type=bind,source="$(pwd)",target=/spring-batch maven:3-openjdk-17 bash
-#> cd spring-batch
-#> ./mvnw package
-```
-
-This will mount the source code that you cloned previously on the host inside the container.
-If you want to work on a copy of the source code inside the container (no side effects on the host),
-you can proceed as follows:
-
-```
-$> docker run -it maven:3-openjdk-17 bash
-#> git clone https://github.com/spring-projects/spring-batch.git
-#> cd spring-batch
-#> ./mvnw package
-```
 
 # Contributing to Spring Batch
 
