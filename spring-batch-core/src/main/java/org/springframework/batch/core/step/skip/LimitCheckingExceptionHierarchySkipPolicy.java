@@ -32,7 +32,7 @@ public class LimitCheckingExceptionHierarchySkipPolicy implements SkipPolicy {
 
 	private Set<Class<? extends Throwable>> skippableExceptions = new HashSet<>();
 
-	private long skipLimit = -1;
+	private final long skipLimit;
 
 	/**
 	 * Create a new {@link LimitCheckingExceptionHierarchySkipPolicy} instance.
@@ -41,7 +41,7 @@ public class LimitCheckingExceptionHierarchySkipPolicy implements SkipPolicy {
 	 */
 	public LimitCheckingExceptionHierarchySkipPolicy(Set<Class<? extends Throwable>> skippableExceptions,
 			long skipLimit) {
-		Assert.notEmpty(skippableExceptions, "The skippableExceptions must not be empty");
+		Assert.notNull(skippableExceptions, "The skippableExceptions must not be null");
 		Assert.isTrue(skipLimit > 0, "The skipLimit must be greater than zero");
 		this.skippableExceptions = skippableExceptions;
 		this.skipLimit = skipLimit;

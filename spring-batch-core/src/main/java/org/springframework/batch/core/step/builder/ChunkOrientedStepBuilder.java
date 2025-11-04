@@ -50,6 +50,7 @@ import org.springframework.batch.core.step.ThreadStepInterruptionPolicy;
 import org.springframework.batch.core.step.item.ChunkOrientedStep;
 import org.springframework.batch.core.step.skip.AlwaysSkipItemSkipPolicy;
 import org.springframework.batch.core.step.skip.LimitCheckingExceptionHierarchySkipPolicy;
+import org.springframework.batch.core.step.skip.SkipLimitExceededException;
 import org.springframework.batch.core.step.skip.SkipPolicy;
 import org.springframework.batch.infrastructure.item.ItemProcessor;
 import org.springframework.batch.infrastructure.item.ItemReader;
@@ -108,7 +109,7 @@ public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrien
 
 	private final Set<Class<? extends Throwable>> skippableExceptions = new HashSet<>();
 
-	private long skipLimit = -1;
+	private long skipLimit = 10;
 
 	private @Nullable AsyncTaskExecutor asyncTaskExecutor;
 
@@ -347,6 +348,14 @@ public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrien
 		return self();
 	}
 
+	/**
+	 * Set the skip limit for the step. This limit determines the maximum number of items
+	 * that can be skipped before the step fails. If the number of skipped items exceeds
+	 * this limit, the step will throw a {@link SkipLimitExceededException} and fail.
+	 * Defaults to 10.
+	 * @param skipLimit the skip limit to set
+	 * @return this for fluent chaining
+	 */
 	public ChunkOrientedStepBuilder<I, O> skipLimit(long skipLimit) {
 		Assert.isTrue(skipLimit > 0, "skipLimit must be positive");
 		this.skipLimit = skipLimit;

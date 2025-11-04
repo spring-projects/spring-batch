@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.core.step.item;
 
-import java.util.Map;
+import java.util.List;
 import java.util.Set;
 
 import javax.sql.DataSource;
@@ -38,6 +38,7 @@ import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.ChunkOrientedStepBuilder;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.core.step.skip.LimitCheckingExceptionHierarchySkipPolicy;
 import org.springframework.batch.core.step.skip.SkipLimitExceededException;
 import org.springframework.batch.infrastructure.item.ItemProcessor;
@@ -48,6 +49,7 @@ import org.springframework.batch.infrastructure.item.database.builder.JdbcBatchI
 import org.springframework.batch.infrastructure.item.file.FlatFileItemReader;
 import org.springframework.batch.infrastructure.item.file.FlatFileParseException;
 import org.springframework.batch.infrastructure.item.file.builder.FlatFileItemReaderBuilder;
+import org.springframework.batch.infrastructure.item.support.ListItemReader;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -63,6 +65,8 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
+import static org.mockito.Mockito.mock;
+
 /**
  * Integration tests for {@link ChunkOrientedStep}.
  *
@@ -72,6 +76,17 @@ public class ChunkOrientedStepIntegrationTests {
 
 	// TODO use parameterized tests for serial and concurrent steps
 	// The outcome should be the same for both
+
+	@Test
+	void testFaultTolerantChunkOrientedStepSetupWithDefaultSkipLimit() {
+		Assertions.assertDoesNotThrow(() -> new StepBuilder(mock()).chunk(5)
+			.reader(new ListItemReader<>(List.of("item1", "item2")))
+			.writer(items -> {
+			})
+			.faultTolerant()
+			.skip(Exception.class)
+			.build());
+	}
 
 	@Test
 	void testChunkOrientedStep() throws Exception {
