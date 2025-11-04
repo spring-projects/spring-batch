@@ -89,6 +89,17 @@ public class ChunkOrientedStepIntegrationTests {
 	}
 
 	@Test
+	void testFaultTolerantChunkOrientedStepSetupWithDefaultRetryLimit() {
+		Assertions.assertDoesNotThrow(() -> new StepBuilder(mock()).chunk(5)
+			.reader(new ListItemReader<>(List.of("item1", "item2")))
+			.writer(items -> {
+			})
+			.faultTolerant()
+			.retry(Exception.class)
+			.build());
+	}
+
+	@Test
 	void testChunkOrientedStep() throws Exception {
 		// given
 		ApplicationContext context = new AnnotationConfigApplicationContext(TestConfiguration.class,

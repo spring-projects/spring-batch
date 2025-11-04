@@ -101,7 +101,7 @@ public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrien
 
 	private final Set<Class<? extends Throwable>> retryableExceptions = new HashSet<>();
 
-	private long retryLimit = -1;
+	private long retryLimit = 0;
 
 	private @Nullable SkipPolicy skipPolicy;
 
