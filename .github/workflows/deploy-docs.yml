@@ -34,7 +34,7 @@ jobs:
         echo BUILD_VERSION=$BUILD_VERSION >> $GITHUB_ENV
     - name: Run Antora
       run: |
-        ./mvnw antora
+        ./mvnw --no-transfer-progress antora
     - name: Publish Docs
       uses: spring-io/spring-doc-actions/rsync-antora-reference@v0.0.20
       with:
