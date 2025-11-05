@@ -61,4 +61,3 @@
 ** xref:transaction-appendix.adoc[]
 ** xref:glossary.adoc[]
 ** xref:faq.adoc[]
-* xref:api:attachment$index.html[Javadoc,role=link-external,window=_blank]
