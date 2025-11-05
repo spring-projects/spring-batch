@@ -19,6 +19,7 @@ Spring Batch 6.0 includes the following features and improvements:
 * xref:whatsnew.adoc#seda-with-si[SEDA style with Spring Integration message channels]
 * xref:whatsnew.adoc#jackson-3-support[Jackson 3 support]
 * xref:whatsnew.adoc#remote-step-support[Remote step support]
+* xref:whatsnew.adoc#lambda-style-configuration[Lambda style configuration]
 * xref:whatsnew.adoc#deprecations-and-pruning[Deprecations and pruning]
 
 [[dependencies-upgrade]]
@@ -228,6 +229,34 @@ The support for Jackson 2.x has been deprecated and will be removed in a future 
 This release introduces support for remote step executions, allowing you to execute steps of a batch job on remote machines or clusters.
 This feature is particularly useful for large-scale batch processing scenarios where you want to distribute the workload across multiple nodes to improve performance and scalability. Remote step execution is facilitated through the use of Spring Integration messaging channels, which enable communication between the local job execution environment and the remote step executors.
 
+[[lambda-style-configuration]]
+== Lambda style configuration
+
+This release introduces the use of contextual lambda expressions to configure batch artefacts. This new style of configuration provides a more concise and readable way to define item readers and writers.
+
+For example, instead of using the traditional builder pattern like this:
+
+[source, java]
+----
+var reader = new FlatFileItemReaderBuilder()
+ .resource(...)
+ .delimited()
+ .delimiter(",")
+ .quoteCharacter('"')
+ ...
+ .build();
+----
+
+You can now use a lambda expression to configure the delimited options like this:
+
+[source, java]
+----
+var reader = new FlatFileItemReaderBuilder()
+ .resource(...)
+ .delimited (config -> config.delimiter(',').quoteCharcter( '"' ))
+ ...
+ .build();
+----
 
 [[deprecations-and-pruning]]
 == Deprecations and pruning
