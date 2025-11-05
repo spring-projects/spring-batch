@@ -1,17 +1,13 @@
-# The purpose of this Antora playbook is to build the docs in the current branch.
 antora:
   extensions:
-    - '@springio/antora-extensions/partial-build-extension'
-    - '@antora/atlas-extension'
-    - require: '@springio/antora-extensions/latest-version-extension'
-    - require: '@springio/antora-extensions/inject-collector-cache-config-extension'
-    - '@antora/collector-extension'
-    - require: '@springio/antora-extensions/root-component-extension'
+    - require: '@springio/antora-extensions'
       root_component_name: 'batch'
-    - '@springio/antora-extensions/static-page-extension'
 site:
   title: Spring Batch Reference
   url: https://docs.spring.io/spring-batch/reference
+  robots: allow
+git:
+  ensure_git_suffix: false
 content:
   sources:
     - url: ..
@@ -20,21 +16,26 @@ content:
       worktrees: true
 asciidoc:
   attributes:
+    page-stackoverflow-url: https://stackoverflow.com/tags/spring-batch
     page-pagination: ''
     hide-uri-scheme: '@'
     tabs-sync-option: '@'
     chomp: 'all'
+    attribute-missing: 'warn'
+    sourcemap: true
   extensions:
     - '@asciidoctor/tabs'
     - '@springio/asciidoctor-extensions'
-  sourcemap: true
+    - '@springio/asciidoctor-extensions/javadoc-extension'
 urls:
+  latest_version_segment_strategy: redirect:to
   latest_version_segment: ''
+  redirect_facility: httpd
+ui:
+  bundle:
+    url: https://github.com/spring-io/antora-ui-spring/releases/download/latest/ui-bundle.zip
+    snapshot: true
 runtime:
   log:
     failure_level: warn
     format: pretty
-ui:
-  bundle:
-    url: https://github.com/spring-io/antora-ui-spring/releases/download/v0.4.18/ui-bundle.zip
-    snapshot: true

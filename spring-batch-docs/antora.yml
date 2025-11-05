@@ -5,7 +5,15 @@ nav:
   - modules/ROOT/nav.adoc
 ext:
   collector:
-    run:
-      command: ./mvnw process-resources -pl spring-batch-docs -am
-    scan:
-      dir: ./target/classes/antora-resources
+    - run:
+        command: ./mvnw process-resources -pl spring-batch-docs
+        local: true
+      scan:
+        dir: ./target/classes/antora-resources
+    - run:
+        command: ./mvnw javadoc:aggregate
+        local: true
+      scan:
+        clean: true
+        dir: target/reports/apidocs
+        into: modules/api/attachments

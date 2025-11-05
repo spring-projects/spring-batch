@@ -133,6 +133,7 @@
 
 		<!-- documentation dependencies -->
 		<io.spring.maven.antora-version>0.0.4</io.spring.maven.antora-version>
+		<antora-maven-plugin.version>1.0.0-alpha.5</antora-maven-plugin.version>
 
 		<!-- plugin versions -->
 		<maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>

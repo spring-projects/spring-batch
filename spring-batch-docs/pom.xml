@@ -17,18 +17,15 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>io.spring.maven.antora</groupId>
+                <groupId>org.antora</groupId>
                 <artifactId>antora-maven-plugin</artifactId>
-                <version>${io.spring.maven.antora-version}</version>
+                <version>${antora-maven-plugin.version}</version>
                 <extensions>true</extensions>
                 <configuration>
-                    <packages>
-                        <package>@antora/atlas-extension@1.0.0-alpha.2</package>
-                        <package>@antora/collector-extension@1.0.1</package>
-                        <package>@asciidoctor/tabs@1.0.0-beta.6</package>
-                        <package>@springio/antora-extensions@1.14.7</package>
-                        <package>@springio/asciidoctor-extensions@1.0.0-alpha.17</package>
-                    </packages>
+                    <environmentVariables>
+                        <BUILD_REFNAME>HEAD</BUILD_REFNAME>
+                        <BUILD_VERSION>${project.version}</BUILD_VERSION>
+                    </environmentVariables>
                 </configuration>
             </plugin>
             <plugin>
@@ -49,7 +46,6 @@
                 <version>${maven-assembly-plugin.version}</version>
                 <configuration>
                     <descriptors>
-                        <descriptor>src/assembly/javadocs.xml</descriptor>
                         <descriptor>src/assembly/schemas.xml</descriptor>
                     </descriptors>
                     <finalName>spring-batch-${project.version}</finalName>

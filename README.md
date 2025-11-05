@@ -182,8 +182,7 @@ Please note that some integration tests are based on Docker, so please make sure
 To generate the reference documentation, run the following commands:
 
 ```
-$ cd spring-batch-docs
-$ ../mvnw antora:antora
+$ ./mvnw antora -pl spring-batch-docs
 ```
 
 The reference documentation can be found in `spring-batch-docs/target/anotra/site`.
