@@ -42,7 +42,7 @@ jobs:
         docs-host: ${{ secrets.DOCS_HOST }}
         docs-ssh-key: ${{ secrets.DOCS_SSH_KEY }}
         docs-ssh-host-key: ${{ secrets.DOCS_SSH_HOST_KEY }}
-        site-path: target/site
+        site-path: target/antora/site
     - name: Bust Cloudflare Cache
       uses: spring-io/spring-doc-actions/bust-cloudflare-antora-cache@v0.0.20
       with:
