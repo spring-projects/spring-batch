@@ -16,6 +16,7 @@
 package org.springframework.batch.core.repository.dao.mongodb;
 
 import java.util.Collection;
+import java.util.Collections;
 
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.step.StepExecution;
@@ -110,6 +111,24 @@ public class MongoExecutionContextDao implements ExecutionContextDao {
 	@Override
 	public void updateExecutionContext(StepExecution stepExecution) {
 		saveExecutionContext(stepExecution);
+	}
+
+	@Override
+	public void deleteExecutionContext(JobExecution jobExecution) {
+		Query query = new Query(where("jobExecutionId").is(jobExecution.getId()));
+		org.springframework.batch.core.repository.persistence.ExecutionContext executionContext = new org.springframework.batch.core.repository.persistence.ExecutionContext(
+				Collections.emptyMap(), false);
+		Update executionContextRemovalUpdate = new Update().set("executionContext", executionContext);
+		this.mongoOperations.updateFirst(query, executionContextRemovalUpdate, JOB_EXECUTIONS_COLLECTION_NAME);
+	}
+
+	@Override
+	public void deleteExecutionContext(StepExecution stepExecution) {
+		Query query = new Query(where("stepExecutionId").is(stepExecution.getId()));
+		org.springframework.batch.core.repository.persistence.ExecutionContext executionContext = new org.springframework.batch.core.repository.persistence.ExecutionContext(
+				Collections.emptyMap(), false);
+		Update executionContextRemovalUpdate = new Update().set("executionContext", executionContext);
+		this.mongoOperations.updateFirst(query, executionContextRemovalUpdate, STEP_EXECUTIONS_COLLECTION_NAME);
 	}
 
 }

@@ -23,6 +23,7 @@ import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersBuilder;
+import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.repository.dao.ExecutionContextDao;
@@ -105,6 +106,27 @@ public class MongoExecutionContextDaoIntegrationTests extends AbstractMongoDBDao
 		// then
 		assertTrue(actual.containsKey("foo"));
 		assertEquals("bar", actual.get("foo"));
+	}
+
+	@Test
+	void testDeleteExecutionContext(@Autowired JobOperator jobOperator, @Autowired Job job,
+			@Autowired ExecutionContextDao executionContextDao) throws Exception {
+		// given
+		JobParameters jobParameters = new JobParametersBuilder().addString("name", "foo")
+			.addLocalDateTime("runtime", LocalDateTime.now())
+			.toJobParameters();
+		JobExecution jobExecution = jobOperator.start(job, jobParameters);
+		StepExecution stepExecution = jobExecution.getStepExecutions().stream().findFirst().orElseThrow();
+
+		// when
+		executionContextDao.deleteExecutionContext(jobExecution);
+		executionContextDao.deleteExecutionContext(stepExecution);
+
+		// then
+		ExecutionContext updatedJobExecutionContext = executionContextDao.getExecutionContext(jobExecution);
+		ExecutionContext updatedStepExecutionContext = executionContextDao.getExecutionContext(stepExecution);
+		assertTrue(updatedJobExecutionContext.isEmpty());
+		assertTrue(updatedStepExecutionContext.isEmpty());
 	}
 
 }

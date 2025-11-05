@@ -19,6 +19,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -33,6 +34,7 @@ import org.springframework.batch.core.repository.persistence.converter.JobExecut
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.springframework.util.CollectionUtils;
 
@@ -158,6 +160,13 @@ public class MongoJobExecutionDao implements JobExecutionDao {
 		this.mongoOperations.remove(query(where("jobExecutionId").is(jobExecution.getId())),
 				JOB_EXECUTIONS_COLLECTION_NAME);
 
+	}
+
+	@Override
+	public void deleteJobExecutionParameters(JobExecution jobExecution) {
+		Query query = new Query(where("jobExecutionId").is(jobExecution.getId()));
+		Update jobParametersRemovalUpdate = new Update().set("jobParameters", Collections.emptyList());
+		this.mongoOperations.updateFirst(query, jobParametersRemovalUpdate, JOB_EXECUTIONS_COLLECTION_NAME);
 	}
 
 	private JobExecution convert(org.springframework.batch.core.repository.persistence.JobExecution jobExecution,

@@ -356,6 +356,20 @@ class MongoJobExecutionDaoIntegrationTests extends AbstractMongoDBDaoIntegration
 		assertNull(dao.getJobExecution(execution.getId()));
 	}
 
+	@Test
+	void testDeleteJobExecutionParameters() {
+		// given
+		JobParameters jobParameters = new JobParametersBuilder().addString("name", "foo").toJobParameters();
+		JobExecution execution = dao.createJobExecution(jobInstance, jobParameters);
+
+		// when
+		dao.deleteJobExecutionParameters(execution);
+
+		// then
+		JobExecution updatedJobExecution = dao.getJobExecution(execution.getId());
+		assertTrue(updatedJobExecution.getJobParameters().isEmpty());
+	}
+
 	/*
 	 * Check to make sure the executions are equal. Normally, comparing the id's is
 	 * sufficient. However, for testing purposes, especially of a DAO, we need to make
