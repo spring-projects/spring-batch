@@ -1,0 +1,51 @@
+name: Tag release and move to next development version
+
+on:
+  workflow_dispatch:
+    inputs:
+      releaseVersion:
+        description: "Release version"
+        required: true
+      snapshotVersion:
+        description: "Next snapshot version"
+        required: true
+
+jobs:
+
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4.2.2
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v5
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Set up git
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
+      - name: Capture versions
+        run: |
+          echo RELEASE_VERSION=${{ github.event.inputs.releaseVersion }} >> $GITHUB_ENV
+          echo SNAPSHOT_VERSION=${{ github.event.inputs.snapshotVersion }} >> $GITHUB_ENV
+
+      - name: Tag release
+        run: |
+          ./mvnw versions:set -DgenerateBackupPoms=false -DnewVersion=$RELEASE_VERSION
+          git commit -a -m "Release version $RELEASE_VERSION"
+          git tag -a v$RELEASE_VERSION -m "Release version $RELEASE_VERSION"
+          git push origin v$RELEASE_VERSION
+          
+      - name: Move to next development version
+        run: |
+          ./mvnw versions:set -DgenerateBackupPoms=false -DnewVersion=$SNAPSHOT_VERSION
+          git commit -a -m "Next development version"
+          git push origin main
