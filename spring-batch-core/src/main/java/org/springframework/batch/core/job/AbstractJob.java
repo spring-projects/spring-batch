@@ -44,8 +44,6 @@ import org.springframework.batch.core.listener.CompositeJobExecutionListener;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.launch.JobRestartException;
 import org.springframework.batch.core.scope.context.JobSynchronizationManager;
-import org.springframework.batch.core.step.StepLocator;
-import org.springframework.batch.infrastructure.repeat.RepeatException;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
@@ -292,15 +290,11 @@ public abstract class AbstractJob implements Job, ListableStepLocator, BeanNameA
 
 				listener.beforeJob(execution);
 
-				try {
-					doExecute(execution);
-					if (logger.isDebugEnabled()) {
-						logger.debug("Job execution complete: " + execution);
-					}
+				doExecute(execution);
+				if (logger.isDebugEnabled()) {
+					logger.debug("Job execution complete: " + execution);
 				}
-				catch (RepeatException e) {
-					throw e.getCause();
-				}
+
 			}
 			else {
 
@@ -326,7 +320,7 @@ public abstract class AbstractJob implements Job, ListableStepLocator, BeanNameA
 			execution.setStatus(BatchStatus.max(BatchStatus.STOPPED, e.getStatus()));
 			execution.addFailureException(e);
 		}
-		catch (Throwable t) {
+		catch (Exception t) {
 			logger.error("Encountered fatal error executing job", t);
 			execution.setExitStatus(getDefaultExitStatusForFailure(t));
 			execution.setStatus(BatchStatus.FAILED);
