@@ -144,6 +144,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 
 	private static final String GET_JOB_EXECUTION_IDS_BY_INSTANCE_ID = """
 			SELECT JOB_EXECUTION_ID FROM %PREFIX%JOB_EXECUTION WHERE JOB_INSTANCE_ID = ?
+			ORDER BY JOB_EXECUTION_ID DESC
 			""";
 
 	JdbcJobInstanceDao jobInstanceDao;
@@ -217,10 +218,10 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		Assert.notNull(jobInstance, "Job instance cannot be null.");
 		long jobInstanceId = jobInstance.getId();
 		// TODO optimize to a single query with a join if possible
-		List<Long> jobExecutionIds = getJdbcTemplate().queryForList(getQuery(GET_JOB_EXECUTION_IDS_BY_INSTANCE_ID),
-				Long.class, jobInstanceId);
-		List<JobExecution> jobExecutions = new ArrayList<>(jobExecutionIds.size());
-		for (Long jobExecutionId : jobExecutionIds) {
+		List<Long> jobExecutionIdsSortedBackwardByCreationOrder = getJdbcTemplate()
+			.queryForList(getQuery(GET_JOB_EXECUTION_IDS_BY_INSTANCE_ID), Long.class, jobInstanceId);
+		List<JobExecution> jobExecutions = new ArrayList<>(jobExecutionIdsSortedBackwardByCreationOrder.size());
+		for (Long jobExecutionId : jobExecutionIdsSortedBackwardByCreationOrder) {
 			jobExecutions.add(getJobExecution(jobExecutionId));
 		}
 		return jobExecutions;

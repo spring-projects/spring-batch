@@ -19,8 +19,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Date;
-
-import javax.transaction.Transactional;
+import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -153,6 +152,23 @@ public class JdbcJobExecutionDaoTests {
 		Assertions.assertEquals(stringParameter, parameters.getString("string"));
 		Assertions.assertEquals(longParameter, parameters.getLong("long"));
 		Assertions.assertEquals(doubleParameter, parameters.getDouble("double"));
+	}
+
+	@Test
+	void testFindJobExecutionsInOrder() {
+		// given
+		JobParameters jobParameters = new JobParametersBuilder().addString("name", "foo").toJobParameters();
+		JobInstance jobInstance = jdbcJobInstanceDao.createJobInstance("job", jobParameters);
+		JobExecution jobExecution1 = jdbcJobExecutionDao.createJobExecution(jobInstance, jobParameters);
+		JobExecution jobExecution2 = jdbcJobExecutionDao.createJobExecution(jobInstance, jobParameters);
+
+		// when
+		List<JobExecution> jobExecutions = jdbcJobExecutionDao.findJobExecutions(jobInstance);
+
+		// then
+		Assertions.assertEquals(2, jobExecutions.size());
+		Assertions.assertEquals(jobExecution2.getId(), jobExecutions.get(0).getId());
+		Assertions.assertEquals(jobExecution1.getId(), jobExecutions.get(1).getId());
 	}
 
 }
