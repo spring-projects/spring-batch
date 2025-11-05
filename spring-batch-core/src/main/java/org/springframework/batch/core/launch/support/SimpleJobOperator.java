@@ -416,7 +416,7 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 	@Override
 	public JobExecution recover(JobExecution jobExecution) {
 		Assert.notNull(jobExecution, "JobExecution must not be null");
-		if (jobExecution.getExecutionContext().containsKey("recovered")) {
+		if (jobExecution.getExecutionContext().containsKey("batch.recovered")) {
 			if (logger.isWarnEnabled()) {
 				logger.warn("Job execution already recovered: " + jobExecution);
 			}
@@ -443,14 +443,14 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 			if (stepStatus.isRunning()) {
 				stepExecution.setStatus(BatchStatus.FAILED);
 				stepExecution.setEndTime(LocalDateTime.now());
-				stepExecution.getExecutionContext().put("recovered", true);
+				stepExecution.getExecutionContext().put("batch.recovered", true);
 				jobRepository.update(stepExecution);
 			}
 		}
 
 		jobExecution.setStatus(BatchStatus.FAILED);
 		jobExecution.setEndTime(LocalDateTime.now());
-		jobExecution.getExecutionContext().put("recovered", true);
+		jobExecution.getExecutionContext().put("batch.recovered", true);
 		jobRepository.update(jobExecution);
 
 		return jobExecution;

@@ -162,7 +162,7 @@ public class MongoDBJobRestartIntegrationTests {
 
 		// Step 4: recover the job execution
 		JobExecution recoveredJobExecution = jobOperator.recover(jobExecution);
-		Assert.notNull(recoveredJobExecution.getExecutionContext().get("recovered"),
+		Assert.notNull(recoveredJobExecution.getExecutionContext().get("batch.recovered"),
 				"Job execution should be marked as recovered");
 
 		// Step 5: restart the job
