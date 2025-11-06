@@ -1,5 +1,6 @@
 # Latest news
 
+* November 04, 2025: [Spring Batch 6.0.0 RC2 available now!](https://spring.io/blog/2025/11/06/spring-batch-6-0-0-rc2-released)
 * October 22, 2025: [Spring Batch 6.0.0 RC1 and 5.2.4 are released!](https://spring.io/blog/2025/10/22/spring-batch-6-0-0-rc1-released)
 * October 9, 2025: [Spring Batch 6.0.0 M4 is out!](https://spring.io/blog/2025/10/09/spring-batch-6-0-0-m4-released)
 * September 17, 2025: [Spring Batch 6.0.0 M3 and 5.2.3 available now](https://spring.io/blog/2025/09/17/spring-batch-6-0-0-m3-5-2-3-released)
