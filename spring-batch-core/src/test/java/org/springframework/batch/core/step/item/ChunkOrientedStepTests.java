@@ -21,23 +21,29 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.ResourcelessJobRepository;
+import org.springframework.batch.core.step.FatalStepExecutionException;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.step.builder.ChunkOrientedStepBuilder;
 import org.springframework.batch.core.step.builder.StepBuilder;
+import org.springframework.batch.core.step.skip.NeverSkipItemSkipPolicy;
+import org.springframework.batch.core.step.skip.NonSkippableProcessException;
 import org.springframework.batch.infrastructure.item.ItemProcessor;
 import org.springframework.batch.infrastructure.item.ItemReader;
 import org.springframework.batch.infrastructure.item.ItemWriter;
 import org.springframework.batch.infrastructure.item.support.ListItemReader;
 import org.springframework.batch.infrastructure.item.support.ListItemWriter;
 import org.springframework.batch.infrastructure.support.transaction.ResourcelessTransactionManager;
+import org.springframework.core.retry.RetryPolicy;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -213,6 +219,52 @@ public class ChunkOrientedStepTests {
 		// Should not retry (only 1 attempt)
 		assertEquals(1, attempts.get(),
 				"RuntimeException should not be retried when only IllegalStateException is configured");
+	}
+
+	@Test
+	void testDoSkipInProcessShouldThrowNonSkippableProcessExceptionWhenSkipPolicyReturnsFalse() throws Exception {
+		// given - fault-tolerant step with NeverSkipItemSkipPolicy and retry limit
+		ItemReader<String> reader = new ListItemReader<>(List.of("item1", "item2", "item3"));
+
+		ItemProcessor<String, String> processor = item -> {
+			if ("item2".equals(item)) {
+				throw new RuntimeException("Processing failed for item2");
+			}
+			return item.toUpperCase();
+		};
+
+		ItemWriter<String> writer = chunk -> {
+		};
+
+		JobRepository jobRepository = new ResourcelessJobRepository();
+		ChunkOrientedStep<String, String> step = new ChunkOrientedStep<>("step", 3, reader, writer, jobRepository);
+		step.setItemProcessor(processor);
+		step.setFaultTolerant(true);
+		step.setRetryPolicy(RetryPolicy.withMaxRetries(1)); // retry once (initial + 1
+															// retry)
+		step.setSkipPolicy(new NeverSkipItemSkipPolicy()); // never skip
+		step.afterPropertiesSet();
+
+		JobInstance jobInstance = new JobInstance(1L, "job");
+		JobExecution jobExecution = new JobExecution(1L, jobInstance, new JobParameters());
+		StepExecution stepExecution = new StepExecution(1L, "step", jobExecution);
+
+		// when - execute step
+		step.execute(stepExecution);
+
+		// then - should fail with FatalStepExecutionException having
+		// NonSkippableProcessException as cause
+		ExitStatus stepExecutionExitStatus = stepExecution.getExitStatus();
+		assertEquals(ExitStatus.FAILED.getExitCode(), stepExecutionExitStatus.getExitCode());
+		Throwable throwable = stepExecution.getFailureExceptions().get(0);
+		assertInstanceOf(FatalStepExecutionException.class, throwable,
+				"Expected FatalStepExecutionException when skip policy rejects skipping");
+		Throwable cause = throwable.getCause();
+		assertInstanceOf(NonSkippableProcessException.class, cause,
+				"Expected NonSkippableProcessException as cause when skip policy rejects skipping");
+		assertEquals("Skip policy rejected skipping item", cause.getMessage());
+		assertEquals(ExitStatus.FAILED.getExitCode(), stepExecution.getExitStatus().getExitCode());
+		assertEquals(0, stepExecution.getProcessSkipCount(), "Process skip count should be 0");
 	}
 
 }
