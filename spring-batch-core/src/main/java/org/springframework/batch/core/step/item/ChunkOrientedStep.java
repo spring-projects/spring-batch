@@ -51,6 +51,9 @@ import org.springframework.batch.core.step.FatalStepExecutionException;
 import org.springframework.batch.core.step.StepInterruptionPolicy;
 import org.springframework.batch.core.step.ThreadStepInterruptionPolicy;
 import org.springframework.batch.core.step.skip.AlwaysSkipItemSkipPolicy;
+import org.springframework.batch.core.step.skip.NonSkippableProcessException;
+import org.springframework.batch.core.step.skip.NonSkippableReadException;
+import org.springframework.batch.core.step.skip.NonSkippableWriteException;
 import org.springframework.batch.core.step.skip.SkipPolicy;
 import org.springframework.batch.infrastructure.item.Chunk;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
@@ -560,6 +563,9 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			this.compositeSkipListener.onSkipInRead(cause);
 			contribution.incrementReadSkipCount();
 		}
+		else {
+			throw new NonSkippableReadException("Skip policy rejected skipping item", cause);
+		}
 	}
 
 	private Chunk<O> processChunk(Chunk<I> chunk, StepContribution contribution) throws Exception {
@@ -653,6 +659,9 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			this.compositeSkipListener.onSkipInProcess(item, retryException.getCause());
 			contribution.incrementProcessSkipCount();
 		}
+		else {
+			throw new NonSkippableProcessException("Skip policy rejected skipping item", cause);
+		}
 	}
 
 	private void writeChunk(Chunk<O> chunk, StepContribution contribution) throws Exception {
@@ -737,6 +746,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 				else {
 					logger.error("Failed to write item: " + item, exception);
 					this.compositeItemWriteListener.onWriteError(exception, singleItemChunk);
+					throw new NonSkippableWriteException("Skip policy rejected skipping item", exception);
 				}
 			}
 		}

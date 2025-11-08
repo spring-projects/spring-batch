@@ -17,21 +17,32 @@ package org.springframework.batch.core.step.item;
 
 import org.junit.jupiter.api.Test;
 
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.ResourcelessJobRepository;
+import org.springframework.batch.core.step.FatalStepExecutionException;
 import org.springframework.batch.core.step.StepExecution;
+import org.springframework.batch.core.step.skip.NeverSkipItemSkipPolicy;
+import org.springframework.batch.core.step.skip.NonSkippableProcessException;
+import org.springframework.batch.infrastructure.item.ItemProcessor;
 import org.springframework.batch.infrastructure.item.ItemReader;
 import org.springframework.batch.infrastructure.item.ItemWriter;
+import org.springframework.core.retry.policy.SimpleRetryPolicy;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
+ * Tests for {@link ChunkOrientedStep}.
+ *
  * @author Mahmoud Ben Hassine
  */
 public class ChunkOrientedStepTests {
@@ -55,6 +66,48 @@ public class ChunkOrientedStepTests {
 
 		// then
 		verify(reader, times(6)).read();
+	}
+
+	@Test
+	void testDoSkipInProcessThrowsNonSkippableProcessExceptionWhenSkipPolicyReturnsFalse() throws Exception {
+		// given - fault-tolerant step with NeverSkipItemSkipPolicy and retry limit
+		ItemReader<String> reader = mock();
+		when(reader.read()).thenReturn("item1", "item2", "item3", null);
+
+		ItemProcessor<String, String> processor = item -> {
+			if ("item2".equals(item)) {
+				throw new RuntimeException("Processing failed for item2");
+			}
+			return item.toUpperCase();
+		};
+
+		ItemWriter<String> writer = chunk -> {
+		};
+
+		JobRepository jobRepository = new ResourcelessJobRepository();
+		ChunkOrientedStep<String, String> step = new ChunkOrientedStep<>("step", 3, reader, writer, jobRepository);
+		step.setItemProcessor(processor);
+		step.setFaultTolerant(true);
+		step.setRetryPolicy(new SimpleRetryPolicy(2)); // retry once (initial + 1 retry)
+		step.setSkipPolicy(new NeverSkipItemSkipPolicy()); // never skip
+		step.afterPropertiesSet();
+
+		JobInstance jobInstance = new JobInstance(1L, "job");
+		JobExecution jobExecution = new JobExecution(1L, jobInstance, new JobParameters());
+		StepExecution stepExecution = new StepExecution(1L, "step", jobExecution);
+
+		// when - execute step
+		FatalStepExecutionException exception = assertThrows(FatalStepExecutionException.class, () -> {
+			step.execute(stepExecution);
+		});
+
+		// then - should throw NonSkippableProcessException
+		Throwable cause = exception.getCause();
+		assertInstanceOf(NonSkippableProcessException.class, cause,
+				"Expected NonSkippableProcessException when skip policy rejects skipping");
+		assertEquals("Skip policy rejected skipping item", cause.getMessage());
+		assertEquals(ExitStatus.FAILED.getExitCode(), stepExecution.getExitStatus().getExitCode());
+		assertEquals(0, stepExecution.getProcessSkipCount(), "Process skip count should be 0");
 	}
 
 }
