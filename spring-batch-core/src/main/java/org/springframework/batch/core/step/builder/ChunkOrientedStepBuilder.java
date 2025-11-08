@@ -310,6 +310,15 @@ public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrien
 		return self();
 	}
 
+	/**
+	 * Set the retry limit for the step. If no explicit retry exceptions are configured
+	 * via {@link #retry(Class[])}, the default is to retry all {@link Exception} types
+	 * but not {@link Error} types (e.g., OutOfMemoryError, StackOverflowError). This
+	 * ensures that fatal JVM errors fail immediately rather than being retried.
+	 * @param retryLimit the maximum number of retry attempts
+	 * @return this for fluent chaining
+	 * @since 6.0
+	 */
 	public ChunkOrientedStepBuilder<I, O> retryLimit(long retryLimit) {
 		Assert.isTrue(retryLimit > 0, "retryLimit must be positive");
 		this.retryLimit = retryLimit;
@@ -409,10 +418,12 @@ public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrien
 		chunkOrientedStep.setInterruptionPolicy(this.interruptionPolicy);
 		if (this.retryPolicy == null) {
 			if (!this.retryableExceptions.isEmpty() || this.retryLimit > 0) {
-				this.retryPolicy = RetryPolicy.builder()
-					.maxRetries(this.retryLimit)
-					.includes(this.retryableExceptions)
-					.build();
+				// Default to Exception.class when retryLimit is set without explicit
+				// retry() configuration. This prevents retrying fatal JVM errors like
+				// OutOfMemoryError and StackOverflowError.
+				Set<Class<? extends Throwable>> exceptions = this.retryableExceptions.isEmpty()
+						? Set.of(Exception.class) : this.retryableExceptions;
+				this.retryPolicy = RetryPolicy.builder().maxRetries(this.retryLimit).includes(exceptions).build();
 			}
 			else {
 				this.retryPolicy = throwable -> false;
