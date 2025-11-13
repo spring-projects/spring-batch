@@ -15,6 +15,9 @@
  */
 package org.springframework.batch.core.step.item;
 
+import java.util.List;
+
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.job.JobExecution;
@@ -23,8 +26,10 @@ import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.ResourcelessJobRepository;
 import org.springframework.batch.core.step.StepExecution;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.infrastructure.item.ItemReader;
 import org.springframework.batch.infrastructure.item.ItemWriter;
+import org.springframework.batch.infrastructure.item.support.ListItemReader;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -35,6 +40,28 @@ import static org.mockito.Mockito.when;
  * @author Mahmoud Ben Hassine
  */
 public class ChunkOrientedStepTests {
+
+	@Test
+	void testFaultTolerantChunkOrientedStepSetupWithDefaultSkipLimit() {
+		Assertions.assertDoesNotThrow(() -> new StepBuilder(mock()).chunk(5)
+			.reader(new ListItemReader<>(List.of("item1", "item2")))
+			.writer(items -> {
+			})
+			.faultTolerant()
+			.skip(Exception.class)
+			.build());
+	}
+
+	@Test
+	void testFaultTolerantChunkOrientedStepSetupWithDefaultRetryLimit() {
+		Assertions.assertDoesNotThrow(() -> new StepBuilder(mock()).chunk(5)
+			.reader(new ListItemReader<>(List.of("item1", "item2")))
+			.writer(items -> {
+			})
+			.faultTolerant()
+			.retry(Exception.class)
+			.build());
+	}
 
 	@Test
 	void testReadNoMoreThanAvailableItems() throws Exception {
