@@ -48,7 +48,7 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.StepInterruptionPolicy;
 import org.springframework.batch.core.step.ThreadStepInterruptionPolicy;
 import org.springframework.batch.core.step.item.ChunkOrientedStep;
-import org.springframework.batch.core.step.skip.AlwaysSkipItemSkipPolicy;
+import org.springframework.batch.core.step.skip.NeverSkipItemSkipPolicy;
 import org.springframework.batch.core.step.skip.LimitCheckingExceptionHierarchySkipPolicy;
 import org.springframework.batch.core.step.skip.SkipLimitExceededException;
 import org.springframework.batch.core.step.skip.SkipPolicy;
@@ -320,7 +320,7 @@ public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrien
 	 * Set the skip policy for the step. This policy determines how the step handles
 	 * skipping items in case of failures. It can be used to define the conditions under
 	 * which items should be skipped and how many times an item can be skipped before the
-	 * step fails. Defaults to {@link AlwaysSkipItemSkipPolicy}.
+	 * step fails. Defaults to {@link NeverSkipItemSkipPolicy}.
 	 * @param skipPolicy the skip policy to use
 	 * @return this for fluent chaining
 	 */
@@ -425,7 +425,7 @@ public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrien
 						this.skipLimit);
 			}
 			else {
-				this.skipPolicy = new AlwaysSkipItemSkipPolicy();
+				this.skipPolicy = new NeverSkipItemSkipPolicy();
 			}
 		}
 		chunkOrientedStep.setSkipPolicy(this.skipPolicy);

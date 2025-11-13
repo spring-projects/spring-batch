@@ -50,7 +50,7 @@ import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.core.step.FatalStepExecutionException;
 import org.springframework.batch.core.step.StepInterruptionPolicy;
 import org.springframework.batch.core.step.ThreadStepInterruptionPolicy;
-import org.springframework.batch.core.step.skip.AlwaysSkipItemSkipPolicy;
+import org.springframework.batch.core.step.skip.NeverSkipItemSkipPolicy;
 import org.springframework.batch.core.step.skip.SkipPolicy;
 import org.springframework.batch.infrastructure.item.Chunk;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
@@ -143,7 +143,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 
 	private final CompositeRetryListener compositeRetryListener = new CompositeRetryListener();
 
-	private SkipPolicy skipPolicy = new AlwaysSkipItemSkipPolicy();
+	private SkipPolicy skipPolicy = new NeverSkipItemSkipPolicy();
 
 	private final CompositeSkipListener<I, O> compositeSkipListener = new CompositeSkipListener<>();
 
@@ -297,7 +297,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 	 * whether an item should be skipped or not when an exception occurs during item
 	 * processing.
 	 * @param skipPolicy the skip policy to set. Defaults to
-	 * {@link AlwaysSkipItemSkipPolicy}.
+	 * {@link NeverSkipItemSkipPolicy}.
 	 */
 	public void setSkipPolicy(SkipPolicy skipPolicy) {
 		Assert.notNull(skipPolicy, "Skip policy must not be null");
