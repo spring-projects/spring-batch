@@ -410,7 +410,7 @@ public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrien
 		if (this.retryPolicy == null) {
 			if (!this.retryableExceptions.isEmpty() || this.retryLimit > 0) {
 				this.retryPolicy = RetryPolicy.builder()
-					.maxAttempts(this.retryLimit)
+					.maxRetries(this.retryLimit)
 					.includes(this.retryableExceptions)
 					.build();
 			}

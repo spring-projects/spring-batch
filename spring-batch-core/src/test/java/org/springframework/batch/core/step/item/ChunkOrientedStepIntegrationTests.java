@@ -446,7 +446,7 @@ public class ChunkOrientedStepIntegrationTests {
 			Set<Class<? extends Throwable>> nonRetrybaleExceptions = Set.of(FlatFileParseException.class,
 					DataIntegrityViolationException.class);
 			RetryPolicy retryPolicy = RetryPolicy.builder()
-				.maxAttempts(retryLimit)
+				.maxRetries(retryLimit)
 				.excludes(nonRetrybaleExceptions)
 				.build();
 
@@ -481,7 +481,7 @@ public class ChunkOrientedStepIntegrationTests {
 			Set<Class<? extends Throwable>> nonRetrybaleExceptions = Set.of(FlatFileParseException.class,
 					DataIntegrityViolationException.class);
 			RetryPolicy retryPolicy = RetryPolicy.builder()
-				.maxAttempts(retryLimit)
+				.maxRetries(retryLimit)
 				.excludes(nonRetrybaleExceptions)
 				.build();
 
