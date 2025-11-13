@@ -15,8 +15,10 @@
  */
 package org.springframework.batch.core.step.item;
 
+import java.util.List;
 import java.util.Set;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -31,12 +33,14 @@ import org.springframework.batch.core.step.FatalStepExecutionException;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.step.builder.ChunkOrientedStepBuilder;
+import org.springframework.batch.core.step.skip.AlwaysSkipItemSkipPolicy;
 import org.springframework.batch.core.step.skip.LimitCheckingExceptionHierarchySkipPolicy;
 import org.springframework.batch.core.step.skip.SkipLimitExceededException;
 import org.springframework.batch.infrastructure.item.ItemProcessor;
 import org.springframework.batch.infrastructure.item.ItemReader;
 import org.springframework.batch.infrastructure.item.ItemWriter;
 import org.springframework.batch.infrastructure.item.file.FlatFileParseException;
+import org.springframework.batch.infrastructure.item.support.ListItemReader;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -186,6 +190,105 @@ public class ChunkOrientedStepFaultToleranceIntegrationTests {
 		Assertions.assertEquals(1, stepExecution.getSkipCount());
 		Assertions.assertEquals(2, JdbcTestUtils.countRowsInTable(jdbcTemplate, "person_target"));
 		System.clearProperty("skipLimit");
+	}
+
+	// Issue https://github.com/spring-projects/spring-batch/issues/5084
+	@Test
+	void testSkipInReadInSequentialMode() throws Exception {
+		// given
+		ApplicationContext context = new AnnotationConfigApplicationContext(TestConfiguration.class,
+				StepConfiguration.class);
+		JobOperator jobOperator = context.getBean(JobOperator.class);
+		Job job = context.getBean(Job.class);
+
+		// when
+		JobParameters jobParameters = new JobParametersBuilder().toJobParameters();
+		JobExecution jobExecution = jobOperator.start(job, jobParameters);
+
+		// then
+		Assertions.assertEquals(ExitStatus.COMPLETED.getExitCode(), jobExecution.getExitStatus().getExitCode());
+		StepExecution stepExecution = jobExecution.getStepExecutions().iterator().next();
+		Assertions.assertEquals(8, stepExecution.getReadCount());
+		Assertions.assertEquals(8, stepExecution.getWriteCount());
+		Assertions.assertEquals(2, stepExecution.getCommitCount());
+		Assertions.assertEquals(0, stepExecution.getRollbackCount());
+		Assertions.assertEquals(2, stepExecution.getReadSkipCount());
+		Assertions.assertEquals(0, stepExecution.getWriteSkipCount());
+	}
+
+	// Issue https://github.com/spring-projects/spring-batch/issues/5084
+	@Test
+	void testSkipInReadInConcurrentMode() throws Exception {
+		// given
+		ApplicationContext context = new AnnotationConfigApplicationContext(TestConfiguration.class,
+				ConcurrentStepConfiguration.class);
+		JobOperator jobOperator = context.getBean(JobOperator.class);
+		Job job = context.getBean(Job.class);
+
+		// when
+		JobParameters jobParameters = new JobParametersBuilder().toJobParameters();
+		JobExecution jobExecution = jobOperator.start(job, jobParameters);
+
+		// then
+		Assertions.assertEquals(ExitStatus.COMPLETED.getExitCode(), jobExecution.getExitStatus().getExitCode());
+		StepExecution stepExecution = jobExecution.getStepExecutions().iterator().next();
+		Assertions.assertEquals(8, stepExecution.getReadCount());
+		Assertions.assertEquals(8, stepExecution.getWriteCount());
+		Assertions.assertEquals(2, stepExecution.getCommitCount());
+		Assertions.assertEquals(0, stepExecution.getRollbackCount());
+		Assertions.assertEquals(2, stepExecution.getReadSkipCount());
+		Assertions.assertEquals(0, stepExecution.getWriteSkipCount());
+	}
+
+	@Configuration
+	static class StepConfiguration {
+
+		@Bean
+		public Step step(JobRepository jobRepository, JdbcTransactionManager transactionManager) {
+			List<String> items = List.of("one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten");
+			return new ChunkOrientedStepBuilder<String, String>(jobRepository, 5).reader(new ListItemReader<>(items) {
+				@Override
+				public @Nullable String read() {
+					String item = super.read();
+					if ("three".equals(item) || "seven".equals(item)) {
+						throw new RuntimeException("Simulated read error on item: " + item);
+					}
+					return item;
+				}
+			}).writer(chunk -> {
+			})
+				.transactionManager(transactionManager)
+				.faultTolerant()
+				.skipPolicy(new AlwaysSkipItemSkipPolicy())
+				.build();
+		}
+
+	}
+
+	@Configuration
+	static class ConcurrentStepConfiguration {
+
+		@Bean
+		public Step step(JobRepository jobRepository, JdbcTransactionManager transactionManager) {
+			List<String> items = List.of("one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten");
+			return new ChunkOrientedStepBuilder<String, String>(jobRepository, 5).reader(new ListItemReader<>(items) {
+				@Override
+				public @Nullable String read() {
+					String item = super.read();
+					if ("three".equals(item) || "seven".equals(item)) {
+						throw new RuntimeException("Simulated read error on item: " + item);
+					}
+					return item;
+				}
+			}).writer(chunk -> {
+			})
+				.transactionManager(transactionManager)
+				.taskExecutor(new SimpleAsyncTaskExecutor())
+				.faultTolerant()
+				.skipPolicy(new AlwaysSkipItemSkipPolicy())
+				.build();
+		}
+
 	}
 
 	@Configuration

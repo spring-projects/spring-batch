@@ -386,7 +386,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 		List<Future<O>> itemProcessingTasks = new LinkedList<>();
 		try {
 			// read items and submit concurrent item processing tasks
-			for (int i = 0; i < this.chunkSize; i++) {
+			for (int i = 0; i < this.chunkSize && this.chunkTracker.moreItems(); i++) {
 				I item = readItem(contribution);
 				if (item != null) {
 					Future<O> itemProcessingFuture = this.taskExecutor.submit(() -> processItem(item, contribution));
@@ -477,13 +477,10 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 
 	private Chunk<I> readChunk(StepContribution contribution) throws Exception {
 		Chunk<I> chunk = new Chunk<>();
-		for (int i = 0; i < chunkSize; i++) {
+		for (int i = 0; i < chunkSize && this.chunkTracker.moreItems(); i++) {
 			I item = readItem(contribution);
 			if (item != null) {
 				chunk.add(item);
-			}
-			else {
-				break;
 			}
 		}
 		return chunk;

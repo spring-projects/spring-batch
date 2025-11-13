@@ -30,6 +30,7 @@ import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.infrastructure.item.ItemReader;
 import org.springframework.batch.infrastructure.item.ItemWriter;
 import org.springframework.batch.infrastructure.item.support.ListItemReader;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -64,7 +65,7 @@ public class ChunkOrientedStepTests {
 	}
 
 	@Test
-	void testReadNoMoreThanAvailableItems() throws Exception {
+	void testReadNoMoreThanAvailableItemsInSequentialMode() throws Exception {
 		// given
 		ItemReader<String> reader = mock();
 		ItemWriter<String> writer = chunk -> {
@@ -72,6 +73,28 @@ public class ChunkOrientedStepTests {
 		JobRepository jobRepository = new ResourcelessJobRepository();
 		when(reader.read()).thenReturn("1", "2", "3", "4", "5", null);
 		ChunkOrientedStep<String, String> step = new ChunkOrientedStep<>("step", 10, reader, writer, jobRepository);
+		step.afterPropertiesSet();
+		JobInstance jobInstance = new JobInstance(1L, "job");
+		JobExecution jobExecution = new JobExecution(1L, jobInstance, new JobParameters());
+		StepExecution stepExecution = new StepExecution(1L, "step", jobExecution);
+
+		// when
+		step.execute(stepExecution);
+
+		// then
+		verify(reader, times(6)).read();
+	}
+
+	@Test
+	void testReadNoMoreThanAvailableItemsInConcurrentMode() throws Exception {
+		// given
+		ItemReader<String> reader = mock();
+		ItemWriter<String> writer = chunk -> {
+		};
+		JobRepository jobRepository = new ResourcelessJobRepository();
+		when(reader.read()).thenReturn("1", "2", "3", "4", "5", null);
+		ChunkOrientedStep<String, String> step = new ChunkOrientedStep<>("step", 10, reader, writer, jobRepository);
+		step.setTaskExecutor(new SimpleAsyncTaskExecutor());
 		step.afterPropertiesSet();
 		JobInstance jobInstance = new JobInstance(1L, "job");
 		JobExecution jobExecution = new JobExecution(1L, jobInstance, new JobParameters());
