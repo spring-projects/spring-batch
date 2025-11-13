@@ -16,6 +16,7 @@
 package org.springframework.batch.core.step.item;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -26,12 +27,17 @@ import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.ResourcelessJobRepository;
 import org.springframework.batch.core.step.StepExecution;
+import org.springframework.batch.core.step.builder.ChunkOrientedStepBuilder;
 import org.springframework.batch.core.step.builder.StepBuilder;
+import org.springframework.batch.infrastructure.item.ItemProcessor;
 import org.springframework.batch.infrastructure.item.ItemReader;
 import org.springframework.batch.infrastructure.item.ItemWriter;
 import org.springframework.batch.infrastructure.item.support.ListItemReader;
+import org.springframework.batch.infrastructure.item.support.ListItemWriter;
+import org.springframework.batch.infrastructure.support.transaction.ResourcelessTransactionManager;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -105,6 +111,108 @@ public class ChunkOrientedStepTests {
 
 		// then
 		verify(reader, times(6)).read();
+	}
+
+	@Test
+	void testRetryLimitWithoutRetryDoesNotRetryErrors() throws Exception {
+		// Given: ItemProcessor that throws OutOfMemoryError
+		AtomicInteger attempts = new AtomicInteger(0);
+		ItemProcessor<String, String> processor = item -> {
+			attempts.incrementAndGet();
+			throw new OutOfMemoryError("Simulated OOM");
+		};
+
+		ChunkOrientedStep<String, String> step = new ChunkOrientedStepBuilder<String, String>(
+				new ResourcelessJobRepository(), 2)
+			.reader(new ListItemReader<>(List.of("item1")))
+			.processor(processor)
+			.writer(items -> {
+			})
+			.transactionManager(new ResourcelessTransactionManager())
+			.faultTolerant()
+			.retryLimit(3)
+			.build();
+
+		JobInstance jobInstance = new JobInstance(1L, "job");
+		JobExecution jobExecution = new JobExecution(1L, jobInstance, new JobParameters());
+		StepExecution stepExecution = new StepExecution(1L, "step", jobExecution);
+
+		// when
+		step.execute(stepExecution);
+
+		// then: Should fail immediately without retry
+		assertEquals(1, attempts.get(),
+				"OutOfMemoryError should not be retried. Expected 1 attempt, but got " + attempts.get());
+	}
+
+	@Test
+	void testRetryLimitWithoutRetryRetriesExceptions() throws Exception {
+		// Given: ItemProcessor that fails first 2 times with Exception
+		AtomicInteger attempts = new AtomicInteger(0);
+		ItemProcessor<String, String> processor = item -> {
+			if (attempts.incrementAndGet() < 3) {
+				throw new RuntimeException("Temporary failure");
+			}
+			return item.toUpperCase();
+		};
+		ListItemReader<String> listItemReader = new ListItemReader<>(List.of("item1"));
+		ListItemWriter<String> listItemWriter = new ListItemWriter<>();
+		ChunkOrientedStep<String, String> step = new ChunkOrientedStepBuilder<String, String>(
+				new ResourcelessJobRepository(), 2)
+			.reader(listItemReader)
+			.processor(processor)
+			.writer(listItemWriter)
+			.transactionManager(new ResourcelessTransactionManager())
+			.faultTolerant()
+			.retryLimit(3)
+			.build();
+
+		JobInstance jobInstance = new JobInstance(1L, "job");
+		JobExecution jobExecution = new JobExecution(1L, jobInstance, new JobParameters());
+		StepExecution stepExecution = new StepExecution(1L, "step", jobExecution);
+
+		// When: Execute step
+		// Then: Should succeed after 2 retries
+		step.execute(stepExecution);
+
+		// Should have retried 2 times (total 3 attempts)
+		assertEquals(3, attempts.get(), "Should retry RuntimeException");
+		assertEquals(List.of("ITEM1"), listItemWriter.getWrittenItems(), "Item should be processed successfully");
+	}
+
+	@Test
+	void testExplicitRetryConfigurationTakesPrecedence() throws Exception {
+		// Given: Explicit retry configuration for IllegalStateException only
+		AtomicInteger attempts = new AtomicInteger(0);
+		ItemProcessor<String, String> processor = item -> {
+			attempts.incrementAndGet();
+			throw new RuntimeException("This should not be retried");
+		};
+		ListItemReader<String> listItemReader = new ListItemReader<>(List.of("item1"));
+		ListItemWriter<String> listItemWriter = new ListItemWriter<>();
+
+		ChunkOrientedStep<String, String> step = new ChunkOrientedStepBuilder<String, String>(
+				new ResourcelessJobRepository(), 2)
+			.reader(listItemReader)
+			.processor(processor)
+			.writer(listItemWriter)
+			.transactionManager(new ResourcelessTransactionManager())
+			.faultTolerant()
+			.retry(IllegalStateException.class)
+			.retryLimit(3)
+			.build();
+
+		JobInstance jobInstance = new JobInstance(1L, "job");
+		JobExecution jobExecution = new JobExecution(1L, jobInstance, new JobParameters());
+		StepExecution stepExecution = new StepExecution(1L, "step", jobExecution);
+
+		// When & Then: Should fail immediately without retry
+		// because RuntimeException is not in the explicit retry list
+		step.execute(stepExecution);
+
+		// Should not retry (only 1 attempt)
+		assertEquals(1, attempts.get(),
+				"RuntimeException should not be retried when only IllegalStateException is configured");
 	}
 
 }
