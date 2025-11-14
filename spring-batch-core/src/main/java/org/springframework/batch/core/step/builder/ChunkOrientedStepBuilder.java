@@ -399,19 +399,13 @@ public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrien
 	public ChunkOrientedStep<I, O> build() {
 		Assert.notNull(this.reader, "Item reader must not be null");
 		Assert.notNull(this.writer, "Item writer must not be null");
-		if (this.reader instanceof StepExecutionListener listener) {
-			this.stepListeners.add(listener);
-		}
-		if (this.writer instanceof StepExecutionListener listener) {
-			this.stepListeners.add(listener);
-		}
 		ChunkOrientedStep<I, O> chunkOrientedStep = new ChunkOrientedStep<>(this.getName(), this.chunkSize, this.reader,
 				this.writer, this.getJobRepository());
+		addAsStreamAndListener(this.reader);
+		addAsStreamAndListener(this.writer);
 		if (this.processor != null) {
 			chunkOrientedStep.setItemProcessor(this.processor);
-		}
-		if (this.processor instanceof StepExecutionListener listener) {
-			this.stepListeners.add(listener);
+			addAsStreamAndListener(this.processor);
 		}
 		chunkOrientedStep.setTransactionManager(this.transactionManager);
 		chunkOrientedStep.setTransactionAttribute(this.transactionAttribute);
@@ -474,6 +468,22 @@ public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrien
 			throw new StepBuilderException("Unable to build a chunk-oriented step", e);
 		}
 		return chunkOrientedStep;
+	}
+
+	private void addAsStreamAndListener(Object itemHandler) {
+		// Register as stream if applicable
+		if (itemHandler instanceof ItemStream itemStream) {
+			this.streams.add(itemStream);
+		}
+		// Register as listener if implements the interface
+		if (itemHandler instanceof StepListener listener) {
+			this.stepListeners.add(listener);
+		}
+		// Register as listener if annotated methods are present
+		if (StepListenerFactoryBean.isListener(itemHandler)) {
+			StepListener listener = StepListenerFactoryBean.getListener(itemHandler);
+			this.stepListeners.add(listener);
+		}
 	}
 
 }
