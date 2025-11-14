@@ -98,11 +98,6 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 			ORDER BY SE.CREATE_TIME DESC, SE.STEP_EXECUTION_ID DESC
 			""";
 
-	private static final String CURRENT_VERSION_STEP_EXECUTION = """
-			SELECT VERSION FROM %PREFIX%STEP_EXECUTION
-			WHERE STEP_EXECUTION_ID=?
-			""";
-
 	private static final String COUNT_STEP_EXECUTIONS = """
 			SELECT COUNT(*)
 			FROM %PREFIX%JOB_EXECUTION JE
@@ -247,11 +242,8 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 
 			// Avoid concurrent modifications...
 			if (count == 0) {
-				int currentVersion = getJdbcTemplate().queryForObject(getQuery(CURRENT_VERSION_STEP_EXECUTION),
-						Integer.class, stepExecution.getId());
-				throw new OptimisticLockingFailureException(
-						"Attempt to update step execution id=" + stepExecution.getId() + " with wrong version ("
-								+ stepExecution.getVersion() + "), where current version is " + currentVersion);
+				throw new OptimisticLockingFailureException("Attempt to update step execution id="
+						+ stepExecution.getId() + " with wrong version (" + stepExecution.getVersion() + ")");
 			}
 
 			stepExecution.incrementVersion();
