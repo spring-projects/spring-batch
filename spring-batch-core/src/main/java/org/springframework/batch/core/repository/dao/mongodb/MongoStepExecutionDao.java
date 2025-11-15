@@ -66,8 +66,8 @@ public class MongoStepExecutionDao implements StepExecutionDao {
 		this.mongoOperations = mongoOperations;
 		this.stepExecutionCollectionName = collectionPrefix + STEP_EXECUTIONS_COLLECTION_NAME;
 		this.jobExecutionCollectionName = collectionPrefix + JOB_EXECUTIONS_COLLECTION_NAME;
-		this.stepExecutionIncrementer = new MongoSequenceIncrementer(mongoOperations,
-				collectionPrefix + STEP_EXECUTIONS_SEQUENCE_NAME);
+		this.stepExecutionIncrementer = new MongoSequenceIncrementer(mongoOperations, STEP_EXECUTIONS_SEQUENCE_NAME,
+				collectionPrefix);
 	}
 
 	public void setStepExecutionIncrementer(DataFieldMaxValueIncrementer stepExecutionIncrementer) {

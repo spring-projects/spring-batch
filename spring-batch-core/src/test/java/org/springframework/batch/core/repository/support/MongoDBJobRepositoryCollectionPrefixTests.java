@@ -57,13 +57,13 @@ public class MongoDBJobRepositoryCollectionPrefixTests {
 		mongoTemplate.createCollection(PREFIX + "JOB_INSTANCE");
 		mongoTemplate.createCollection(PREFIX + "JOB_EXECUTION");
 		mongoTemplate.createCollection(PREFIX + "STEP_EXECUTION");
-		// sequences
-		mongoTemplate.createCollection("BATCH_SEQUENCES");
-		mongoTemplate.getCollection("BATCH_SEQUENCES")
+		// sequences collection with custom prefix
+		mongoTemplate.createCollection(PREFIX + "SEQUENCES");
+		mongoTemplate.getCollection(PREFIX + "SEQUENCES")
 			.insertOne(new Document(Map.of("_id", PREFIX + "JOB_INSTANCE_SEQ", "count", 0L)));
-		mongoTemplate.getCollection("BATCH_SEQUENCES")
+		mongoTemplate.getCollection(PREFIX + "SEQUENCES")
 			.insertOne(new Document(Map.of("_id", PREFIX + "JOB_EXECUTION_SEQ", "count", 0L)));
-		mongoTemplate.getCollection("BATCH_SEQUENCES")
+		mongoTemplate.getCollection(PREFIX + "SEQUENCES")
 			.insertOne(new Document(Map.of("_id", PREFIX + "STEP_EXECUTION_SEQ", "count", 0L)));
 	}
 

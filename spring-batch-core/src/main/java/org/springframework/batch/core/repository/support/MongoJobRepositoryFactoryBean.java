@@ -50,7 +50,7 @@ public class MongoJobRepositoryFactoryBean extends AbstractJobRepositoryFactoryB
 
 	private @Nullable DataFieldMaxValueIncrementer stepExecutionIncrementer;
 
-	private @Nullable String collectionPrefix;
+	private @Nullable String collectionPrefix = "BATCH_";
 
 	public void setMongoOperations(MongoOperations mongoOperations) {
 		this.mongoOperations = mongoOperations;
@@ -116,16 +116,18 @@ public class MongoJobRepositoryFactoryBean extends AbstractJobRepositoryFactoryB
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
 		Assert.notNull(this.mongoOperations, "MongoOperations must not be null.");
+		
 		if (this.jobInstanceIncrementer == null) {
-			this.jobInstanceIncrementer = new MongoSequenceIncrementer(this.mongoOperations, "BATCH_JOB_INSTANCE_SEQ");
+			this.jobInstanceIncrementer = new MongoSequenceIncrementer(this.mongoOperations, "JOB_INSTANCE_SEQ",
+					this.collectionPrefix);
 		}
 		if (this.jobExecutionIncrementer == null) {
-			this.jobExecutionIncrementer = new MongoSequenceIncrementer(this.mongoOperations,
-					"BATCH_JOB_EXECUTION_SEQ");
+			this.jobExecutionIncrementer = new MongoSequenceIncrementer(this.mongoOperations, "JOB_EXECUTION_SEQ",
+					this.collectionPrefix);
 		}
 		if (this.stepExecutionIncrementer == null) {
-			this.stepExecutionIncrementer = new MongoSequenceIncrementer(this.mongoOperations,
-					"BATCH_STEP_EXECUTION_SEQ");
+			this.stepExecutionIncrementer = new MongoSequenceIncrementer(this.mongoOperations, "STEP_EXECUTION_SEQ",
+					this.collectionPrefix);
 		}
 	}
 

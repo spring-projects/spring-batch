@@ -66,8 +66,8 @@ public class MongoJobExecutionDao implements JobExecutionDao {
 	public MongoJobExecutionDao(MongoOperations mongoOperations, String collectionPrefix) {
 		this.mongoOperations = mongoOperations;
 		this.jobExecutionsCollectionName = collectionPrefix + JOB_EXECUTIONS_COLLECTION_NAME;
-		this.jobExecutionIncrementer = new MongoSequenceIncrementer(mongoOperations,
-				collectionPrefix + JOB_EXECUTIONS_SEQUENCE_NAME);
+		this.jobExecutionIncrementer = new MongoSequenceIncrementer(mongoOperations, JOB_EXECUTIONS_SEQUENCE_NAME,
+				collectionPrefix);
 	}
 
 	public void setJobExecutionIncrementer(DataFieldMaxValueIncrementer jobExecutionIncrementer) {

@@ -62,7 +62,7 @@ public class MongoJobInstanceDao implements JobInstanceDao {
 		Assert.notNull(collectionPrefix, "collectionPrefix must not be null.");
 		this.mongoOperations = mongoOperations;
 		this.collectionName = collectionPrefix + COLLECTION_NAME;
-		this.jobInstanceIncrementer = new MongoSequenceIncrementer(mongoOperations, collectionPrefix + SEQUENCE_NAME);
+		this.jobInstanceIncrementer = new MongoSequenceIncrementer(mongoOperations, SEQUENCE_NAME, collectionPrefix);
 	}
 
 	public void setJobKeyGenerator(JobKeyGenerator jobKeyGenerator) {

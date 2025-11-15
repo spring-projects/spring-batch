@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2025 the original author or authors.
  *
@@ -39,7 +40,6 @@ import org.testcontainers.utility.DockerImageName;
  */
 @Configuration
 @EnableBatchProcessing
-@EnableMongoJobRepository(collectionPrefix = "TEST_COLLECTION_PREFIX_")
 class MongoDBCollectionPrefixTestConfiguration {
 
 	private static final DockerImageName MONGODB_IMAGE = DockerImageName.parse("mongo:8.0.11");
@@ -60,6 +60,7 @@ class MongoDBCollectionPrefixTestConfiguration {
 		MongoJobRepositoryFactoryBean jobRepositoryFactoryBean = new MongoJobRepositoryFactoryBean();
 		jobRepositoryFactoryBean.setMongoOperations(mongoTemplate);
 		jobRepositoryFactoryBean.setTransactionManager(transactionManager);
+		jobRepositoryFactoryBean.setCollectionPrefix("TEST_COLLECTION_PREFIX_");
 		jobRepositoryFactoryBean.afterPropertiesSet();
 		return jobRepositoryFactoryBean.getObject();
 	}
