@@ -98,4 +98,10 @@ public @interface EnableMongoJobRepository {
 	 */
 	String stepExecutionIncrementerRef() default "stepExecutionIncrementer";
 
+	/**
+	 * Set the prefix for MongoDB collection names. Defaults to {@literal BATCH_}.
+	 * @return the collection prefix to use
+	 */
+	String collectionPrefix() default "BATCH_";
+
 }
