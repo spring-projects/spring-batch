@@ -57,8 +57,8 @@ import org.jspecify.annotations.Nullable;
  * <p>
  * It should be noted that using any of the methods that don't contain
  * {@link JobParameters} in their signature, will result in one being created with a
- * random number of type {@code long} as a parameter. This will ensure restartability when
- * no parameters are provided.
+ * random number of type {@code long} as a parameter with the name {@code batch.random}.
+ * This will ensure restartability when no parameters are provided.
  * </p>
  *
  * @author Lucas Ward
@@ -159,16 +159,18 @@ public class JobLauncherTestUtils {
 	}
 
 	/**
-	 * @return a new JobParameters object containing only a parameter with a random number
-	 * of type {@code long}, to ensure that the job instance will be unique.
+	 * @return a new {@link JobParameters} object containing only one parameter named
+	 * {@code batch.random} with a random number of type {@code long}, to ensure that the
+	 * job instance will be unique.
 	 */
 	public JobParameters getUniqueJobParameters() {
-		return new JobParameters(Set.of(new JobParameter<>("random", this.secureRandom.nextLong(), Long.class)));
+		return new JobParameters(Set.of(new JobParameter<>("batch.random", this.secureRandom.nextLong(), Long.class)));
 	}
 
 	/**
-	 * @return a new JobParametersBuilder object containing only a parameter with a random
-	 * number of type {@code long}, to ensure that the job instance will be unique.
+	 * @return a new {@link JobParameters} object containing only one parameter named
+	 * {@code batch.random} with a random number of type {@code long}, to ensure that the
+	 * job instance will be unique.
 	 */
 	public JobParametersBuilder getUniqueJobParametersBuilder() {
 		return new JobParametersBuilder(this.getUniqueJobParameters());
