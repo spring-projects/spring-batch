@@ -401,6 +401,7 @@ public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrien
 		Assert.notNull(this.writer, "Item writer must not be null");
 		ChunkOrientedStep<I, O> chunkOrientedStep = new ChunkOrientedStep<>(this.getName(), this.chunkSize, this.reader,
 				this.writer, this.getJobRepository());
+		super.enhance(chunkOrientedStep);
 		addAsStreamAndListener(this.reader);
 		addAsStreamAndListener(this.writer);
 		if (this.processor != null) {

@@ -55,6 +55,22 @@ import static org.mockito.Mockito.when;
 public class ChunkOrientedStepTests {
 
 	@Test
+	void testInheritedPropertiesOnBuild() {
+		ChunkOrientedStep<String, String> step = new StepBuilder("step", new ResourcelessJobRepository())
+			.<String, String>chunk(5)
+			.reader(new ListItemReader<>(List.of("foo", "bar")))
+			.writer(items -> {
+			})
+			// inherited properties from StepBuilderHelper
+			.allowStartIfComplete(true)
+			.startLimit(5)
+			.build();
+
+		Assertions.assertTrue(step.isAllowStartIfComplete());
+		Assertions.assertEquals(5, step.getStartLimit());
+	}
+
+	@Test
 	void testFaultTolerantChunkOrientedStepSetupWithDefaultSkipLimit() {
 		Assertions.assertDoesNotThrow(() -> new StepBuilder(mock()).chunk(5)
 			.reader(new ListItemReader<>(List.of("item1", "item2")))
