@@ -685,7 +685,8 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			chunkWriteEvent.chunkWriteStatus = BatchMetrics.STATUS_FAILURE;
 			observation.lowCardinalityKeyValue(fullyQualifiedMetricName + ".status", BatchMetrics.STATUS_FAILURE);
 			observation.error(exception);
-			if (this.faultTolerant && exception instanceof RetryException retryException) {
+			if (this.faultTolerant && exception instanceof RetryException retryException
+					&& !this.skipPolicy.shouldSkip(retryException.getCause(), -1)) {
 				logger.info("Retry exhausted while attempting to write items, scanning the chunk", retryException);
 				ChunkScanEvent chunkScanEvent = new ChunkScanEvent(contribution.getStepExecution().getStepName(),
 						contribution.getStepExecution().getId());
@@ -696,6 +697,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 				logger.info("Chunk scan completed");
 			}
 			else {
+				logger.error("Retry exhausted after last attempt in recovery path, but exception is not skippable");
 				throw exception;
 			}
 		}

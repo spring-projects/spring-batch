@@ -49,6 +49,9 @@ public class LimitCheckingExceptionHierarchySkipPolicy implements SkipPolicy {
 
 	@Override
 	public boolean shouldSkip(Throwable t, long skipCount) throws SkipLimitExceededException {
+		if (skipCount < 0) {
+			return !isSkippable(t);
+		}
 		if (!isSkippable(t)) {
 			return false;
 		}

@@ -45,6 +45,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.retry.RetryException;
 import org.springframework.core.retry.RetryPolicy;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -240,6 +241,36 @@ public class ChunkOrientedStepFaultToleranceIntegrationTests {
 		Assertions.assertEquals(0, stepExecution.getWriteSkipCount());
 	}
 
+	// Issue https://github.com/spring-projects/spring-batch/issues/5091
+	@Test
+	void testExhaustedRetryWithNonSkippableException() throws Exception {
+		// given
+		ApplicationContext context = new AnnotationConfigApplicationContext(TestConfiguration.class,
+				ExhaustedRetryStepConfiguration.class);
+		JobOperator jobOperator = context.getBean(JobOperator.class);
+		Job job = context.getBean(Job.class);
+
+		// when
+		JobParameters jobParameters = new JobParametersBuilder().toJobParameters();
+		JobExecution jobExecution = jobOperator.start(job, jobParameters);
+
+		// then
+		Assertions.assertEquals(ExitStatus.FAILED.getExitCode(), jobExecution.getExitStatus().getExitCode());
+		StepExecution stepExecution = jobExecution.getStepExecutions().iterator().next();
+		Throwable failureException = stepExecution.getFailureExceptions().iterator().next();
+		Assertions.assertInstanceOf(FatalStepExecutionException.class, failureException);
+		Assertions.assertInstanceOf(RetryException.class, failureException.getCause());
+		// the test has a single chunk (3 items with chunk size = 3) that is rolled back
+		// upon retry exhaustion
+		Assertions.assertEquals(3, stepExecution.getReadCount());
+		Assertions.assertEquals(0, stepExecution.getWriteCount());
+		Assertions.assertEquals(0, stepExecution.getCommitCount());
+		Assertions.assertEquals(1, stepExecution.getRollbackCount());
+		Assertions.assertEquals(0, stepExecution.getReadSkipCount());
+		// no scan is triggered as the exception is non skippable
+		Assertions.assertEquals(0, stepExecution.getWriteSkipCount());
+	}
+
 	@Configuration
 	static class StepConfiguration {
 
@@ -260,6 +291,27 @@ public class ChunkOrientedStepFaultToleranceIntegrationTests {
 				.transactionManager(transactionManager)
 				.faultTolerant()
 				.skipPolicy(new AlwaysSkipItemSkipPolicy())
+				.build();
+		}
+
+	}
+
+	@Configuration
+	static class ExhaustedRetryStepConfiguration {
+
+		@Bean
+		public Step step(JobRepository jobRepository, JdbcTransactionManager transactionManager) {
+			List<String> items = List.of("one", "two", "three");
+			return new ChunkOrientedStepBuilder<String, String>(jobRepository, 3).reader(new ListItemReader<>(items))
+				.writer(chunk -> {
+					for (String item : chunk) {
+						if (item.equalsIgnoreCase("two")) {
+							throw new RuntimeException("Simulated write error on item two");
+						}
+					}
+				})
+				.transactionManager(transactionManager)
+				.faultTolerant()
 				.build();
 		}
 
