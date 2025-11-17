@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2022 the original author or authors.
+ * Copyright 2014-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,31 +15,27 @@
  */
 package org.springframework.batch.test;
 
-import org.jspecify.annotations.Nullable;
+import javax.sql.DataSource;
+
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.ExitStatus;
+import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.EnableJdbcJobRepository;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
-import org.springframework.batch.core.step.Step;
-import org.springframework.batch.core.step.StepContribution;
-import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.job.builder.JobBuilder;
-import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.scope.context.ChunkContext;
+import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.infrastructure.repeat.RepeatStatus;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.batch.test.context.SpringBatchTest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.support.JdbcTransactionManager;
-
-import javax.sql.DataSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -47,14 +43,22 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author mminella
  * @author Mahmoud Ben Hassine
  */
+// TODO remove in 6.2 when JobLauncherTestUtils is removed
+@SpringBatchTest
 class JobLauncherTestUtilsTests {
 
+	@Autowired
+	private JobLauncherTestUtils testUtils;
+
 	@Test
-	void testStepExecutionWithJavaConfig() {
-		ApplicationContext context = new AnnotationConfigApplicationContext(TestJobConfiguration.class);
+	void testJobExecutionWithDeprecatedLauncher() throws Exception {
+		JobExecution execution = testUtils.launchJob();
 
-		JobLauncherTestUtils testUtils = context.getBean(JobLauncherTestUtils.class);
+		assertEquals(ExitStatus.COMPLETED, execution.getExitStatus());
+	}
 
+	@Test
+	void testStepExecutionWithDeprecatedLauncher() {
 		JobExecution execution = testUtils.launchStep("step1");
 
 		assertEquals(ExitStatus.COMPLETED, execution.getExitStatus());
@@ -66,30 +70,14 @@ class JobLauncherTestUtilsTests {
 	static class TestJobConfiguration {
 
 		@Bean
-		public Step step(JobRepository jobRepository) {
-			return new StepBuilder("step1", jobRepository).tasklet(new Tasklet() {
-
-				@Override
-				public @Nullable RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
-						throws Exception {
-					return null;
-				}
-			}, transactionManager(dataSource())).build();
+		public Step step(JobRepository jobRepository, JdbcTransactionManager transactionManager) {
+			Tasklet tasklet = (contribution, chunkContext) -> RepeatStatus.FINISHED;
+			return new StepBuilder("step1", jobRepository).tasklet(tasklet, transactionManager).build();
 		}
 
 		@Bean
-		public Job job(JobRepository jobRepository) {
-			return new JobBuilder("job", jobRepository).flow(step(jobRepository)).end().build();
-		}
-
-		@Bean
-		public JobLauncherTestUtils testUtils(Job jobUnderTest, JobRepository jobRepository, JobLauncher jobLauncher) {
-			JobLauncherTestUtils jobLauncherTestUtils = new JobLauncherTestUtils();
-			jobLauncherTestUtils.setJob(jobUnderTest);
-			jobLauncherTestUtils.setJobRepository(jobRepository);
-			jobLauncherTestUtils.setJobLauncher(jobLauncher);
-
-			return jobLauncherTestUtils;
+		public Job job(JobRepository jobRepository, Step step) {
+			return new JobBuilder("job", jobRepository).start(step).build();
 		}
 
 		@Bean

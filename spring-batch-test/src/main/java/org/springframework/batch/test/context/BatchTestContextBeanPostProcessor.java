@@ -18,6 +18,7 @@ package org.springframework.batch.test.context;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.batch.test.JobOperatorTestUtils;
 import org.springframework.batch.test.JobRepositoryTestUtils;
 import org.springframework.beans.BeansException;
@@ -66,6 +67,12 @@ public class BatchTestContextBeanPostProcessor implements BeanPostProcessor {
 		}
 		if (bean instanceof JobRepositoryTestUtils jobRepositoryTestUtils) {
 			this.jobRepositoryProvider.ifUnique(jobRepositoryTestUtils::setJobRepository);
+		}
+		// TODO remove in 6.2 when JobLauncherTestUtils is removed
+		if (bean instanceof JobLauncherTestUtils jobLauncherTestUtils) {
+			this.jobProvider.ifUnique(jobLauncherTestUtils::setJob);
+			this.jobRepositoryProvider.ifUnique(jobLauncherTestUtils::setJobRepository);
+			this.jobOperatorProvider.ifUnique(jobLauncherTestUtils::setJobLauncher);
 		}
 		return bean;
 	}
