@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2025 the original author or authors.
+ * Copyright 2025-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,37 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.test.repository;
+package org.springframework.batch.core.repository.migration;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 
 /**
- * Integration tests for HSQLDB migration script for v5.0
+ * Integration tests for HSQLDB migration script for v6.0
  *
  * @author Jinwoo Bae
+ * @author Mahmoud Ben Hassine
  */
+@Disabled("On purpose, not part of the CI build. Used on demand to validate migration scripts.")
 class HSQLDBMigrationScriptIntegrationTests {
 
-	// Note: This test currently FAILS due to HSQLDB-specific syntax issues in
-	// migration-hsqldb.sql:
-	// - HSQLDB does not support "MODIFY COLUMN"
 	@Test
-	@Disabled
 	void migrationScriptShouldBeValid() {
 		EmbeddedDatabase datasource = new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.HSQL)
-			.addScript("/org/springframework/batch/core/schema-hsqldb-v4.sql")
+			.addScript(
+					"file:src/test/resources/org/springframework/batch/core/repository/migration/schema-hsqldb-v5.2.sql")
 			.build();
 
 		ResourceDatabasePopulator databasePopulator = new ResourceDatabasePopulator();
-		databasePopulator
-			.addScript(new ClassPathResource("/org/springframework/batch/core/migration/5.0/migration-hsqldb.sql"));
+		databasePopulator.addScript(new FileSystemResource(
+				"src/main/resources/org/springframework/batch/core/migration/6.0/migration-hsqldb.sql"));
 
 		Assertions.assertDoesNotThrow(() -> databasePopulator.execute(datasource));
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2025 the original author or authors.
+ * Copyright 2025-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.test.repository;
+package org.springframework.batch.core.repository.migration;
 
 import com.mysql.cj.jdbc.MysqlDataSource;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -26,23 +27,26 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
 /**
- * Integration tests for Mysql migration script for v5.0
+ * Integration tests for Mysql migration script for v6.0
  *
  * @author Jinwoo Bae
+ * @author Mahmoud Ben Hassine
  */
+@Disabled("On purpose, not part of the CI build. Used on demand to validate migration scripts.")
 @Testcontainers(disabledWithoutDocker = true)
 class MySQLMigrationScriptIntegrationTests {
 
 	@Container
-	public static MySQLContainer<?> mysql = new MySQLContainer<>(DockerImageName.parse("mysql:8.0"));
+	public static MySQLContainer<?> mysql = new MySQLContainer<>(DockerImageName.parse("mysql:9.2.0"));
 
 	@Test
 	void migrationScriptShouldBeValid() {
 		MysqlDataSource datasource = createDataSource();
 		ResourceDatabasePopulator databasePopulator = new ResourceDatabasePopulator();
-		databasePopulator.addScript(new ClassPathResource("/org/springframework/batch/core/schema-mysql-v4.sql"));
-		databasePopulator
-			.addScript(new ClassPathResource("/org/springframework/batch/core/migration/5.0/migration-mysql.sql"));
+		databasePopulator.addScript(new FileSystemResource(
+				"src/test/resources/org/springframework/batch/core/repository/migration/schema-mysql-v5.2.sql"));
+		databasePopulator.addScript(new FileSystemResource(
+				"src/main/resources/org/springframework/batch/core/migration/6.0/migration-mysql.sql"));
 		Assertions.assertDoesNotThrow(() -> databasePopulator.execute(datasource));
 	}
 

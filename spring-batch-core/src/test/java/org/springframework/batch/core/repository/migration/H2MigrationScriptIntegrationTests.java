@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2025 the original author or authors.
+ * Copyright 2025-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,40 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.test.repository;
+package org.springframework.batch.core.repository.migration;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 
 /**
- * Integration tests for Derby migration script for v5.0
+ * Integration tests for H2 migration script for v6.0
  *
  * @author Jinwoo Bae
+ * @author Mahmoud Ben Hassine
  */
-class DerbyMigrationScriptIntegrationTests {
+@Disabled("On purpose, not part of the CI build. Used on demand to validate migration scripts.")
+class H2MigrationScriptIntegrationTests {
 
-	// Note: This test currently FAILS due to Derby-specific syntax issues in
-	// migration-derby.sql:
-	// Derby does not support "MODIFY COLUMN" syntax
 	@Test
-	@Disabled
 	void migrationScriptShouldBeValid() {
-		EmbeddedDatabase datasource = new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.DERBY)
-			.addScript("/org/springframework/batch/core/schema-derby-v4.sql")
+		EmbeddedDatabase datasource = new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2)
+			.addScript("file:src/test/resources/org/springframework/batch/core/repository/migration/schema-h2-v5.2.sql")
 			.build();
 
-		ResourceDatabasePopulator schemaPopulator = new ResourceDatabasePopulator();
-		schemaPopulator
-			.addScript(new ClassPathResource("/org/springframework/batch/core/migration/5.0/migration-derby.sql"));
+		ResourceDatabasePopulator databasePopulator = new ResourceDatabasePopulator();
+		databasePopulator.addScript(new FileSystemResource(
+				"src/main/resources/org/springframework/batch/core/migration/6.0/migration-h2.sql"));
 
-		Assertions.assertDoesNotThrow(() -> schemaPopulator.execute(datasource));
-
+		Assertions.assertDoesNotThrow(() -> databasePopulator.execute(datasource));
 	}
 
 }
