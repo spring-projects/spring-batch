@@ -5,7 +5,7 @@
 
     <groupId>org.springframework.batch</groupId>
     <artifactId>spring-batch-docs-build</artifactId>
-    <version>5.1.0-SNAPSHOT</version>
+    <version>6.0.0-SNAPSHOT</version>
 
     <name>Spring Batch Docs Build</name>
     <description>Builds Spring Batch Docs.</description>
@@ -22,7 +22,7 @@
     </issueManagement>
 
     <properties>
-        <maven.antora-version>1.0.0-alpha.4</maven.antora-version>
+        <maven.antora-version>1.0.0-alpha.5</maven.antora-version>
     </properties>
 
     <build>

@@ -1,10 +1,9 @@
 antora:
   extensions:
-  - require: '@springio/antora-extensions'
-    root_component_name: 'batch'
-
+    - require: '@springio/antora-extensions'
+      root_component_name: 'batch'
 site:
-  title: Spring Batch
+  title: Spring Batch Reference
   url: https://docs.spring.io/spring-batch/reference
   robots: allow
 git:
@@ -23,16 +22,20 @@ asciidoc:
     page-pagination: ''
     hide-uri-scheme: '@'
     tabs-sync-option: '@'
+    chomp: 'all'
+    attribute-missing: 'warn'
+    sourcemap: true
   extensions:
-  - '@asciidoctor/tabs'
-  - '@springio/asciidoctor-extensions'
+    - '@asciidoctor/tabs'
+    - '@springio/asciidoctor-extensions'
+    - '@springio/asciidoctor-extensions/javadoc-extension'
 urls:
   latest_version_segment_strategy: redirect:to
   latest_version_segment: ''
   redirect_facility: httpd
 ui:
   bundle:
-    url: https://github.com/spring-io/antora-ui-spring/releases/download/v0.4.15/ui-bundle.zip
+    url: https://github.com/spring-io/antora-ui-spring/releases/download/latest/ui-bundle.zip
     snapshot: true
 runtime:
   log:
