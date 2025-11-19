@@ -140,12 +140,12 @@ following image shows:
 .Job Parameters
 image::job-stereotypes-parameters.png[Job Parameters, scaledwidth="60%"]
 
-In the preceding example, where there are two instances, one for January 1st and another
-for January 2nd, there is really only one `Job`, but it has two `JobParameter` objects:
-one that was started with a job parameter of 01-01-2017 and another that was started with
-a parameter of 01-02-2017. Thus, the contract can be defined as: `JobInstance` = `Job`
- + identifying `JobParameters`. This allows a developer to effectively control how a
-`JobInstance` is defined, since they control what parameters are passed in.
+In the example from the xref:domain.adoc#jobinstance[Job Instance] section, where there are
+two instances, one for January 1st and another for January 2nd, there is really only one `Job`,
+but it has two `JobParameter` objects: one that was started with a job parameter of 01-01-2017
+and another that was started with a parameter of 01-02-2017. Thus, the contract can be defined
+as: `JobInstance` = `Job` + identifying `JobParameters`. This allows a developer to effectively
+control how a `JobInstance` is defined, since they control what parameters are passed in.
 
 NOTE: Not all job parameters are required to contribute to the identification of a
 `JobInstance`.  By default, they do so. However, the framework also allows the submission
