@@ -6,6 +6,23 @@ of the various persisted domain objects within Spring Batch, such as `JobExecuti
 It is required by many of the major framework features, such as the `JobOperator`,
 `Job`, and `Step`.
 
+== Configuring a Resourceless JobRepository
+
+The simplest implementation of the `JobRepository` interface is the
+`ResourcelessJobRepository`. This implementation does not use or store batch meta-data.
+It is intended for use-cases where restartability is not required and where the execution context
+is not involved in any way (like sharing data between steps through the execution context,
+or partitioned steps where partitions meta-data is shared between the manager and workers through
+the execution context, etc). This implementation holds the minimal state to run a single job
+(ie 1 job instance + 1 job execution + N step executions). This is suitable for one-time jobs
+executed in their own JVM. This job repository works with transactional steps as well as non-transactional
+steps (in conjunction with `ResourcelessTransactionManager`).
+
+IMPORTANT: This implementation is *not* thread-safe and should *not* be used in any concurrent environment.
+
+By default, when using `@EnableBatchProcessing` or `DefaultBatchConfiguration`, a `ResourcelessJobRepository`
+is provided for you.
+
 == Configuring a JDBC JobRepository
 
 [tabs]

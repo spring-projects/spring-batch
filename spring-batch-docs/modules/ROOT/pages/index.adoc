@@ -7,9 +7,9 @@ The reference documentation is divided into several sections:
 [horizontal]
 xref:spring-batch-intro.adoc[Spring Batch Introduction] :: Background, usage
  scenarios, and general guidelines.
+xref:whatsnew.adoc[What's new in Spring Batch 6.0] :: New features introduced in version 6.0.
 xref:spring-batch-architecture.adoc[Spring Batch Architecture] :: Spring Batch
 architecture, general batch principles, batch processing strategies.
-xref:whatsnew.adoc[What's new in Spring Batch 6.0] :: New features introduced in version 6.0.
 xref:domain.adoc[The Domain Language of Batch] :: Core concepts and abstractions
 of the Batch domain language.
 xref:job.adoc[Configuring and Running a Job] :: Job configuration, execution, and
@@ -23,7 +23,7 @@ xref:scalability.adoc#scalability[Scaling and Parallel Processing] :: Multi-thre
 parallel steps, remote chunking, and partitioning.
 <<repeat.adoc#repeat,Repeat>> :: Completion policies and exception handling of repetitive actions.
 <<retry.adoc#retry,Retry>> :: Retry and backoff policies of retryable operations.
-xref:testing.adoc[Unit Testing] :: Job and Step testing facilities and APIs.
+xref:testing.adoc[Unit and Integration Testing] :: Job and Step testing facilities and APIs.
 xref:common-patterns.adoc#commonPatterns[Common Patterns] :: Common batch processing patterns
 and guidelines.
 xref:spring-batch-integration.adoc[Spring Batch Integration] :: Integration
@@ -38,8 +38,6 @@ xref:appendix.adoc#listOfReadersAndWriters[List of ItemReaders and ItemWriters] 
 all provided item readers and writers.
 xref:schema-appendix.adoc#metaDataSchema[Meta-Data Schema] :: Core tables used by the Batch
 domain model.
-xref:transaction-appendix.adoc#transactions[Batch Processing and Transactions] :: Transaction
-boundaries, propagation, and isolation levels used in Spring Batch.
 <<glossary.adoc#glossary,Glossary>> :: Glossary of common terms, concepts, and vocabulary of
 the Batch domain.
 <<faq.adoc#faq,Frequently Asked Questions>> :: Frequently Asked Questions about Spring Batch.

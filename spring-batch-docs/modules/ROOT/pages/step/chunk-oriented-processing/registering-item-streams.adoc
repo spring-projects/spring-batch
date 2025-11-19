@@ -32,23 +32,6 @@ public Step step1(JobRepository jobRepository, PlatformTransactionManager transa
 				.stream(fileItemWriter2())
 				.build();
 }
-
-/**
- * In Spring Batch 4, the CompositeItemWriter implements ItemStream so this isn't
- * necessary, but used for an example.
- */
-@Bean
-public CompositeItemWriter compositeItemWriter() {
-	List<ItemWriter> writers = new ArrayList<>(2);
-	writers.add(fileItemWriter1());
-	writers.add(fileItemWriter2());
-
-	CompositeItemWriter itemWriter = new CompositeItemWriter();
-
-	itemWriter.setDelegates(writers);
-
-	return itemWriter;
-}
 ----
 
 XML::
@@ -68,16 +51,6 @@ The following example shows how to register a `stream` on a `step` in XML:
         </chunk>
     </tasklet>
 </step>
-
-<beans:bean id="compositeWriter"
-            class="org.springframework.batch.infrastructure.item.support.CompositeItemWriter">
-    <beans:property name="delegates">
-        <beans:list>
-            <beans:ref bean="fileItemWriter1" />
-            <beans:ref bean="fileItemWriter2" />
-        </beans:list>
-    </beans:property>
-</beans:bean>
 ----
 
 ====

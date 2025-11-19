@@ -28,7 +28,7 @@ input operations, as shown in the following interface definition:
 ----
 public interface ItemReader<T> {
 
-    T read() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException;
+    T read() throws Exception;
 
 }
 ----

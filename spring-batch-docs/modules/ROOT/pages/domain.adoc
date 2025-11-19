@@ -657,3 +657,5 @@ information on configuring a Job in xref:job.adoc[Configuring and Running a Job]
 . You can find more information on configuring a `Step` in
 xref:step.adoc[Configuring a Step].
 
+WARNING: The batch XML namespace is deprecated as of Spring Batch 6.0 and will be removed in version 7.0.
+

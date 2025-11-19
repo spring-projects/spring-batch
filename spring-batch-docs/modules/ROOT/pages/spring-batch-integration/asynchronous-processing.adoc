@@ -1,0 +1,93 @@
+[[asynchronous-processors]]
+== Asynchronous Processors
+
+Asynchronous Processors help you scale the processing of items. In the asynchronous
+processor use case, an `AsyncItemProcessor` serves as a dispatcher, executing the logic of
+the `ItemProcessor` for an item on a new thread. Once the item completes, the `Future` is
+passed to the `AsyncItemWriter` to be written.
+
+Therefore, you can increase performance by using asynchronous item processing, basically
+letting you implement fork-join scenarios. The `AsyncItemWriter` gathers the results and
+writes back the chunk as soon as all the results become available.
+
+
+[tabs]
+====
+Java::
++
+The following example shows how to configuration the `AsyncItemProcessor` in Java:
++
+.Java Configuration
+[source, java]
+----
+@Bean
+public AsyncItemProcessor processor(ItemProcessor itemProcessor, TaskExecutor taskExecutor) {
+    AsyncItemProcessor asyncItemProcessor = new AsyncItemProcessor();
+    asyncItemProcessor.setTaskExecutor(taskExecutor);
+    asyncItemProcessor.setDelegate(itemProcessor);
+    return asyncItemProcessor;
+}
+----
+
+XML::
++
+The following example shows how to configuration the `AsyncItemProcessor` in XML:
++
+.XML Configuration
+[source, xml]
+----
+<bean id="processor"
+    class="org.springframework.batch.integration.async.AsyncItemProcessor">
+  <property name="delegate">
+    <bean class="your.ItemProcessor"/>
+  </property>
+  <property name="taskExecutor">
+    <bean class="org.springframework.core.task.SimpleAsyncTaskExecutor"/>
+  </property>
+</bean>
+----
+
+====
+
+The `delegate` property refers to your `ItemProcessor` bean, and the `taskExecutor`
+property refers to the `TaskExecutor` of your choice.
+
+
+[tabs]
+====
+Java::
++
+The following example shows how to configure the `AsyncItemWriter` in Java:
++
+.Java Configuration
+[source, java]
+----
+@Bean
+public AsyncItemWriter writer(ItemWriter itemWriter) {
+    AsyncItemWriter asyncItemWriter = new AsyncItemWriter();
+    asyncItemWriter.setDelegate(itemWriter);
+    return asyncItemWriter;
+}
+----
+
+XML::
++
+The following example shows how to configure the `AsyncItemWriter` in XML:
++
+.XML Configuration
+[source, xml]
+----
+<bean id="itemWriter"
+    class="org.springframework.batch.integration.async.AsyncItemWriter">
+  <property name="delegate">
+    <bean id="itemWriter" class="your.ItemWriter"/>
+  </property>
+</bean>
+----
+
+====
+
+
+
+Again, the `delegate` property is
+actually a reference to your `ItemWriter` bean.

@@ -23,7 +23,7 @@ public Step step1(JobRepository jobRepository, PlatformTransactionManager transa
     int retryLimit = 3;
     var retrybaleExceptions = Set.of(DeadlockLoserDataAccessException.class);
     RetryPolicy retryPolicy = RetryPolicy.builder()
-        .maxAttempts(retryLimit)
+        .maxRetries(retryLimit)
         .includes(retrybaleExceptions)
         .build();
 

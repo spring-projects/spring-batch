@@ -208,7 +208,7 @@ See the section on xref:step/controlling-flow.adoc#split-flows[Split Flows] for 
 [[localChunking]]
 == Local Chunking
 
-Local chunking is a new feature that allows you to process chunks of items in parallel, locally within the same JVM using multiple threads.
+Local chunking is a new feature in v6.0 that allows you to process chunks of items in parallel, locally within the same JVM using multiple threads.
 This is particularly useful when you have a large number of items to process and want to take advantage of multi-core processors.
 With local chunking, you can configure a chunk-oriented step to use multiple threads to process chunks of items concurrently.
 Each thread will read, process and write its own chunk of items independently, while the step will manage the overall execution and commit the results.
@@ -292,7 +292,7 @@ message. JMS is the obvious candidate, but other options (such as JavaSpaces) ex
 the grid computing and shared memory product space.
 
 See the section on
-xref:spring-batch-integration/sub-elements.adoc#remote-chunking[Spring Batch Integration - Remote Chunking]
+xref:spring-batch-integration/externelazing-execution.adoc#remote-chunking[Spring Batch Integration - Remote Chunking]
 for more detail.
 
 [[partitioning]]

@@ -97,14 +97,12 @@ Here is an example of how to define a `ChunkOrientedStep` by using its builder:
 [source, java]
 ----
 @Bean
-public Step chunkOrientedStep(JobRepository jobRepository, JdbcTransactionManager transactionManager,
-        ItemReader<Person> itemReader, ItemProcessor<Person, Person> itemProcessor, ItemWriter<Person> itemWriter) {
+public Step chunkOrientedStep(JobRepository jobRepository, ItemReader<Person> itemReader, ItemWriter<Person> itemWriter) {
     int chunkSize = 100;
-    return new ChunkOrientedStepBuilder<Person, Person>(jobRepository, transactionManager, chunkSize)
-        .reader(itemReader)
-        .processor(itemProcessor)
-        .writer(itemWriter)
-        .build();
+    return new ChunkOrientedStepBuilder<Person, Person>("step", jobRepository, chunkSize)
+            .reader(itemReader)
+            .writer(itemWriter)
+            .build();
 }
 ----
 
@@ -118,14 +116,13 @@ Here is a quick example of how to use the retry and skip features with the new `
 [source, java]
 ----
 @Bean
-public Step faulTolerantChunkOrientedStep(JobRepository jobRepository, JdbcTransactionManager transactionManager,
-        ItemReader<Person> itemReader, ItemProcessor<Person, Person> itemProcessor, ItemWriter<Person> itemWriter) {
+public Step faulTolerantChunkOrientedStep(JobRepository jobRepository, ItemReader<Person> itemReader, ItemWriter<Person> itemWriter) {
 
     // retry policy configuration
-    int maxAttempts = 10;
+    int maxRetries = 10;
     var retrybaleExceptions = Set.of(TransientException.class);
     RetryPolicy retryPolicy = RetryPolicy.builder()
-        .maxAttempts(maxAttempts)
+        .maxRetries(maxRetries)
         .includes(retrybaleExceptions)
         .build();
 
@@ -136,9 +133,8 @@ public Step faulTolerantChunkOrientedStep(JobRepository jobRepository, JdbcTrans
 
     // step configuration
     int chunkSize = 100;
-    return new ChunkOrientedStepBuilder<Person, Person>(jobRepository, transactionManager, chunkSize)
+    return new ChunkOrientedStepBuilder<Person, Person>("step", jobRepository, chunkSize)
         .reader(itemReader)
-        .processor(itemProcessor)
         .writer(itemWriter)
         .faultTolerant()
         .retryPolicy(retryPolicy)

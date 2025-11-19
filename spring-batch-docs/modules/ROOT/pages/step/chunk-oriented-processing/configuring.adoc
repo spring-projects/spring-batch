@@ -30,20 +30,23 @@ public Job sampleJob(JobRepository jobRepository, Step sampleStep) {
  * configured
  */
 @Bean
-public Step sampleStep(JobRepository jobRepository, // <2>
-		PlatformTransactionManager transactionManager) { // <1>
-	return new StepBuilder("sampleStep", jobRepository)
-				.<String, String>chunk(10).transactionManager(transactionManager) // <3>
+public Step sampleStep(JobRepository jobRepository, // <1>
+		PlatformTransactionManager transactionManager) { // <2>
+	return new StepBuilder(jobRepository) // <3>
+				.<String, String>chunk(10).transactionManager(transactionManager) // <4>
 				.reader(itemReader())
 				.writer(itemWriter())
 				.build();
 }
 ----
-<1> `transactionManager`: Spring's `PlatformTransactionManager` that begins and commits
-transactions during processing.
-<2> `repository`: The Java-specific name of the `JobRepository` that periodically stores
+<1> `repository`: The Java-specific name of the `JobRepository` that periodically stores
 the `StepExecution` and `ExecutionContext` during processing (just before committing).
-<3> `chunk`: The Java-specific name of the dependency that indicates that this is an
+<2> `transactionManager`: Spring's `PlatformTransactionManager` that begins and commits
+transactions during processing.
+<3> Step name: when the step is declared as a bean, the name can be omitted and will be derived
+from the method name. However, if the step is *not* defined as a bean, the name must be explicitly
+provided to the `StepBuilder` constructor like `new StepBuilder("myStep", jobRepository)`.
+<4> `chunk`: The Java-specific name of the dependency that indicates that this is an
 item-based step and the number of items to be processed before the transaction is
 committed.
 +

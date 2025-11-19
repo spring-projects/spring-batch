@@ -14,8 +14,6 @@ Examples include remote calls to a web service that fails because of a network g
 
 [NOTE]
 ====
-As of version 2.2.0, the retry functionality was pulled out of Spring Batch.
-It is now part of a new library, https://github.com/spring-projects/spring-retry[Spring Retry].
-As of v6.0, Spring Batch does *not* use Spring Retry to automate retry operations within the framework,
-and is now based on the https://docs.spring.io/spring-framework/reference/7.0/core/resilience.html#resilience-annotations-retryable[retry feature] provided by Spring Framework 7.0.
+As of v6.0, Spring Batch does *not* use https://github.com/spring-projects/spring-retry[Spring Retry] to automate retry operations within the framework,
+and is now based on the https://docs.spring.io/spring-framework/reference/7.0/core/resilience.html[core retry feature] provided by Spring Framework 7.0.
 ====

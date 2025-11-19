@@ -52,11 +52,11 @@ create an `ApplicationContext`. This file
 should contain everything needed to run the complete
 `Job`, including a `JobOperator`, a `JobRepository` and a `JobRegistry` populated with the jobs to operate.
 |`operation`|The name of the operation to execute on the job. Can be one of [`start`, `startNextInstance`, `stop`, `restart`, `abandon`]
-|`jobName` or `jobExecutionId`|Depending on the operation, this can be the name of the job to start or the execution ID of the job to stop, restart or abandon.
+|`jobName` or `jobExecutionId`|Depending on the operation, this can be the name of the job to start or the execution ID of the job to stop, restart, abandon or recover.
 |===============
 
 When starting a job, all arguments after these are considered to be job parameters, are turned into a `JobParameters` object,
-and must be in the format of `name=value`. In the case of stopping, restarting or abandoning a job, the `jobExecutionId` is
+and must be in the format of `name=value,type,identifying`. In the case of stopping, restarting, abandoning or recovering a job, the `jobExecutionId` is
 expected as the 4th argument, and all remaining arguments are ignored.
 
 The following example shows a date passed as a job parameter to a job defined in Java:

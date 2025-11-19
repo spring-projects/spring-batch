@@ -4,11 +4,11 @@
 When starting batch jobs by using the core Spring Batch API, you
 basically have two options:
 
-* From the command line, with the `CommandLineJobRunner`
-* Programmatically, with either `JobOperator.start()` or `JobLauncher.run()`
+* From the command line, with the `CommandLineJobOperator`
+* Programmatically, with either `JobOperator.start()`
 
 For example, you may want to use the
-`CommandLineJobRunner` when invoking batch jobs by
+`CommandLineJobOperator` when invoking batch jobs by
 using a shell script. Alternatively, you can use the
 `JobOperator` directly (for example, when using
 Spring Batch as part of a web application). However, what about
@@ -29,7 +29,7 @@ ingest data for your batch jobs from multiple sources
 simultaneously by using only configuration. Implementing all these
 scenarios with Spring Integration is easy, as it allows for
 decoupled, event-driven execution of the
-`JobLauncher`.
+`JobOperator`.
 
 Spring Batch Integration provides the
 `JobLaunchingMessageHandler` class that you can

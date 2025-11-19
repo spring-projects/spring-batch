@@ -20,7 +20,6 @@ created, in addition to a number of beans being made available to be autowired:
 
 * `JobRepository`: a bean named `jobRepository`
 * `JobOperator`: a bean named `jobOperator`
-* `JobRegistry`: a bean named `jobRegistry`
 
 Here is an example of how to use the `@EnableBatchProcessing` annotation in a Java configuration class:
 

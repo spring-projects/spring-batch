@@ -54,4 +54,8 @@ could possibly create issues when updating the Spring Batch
 Integration dependencies, as they may require more recent versions
 of the XML schema.
 
+WARNING: The `batch-integration` XML namespace is deprecated as of Spring
+Batch 6.0 and will be removed in version 7.0.
+
+
 

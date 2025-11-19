@@ -36,3 +36,40 @@ exists, an exception is thrown.
 * `order`: Specifies the order of invocation when this endpoint is connected as a subscriber
 to a `SubscribableChannel`.
 
+When this `Gateway` is receiving messages from a
+`PollableChannel`, you must either provide
+a global default `Poller` or provide a `Poller` sub-element to the
+`Job Launching Gateway`.
+
+
+[tabs]
+====
+Java::
++
+The following example shows how to provide a poller in Java:
++
+.Java Configuration
+[source, java]
+----
+@Bean
+@ServiceActivator(inputChannel = "queueChannel", poller = @Poller(fixedRate="1000"))
+public JobLaunchingGateway sampleJobLaunchingGateway() {
+    JobLaunchingGateway jobLaunchingGateway = new JobLaunchingGateway(jobLauncher());
+    jobLaunchingGateway.setOutputChannel(replyChannel());
+    return jobLaunchingGateway;
+}
+----
+
+XML::
++
+The following example shows how to provide a poller in XML:
++
+.XML Configuration
+[source, xml]
+----
+<batch-int:job-launching-gateway request-channel="queueChannel"
+    reply-channel="replyChannel" job-launcher="jobLauncher">
+  <int:poller fixed-rate="1000">
+</batch-int:job-launching-gateway>
+----
+====

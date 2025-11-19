@@ -24,7 +24,7 @@ NOTE: If the test context contains a single `Job` bean definition, this
 bean will be autowired in `JobOperatorTestUtils`. Otherwise, the job
 under test should be manually set on the `JobOperatorTestUtils`.
 
-NOTE: As of Spring Batch 6.0, JUnit 4 is no longer supported. Migration to JUnit Jupiter is recommended.
+WARNING: As of Spring Batch 6.0, JUnit 4 is no longer supported. Migration to JUnit Jupiter is recommended.
 
 
 [tabs]

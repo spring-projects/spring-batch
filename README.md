@@ -28,88 +28,51 @@ In your favorite IDE, create a new Maven-based Java 17+ project and add the foll
         <artifactId>spring-batch-core</artifactId>
         <version>${LATEST_VERSION}</version>
     </dependency>
-    <dependency>
-        <groupId>org.hsqldb</groupId>
-        <artifactId>hsqldb</artifactId>
-        <version>${LATEST_VERSION}</version>
-        <scope>runtime</scope>
-    </dependency>
 </dependencies>
 ```
 
-Then, create a configuration class to define the datasource and transaction manager that will be used by the job repository:
+Then, create a class to define the batch job:
 
 ```java
-import javax.sql.DataSource;
-
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.jdbc.support.JdbcTransactionManager;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
-
-@Configuration
-public class DataSourceConfiguration {
-
-	@Bean
-	public DataSource dataSource() {
-		return new EmbeddedDatabaseBuilder()
-			.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
-			.build();
-	}
-
-	@Bean
-	public JdbcTransactionManager transactionManager(DataSource dataSource) {
-		return new JdbcTransactionManager(dataSource);
-	}
-
-}
-```
-
-In this tutorial, an embedded [HSQLDB](http://www.hsqldb.org) database is created and initialized with Spring Batch's meta-data tables.
-
-Finally, create a class to define the batch job:
-
-```java
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.Step;
+import org.springframework.batch.core.job.Job;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.launch.JobOperator;
+import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.job.builder.JobBuilder;
-import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
-import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.batch.infrastructure.repeat.RepeatStatus;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
-import org.springframework.jdbc.support.JdbcTransactionManager;
 
 @Configuration
 @EnableBatchProcessing
-@Import(DataSourceConfiguration.class)
 public class HelloWorldJobConfiguration {
 
-	@Bean
-	public Step step(JobRepository jobRepository, JdbcTransactionManager transactionManager) {
-		return new StepBuilder("step", jobRepository).tasklet((contribution, chunkContext) -> {
-			System.out.println("Hello world!");
-			return RepeatStatus.FINISHED;
-		}, transactionManager).build();
-	}
+    @Bean
+    public Step step(JobRepository jobRepository) {
+        return new StepBuilder(jobRepository).tasklet((contribution, chunkContext) -> {
+            System.out.println("Hello world!");
+            return RepeatStatus.FINISHED;
+        }).build();
+    }
 
-	@Bean
-	public Job job(JobRepository jobRepository, Step step) {
-		return new JobBuilder("job", jobRepository).start(step).build();
-	}
+    @Bean
+    public Job job(JobRepository jobRepository, Step step) {
+        return new JobBuilder(jobRepository)
+                .start(step)
+                .build();
+    }
 
-	public static void main(String[] args) throws Exception {
-		ApplicationContext context = new AnnotationConfigApplicationContext(HelloWorldJobConfiguration.class);
-		JobLauncher jobLauncher = context.getBean(JobLauncher.class);
-		Job job = context.getBean(Job.class);
-		jobLauncher.run(job, new JobParameters());
-	}
+    public static void main(String[] args) throws Exception {
+        ApplicationContext context = new AnnotationConfigApplicationContext(HelloWorldJobConfiguration.class);
+        JobOperator jobOperator = context.getBean(JobOperator.class);
+        Job job = context.getBean(Job.class);
+        jobOperator.start(job, new JobParameters());
+    }
 
 }
 ```
@@ -119,16 +82,11 @@ The job in this tutorial is composed of a single step that prints "Hello world!"
 You can now run the `main` method of the `HelloWorldJobConfiguration` class to launch the job. The output should be similar to the following:
 
 ```
-INFO: Finished Spring Batch infrastructure beans configuration in 8 ms.
-INFO: Starting embedded database: url='jdbc:hsqldb:mem:testdb', username='sa'
-INFO: No database type set, using meta data indicating: HSQL
-INFO: No Micrometer observation registry found, defaulting to ObservationRegistry.NOOP
-INFO: No TaskExecutor has been set, defaulting to synchronous executor.
-INFO: Job: [SimpleJob: [name=job]] launched with the following parameters: [{}]
-INFO: Executing step: [step]
+[main] INFO org.springframework.batch.core.launch.support.TaskExecutorJobLauncher -  COMMONS-LOGGING Job: [SimpleJob: [name=job]] launched with the following parameters: [{}]
+[main] INFO org.springframework.batch.core.job.SimpleStepHandler -  COMMONS-LOGGING Executing step: [step]
 Hello world!
-INFO: Step: [step] executed in 10ms
-INFO: Job: [SimpleJob: [name=job]] completed with the following parameters: [{}] and the following status: [COMPLETED] in 25ms
+[main] INFO org.springframework.batch.core.step.AbstractStep -  COMMONS-LOGGING Step: [step] executed in 3ms
+[main] INFO org.springframework.batch.core.launch.support.TaskExecutorJobLauncher -  COMMONS-LOGGING Job: [SimpleJob: [name=job]] completed with the following parameters: [{}] and the following status: [COMPLETED] in 4ms
 ```
 
 ## Getting Started Guide
