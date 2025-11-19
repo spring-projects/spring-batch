@@ -48,7 +48,8 @@ item-based step and the number of items to be processed before the transaction i
 committed.
 +
 NOTE: Note that `repository` defaults to `jobRepository` (provided through `@EnableBatchProcessing`)
-and `transactionManager` defaults to `transactionManager` (provided from the application context).
+and `transactionManager` defaults to `transactionManager` (provided from the application context). The
+transaction manager is optional and defaults to a `ResourcelessTransactionManager`.
 Also, the `ItemProcessor` is optional, since the item could be
 directly passed from the reader to the writer.
 
@@ -85,10 +86,15 @@ optional, since the item could be directly passed from the reader to the writer.
 
 
 
-The preceding configuration includes the only required dependencies to create a item-oriented
+The preceding configuration includes the only required dependencies to create an item-oriented
 step:
 
 * `reader`: The `ItemReader` that provides items for processing.
 * `writer`: The `ItemWriter` that processes the items provided by the `ItemReader`.
 
+NOTE: The transaction manager used in the step could be different from the one used in the job
+repository. The caveat though is that the job repository and the processing database
+won't be in the same transaction, so if a failure occurs after processing but before the job
+repository is updated, the step could be re-executed and lead to duplicate processing. This could
+be mitigated through idempotent processing or external transaction management (e.g., JTA).
 
