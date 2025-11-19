@@ -6,6 +6,8 @@ of the various persisted domain objects within Spring Batch, such as `JobExecuti
 It is required by many of the major framework features, such as the `JobOperator`,
 `Job`, and `Step`.
 
+== Configuring a JDBC JobRepository
+
 [tabs]
 ====
 Java::
@@ -68,6 +70,29 @@ The `max-varchar-length` defaults to `2500`, which is the length of the long
 `VARCHAR` columns in the xref:schema-appendix.adoc#metaDataSchemaOverview[sample schema scripts].
 ====
 
+== Configuring a MongoDB JobRepository
+
+Similar to the JDBC-based `JobRepository`, the MongoDB-based `JobRepository` requires some collections
+to store the batch metadata. These collections are defined in the `org/springframework/batch/core/schema-mongodb.jsonl`
+of the `spring-batch-core` jar. As with the JDBC-based `JobRepository`, you need to create these collections
+in your MongoDB database before running any job.
+
+Moreover, since it is https://www.mongodb.com/docs/manual/core/dot-dollar-considerations/[not recommended] to use `.` in
+field names in MongoDB documents, you need to customize the `MongoTemplate` used by the `MongoJobRepositoryFactoryBean`
+to replace `.` with another character (for example, `_`) in the field names. You can do this by customizing the `MappingMongoConverter`
+used by the `MongoTemplate`. The following example shows how to do this in Java configuration:
+
+.Java Configuration
+[source, java]
+----
+@Bean
+public MongoTemplate mongoTemplate(MongoDatabaseFactory mongoDatabaseFactory) {
+    MongoTemplate template = new MongoTemplate(mongoDatabaseFactory);
+    MappingMongoConverter converter = (MappingMongoConverter) template.getConverter();
+    converter.setMapKeyDotReplacement("_");
+    return template;
+}
+----
 
 [[txConfigForJobRepository]]
 == Transaction Configuration for the JobRepository
