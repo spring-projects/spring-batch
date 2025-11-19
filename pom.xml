@@ -386,9 +386,6 @@
 			<id>mminella</id>
 			<name>Michael Minella</name>
 			<email>mminella@vmware.com</email>
-			<roles>
-				<role>Project Lead</role>
-			</roles>
 		</developer>
 		<developer>
 			<id>chrisjs</id>
@@ -398,7 +395,7 @@
 		<developer>
 			<id>fmbenhassine</id>
 			<name>Mahmoud Ben Hassine</name>
-			<email>mbenhassine@vmware.com</email>
+			<email>mahmoud.ben-hassine@broadcom.com</email>
 			<roles>
 				<role>Project Lead</role>
 			</roles>
