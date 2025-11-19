@@ -50,7 +50,7 @@ The following table describes the required arguments:
 |`jobClass`|The fully qualified name of the job configuration class used to
 create an `ApplicationContext`. This file
 should contain everything needed to run the complete
-`Job`.
+`Job`, including a `JobOperator`, a `JobRepository` and a `JobRegistry` populated with the jobs to operate.
 |`operation`|The name of the operation to execute on the job. Can be one of [`start`, `startNextInstance`, `stop`, `restart`, `abandon`]
 |`jobName` or `jobExecutionId`|Depending on the operation, this can be the name of the job to start or the execution ID of the job to stop, restart or abandon.
 |===============
