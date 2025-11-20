@@ -52,19 +52,19 @@
 		<java.version>17</java.version>
 
 		<!-- production dependencies -->
-        <spring-framework.version>7.0.0</spring-framework.version>
-        <spring-retry.version>2.0.12</spring-retry.version>
-        <spring-integration.version>7.0.0</spring-integration.version>
-        <micrometer.version>1.16.0</micrometer.version>
+        <spring-framework.version>7.0.1-SNAPSHOT</spring-framework.version>
+        <spring-retry.version>2.0.13-SNAPSHOT</spring-retry.version>
+        <spring-integration.version>7.0.1-SNAPSHOT</spring-integration.version>
+        <micrometer.version>1.16.1-SNAPSHOT</micrometer.version>
 
 		<!-- optional production dependencies -->
-        <spring-data-commons.version>4.0.0</spring-data-commons.version>
-        <spring-data-jpa.version>4.0.0</spring-data-jpa.version>
-        <spring-data-redis.version>4.0.0</spring-data-redis.version>
-        <spring-data-mongodb.version>5.0.0</spring-data-mongodb.version>
-        <spring-kafka.version>4.0.0</spring-kafka.version>
-        <spring-amqp.version>4.0.0</spring-amqp.version>
-        <spring-ldap.version>4.0.0</spring-ldap.version>
+        <spring-data-commons.version>4.0.1-SNAPSHOT</spring-data-commons.version>
+        <spring-data-jpa.version>4.0.1-SNAPSHOT</spring-data-jpa.version>
+        <spring-data-redis.version>4.0.1-SNAPSHOT</spring-data-redis.version>
+        <spring-data-mongodb.version>5.0.1-SNAPSHOT</spring-data-mongodb.version>
+        <spring-kafka.version>4.0.1-SNAPSHOT</spring-kafka.version>
+        <spring-amqp.version>4.0.1-SNAPSHOT</spring-amqp.version>
+        <spring-ldap.version>4.0.1-SNAPSHOT</spring-ldap.version>
 
 		<jackson2.version>2.20.1</jackson2.version>
 		<jackson3.version>3.0.2</jackson3.version>
@@ -81,7 +81,7 @@
 		<junit-platform-launcher.version>6.0.1</junit-platform-launcher.version>
 
 		<!-- test dependencies -->
-		<micrometer-tracing.version>1.6.0</micrometer-tracing.version>
+		<micrometer-tracing.version>1.6.1-SNAPSHOT</micrometer-tracing.version>
 
 		<xstream.version>1.4.21</xstream.version>
 		<junit.version>4.13.2</junit.version>
