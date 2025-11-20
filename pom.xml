@@ -143,7 +143,6 @@
 		<maven-source-plugin.version>3.3.1</maven-source-plugin.version>
 		<flatten-maven-plugin.version>1.7.3</flatten-maven-plugin.version>
 		<maven-deploy-plugin.version>3.1.4</maven-deploy-plugin.version>
-		<maven-assembly-plugin.version>3.7.1</maven-assembly-plugin.version>
 		<maven-jar-plugin.version>3.5.0</maven-jar-plugin.version>
 		<spring-javaformat-maven-plugin.version>0.0.47</spring-javaformat-maven-plugin.version>
 		<error-prone.version>2.44.0</error-prone.version>
