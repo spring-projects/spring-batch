@@ -33,18 +33,27 @@ import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer
  */
 public class MongoSequenceIncrementer implements DataFieldMaxValueIncrementer {
 
+	private static final String SEQUENCES_COLLECTION_NAME = "SEQUENCES";
+
 	private final MongoOperations mongoTemplate;
 
 	private final String sequenceName;
 
+	private final String sequencesCollectionName;
+
 	public MongoSequenceIncrementer(MongoOperations mongoTemplate, String sequenceName) {
+		this(mongoTemplate, sequenceName, "BATCH_");
+	}
+
+	public MongoSequenceIncrementer(MongoOperations mongoTemplate, String sequenceName, String collectionPrefix) {
 		this.mongoTemplate = mongoTemplate;
-		this.sequenceName = sequenceName;
+		this.sequencesCollectionName = collectionPrefix + SEQUENCES_COLLECTION_NAME;
+		this.sequenceName = collectionPrefix + sequenceName;
 	}
 
 	@Override
 	public long nextLongValue() throws DataAccessException {
-		return mongoTemplate.execute("BATCH_SEQUENCES",
+		return mongoTemplate.execute(sequencesCollectionName,
 				collection -> collection
 					.findOneAndUpdate(new Document("_id", sequenceName), new Document("$inc", new Document("count", 1)),
 							new FindOneAndUpdateOptions().returnDocument(ReturnDocument.AFTER))
