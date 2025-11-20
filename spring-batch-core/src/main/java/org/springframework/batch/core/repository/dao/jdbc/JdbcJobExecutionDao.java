@@ -24,8 +24,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 import org.apache.commons.logging.Log;
@@ -154,7 +152,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 
 	private DataFieldMaxValueIncrementer jobExecutionIncrementer;
 
-	private final Lock lock = new ReentrantLock();
+	private final FineGrainedLock<Long> lock = new FineGrainedLock<>();
 
 	/**
 	 * Public setter for the exit message length in database. Do not set this if you
@@ -254,7 +252,8 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		Assert.notNull(jobExecution.getVersion(),
 				"JobExecution version cannot be null. JobExecution must be saved before it can be updated");
 
-		this.lock.lock();
+		Long executionId = jobExecution.getId();
+		this.lock.lock(executionId);
 		try {
 
 			String exitDescription = jobExecution.getExitStatus().getExitDescription();
@@ -302,7 +301,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 			jobExecution.incrementVersion();
 		}
 		finally {
-			this.lock.unlock();
+			this.lock.unlock(executionId);
 		}
 	}
 
