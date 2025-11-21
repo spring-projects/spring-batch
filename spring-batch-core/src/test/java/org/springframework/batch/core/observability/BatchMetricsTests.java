@@ -93,7 +93,7 @@ class BatchMetricsTests {
 	@Test
 	void testFormatZeroDuration() {
 		String formattedDuration = BatchMetrics.formatDuration(Duration.ZERO);
-		assertTrue(formattedDuration.isEmpty());
+		assertEquals("0ms", formattedDuration);
 	}
 
 	@Test
