@@ -12,6 +12,14 @@ on:
           - spring-batch-excel
           - spring-batch-elasticsearch
           - spring-batch-neo4j
+          - spring-batch-notion
+      javaVersion:
+        description: "Java version"
+        required: true
+        type: choice
+        options:
+          - '17'
+          - '25'
 
 jobs:
   build:
@@ -24,10 +32,10 @@ jobs:
           repository: 'spring-projects/spring-batch-extensions'
           ref: 'main'
 
-      - name: Set up JDK 17
+      - name: Set up JDK ${{ github.event.inputs.javaVersion }}
         uses: actions/setup-java@387ac29b308b003ca37ba93a6cab5eb57c8f5f93 # v4.0.0
         with:
-          java-version: '17'
+          java-version: '${{ github.event.inputs.javaVersion }}'
           distribution: 'temurin'
 
       - name: Build extension with Maven
