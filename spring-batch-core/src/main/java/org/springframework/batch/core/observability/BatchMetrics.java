@@ -66,8 +66,11 @@ public final class BatchMetrics {
 	 * @return A human readable duration
 	 */
 	public static String formatDuration(@Nullable Duration duration) {
-		if (duration == null || duration.isZero() || duration.isNegative()) {
+		if (duration == null || duration.isNegative()) {
 			return "";
+		}
+		if (duration.isZero()) {
+			return "0ms";
 		}
 		StringBuilder formattedDuration = new StringBuilder();
 		long hours = duration.toHours();
