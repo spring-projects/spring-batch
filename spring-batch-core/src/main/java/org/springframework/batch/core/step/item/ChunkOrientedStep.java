@@ -131,7 +131,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 	 */
 	private final int chunkSize;
 
-	private final ChunkTracker chunkTracker = new ChunkTracker();
+	private final ThreadLocal<ChunkTracker> chunkTracker = ThreadLocal.withInitial(ChunkTracker::new);
 
 	private final CompositeChunkListener<I, O> compositeChunkListener = new CompositeChunkListener<>();
 
@@ -359,7 +359,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 	@Override
 	protected void doExecute(StepExecution stepExecution) throws Exception {
 		stepExecution.getExecutionContext().put(STEP_TYPE_KEY, this.getClass().getName());
-		while (this.chunkTracker.moreItems() && !interrupted(stepExecution)) {
+		while (this.chunkTracker.get().moreItems() && !interrupted(stepExecution)) {
 			// process next chunk in its own transaction
 			this.transactionTemplate.executeWithoutResult(transactionStatus -> {
 				ChunkTransactionEvent chunkTransactionEvent = new ChunkTransactionEvent(stepExecution.getStepName(),
@@ -389,7 +389,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 		List<Future<O>> itemProcessingTasks = new LinkedList<>();
 		try {
 			// read items and submit concurrent item processing tasks
-			for (int i = 0; i < this.chunkSize && this.chunkTracker.moreItems(); i++) {
+			for (int i = 0; i < this.chunkSize && this.chunkTracker.get().moreItems(); i++) {
 				I item = readItem(contribution);
 				if (item != null) {
 					Future<O> itemProcessingFuture = this.taskExecutor.submit(() -> processItem(item, contribution));
@@ -480,7 +480,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 
 	private Chunk<I> readChunk(StepContribution contribution) throws Exception {
 		Chunk<I> chunk = new Chunk<>();
-		for (int i = 0; i < chunkSize && this.chunkTracker.moreItems(); i++) {
+		for (int i = 0; i < chunkSize && this.chunkTracker.get().moreItems(); i++) {
 			I item = readItem(contribution);
 			if (item != null) {
 				chunk.add(item);
@@ -505,7 +505,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			this.compositeItemReadListener.beforeRead();
 			item = doRead();
 			if (item == null) {
-				this.chunkTracker.noMoreItems();
+				this.chunkTracker.get().noMoreItems();
 			}
 			else {
 				contribution.incrementReadCount();

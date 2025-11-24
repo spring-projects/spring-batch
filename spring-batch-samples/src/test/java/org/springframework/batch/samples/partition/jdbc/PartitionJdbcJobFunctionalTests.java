@@ -16,11 +16,9 @@
 
 package org.springframework.batch.samples.partition.jdbc;
 
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
@@ -28,17 +26,20 @@ import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.launch.JobOperator;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.batch.infrastructure.item.ItemReader;
 import org.springframework.batch.infrastructure.item.ItemStream;
 import org.springframework.batch.samples.domain.trade.CustomerCredit;
 import org.springframework.batch.samples.domain.trade.internal.CustomerCreditIncreaseProcessor;
+import org.springframework.batch.samples.partitioning.local.PartitionJdbcJobConfiguration;
 import org.springframework.batch.test.JobOperatorTestUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -95,6 +96,26 @@ class PartitionJdbcJobFunctionalTests implements ApplicationContextAware {
 			assertEquals(inputs.get(i).getCredit().add(CustomerCreditIncreaseProcessor.FIXED_AMOUNT).intValue(),
 					outputs.get(i).getCredit().intValue());
 		}
+	}
+
+	@Test
+	void testLaunchJobWithJavaConfiguration() throws Exception {
+		// given
+		ApplicationContext context = new AnnotationConfigApplicationContext(PartitionJdbcJobConfiguration.class);
+		JobOperator jobOperator = context.getBean(JobOperator.class);
+		Job job = context.getBean(Job.class);
+
+		// when
+		JobExecution jobExecution = jobOperator.start(job, new JobParameters());
+
+		// then
+		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
+		Collection<StepExecution> stepExecutions = jobExecution.getStepExecutions();
+		// one manager step + 2 worker steps
+		Assertions.assertEquals(3, stepExecutions.size());
+		StepExecution managerStepExecution = stepExecutions.iterator().next();
+		Assertions.assertEquals(10, managerStepExecution.getReadCount());
+		Assertions.assertEquals(10, managerStepExecution.getWriteCount());
 	}
 
 	/**
