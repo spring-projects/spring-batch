@@ -21,7 +21,7 @@ The following example shows how to configure a `TaskExecutorJobOperator` in Java
 @Bean
 public JobOperatorFactoryBean jobOperator(JobRepository jobRepository) {
 	JobOperatorFactoryBean jobOperatorFactoryBean = new JobOperatorFactoryBean();
-	jobOperator.setJobRepository(jobRepository);
+	jobOperatorFactoryBean.setJobRepository(jobRepository);
 	return jobOperatorFactoryBean;
 }
 ...
@@ -74,8 +74,8 @@ The following Java example configures a `TaskExecutorJobOperator` to return imme
 @Bean
 public JobOperatorFactoryBean jobOperator(JobRepository jobRepository) {
 	JobOperatorFactoryBean jobOperatorFactoryBean = new JobOperatorFactoryBean();
-	jobOperator.setJobRepository(jobRepository);
-	jobOperator.setTaskExecutor(new SimpleAsyncTaskExecutor());
+	jobOperatorFactoryBean.setJobRepository(jobRepository);
+	jobOperatorFactoryBean.setTaskExecutor(new SimpleAsyncTaskExecutor());
 	return jobOperatorFactoryBean;
 }
 ----
