@@ -144,13 +144,15 @@ public class JdbcCursorItemReader<T> extends AbstractCursorItemReader<T> {
 	}
 
 	/**
-	 * Close the cursor and database connection.
-	 * @param connection to the database
+	 * Releases JDBC resources associated with this reader.
+	 * Closes the PreparedStatement used for the cursor.
+	 * The Connection is not closed here; it is managed by the parent class.
+	 *
+	 * @param connection the active database connection used for the cursor
 	 */
 	@Override
 	protected void cleanupOnClose(Connection connection) {
 		JdbcUtils.closeStatement(this.preparedStatement);
-		JdbcUtils.closeConnection(connection);
 	}
 
 	@Override
