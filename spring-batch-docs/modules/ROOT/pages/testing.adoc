@@ -68,7 +68,7 @@ and verifies the end result.
 Consider an example of a batch job that reads from the database and writes to a flat file.
 The test method begins by setting up the database with test data. It clears the `CUSTOMER`
 table and then inserts 10 new records. The test then launches the `Job` by using the
-`srartJob()` method. The `srartJob()` method is provided by the `JobOperatorTestUtils`
+`startJob()` method. The `startJob()` method is provided by the `JobOperatorTestUtils`
 class. The `JobOperatorTestUtils` class also provides the `startJob(JobParameters)`
 method, which lets the test give particular parameters. The `srartJob()` method
 returns the `JobExecution` object, which is useful for asserting particular information

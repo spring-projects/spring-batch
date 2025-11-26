@@ -53,7 +53,7 @@
 ** xref:spring-batch-integration/available-attributes-of-the-job-launching-gateway.adoc[]
 ** xref:spring-batch-integration/providing-feedback-with-informational-messages.adoc[Providing Feedback with Informational Messages]
 ** xref:spring-batch-integration/asynchronous-processing.adoc[Asynchronous Processors]
-** xref:spring-batch-integration/externelazing-execution.adoc[Externalizing Batch Process Execution]
+** xref:spring-batch-integration/externalizing-execution.adoc[Externalizing Batch Process Execution]
 * xref:spring-batch-observability.adoc[]
 ** xref:spring-batch-observability/micrometer.adoc[]
 ** xref:spring-batch-observability/jfr.adoc[]
