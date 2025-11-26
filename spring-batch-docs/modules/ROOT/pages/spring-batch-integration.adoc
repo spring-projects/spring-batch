@@ -37,4 +37,4 @@ This section covers the following key concepts:
 * xref:spring-batch-integration/available-attributes-of-the-job-launching-gateway.adoc[Available Attributes of the Job-Launching Gateway]
 * xref:spring-batch-integration/providing-feedback-with-informational-messages.adoc[Providing Feedback with Informational Messages]
 * xref:spring-batch-integration/asynchronous-processing.adoc[Asynchronous Processors]
-* xref:spring-batch-integration/externelazing-execution.adoc[Externalizing Batch Process Execution]
+* xref:spring-batch-integration/externalizing-execution.adoc[Externalizing Batch Process Execution]

@@ -292,7 +292,7 @@ message. JMS is the obvious candidate, but other options (such as JavaSpaces) ex
 the grid computing and shared memory product space.
 
 See the section on
-xref:spring-batch-integration/externelazing-execution.adoc#remote-chunking[Spring Batch Integration - Remote Chunking]
+xref:spring-batch-integration/externalizing-execution.adoc#remote-chunking[Spring Batch Integration - Remote Chunking]
 for more detail.
 
 [[partitioning]]

@@ -29,7 +29,7 @@ is provided for you.
 ====
 Java::
 +
-When using `@EnableBatchProcessing`, a `ResourcelssJobRepository` is provided for you.
+When using `@EnableBatchProcessing`, a `ResourcelessJobRepository` is provided for you.
 This section describes how to customize it. Spring Batch provides two implementations
 of the `JobRepository` interface which are backed by a database: a JDBC implementation
 (which can be used with any JDBC-compliant database) and a MongoDB implementation. These two
