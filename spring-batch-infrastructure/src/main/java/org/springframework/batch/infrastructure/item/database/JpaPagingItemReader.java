@@ -87,7 +87,7 @@ import org.springframework.util.StringUtils;
  */
 public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
 
-	private EntityManagerFactory entityManagerFactory;
+	private final EntityManagerFactory entityManagerFactory;
 
 	private @Nullable EntityManager entityManager;
 
@@ -110,10 +110,6 @@ public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
 	 */
 	public JpaPagingItemReader(EntityManagerFactory entityManagerFactory) {
 		Assert.notNull(entityManagerFactory, "EntityManagerFactory must not be null.");
-		this.entityManagerFactory = entityManagerFactory;
-	}
-
-	public void setEntityManagerFactory(EntityManagerFactory entityManagerFactory) {
 		this.entityManagerFactory = entityManagerFactory;
 	}
 
