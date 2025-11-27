@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,10 @@
 
 package org.springframework.batch.infrastructure.item.database;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
@@ -217,7 +217,7 @@ public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
 		}
 
 		if (results == null) {
-			results = new CopyOnWriteArrayList<>();
+			results = new ArrayList<>();
 		}
 		else {
 			results.clear();
