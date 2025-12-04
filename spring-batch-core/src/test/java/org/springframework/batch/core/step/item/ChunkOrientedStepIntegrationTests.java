@@ -19,8 +19,11 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.ExitStatus;
+import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
+import org.springframework.batch.core.configuration.annotation.EnableJdbcJobRepository;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobOperator;
@@ -28,13 +31,16 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.step.builder.ChunkOrientedStepBuilder;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.infrastructure.item.ItemProcessor;
 import org.springframework.batch.infrastructure.item.ItemReader;
 import org.springframework.batch.infrastructure.item.ItemWriter;
+import org.springframework.batch.infrastructure.item.support.ListItemWriter;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.JdbcTransactionManager;
@@ -160,6 +166,23 @@ public class ChunkOrientedStepIntegrationTests {
 		System.clearProperty("fail");
 	}
 
+	// Issue: https://github.com/spring-projects/spring-batch/issues/5126
+	@Test
+	void testChunkOrientedStepReExecution() throws Exception {
+		// given
+		ApplicationContext context = new AnnotationConfigApplicationContext(StepConfiguration.class);
+		JobOperator jobOperator = context.getBean(JobOperator.class);
+		Job job = context.getBean(Job.class);
+
+		// when
+		jobOperator.start(job, new JobParametersBuilder().addLong("run.id", 1L).toJobParameters());
+		jobOperator.start(job, new JobParametersBuilder().addLong("run.id", 2L).toJobParameters());
+
+		// then
+		ListItemWriter<String> itemWriter = context.getBean(ListItemWriter.class);
+		Assertions.assertEquals(2, itemWriter.getWrittenItems().size());
+	}
+
 	@Configuration
 	static class ChunkOrientedStepConfiguration {
 
@@ -189,6 +212,32 @@ public class ChunkOrientedStepIntegrationTests {
 				.transactionManager(transactionManager)
 				.taskExecutor(new SimpleAsyncTaskExecutor())
 				.build();
+		}
+
+	}
+
+	@Configuration
+	@EnableBatchProcessing
+	@EnableJdbcJobRepository
+	@Import(JdbcInfrastructureConfiguration.class)
+	static class StepConfiguration {
+
+		// singleton-scoped item writer acting as a global collector
+		// of written items across job executions
+		@Bean
+		public ListItemWriter<String> itemWriter() {
+			return new ListItemWriter<>();
+		}
+
+		@Bean
+		Job job(JobRepository jobRepository, JdbcTransactionManager transactionManager,
+				ListItemWriter<String> itemWriter) {
+			ChunkOrientedStep<String, String> step = new StepBuilder("step", jobRepository).<String, String>chunk(1)
+				.transactionManager(transactionManager)
+				.reader(new SingleItemStreamReader<>("foo"))
+				.writer(itemWriter)
+				.build();
+			return new JobBuilder(jobRepository).start(step).build();
 		}
 
 	}

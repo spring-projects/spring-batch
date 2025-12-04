@@ -349,10 +349,12 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 	@Override
 	protected void open(ExecutionContext executionContext) throws Exception {
 		this.compositeItemStream.open(executionContext);
+		this.chunkTracker.get().init();
 	}
 
 	@Override
 	protected void close(ExecutionContext executionContext) throws Exception {
+		this.chunkTracker.get().reset();
 		this.compositeItemStream.close();
 	}
 
@@ -505,7 +507,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			this.compositeItemReadListener.beforeRead();
 			item = doRead();
 			if (item == null) {
-				this.chunkTracker.get().noMoreItems();
+				this.chunkTracker.get().reset();
 			}
 			else {
 				contribution.incrementReadCount();
@@ -757,9 +759,13 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 
 	private static class ChunkTracker {
 
-		private boolean moreItems = true;
+		private boolean moreItems;
 
-		void noMoreItems() {
+		void init() {
+			this.moreItems = true;
+		}
+
+		void reset() {
 			this.moreItems = false;
 		}
 
