@@ -32,15 +32,13 @@ import org.springframework.batch.infrastructure.item.file.builder.FlatFileItemRe
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.io.Resource;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
-import org.springframework.jdbc.support.JdbcTransactionManager;
 
 @Configuration
 @EnableBatchProcessing
 @EnableJdbcJobRepository
+@Import(JdbcInfrastructureConfiguration.class)
 public class TestConfiguration {
 
 	@Bean
@@ -65,34 +63,14 @@ public class TestConfiguration {
 	}
 
 	@Bean
-	public JdbcBatchItemWriter<Person> itemWriter() {
+	public JdbcBatchItemWriter<Person> itemWriter(DataSource dataSource) {
 		String sql = "insert into person_target (id, name) values (:id, :name)";
-		return new JdbcBatchItemWriterBuilder<Person>().dataSource(dataSource()).sql(sql).beanMapped().build();
+		return new JdbcBatchItemWriterBuilder<Person>().dataSource(dataSource).sql(sql).beanMapped().build();
 	}
 
 	@Bean
 	public Job job(JobRepository jobRepository, Step step) {
-		return new JobBuilder("job", jobRepository).start(step).build();
-	}
-
-	@Bean
-	public DataSource dataSource() {
-		return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2)
-			.addScript("/org/springframework/batch/core/schema-drop-h2.sql")
-			.addScript("/org/springframework/batch/core/schema-h2.sql")
-			.addScript("schema.sql")
-			.generateUniqueName(true)
-			.build();
-	}
-
-	@Bean
-	public JdbcTransactionManager transactionManager(DataSource dataSource) {
-		return new JdbcTransactionManager(dataSource);
-	}
-
-	@Bean
-	public JdbcTemplate jdbcTemplate(DataSource dataSource) {
-		return new JdbcTemplate(dataSource);
+		return new JobBuilder(jobRepository).start(step).build();
 	}
 
 }
