@@ -343,9 +343,15 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		final Set<JobExecution> result = new HashSet<>();
 		List<Long> jobInstanceIds = this.jobInstanceDao.getJobInstanceIds(jobName);
 		for (long jobInstanceId : jobInstanceIds) {
-			long runningJobExecutionId = getJdbcTemplate().queryForObject(getQuery(GET_RUNNING_EXECUTION_FOR_INSTANCE),
-					Long.class, jobInstanceId);
-			JobExecution runningJobExecution = getJobExecution(runningJobExecutionId);
+			List<Long> runningJobExecutionIds = getJdbcTemplate()
+				.queryForList(getQuery(GET_RUNNING_EXECUTION_FOR_INSTANCE), Long.class, jobInstanceId);
+			if (runningJobExecutionIds.isEmpty()) {
+				continue;
+			}
+			// There should be only one running execution per job instance, enforced at
+			// startup time
+			Long jobExecutionId = runningJobExecutionIds.get(0);
+			JobExecution runningJobExecution = getJobExecution(jobExecutionId);
 			result.add(runningJobExecution);
 		}
 		return result;
