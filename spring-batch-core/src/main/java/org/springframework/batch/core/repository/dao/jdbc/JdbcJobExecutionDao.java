@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Collectors;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -106,7 +107,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	private static final String GET_RUNNING_EXECUTION_FOR_INSTANCE = """
 			SELECT E.JOB_EXECUTION_ID
 			FROM %PREFIX%JOB_EXECUTION E, %PREFIX%JOB_INSTANCE I
-			WHERE E.JOB_INSTANCE_ID=I.JOB_INSTANCE_ID AND I.JOB_INSTANCE_ID=? AND E.STATUS IN ('STARTING', 'STARTED', 'STOPPING')
+			WHERE E.JOB_INSTANCE_ID=I.JOB_INSTANCE_ID AND I.JOB_NAME=? AND E.STATUS IN ('STARTING', 'STARTED', 'STOPPING')
 			""";
 
 	private static final String CURRENT_VERSION_JOB_EXECUTION = """
@@ -340,21 +341,10 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 
 	@Override
 	public Set<JobExecution> findRunningJobExecutions(String jobName) {
-		final Set<JobExecution> result = new HashSet<>();
-		List<Long> jobInstanceIds = this.jobInstanceDao.getJobInstanceIds(jobName);
-		for (long jobInstanceId : jobInstanceIds) {
-			List<Long> runningJobExecutionIds = getJdbcTemplate()
-				.queryForList(getQuery(GET_RUNNING_EXECUTION_FOR_INSTANCE), Long.class, jobInstanceId);
-			if (runningJobExecutionIds.isEmpty()) {
-				continue;
-			}
-			// There should be only one running execution per job instance, enforced at
-			// startup time
-			Long jobExecutionId = runningJobExecutionIds.get(0);
-			JobExecution runningJobExecution = getJobExecution(jobExecutionId);
-			result.add(runningJobExecution);
-		}
-		return result;
+		return getJdbcTemplate().queryForList(getQuery(GET_RUNNING_EXECUTION_FOR_INSTANCE), Long.class, jobName)
+			.stream()
+			.map(this::getJobExecution)
+			.collect(Collectors.toSet());
 	}
 
 	@Override
