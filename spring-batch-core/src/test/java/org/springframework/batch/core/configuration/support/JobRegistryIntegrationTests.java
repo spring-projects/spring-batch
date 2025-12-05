@@ -16,14 +16,24 @@
 package org.springframework.batch.core.configuration.support;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 
 import org.springframework.batch.core.configuration.DuplicateJobException;
-import org.springframework.batch.core.job.Job;
+import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
+import org.springframework.batch.core.job.*;
 import org.springframework.batch.core.configuration.JobRegistry;
-import org.springframework.batch.core.job.SimpleJob;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.StepSupport;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 /**
@@ -42,6 +52,33 @@ class JobRegistryIntegrationTests {
 
 		assertEquals(1, jobRegistry.getJobNames().size());
 		assertEquals(job.getName(), jobRegistry.getJobNames().iterator().next());
+	}
+
+	@Test
+	void testDuplicateJobRegistration() {
+		assertThrows(IllegalStateException.class,
+				() -> new AnnotationConfigApplicationContext(JobConfigurationWithDuplicateJobs.class));
+	}
+
+	@Configuration
+	@EnableBatchProcessing
+	static class JobConfigurationWithDuplicateJobs {
+
+		@Bean
+		Job job1() {
+			return new JobSupport("sameJobNameOnPurpose");
+		}
+
+		@Bean
+		Job job2() {
+			return new JobSupport("sameJobNameOnPurpose");
+		}
+
+		@Bean
+		public JobRegistry jobRegistry() {
+			return new MapJobRegistry();
+		}
+
 	}
 
 }

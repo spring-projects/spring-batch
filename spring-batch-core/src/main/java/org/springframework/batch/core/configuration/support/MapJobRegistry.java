@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,7 +63,14 @@ public class MapJobRegistry implements JobRegistry, SmartInitializingSingleton, 
 	@Override
 	public void afterSingletonsInstantiated() {
 		Map<String, Job> jobBeans = this.applicationContext.getBeansOfType(Job.class);
-		this.map.putAll(jobBeans);
+		for (Job job : jobBeans.values()) {
+			try {
+				register(job);
+			}
+			catch (DuplicateJobException e) {
+				throw new IllegalStateException("Unable to register job " + job.getName(), e);
+			}
+		}
 	}
 
 	@Override
