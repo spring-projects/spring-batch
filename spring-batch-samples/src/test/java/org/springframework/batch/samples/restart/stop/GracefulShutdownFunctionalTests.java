@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,19 +16,37 @@
 
 package org.springframework.batch.samples.restart.stop;
 
+import java.util.List;
+
+import javax.sql.DataSource;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
+import org.springframework.batch.core.configuration.annotation.EnableJdbcJobRepository;
+import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.job.parameters.JobParameters;
-import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobOperator;
-import org.springframework.batch.test.JobOperatorTestUtils;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.Step;
+import org.springframework.batch.core.step.builder.ChunkOrientedStepBuilder;
+import org.springframework.batch.infrastructure.item.support.ListItemReader;
+import org.springframework.batch.infrastructure.item.support.ListItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.task.AsyncTaskExecutor;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
+import org.springframework.jdbc.support.JdbcTransactionManager;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -44,26 +62,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Mahmoud Ben Hassine
  *
  */
-@SpringJUnitConfig(locations = { "/org/springframework/batch/samples/restart/stop/stopRestartSample.xml" })
-@Disabled
-// FIXME passes in the IDE but not on the CLI - needs investigation
+@ExtendWith(SpringExtension.class)
 class GracefulShutdownFunctionalTests {
 
 	/** Logger */
 	private final Log logger = LogFactory.getLog(getClass());
 
-	@Autowired
-	private JobOperatorTestUtils jobOperatorTestUtils;
-
-	@Autowired
-	private JobOperator jobOperator;
-
 	@Test
-	void testLaunchJob() throws Exception {
-		final JobParameters jobParameters = new JobParametersBuilder().addLong("timestamp", System.currentTimeMillis())
-			.toJobParameters();
-
-		JobExecution jobExecution = jobOperatorTestUtils.startJob(jobParameters);
+	void testStopJob(@Autowired Job job, @Autowired JobOperator jobOperator) throws Exception {
+		JobExecution jobExecution = jobOperator.start(job, new JobParameters());
 
 		Thread.sleep(1000);
 
@@ -81,6 +88,53 @@ class GracefulShutdownFunctionalTests {
 
 		assertFalse(jobExecution.isRunning(), "Timed out waiting for job to end.");
 		assertEquals(BatchStatus.STOPPED, jobExecution.getStatus());
+	}
+
+	@Configuration
+	@EnableBatchProcessing(taskExecutorRef = "batchTaskExecutor")
+	@EnableJdbcJobRepository
+	static class JobConfiguration {
+
+		@Bean
+		public Job job(JobRepository jobRepository, Step step) {
+			return new JobBuilder(jobRepository).start(step).build();
+		}
+
+		@Bean
+		public Step chunkOrientedStep(JobRepository jobRepository, JdbcTransactionManager transactionManager) {
+			return new ChunkOrientedStepBuilder<String, String>(jobRepository, 2)
+				.reader(new ListItemReader<>(List.of("item1", "item2", "item3", "item4", "item5")))
+				.processor(item -> {
+					// Simulate processing time
+					Thread.sleep(500);
+					return item.toUpperCase();
+				})
+				.writer(new ListItemWriter<>())
+				.transactionManager(transactionManager)
+				.build();
+		}
+
+		@Bean
+		public DataSource dataSource() {
+			return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.HSQL)
+				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
+				.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
+				.generateUniqueName(true)
+				.build();
+		}
+
+		@Bean
+		public JdbcTransactionManager transactionManager(DataSource dataSource) {
+			return new JdbcTransactionManager(dataSource);
+		}
+
+		@Bean
+		public AsyncTaskExecutor batchTaskExecutor() {
+			SimpleAsyncTaskExecutor asyncTaskExecutor = new SimpleAsyncTaskExecutor("batch-executor");
+			asyncTaskExecutor.setConcurrencyLimit(1);
+			return asyncTaskExecutor;
+		}
+
 	}
 
 }

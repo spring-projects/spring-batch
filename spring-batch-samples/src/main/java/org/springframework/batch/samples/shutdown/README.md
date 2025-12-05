@@ -12,6 +12,8 @@ gracefully, allowing it to complete its current processing before shutting down.
 
 ## Run the sample
 
+### 1. Start the job
+
 First, you need to start the database server of the job repository. In a terminal, run:
 
 ```
@@ -26,11 +28,15 @@ Get the process id from the first line of logs (needed for the stop):
 Process id = 73280
 ```
 
+### 2. Stop the job
+
 In a second terminal, Gracefully stop the app by running:
 
 ```
 $>kill -15 73280
 ```
+
+You can otherwise run the `org.springframework.batch.samples.shutdown.StopJobExecutionApp` class in your IDE with no arguments.
 
 You should see the shutdown hook being called:
 
@@ -49,6 +55,8 @@ $>docker exec postgres psql -U postgres -c 'select * from batch_step_execution;'
 ```
 
 Both the job and the step should have a `STOPPED` status.
+
+### 3. Restart the job
 
 Now, you can restart the job by running the `org.springframework.batch.samples.shutdown.RestartJobExecutionApp` class in your IDE.
 
