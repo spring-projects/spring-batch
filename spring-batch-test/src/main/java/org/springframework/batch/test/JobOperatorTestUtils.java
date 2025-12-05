@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 the original author or authors.
+ * Copyright 2025-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -101,6 +101,15 @@ public class JobOperatorTestUtils extends JobLauncherTestUtils {
 	}
 
 	/**
+	 * Get the job that can be operated by this utility.
+	 * @return the job under test
+	 */
+	@Override
+	public Job getJob() {
+		return super.getJob();
+	}
+
+	/**
 	 * Set the job operator to be used by this utility.
 	 * @param jobOperator the job operator to use to start jobs and steps
 	 */
@@ -109,11 +118,28 @@ public class JobOperatorTestUtils extends JobLauncherTestUtils {
 	}
 
 	/**
+	 * Get the job operator used by this utility.
+	 * @return the job operator
+	 */
+	public JobOperator getJobOperator() {
+		return this.jobOperator;
+	}
+
+	/**
 	 * Set the job repository to be used by this utility.
 	 * @param jobRepository the job repository to use to access job metadata
 	 */
 	public void setJobRepository(JobRepository jobRepository) {
 		this.jobRepository = jobRepository;
+	}
+
+	/**
+	 * Get the job repository used by this utility.
+	 * @return the job repository
+	 */
+	@Override
+	public JobRepository getJobRepository() {
+		return super.getJobRepository();
 	}
 
 	/**
