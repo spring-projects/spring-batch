@@ -130,6 +130,7 @@
 		<quartz.version>2.5.1</quartz.version>
 		<prometheus-metrics-exporter-pushgateway>1.4.2</prometheus-metrics-exporter-pushgateway>
 		<groovy.version>3.0.25</groovy.version> <!-- change to org.apache.groovy:groovy + update to latest 5.0.2 -->
+        <logback.version>1.5.21</logback.version>
 
 		<!-- documentation dependencies -->
 		<io.spring.maven.antora-version>0.0.4</io.spring.maven.antora-version>
