@@ -19,6 +19,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.launch.JobExecutionNotRunningException;
 import org.springframework.batch.core.launch.JobOperator;
 
 /**
@@ -53,6 +54,9 @@ public class JobExecutionShutdownHook extends Thread {
 			this.logger.info("Attempting to gracefully stop job execution " + jobExecutionId);
 			this.jobOperator.stop(this.jobExecution);
 			this.logger.info("Successfully stopped job execution " + jobExecutionId);
+		}
+		catch (JobExecutionNotRunningException e) {
+			this.logger.warn("Job execution " + jobExecutionId + " is not running");
 		}
 		catch (Exception e) {
 			throw new RuntimeException("Unable to gracefully stop job execution " + jobExecutionId, e);
