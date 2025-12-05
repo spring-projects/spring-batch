@@ -118,9 +118,10 @@ public abstract class AbstractPaginatedDataItemReader<T> extends AbstractItemCou
 
 			Iterator<T> initialPage = doPageRead();
 
-			for (; current >= 0; current--) {
+			for (; current > 0; current--) {
 				initialPage.next();
 			}
+			this.results = initialPage;
 		}
 		finally {
 			this.lock.unlock();
