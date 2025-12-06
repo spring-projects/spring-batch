@@ -189,7 +189,7 @@ public class MetaDataInstanceFactory {
 	public static StepExecution createStepExecution(JobParameters jobParameters) {
 		JobExecution jobExecution = createJobExecution(DEFAULT_JOB_NAME, DEFAULT_JOB_INSTANCE_ID,
 				DEFAULT_JOB_EXECUTION_ID, jobParameters);
-		StepExecution stepExecution = createStepExecution();
+		StepExecution stepExecution = createStepExecution(jobExecution, DEFAULT_STEP_NAME, DEFAULT_STEP_EXECUTION_ID);
 		jobExecution.addStepExecution(stepExecution);
 		return stepExecution;
 	}

@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.List;
@@ -22,6 +23,8 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
+import org.springframework.batch.core.job.parameters.JobParametersBuilder;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.infrastructure.support.PropertiesConverter;
 
 /**
@@ -88,6 +91,14 @@ class MetaDataInstanceFactoryTests {
 	@Test
 	void testCreateStepExecutionJobExecutionStringLong() {
 		assertNotNull(MetaDataInstanceFactory.createStepExecution(stepName, stepExecutionId));
+	}
+
+	@Test
+	void testCreateStepExecutionJobParameters() {
+		JobParameters parameters = new JobParametersBuilder().addString("foo", "bar").toJobParameters();
+		StepExecution stepExecution = MetaDataInstanceFactory.createStepExecution(parameters);
+		String paramValue = stepExecution.getJobExecution().getJobParameters().getString("foo");
+		assertEquals("bar", paramValue);
 	}
 
 	@Test
