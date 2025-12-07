@@ -50,8 +50,6 @@ public class MongoJobExecutionDao implements JobExecutionDao {
 
 	private static final String JOB_EXECUTIONS_COLLECTION_NAME = "BATCH_JOB_EXECUTION";
 
-	private static final String JOB_EXECUTIONS_SEQUENCE_NAME = "BATCH_JOB_EXECUTION_SEQ";
-
 	private final MongoOperations mongoOperations;
 
 	private final JobExecutionConverter jobExecutionConverter = new JobExecutionConverter();
@@ -62,7 +60,7 @@ public class MongoJobExecutionDao implements JobExecutionDao {
 
 	public MongoJobExecutionDao(MongoOperations mongoOperations) {
 		this.mongoOperations = mongoOperations;
-		this.jobExecutionIncrementer = new MongoSequenceIncrementer(mongoOperations, JOB_EXECUTIONS_SEQUENCE_NAME);
+		this.jobExecutionIncrementer = new MongoSequenceIncrementer();
 	}
 
 	public void setJobExecutionIncrementer(DataFieldMaxValueIncrementer jobExecutionIncrementer) {

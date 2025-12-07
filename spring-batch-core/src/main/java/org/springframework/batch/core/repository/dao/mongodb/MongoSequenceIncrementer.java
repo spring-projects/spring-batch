@@ -15,16 +15,10 @@
  */
 package org.springframework.batch.core.repository.dao.mongodb;
 
-import com.mongodb.client.model.FindOneAndUpdateOptions;
-import com.mongodb.client.model.ReturnDocument;
-import org.bson.Document;
-
 import org.springframework.dao.DataAccessException;
-import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 
-// Based on https://www.mongodb.com/blog/post/generating-globally-unique-identifiers-for-use-with-mongodb
-// Section: Use a single counter document to generate unique identifiers one at a time
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author Mahmoud Ben Hassine
@@ -33,22 +27,33 @@ import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer
  */
 public class MongoSequenceIncrementer implements DataFieldMaxValueIncrementer {
 
-	private final MongoOperations mongoTemplate;
+	private static final int NODE_BITS = 10;
+	private static final int SEQUENCE_BITS = 12;
+	private static final int NODE_SHIFT = SEQUENCE_BITS;
+	private static final int TIMESTAMP_SHIFT = NODE_BITS + SEQUENCE_BITS;
+	private static final int SEQUENCE_MASK = (1 << SEQUENCE_BITS) - 1;
+	private static final int NODE_MASK = (1 << NODE_BITS) - 1;
+	
+	private static final long TSID_EPOCH = 1577836800000L;
+	
+	private final int nodeId;
+	private final AtomicInteger sequence = new AtomicInteger(0);
+	private volatile long lastTimestamp = -1L;
 
-	private final String sequenceName;
+	public MongoSequenceIncrementer() {
+		this.nodeId = (int) (System.nanoTime() & NODE_MASK);
+	}
 
-	public MongoSequenceIncrementer(MongoOperations mongoTemplate, String sequenceName) {
-		this.mongoTemplate = mongoTemplate;
-		this.sequenceName = sequenceName;
+	public MongoSequenceIncrementer(int nodeId) {
+		if (nodeId < 0 || nodeId > NODE_MASK) {
+			throw new IllegalArgumentException("Node ID must be between 0 and " + NODE_MASK);
+		}
+		this.nodeId = nodeId;
 	}
 
 	@Override
 	public long nextLongValue() throws DataAccessException {
-		return mongoTemplate.execute("BATCH_SEQUENCES",
-				collection -> collection
-					.findOneAndUpdate(new Document("_id", sequenceName), new Document("$inc", new Document("count", 1)),
-							new FindOneAndUpdateOptions().returnDocument(ReturnDocument.AFTER))
-					.getLong("count"));
+		return generateTsid();
 	}
 
 	@Override
@@ -59,6 +64,35 @@ public class MongoSequenceIncrementer implements DataFieldMaxValueIncrementer {
 	@Override
 	public String nextStringValue() throws DataAccessException {
 		throw new UnsupportedOperationException();
+	}
+
+	private synchronized long generateTsid() {
+		long timestamp = System.currentTimeMillis() - TSID_EPOCH;
+		
+		if (timestamp < lastTimestamp) {
+			timestamp = lastTimestamp;
+		}
+		
+		if (timestamp == lastTimestamp) {
+			int seq = sequence.incrementAndGet() & SEQUENCE_MASK;
+			if (seq == 0) {
+				timestamp = waitNextMillis(lastTimestamp);
+				lastTimestamp = timestamp;
+			}
+			return (timestamp << TIMESTAMP_SHIFT) | ((long) nodeId << NODE_SHIFT) | seq;
+		} else {
+			sequence.set(0);
+			lastTimestamp = timestamp;
+			return (timestamp << TIMESTAMP_SHIFT) | ((long) nodeId << NODE_SHIFT);
+		}
+	}
+
+	private long waitNextMillis(long lastTimestamp) {
+		long timestamp = System.currentTimeMillis() - TSID_EPOCH;
+		while (timestamp <= lastTimestamp) {
+			timestamp = System.currentTimeMillis() - TSID_EPOCH;
+		}
+		return timestamp;
 	}
 
 }
