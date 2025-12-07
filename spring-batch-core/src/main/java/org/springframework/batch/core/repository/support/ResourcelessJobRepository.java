@@ -22,8 +22,10 @@ import java.util.List;
 import org.jspecify.annotations.Nullable;
 
 import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.job.DefaultJobKeyGenerator;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.JobKeyGenerator;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.batch.core.step.StepExecution;
@@ -45,6 +47,7 @@ import org.springframework.batch.infrastructure.support.transaction.Resourceless
  *
  * @since 5.2.0
  * @author Mahmoud Ben Hassine
+ * @author Sanghyuk Jung
  */
 public class ResourcelessJobRepository implements JobRepository {
 
@@ -53,6 +56,34 @@ public class ResourcelessJobRepository implements JobRepository {
 	private @Nullable JobExecution jobExecution;
 
 	private long stepExecutionIdIncrementer = 0L;
+
+	private JobKeyGenerator jobKeyGenerator;
+
+	/**
+	 * Create a new {@link ResourcelessJobRepository} instance with a
+	 * {@link DefaultJobKeyGenerator}.
+	 */
+	public ResourcelessJobRepository() {
+		this(new DefaultJobKeyGenerator());
+	}
+
+	/**
+	 * Create a new {@link ResourcelessJobRepository} instance with the provided
+	 * {@link JobKeyGenerator}.
+	 * @param jobKeyGenerator the job key generator to use
+	 * @since 6.0.1
+	 */
+	public ResourcelessJobRepository(JobKeyGenerator jobKeyGenerator) {
+		this.jobKeyGenerator = jobKeyGenerator;
+	}
+
+	/**
+	 * Set the {@link JobKeyGenerator} to use.
+	 * @param jobKeyGenerator the job key generator
+	 */
+	public void setJobKeyGenerator(JobKeyGenerator jobKeyGenerator) {
+		this.jobKeyGenerator = jobKeyGenerator;
+	}
 
 	/*
 	 * ===================================================================================
@@ -76,7 +107,7 @@ public class ResourcelessJobRepository implements JobRepository {
 
 	@Override
 	public List<JobInstance> getJobInstances(String jobName, int start, int count) {
-		if (this.jobInstance == null) {
+		if (this.jobInstance == null || !this.jobInstance.getJobName().equals(jobName)) {
 			return Collections.emptyList();
 		}
 		return Collections.singletonList(this.jobInstance);
@@ -91,7 +122,7 @@ public class ResourcelessJobRepository implements JobRepository {
 	 */
 	@Override
 	public List<JobInstance> findJobInstances(String jobName) {
-		if (this.jobInstance == null) {
+		if (this.jobInstance == null || !this.jobInstance.getJobName().equals(jobName)) {
 			return Collections.emptyList();
 		}
 		return Collections.singletonList(this.jobInstance);
@@ -99,17 +130,26 @@ public class ResourcelessJobRepository implements JobRepository {
 
 	@Override
 	@Nullable public JobInstance getJobInstance(long instanceId) {
+		if (this.jobInstance == null || !(this.jobInstance.getId() == instanceId)) {
+			return null;
+		}
 		return this.jobInstance;
 	}
 
 	@Override
 	@Nullable public JobInstance getLastJobInstance(String jobName) {
+		if (this.jobInstance == null || !this.jobInstance.getJobName().equals(jobName)) {
+			return null;
+		}
 		return this.jobInstance;
 	}
 
 	@Override
 	@Nullable public JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
-		return this.jobInstance;
+		if (this.jobInstance == null || !this.jobInstance.getJobName().equals(jobName)) {
+			return null;
+		}
+		return isJobKeyEquals(jobParameters) ? this.jobInstance : null;
 	}
 
 	@SuppressWarnings("removal")
@@ -121,7 +161,9 @@ public class ResourcelessJobRepository implements JobRepository {
 
 	@Override
 	public long getJobInstanceCount(String jobName) {
-		// FIXME should return 0 if jobInstance is null or the name is not matching
+		if (this.jobInstance == null || !this.jobInstance.getJobName().equals(jobName)) {
+			return 0;
+		}
 		return 1;
 	}
 
@@ -129,6 +171,14 @@ public class ResourcelessJobRepository implements JobRepository {
 	public JobInstance createJobInstance(String jobName, JobParameters jobParameters) {
 		this.jobInstance = new JobInstance(1L, jobName);
 		return this.jobInstance;
+	}
+
+	@Override
+	public void deleteJobInstance(JobInstance jobInstance) {
+		if (this.jobInstance != null && this.jobInstance.getId() == jobInstance.getId()) {
+			this.jobInstance = null;
+			this.jobExecution = null;
+		}
 	}
 
 	/*
@@ -139,24 +189,33 @@ public class ResourcelessJobRepository implements JobRepository {
 
 	@Override
 	@Nullable public JobExecution getJobExecution(long executionId) {
-		// FIXME should return null if the id is not matching
+		if (this.jobExecution == null || !(this.jobExecution.getId() == executionId)) {
+			return null;
+		}
 		return this.jobExecution;
 	}
 
 	@Override
 	@Nullable public JobExecution getLastJobExecution(String jobName, JobParameters jobParameters) {
-		// FIXME should return null if the job name is not matching
-		return this.jobExecution;
+		if (this.jobInstance == null || !this.jobInstance.getJobName().equals(jobName)) {
+			return null;
+		}
+		return isJobKeyEquals(jobParameters) ? this.jobExecution : null;
 	}
 
 	@Override
 	@Nullable public JobExecution getLastJobExecution(JobInstance jobInstance) {
-		// FIXME should return null if the job instance is not matching
+		if (this.jobInstance == null || !(this.jobInstance.getId() == jobInstance.getId())) {
+			return null;
+		}
 		return this.jobExecution;
 	}
 
 	@Override
 	public List<JobExecution> getJobExecutions(JobInstance jobInstance) {
+		if (this.jobInstance == null || !(this.jobInstance.getId() == jobInstance.getId())) {
+			return Collections.emptyList();
+		}
 		if (this.jobExecution == null) {
 			return Collections.emptyList();
 		}
@@ -185,6 +244,13 @@ public class ResourcelessJobRepository implements JobRepository {
 	@Override
 	public void updateExecutionContext(JobExecution jobExecution) {
 		jobExecution.setLastUpdated(LocalDateTime.now());
+	}
+
+	@Override
+	public void deleteJobExecution(JobExecution jobExecution) {
+		if (this.jobExecution != null && this.jobExecution.getId() == jobExecution.getId()) {
+			this.jobExecution = null;
+		}
 	}
 
 	/*
@@ -270,6 +336,15 @@ public class ResourcelessJobRepository implements JobRepository {
 	@Override
 	public void updateExecutionContext(StepExecution stepExecution) {
 		stepExecution.setLastUpdated(LocalDateTime.now());
+	}
+
+	private boolean isJobKeyEquals(JobParameters jobParameters) {
+		if (this.jobExecution == null) {
+			return false;
+		}
+		String currentKey = this.jobKeyGenerator.generateKey(this.jobExecution.getJobParameters());
+		String expectedKey = this.jobKeyGenerator.generateKey(jobParameters);
+		return currentKey.equals(expectedKey);
 	}
 
 }
