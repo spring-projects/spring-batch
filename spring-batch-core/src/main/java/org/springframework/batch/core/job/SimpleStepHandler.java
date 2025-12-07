@@ -160,7 +160,7 @@ public class SimpleStepHandler implements StepHandler {
 	 * @return true if the {@link StepExecution} is part of the {@link JobExecution}
 	 */
 	private boolean stepExecutionPartOfExistingJobExecution(JobExecution jobExecution, StepExecution stepExecution) {
-		return stepExecution != null && stepExecution.getJobExecutionId() == jobExecution.getId();
+		return stepExecution != null && stepExecution.getJobExecution().getId() == jobExecution.getId();
 	}
 
 	/**
