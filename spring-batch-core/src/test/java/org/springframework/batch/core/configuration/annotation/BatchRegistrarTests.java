@@ -40,6 +40,8 @@ import org.springframework.batch.core.repository.dao.jdbc.JdbcStepExecutionDao;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.mongodb.MongoTransactionManager;
+import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
@@ -202,6 +204,17 @@ class BatchRegistrarTests {
 		Assertions.assertEquals(JsonJobParametersConverter.class, jobParametersConverter.getClass());
 	}
 
+	@Test
+	@DisplayName("Mongo job repository should be configured successfully with @EnableMongoJobRepository")
+	void testMongoJobRepositoryConfiguredWithEnableMongoJobRepository() {
+		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(
+				MongoJobConfiguration.class);
+
+		JobRepository jobRepository = context.getBean(JobRepository.class);
+
+		Assertions.assertNotNull(jobRepository);
+	}
+
 	@Configuration
 	@EnableBatchProcessing
 	public static class JobConfigurationWithUserDefinedInfrastructureBeans {
@@ -318,6 +331,23 @@ class BatchRegistrarTests {
 		@Bean
 		public JobParametersConverter jobParametersConverter() {
 			return new JsonJobParametersConverter();
+		}
+
+	}
+
+	@Configuration
+	@EnableBatchProcessing
+	@EnableMongoJobRepository
+	public static class MongoJobConfiguration {
+
+		@Bean
+		public MongoOperations mongoTemplate() {
+			return Mockito.mock(MongoOperations.class);
+		}
+
+		@Bean
+		public MongoTransactionManager transactionManager() {
+			return Mockito.mock(MongoTransactionManager.class);
 		}
 
 	}
