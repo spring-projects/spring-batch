@@ -18,6 +18,8 @@ package org.springframework.batch.core.repository.dao.mongodb;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 
+import java.net.InetAddress;
+import java.security.SecureRandom;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -40,8 +42,10 @@ public class MongoSequenceIncrementer implements DataFieldMaxValueIncrementer {
 	private final AtomicInteger sequence = new AtomicInteger(0);
 	private volatile long lastTimestamp = -1L;
 
+    private static final SecureRandom random = new SecureRandom();
+
 	public MongoSequenceIncrementer() {
-		this.nodeId = (int) (System.nanoTime() & NODE_MASK);
+		this.nodeId = calculateNodeId();
 	}
 
 	public MongoSequenceIncrementer(int nodeId) {
@@ -93,6 +97,18 @@ public class MongoSequenceIncrementer implements DataFieldMaxValueIncrementer {
 			timestamp = System.currentTimeMillis() - TSID_EPOCH;
 		}
 		return timestamp;
+	}
+
+	private int calculateNodeId() {
+		try {
+			String hostname = InetAddress.getLocalHost().getHostName();
+			int hostHash = hostname.hashCode();
+            long processId = ProcessHandle.current().pid();
+			long randomValue = random.nextInt();
+			return (int) ((hostHash ^ processId ^ randomValue) & NODE_MASK);
+		} catch (Exception e) {
+			return (int) ((System.nanoTime() ^ Thread.currentThread().getId()) & NODE_MASK);
+		}
 	}
 
 }
