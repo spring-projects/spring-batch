@@ -48,6 +48,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * @author Robert Kasanicky
  * @author Dimitrios Liapis
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  */
 // TODO rename to JdbcJobRepositoryIntegrationTests and update to new domain model
 // TODO should add a mongodb similar test suite
@@ -168,11 +169,17 @@ class SimpleJobRepositoryIntegrationTests {
 		JobExecution jobExec = jobRepository.createJobExecution(jobInstance, jobParameters, new ExecutionContext());
 		jobExec.setStartTime(LocalDateTime.now());
 		jobExec.setExecutionContext(ctx);
+		jobRepository.updateExecutionContext(jobExec);
 		Step step = new StepSupport("step1");
 		StepExecution stepExec = jobRepository.createStepExecution(step.getName(), jobExec);
 		stepExec.setExecutionContext(ctx);
+		jobRepository.updateExecutionContext(stepExec);
 
 		StepExecution retrievedStepExec = jobRepository.getLastStepExecution(jobExec.getJobInstance(), step.getName());
+		assertEquals(stepExec, retrievedStepExec);
+		assertEquals(ctx, retrievedStepExec.getExecutionContext());
+
+		retrievedStepExec = jobRepository.getStepExecution(stepExec.getId());
 		assertEquals(stepExec, retrievedStepExec);
 		assertEquals(ctx, retrievedStepExec.getExecutionContext());
 	}

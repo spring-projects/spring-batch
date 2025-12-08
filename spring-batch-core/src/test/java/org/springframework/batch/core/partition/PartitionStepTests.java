@@ -18,6 +18,8 @@ package org.springframework.batch.core.partition;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -41,10 +43,12 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  *
  */
 class PartitionStepTests {
@@ -71,12 +75,24 @@ class PartitionStepTests {
 	@Test
 	void testVanillaStepExecution() throws Exception {
 		SimpleStepExecutionSplitter stepExecutionSplitter = new SimpleStepExecutionSplitter(jobRepository,
-				step.getName(), new SimplePartitioner());
+				step.getName(), gridSize -> {
+					Map<String, ExecutionContext> map = new HashMap<>(gridSize);
+					for (int i = 0; i < gridSize; i++) {
+						ExecutionContext context = new ExecutionContext();
+						context.putString("foo", "foo" + i);
+						map.put("partition" + i, context);
+					}
+					return map;
+				});
 		stepExecutionSplitter.setAllowStartIfComplete(true);
 		step.setStepExecutionSplitter(stepExecutionSplitter);
 		step.setPartitionHandler((stepSplitter, stepExecution) -> {
 			Set<StepExecution> executions = stepSplitter.split(stepExecution, 2);
 			for (StepExecution execution : executions) {
+				// Query from repository to ensure it's persisted
+				ExecutionContext context = jobRepository.getStepExecution(execution.getId()).getExecutionContext();
+				assertNotNull(context.getString("foo"));
+
 				execution.setStatus(BatchStatus.COMPLETED);
 				execution.setExitStatus(ExitStatus.COMPLETED);
 				jobRepository.update(execution);
@@ -144,7 +160,9 @@ class PartitionStepTests {
 			else {
 				for (StepExecution execution : executions) {
 					// On restart the execution context should have been restored
-					assertEquals(execution.getStepName(), execution.getExecutionContext().getString("foo"));
+					// Query from repository to ensure it's persisted
+					ExecutionContext context = jobRepository.getStepExecution(execution.getId()).getExecutionContext();
+					assertEquals(execution.getStepName(), context.getString("foo"));
 				}
 			}
 			for (StepExecution execution : executions) {
