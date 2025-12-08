@@ -20,8 +20,13 @@ import com.mongodb.client.model.ReturnDocument;
 import org.bson.Document;
 
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
+import org.springframework.retry.RetryCallback;
+import org.springframework.retry.RetryException;
+import org.springframework.retry.support.RetryTemplate;
+import org.springframework.retry.support.RetryTemplateBuilder;
 
 // Based on https://www.mongodb.com/blog/post/generating-globally-unique-identifiers-for-use-with-mongodb
 // Section: Use a single counter document to generate unique identifiers one at a time
@@ -29,9 +34,16 @@ import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer
 /**
  * @author Mahmoud Ben Hassine
  * @author Christoph Strobl
+ * @author Yanming Zhou
  * @since 5.2.0
  */
 public class MongoSequenceIncrementer implements DataFieldMaxValueIncrementer {
+
+	private final RetryTemplate retryTemplate = new RetryTemplateBuilder()
+		.retryOn(DataIntegrityViolationException.class)
+		.maxAttempts(3)
+		.fixedBackoff(1000L)
+		.build();
 
 	private final MongoOperations mongoTemplate;
 
@@ -44,11 +56,24 @@ public class MongoSequenceIncrementer implements DataFieldMaxValueIncrementer {
 
 	@Override
 	public long nextLongValue() throws DataAccessException {
-		return mongoTemplate.execute("BATCH_SEQUENCES",
-				collection -> collection
-					.findOneAndUpdate(new Document("_id", sequenceName), new Document("$inc", new Document("count", 1)),
-							new FindOneAndUpdateOptions().returnDocument(ReturnDocument.AFTER))
-					.getLong("count"));
+		try {
+			return retryTemplate
+				.execute((RetryCallback<Long, RetryException>) retryContext -> mongoTemplate.execute("BATCH_SEQUENCES",
+						collection -> collection
+							.findOneAndUpdate(new Document("_id", sequenceName),
+									new Document("$inc", new Document("count", 1)),
+									new FindOneAndUpdateOptions().returnDocument(ReturnDocument.AFTER))
+							.getLong("count")));
+		}
+		catch (RetryException e) {
+			Throwable cause = e.getCause();
+			if (cause instanceof DataAccessException ex) {
+				throw ex;
+			}
+			else {
+				throw new RuntimeException("Failed to retrieve next value of sequence", e);
+			}
+		}
 	}
 
 	@Override
