@@ -16,18 +16,24 @@
 
 package org.springframework.batch.integration.partition;
 
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  */
 class RemotePartitioningWorkerStepBuilderTests {
 
@@ -108,6 +114,23 @@ class RemotePartitioningWorkerStepBuilderTests {
 
 		// then
 		assertThat(expectedException).hasMessage("An InputChannel must be provided");
+	}
+
+	@Test
+	void testAllMethodsAreOverridden() throws Exception {
+		for (Method method : StepBuilder.class.getDeclaredMethods()) {
+			if (!Modifier.isPublic(method.getModifiers())) {
+				continue;
+			}
+			try {
+				RemotePartitioningWorkerStepBuilder.class.getDeclaredMethod(method.getName(),
+						method.getParameterTypes());
+			}
+			catch (NoSuchMethodException ex) {
+				fail(RemotePartitioningWorkerStepBuilder.class.getName() + " should override method [" + method
+						+ "] to configure worker integration flow.");
+			}
+		}
 	}
 
 }
