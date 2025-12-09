@@ -24,6 +24,7 @@ import java.util.Objects;
 
 import javax.sql.DataSource;
 
+import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 
 import org.jspecify.annotations.Nullable;
@@ -62,8 +63,9 @@ import org.springframework.util.ClassUtils;
  * @author Mahmoud Ben Hassine
  * @author Stefano Cordio
  * @author Jimmy Praet
+ * @author Andrey Litvitski
  */
-public class JdbcCursorItemReader<T> extends AbstractCursorItemReader<T> {
+public class JdbcCursorItemReader<T> extends AbstractCursorItemReader<T> implements BeanNameAware {
 
 	private @Nullable PreparedStatement preparedStatement;
 

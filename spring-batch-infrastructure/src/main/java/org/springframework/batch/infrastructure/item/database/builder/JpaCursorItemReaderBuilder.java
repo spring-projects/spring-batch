@@ -33,6 +33,7 @@ import org.springframework.util.Assert;
  * @author Mahmoud Ben Hassine
  * @author Jinwoo Bae
  * @author Stefano Cordio
+ * @author Andrey Litvitski
  * @since 4.3
  */
 public class JpaCursorItemReaderBuilder<T> {
@@ -175,9 +176,6 @@ public class JpaCursorItemReaderBuilder<T> {
 	 */
 	public JpaCursorItemReader<T> build() {
 		Assert.notNull(this.entityManagerFactory, "An EntityManagerFactory is required");
-		if (this.saveState) {
-			Assert.hasText(this.name, "A name is required when saveState is set to true");
-		}
 		if (this.queryProvider == null) {
 			Assert.hasLength(this.queryString, "Query string is required when queryProvider is null");
 		}

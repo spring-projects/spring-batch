@@ -28,6 +28,7 @@ import org.springframework.batch.infrastructure.item.ItemStream;
 import org.springframework.batch.infrastructure.item.ItemStreamException;
 import org.springframework.batch.infrastructure.item.ResourceAware;
 import org.springframework.batch.infrastructure.item.support.AbstractItemStreamItemReader;
+import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 
@@ -43,8 +44,9 @@ import org.springframework.util.Assert;
  * @author Lucas Ward
  * @author Mahmoud Ben Hassine
  * @author Jimmy Praet
+ * @author Andrey Litvitski
  */
-public class MultiResourceItemReader<T> extends AbstractItemStreamItemReader<T> {
+public class MultiResourceItemReader<T> extends AbstractItemStreamItemReader<T> implements BeanNameAware {
 
 	private static final Log logger = LogFactory.getLog(MultiResourceItemReader.class);
 
