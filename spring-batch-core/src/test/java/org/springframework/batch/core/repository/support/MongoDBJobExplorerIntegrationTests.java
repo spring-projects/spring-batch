@@ -54,9 +54,14 @@ public class MongoDBJobExplorerIntegrationTests {
 
 	@BeforeAll
 	static void setUp(@Autowired MongoTemplate mongoTemplate) throws IOException {
-		Resource resource = new FileSystemResource(
-				"src/main/resources/org/springframework/batch/core/schema-mongodb.jsonl");
-		Files.lines(resource.getFilePath()).forEach(line -> mongoTemplate.executeCommand(line));
+		Files
+			.lines(new FileSystemResource("src/main/resources/org/springframework/batch/core/schema-drop-mongodb.jsonl")
+				.getFilePath())
+			.forEach(mongoTemplate::executeCommand);
+		Files
+			.lines(new FileSystemResource("src/main/resources/org/springframework/batch/core/schema-mongodb.jsonl")
+				.getFilePath())
+			.forEach(mongoTemplate::executeCommand);
 	}
 
 	@Test

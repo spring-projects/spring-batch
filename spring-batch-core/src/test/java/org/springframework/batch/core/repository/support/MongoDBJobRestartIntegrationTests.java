@@ -52,6 +52,7 @@ import org.springframework.util.Assert;
 
 /**
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  */
 @Testcontainers(disabledWithoutDocker = true)
 @SpringJUnitConfig(MongoDBIntegrationTestConfiguration.class)
@@ -62,14 +63,14 @@ public class MongoDBJobRestartIntegrationTests {
 
 	@BeforeEach
 	public void setUp() throws IOException {
-		// TODO put drop statements in schema-drop-mongodb.jsonl
-		mongoTemplate.dropCollection("BATCH_JOB_INSTANCE");
-		mongoTemplate.dropCollection("BATCH_JOB_EXECUTION");
-		mongoTemplate.dropCollection("BATCH_STEP_EXECUTION");
-		mongoTemplate.dropCollection("BATCH_SEQUENCES");
-		Resource resource = new FileSystemResource(
-				"src/main/resources/org/springframework/batch/core/schema-mongodb.jsonl");
-		Files.lines(resource.getFilePath()).forEach(line -> mongoTemplate.executeCommand(line));
+		Files
+			.lines(new FileSystemResource("src/main/resources/org/springframework/batch/core/schema-drop-mongodb.jsonl")
+				.getFilePath())
+			.forEach(mongoTemplate::executeCommand);
+		Files
+			.lines(new FileSystemResource("src/main/resources/org/springframework/batch/core/schema-mongodb.jsonl")
+				.getFilePath())
+			.forEach(mongoTemplate::executeCommand);
 	}
 
 	@Test
