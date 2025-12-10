@@ -49,19 +49,14 @@ abstract class AbstractMongoDBDaoIntegrationTests {
 
 	@BeforeEach
 	void setUp(@Autowired MongoTemplate mongoTemplate) throws IOException {
-		mongoTemplate.dropCollection("BATCH_JOB_INSTANCE");
-		mongoTemplate.dropCollection("BATCH_JOB_EXECUTION");
-		mongoTemplate.dropCollection("BATCH_STEP_EXECUTION");
-		mongoTemplate.createCollection("BATCH_JOB_INSTANCE");
-		mongoTemplate.createCollection("BATCH_JOB_EXECUTION");
-		mongoTemplate.createCollection("BATCH_STEP_EXECUTION");
-		// sequences
-		mongoTemplate.dropCollection("BATCH_SEQUENCES");
-		Resource resource = new FileSystemResource(
-				"src/main/resources/org/springframework/batch/core/schema-mongodb.jsonl");
-		try (Stream<String> lines = Files.lines(resource.getFilePath())) {
-			lines.forEach(mongoTemplate::executeCommand);
-		}
+		Files
+			.lines(new FileSystemResource("src/main/resources/org/springframework/batch/core/schema-drop-mongodb.jsonl")
+				.getFilePath())
+			.forEach(mongoTemplate::executeCommand);
+		Files
+			.lines(new FileSystemResource("src/main/resources/org/springframework/batch/core/schema-mongodb.jsonl")
+				.getFilePath())
+			.forEach(mongoTemplate::executeCommand);
 	}
 
 	protected void assertTemporalEquals(LocalDateTime lhs, LocalDateTime rhs) {
