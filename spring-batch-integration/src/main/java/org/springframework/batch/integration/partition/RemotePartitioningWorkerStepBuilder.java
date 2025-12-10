@@ -26,6 +26,7 @@ import org.springframework.batch.core.job.flow.Flow;
 import org.springframework.batch.core.partition.Partitioner;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.StepLocator;
+import org.springframework.batch.core.step.builder.ChunkOrientedStepBuilder;
 import org.springframework.batch.core.step.builder.FlowStepBuilder;
 import org.springframework.batch.core.step.builder.JobStepBuilder;
 import org.springframework.batch.core.step.builder.PartitionStepBuilder;
@@ -62,7 +63,9 @@ import org.springframework.util.Assert;
  *
  * @since 4.1
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  */
+@SuppressWarnings("removal")
 public class RemotePartitioningWorkerStepBuilder extends StepBuilder {
 
 	private static final String SERVICE_ACTIVATOR_METHOD_NAME = "handle";
@@ -160,6 +163,18 @@ public class RemotePartitioningWorkerStepBuilder extends StepBuilder {
 	public TaskletStepBuilder tasklet(Tasklet tasklet, PlatformTransactionManager transactionManager) {
 		configureWorkerIntegrationFlow();
 		return super.tasklet(tasklet, transactionManager);
+	}
+
+	@Override
+	public TaskletStepBuilder tasklet(Tasklet tasklet) {
+		configureWorkerIntegrationFlow();
+		return super.tasklet(tasklet);
+	}
+
+	@Override
+	public <I, O> ChunkOrientedStepBuilder<I, O> chunk(int chunkSize) {
+		configureWorkerIntegrationFlow();
+		return super.chunk(chunkSize);
 	}
 
 	@Override
