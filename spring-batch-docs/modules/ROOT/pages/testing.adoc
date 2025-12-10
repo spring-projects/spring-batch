@@ -70,7 +70,7 @@ The test method begins by setting up the database with test data. It clears the 
 table and then inserts 10 new records. The test then launches the `Job` by using the
 `startJob()` method. The `startJob()` method is provided by the `JobOperatorTestUtils`
 class. The `JobOperatorTestUtils` class also provides the `startJob(JobParameters)`
-method, which lets the test give particular parameters. The `srartJob()` method
+method, which lets the test give particular parameters. The `startJob()` method
 returns the `JobExecution` object, which is useful for asserting particular information
 about the `Job` run. In the following case, the test verifies that the `Job` ended with
 a status of `COMPLETED`.
