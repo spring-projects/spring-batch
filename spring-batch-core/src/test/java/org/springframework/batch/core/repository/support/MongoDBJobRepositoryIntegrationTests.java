@@ -40,13 +40,15 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 /**
+ * Repository tests using MongoDB DAOs (rather than mocks).
+ *
  * @author Mahmoud Ben Hassine
  * @author Yanming Zhou
  */
 @DirtiesContext
 @Testcontainers(disabledWithoutDocker = true)
 @SpringJUnitConfig(MongoDBIntegrationTestConfiguration.class)
-public class MongoDBJobRepositoryIntegrationTests {
+public class MongoDBJobRepositoryIntegrationTests extends AbstractJobRepositoryIntegrationTests {
 
 	@Autowired
 	private MongoTemplate mongoTemplate;
