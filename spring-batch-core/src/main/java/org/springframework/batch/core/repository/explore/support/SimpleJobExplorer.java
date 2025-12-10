@@ -44,6 +44,7 @@ import java.util.Set;
  * @author Mahmoud Ben Hassine
  * @author Parikshit Dutta
  * @author Glenn Renfro
+ * @author Yanming Zhou
  * @see JobExplorer
  * @see JobInstanceDao
  * @see JobExecutionDao
@@ -157,9 +158,9 @@ public class SimpleJobExplorer implements JobExplorer {
 	public List<JobExecution> getJobExecutions(JobInstance jobInstance) {
 		List<JobExecution> executions = jobExecutionDao.findJobExecutions(jobInstance);
 		for (JobExecution jobExecution : executions) {
-			getJobExecutionDependencies(jobExecution);
+			fillJobExecutionDependencies(jobExecution);
 			for (StepExecution stepExecution : jobExecution.getStepExecutions()) {
-				getStepExecutionDependencies(stepExecution);
+				fillStepExecutionDependencies(stepExecution);
 			}
 		}
 		return executions;
@@ -170,9 +171,9 @@ public class SimpleJobExplorer implements JobExplorer {
 	public JobExecution getLastJobExecution(JobInstance jobInstance) {
 		JobExecution lastJobExecution = jobExecutionDao.getLastJobExecution(jobInstance);
 		if (lastJobExecution != null) {
-			getJobExecutionDependencies(lastJobExecution);
+			fillJobExecutionDependencies(lastJobExecution);
 			for (StepExecution stepExecution : lastJobExecution.getStepExecutions()) {
-				getStepExecutionDependencies(stepExecution);
+				fillStepExecutionDependencies(stepExecution);
 			}
 		}
 		return lastJobExecution;
@@ -198,7 +199,7 @@ public class SimpleJobExplorer implements JobExplorer {
 		JobExecution jobExecution = jobExecutionDao.getLastJobExecution(jobInstance);
 
 		if (jobExecution != null) {
-			getJobExecutionDependencies(jobExecution);
+			fillJobExecutionDependencies(jobExecution);
 		}
 		return jobExecution;
 	}
@@ -207,9 +208,9 @@ public class SimpleJobExplorer implements JobExplorer {
 	public Set<JobExecution> findRunningJobExecutions(@Nullable String jobName) {
 		Set<JobExecution> executions = jobExecutionDao.findRunningJobExecutions(jobName);
 		for (JobExecution jobExecution : executions) {
-			getJobExecutionDependencies(jobExecution);
+			fillJobExecutionDependencies(jobExecution);
 			for (StepExecution stepExecution : jobExecution.getStepExecutions()) {
-				getStepExecutionDependencies(stepExecution);
+				fillStepExecutionDependencies(stepExecution);
 			}
 		}
 		return executions;
@@ -222,20 +223,18 @@ public class SimpleJobExplorer implements JobExplorer {
 		if (jobExecution == null) {
 			return null;
 		}
-		getJobExecutionDependencies(jobExecution);
+		fillJobExecutionDependencies(jobExecution);
 		for (StepExecution stepExecution : jobExecution.getStepExecutions()) {
-			getStepExecutionDependencies(stepExecution);
+			fillStepExecutionDependencies(stepExecution);
 		}
 		return jobExecution;
 	}
 
 	/*
-	 * Find all dependencies for a JobExecution, including JobInstance (which requires
+	 * Fill all dependencies for a JobExecution, including JobInstance (which requires
 	 * JobParameters) plus StepExecutions
 	 */
-	// TODO rename to something more representative of what it does (side effect on the
-	// parameter)
-	private void getJobExecutionDependencies(JobExecution jobExecution) {
+	protected void fillJobExecutionDependencies(JobExecution jobExecution) {
 		JobInstance jobInstance = jobInstanceDao.getJobInstance(jobExecution);
 		jobExecution.setJobInstance(jobInstance);
 		jobExecution.addStepExecutions(stepExecutionDao.getStepExecutions(jobExecution));
@@ -257,9 +256,9 @@ public class SimpleJobExplorer implements JobExplorer {
 		if (jobExecution == null) {
 			return null;
 		}
-		getJobExecutionDependencies(jobExecution);
+		fillJobExecutionDependencies(jobExecution);
 		StepExecution stepExecution = stepExecutionDao.getStepExecution(jobExecution, executionId);
-		getStepExecutionDependencies(stepExecution);
+		fillStepExecutionDependencies(stepExecution);
 		return stepExecution;
 	}
 
@@ -268,8 +267,7 @@ public class SimpleJobExplorer implements JobExplorer {
 		StepExecution latest = stepExecutionDao.getLastStepExecution(jobInstance, stepName);
 
 		if (latest != null) {
-			ExecutionContext stepExecutionContext = ecDao.getExecutionContext(latest);
-			latest.setExecutionContext(stepExecutionContext);
+			fillStepExecutionDependencies(latest);
 			ExecutionContext jobExecutionContext = ecDao.getExecutionContext(latest.getJobExecution());
 			latest.getJobExecution().setExecutionContext(jobExecutionContext);
 		}
@@ -287,7 +285,7 @@ public class SimpleJobExplorer implements JobExplorer {
 		return stepExecutionDao.countStepExecutions(jobInstance, stepName);
 	}
 
-	private void getStepExecutionDependencies(StepExecution stepExecution) {
+	protected void fillStepExecutionDependencies(StepExecution stepExecution) {
 		if (stepExecution != null) {
 			stepExecution.setExecutionContext(ecDao.getExecutionContext(stepExecution));
 		}

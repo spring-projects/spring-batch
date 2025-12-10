@@ -45,6 +45,7 @@ import org.springframework.batch.infrastructure.item.ExecutionContext;
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  * @since 2.0
  */
 public class SimpleStepExecutionSplitter implements StepExecutionSplitter {
@@ -138,6 +139,7 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter {
 			if (lastStepExecution == null) { // fresh start
 				StepExecution currentStepExecution = jobRepository.createStepExecution(stepName, jobExecution);
 				currentStepExecution.setExecutionContext(context.getValue());
+				jobRepository.updateExecutionContext(currentStepExecution);
 				set.add(currentStepExecution);
 			}
 			else { // restart
@@ -145,6 +147,7 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter {
 						&& shouldStart(allowStartIfComplete, stepExecution, lastStepExecution)) {
 					StepExecution currentStepExecution = jobRepository.createStepExecution(stepName, jobExecution);
 					currentStepExecution.setExecutionContext(lastStepExecution.getExecutionContext());
+					jobRepository.updateExecutionContext(currentStepExecution);
 					set.add(currentStepExecution);
 				}
 			}
