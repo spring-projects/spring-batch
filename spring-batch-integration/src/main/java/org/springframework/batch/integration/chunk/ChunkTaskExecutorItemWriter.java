@@ -68,7 +68,7 @@ public class ChunkTaskExecutorItemWriter<T> implements ItemWriter<T>, StepExecut
 
 	@Override
 	public void write(Chunk<? extends T> chunk) {
-		ChunkRequest<T> request = new ChunkRequest<>(++sequence, chunk, this.stepExecution.getJobExecutionId(),
+		ChunkRequest<T> request = new ChunkRequest<>(++sequence, chunk, this.stepExecution.getJobExecution().getId(),
 				this.stepExecution.createStepContribution());
 		FutureTask<ChunkResponse> chunkResponseFutureTask = new FutureTask<>(
 				() -> this.chunkProcessorChunkHandler.handle(request));
