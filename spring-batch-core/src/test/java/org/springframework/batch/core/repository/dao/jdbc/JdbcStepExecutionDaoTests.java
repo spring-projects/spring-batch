@@ -158,4 +158,21 @@ class JdbcStepExecutionDaoTests {
 		Assertions.assertEquals(0, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_STEP_EXECUTION"));
 	}
 
+	@Test
+	void testGetLastStepExecution() {
+		// Given
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = jdbcJobInstanceDao.createJobInstance("job", jobParameters);
+		JobExecution jobExecution = jdbcJobExecutionDao.createJobExecution(jobInstance, jobParameters);
+		jdbcStepExecutionDao.createStepExecution("step1", jobExecution);
+		jdbcStepExecutionDao.createStepExecution("step2", jobExecution);
+		StepExecution stepExecution = jdbcStepExecutionDao.createStepExecution("step2", jobExecution);
+
+		// when
+		StepExecution lastStepExecution = jdbcStepExecutionDao.getLastStepExecution(jobInstance, "step2");
+
+		// Then
+		assertEquals(stepExecution, lastStepExecution);
+	}
+
 }
