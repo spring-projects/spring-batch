@@ -45,6 +45,7 @@ import org.springframework.util.StringUtils;
  * @since 5.0
  * @see EnableBatchProcessing
  */
+@SuppressWarnings("removal")
 class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 
 	private static final Log LOGGER = LogFactory.getLog(BatchRegistrar.class);
@@ -128,14 +129,10 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 		}
 
 		String charset = jdbcJobRepositoryAnnotation.charset();
-		if (charset != null) {
-			beanDefinitionBuilder.addPropertyValue("charset", Charset.forName(charset));
-		}
+		beanDefinitionBuilder.addPropertyValue("charset", Charset.forName(charset));
 
 		String tablePrefix = jdbcJobRepositoryAnnotation.tablePrefix();
-		if (tablePrefix != null) {
-			beanDefinitionBuilder.addPropertyValue("tablePrefix", tablePrefix);
-		}
+		beanDefinitionBuilder.addPropertyValue("tablePrefix", tablePrefix);
 
 		String databaseType = jdbcJobRepositoryAnnotation.databaseType();
 		if (StringUtils.hasText(databaseType)) {
@@ -153,9 +150,7 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 				jdbcJobRepositoryAnnotation.validateTransactionState());
 
 		Isolation isolationLevelForCreate = jdbcJobRepositoryAnnotation.isolationLevelForCreate();
-		if (isolationLevelForCreate != null) {
-			beanDefinitionBuilder.addPropertyValue("isolationLevelForCreateEnum", isolationLevelForCreate);
-		}
+		beanDefinitionBuilder.addPropertyValue("isolationLevelForCreateEnum", isolationLevelForCreate);
 
 		String jobKeyGeneratorRef = jdbcJobRepositoryAnnotation.jobKeyGeneratorRef();
 		if (registry.containsBeanDefinition(jobKeyGeneratorRef)) {
@@ -181,9 +176,7 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 			beanDefinitionBuilder.addPropertyReference("transactionManager", transactionManagerRef);
 		}
 		Isolation isolationLevelForCreate = mongoJobRepositoryAnnotation.isolationLevelForCreate();
-		if (isolationLevelForCreate != null) {
-			beanDefinitionBuilder.addPropertyValue("isolationLevelForCreate", isolationLevelForCreate);
-		}
+		beanDefinitionBuilder.addPropertyValue("isolationLevelForCreate", isolationLevelForCreate);
 
 		String jobKeyGeneratorRef = mongoJobRepositoryAnnotation.jobKeyGeneratorRef();
 		if (registry.containsBeanDefinition(jobKeyGeneratorRef)) {
@@ -248,7 +241,7 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 		if (registry.containsBeanDefinition(taskExecutorRef)) {
 			beanDefinitionBuilder.addPropertyReference("taskExecutor", taskExecutorRef);
 		}
-		@SuppressWarnings("removal")
+
 		String jobParametersConverterRef = batchAnnotation.jobParametersConverterRef();
 		if (registry.containsBeanDefinition(jobParametersConverterRef)) {
 			beanDefinitionBuilder.addPropertyReference("jobParametersConverter", jobParametersConverterRef);
