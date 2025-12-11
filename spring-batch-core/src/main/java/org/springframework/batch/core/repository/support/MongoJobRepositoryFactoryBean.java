@@ -108,15 +108,13 @@ public class MongoJobRepositoryFactoryBean extends AbstractJobRepositoryFactoryB
 		super.afterPropertiesSet();
 		Assert.notNull(this.mongoOperations, "MongoOperations must not be null.");
 		if (this.jobInstanceIncrementer == null) {
-			this.jobInstanceIncrementer = new MongoSequenceIncrementer(this.mongoOperations, "BATCH_JOB_INSTANCE_SEQ");
+			this.jobInstanceIncrementer = new MongoSequenceIncrementer();
 		}
 		if (this.jobExecutionIncrementer == null) {
-			this.jobExecutionIncrementer = new MongoSequenceIncrementer(this.mongoOperations,
-					"BATCH_JOB_EXECUTION_SEQ");
+			this.jobExecutionIncrementer = new MongoSequenceIncrementer();
 		}
 		if (this.stepExecutionIncrementer == null) {
-			this.stepExecutionIncrementer = new MongoSequenceIncrementer(this.mongoOperations,
-					"BATCH_STEP_EXECUTION_SEQ");
+			this.stepExecutionIncrementer = new MongoSequenceIncrementer();
 		}
 	}
 

@@ -43,8 +43,6 @@ public class MongoStepExecutionDao implements StepExecutionDao {
 
 	private static final String STEP_EXECUTIONS_COLLECTION_NAME = "BATCH_STEP_EXECUTION";
 
-	private static final String STEP_EXECUTIONS_SEQUENCE_NAME = "BATCH_STEP_EXECUTION_SEQ";
-
 	private static final String JOB_EXECUTIONS_COLLECTION_NAME = "BATCH_JOB_EXECUTION";
 
 	private final StepExecutionConverter stepExecutionConverter = new StepExecutionConverter();
@@ -59,7 +57,7 @@ public class MongoStepExecutionDao implements StepExecutionDao {
 
 	public MongoStepExecutionDao(MongoOperations mongoOperations) {
 		this.mongoOperations = mongoOperations;
-		this.stepExecutionIncrementer = new MongoSequenceIncrementer(mongoOperations, STEP_EXECUTIONS_SEQUENCE_NAME);
+		this.stepExecutionIncrementer = new MongoSequenceIncrementer();
 	}
 
 	public void setStepExecutionIncrementer(DataFieldMaxValueIncrementer stepExecutionIncrementer) {
