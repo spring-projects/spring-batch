@@ -182,7 +182,7 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 		}
 		Isolation isolationLevelForCreate = mongoJobRepositoryAnnotation.isolationLevelForCreate();
 		if (isolationLevelForCreate != null) {
-			beanDefinitionBuilder.addPropertyValue("isolationLevelForCreate", isolationLevelForCreate);
+			beanDefinitionBuilder.addPropertyValue("isolationLevelForCreateEnum", isolationLevelForCreate);
 		}
 
 		String jobKeyGeneratorRef = mongoJobRepositoryAnnotation.jobKeyGeneratorRef();
