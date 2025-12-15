@@ -14,14 +14,22 @@ gracefully, allowing it to complete its current processing before shutting down.
 
 ### 1. Start the job
 
-First, you need to start the database server of the job repository. In a terminal, run:
+First, you need to start the database server of the job repository. 
+
+Open a terminal and run the following command from the top level directory of the project:
 
 ```
-$>cd spring-batch-samples/src/main/resources/org/springframework/batch/samples/shutdown
-$>docker-compose up -d
+$>docker-compose -f spring-batch-samples/src/main/resources/org/springframework/batch/samples/shutdown/docker-compose.yml up -d
 ```
 
 Then, run the `org.springframework.batch.samples.shutdown.StartJobExecutionApp` class in your IDE with no arguments.
+
+You can also run the application from the command line using this command:
+
+```bash
+./mvnw -pl org.springframework.batch:spring-batch-samples exec:java -Dexec.mainClass=org.springframework.batch.samples.shutdown.StartJobExecutionApp
+```
+
 Get the process id from the first line of logs (needed for the stop):
 
 ```
@@ -37,6 +45,12 @@ $>kill -15 73280
 ```
 
 You can otherwise run the `org.springframework.batch.samples.shutdown.StopJobExecutionApp` class in your IDE with no arguments.
+
+You can also stop the execution on the command line with the following command:
+
+```bash
+./mvnw -pl org.springframework.batch:spring-batch-samples exec:java -Dexec.mainClass=org.springframework.batch.samples.shutdown.StopJobExecutionApp
+```
 
 You should see the shutdown hook being called:
 
@@ -60,6 +74,12 @@ Both the job and the step should have a `STOPPED` status.
 
 Now, you can restart the job by running the `org.springframework.batch.samples.shutdown.RestartJobExecutionApp` class in your IDE.
 
+Or restart the execution on the command line with the following command:
+
+```bash
+./mvnw -pl org.springframework.batch:spring-batch-samples exec:java -Dexec.mainClass=org.springframework.batch.samples.shutdown.RestartJobExecutionApp
+```
+
 You should see that the job is restarted from the last commit point and completes successfully.
 
 ## Clean up
@@ -67,5 +87,5 @@ You should see that the job is restarted from the last commit point and complete
 To stop the database server, run:
 
 ```
-$>docker-compose down
+$>docker-compose -f spring-batch-samples/src/main/resources/org/springframework/batch/samples/shutdown/docker-compose.yml down
 ```
