@@ -158,8 +158,22 @@ public class SimpleJobRepository extends SimpleJobExplorer implements JobReposit
 		Assert.notNull(stepExecution.getId(), "StepExecution must already be saved (have an id assigned)");
 
 		stepExecution.setLastUpdated(LocalDateTime.now());
+
+		StepExecution latestStepExecution = getStepExecution(stepExecution.getId());
+		Assert.state(latestStepExecution != null,
+				"StepExecution with id " + stepExecution.getId() + "not found. Batch metadata state may be corrupted.");
+
+		if (latestStepExecution.isStopped()) {
+			stepExecution.upgradeStatus(latestStepExecution.getStatus());
+
+			Integer version = latestStepExecution.getVersion();
+			if (version != null) {
+				stepExecution.setVersion(version);
+			}
+			stepExecution.setTerminateOnly();
+		}
+
 		stepExecutionDao.updateStepExecution(stepExecution);
-		checkForInterruption(stepExecution);
 	}
 
 	private void validateStepExecution(StepExecution stepExecution) {
@@ -178,22 +192,6 @@ public class SimpleJobRepository extends SimpleJobExplorer implements JobReposit
 	@Override
 	public void updateExecutionContext(JobExecution jobExecution) {
 		ecDao.updateExecutionContext(jobExecution);
-	}
-
-	/**
-	 * Check to determine whether or not the JobExecution that is the parent of the
-	 * provided StepExecution has been interrupted. If, after synchronizing the status
-	 * with the database, the status has been updated to STOPPING, then the job has been
-	 * interrupted.
-	 * @param stepExecution the step execution
-	 */
-	private void checkForInterruption(StepExecution stepExecution) {
-		JobExecution jobExecution = stepExecution.getJobExecution();
-		jobExecutionDao.synchronizeStatus(jobExecution);
-		if (jobExecution.isStopping()) {
-			logger.info("Parent JobExecution is stopped, so passing message on to StepExecution");
-			stepExecution.setTerminateOnly();
-		}
 	}
 
 	@Override

@@ -37,7 +37,6 @@ public interface StoppableStep extends Step {
 	 * @param stepExecution the current step execution
 	 */
 	default void stop(StepExecution stepExecution) {
-		stepExecution.setTerminateOnly();
 		stepExecution.setStatus(BatchStatus.STOPPED);
 		stepExecution.setExitStatus(ExitStatus.STOPPED);
 		stepExecution.setEndTime(LocalDateTime.now());
