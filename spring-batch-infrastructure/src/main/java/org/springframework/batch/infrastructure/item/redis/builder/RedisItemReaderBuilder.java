@@ -15,9 +15,11 @@
  */
 package org.springframework.batch.infrastructure.item.redis.builder;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.infrastructure.item.redis.RedisItemReader;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ScanOptions;
+import org.springframework.util.Assert;
 
 /**
  * Builder for {@link RedisItemReader}.
@@ -29,9 +31,9 @@ import org.springframework.data.redis.core.ScanOptions;
  */
 public class RedisItemReaderBuilder<K, V> {
 
-	private RedisTemplate<K, V> redisTemplate;
+	private @Nullable RedisTemplate<K, V> redisTemplate;
 
-	private ScanOptions scanOptions;
+	private @Nullable ScanOptions scanOptions;
 
 	/**
 	 * Set the {@link RedisTemplate} to use in the reader.
@@ -58,6 +60,8 @@ public class RedisItemReaderBuilder<K, V> {
 	 * @return a new item reader
 	 */
 	public RedisItemReader<K, V> build() {
+		Assert.notNull(redisTemplate, "redisTemplate must not be null");
+		Assert.notNull(scanOptions, "scanOptions must no be null");
 		return new RedisItemReader<>(this.redisTemplate, this.scanOptions);
 	}
 
