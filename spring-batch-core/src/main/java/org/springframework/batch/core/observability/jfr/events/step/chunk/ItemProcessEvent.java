@@ -19,6 +19,7 @@ import jdk.jfr.Category;
 import jdk.jfr.Description;
 import jdk.jfr.Event;
 import jdk.jfr.Label;
+import org.jspecify.annotations.Nullable;
 
 @Label("Item Process")
 @Description("Item Process Event")
@@ -32,7 +33,7 @@ public class ItemProcessEvent extends Event {
 	public long stepExecutionId;
 
 	@Label("Item Process Status")
-	public String itemProcessStatus;
+	public @Nullable String itemProcessStatus;
 
 	public ItemProcessEvent(String stepName, long stepExecutionId) {
 		this.stepName = stepName;

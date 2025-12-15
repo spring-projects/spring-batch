@@ -42,6 +42,7 @@ public class MongoSequenceIncrementer implements DataFieldMaxValueIncrementer {
 		this.sequenceName = sequenceName;
 	}
 
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public long nextLongValue() throws DataAccessException {
 		return mongoTemplate.execute("BATCH_SEQUENCES",

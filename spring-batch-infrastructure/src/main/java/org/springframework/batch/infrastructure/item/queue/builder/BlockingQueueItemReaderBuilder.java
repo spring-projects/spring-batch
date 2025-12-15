@@ -18,6 +18,7 @@ package org.springframework.batch.infrastructure.item.queue.builder;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.infrastructure.item.queue.BlockingQueueItemReader;
 import org.springframework.util.Assert;
 
@@ -30,7 +31,7 @@ import org.springframework.util.Assert;
  */
 public class BlockingQueueItemReaderBuilder<T> {
 
-	private BlockingQueue<T> queue;
+	private @Nullable BlockingQueue<T> queue;
 
 	private long timeout = 1L;
 

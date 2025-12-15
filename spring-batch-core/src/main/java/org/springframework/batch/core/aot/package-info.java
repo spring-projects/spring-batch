@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,11 @@
  */
 
 /**
- * Infrastructure interfaces and primary dependencies for item concerns.
+ * Core implementations of Spring AOT concerns.
+ *
+ * @author Stefano Cordio
  */
 @NullMarked
-package org.springframework.batch.infrastructure.item;
+package org.springframework.batch.core.aot;
 
 import org.jspecify.annotations.NullMarked;

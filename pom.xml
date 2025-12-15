@@ -146,8 +146,8 @@
 		<maven-deploy-plugin.version>3.1.4</maven-deploy-plugin.version>
 		<maven-jar-plugin.version>3.5.0</maven-jar-plugin.version>
 		<spring-javaformat-maven-plugin.version>0.0.47</spring-javaformat-maven-plugin.version>
-		<error-prone.version>2.44.0</error-prone.version>
-		<nullaway.version>0.12.12</nullaway.version>
+		<error-prone.version>2.45.0</error-prone.version>
+		<nullaway.version>0.12.15</nullaway.version>
 	</properties>
 
 	<build>
@@ -180,9 +180,10 @@
 						<compilerArg>
 							-Xplugin:ErrorProne
 							<!-- Check JSpecify annotations -->
+							-Xep:RequireExplicitNullMarking:ERROR
 							-Xep:NullAway:ERROR
-                            -XepOpt:NullAway:JSpecifyMode=true
-                            -XepOpt:NullAway:OnlyNullMarked
+							-XepOpt:NullAway:JSpecifyMode=true
+							-XepOpt:NullAway:OnlyNullMarked
 							-XepOpt:NullAway:SuppressionNameAliases=DataFlowIssue
 							<!-- https://github.com/uber/NullAway/issues/162 -->
 							-XepExcludedPaths:.*/src/test/java/.*

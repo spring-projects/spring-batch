@@ -20,7 +20,6 @@ import org.springframework.batch.infrastructure.item.ItemReader;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -32,7 +31,7 @@ import org.jspecify.annotations.Nullable;
  * @author Mahmoud Ben Hassine
  * @since 5.2.0
  */
-public class BlockingQueueItemReader<T> implements ItemReader<@NonNull T> {
+public class BlockingQueueItemReader<T> implements ItemReader<T> {
 
 	private final BlockingQueue<T> queue;
 

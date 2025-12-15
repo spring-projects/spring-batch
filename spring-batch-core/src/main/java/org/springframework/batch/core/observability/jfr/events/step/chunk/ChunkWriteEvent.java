@@ -19,6 +19,7 @@ import jdk.jfr.Category;
 import jdk.jfr.Description;
 import jdk.jfr.Event;
 import jdk.jfr.Label;
+import org.jspecify.annotations.Nullable;
 
 @Label("Chunk Write")
 @Description("Chunk Write Event")
@@ -32,7 +33,7 @@ public class ChunkWriteEvent extends Event {
 	public long stepExecutionId;
 
 	@Label("Chunk Write Status")
-	public String chunkWriteStatus;
+	public @Nullable String chunkWriteStatus;
 
 	@Label("Item Count")
 	public long itemCount;
