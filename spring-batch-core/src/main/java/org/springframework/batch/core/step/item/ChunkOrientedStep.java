@@ -373,6 +373,8 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 						? BatchMetrics.STATUS_ROLLED_BACK : BatchMetrics.STATUS_COMMITTED;
 				chunkTransactionEvent.commit();
 			});
+
+			getJobRepository().update(stepExecution);
 		}
 	}
 
@@ -427,7 +429,6 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			stepExecution.apply(contribution);
 			this.compositeItemStream.update(stepExecution.getExecutionContext());
 			getJobRepository().updateExecutionContext(stepExecution);
-			getJobRepository().update(stepExecution);
 		}
 
 	}
@@ -459,7 +460,6 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			stepExecution.apply(contribution);
 			compositeItemStream.update(stepExecution.getExecutionContext());
 			getJobRepository().updateExecutionContext(stepExecution);
-			getJobRepository().update(stepExecution);
 		}
 	}
 
