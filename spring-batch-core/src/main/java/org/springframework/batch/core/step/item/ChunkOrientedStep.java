@@ -373,6 +373,8 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 						? BatchMetrics.STATUS_ROLLED_BACK : BatchMetrics.STATUS_COMMITTED;
 				chunkTransactionEvent.commit();
 			});
+
+			getJobRepository().update(stepExecution);
 		}
 	}
 
