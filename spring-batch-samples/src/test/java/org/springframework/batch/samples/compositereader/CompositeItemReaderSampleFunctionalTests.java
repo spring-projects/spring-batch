@@ -137,6 +137,7 @@ public class CompositeItemReaderSampleFunctionalTests {
 				.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
 				.addScript("/org/springframework/batch/samples/compositereader/sql/schema.sql")
 				.addScript("/org/springframework/batch/samples/compositereader/sql/data.sql")
+				.generateUniqueName(true)
 				.build();
 		}
 

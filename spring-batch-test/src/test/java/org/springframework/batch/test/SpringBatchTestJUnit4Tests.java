@@ -116,6 +116,7 @@ public class SpringBatchTestJUnit4Tests {
 			return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.HSQL)
 				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
 				.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
+				.generateUniqueName(true)
 				.build();
 		}
 

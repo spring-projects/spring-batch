@@ -74,6 +74,7 @@ public class FlowJobTests {
 		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
 			.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
 			.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
+			.generateUniqueName(true)
 			.build();
 		JdbcTransactionManager transactionManager = new JdbcTransactionManager(embeddedDatabase);
 		JdbcJobRepositoryFactoryBean factory = new JdbcJobRepositoryFactoryBean();

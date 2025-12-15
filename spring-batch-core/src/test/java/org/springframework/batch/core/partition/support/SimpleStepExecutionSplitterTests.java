@@ -59,6 +59,7 @@ class SimpleStepExecutionSplitterTests {
 		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
 			.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
 			.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
+			.generateUniqueName(true)
 			.build();
 		JdbcJobRepositoryFactoryBean factory = new JdbcJobRepositoryFactoryBean();
 		factory.setDataSource(embeddedDatabase);
