@@ -110,6 +110,8 @@ public class TaskExecutorJobOperator extends SimpleJobOperator {
 		Assert.notNull(job, "Job must not be null");
 		Assert.notNull(jobParameters, "JobParameters must not be null");
 		new JobLaunchEvent(job.getName(), jobParameters.toString()).commit();
+
+		@SuppressWarnings("DataFlowIssue")
 		Observation observation = MicrometerMetrics
 			.createObservation(METRICS_PREFIX + "job.launch.count", this.observationRegistry)
 			.start();
