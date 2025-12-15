@@ -341,14 +341,6 @@ public class StepExecution extends Entity {
 	}
 
 	/**
-	 * Test if this {@link StepExecution} indicates that it has been stopped.
-	 * @return {@code true} if the status is {@link BatchStatus#STOPPED}.
-	 */
-	public boolean isStopped() {
-		return status == BatchStatus.STOPPED;
-	}
-
-	/**
 	 * @return flag to indicate that an execution should halt.
 	 */
 	public boolean isTerminateOnly() {

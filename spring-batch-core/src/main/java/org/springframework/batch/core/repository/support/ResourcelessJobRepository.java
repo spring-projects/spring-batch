@@ -328,7 +328,7 @@ public class ResourcelessJobRepository implements JobRepository {
 	@Override
 	public void update(StepExecution stepExecution) {
 		stepExecution.setLastUpdated(LocalDateTime.now());
-		if (stepExecution.isStopped()) {
+		if (this.jobExecution != null && this.jobExecution.isStopped()) {
 			stepExecution.setTerminateOnly();
 		}
 	}
