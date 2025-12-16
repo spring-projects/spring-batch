@@ -23,13 +23,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.batch.infrastructure.item.ItemStreamException;
 import org.springframework.batch.infrastructure.item.ItemStreamReader;
-import org.springframework.batch.infrastructure.item.support.CompositeItemReader;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -37,6 +37,7 @@ import static org.mockito.Mockito.when;
  *
  * @author Mahmoud Ben Hassine
  * @author Elimelec Burghelea
+ * @author Yanming Zhou
  */
 public class CompositeItemReaderTests {
 
@@ -62,6 +63,7 @@ public class CompositeItemReaderTests {
 		ItemStreamReader<String> reader1 = mock();
 		ItemStreamReader<String> reader2 = mock();
 		CompositeItemReader<String> compositeItemReader = new CompositeItemReader<>(Arrays.asList(reader1, reader2));
+		compositeItemReader.open(new ExecutionContext());
 		when(reader1.read()).thenReturn("foo1", "foo2", null);
 		when(reader2.read()).thenReturn("bar1", "bar2", null);
 
@@ -88,13 +90,15 @@ public class CompositeItemReaderTests {
 		ItemStreamReader<String> reader2 = mock();
 		CompositeItemReader<String> compositeItemReader = new CompositeItemReader<>(Arrays.asList(reader1, reader2));
 		ExecutionContext executionContext = new ExecutionContext();
+		compositeItemReader.open(executionContext);
 
 		// when
 		compositeItemReader.update(executionContext);
 
 		// then
 		verify(reader1).update(executionContext);
-		verifyNoInteractions(reader2); // reader1 is the current delegate in this setup
+		verify(reader2, times(0)).update(executionContext); // reader1 is the current
+															// delegate in this setup
 	}
 
 	@Test
@@ -103,6 +107,7 @@ public class CompositeItemReaderTests {
 		ItemStreamReader<String> reader1 = mock();
 		ItemStreamReader<String> reader2 = mock();
 		CompositeItemReader<String> compositeItemReader = new CompositeItemReader<>(Arrays.asList(reader1, reader2));
+		compositeItemReader.open(new ExecutionContext());
 
 		// when
 		compositeItemReader.close();
@@ -118,6 +123,7 @@ public class CompositeItemReaderTests {
 		ItemStreamReader<String> reader1 = mock();
 		ItemStreamReader<String> reader2 = mock();
 		CompositeItemReader<String> compositeItemReader = new CompositeItemReader<>(Arrays.asList(reader1, reader2));
+		compositeItemReader.open(new ExecutionContext());
 
 		doThrow(new ItemStreamException("A failure")).when(reader1).close();
 
@@ -133,6 +139,64 @@ public class CompositeItemReaderTests {
 		// then
 		verify(reader1).close();
 		verify(reader2).close();
+	}
+
+	@Test
+	void testCompositeItemReaderRepeatableRead() throws Exception {
+		// given
+		ItemStreamReader<String> reader1 = new ItemStreamReader<>() {
+			int counter = 0;
+
+			@Override
+			public String read() {
+				return switch (this.counter++) {
+					case 0 -> "a";
+					case 1 -> "b";
+					default -> null;
+				};
+			}
+
+			@Override
+			public void close() {
+				this.counter = 0;
+			}
+		};
+		ItemStreamReader<String> reader2 = new ItemStreamReader<>() {
+			int counter = 0;
+
+			@Override
+			public String read() {
+				return switch (this.counter++) {
+					case 0 -> "c";
+					case 1 -> "d";
+					default -> null;
+				};
+			}
+
+			@Override
+			public void close() {
+				this.counter = 0;
+			}
+		};
+		CompositeItemReader<String> compositeItemReader = new CompositeItemReader<>(Arrays.asList(reader1, reader2));
+
+		for (int i = 0; i < 5; i++) {
+			verifyRead(compositeItemReader);
+		}
+	}
+
+	private void verifyRead(CompositeItemReader<String> compositeItemReader) throws Exception {
+		// when
+		compositeItemReader.open(new ExecutionContext());
+
+		// then
+		assertEquals("a", compositeItemReader.read());
+		assertEquals("b", compositeItemReader.read());
+		assertEquals("c", compositeItemReader.read());
+		assertEquals("d", compositeItemReader.read());
+		assertNull(compositeItemReader.read());
+
+		compositeItemReader.close();
 	}
 
 }
