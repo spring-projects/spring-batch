@@ -26,6 +26,7 @@ import org.springframework.util.Assert;
  * limit.
  *
  * @author Mahmoud Ben Hassine
+ * @author Andrey Litvitski
  * @since 6.0
  */
 public class LimitCheckingExceptionHierarchySkipPolicy implements SkipPolicy {
@@ -49,29 +50,30 @@ public class LimitCheckingExceptionHierarchySkipPolicy implements SkipPolicy {
 
 	@Override
 	public boolean shouldSkip(Throwable t, long skipCount) throws SkipLimitExceededException {
+		boolean skippable = isSkippable(t);
 		if (skipCount < 0) {
-			return !isSkippable(t);
+			return skippable;
 		}
-		if (!isSkippable(t)) {
+		if (!skippable) {
 			return false;
 		}
-		if (skipCount < this.skipLimit) {
-			return true;
-		}
-		else {
+		if (skipCount >= this.skipLimit) {
 			throw new SkipLimitExceededException(this.skipLimit, t);
 		}
+		return true;
 	}
 
 	private boolean isSkippable(Throwable t) {
-		boolean isSkippable = false;
-		for (Class<? extends Throwable> skippableException : this.skippableExceptions) {
-			if (skippableException.isAssignableFrom(t.getClass())) {
-				isSkippable = true;
-				break;
+		Throwable current = t;
+		while (current != null) {
+			for (Class<? extends Throwable> skippableException : this.skippableExceptions) {
+				if (skippableException.isInstance(current)) {
+					return true;
+				}
 			}
+			current = current.getCause();
 		}
-		return isSkippable;
+		return false;
 	}
 
 }
