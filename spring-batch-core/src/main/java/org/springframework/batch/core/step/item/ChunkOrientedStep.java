@@ -24,6 +24,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jspecify.annotations.Nullable;
 
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.JobInterruptedException;
 import org.springframework.batch.core.listener.ChunkListener;
 import org.springframework.batch.core.listener.CompositeChunkListener;
@@ -87,6 +88,7 @@ import static org.springframework.batch.core.observability.BatchMetrics.METRICS_
  * @param <I> type of input items
  * @param <O> type of output items
  * @author Mahmoud Ben Hassine
+ * @author Andrey Litvitski
  * @since 6.0
  */
 public class ChunkOrientedStep<I, O> extends AbstractStep {
@@ -690,7 +692,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			observation.lowCardinalityKeyValue(fullyQualifiedMetricName + ".status", BatchMetrics.STATUS_FAILURE);
 			observation.error(exception);
 			if (this.faultTolerant && exception instanceof RetryException retryException
-					&& !this.skipPolicy.shouldSkip(retryException.getCause(), -1)) {
+					&& this.skipPolicy.shouldSkip(retryException.getCause(), -1)) {
 				logger.info("Retry exhausted while attempting to write items, scanning the chunk", retryException);
 				ChunkScanEvent chunkScanEvent = new ChunkScanEvent(contribution.getStepExecution().getStepName(),
 						contribution.getStepExecution().getId());

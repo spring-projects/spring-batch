@@ -51,6 +51,7 @@ import static org.mockito.Mockito.when;
 
 /**
  * @author Mahmoud Ben Hassine
+ * @author Andrey Litvitski
  */
 public class ChunkOrientedStepTests {
 
@@ -281,6 +282,41 @@ public class ChunkOrientedStepTests {
 		assertEquals("Skip policy rejected skipping item", cause.getMessage());
 		assertEquals(ExitStatus.FAILED.getExitCode(), stepExecution.getExitStatus().getExitCode());
 		assertEquals(0, stepExecution.getProcessSkipCount(), "Process skip count should be 0");
+	}
+
+	@Test
+	void testSkippableExceptionsTraversal() throws Exception {
+		// given
+		class SkippableException extends RuntimeException {
+
+		}
+		ItemReader<String> reader = new ListItemReader<>(List.of("item1"));
+		ItemWriter<String> writer = chunk -> {
+			throw new RuntimeException(new SkippableException());
+		};
+
+		JobRepository jobRepository = new ResourcelessJobRepository();
+		ChunkOrientedStep<String, String> step = new StepBuilder("step", jobRepository).<String, String>chunk(1)
+			.reader(reader)
+			.writer(writer)
+			.faultTolerant()
+			.retry(SkippableException.class)
+			.retryLimit(1)
+			.skip(SkippableException.class)
+			.skipLimit(1)
+			.build();
+
+		JobInstance jobInstance = new JobInstance(1L, "job");
+		JobExecution jobExecution = new JobExecution(1L, jobInstance, new JobParameters());
+		StepExecution stepExecution = new StepExecution(1L, "step", jobExecution);
+
+		// when - execute step
+		step.execute(stepExecution);
+
+		// then - should skip the exception thrown by the writer
+		ExitStatus stepExecutionExitStatus = stepExecution.getExitStatus();
+		assertEquals(ExitStatus.COMPLETED.getExitCode(), stepExecutionExitStatus.getExitCode());
+		assertEquals(1, stepExecution.getSkipCount());
 	}
 
 }
