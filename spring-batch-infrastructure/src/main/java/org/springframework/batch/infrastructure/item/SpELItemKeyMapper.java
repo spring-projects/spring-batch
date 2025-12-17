@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2023 the original author or authors.
+ * Copyright 2002-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -12,7 +12,6 @@
  */
 package org.springframework.batch.infrastructure.item;
 
-import org.jspecify.annotations.Nullable;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.expression.Expression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
@@ -22,6 +21,7 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
  *
  * @author David Turanski
  * @author Stefano Cordio
+ * @author Mahmoud Ben Hassine
  * @since 2.2
  */
 public class SpELItemKeyMapper<K, V> implements Converter<V, K> {
@@ -34,8 +34,13 @@ public class SpELItemKeyMapper<K, V> implements Converter<V, K> {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public @Nullable K convert(V item) {
-		return (K) parsedExpression.getValue(item);
+	public K convert(V item) {
+		K key = (K) parsedExpression.getValue(item);
+		if (key == null) {
+			throw new IllegalArgumentException(
+					"Derived Key is null for item = " + item + ". This item will be skipped.");
+		}
+		return key;
 	}
 
 }

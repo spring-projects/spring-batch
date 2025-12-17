@@ -52,11 +52,6 @@ public abstract class KeyValueItemWriter<K, V> implements ItemWriter<V>, Initial
 	public void write(Chunk<? extends V> chunk) throws Exception {
 		for (V item : chunk) {
 			K key = itemKeyMapper.convert(item);
-			// TODO should we add a strict mode and throw an exception instead?
-			if (key == null) {
-				logger.warn("Derived Key is null for item = " + item + ". This item will be skipped.");
-				continue;
-			}
 			writeKeyValue(key, item);
 		}
 		flush();
