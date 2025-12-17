@@ -1,12 +1,7 @@
 # Latest news
 
+* December 17, 2025: [Spring Batch 6.0.1 available now](https://spring.io/blog/2025/12/17/spring-batch-6-0-1-available-now)
 * November 19, 2025: [Spring Batch 6.0.0 GA is out!](https://spring.io/blog/2025/11/19/spring-batch-6-0-0-ga)
-* November 04, 2025: [Spring Batch 6.0.0 RC2 available now!](https://spring.io/blog/2025/11/06/spring-batch-6-0-0-rc2-released)
-* October 22, 2025: [Spring Batch 6.0.0 RC1 and 5.2.4 are released!](https://spring.io/blog/2025/10/22/spring-batch-6-0-0-rc1-released)
-* October 9, 2025: [Spring Batch 6.0.0 M4 is out!](https://spring.io/blog/2025/10/09/spring-batch-6-0-0-m4-released)
-* September 17, 2025: [Spring Batch 6.0.0 M3 and 5.2.3 available now](https://spring.io/blog/2025/09/17/spring-batch-6-0-0-m3-5-2-3-released)
-* August 20, 2025: [Spring Batch 6.0.0 M2 available now](https://spring.io/blog/2025/08/20/spring-batch-6) 
-* July 23, 2025: [Spring Batch 6.0.0 M1 is out!](https://spring.io/blog/2025/07/23/spring-batch-6) 
 
 # Spring Batch [![build status](https://github.com/spring-projects/spring-batch/actions/workflows/continuous-integration.yml/badge.svg)](https://github.com/spring-projects/spring-batch/actions/workflows/continuous-integration.yml)
 
@@ -25,7 +20,7 @@ In your favorite IDE, create a new Maven-based Java 17+ project and add the foll
     <dependency>
         <groupId>org.springframework.batch</groupId>
         <artifactId>spring-batch-core</artifactId>
-        <version>6.0.0</version>
+        <version>6.0.1</version>
     </dependency>
 </dependencies>
 ```
