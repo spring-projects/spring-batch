@@ -29,6 +29,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class LocalChunkingJobFunctionalTests {
 
@@ -50,6 +51,27 @@ public class LocalChunkingJobFunctionalTests {
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		int vetsCount = JdbcTestUtils.countRowsInTable(jdbcTemplate, "vets");
 		assertEquals(6, vetsCount);
+	}
+
+	@Test
+	public void testLaunchJobWithJavaConfigFailure() throws Exception {
+		// given
+		ApplicationContext context = new AnnotationConfigApplicationContext(LocalChunkingJobConfiguration.class);
+		JdbcTemplate jdbcTemplate = context.getBean(JdbcTemplate.class);
+		JobOperator jobOperator = context.getBean(JobOperator.class);
+		Job job = context.getBean(Job.class);
+		JobParameters jobParameters = new JobParametersBuilder()
+			.addString("inputFile", "org/springframework/batch/samples/chunking/local/data/vets-bad-data.csv")
+			.toJobParameters();
+
+		// when
+		JobExecution jobExecution = jobOperator.start(job, jobParameters);
+
+		// then
+		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
+		assertTrue(jobExecution.getExitStatus().getExitDescription().contains("size limit: 30"));
+		int vetsCount = JdbcTestUtils.countRowsInTable(jdbcTemplate, "vets");
+		assertEquals(4, vetsCount);
 	}
 
 }

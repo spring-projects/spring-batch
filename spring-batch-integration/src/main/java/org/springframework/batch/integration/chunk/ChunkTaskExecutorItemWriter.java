@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.integration.chunk;
 
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.step.StepContribution;
 import org.springframework.batch.core.step.StepExecution;
@@ -84,14 +85,21 @@ public class ChunkTaskExecutorItemWriter<T> implements ItemWriter<T>, StepExecut
 	@Override
 	public ExitStatus afterStep(StepExecution stepExecution) {
 		try {
+			ExitStatus exitStatus = ExitStatus.COMPLETED
+				.addExitDescription("Waited for " + this.responses.size() + " results.");
 			for (StepContribution contribution : getStepContributions()) {
 				stepExecution.apply(contribution);
+				if (ExitStatus.FAILED.getExitCode().equals(contribution.getExitStatus().getExitCode())) {
+					exitStatus = contribution.getExitStatus();
+					stepExecution.setStatus(BatchStatus.FAILED);
+				}
 			}
+			return exitStatus;
 		}
 		catch (ExecutionException | InterruptedException e) {
+			stepExecution.setStatus(BatchStatus.FAILED);
 			return ExitStatus.FAILED.addExitDescription(e);
 		}
-		return ExitStatus.COMPLETED.addExitDescription("Waited for " + this.responses.size() + " results.");
 	}
 
 	private Collection<StepContribution> getStepContributions() throws ExecutionException, InterruptedException {
