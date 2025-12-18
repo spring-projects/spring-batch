@@ -22,6 +22,7 @@ import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersBuilder;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.job.JobSupport;
@@ -29,8 +30,6 @@ import org.springframework.batch.core.launch.JobExecutionAlreadyRunningException
 import org.springframework.batch.core.step.StepSupport;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -43,21 +42,17 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
- * Repository tests using JDBC DAOs (rather than mocks).
+ * Abstract repository tests using DAOs (rather than mocks).
  *
  * @author Robert Kasanicky
  * @author Dimitrios Liapis
  * @author Mahmoud Ben Hassine
  * @author Yanming Zhou
  */
-// TODO rename to JdbcJobRepositoryIntegrationTests and update to new domain model
-// TODO should add a mongodb similar test suite
-@Disabled
-@SpringJUnitConfig(locations = "/org/springframework/batch/core/repository/dao/jdbc/sql-dao-test.xml")
-class SimpleJobRepositoryIntegrationTests {
+abstract class AbstractJobRepositoryIntegrationTests {
 
 	@Autowired
-	private SimpleJobRepository jobRepository;
+	private JobRepository jobRepository;
 
 	private final JobSupport job = new JobSupport("SimpleJobRepositoryIntegrationTestsJob");
 
@@ -67,9 +62,8 @@ class SimpleJobRepositoryIntegrationTests {
 	 * Create two job executions for same job+parameters tuple. Check both executions
 	 * belong to the same job instance and job.
 	 */
-	@Transactional
 	@Test
-	void testCreateAndFind() throws Exception {
+	void testCreateAndFind() {
 
 		job.setRestartable(true);
 
@@ -81,7 +75,7 @@ class SimpleJobRepositoryIntegrationTests {
 		JobInstance jobInstance = jobRepository.createJobInstance(job.getName(), jobParameters);
 		JobExecution firstExecution = jobRepository.createJobExecution(jobInstance, jobParameters, executionContext);
 		firstExecution.setStartTime(LocalDateTime.now());
-		assertNotNull(firstExecution.getLastUpdated());
+		assertNull(firstExecution.getLastUpdated());
 
 		assertEquals(job.getName(), firstExecution.getJobInstance().getJobName());
 
@@ -99,9 +93,8 @@ class SimpleJobRepositoryIntegrationTests {
 	 * Create two job executions for same job+parameters tuple. Check both executions
 	 * belong to the same job instance and job.
 	 */
-	@Transactional
 	@Test
-	void testCreateAndFindWithNoStartDate() throws Exception {
+	void testCreateAndFindWithNoStartDate() {
 		job.setRestartable(true);
 
 		JobInstance jobInstance = jobRepository.createJobInstance(job.getName(), jobParameters);
@@ -123,7 +116,6 @@ class SimpleJobRepositoryIntegrationTests {
 	 * Save multiple StepExecutions for the same step and check the returned count and
 	 * last execution are correct.
 	 */
-	@Transactional
 	@Test
 	void testGetStepExecutionCountAndLastStepExecution() throws Exception {
 		job.setRestartable(true);
@@ -161,9 +153,8 @@ class SimpleJobRepositoryIntegrationTests {
 	/*
 	 * Save execution context and retrieve it.
 	 */
-	@Transactional
 	@Test
-	void testSaveExecutionContext() throws Exception {
+	void testSaveExecutionContext() {
 		ExecutionContext ctx = new ExecutionContext(Map.of("crashedPosition", 7));
 		JobInstance jobInstance = jobRepository.createJobInstance(job.getName(), jobParameters);
 		JobExecution jobExec = jobRepository.createJobExecution(jobInstance, jobParameters, new ExecutionContext());
@@ -188,9 +179,9 @@ class SimpleJobRepositoryIntegrationTests {
 	 * If JobExecution is already running, exception will be thrown in attempt to create
 	 * new execution.
 	 */
-	@Transactional
 	@Test
-	void testOnlyOneJobExecutionAllowedRunning() throws Exception {
+	@Disabled("JobExecutionAlreadyRunningException is not thrown at repository level")
+	void testOnlyOneJobExecutionAllowedRunning() {
 		job.setRestartable(true);
 		JobInstance jobInstance = jobRepository.createJobInstance(job.getName(), jobParameters);
 		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
@@ -204,7 +195,6 @@ class SimpleJobRepositoryIntegrationTests {
 				() -> jobRepository.createJobExecution(jobInstance, jobParameters, new ExecutionContext()));
 	}
 
-	@Transactional
 	@Test
 	void testGetLastJobExecution() throws Exception {
 		JobInstance jobInstance = jobRepository.createJobInstance(job.getName(), jobParameters);
@@ -225,9 +215,8 @@ class SimpleJobRepositoryIntegrationTests {
 	 * Create two job executions for the same job+parameters tuple. Should ignore
 	 * non-identifying job parameters when identifying the job instance.
 	 */
-	@Transactional
 	@Test
-	void testReExecuteWithSameJobParameters() throws Exception {
+	void testReExecuteWithSameJobParameters() {
 		JobParameters jobParameters = new JobParametersBuilder().addString("name", "foo", false).toJobParameters();
 		JobInstance jobInstance = jobRepository.createJobInstance(job.getName(), jobParameters);
 		JobExecution jobExecution1 = jobRepository.createJobExecution(jobInstance, jobParameters,
@@ -245,9 +234,9 @@ class SimpleJobRepositoryIntegrationTests {
 	 * When a job execution is running, JobExecutionAlreadyRunningException should be
 	 * thrown if trying to create any other ones with same job parameters.
 	 */
-	@Transactional
 	@Test
-	void testReExecuteWithSameJobParametersWhenRunning() throws Exception {
+	@Disabled("JobExecutionAlreadyRunningException is not thrown at repository level")
+	void testReExecuteWithSameJobParametersWhenRunning() {
 		JobParameters jobParameters = new JobParametersBuilder().addString("stringKey", "stringValue")
 			.toJobParameters();
 
@@ -272,9 +261,8 @@ class SimpleJobRepositoryIntegrationTests {
 				() -> jobRepository.createJobExecution(jobInstance, jobParameters, new ExecutionContext()));
 	}
 
-	@Transactional
 	@Test
-	void testDeleteJobInstance() throws Exception {
+	void testDeleteJobInstance() {
 		var jobParameters = new JobParametersBuilder().addString("foo", "bar").toJobParameters();
 		JobInstance jobInstance = jobRepository.createJobInstance(job.getName(), jobParameters);
 		var jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters, new ExecutionContext());
