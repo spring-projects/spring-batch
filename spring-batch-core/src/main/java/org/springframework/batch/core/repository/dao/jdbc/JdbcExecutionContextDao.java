@@ -45,6 +45,7 @@ import org.springframework.core.serializer.Serializer;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 
 /**
  * JDBC DAO for {@link ExecutionContext}.
@@ -238,7 +239,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 	@Override
 	public void saveExecutionContexts(Collection<StepExecution> stepExecutions) {
 		Assert.notNull(stepExecutions, "Attempt to save an null collection of step executions");
-		Map<Long, String> serializedContexts = new HashMap<>(stepExecutions.size());
+		Map<Long, String> serializedContexts = CollectionUtils.newHashMap(stepExecutions.size());
 		for (StepExecution stepExecution : stepExecutions) {
 			Long executionId = stepExecution.getId();
 			ExecutionContext executionContext = stepExecution.getExecutionContext();
