@@ -153,7 +153,12 @@ public class JobRepositoryTestUtils {
 	 * @param jobExecution the {@link JobExecution} to delete
 	 */
 	public void removeJobExecution(JobExecution jobExecution) {
-		this.jobRepository.deleteJobExecution(jobExecution);
+		// query latest version of JobExecution to avoid OptimisticLockingFailureException
+		jobExecution = this.jobRepository.getLastJobExecution(jobExecution.getJobInstance().getJobName(),
+				jobExecution.getJobParameters());
+		if (jobExecution != null) {
+			this.jobRepository.deleteJobExecution(jobExecution);
+		}
 	}
 
 	/**
@@ -170,7 +175,7 @@ public class JobRepositoryTestUtils {
 			while (!jobInstances.isEmpty()) {
 				for (JobInstance jobInstance : jobInstances) {
 					List<JobExecution> jobExecutions = this.jobRepository.findJobExecutions(jobInstance);
-					if (jobExecutions != null && !jobExecutions.isEmpty()) {
+					if (!jobExecutions.isEmpty()) {
 						removeJobExecutions(jobExecutions);
 					}
 				}

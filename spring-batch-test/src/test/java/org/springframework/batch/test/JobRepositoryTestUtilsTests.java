@@ -31,6 +31,7 @@ import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
@@ -39,8 +40,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  *
  */
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @SpringJUnitConfig(locations = "/simple-job-launcher-context.xml")
 class JobRepositoryTestUtilsTests {
 
@@ -139,6 +142,35 @@ class JobRepositoryTestUtilsTests {
 
 		// when
 		utils.removeJobExecutions();
+
+		// then
+		assertEquals(0, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_STEP_EXECUTION"));
+		assertEquals(0, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_EXECUTION"));
+	}
+
+	@Test
+	void testRemoveJobExecution() throws Exception {
+		// given
+		utils = new JobRepositoryTestUtils(jobRepository);
+		JobExecution jobExecution = utils.createJobExecutions(1).get(0);
+		assertEquals(1, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_EXECUTION"));
+		assertEquals(1, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_STEP_EXECUTION"));
+
+		// when
+		jobExecution.setVersion(-1); // simulate stale version
+		utils.removeJobExecution(jobExecution);
+
+		// then
+		assertEquals(0, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_STEP_EXECUTION"));
+		assertEquals(0, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_EXECUTION"));
+
+		List<JobExecution> jobExecutions = utils.createJobExecutions("test", new String[] { "step1", "step2" }, 2);
+		assertEquals(2, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_EXECUTION"));
+		assertEquals(4, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_STEP_EXECUTION"));
+
+		// when
+		jobExecutions.forEach(je -> je.setVersion(-1)); // simulate stale version
+		utils.removeJobExecutions(jobExecutions);
 
 		// then
 		assertEquals(0, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_STEP_EXECUTION"));
