@@ -34,6 +34,7 @@ import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.core.task.TaskRejectedException;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 
 /**
  * A {@link PartitionHandler} that uses a {@link TaskExecutor} to execute the partitioned
@@ -94,8 +95,8 @@ public class TaskExecutorPartitionHandler extends AbstractPartitionHandler imple
 	protected Set<StepExecution> doHandle(StepExecution managerStepExecution,
 			Set<StepExecution> partitionStepExecutions) throws Exception {
 		Assert.notNull(step, "A Step must be provided.");
-		final Set<Future<StepExecution>> tasks = new HashSet<>(getGridSize());
-		final Set<StepExecution> result = new HashSet<>();
+		final Set<Future<StepExecution>> tasks = CollectionUtils.newHashSet(partitionStepExecutions.size());
+		final Set<StepExecution> result = CollectionUtils.newHashSet(partitionStepExecutions.size());
 
 		for (StepExecution stepExecution : partitionStepExecutions) {
 			final FutureTask<StepExecution> task = createTask(step, stepExecution);

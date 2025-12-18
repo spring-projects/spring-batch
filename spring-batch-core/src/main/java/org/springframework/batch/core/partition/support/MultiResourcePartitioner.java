@@ -24,6 +24,7 @@ import org.springframework.batch.core.partition.Partitioner;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 
 /**
  * Implementation of {@link Partitioner} that locates multiple resources and associates
@@ -70,7 +71,7 @@ public class MultiResourcePartitioner implements Partitioner {
 	 */
 	@Override
 	public Map<String, ExecutionContext> partition(int gridSize) {
-		Map<String, ExecutionContext> map = new HashMap<>(gridSize);
+		Map<String, ExecutionContext> map = CollectionUtils.newHashMap(gridSize);
 		int i = 0;
 		for (Resource resource : resources) {
 			ExecutionContext context = new ExecutionContext();

@@ -33,6 +33,7 @@ import org.springframework.batch.core.partition.Partitioner;
 import org.springframework.batch.core.partition.StepExecutionSplitter;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
+import org.springframework.util.CollectionUtils;
 
 /**
  * Generic implementation of {@link StepExecutionSplitter} that delegates to a
@@ -128,7 +129,7 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter {
 		JobExecution jobExecution = stepExecution.getJobExecution();
 
 		Map<String, ExecutionContext> contexts = getContexts(stepExecution, gridSize);
-		Set<StepExecution> set = new HashSet<>(contexts.size());
+		Set<StepExecution> set = CollectionUtils.newHashSet(contexts.size());
 
 		for (Entry<String, ExecutionContext> context : contexts.entrySet()) {
 
@@ -153,7 +154,7 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter {
 			}
 		}
 
-		Set<StepExecution> executions = new HashSet<>(set.size());
+		Set<StepExecution> executions = CollectionUtils.newHashSet(set.size());
 		executions.addAll(set);
 
 		return executions;
