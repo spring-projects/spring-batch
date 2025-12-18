@@ -37,6 +37,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.task.VirtualThreadTaskExecutor;
 import org.springframework.jdbc.support.JdbcTransactionManager;
+import org.springframework.util.CollectionUtils;
 
 /**
  * Configuration class that defines a partitioned step based on a
@@ -76,7 +77,7 @@ public class JobConfigurationForRunningPartitionedStepsWithVirtualThreads {
 	@Bean
 	public Partitioner partitioner() {
 		return gridSize -> {
-			Map<String, ExecutionContext> partitionMap = new HashMap<>(gridSize);
+			Map<String, ExecutionContext> partitionMap = CollectionUtils.newHashMap(gridSize);
 			for (int i = 0; i < gridSize; i++) {
 				ExecutionContext executionContext = new ExecutionContext();
 				executionContext.put("data", "data" + i);

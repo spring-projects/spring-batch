@@ -35,6 +35,7 @@ import org.springframework.util.Assert;
 
 import org.jspecify.annotations.NullUnmarked;
 import org.jspecify.annotations.Nullable;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 /**
@@ -131,7 +132,7 @@ public class DefaultFieldSet implements FieldSet {
 		}
 		this.tokens = tokens.clone();
 		this.names = Arrays.asList(names);
-		this.nameIndexMap = new HashMap<>(names.length);
+		this.nameIndexMap = CollectionUtils.newHashMap(names.length);
 		for (int i = 0; i < names.length; i++) {
 			this.nameIndexMap.put(names[i], i);
 		}

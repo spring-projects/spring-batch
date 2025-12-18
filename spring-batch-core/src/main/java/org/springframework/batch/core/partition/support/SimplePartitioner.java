@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.springframework.batch.core.partition.Partitioner;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
+import org.springframework.util.CollectionUtils;
 
 /**
  * Simplest possible implementation of {@link Partitioner}. Just creates a set of empty
@@ -37,7 +38,7 @@ public class SimplePartitioner implements Partitioner {
 
 	@Override
 	public Map<String, ExecutionContext> partition(int gridSize) {
-		Map<String, ExecutionContext> map = new HashMap<>(gridSize);
+		Map<String, ExecutionContext> map = CollectionUtils.newHashMap(gridSize);
 		for (int i = 0; i < gridSize; i++) {
 			map.put(PARTITION_KEY + i, new ExecutionContext());
 		}
