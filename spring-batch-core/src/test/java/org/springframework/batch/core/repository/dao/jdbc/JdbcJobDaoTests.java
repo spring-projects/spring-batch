@@ -32,7 +32,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 @SpringJUnitConfig(locations = { "sql-dao-test.xml" })
 // TODO refactor using black-box testing instead of white-box testing
-@Disabled
 public class JdbcJobDaoTests extends AbstractJobDaoTests {
 
 	public static final String LONG_STRING = "A very long String A very long String A very long String A very long String A very long String A very long String A very long String A very long String A very long String A very long String A very long String A very long String A very long String A very long String A very long String A very long String A very long String A very long String A very long String ";
