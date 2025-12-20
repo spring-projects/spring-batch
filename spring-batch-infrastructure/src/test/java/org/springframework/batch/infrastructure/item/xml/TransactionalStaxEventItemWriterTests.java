@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2023 the original author or authors.
+ * Copyright 2008-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,10 @@ package org.springframework.batch.infrastructure.item.xml;
 import java.io.File;
 import java.io.IOException;
 
+import java.lang.reflect.Field;
+import java.nio.channels.FileChannel;
+import java.util.ArrayList;
+import java.util.List;
 import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.Result;
@@ -39,7 +43,9 @@ import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -233,6 +239,91 @@ class TransactionalStaxEventItemWriterTests {
 		source.afterPropertiesSet();
 
 		return source;
+	}
+
+	@Test
+	void shouldWriteThreeSeparateFilesWhenMultipleOpenCloseAndResourceSwitchInSingleTransaction() throws Exception {
+		WritableResource r1 = new FileSystemResource(File.createTempFile("stax-tx-rot-1", ".xml"));
+		WritableResource r2 = new FileSystemResource(File.createTempFile("stax-tx-rot-2", ".xml"));
+		WritableResource r3 = new FileSystemResource(File.createTempFile("stax-tx-rot-3", ".xml"));
+
+		assertDoesNotThrow(
+				() -> new TransactionTemplate(transactionManager).execute((TransactionCallback<Void>) status -> {
+					try {
+						writer.setResource(r1);
+						writer.open(new ExecutionContext());
+						writer.write(items);
+						writer.close();
+
+						writer.setResource(r2);
+						writer.open(new ExecutionContext());
+						writer.write(items);
+						writer.close();
+
+						writer.setResource(r3);
+						writer.open(new ExecutionContext());
+						writer.write(items);
+						writer.close();
+
+						return null;
+					}
+					catch (Exception e) {
+						throw new RuntimeException(e);
+					}
+				}));
+	}
+
+	@Test
+	void shouldCloseAllFileChannelsAfterTransaction() throws Exception {
+		WritableResource r1 = new FileSystemResource(File.createTempFile("stax-tx-leak-1", ".xml"));
+		WritableResource r2 = new FileSystemResource(File.createTempFile("stax-tx-leak-2", ".xml"));
+		WritableResource r3 = new FileSystemResource(File.createTempFile("stax-tx-leak-3", ".xml"));
+
+		List<FileChannel> opened = new ArrayList<>();
+
+		try {
+			new TransactionTemplate(transactionManager).execute((TransactionCallback<Void>) status -> {
+				try {
+					writer.setResource(r1);
+					writer.open(new ExecutionContext());
+					opened.add(extractChannelFromStaxWriter(writer));
+					writer.write(items);
+					writer.close();
+
+					writer.setResource(r2);
+					writer.open(new ExecutionContext());
+					opened.add(extractChannelFromStaxWriter(writer));
+					writer.write(items);
+					writer.close();
+
+					writer.setResource(r3);
+					writer.open(new ExecutionContext());
+					opened.add(extractChannelFromStaxWriter(writer));
+					writer.write(items);
+					writer.close();
+				}
+				catch (Exception ignored) {
+				}
+				return null;
+			});
+		}
+		catch (Exception ignored) {
+		}
+
+		assertEquals(3, opened.size(), "Expected 3 opened channels");
+		for (FileChannel ch : opened) {
+			assertFalse(ch.isOpen(), "FileChannel should be closed after transaction");
+		}
+	}
+
+	private static FileChannel extractChannelFromStaxWriter(StaxEventItemWriter<?> w) throws Exception {
+		Field stateField = StaxEventItemWriter.class.getDeclaredField("state");
+		stateField.setAccessible(true);
+		Object state = stateField.get(w);
+
+		Field channelField = state.getClass().getDeclaredField("channel");
+		channelField.setAccessible(true);
+		return (FileChannel) channelField.get(state);
 	}
 
 }
