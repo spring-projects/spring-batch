@@ -128,7 +128,8 @@ class StaxEventItemWriterBuilderTests {
 
 		staxEventItemWriter.open(executionContext);
 
-		Object writer = ReflectionTestUtils.getField(staxEventItemWriter, "bufferedWriter");
+		Object state = ReflectionTestUtils.getField(staxEventItemWriter, "state");
+		Object writer = ReflectionTestUtils.getField(state, "bufferedWriter");
 
 		assertTrue(writer instanceof TransactionAwareBufferedWriter);
 
