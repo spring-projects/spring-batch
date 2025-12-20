@@ -133,16 +133,6 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T>
 	// TRUE
 	private boolean overwriteOutput = true;
 
-	// file channel
-	private @Nullable FileChannel channel;
-
-	// wrapper for XML event writer that swallows StartDocument and EndDocument
-	// events
-	private @Nullable XMLEventWriter eventWriter;
-
-	// XML event writer
-	private @Nullable XMLEventWriter delegateEventWriter;
-
 	// current count of processed records
 	private long currentRecordCount = 0;
 
@@ -151,8 +141,6 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T>
 	private @Nullable StaxWriterCallback headerCallback;
 
 	private @Nullable StaxWriterCallback footerCallback;
-
-	private @Nullable Writer bufferedWriter;
 
 	private boolean transactional = true;
 
@@ -163,6 +151,8 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T>
 	private boolean restarted = false;
 
 	private boolean initialized = false;
+
+	private @Nullable OutputState state;
 
 	// List holding the QName of elements that were opened in the header callback, but not
 	// closed
@@ -432,7 +422,7 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T>
 			try {
 				if (headerCallback != null) {
 					UnclosedElementCollectingEventWriter headerCallbackWriter = new UnclosedElementCollectingEventWriter(
-							delegateEventWriter);
+							state.getDelegateEventWriter());
 					headerCallback.write(headerCallbackWriter);
 					unclosedHeaderCallbackElements = headerCallbackWriter.getUnclosedElements();
 				}
@@ -449,72 +439,10 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T>
 	/**
 	 * Helper method for opening output source at given file position
 	 */
-	@SuppressWarnings("DataFlowIssue")
 	private void open(long position) {
-
-		File file;
-		FileOutputStream os;
-		FileChannel fileChannel;
-
-		try {
-			file = resource.getFile();
-			FileUtils.setUpOutputFile(file, restarted, false, overwriteOutput);
-			Assert.state(resource.exists(), "Output resource must exist");
-			os = new FileOutputStream(file, true);
-			fileChannel = os.getChannel();
-			channel = os.getChannel();
-			setPosition(position);
-		}
-		catch (IOException ioe) {
-			throw new ItemStreamException("Unable to write to file resource: [" + resource + "]", ioe);
-		}
-
-		XMLOutputFactory outputFactory = createXmlOutputFactory();
-
-		if (outputFactory.isPropertySupported("com.ctc.wstx.automaticEndElements")) {
-			// If the current XMLOutputFactory implementation is supplied by
-			// Woodstox >= 3.2.9 we want to disable its
-			// automatic end element feature (see:
-			// https://jira.codehaus.org/browse/WSTX-165) per
-			// https://jira.spring.io/browse/BATCH-761).
-			outputFactory.setProperty("com.ctc.wstx.automaticEndElements", Boolean.FALSE);
-		}
-		if (outputFactory.isPropertySupported("com.ctc.wstx.outputValidateStructure")) {
-			// On restart we don't write the root element so we have to disable
-			// structural validation (see:
-			// https://jira.spring.io/browse/BATCH-1681).
-			outputFactory.setProperty("com.ctc.wstx.outputValidateStructure", Boolean.FALSE);
-		}
-
-		try {
-			if (transactional) {
-				TransactionAwareBufferedWriter writer = new TransactionAwareBufferedWriter(fileChannel,
-						this::closeStream);
-
-				writer.setEncoding(encoding);
-				writer.setForceSync(forceSync);
-				bufferedWriter = writer;
-			}
-			else {
-				bufferedWriter = new BufferedWriter(new OutputStreamWriter(os, encoding));
-			}
-			delegateEventWriter = createXmlEventWriter(outputFactory, bufferedWriter);
-			eventWriter = new NoStartEndDocumentStreamWriter(delegateEventWriter);
-			initNamespaceContext(delegateEventWriter);
-			if (!restarted) {
-				startDocument(delegateEventWriter);
-				if (forceSync) {
-					fileChannel.force(false);
-				}
-			}
-		}
-		catch (UnsupportedEncodingException e) {
-			throw new ItemStreamException(
-					"Unable to write to file resource: [" + resource + "] with encoding=[" + encoding + "]", e);
-		}
-		catch (XMLStreamException | IOException xse) {
-			throw new ItemStreamException("Unable to write to file resource: [" + resource + "]", xse);
-		}
+		Assert.notNull(resource, "Output resource must be set");
+		state = new OutputState();
+		state.open(position, restarted);
 	}
 
 	/**
@@ -556,7 +484,7 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T>
 	 */
 	@SuppressWarnings("DataFlowIssue")
 	protected Result createStaxResult() {
-		return StaxUtils.createStaxResult(eventWriter);
+		return state.createStaxResult();
 	}
 
 	/**
@@ -659,26 +587,6 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T>
 	}
 
 	/**
-	 * Writes the EndDocument tag manually.
-	 * @param writer XML event writer
-	 * @throws XMLStreamException thrown if error occurs.
-	 */
-	@SuppressWarnings("DataFlowIssue")
-	protected void endDocument(XMLEventWriter writer) throws XMLStreamException {
-
-		// writer.writeEndDocument(); <- this doesn't work after restart
-		// we need to write end tag of the root element manually
-
-		String nsPrefix = !StringUtils.hasText(getRootTagNamespacePrefix()) ? "" : getRootTagNamespacePrefix() + ":";
-		try {
-			bufferedWriter.write("</" + nsPrefix + getRootTagName() + ">");
-		}
-		catch (IOException ioe) {
-			throw new XMLStreamException("Unable to close file resource: [" + resource + "]", ioe);
-		}
-	}
-
-	/**
 	 * Flush and close the output source.
 	 *
 	 * @see ItemStream#close()
@@ -688,52 +596,9 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T>
 	public void close() {
 		super.close();
 
-		XMLEventFactory factory = createXmlEventFactory();
 		try {
-			delegateEventWriter.add(factory.createCharacters(""));
-		}
-		catch (XMLStreamException e) {
-			log.error(e);
-		}
-
-		try {
-			if (footerCallback != null) {
-				XMLEventWriter footerCallbackWriter = delegateEventWriter;
-				if (restarted && !unclosedHeaderCallbackElements.isEmpty()) {
-					footerCallbackWriter = new UnopenedElementClosingEventWriter(delegateEventWriter, bufferedWriter,
-							unclosedHeaderCallbackElements);
-				}
-				footerCallback.write(footerCallbackWriter);
-			}
-			delegateEventWriter.flush();
-			endDocument(delegateEventWriter);
-		}
-		catch (IOException e) {
-			throw new ItemStreamException("Failed to write footer items", e);
-		}
-		catch (XMLStreamException e) {
-			throw new ItemStreamException("Failed to write end document tag", e);
-		}
-		finally {
-
-			try {
-				delegateEventWriter.close();
-			}
-			catch (XMLStreamException e) {
-				log.error("Unable to close file resource: [" + resource + "] " + e);
-			}
-			finally {
-				try {
-					bufferedWriter.close();
-				}
-				catch (IOException e) {
-					log.error("Unable to close file resource: [" + resource + "] " + e);
-				}
-				finally {
-					if (!transactional) {
-						closeStream();
-					}
-				}
+			if (state != null) {
+				state.close(footerCallback, unclosedHeaderCallbackElements);
 			}
 			if (currentRecordCount == 0 && shouldDeleteIfEmpty) {
 				try {
@@ -744,17 +609,9 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T>
 				}
 			}
 		}
-
-		this.initialized = false;
-	}
-
-	@SuppressWarnings("DataFlowIssue")
-	private void closeStream() {
-		try {
-			channel.close();
-		}
-		catch (IOException ioe) {
-			log.error("Unable to close file resource: [" + resource + "] " + ioe);
+		finally {
+			state = null;
+			initialized = false;
 		}
 	}
 
@@ -768,7 +625,7 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T>
 	@Override
 	public void write(Chunk<? extends T> items) throws XmlMappingException, IOException {
 
-		if (!this.initialized) {
+		if (!initialized || state == null || !state.isInitialized()) {
 			throw new WriterNotOpenException("Writer must be open before it can be written to");
 		}
 
@@ -780,15 +637,8 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T>
 			Result result = createStaxResult();
 			marshaller.marshal(object, result);
 		}
-		try {
-			eventWriter.flush();
-			if (forceSync) {
-				channel.force(false);
-			}
-		}
-		catch (XMLStreamException | IOException e) {
-			throw new WriteFailedException("Failed to flush the events", e);
-		}
+
+		state.flush();
 	}
 
 	/**
@@ -819,35 +669,260 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T>
 	 */
 	@SuppressWarnings("DataFlowIssue")
 	private long getPosition() {
-		long position;
-
-		try {
-			eventWriter.flush();
-			position = channel.position();
-			if (bufferedWriter instanceof TransactionAwareBufferedWriter transactionAwareBufferedWriter) {
-				position += transactionAwareBufferedWriter.getBufferSize();
-			}
+		if (state == null) {
+			return 0;
 		}
-		catch (Exception e) {
-			throw new ItemStreamException("Unable to write to file resource: [" + resource + "]", e);
-		}
-
-		return position;
+		return state.position();
 	}
 
-	/**
-	 * Set the file channel position.
-	 * @param newPosition new file channel position
-	 */
-	@SuppressWarnings("DataFlowIssue")
-	private void setPosition(long newPosition) {
-		try {
-			channel.truncate(newPosition);
-			channel.position(newPosition);
+	protected class OutputState {
+
+		private @Nullable FileOutputStream os;
+
+		// file channel
+		private @Nullable FileChannel channel;
+
+		private @Nullable Writer bufferedWriter;
+
+		// wrapper for XML event writer that swallows StartDocument and EndDocument
+		// events
+		private @Nullable XMLEventWriter eventWriter;
+
+		// XML event writer
+		private @Nullable XMLEventWriter delegateEventWriter;
+
+		private boolean initialized = false;
+
+		private boolean restarted = false;
+
+		public boolean isInitialized() {
+			return initialized;
 		}
-		catch (IOException e) {
-			throw new ItemStreamException("Unable to write to file resource: [" + resource + "]", e);
+
+		@SuppressWarnings("DataFlowIssue")
+		public void open(long position, boolean restart) {
+
+			restarted = restart;
+
+			File file;
+			FileOutputStream osLocal;
+			FileChannel fileChannel;
+
+			try {
+				file = resource.getFile();
+				FileUtils.setUpOutputFile(file, restarted, false, overwriteOutput);
+				Assert.state(resource.exists(), "Output resource must exist");
+				osLocal = new FileOutputStream(file, true);
+				fileChannel = osLocal.getChannel();
+				os = osLocal;
+				channel = fileChannel;
+				setPosition(position);
+			}
+			catch (IOException ioe) {
+				throw new ItemStreamException("Unable to write to file resource: [" + resource + "]", ioe);
+			}
+
+			XMLOutputFactory outputFactory = createXmlOutputFactory();
+
+			if (outputFactory.isPropertySupported("com.ctc.wstx.automaticEndElements")) {
+				// If the current XMLOutputFactory implementation is supplied by
+				// Woodstox >= 3.2.9 we want to disable its
+				// automatic end element feature (see:
+				// https://jira.codehaus.org/browse/WSTX-165) per
+				// https://jira.spring.io/browse/BATCH-761).
+				outputFactory.setProperty("com.ctc.wstx.automaticEndElements", Boolean.FALSE);
+			}
+			if (outputFactory.isPropertySupported("com.ctc.wstx.outputValidateStructure")) {
+				// On restart we don't write the root element so we have to disable
+				// structural validation (see:
+				// https://jira.spring.io/browse/BATCH-1681).
+				outputFactory.setProperty("com.ctc.wstx.outputValidateStructure", Boolean.FALSE);
+			}
+
+			try {
+				if (transactional) {
+					TransactionAwareBufferedWriter writer = new TransactionAwareBufferedWriter(fileChannel,
+							this::closeStream);
+
+					writer.setEncoding(encoding);
+					writer.setForceSync(forceSync);
+					bufferedWriter = writer;
+				}
+				else {
+					bufferedWriter = new BufferedWriter(new OutputStreamWriter(osLocal, encoding));
+				}
+				delegateEventWriter = createXmlEventWriter(outputFactory, bufferedWriter);
+				eventWriter = new NoStartEndDocumentStreamWriter(delegateEventWriter);
+				initNamespaceContext(delegateEventWriter);
+				if (!restarted) {
+					startDocument(delegateEventWriter);
+					if (forceSync) {
+						fileChannel.force(false);
+					}
+				}
+			}
+			catch (UnsupportedEncodingException e) {
+				throw new ItemStreamException(
+						"Unable to write to file resource: [" + resource + "] with encoding=[" + encoding + "]", e);
+			}
+			catch (XMLStreamException | IOException xse) {
+				throw new ItemStreamException("Unable to write to file resource: [" + resource + "]", xse);
+			}
+
+			initialized = true;
 		}
+
+		public XMLEventWriter getDelegateEventWriter() {
+			Assert.state(delegateEventWriter != null, "Delegate event writer has not been initialized");
+			return delegateEventWriter;
+		}
+
+		@SuppressWarnings("DataFlowIssue")
+		public Result createStaxResult() {
+			return StaxUtils.createStaxResult(eventWriter);
+		}
+
+		@SuppressWarnings("DataFlowIssue")
+		public void flush() {
+			try {
+				eventWriter.flush();
+				if (forceSync) {
+					channel.force(false);
+				}
+			}
+			catch (XMLStreamException | IOException e) {
+				throw new WriteFailedException("Failed to flush the events", e);
+			}
+		}
+
+		@SuppressWarnings("DataFlowIssue")
+		public long position() {
+			long position;
+
+			try {
+				eventWriter.flush();
+				position = channel.position();
+				if (bufferedWriter instanceof TransactionAwareBufferedWriter transactionAwareBufferedWriter) {
+					position += transactionAwareBufferedWriter.getBufferSize();
+				}
+			}
+			catch (Exception e) {
+				throw new ItemStreamException("Unable to write to file resource: [" + resource + "]", e);
+			}
+
+			return position;
+		}
+
+		@SuppressWarnings("DataFlowIssue")
+		public void close(@Nullable StaxWriterCallback footerCallback, List<QName> unclosedHeaderCallbackElements) {
+
+			XMLEventFactory factory = createXmlEventFactory();
+			try {
+				delegateEventWriter.add(factory.createCharacters(""));
+			}
+			catch (XMLStreamException e) {
+				log.error(e);
+			}
+
+			try {
+				if (footerCallback != null) {
+					XMLEventWriter footerCallbackWriter = delegateEventWriter;
+					if (restarted && !unclosedHeaderCallbackElements.isEmpty()) {
+						footerCallbackWriter = new UnopenedElementClosingEventWriter(delegateEventWriter,
+								bufferedWriter, unclosedHeaderCallbackElements);
+					}
+					footerCallback.write(footerCallbackWriter);
+				}
+				delegateEventWriter.flush();
+				endDocument();
+			}
+			catch (IOException e) {
+				throw new ItemStreamException("Failed to write footer items", e);
+			}
+			catch (XMLStreamException e) {
+				throw new ItemStreamException("Failed to write end document tag", e);
+			}
+			finally {
+
+				try {
+					delegateEventWriter.close();
+				}
+				catch (XMLStreamException e) {
+					log.error("Unable to close file resource: [" + resource + "] " + e);
+				}
+				finally {
+					try {
+						bufferedWriter.close();
+					}
+					catch (IOException e) {
+						log.error("Unable to close file resource: [" + resource + "] " + e);
+					}
+					finally {
+						if (!transactional) {
+							closeStream();
+						}
+					}
+				}
+			}
+
+			initialized = false;
+		}
+
+		@SuppressWarnings("DataFlowIssue")
+		private void closeStream() {
+			try {
+				channel.close();
+			}
+			catch (IOException ioe) {
+				log.error("Unable to close file resource: [" + resource + "] " + ioe);
+			}
+			finally {
+				try {
+					if (os != null) {
+						os.close();
+					}
+				}
+				catch (IOException ioe) {
+					log.error("Unable to close file resource: [" + resource + "] " + ioe);
+				}
+			}
+		}
+
+		/**
+		 * Writes the EndDocument tag manually.
+		 * @throws XMLStreamException thrown if error occurs.
+		 */
+		@SuppressWarnings("DataFlowIssue")
+		private void endDocument() throws XMLStreamException {
+
+			// writer.writeEndDocument(); <- this doesn't work after restart
+			// we need to write end tag of the root element manually
+
+			String nsPrefix = !StringUtils.hasText(getRootTagNamespacePrefix()) ? ""
+					: getRootTagNamespacePrefix() + ":";
+			try {
+				bufferedWriter.write("</" + nsPrefix + getRootTagName() + ">");
+			}
+			catch (IOException ioe) {
+				throw new XMLStreamException("Unable to close file resource: [" + resource + "]", ioe);
+			}
+		}
+
+		/**
+		 * Set the file channel position.
+		 * @param newPosition new file channel position
+		 */
+		@SuppressWarnings("DataFlowIssue")
+		private void setPosition(long newPosition) {
+			try {
+				channel.truncate(newPosition);
+				channel.position(newPosition);
+			}
+			catch (IOException e) {
+				throw new ItemStreamException("Unable to write to file resource: [" + resource + "]", e);
+			}
+		}
+
 	}
 
 }
