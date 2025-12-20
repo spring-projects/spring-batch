@@ -28,6 +28,7 @@ import org.bson.codecs.DecoderContext;
 import org.jspecify.annotations.Nullable;
 import org.springframework.batch.infrastructure.item.ItemReader;
 import org.springframework.batch.infrastructure.item.support.AbstractItemCountingItemStreamItemReader;
+import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -45,9 +46,11 @@ import org.springframework.util.StringUtils;
  * @author LEE Juchan
  * @author Mahmoud Ben Hassine
  * @author Jimmy Praet
+ * @author Andrey Litvitski
  * @since 5.1
  */
-public class MongoCursorItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> implements InitializingBean {
+public class MongoCursorItemReader<T> extends AbstractItemCountingItemStreamItemReader<T>
+		implements InitializingBean, BeanNameAware {
 
 	private MongoOperations template;
 
