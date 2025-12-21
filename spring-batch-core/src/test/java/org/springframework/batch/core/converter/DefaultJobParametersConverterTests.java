@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2024 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,10 @@
 package org.springframework.batch.core.converter;
 
 import java.time.LocalDate;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
@@ -259,6 +263,81 @@ class DefaultJobParametersConverterTests {
 	void testEmptyArgs() {
 		JobParameters props = factory.getJobParameters(new Properties());
 		assertTrue(props.parameters().isEmpty());
+	}
+
+	@Test
+	void testGetParametersWithZonedDateTime() {
+		String zonedDateTime = "schedule.zonedDateTime=2023-12-25T10:30:00+09:00[Asia/Seoul],java.time.ZonedDateTime,true";
+		String[] args = new String[] { zonedDateTime };
+
+		JobParameters parameters = factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
+		assertNotNull(parameters);
+		JobParameter<?> parameter = parameters.getParameter("schedule.zonedDateTime");
+		assertEquals(ZonedDateTime.class, parameter.type());
+		ZonedDateTime expected = ZonedDateTime.of(2023, 12, 25, 10, 30, 0, 0, ZoneId.of("Asia/Seoul"));
+		assertEquals(expected, parameter.value());
+	}
+
+	@Test
+	void testGetParametersWithOffsetDateTime() {
+		String offsetDateTime = "schedule.offsetDateTime=2023-12-25T10:30:00+09:00,java.time.OffsetDateTime,true";
+		String[] args = new String[] { offsetDateTime };
+
+		JobParameters parameters = factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
+		assertNotNull(parameters);
+		JobParameter<?> parameter = parameters.getParameter("schedule.offsetDateTime");
+		assertEquals(OffsetDateTime.class, parameter.type());
+		OffsetDateTime expected = OffsetDateTime.of(2023, 12, 25, 10, 30, 0, 0, ZoneOffset.of("+09:00"));
+		assertEquals(expected, parameter.value());
+	}
+
+	@Test
+	void testGetPropertiesWithZonedDateTime() {
+		ZonedDateTime zonedDateTime = ZonedDateTime.of(2023, 12, 25, 10, 30, 0, 0, ZoneId.of("Asia/Seoul"));
+		JobParameters parameters = new JobParametersBuilder()
+			.addJobParameter("schedule.zonedDateTime", zonedDateTime, ZonedDateTime.class, true)
+			.toJobParameters();
+
+		Properties props = factory.getProperties(parameters);
+		assertNotNull(props);
+		assertEquals("2023-12-25T10:30:00+09:00[Asia/Seoul],java.time.ZonedDateTime,true",
+				props.getProperty("schedule.zonedDateTime"));
+	}
+
+	@Test
+	void testGetPropertiesWithOffsetDateTime() {
+		OffsetDateTime offsetDateTime = OffsetDateTime.of(2023, 12, 25, 10, 30, 0, 0, ZoneOffset.of("+09:00"));
+		JobParameters parameters = new JobParametersBuilder()
+			.addJobParameter("schedule.offsetDateTime", offsetDateTime, OffsetDateTime.class, true)
+			.toJobParameters();
+
+		Properties props = factory.getProperties(parameters);
+		assertNotNull(props);
+		assertEquals("2023-12-25T10:30:00+09:00,java.time.OffsetDateTime,true",
+				props.getProperty("schedule.offsetDateTime"));
+	}
+
+	@Test
+	void testRoundTripWithZonedDateTime() {
+		String[] args = new String[] {
+				"schedule.zonedDateTime=2023-12-25T10:30:00+09:00[Asia/Seoul],java.time.ZonedDateTime" };
+
+		JobParameters parameters = factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
+		Properties props = factory.getProperties(parameters);
+		assertNotNull(props);
+		assertEquals("2023-12-25T10:30:00+09:00[Asia/Seoul],java.time.ZonedDateTime,true",
+				props.getProperty("schedule.zonedDateTime"));
+	}
+
+	@Test
+	void testRoundTripWithOffsetDateTime() {
+		String[] args = new String[] { "schedule.offsetDateTime=2023-12-25T10:30:00+09:00,java.time.OffsetDateTime" };
+
+		JobParameters parameters = factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
+		Properties props = factory.getProperties(parameters);
+		assertNotNull(props);
+		assertEquals("2023-12-25T10:30:00+09:00,java.time.OffsetDateTime,true",
+				props.getProperty("schedule.offsetDateTime"));
 	}
 
 }
