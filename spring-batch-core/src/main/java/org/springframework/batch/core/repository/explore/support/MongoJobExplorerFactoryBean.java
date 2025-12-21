@@ -38,6 +38,7 @@ import org.springframework.util.Assert;
  * "batch.version")</strong>
  *
  * @author Mahmoud Ben Hassine
+ * @author Myeongha Shin
  * @since 5.2.0
  * @deprecated since 6.0 in favor of {@link MongoJobRepositoryFactoryBean}. Scheduled for
  * removal in 6.2 or later.
@@ -47,28 +48,34 @@ public class MongoJobExplorerFactoryBean extends AbstractJobExplorerFactoryBean 
 
 	private MongoOperations mongoOperations;
 
+	private String collectionPrefix;
+
 	public void setMongoOperations(MongoOperations mongoOperations) {
 		this.mongoOperations = mongoOperations;
 	}
 
+	public void setCollectionPrefix(String collectionPrefix) {
+		this.collectionPrefix = collectionPrefix;
+	}
+
 	@Override
 	protected JobInstanceDao createJobInstanceDao() {
-		return new MongoJobInstanceDao(this.mongoOperations);
+		return new MongoJobInstanceDao(this.mongoOperations, this.collectionPrefix);
 	}
 
 	@Override
 	protected JobExecutionDao createJobExecutionDao() {
-		return new MongoJobExecutionDao(this.mongoOperations);
+		return new MongoJobExecutionDao(this.mongoOperations, this.collectionPrefix);
 	}
 
 	@Override
 	protected StepExecutionDao createStepExecutionDao() {
-		return new MongoStepExecutionDao(this.mongoOperations);
+		return new MongoStepExecutionDao(this.mongoOperations, this.collectionPrefix);
 	}
 
 	@Override
 	protected ExecutionContextDao createExecutionContextDao() {
-		return new MongoExecutionContextDao(this.mongoOperations);
+		return new MongoExecutionContextDao(this.mongoOperations, this.collectionPrefix);
 	}
 
 	@Override
