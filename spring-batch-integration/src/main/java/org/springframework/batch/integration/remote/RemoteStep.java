@@ -93,12 +93,8 @@ public class RemoteStep extends AbstractStep {
 	protected void doExecute(StepExecution stepExecution) throws Exception {
 		// create a step execution for the remote worker step
 		JobExecution jobExecution = stepExecution.getJobExecution();
-		StepExecution workerStepExecution = getJobRepository().createStepExecution(this.remoteStepName, jobExecution);
-
-		// pass the same context to the remote worker step
-		workerStepExecution.setExecutionContext(stepExecution.getExecutionContext());
-		getJobRepository().update(workerStepExecution);
-		getJobRepository().updateExecutionContext(workerStepExecution);
+		StepExecution workerStepExecution = getJobRepository().createStepExecution(this.remoteStepName, jobExecution,
+				stepExecution.getExecutionContext());
 
 		// send step execution request and wait for the remote step to finish
 		StepExecutionRequest stepExecutionRequest = new StepExecutionRequest(this.remoteStepName,
