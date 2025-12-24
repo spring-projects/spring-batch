@@ -279,11 +279,20 @@ public class ResourcelessJobRepository implements JobRepository {
 
 	@Override
 	public StepExecution createStepExecution(String stepName, JobExecution jobExecution) {
+		return createStepExecution(stepName, jobExecution, new ExecutionContext());
+	}
+
+	@Override
+	public StepExecution createStepExecution(String stepName, JobExecution jobExecution,
+			ExecutionContext stepExecutionContext) {
 		StepExecution stepExecution = new StepExecution(++stepExecutionIdIncrementer, stepName, jobExecution);
 		stepExecution.setStartTime(LocalDateTime.now());
 		stepExecution.setStatus(BatchStatus.STARTING);
 		stepExecution.setLastUpdated(LocalDateTime.now());
 		stepExecution.incrementVersion();
+		if (!stepExecutionContext.isEmpty()) {
+			stepExecution.setExecutionContext(new ExecutionContext(stepExecutionContext));
+		}
 		jobExecution.addStepExecution(stepExecution);
 		return stepExecution;
 	}

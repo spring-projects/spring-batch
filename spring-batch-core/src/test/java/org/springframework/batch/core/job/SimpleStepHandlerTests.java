@@ -16,12 +16,12 @@
 
 package org.springframework.batch.core.job;
 
-import org.springframework.batch.infrastructure.support.DatabaseType;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.parameters.JobParameters;
@@ -33,13 +33,17 @@ import org.springframework.batch.core.step.StepSupport;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.batch.infrastructure.repeat.RepeatStatus;
+import org.springframework.batch.infrastructure.support.DatabaseType;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 /**
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  *
  */
 class SimpleStepHandlerTests {
@@ -74,6 +78,38 @@ class SimpleStepHandlerTests {
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 	}
 
+	@Test
+	void testHandleRestartableStep() throws Exception {
+		ExecutionContext stepExecutionContext = new ExecutionContext(Map.of("foo", "bar"));
+		stepHandler = new SimpleStepHandler(jobRepository, stepExecutionContext);
+		RestartableStep restartableStep = new RestartableStep("step");
+
+		StepExecution stepExecution = stepHandler.handleStep(restartableStep, jobExecution);
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
+		assertEquals("bar", stepExecution.getExecutionContext().get("foo"));
+		assertEquals("true", stepExecution.getExecutionContext().get("failed"));
+		// check persisted step execution
+		stepExecution = jobRepository.getStepExecution(stepExecution.getId());
+		assertNotNull(stepExecution);
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
+		assertEquals("bar", stepExecution.getExecutionContext().get("foo"));
+		assertEquals("true", stepExecution.getExecutionContext().get("failed"));
+
+		// restart
+		jobExecution = jobRepository.createJobExecution(jobExecution.getJobInstance(), jobExecution.getJobParameters(),
+				new ExecutionContext());
+		stepExecution = stepHandler.handleStep(restartableStep, jobExecution);
+		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
+		assertEquals("foo", stepExecution.getExecutionContext().get("foo"));
+		assertFalse(stepExecution.getExecutionContext().containsKey("failed"));
+		// check persisted step execution
+		stepExecution = jobRepository.getStepExecution(stepExecution.getId());
+		assertNotNull(stepExecution);
+		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
+		assertEquals("foo", stepExecution.getExecutionContext().get("foo"));
+		assertFalse(stepExecution.getExecutionContext().containsKey("failed"));
+	}
+
 	// https://github.com/spring-projects/spring-batch/issues/5278
 	@Test
 	void testHandleStepWithNoNameAndNotDefinedAsABean() throws Exception {
@@ -97,6 +133,34 @@ class SimpleStepHandlerTests {
 		public void execute(StepExecution stepExecution) throws JobInterruptedException {
 			stepExecution.setStatus(BatchStatus.COMPLETED);
 			stepExecution.setExitStatus(ExitStatus.COMPLETED);
+			jobRepository.update(stepExecution);
+		}
+
+	}
+
+	private class RestartableStep extends StepSupport {
+
+		private final AtomicInteger counter = new AtomicInteger();
+
+		private RestartableStep(String name) {
+			super(name);
+		}
+
+		@Override
+		public void execute(StepExecution stepExecution) throws JobInterruptedException {
+			if (counter.incrementAndGet() < 2) {
+				stepExecution.setStatus(BatchStatus.FAILED);
+				stepExecution.setExitStatus(ExitStatus.FAILED);
+				stepExecution.getExecutionContext().put("failed", "true");
+				jobRepository.updateExecutionContext(stepExecution);
+			}
+			else {
+				stepExecution.setStatus(BatchStatus.COMPLETED);
+				stepExecution.setExitStatus(ExitStatus.COMPLETED);
+				stepExecution.getExecutionContext().put("foo", "foo");
+				stepExecution.getExecutionContext().remove("failed");
+				jobRepository.updateExecutionContext(stepExecution);
+			}
 			jobRepository.update(stepExecution);
 		}
 

@@ -127,10 +127,19 @@ public class SimpleJobRepository extends SimpleJobExplorer implements JobReposit
 	 * @since 6.0
 	 */
 	public StepExecution createStepExecution(String stepName, JobExecution jobExecution) {
-		Assert.notNull(jobExecution, "JobExecution must not be null.");
+		return this.createStepExecution(stepName, jobExecution, new ExecutionContext());
+	}
+
+	public StepExecution createStepExecution(String stepName, JobExecution jobExecution,
+			ExecutionContext stepExecutionContext) {
 		Assert.notNull(stepName, "Step name must not be null.");
+		Assert.notNull(jobExecution, "JobExecution must not be null.");
+		Assert.notNull(stepExecutionContext, "ExecutionContext must not be null.");
 
 		StepExecution stepExecution = stepExecutionDao.createStepExecution(stepName, jobExecution);
+		if (!stepExecutionContext.isEmpty()) {
+			stepExecution.setExecutionContext(new ExecutionContext(stepExecutionContext));
+		}
 		ecDao.saveExecutionContext(stepExecution);
 		jobExecution.addStepExecution(stepExecution);
 
