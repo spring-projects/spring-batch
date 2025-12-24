@@ -42,9 +42,7 @@ import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class SimpleStepExecutionSplitterTests {
 
@@ -108,6 +106,22 @@ class SimpleStepExecutionSplitterTests {
 		SimpleStepExecutionSplitter splitter = new SimpleStepExecutionSplitter(jobRepository, step.getName(),
 				gridSize -> map);
 		assertEquals(1, splitter.split(stepExecution, 2).size());
+	}
+
+	@Test
+	void testPersistStepExecutionContext() throws Exception {
+		final Map<String, ExecutionContext> map = Map.of("foo", new ExecutionContext(Map.of("foo", "bar")), "bar",
+				new ExecutionContext(Map.of("foo", "bar")));
+		SimpleStepExecutionSplitter splitter = new SimpleStepExecutionSplitter(jobRepository, step.getName(),
+				gridSize -> map);
+		Set<StepExecution> execs = splitter.split(stepExecution, 2);
+		assertEquals(2, execs.size());
+
+		for (StepExecution execution : execs) {
+			StepExecution persisted = jobRepository.getStepExecution(execution.getId());
+			assertNotNull(persisted);
+			assertTrue(persisted.getExecutionContext().containsKey("foo"));
+		}
 	}
 
 	@Test

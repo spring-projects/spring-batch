@@ -321,4 +321,24 @@ abstract class AbstractJobRepositoryIntegrationTests {
 		assertFalse(ctx.isDirty());
 	}
 
+	@Test
+	void createStepExecutionWithExecutionContext() {
+		// given
+		String jobName = "job";
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = jobRepository.createJobInstance(jobName, jobParameters);
+		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
+				new ExecutionContext());
+		ExecutionContext stepExecutionContext = new ExecutionContext();
+		stepExecutionContext.put("key", "value");
+		long stepExecutionId = jobRepository.createStepExecution("step", jobExecution, stepExecutionContext).getId();
+
+		// when
+		StepExecution stepExecution = jobRepository.getStepExecution(stepExecutionId);
+
+		// then
+		assertNotNull(stepExecution);
+		assertEquals("value", stepExecution.getExecutionContext().get("key"));
+	}
+
 }
