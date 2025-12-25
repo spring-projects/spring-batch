@@ -32,6 +32,7 @@ import org.springframework.batch.infrastructure.item.ExecutionContext;
  * Implementation of {@link StepHandler} that manages repository and restart concerns.
  *
  * @author Dave Syer
+ * @author Yanming Zhou
  *
  */
 @NullUnmarked
@@ -108,21 +109,24 @@ public class SimpleStepHandler implements StepHandler {
 
 		if (shouldStart(lastStepExecution, execution, step)) {
 
-			currentStepExecution = jobRepository.createStepExecution(step.getName(), execution);
+			ExecutionContext toBeSavedStepExecutionContext;
 
 			boolean isRestart = (lastStepExecution != null
 					&& !lastStepExecution.getStatus().equals(BatchStatus.COMPLETED));
 
 			if (isRestart) {
-				currentStepExecution.setExecutionContext(lastStepExecution.getExecutionContext());
+				toBeSavedStepExecutionContext = new ExecutionContext(lastStepExecution.getExecutionContext());
 
-				if (lastStepExecution.getExecutionContext().containsKey("batch.executed")) {
-					currentStepExecution.getExecutionContext().remove("batch.executed");
+				if (toBeSavedStepExecutionContext.containsKey("batch.executed")) {
+					toBeSavedStepExecutionContext.remove("batch.executed");
 				}
 			}
 			else {
-				currentStepExecution.setExecutionContext(new ExecutionContext(executionContext));
+				toBeSavedStepExecutionContext = new ExecutionContext(executionContext);
 			}
+
+			currentStepExecution = jobRepository.createStepExecution(step.getName(), execution,
+					toBeSavedStepExecutionContext);
 
 			if (logger.isInfoEnabled()) {
 				logger.info("Executing step: [" + step.getName() + "]");
