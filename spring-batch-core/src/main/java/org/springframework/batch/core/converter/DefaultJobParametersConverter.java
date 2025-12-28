@@ -24,7 +24,6 @@ import org.springframework.batch.core.job.parameters.JobParameter;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.core.convert.support.ConfigurableConversionService;
-import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -73,28 +72,11 @@ import org.springframework.util.StringUtils;
  * @author Dave Syer
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
- *
+ * @author Stefano Cordio
  */
 public class DefaultJobParametersConverter implements JobParametersConverter {
 
-	protected ConfigurableConversionService conversionService;
-
-	public DefaultJobParametersConverter() {
-		DefaultConversionService conversionService = new DefaultConversionService();
-		conversionService.addConverter(new DateToStringConverter());
-		conversionService.addConverter(new StringToDateConverter());
-		conversionService.addConverter(new LocalDateToStringConverter());
-		conversionService.addConverter(new StringToLocalDateConverter());
-		conversionService.addConverter(new LocalTimeToStringConverter());
-		conversionService.addConverter(new StringToLocalTimeConverter());
-		conversionService.addConverter(new LocalDateTimeToStringConverter());
-		conversionService.addConverter(new StringToLocalDateTimeConverter());
-		conversionService.addConverter(new ZonedDateTimeToStringConverter());
-		conversionService.addConverter(new StringToZonedDateTimeConverter());
-		conversionService.addConverter(new OffsetDateTimeToStringConverter());
-		conversionService.addConverter(new StringToOffsetDateTimeConverter());
-		this.conversionService = conversionService;
-	}
+	protected ConfigurableConversionService conversionService = ConversionServiceFactory.createConversionService();
 
 	/**
 	 * @see org.springframework.batch.core.converter.JobParametersConverter#getJobParameters(java.util.Properties)
@@ -184,8 +166,7 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 			return String.class;
 		}
 		try {
-			Class<?> type = Class.forName(tokens[1]);
-			return type;
+			return Class.forName(tokens[1]);
 		}
 		catch (ClassNotFoundException e) {
 			throw new JobParametersConversionException("Unable to parse job parameter " + encodedJobParameter, e);

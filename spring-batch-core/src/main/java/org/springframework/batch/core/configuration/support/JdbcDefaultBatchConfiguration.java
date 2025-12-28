@@ -16,14 +16,7 @@
 package org.springframework.batch.core.configuration.support;
 
 import org.springframework.batch.core.configuration.BatchConfigurationException;
-import org.springframework.batch.core.converter.DateToStringConverter;
-import org.springframework.batch.core.converter.LocalDateTimeToStringConverter;
-import org.springframework.batch.core.converter.LocalDateToStringConverter;
-import org.springframework.batch.core.converter.LocalTimeToStringConverter;
-import org.springframework.batch.core.converter.StringToDateConverter;
-import org.springframework.batch.core.converter.StringToLocalDateConverter;
-import org.springframework.batch.core.converter.StringToLocalDateTimeConverter;
-import org.springframework.batch.core.converter.StringToLocalTimeConverter;
+import org.springframework.batch.core.converter.ConversionServiceFactory;
 import org.springframework.batch.core.job.DefaultJobKeyGenerator;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.JobKeyGenerator;
@@ -42,7 +35,6 @@ import org.springframework.batch.infrastructure.support.DatabaseType;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.support.ConfigurableConversionService;
-import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.MetaDataAccessException;
@@ -242,21 +234,12 @@ public class JdbcDefaultBatchConfiguration extends DefaultBatchConfiguration {
 
 	/**
 	 * Return the conversion service to use in the job repository and job explorer. This
-	 * service is used to convert job parameters from String literal to typed values and
-	 * vice versa.
+	 * service is used to convert job parameters from {@code String} literal to typed
+	 * values and vice versa.
 	 * @return the {@link ConfigurableConversionService} to use.
 	 */
 	protected ConfigurableConversionService getConversionService() {
-		DefaultConversionService conversionService = new DefaultConversionService();
-		conversionService.addConverter(new DateToStringConverter());
-		conversionService.addConverter(new StringToDateConverter());
-		conversionService.addConverter(new LocalDateToStringConverter());
-		conversionService.addConverter(new StringToLocalDateConverter());
-		conversionService.addConverter(new LocalTimeToStringConverter());
-		conversionService.addConverter(new StringToLocalTimeConverter());
-		conversionService.addConverter(new LocalDateTimeToStringConverter());
-		conversionService.addConverter(new StringToLocalDateTimeConverter());
-		return conversionService;
+		return ConversionServiceFactory.createConversionService();
 	}
 
 	/**
