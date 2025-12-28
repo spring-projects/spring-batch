@@ -22,7 +22,11 @@ import java.time.format.DateTimeFormatter;
  *
  * @author Mahmoud Ben Hassine
  * @since 5.0.1
+ * @deprecated since 6.1 in favor of
+ * {@link ConversionServiceFactory#createConversionService()}. Scheduled for removal in
+ * 6.3 or later.
  */
+@Deprecated(since = "6.1", forRemoval = true)
 class AbstractDateTimeConverter {
 
 	protected DateTimeFormatter instantFormatter = DateTimeFormatter.ISO_INSTANT;

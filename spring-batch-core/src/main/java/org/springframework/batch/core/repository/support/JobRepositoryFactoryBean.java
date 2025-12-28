@@ -20,21 +20,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jspecify.annotations.NullUnmarked;
 
-import org.springframework.batch.core.converter.DateToStringConverter;
-import org.springframework.batch.core.converter.LocalDateTimeToStringConverter;
-import org.springframework.batch.core.converter.LocalDateToStringConverter;
-import org.springframework.batch.core.converter.LocalTimeToStringConverter;
-import org.springframework.batch.core.converter.StringToDateConverter;
-import org.springframework.batch.core.converter.StringToLocalDateConverter;
-import org.springframework.batch.core.converter.StringToLocalDateTimeConverter;
-import org.springframework.batch.core.converter.StringToLocalTimeConverter;
+import org.springframework.batch.core.converter.ConversionServiceFactory;
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
 import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDao;
 import org.springframework.batch.core.repository.dao.DefaultExecutionContextSerializer;
-import org.springframework.batch.core.repository.dao.ExecutionContextDao;
-import org.springframework.batch.core.repository.dao.JobExecutionDao;
-import org.springframework.batch.core.repository.dao.JobInstanceDao;
-import org.springframework.batch.core.repository.dao.StepExecutionDao;
 import org.springframework.batch.core.repository.dao.jdbc.JdbcExecutionContextDao;
 import org.springframework.batch.core.repository.dao.jdbc.JdbcJobExecutionDao;
 import org.springframework.batch.core.repository.dao.jdbc.JdbcJobInstanceDao;
@@ -46,7 +35,6 @@ import org.springframework.batch.infrastructure.support.DatabaseType;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.convert.support.ConfigurableConversionService;
-import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.Assert;
@@ -99,9 +87,9 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 
 	protected Charset charset = StandardCharsets.UTF_8;
 
-	protected ConfigurableConversionService conversionService;
+	protected ConfigurableConversionService conversionService = ConversionServiceFactory.createConversionService();
 
-	protected Object getTarget() throws Exception {
+	protected Object getTarget() {
 		JdbcJobInstanceDao jobInstanceDao = createJobInstanceDao();
 		JdbcJobExecutionDao jobExecutionDao = createJobExecutionDao();
 		jobExecutionDao.setJobInstanceDao(jobInstanceDao);
@@ -264,19 +252,6 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 
 		if (clobType != null) {
 			Assert.state(isValidTypes(clobType), "lobType must be a value from the java.sql.Types class");
-		}
-
-		if (this.conversionService == null) {
-			DefaultConversionService conversionService = new DefaultConversionService();
-			conversionService.addConverter(new DateToStringConverter());
-			conversionService.addConverter(new StringToDateConverter());
-			conversionService.addConverter(new LocalDateToStringConverter());
-			conversionService.addConverter(new StringToLocalDateConverter());
-			conversionService.addConverter(new LocalTimeToStringConverter());
-			conversionService.addConverter(new StringToLocalTimeConverter());
-			conversionService.addConverter(new LocalDateTimeToStringConverter());
-			conversionService.addConverter(new StringToLocalDateTimeConverter());
-			this.conversionService = conversionService;
 		}
 
 		super.afterPropertiesSet();
