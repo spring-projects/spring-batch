@@ -97,11 +97,6 @@ public class StagingItemWriter<T> extends JdbcDaoSupport implements StepExecutio
 	}
 
 	@Override
-	public @Nullable ExitStatus afterStep(StepExecution stepExecution) {
-		return null;
-	}
-
-	@Override
 	public void beforeStep(StepExecution stepExecution) {
 		this.stepExecution = stepExecution;
 	}
