@@ -133,11 +133,6 @@ public class StagingItemReader<T>
 	}
 
 	@Override
-	public @Nullable ExitStatus afterStep(StepExecution stepExecution) {
-		return null;
-	}
-
-	@Override
 	public void beforeStep(StepExecution stepExecution) {
 		this.stepExecution = stepExecution;
 		synchronized (lock) {
