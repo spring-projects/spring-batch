@@ -20,17 +20,9 @@ import java.sql.Types;
 
 import org.jspecify.annotations.Nullable;
 
-import org.springframework.batch.core.converter.DateToStringConverter;
-import org.springframework.batch.core.converter.LocalDateTimeToStringConverter;
-import org.springframework.batch.core.converter.LocalDateToStringConverter;
-import org.springframework.batch.core.converter.LocalTimeToStringConverter;
-import org.springframework.batch.core.converter.StringToDateConverter;
-import org.springframework.batch.core.converter.StringToLocalDateConverter;
-import org.springframework.batch.core.converter.StringToLocalDateTimeConverter;
-import org.springframework.batch.core.converter.StringToLocalTimeConverter;
+import org.springframework.batch.core.converter.ConversionServiceFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.convert.support.ConfigurableConversionService;
-import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -59,7 +51,7 @@ public abstract class AbstractJdbcBatchMetadataDao implements InitializingBean {
 
 	private @Nullable JdbcOperations jdbcTemplate;
 
-	private @Nullable ConfigurableConversionService conversionService;
+	private ConfigurableConversionService conversionService = ConversionServiceFactory.createConversionService();
 
 	protected String getQuery(String base) {
 		return StringUtils.replace(base, "%PREFIX%", tablePrefix);
@@ -103,25 +95,13 @@ public abstract class AbstractJdbcBatchMetadataDao implements InitializingBean {
 		this.conversionService = conversionService;
 	}
 
-	@Nullable public ConfigurableConversionService getConversionService() {
+	public ConfigurableConversionService getConversionService() {
 		return conversionService;
 	}
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(jdbcTemplate != null, "JdbcOperations is required");
-		if (this.conversionService == null) {
-			DefaultConversionService conversionService = new DefaultConversionService();
-			conversionService.addConverter(new DateToStringConverter());
-			conversionService.addConverter(new StringToDateConverter());
-			conversionService.addConverter(new LocalDateToStringConverter());
-			conversionService.addConverter(new StringToLocalDateConverter());
-			conversionService.addConverter(new LocalTimeToStringConverter());
-			conversionService.addConverter(new StringToLocalTimeConverter());
-			conversionService.addConverter(new LocalDateTimeToStringConverter());
-			conversionService.addConverter(new StringToLocalDateTimeConverter());
-			this.conversionService = conversionService;
-		}
 	}
 
 }
