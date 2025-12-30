@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2026 the original author or authors.
+ * Copyright 2009-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,8 @@ import org.springframework.batch.core.job.StepHandler;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.util.Assert;
+
+import static org.springframework.batch.core.BatchConstants.BATCH_STEP_TYPE;
 
 /**
  * A {@link Step} implementation that delegates to a {@link Flow}. Useful for logical
@@ -87,7 +89,7 @@ public class FlowStep extends AbstractStep {
 	@Override
 	protected void doExecute(StepExecution stepExecution) throws Exception {
 		try {
-			stepExecution.getExecutionContext().put(STEP_TYPE_KEY, this.getClass().getName());
+			stepExecution.getExecutionContext().put(BATCH_STEP_TYPE, this.getClass().getName());
 			StepHandler stepHandler = new SimpleStepHandler(getJobRepository(), stepExecution.getExecutionContext());
 			JobFlowExecutor executor = new JobFlowExecutor(getJobRepository(), stepHandler,
 					stepExecution.getJobExecution());

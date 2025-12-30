@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2025 the original author or authors.
+ * Copyright 2022-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,6 +42,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.batch.core.BatchConstants.BATCH_VERSION;
 
 /**
  * Test class for {@link SpringBatchVersion}.
@@ -68,12 +69,8 @@ public class SpringBatchVersionTests {
 		// then
 		assertNotNull(jobExecution);
 		assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
-		assertTrue(jobExecution.getExecutionContext().containsKey(SpringBatchVersion.BATCH_VERSION_KEY));
-		assertTrue(jobExecution.getStepExecutions()
-			.iterator()
-			.next()
-			.getExecutionContext()
-			.containsKey(SpringBatchVersion.BATCH_VERSION_KEY));
+		assertTrue(jobExecution.getExecutionContext().containsKey(BATCH_VERSION));
+		assertTrue(jobExecution.getStepExecutions().iterator().next().getExecutionContext().containsKey(BATCH_VERSION));
 	}
 
 	@Configuration
