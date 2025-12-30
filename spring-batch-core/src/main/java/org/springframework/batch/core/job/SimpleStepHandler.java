@@ -28,6 +28,8 @@ import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
 
+import static org.springframework.batch.core.BatchConstants.BATCH_EXECUTED;
+
 /**
  * Implementation of {@link StepHandler} that manages repository and restart concerns.
  *
@@ -116,8 +118,8 @@ public class SimpleStepHandler implements StepHandler {
 			if (isRestart) {
 				currentStepExecution.setExecutionContext(lastStepExecution.getExecutionContext());
 
-				if (lastStepExecution.getExecutionContext().containsKey("batch.executed")) {
-					currentStepExecution.getExecutionContext().remove("batch.executed");
+				if (lastStepExecution.getExecutionContext().containsKey(BATCH_EXECUTED)) {
+					currentStepExecution.getExecutionContext().remove(BATCH_EXECUTED);
 				}
 			}
 			else {
@@ -129,7 +131,7 @@ public class SimpleStepHandler implements StepHandler {
 			}
 			try {
 				step.execute(currentStepExecution);
-				currentStepExecution.getExecutionContext().put("batch.executed", true);
+				currentStepExecution.getExecutionContext().put(BATCH_EXECUTED, true);
 			}
 			catch (JobInterruptedException e) {
 				// Ensure that the job gets the message that it is stopping

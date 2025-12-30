@@ -15,8 +15,6 @@
  */
 package org.springframework.batch.core;
 
-import org.jspecify.annotations.Nullable;
-
 /**
  * Class that exposes the Spring Batch version. Fetches the "Implementation-Version"
  * manifest attribute from the jar file.
@@ -32,8 +30,10 @@ public final class SpringBatchVersion {
 
 	/**
 	 * The key to use in the execution context for batch version.
+	 * @deprecated deprecated in favor of {@link BatchConstants#BATCH_VERSION}
 	 */
-	public static final String BATCH_VERSION_KEY = "batch.version";
+	@Deprecated(forRemoval = true)
+	public static final String BATCH_VERSION_KEY = BatchConstants.BATCH_VERSION;
 
 	private SpringBatchVersion() {
 	}
@@ -43,7 +43,7 @@ public final class SpringBatchVersion {
 	 * {@code "N/A"} if it cannot be determined.
 	 * @see Package#getImplementationVersion()
 	 */
-	public static @Nullable String getVersion() {
+	public static String getVersion() {
 		Package pkg = SpringBatchVersion.class.getPackage();
 		if (pkg != null && pkg.getImplementationVersion() != null) {
 			return pkg.getImplementationVersion();
