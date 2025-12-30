@@ -17,6 +17,7 @@ package org.springframework.batch.core.step;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.springframework.batch.core.ExitStatus;
 
@@ -36,7 +37,7 @@ public class StepContribution implements Serializable {
 
 	private long writeCount = 0;
 
-	private long filterCount = 0;
+	private final AtomicLong filterCount = new AtomicLong(0);
 
 	private final long parentSkipCount;
 
@@ -44,7 +45,7 @@ public class StepContribution implements Serializable {
 
 	private long writeSkipCount;
 
-	private long processSkipCount;
+	private final AtomicLong processSkipCount = new AtomicLong(0);
 
 	private ExitStatus exitStatus = ExitStatus.EXECUTING;
 
@@ -86,7 +87,7 @@ public class StepContribution implements Serializable {
 	 * @param count The {@code long} amount to increment by.
 	 */
 	public void incrementFilterCount(long count) {
-		filterCount += count;
+		filterCount.addAndGet(count);
 	}
 
 	/**
@@ -125,7 +126,7 @@ public class StepContribution implements Serializable {
 	 * @return the filter counter.
 	 */
 	public long getFilterCount() {
-		return filterCount;
+		return filterCount.get();
 	}
 
 	/**
@@ -133,7 +134,7 @@ public class StepContribution implements Serializable {
 	 * <code>StepContribution</code>.
 	 */
 	public long getStepSkipCount() {
-		return readSkipCount + writeSkipCount + processSkipCount + parentSkipCount;
+		return readSkipCount + writeSkipCount + processSkipCount.get() + parentSkipCount;
 	}
 
 	/**
@@ -141,7 +142,7 @@ public class StepContribution implements Serializable {
 	 * including skips accumulated in the parent {@link StepExecution}).
 	 */
 	public long getSkipCount() {
-		return readSkipCount + writeSkipCount + processSkipCount;
+		return readSkipCount + writeSkipCount + processSkipCount.get();
 	}
 
 	/**
@@ -179,11 +180,11 @@ public class StepContribution implements Serializable {
 	 *
 	 */
 	public void incrementProcessSkipCount() {
-		processSkipCount++;
+		processSkipCount.incrementAndGet();
 	}
 
 	public void incrementProcessSkipCount(long count) {
-		processSkipCount += count;
+		processSkipCount.addAndGet(count);
 	}
 
 	/**
@@ -207,7 +208,7 @@ public class StepContribution implements Serializable {
 	 * @return the process skip count.
 	 */
 	public long getProcessSkipCount() {
-		return processSkipCount;
+		return processSkipCount.get();
 	}
 
 	/**
@@ -220,25 +221,26 @@ public class StepContribution implements Serializable {
 
 	@Override
 	public String toString() {
-		return "[StepContribution: read=" + readCount + ", written=" + writeCount + ", filtered=" + filterCount
+		return "[StepContribution: read=" + readCount + ", written=" + writeCount + ", filtered=" + filterCount.get()
 				+ ", readSkips=" + readSkipCount + ", writeSkips=" + writeSkipCount + ", processSkips="
-				+ processSkipCount + ", exitStatus=" + exitStatus.getExitCode() + "]";
+				+ processSkipCount.get() + ", exitStatus=" + exitStatus.getExitCode() + "]";
 	}
 
 	@Override
 	public boolean equals(Object o) {
 		if (!(o instanceof StepContribution that))
 			return false;
-		return readCount == that.readCount && writeCount == that.writeCount && filterCount == that.filterCount
-				&& parentSkipCount == that.parentSkipCount && readSkipCount == that.readSkipCount
-				&& writeSkipCount == that.writeSkipCount && processSkipCount == that.processSkipCount
+		return readCount == that.readCount && writeCount == that.writeCount
+				&& filterCount.get() == that.filterCount.get() && parentSkipCount == that.parentSkipCount
+				&& readSkipCount == that.readSkipCount && writeSkipCount == that.writeSkipCount
+				&& processSkipCount.get() == that.processSkipCount.get()
 				&& Objects.equals(stepExecution, that.stepExecution) && Objects.equals(exitStatus, that.exitStatus);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(stepExecution, readCount, writeCount, filterCount, parentSkipCount, readSkipCount,
-				writeSkipCount, processSkipCount, exitStatus);
+		return Objects.hash(stepExecution, readCount, writeCount, filterCount.get(), parentSkipCount, readSkipCount,
+				writeSkipCount, processSkipCount.get(), exitStatus);
 	}
 
 }
