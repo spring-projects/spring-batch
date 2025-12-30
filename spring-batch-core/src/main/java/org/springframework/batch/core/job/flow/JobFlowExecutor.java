@@ -18,6 +18,7 @@ package org.springframework.batch.core.job.flow;
 
 import org.jspecify.annotations.Nullable;
 
+import org.springframework.batch.core.BatchConstants;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.JobExecution;
@@ -79,7 +80,7 @@ public class JobFlowExecutor implements FlowExecutor {
 		}
 
 		if (isRerun) {
-			stepExecution.getExecutionContext().put("batch.restart", true);
+			stepExecution.getExecutionContext().put(BatchConstants.BATCH_RESTART, true);
 		}
 
 		return stepExecution.getExitStatus().getExitCode();
