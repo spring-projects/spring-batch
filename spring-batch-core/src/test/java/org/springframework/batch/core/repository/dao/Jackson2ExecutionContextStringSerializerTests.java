@@ -31,19 +31,20 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.junit.jupiter.api.Test;
 
+import org.springframework.batch.core.job.parameters.JobParameter;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Marten Deinum
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  */
+@SuppressWarnings("removal")
 class Jackson2ExecutionContextStringSerializerTests extends AbstractExecutionContextSerializerTests {
 
 	private final ExecutionContextSerializer serializer = new Jackson2ExecutionContextStringSerializer(
@@ -174,6 +175,7 @@ class Jackson2ExecutionContextStringSerializerTests extends AbstractExecutionCon
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
 	void arrayAsListSerializationTest() throws IOException {
 		// given
 		List<String> list = Arrays.asList("foo", "bar");
@@ -230,6 +232,36 @@ class Jackson2ExecutionContextStringSerializerTests extends AbstractExecutionCon
 		// then
 		LocalDate deserializedNow = (LocalDate) deserializedContext.get("now");
 		assertEquals(now, deserializedNow);
+	}
+
+	@Test
+	void testJobParametersSerialization() throws IOException {
+		// given
+		Jackson2ExecutionContextStringSerializer serializer = new Jackson2ExecutionContextStringSerializer();
+		LocalDate now = LocalDate.now();
+		JobParameters jobParameters = new JobParametersBuilder()
+			.addJobParameter("date", LocalDate.now(), LocalDate.class)
+			.addJobParameter("foo", "bar", String.class, false)
+			.toJobParameters();
+		Map<String, Object> map = new HashMap<>();
+		map.put("jobParameters", jobParameters);
+
+		// when
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		serializer.serialize(map, outputStream);
+		InputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
+		Map<String, Object> deserializedContext = serializer.deserialize(inputStream);
+
+		// then
+		JobParameters deserializedJobParameters = (JobParameters) deserializedContext.get("jobParameters");
+		JobParameter<?> dateJobParameter = deserializedJobParameters.getParameter("date");
+		assertNotNull(dateJobParameter);
+		assertEquals(now, dateJobParameter.value());
+		assertTrue(dateJobParameter.identifying());
+		JobParameter<?> fooJobParameter = deserializedJobParameters.getParameter("foo");
+		assertNotNull(fooJobParameter);
+		assertEquals("bar", fooJobParameter.value());
+		assertFalse(fooJobParameter.identifying());
 	}
 
 }
