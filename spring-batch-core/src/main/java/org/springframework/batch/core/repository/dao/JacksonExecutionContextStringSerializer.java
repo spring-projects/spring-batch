@@ -21,6 +21,9 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.batch.core.job.parameters.JobParameter;
+import org.springframework.batch.core.job.parameters.JobParameters;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
@@ -36,6 +39,7 @@ import org.springframework.batch.core.repository.ExecutionContextSerializer;
  * provide your own {@link JsonMapper} instance through the constructor.
  *
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  * @since 6.0.0
  */
 public class JacksonExecutionContextStringSerializer implements ExecutionContextSerializer {
@@ -58,7 +62,10 @@ public class JacksonExecutionContextStringSerializer implements ExecutionContext
 			.allowIfSubType("java.xml.")
 			.allowIfSubType("org.springframework.batch.")
 			.build();
-		this.jsonMapper = JsonMapper.builder().activateDefaultTyping(polymorphicTypeValidator).build();
+		this.jsonMapper = JsonMapper.builder()
+			.activateDefaultTyping(polymorphicTypeValidator)
+			.addMixIns(Map.of(JobParameters.class, JobParametersMixIn.class))
+			.build();
 	}
 
 	/**
@@ -80,6 +87,17 @@ public class JacksonExecutionContextStringSerializer implements ExecutionContext
 	@Override
 	public void serialize(Map<String, Object> object, OutputStream outputStream) throws IOException {
 		this.jsonMapper.writeValue(outputStream, object);
+	}
+
+	@SuppressWarnings("unused")
+	private abstract static class JobParametersMixIn {
+
+		@JsonIgnore
+		abstract boolean isEmpty();
+
+		@JsonIgnore
+		abstract Map<String, JobParameter<?>> getIdentifyingParameters();
+
 	}
 
 }
