@@ -337,7 +337,8 @@ public class ChunkOrientedStepTests {
 		// when: execute step (writer causes chunk rollback)
 		step.execute(stepExecution);
 
-		// then: due to current bug the stream update count becomes 1 although chunk rolled back
+		// then: due to current bug the stream update count becomes 1 although chunk
+		// rolled back
 		assertEquals(0, trackingItemStream.getUpdateCount(),
 				"ItemStream should not be updated when chunk transaction fails (bug reproduction)");
 	}
@@ -362,6 +363,7 @@ public class ChunkOrientedStepTests {
 		int getUpdateCount() {
 			return this.updateCount;
 		}
+
 	}
 
 }
