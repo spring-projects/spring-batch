@@ -24,7 +24,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jspecify.annotations.Nullable;
 
-import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.JobInterruptedException;
 import org.springframework.batch.core.listener.ChunkListener;
 import org.springframework.batch.core.listener.CompositeChunkListener;
@@ -89,6 +88,7 @@ import static org.springframework.batch.core.observability.BatchMetrics.METRICS_
  * @param <O> type of output items
  * @author Mahmoud Ben Hassine
  * @author Andrey Litvitski
+ * @author xeounxzxu
  * @since 6.0
  */
 public class ChunkOrientedStep<I, O> extends AbstractStep {
@@ -377,6 +377,8 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			});
 
 			getJobRepository().update(stepExecution);
+			this.compositeItemStream.update(stepExecution.getExecutionContext());
+			getJobRepository().updateExecutionContext(stepExecution);
 		}
 	}
 
@@ -427,10 +429,8 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			throw new FatalStepExecutionException("Unable to process chunk", e);
 		}
 		finally {
-			// apply contribution and update streams
+			// apply contribution
 			stepExecution.apply(contribution);
-			this.compositeItemStream.update(stepExecution.getExecutionContext());
-			getJobRepository().updateExecutionContext(stepExecution);
 		}
 
 	}
@@ -458,10 +458,8 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			throw new FatalStepExecutionException("Unable to process chunk", e);
 		}
 		finally {
-			// apply contribution and update streams
+			// apply contribution
 			stepExecution.apply(contribution);
-			compositeItemStream.update(stepExecution.getExecutionContext());
-			getJobRepository().updateExecutionContext(stepExecution);
 		}
 	}
 
