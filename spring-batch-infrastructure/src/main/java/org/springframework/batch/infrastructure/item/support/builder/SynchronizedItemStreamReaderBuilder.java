@@ -31,6 +31,8 @@ public class SynchronizedItemStreamReaderBuilder<T> {
 
 	private @Nullable ItemStreamReader<T> delegate;
 
+	private boolean synchronizeUpdateMethod = false;
+
 	/**
 	 * The item stream reader to use as a delegate. Items are read from the delegate and
 	 * passed to the caller in {@link SynchronizedItemStreamReader#read()}.
@@ -45,13 +47,29 @@ public class SynchronizedItemStreamReaderBuilder<T> {
 	}
 
 	/**
+	 * Synchronize the update method of the ItemStreamReader, when using parallel
+	 * execution and if the delegate reader is not thread-safe with respect to the update
+	 * method. I.e. JpaCursorItemReader.
+	 * @param synchronizeUpdateMethod whether the update method should be synchronized or
+	 * not
+	 * @return this instance for method chaining
+	 */
+	public SynchronizedItemStreamReaderBuilder<T> synchronizeUpdateMethod(final boolean synchronizeUpdateMethod) {
+		this.synchronizeUpdateMethod = synchronizeUpdateMethod;
+
+		return this;
+	}
+
+	/**
 	 * Returns a fully constructed {@link SynchronizedItemStreamReader}.
 	 * @return a new {@link SynchronizedItemStreamReader}
 	 */
 	public SynchronizedItemStreamReader<T> build() {
 		Assert.notNull(this.delegate, "A delegate is required");
 
-		return new SynchronizedItemStreamReader<>(this.delegate);
+		final SynchronizedItemStreamReader<T> reader = new SynchronizedItemStreamReader<>(this.delegate);
+		reader.setSynchronizeUpdate(this.synchronizeUpdateMethod);
+		return reader;
 	}
 
 }
