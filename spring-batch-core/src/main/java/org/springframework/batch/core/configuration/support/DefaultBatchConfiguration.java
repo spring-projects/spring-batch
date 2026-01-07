@@ -31,6 +31,7 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.ResourcelessJobRepository;
 import org.springframework.batch.infrastructure.support.transaction.ResourcelessTransactionManager;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
@@ -74,6 +75,7 @@ import org.springframework.transaction.PlatformTransactionManager;
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
  * @author Taeik Lim
+ * @author Yanming Zhou
  * @since 5.0
  */
 @Configuration(proxyBeanMethods = false)
@@ -94,10 +96,11 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 	}
 
 	@Bean
-	public JobOperator jobOperator(JobRepository jobRepository) throws BatchConfigurationException {
+	public JobOperator jobOperator(JobRepository jobRepository, ObjectProvider<JobRegistry> jobRegistry)
+			throws BatchConfigurationException {
 		JobOperatorFactoryBean jobOperatorFactoryBean = new JobOperatorFactoryBean();
 		jobOperatorFactoryBean.setJobRepository(jobRepository);
-		jobOperatorFactoryBean.setJobRegistry(getJobRegistry());
+		jobOperatorFactoryBean.setJobRegistry(jobRegistry.getIfAvailable(this::getJobRegistry));
 		jobOperatorFactoryBean.setTransactionManager(getTransactionManager());
 		jobOperatorFactoryBean.setObservationRegistry(getObservationRegistry());
 		jobOperatorFactoryBean.setJobParametersConverter(getJobParametersConverter());
