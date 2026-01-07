@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2025 the original author or authors.
+ * Copyright 2012-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,6 +74,7 @@ import org.springframework.transaction.PlatformTransactionManager;
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
  * @author Taeik Lim
+ * @author Yanming Zhou
  * @since 5.0
  */
 @Configuration(proxyBeanMethods = false)
@@ -113,16 +114,18 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 
 	// FIXME getter with side effect, see JobOperatorFactoryBean.populateJobRegistry
 	protected JobRegistry getJobRegistry() {
-		MapJobRegistry jobRegistry = new MapJobRegistry();
-		this.applicationContext.getBeansOfType(Job.class).values().forEach(job -> {
-			try {
-				jobRegistry.register(job);
-			}
-			catch (DuplicateJobException e) {
-				throw new BatchConfigurationException(e);
-			}
+		return this.applicationContext.getBeanProvider(JobRegistry.class).getIfAvailable(() -> {
+			MapJobRegistry jobRegistry = new MapJobRegistry();
+			this.applicationContext.getBeansOfType(Job.class).values().forEach(job -> {
+				try {
+					jobRegistry.register(job);
+				}
+				catch (DuplicateJobException e) {
+					throw new BatchConfigurationException(e);
+				}
+			});
+			return jobRegistry;
 		});
-		return jobRegistry;
 	}
 
 	/**
