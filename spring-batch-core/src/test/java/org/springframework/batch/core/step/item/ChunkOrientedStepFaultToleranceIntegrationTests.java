@@ -347,16 +347,16 @@ public class ChunkOrientedStepFaultToleranceIntegrationTests {
 	static class FaultTolerantChunkOrientedStepConfiguration {
 
 		@Bean
-		public Step faulTolerantChunkOrientedStep(JobRepository jobRepository,
+		public Step faultTolerantChunkOrientedStep(JobRepository jobRepository,
 				JdbcTransactionManager transactionManager, ItemReader<Person> itemReader,
 				ItemProcessor<Person, Person> itemProcessor, ItemWriter<Person> itemWriter) {
 			// retry policy configuration
 			int retryLimit = 3;
-			Set<Class<? extends Throwable>> nonRetrybaleExceptions = Set.of(FlatFileParseException.class,
+			Set<Class<? extends Throwable>> nonRetryableExceptions = Set.of(FlatFileParseException.class,
 					DataIntegrityViolationException.class);
 			RetryPolicy retryPolicy = RetryPolicy.builder()
 				.maxRetries(retryLimit)
-				.excludes(nonRetrybaleExceptions)
+				.excludes(nonRetryableExceptions)
 				.build();
 
 			// skip policy configuration

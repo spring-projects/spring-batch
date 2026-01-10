@@ -116,14 +116,14 @@ Here is a quick example of how to use the retry and skip features with the new `
 [source, java]
 ----
 @Bean
-public Step faulTolerantChunkOrientedStep(JobRepository jobRepository, ItemReader<Person> itemReader, ItemWriter<Person> itemWriter) {
+public Step faultTolerantChunkOrientedStep(JobRepository jobRepository, ItemReader<Person> itemReader, ItemWriter<Person> itemWriter) {
 
     // retry policy configuration
     int maxRetries = 10;
-    var retrybaleExceptions = Set.of(TransientException.class);
+    var retryableExceptions = Set.of(TransientException.class);
     RetryPolicy retryPolicy = RetryPolicy.builder()
         .maxRetries(maxRetries)
-        .includes(retrybaleExceptions)
+        .includes(retryableExceptions)
         .build();
 
     // skip policy configuration
