@@ -16,6 +16,7 @@
 package org.springframework.batch.test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.List;
@@ -104,6 +105,20 @@ class MetaDataInstanceFactoryTests {
 	@Test
 	void testCreateJobExecutionWithStepExecutions() {
 		assertNotNull(MetaDataInstanceFactory.createJobExecutionWithStepExecutions(executionId, List.of(stepName)));
+	}
+
+	@Test
+	void testCreateStepExecutionWithJobParametersShouldGenerateUniqueIds() {
+		JobParameters params1 = new JobParametersBuilder().addString("key", "value1").toJobParameters();
+		JobParameters params2 = new JobParametersBuilder().addString("key", "value2").toJobParameters();
+
+		StepExecution step1 = MetaDataInstanceFactory.createStepExecution(params1);
+		StepExecution step2 = MetaDataInstanceFactory.createStepExecution(params2);
+
+		assertNotEquals(step1.getId(), step2.getId());
+		assertNotEquals(step1.getJobExecutionId(), step2.getJobExecutionId());
+
+		assertNotEquals(step1, step2);
 	}
 
 }

@@ -16,6 +16,7 @@
 package org.springframework.batch.test;
 
 import java.util.Collection;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
@@ -57,6 +58,16 @@ public class MetaDataInstanceFactory {
 	 * The default id for a step execution (1234L)
 	 */
 	public static final long DEFAULT_STEP_EXECUTION_ID = 1234L;
+
+	/**
+	 * Atomic counter for generating unique job execution IDs in tests
+	 */
+	private static final AtomicLong jobExecutionIdCounter = new AtomicLong(DEFAULT_JOB_EXECUTION_ID);
+
+	/**
+	 * Atomic counter for generating unique step execution IDs in tests
+	 */
+	private static final AtomicLong stepExecutionIdCounter = new AtomicLong(DEFAULT_STEP_EXECUTION_ID);
 
 	/**
 	 * Create a {@link JobInstance} with the parameters provided.
@@ -114,7 +125,7 @@ public class MetaDataInstanceFactory {
 	 * @return a {@link JobExecution}
 	 */
 	public static JobExecution createJobExecution(String jobName, Long instanceId, Long executionId,
-			JobParameters jobParameters) {
+		  JobParameters jobParameters) {
 		return new JobExecution(executionId, createJobInstance(jobName, instanceId), jobParameters);
 	}
 
@@ -170,6 +181,8 @@ public class MetaDataInstanceFactory {
 	/**
 	 * Create a {@link StepExecution} and all its parent entities with default values, but
 	 * using the {@link ExecutionContext} and {@link JobParameters} provided.
+	 * Each invocation generates unique IDs to avoid collision in
+	 * {@link org.springframework.batch.core.scope.context.StepSynchronizationManager}.
 	 * @param jobParameters come {@link JobParameters}
 	 * @param executionContext some {@link ExecutionContext}
 	 * @return a {@link StepExecution} with the execution context provided
@@ -183,13 +196,17 @@ public class MetaDataInstanceFactory {
 	/**
 	 * Create a {@link StepExecution} and all its parent entities with default values, but
 	 * using the {@link JobParameters} provided.
+	 * Each invocation generates unique IDs to avoid collision in
+	 * {@link org.springframework.batch.core.scope.context.StepSynchronizationManager}.
 	 * @param jobParameters some {@link JobParameters}
 	 * @return a {@link StepExecution} with the job parameters provided
 	 */
 	public static StepExecution createStepExecution(JobParameters jobParameters) {
-		JobExecution jobExecution = createJobExecution(DEFAULT_JOB_NAME, DEFAULT_JOB_INSTANCE_ID,
-				DEFAULT_JOB_EXECUTION_ID, jobParameters);
-		StepExecution stepExecution = createStepExecution(jobExecution, DEFAULT_STEP_NAME, DEFAULT_STEP_EXECUTION_ID);
+		Long jobExecutionId = jobExecutionIdCounter.incrementAndGet();
+		Long stepExecutionId = stepExecutionIdCounter.incrementAndGet();
+		JobExecution jobExecution = createJobExecution(DEFAULT_JOB_NAME, DEFAULT_JOB_INSTANCE_ID, jobExecutionId,
+				jobParameters);
+		StepExecution stepExecution = createStepExecution(jobExecution, DEFAULT_STEP_NAME, stepExecutionId);
 		jobExecution.addStepExecution(stepExecution);
 		return stepExecution;
 	}
