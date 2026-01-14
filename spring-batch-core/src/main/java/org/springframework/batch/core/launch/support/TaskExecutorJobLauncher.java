@@ -253,9 +253,6 @@ public class TaskExecutorJobLauncher implements JobLauncher, InitializingBean {
 			if (jobExecution.getExitStatus().equals(ExitStatus.UNKNOWN)) {
 				jobExecution.setExitStatus(ExitStatus.FAILED.addExitDescription(e));
 			}
-
-		}
-		finally {
 			this.jobRepository.update(jobExecution);
 		}
 	}
