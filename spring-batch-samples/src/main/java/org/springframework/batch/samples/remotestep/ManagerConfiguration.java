@@ -58,11 +58,10 @@ public class ManagerConfiguration {
 	}
 
 	@Bean
-	public IntegrationFlow outboundFlow(ActiveMQConnectionFactory connectionFactory, BeanFactory beanFactory) {
-		StandardIntegrationFlow integrationFlow = IntegrationFlow.from(requests())
+	public IntegrationFlow outboundFlow(ActiveMQConnectionFactory connectionFactory) {
+		return IntegrationFlow.from(requests())
 			.handle(Jms.outboundAdapter(connectionFactory).destination("requests"))
 			.get();
-		return integrationFlow;
 	}
 
 	@Bean
