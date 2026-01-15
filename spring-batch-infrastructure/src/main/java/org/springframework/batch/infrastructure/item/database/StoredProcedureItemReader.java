@@ -232,10 +232,9 @@ public class StoredProcedureItemReader<T> extends AbstractCursorItemReader<T> {
 	}
 
 	/**
-	 * Releases JDBC resources associated with this reader.
-	 * Closes the PreparedStatement used for the cursor.
-	 * The Connection is not closed here; it is managed by the parent class.
-	 *
+	 * Releases JDBC resources associated with this reader. Closes the PreparedStatement
+	 * used for the cursor. The Connection is not closed here; it is managed by the parent
+	 * class.
 	 * @param connection the active database connection used for the cursor
 	 */
 	@Override
