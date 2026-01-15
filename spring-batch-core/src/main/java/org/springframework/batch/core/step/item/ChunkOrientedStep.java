@@ -371,14 +371,13 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 				chunkTransactionEvent.begin();
 				StepContribution contribution = stepExecution.createStepContribution();
 				processNextChunk(transactionStatus, contribution, stepExecution);
+				this.compositeItemStream.update(stepExecution.getExecutionContext());
+				getJobRepository().updateExecutionContext(stepExecution);
+				getJobRepository().update(stepExecution);
 				chunkTransactionEvent.transactionStatus = transactionStatus.isRollbackOnly()
 						? BatchMetrics.STATUS_ROLLED_BACK : BatchMetrics.STATUS_COMMITTED;
 				chunkTransactionEvent.commit();
 			});
-
-			this.compositeItemStream.update(stepExecution.getExecutionContext());
-			getJobRepository().updateExecutionContext(stepExecution);
-			getJobRepository().update(stepExecution);
 		}
 	}
 
