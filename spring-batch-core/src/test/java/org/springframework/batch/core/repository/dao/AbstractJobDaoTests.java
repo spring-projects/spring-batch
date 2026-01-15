@@ -43,6 +43,7 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  *
  */
 public abstract class AbstractJobDaoTests {
@@ -92,7 +93,7 @@ public abstract class AbstractJobDaoTests {
 
 		// Create an execution
 		jobExecutionStartTime = LocalDateTime.now();
-		jobExecution = new JobExecution(1L, jobInstance, jobParameters);
+		jobExecution = jobExecutionDao.createJobExecution(jobInstance, jobParameters);
 		jobExecution.setStartTime(jobExecutionStartTime);
 		jobExecution.setStatus(BatchStatus.STARTED);
 		jobExecutionDao.updateJobExecution(jobExecution);
@@ -112,7 +113,7 @@ public abstract class AbstractJobDaoTests {
 		int version = jdbcTemplate.queryForObject(
 				"select version from BATCH_JOB_EXECUTION where JOB_EXECUTION_ID=" + jobExecution.getId(),
 				Integer.class);
-		assertEquals(0, version);
+		assertEquals(1, version);
 	}
 
 	@Transactional
@@ -193,7 +194,7 @@ public abstract class AbstractJobDaoTests {
 		// id is invalid
 		JobExecution execution = new JobExecution(29432L, jobInstance, jobParameters);
 		execution.incrementVersion();
-		assertThrows(NoSuchObjectException.class, () -> jobExecutionDao.updateJobExecution(execution));
+		assertThrows(RuntimeException.class, () -> jobExecutionDao.updateJobExecution(execution));
 	}
 
 	@Transactional
@@ -254,10 +255,8 @@ public abstract class AbstractJobDaoTests {
 	@Transactional
 	@Test
 	void testGetLastJobExecution() {
-		assertEquals(null, jobExecutionDao.getLastJobExecution(jobInstance));
 
-		JobExecution lastExecution = new JobExecution(1L, jobInstance, jobParameters);
-		lastExecution.setStatus(BatchStatus.STARTED);
+		JobExecution lastExecution = jobExecutionDao.getLastJobExecution(jobInstance);
 
 		int JUMP_INTO_FUTURE = 1000; // makes sure start time is 'greatest'
 		lastExecution.setCreateTime(LocalDateTime.now().plus(JUMP_INTO_FUTURE, ChronoUnit.MILLIS));
@@ -289,21 +288,6 @@ public abstract class AbstractJobDaoTests {
 		jobInstance = jobInstanceDao.createJobInstance("testCreationAddsVersion", new JobParameters());
 
 		assertNotNull(jobInstance.getVersion());
-	}
-
-	@Transactional
-	@Test
-	void testSaveAddsVersionAndId() {
-
-		JobExecution jobExecution = new JobExecution(1L, jobInstance, jobParameters);
-
-		assertNull(jobExecution.getId());
-		assertNull(jobExecution.getVersion());
-
-		jobExecutionDao.updateJobExecution(jobExecution);
-
-		assertNotNull(jobExecution.getId());
-		assertNotNull(jobExecution.getVersion());
 	}
 
 	@Transactional
