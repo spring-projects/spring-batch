@@ -106,6 +106,7 @@ import static com.fasterxml.jackson.core.JsonToken.START_OBJECT;
  *
  * @author Marten Deinum
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  * @since 3.0.7
  * @see ExecutionContextSerializer
  * @deprecated Since 6.0 in favor of {@link JacksonExecutionContextStringSerializer}.
@@ -210,12 +211,16 @@ public class Jackson2ExecutionContextStringSerializer implements ExecutionContex
 			@Override
 			public void serialize(JobParameter jobParameter, JsonGenerator jsonGenerator,
 					SerializerProvider serializerProvider) throws IOException {
+				jsonGenerator.writeStartObject();
+				jsonGenerator.writeFieldName(NAME_KEY_NAME);
+				jsonGenerator.writeObject(jobParameter.name());
 				jsonGenerator.writeFieldName(VALUE_KEY_NAME);
 				jsonGenerator.writeObject(jobParameter.value());
 				jsonGenerator.writeFieldName(TYPE_KEY_NAME);
 				jsonGenerator.writeString(jobParameter.type().getName());
 				jsonGenerator.writeFieldName(IDENTIFYING_KEY_NAME);
-				jsonGenerator.writeObject(jobParameter.identifying());
+				jsonGenerator.writeBoolean(jobParameter.identifying());
+				jsonGenerator.writeEndObject();
 			}
 
 		}

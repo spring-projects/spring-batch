@@ -33,9 +33,7 @@ import org.springframework.batch.core.step.builder.ChunkOrientedStepBuilder;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.core.step.skip.NeverSkipItemSkipPolicy;
 import org.springframework.batch.core.step.skip.NonSkippableProcessException;
-import org.springframework.batch.infrastructure.item.ItemProcessor;
-import org.springframework.batch.infrastructure.item.ItemReader;
-import org.springframework.batch.infrastructure.item.ItemWriter;
+import org.springframework.batch.infrastructure.item.*;
 import org.springframework.batch.infrastructure.item.support.ListItemReader;
 import org.springframework.batch.infrastructure.item.support.ListItemWriter;
 import org.springframework.batch.infrastructure.support.transaction.ResourcelessTransactionManager;
@@ -52,6 +50,7 @@ import static org.mockito.Mockito.when;
 /**
  * @author Mahmoud Ben Hassine
  * @author Andrey Litvitski
+ * @author xeounxzxu
  */
 public class ChunkOrientedStepTests {
 
@@ -460,6 +459,54 @@ public class ChunkOrientedStepTests {
 		// then
 		assertEquals(itemCount, stepExecution.getProcessSkipCount(),
 				"Sequential mode should have accurate process skip count");
+	}
+
+	@Test
+	void testItemStreamUpdateStillOccursWhenChunkRollsBack_bugReproduction() throws Exception {
+		// given: tracking stream to capture update invocations
+		TrackingItemStream trackingItemStream = new TrackingItemStream();
+		ItemReader<String> reader = new ListItemReader<>(List.of("item1"));
+		ItemWriter<String> writer = chunk -> {
+			throw new RuntimeException("Simulated failure");
+		};
+		JobRepository jobRepository = new ResourcelessJobRepository();
+		ChunkOrientedStep<String, String> step = new ChunkOrientedStep<>("step", 1, reader, writer, jobRepository);
+		step.registerItemStream(trackingItemStream);
+		step.afterPropertiesSet();
+		JobInstance jobInstance = new JobInstance(1L, "job");
+		JobExecution jobExecution = new JobExecution(1L, jobInstance, new JobParameters());
+		StepExecution stepExecution = new StepExecution(1L, "step", jobExecution);
+
+		// when: execute step (writer causes chunk rollback)
+		step.execute(stepExecution);
+
+		// then: due to current bug the stream update count becomes 1 although chunk
+		// rolled back
+		assertEquals(0, trackingItemStream.getUpdateCount(),
+				"ItemStream should not be updated when chunk transaction fails (bug reproduction)");
+	}
+
+	private static final class TrackingItemStream implements ItemStream {
+
+		private int updateCount;
+
+		@Override
+		public void open(ExecutionContext executionContext) {
+		}
+
+		@Override
+		public void update(ExecutionContext executionContext) {
+			this.updateCount++;
+		}
+
+		@Override
+		public void close() {
+		}
+
+		int getUpdateCount() {
+			return this.updateCount;
+		}
+
 	}
 
 }

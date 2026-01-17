@@ -81,9 +81,4 @@ public class ErrorLogTasklet implements Tasklet, StepExecutionListener {
 		stepExecution.getJobExecution().getExecutionContext().remove("stepName");
 	}
 
-	@Override
-	public @Nullable ExitStatus afterStep(StepExecution stepExecution) {
-		return null;
-	}
-
 }

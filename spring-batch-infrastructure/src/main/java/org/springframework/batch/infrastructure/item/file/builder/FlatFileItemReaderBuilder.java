@@ -52,6 +52,7 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 /**
@@ -691,7 +692,7 @@ public class FlatFileItemReaderBuilder<T> {
 			}
 
 			if (!this.includedFields.isEmpty()) {
-				Set<Integer> deDupedFields = new HashSet<>(this.includedFields.size());
+				Set<Integer> deDupedFields = CollectionUtils.newHashSet(this.includedFields.size());
 				deDupedFields.addAll(this.includedFields);
 				deDupedFields.remove(null);
 

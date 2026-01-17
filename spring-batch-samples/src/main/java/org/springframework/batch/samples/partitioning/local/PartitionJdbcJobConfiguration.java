@@ -42,7 +42,7 @@ import org.springframework.jdbc.core.DataClassRowMapper;
 @Import(DataSourceConfiguration.class)
 public class PartitionJdbcJobConfiguration {
 
-	record Owner(int id, String firstName, String lastName) {
+	public record Owner(int id, String firstName, String lastName) {
 	}
 
 	@Bean

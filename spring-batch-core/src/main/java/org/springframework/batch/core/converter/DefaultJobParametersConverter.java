@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,6 +64,10 @@ import org.springframework.util.StringUtils;
  * {@link java.time.format.DateTimeFormatter#ISO_LOCAL_TIME} format</li>
  * <li>{@link java.time.LocalDateTime}: in the
  * {@link java.time.format.DateTimeFormatter#ISO_LOCAL_DATE_TIME} format</li>
+ * <li>{@link java.time.ZonedDateTime}: in the
+ * {@link java.time.format.DateTimeFormatter#ISO_ZONED_DATE_TIME} format</li>
+ * <li>{@link java.time.OffsetDateTime}: in the
+ * {@link java.time.format.DateTimeFormatter#ISO_OFFSET_DATE_TIME} format</li>
  * </ul>
  *
  * @author Dave Syer
@@ -85,6 +89,10 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 		conversionService.addConverter(new StringToLocalTimeConverter());
 		conversionService.addConverter(new LocalDateTimeToStringConverter());
 		conversionService.addConverter(new StringToLocalDateTimeConverter());
+		conversionService.addConverter(new ZonedDateTimeToStringConverter());
+		conversionService.addConverter(new StringToZonedDateTimeConverter());
+		conversionService.addConverter(new OffsetDateTimeToStringConverter());
+		conversionService.addConverter(new StringToOffsetDateTimeConverter());
 		this.conversionService = conversionService;
 	}
 

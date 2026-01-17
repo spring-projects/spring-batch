@@ -157,8 +157,6 @@ public class StoredProcedureItemReader<T> extends AbstractCursorItemReader<T> {
 	protected void openCursor(Connection con) {
 		Assert.state(refCursorPosition >= 0, "invalid refCursorPosition specified as " + refCursorPosition
 				+ "; it can't be " + "specified as a negative number.");
-		Assert.state(refCursorPosition == 0 || refCursorPosition > 0, "invalid refCursorPosition specified as "
-				+ refCursorPosition + "; there are " + parameters.length + " parameters defined.");
 
 		CallMetaDataContext callContext = new CallMetaDataContext();
 		callContext.setAccessCallParameterMetaData(false);
@@ -234,13 +232,14 @@ public class StoredProcedureItemReader<T> extends AbstractCursorItemReader<T> {
 	}
 
 	/**
-	 * Close the cursor and database connection.
-	 * @param connection to the database
+	 * Releases JDBC resources associated with this reader. Closes the PreparedStatement
+	 * used for the cursor. The Connection is not closed here; it is managed by the parent
+	 * class.
+	 * @param connection the active database connection used for the cursor
 	 */
 	@Override
 	protected void cleanupOnClose(Connection connection) {
 		JdbcUtils.closeStatement(this.callableStatement);
-		JdbcUtils.closeConnection(connection);
 	}
 
 	@Override
