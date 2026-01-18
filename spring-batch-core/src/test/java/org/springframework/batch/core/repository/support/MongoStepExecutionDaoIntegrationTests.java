@@ -182,15 +182,24 @@ class MongoStepExecutionDaoIntegrationTests extends AbstractMongoDBDaoIntegratio
 	}
 
 	@Test
-	void testCountStepExecutions() {
-		// Given
-		StepExecution stepExecution = dao.createStepExecution("step", jobExecution);
+	void testCountStepExecutionsFiltersByStepName() {
+		// given
+		dao.createStepExecution("stepA", jobExecution);
+		dao.createStepExecution("stepA", jobExecution);
+		dao.createStepExecution("stepB", jobExecution);
+		dao.createStepExecution("stepC", jobExecution);
 
-		// When
-		long result = dao.countStepExecutions(jobInstance, stepExecution.getStepName());
+		// when
+		long countA = dao.countStepExecutions(jobInstance, "stepA");
+		long countB = dao.countStepExecutions(jobInstance, "stepB");
+		long countC = dao.countStepExecutions(jobInstance, "stepC");
+		long countNonExistent = dao.countStepExecutions(jobInstance, "nonExistentStep");
 
-		// Then
-		assertEquals(1, result);
+		// then
+		assertEquals(2, countA);
+		assertEquals(1, countB);
+		assertEquals(1, countC);
+		assertEquals(0, countNonExistent);
 	}
 
 	@Test
