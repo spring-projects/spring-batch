@@ -398,7 +398,15 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			for (int i = 0; i < this.chunkSize && this.chunkTracker.get().moreItems(); i++) {
 				I item = readItem(contribution);
 				if (item != null) {
-					Future<O> itemProcessingFuture = this.taskExecutor.submit(() -> processItem(item, contribution));
+					Future<O> itemProcessingFuture = this.taskExecutor.submit(() -> {
+						try {
+							StepSynchronizationManager.register(stepExecution);
+							return processItem(item, contribution);
+						}
+						finally {
+							StepSynchronizationManager.close();
+						}
+					});
 					itemProcessingTasks.add(itemProcessingFuture);
 				}
 			}
