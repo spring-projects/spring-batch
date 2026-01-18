@@ -163,7 +163,7 @@ public class SimpleJobRepository extends SimpleJobExplorer implements JobReposit
 		Assert.state(latestStepExecution != null,
 				"StepExecution with id " + stepExecution.getId() + "not found. Batch metadata state may be corrupted.");
 
-		if (latestStepExecution.getJobExecution().isStopped()) {
+		if (latestStepExecution.getJobExecution().isStopped() || latestStepExecution.getJobExecution().isStopping()) {
 			Integer version = latestStepExecution.getVersion();
 			if (version != null) {
 				stepExecution.setVersion(version);
