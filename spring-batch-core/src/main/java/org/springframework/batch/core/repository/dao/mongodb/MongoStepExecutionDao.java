@@ -170,9 +170,12 @@ public class MongoStepExecutionDao implements StepExecutionDao {
 			.find(query, org.springframework.batch.core.repository.persistence.JobExecution.class,
 					JOB_EXECUTIONS_COLLECTION_NAME);
 		return this.mongoOperations.count(
-				query(where("jobExecutionId").in(jobExecutions.stream()
-					.map(org.springframework.batch.core.repository.persistence.JobExecution::getJobExecutionId)
-					.toList())),
+				query(where("jobExecutionId")
+					.in(jobExecutions.stream()
+						.map(org.springframework.batch.core.repository.persistence.JobExecution::getJobExecutionId)
+						.toList())
+					.and("name")
+					.is(stepName)),
 				org.springframework.batch.core.repository.persistence.StepExecution.class,
 				STEP_EXECUTIONS_COLLECTION_NAME);
 	}
