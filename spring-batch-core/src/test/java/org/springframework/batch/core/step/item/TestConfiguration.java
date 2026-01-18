@@ -53,6 +53,7 @@ public class TestConfiguration {
 	}
 
 	@Bean
+	@StepScope
 	public ItemProcessor<Person, Person> itemProcessor() {
 		return item -> {
 			if (System.getProperty("fail") != null) {
