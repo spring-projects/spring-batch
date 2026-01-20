@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.step.item;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Future;
@@ -394,15 +395,18 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 	private void processChunkConcurrently(TransactionStatus status, StepContribution contribution,
 			StepExecution stepExecution) {
 		List<Future<O>> itemProcessingTasks = new LinkedList<>();
+		List<StepContribution> workerContributions = new ArrayList<>();
 		try {
 			// read items and submit concurrent item processing tasks
 			for (int i = 0; i < this.chunkSize && this.chunkTracker.get().moreItems(); i++) {
 				I item = readItem(contribution);
 				if (item != null) {
+					StepContribution workerContribution = stepExecution.createStepContribution();
+					workerContributions.add(workerContribution);
 					Future<O> itemProcessingFuture = this.taskExecutor.submit(() -> {
 						try {
 							StepSynchronizationManager.register(stepExecution);
-							return processItem(item, contribution);
+							return processItem(item, workerContribution);
 						}
 						finally {
 							StepSynchronizationManager.close();
@@ -425,6 +429,11 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 				}
 			}
 
+			// aggregate all worker contributions
+			for (StepContribution workerContribution : workerContributions) {
+				aggregateContribution(contribution, workerContribution);
+			}
+
 			// write processed items
 			writeChunk(processedChunk, contribution);
 			stepExecution.incrementCommitCount();
@@ -440,6 +449,11 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			stepExecution.apply(contribution);
 		}
 
+	}
+
+	private void aggregateContribution(StepContribution main, StepContribution worker) {
+		main.incrementFilterCount(worker.getFilterCount());
+		main.incrementProcessSkipCount(worker.getProcessSkipCount());
 	}
 
 	private void processChunkSequentially(TransactionStatus status, StepContribution contribution,
