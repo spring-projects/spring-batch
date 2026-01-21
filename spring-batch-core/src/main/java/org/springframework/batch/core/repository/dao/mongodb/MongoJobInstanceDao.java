@@ -44,8 +44,6 @@ public class MongoJobInstanceDao implements JobInstanceDao {
 
 	private static final String COLLECTION_NAME = "BATCH_JOB_INSTANCE";
 
-	private static final String SEQUENCE_NAME = "BATCH_JOB_INSTANCE_SEQ";
-
 	private final MongoOperations mongoOperations;
 
 	private DataFieldMaxValueIncrementer jobInstanceIncrementer;
@@ -57,7 +55,7 @@ public class MongoJobInstanceDao implements JobInstanceDao {
 	public MongoJobInstanceDao(MongoOperations mongoOperations) {
 		Assert.notNull(mongoOperations, "mongoOperations must not be null.");
 		this.mongoOperations = mongoOperations;
-		this.jobInstanceIncrementer = new MongoSequenceIncrementer(mongoOperations, SEQUENCE_NAME);
+		this.jobInstanceIncrementer = new MongoSequenceIncrementer();
 	}
 
 	public void setJobKeyGenerator(JobKeyGenerator jobKeyGenerator) {
