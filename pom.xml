@@ -52,36 +52,36 @@
 		<java.version>17</java.version>
 
 		<!-- production dependencies -->
-        <spring-framework.version>7.0.2</spring-framework.version>
+        <spring-framework.version>7.0.3</spring-framework.version>
         <spring-retry.version>2.0.12</spring-retry.version>
-        <spring-integration.version>7.0.1</spring-integration.version>
-        <micrometer.version>1.16.1</micrometer.version>
+        <spring-integration.version>7.0.2</spring-integration.version>
+        <micrometer.version>1.16.2</micrometer.version>
 
 		<!-- optional production dependencies -->
-        <spring-data-commons.version>4.0.1</spring-data-commons.version>
-        <spring-data-jpa.version>4.0.1</spring-data-jpa.version>
-        <spring-data-redis.version>4.0.1</spring-data-redis.version>
-        <spring-data-mongodb.version>5.0.1</spring-data-mongodb.version>
-        <spring-kafka.version>4.0.1</spring-kafka.version>
-        <spring-amqp.version>4.0.1</spring-amqp.version>
+        <spring-data-commons.version>4.0.2</spring-data-commons.version>
+        <spring-data-jpa.version>4.0.2</spring-data-jpa.version>
+        <spring-data-redis.version>4.0.2</spring-data-redis.version>
+        <spring-data-mongodb.version>5.0.2</spring-data-mongodb.version>
+        <spring-kafka.version>4.0.2</spring-kafka.version>
+        <spring-amqp.version>4.0.2</spring-amqp.version>
         <spring-ldap.version>4.0.1</spring-ldap.version>
 
-		<jackson2.version>2.20.1</jackson2.version>
+		<jackson2.version>2.20.2</jackson2.version>
 		<jackson3.version>3.0.3</jackson3.version>
 		<avro.version>1.12.1</avro.version>
 		<gson.version>2.13.2</gson.version>
-		<hibernate-core.version>7.2.0.Final</hibernate-core.version>
+		<hibernate-core.version>7.2.1.Final</hibernate-core.version>
 		<jakarta.annotation-api.version>3.0.0</jakarta.annotation-api.version>
 		<jakarta.mail-api.version>2.1.5</jakarta.mail-api.version>
 		<jakarta.jms-api.version>3.1.0</jakarta.jms-api.version>
 		<jakarta.validation-api.version>3.1.1</jakarta.validation-api.version>
 		<jakarta.persistence-api.version>3.2.0</jakarta.persistence-api.version>
 		<mongodb-driver.version>5.6.2</mongodb-driver.version>
-		<junit-jupiter.version>6.0.1</junit-jupiter.version>
-		<junit-platform-launcher.version>6.0.1</junit-platform-launcher.version>
+		<junit-jupiter.version>6.0.2</junit-jupiter.version>
+		<junit-platform-launcher.version>6.0.2</junit-platform-launcher.version>
 
 		<!-- test dependencies -->
-		<micrometer-tracing.version>1.6.1</micrometer-tracing.version>
+		<micrometer-tracing.version>1.6.2</micrometer-tracing.version>
 
 		<xstream.version>1.4.21</xstream.version>
 		<junit.version>4.13.2</junit.version>
@@ -91,15 +91,15 @@
 		<mockito.version>5.21.0</mockito.version>
 		<xmlunit.version>2.11.0</xmlunit.version>
 		<commons-io.version>2.21.0</commons-io.version>
-		<commons-dbcp2.version>2.13.0</commons-dbcp2.version>
+		<commons-dbcp2.version>2.14.0</commons-dbcp2.version>
 		<hsqldb.version>2.7.4</hsqldb.version>
 		<h2.version>2.4.240</h2.version>
 		<sqlite.version>3.51.1.0</sqlite.version>
 		<derby.version>10.16.1.1</derby.version> <!-- FIXME build failure with 10.17.1.0 -->
-		<hana.version>2.26.11</hana.version>
+		<hana.version>2.26.12</hana.version>
 		<artemis.version>2.44.0</artemis.version>
 		<jaxb-core.version>4.0.6</jaxb-core.version>
-		<log4j.version>2.25.2</log4j.version>
+		<log4j.version>2.25.3</log4j.version>
 		<hibernate-validator.version>9.0.1.Final</hibernate-validator.version>
 		<jakarta.el-api.version>6.0.1</jakarta.el-api.version>
 		<jakarta.el.version>4.0.2</jakarta.el.version>
@@ -110,7 +110,7 @@
 		<aspectj.version>1.9.25.1</aspectj.version>
 		<mysql-connector-j.version>9.5.0</mysql-connector-j.version>
 		<mariadb-java-client.version>3.5.7</mariadb-java-client.version>
-		<postgresql.version>42.7.8</postgresql.version>
+		<postgresql.version>42.7.9</postgresql.version>
 		<db2.version>12.1.3.0</db2.version>
 		<oracle.version>19.29.0.0</oracle.version>
 		<sqlserver.version>11.2.3.jre17</sqlserver.version>
@@ -122,7 +122,7 @@
 		<nashorn.version>15.7</nashorn.version>
 		<beanshell.version>2.0b6</beanshell.version>
 		<jruby.version>9.4.14.0</jruby.version> <!-- update to latest 10.0.2.0 -->
-		<lettuce.version>6.8.1.RELEASE</lettuce.version> <!-- update to 7.0.0.RELEASE -->
+		<lettuce.version>6.8.2.RELEASE</lettuce.version> <!-- update to 7.0.0.RELEASE -->
 		<jedis.version>7.0.0</jedis.version>
 
 		<!-- samples dependencies -->
