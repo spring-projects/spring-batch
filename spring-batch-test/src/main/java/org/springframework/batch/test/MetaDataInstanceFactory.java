@@ -125,7 +125,7 @@ public class MetaDataInstanceFactory {
 	 * @return a {@link JobExecution}
 	 */
 	public static JobExecution createJobExecution(String jobName, Long instanceId, Long executionId,
-		  JobParameters jobParameters) {
+			JobParameters jobParameters) {
 		return new JobExecution(executionId, createJobInstance(jobName, instanceId), jobParameters);
 	}
 
@@ -180,8 +180,8 @@ public class MetaDataInstanceFactory {
 
 	/**
 	 * Create a {@link StepExecution} and all its parent entities with default values, but
-	 * using the {@link ExecutionContext} and {@link JobParameters} provided.
-	 * Each invocation generates unique IDs to avoid collision in
+	 * using the {@link ExecutionContext} and {@link JobParameters} provided. Each
+	 * invocation generates unique IDs to avoid collision in
 	 * {@link org.springframework.batch.core.scope.context.StepSynchronizationManager}.
 	 * @param jobParameters come {@link JobParameters}
 	 * @param executionContext some {@link ExecutionContext}
@@ -195,8 +195,8 @@ public class MetaDataInstanceFactory {
 
 	/**
 	 * Create a {@link StepExecution} and all its parent entities with default values, but
-	 * using the {@link JobParameters} provided.
-	 * Each invocation generates unique IDs to avoid collision in
+	 * using the {@link JobParameters} provided. Each invocation generates unique IDs to
+	 * avoid collision in
 	 * {@link org.springframework.batch.core.scope.context.StepSynchronizationManager}.
 	 * @param jobParameters some {@link JobParameters}
 	 * @return a {@link StepExecution} with the job parameters provided
