@@ -1,5 +1,6 @@
 # Latest news
 
+* January 21, 2026: [Spring Batch 6.0.2 is out](https://spring.io/blog/2026/01/21/spring-batch-6-0-2-available-now)
 * December 17, 2025: [Spring Batch 6.0.1 available now](https://spring.io/blog/2025/12/17/spring-batch-6-0-1-available-now)
 * November 19, 2025: [Spring Batch 6.0.0 GA is out!](https://spring.io/blog/2025/11/19/spring-batch-6-0-0-ga)
 
@@ -20,7 +21,7 @@ In your favorite IDE, create a new Maven-based Java 17+ project and add the foll
     <dependency>
         <groupId>org.springframework.batch</groupId>
         <artifactId>spring-batch-core</artifactId>
-        <version>6.0.1</version>
+        <version>6.0.2</version>
     </dependency>
 </dependencies>
 ```
