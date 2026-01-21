@@ -103,32 +103,30 @@ The annotations corresponding to this interface are:
 A "`chunk`" is defined as the items processed within the scope of a transaction. Committing a
 transaction, at each commit interval, commits a chunk. You can use a `ChunkListener` to
 perform logic before a chunk begins processing or after a chunk has completed
-successfully, as the following interface definition shows:
+successfully or in failure, as the following interface definition shows:
 
 [source, java]
 ----
-public interface ChunkListener extends StepListener {
+public interface ChunkListener<I, O> extends StepListener {
 
-    void beforeChunk(ChunkContext context);
-    void afterChunk(ChunkContext context);
-    void afterChunkError(ChunkContext context);
+    void beforeChunk(Chunk<I> chunk);
+    void afterChunk(Chunk<O> chunk);
+    void afterChunkError(Exception exception, Chunk<O> chunk);
 
 }
 ----
 
-The beforeChunk method is called after the transaction is started but before reading begins
-on the `ItemReader`. Conversely, `afterChunk` is called after the chunk has been
-committed (or not at all if there is a rollback).
+The `beforeChunk` method is called after the transaction is started after reading a chunk
+of items but before processing start. Conversely, `afterChunk` is called after the chunk
+is written but before the transaction is committed or rolled back.
+
+NOTE: The `ChunkListener` listener interface is not called in concurrent steps
 
 The annotations corresponding to this interface are:
 
 * `@BeforeChunk`
 * `@AfterChunk`
 * `@AfterChunkError`
-
-You can apply a `ChunkListener` when there is no chunk declaration. The `TaskletStep` is
-responsible for calling the `ChunkListener`, so it applies to a non-item-oriented tasklet
-as well (it is called before and after the tasklet).
 
 A `ChunkListener` is not designed to throw checked exceptions. Errors must be handled in the
 implementation or the step will terminate.
