@@ -1,5 +1,5 @@
 /*
- * Copyright 2024-2025 the original author or authors.
+ * Copyright 2024-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,15 @@ import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer
  */
 public class MongoSequenceIncrementer implements DataFieldMaxValueIncrementer {
 
+	/*
+	 * Retry template to handle errors when incrementing the sequence value
+	 * https://github.com/spring-projects/spring-batch/issues/4960
+	 *
+	 * Typically, only transient errors are retried, and even if
+	 * DataIntegrityViolationException extends NonTransientDataAccessException, the
+	 * MongoDB driver suggests to retry the operation on write conflict:
+	 * "Please retry your operation or multi-document transaction"
+	 */
 	private final RetryTemplate retryTemplate = new RetryTemplate(
 			RetryPolicy.builder().includes(DataIntegrityViolationException.class).build());
 
