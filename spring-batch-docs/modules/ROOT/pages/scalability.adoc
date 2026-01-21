@@ -56,6 +56,7 @@ public Step sampleStep(TaskExecutor taskExecutor, JobRepository jobRepository, P
 	return new StepBuilder("sampleStep", jobRepository)
 				.<String, String>chunk(10).transactionManager(transactionManager)
 				.reader(itemReader())
+				.processor(itemProcessor())
 				.writer(itemWriter())
 				.taskExecutor(taskExecutor)
 				.build();
@@ -83,35 +84,20 @@ is a standard Spring interface, so consult the Spring User Guide for details of 
 implementations. The simplest multi-threaded `TaskExecutor` is a
 `SimpleAsyncTaskExecutor`.
 
-The result of the preceding configuration is that the `Step` executes by reading, processing,
-and writing each chunk of items (each commit interval) in a separate thread of execution.
-Note that this means there is no fixed order for the items to be processed, and a chunk
-might contain items that are non-consecutive compared to the single-threaded case.
+The result of the preceding configuration is that the `Step` will use multiple threads from
+the task executor to process items concurrently. Therefore, the `ItemProcessor` will be
+called from multiple threads at the same time. This means that the `ItemProcessor` must be
+thread-safe. If you are using stateful components in the processing, you must ensure that
+they are properly synchronized for concurrent access.
+
+The reading and writing of items is still done in serial by the main thread executing the step,
+so the `ItemReader` and `ItemWriter` do not have to be thread-safe or synchronized. However,
+the throughput of the step may be limited by the speed of reading and writing. If this is
+the case, consider using a different concurrency technique, such as local chunking or local partitioning.
 
 Note also that there may be limits placed on concurrency by any pooled resources used in
 your step, such as a `DataSource`. Be sure to make the pool in those resources at least
 as large as the desired number of concurrent threads in the step.
-
-There are some practical limitations of using multi-threaded `Step` implementations for
-some common batch use cases. Many participants in a `Step` (such as readers and writers)
-are stateful. If the state is not segregated by thread, those components are not
-usable in a multi-threaded `Step`. In particular, most of the readers and
-writers from Spring Batch are not designed for multi-threaded use. It is, however,
-possible to work with stateless or thread safe readers and writers, and there is a sample
-(called `parallelJob`) in the
-https://github.com/spring-projects/spring-batch/tree/main/spring-batch-samples[Spring
-Batch Samples] that shows the use of a process indicator (see
-xref:readers-and-writers/process-indicator.adoc[Preventing State Persistence]) to keep track
-of items that have been processed in a database input table.
-
-Spring Batch provides some implementations of `ItemWriter` and `ItemReader`.  Usually,
-they say in the Javadoc if they are thread safe or not or what you have to do to avoid
-problems in a concurrent environment. If there is no information in the Javadoc, you can
-check the implementation to see if there is any state. If a reader is not thread safe,
-you can decorate it with the provided `SynchronizedItemStreamReader` or use it in your own
-synchronizing delegator. You can synchronize the call to `read()`, and, as long as the
-processing and writing is the most expensive part of the chunk, your step may still
-complete much more quickly than it would in a single-threaded configuration.
 
 [[scalabilityParallelSteps]]
 == Parallel Steps
