@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 the original author or authors.
+ * Copyright 2025-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.core.log.LogAccessor;
@@ -121,6 +122,8 @@ public class CommandLineJobOperator {
 			return this.exitCodeMapper.intValue(jobExecution.getExitStatus().getExitCode());
 		}
 		catch (Exception e) {
+			String message = "Job terminated in error: " + e.getMessage();
+			logger.error(e, () -> message);
 			return JVM_EXITCODE_GENERIC_ERROR;
 		}
 	}
@@ -143,6 +146,8 @@ public class CommandLineJobOperator {
 			return this.exitCodeMapper.intValue(jobExecution.getExitStatus().getExitCode());
 		}
 		catch (Exception e) {
+			String message = "Job terminated in error: " + e.getMessage();
+			logger.error(e, () -> message);
 			return JVM_EXITCODE_GENERIC_ERROR;
 		}
 	}
@@ -169,6 +174,8 @@ public class CommandLineJobOperator {
 			return stopSignalSent ? JVM_EXITCODE_COMPLETED : JVM_EXITCODE_GENERIC_ERROR;
 		}
 		catch (Exception e) {
+			String message = "Job stopped in error: " + e.getMessage();
+			logger.error(e, () -> message);
 			return JVM_EXITCODE_GENERIC_ERROR;
 		}
 	}
@@ -197,6 +204,8 @@ public class CommandLineJobOperator {
 			return this.exitCodeMapper.intValue(restartedExecution.getExitStatus().getExitCode());
 		}
 		catch (Exception e) {
+			String message = "Job terminated in error: " + e.getMessage();
+			logger.error(e, () -> message);
 			return JVM_EXITCODE_GENERIC_ERROR;
 		}
 	}
@@ -225,6 +234,8 @@ public class CommandLineJobOperator {
 			return this.exitCodeMapper.intValue(abandonedExecution.getExitStatus().getExitCode());
 		}
 		catch (Exception e) {
+			String message = "Job abandoned in error: " + e.getMessage();
+			logger.error(e, () -> message);
 			return JVM_EXITCODE_GENERIC_ERROR;
 		}
 	}
@@ -248,6 +259,8 @@ public class CommandLineJobOperator {
 			return this.exitCodeMapper.intValue(recoveredExecution.getExitStatus().getExitCode());
 		}
 		catch (Exception e) {
+			String message = "Job recovered in error: " + e.getMessage();
+			logger.error(e, () -> message);
 			return JVM_EXITCODE_GENERIC_ERROR;
 		}
 	}
@@ -297,7 +310,7 @@ public class CommandLineJobOperator {
 					 - recover jobExecutionId
 					and jobParameters are key-value pairs in the form name=value,type,identifying.
 					""";
-			System.err.printf(String.format(usage, CommandLineJobOperator.class.getName()));
+			logger.error(String.format(usage, CommandLineJobOperator.class.getName()));
 			System.exit(1);
 		}
 
@@ -310,7 +323,8 @@ public class CommandLineJobOperator {
 			context = new AnnotationConfigApplicationContext(jobConfigurationClass);
 		}
 		catch (ClassNotFoundException classNotFoundException) {
-			System.err.println("Job configuration class not found: " + jobConfigurationClassName);
+			logger.error(classNotFoundException,
+					() -> "Job configuration class not found: " + jobConfigurationClassName);
 			System.exit(2);
 		}
 
@@ -325,7 +339,7 @@ public class CommandLineJobOperator {
 			jobRegistry = context.getBean(JobRegistry.class);
 		}
 		catch (BeansException e) {
-			System.err.println("A required bean was not found in the application context: " + e.getMessage());
+			logger.error(e, () -> "A required bean was not found in the application context: " + e.getMessage());
 			System.exit(1);
 		}
 
@@ -334,6 +348,23 @@ public class CommandLineJobOperator {
 		Assert.notNull(jobRegistry, "JobRegistry must not be null");
 
 		CommandLineJobOperator operator = new CommandLineJobOperator(jobOperator, jobRepository, jobRegistry);
+		ExitCodeMapper exitCodeMapper;
+		try {
+			exitCodeMapper = context.getBean(ExitCodeMapper.class);
+			operator.setExitCodeMapper(exitCodeMapper);
+		}
+		catch (NoSuchBeanDefinitionException e) {
+			logger.debug(() -> "No ExitCodeMapper bean found in the application context. Using the default one.");
+		}
+		JobParametersConverter jobParametersConverter;
+		try {
+			jobParametersConverter = context.getBean(JobParametersConverter.class);
+			operator.setJobParametersConverter(jobParametersConverter);
+		}
+		catch (NoSuchBeanDefinitionException e) {
+			logger
+				.debug(() -> "No JobParametersConverter bean found in the application context. Using the default one.");
+		}
 
 		int exitCode;
 		String jobName;
@@ -365,7 +396,7 @@ public class CommandLineJobOperator {
 				exitCode = operator.recover(jobExecutionId);
 				break;
 			default:
-				System.err.println("Unknown operation: " + operation);
+				logger.error(() -> "Unknown operation: " + operation);
 				exitCode = JVM_EXITCODE_GENERIC_ERROR;
 		}
 
