@@ -159,7 +159,7 @@ public class MongoDefaultBatchConfiguration extends DefaultBatchConfiguration {
 	 * @since 6.0
 	 */
 	protected DataFieldMaxValueIncrementer getJobInstanceIncrementer() {
-		return new MongoSequenceIncrementer(getMongoOperations(), "BATCH_JOB_INSTANCE_SEQ");
+		return new MongoSequenceIncrementer(getMongoOperations(), "JOB_INSTANCE_SEQ", "BATCH_");
 	}
 
 	/**
@@ -168,7 +168,7 @@ public class MongoDefaultBatchConfiguration extends DefaultBatchConfiguration {
 	 * @since 6.0
 	 */
 	protected DataFieldMaxValueIncrementer getJobExecutionIncrementer() {
-		return new MongoSequenceIncrementer(getMongoOperations(), "BATCH_JOB_EXECUTION_SEQ");
+		return new MongoSequenceIncrementer(getMongoOperations(), "JOB_EXECUTION_SEQ", "BATCH_");
 	}
 
 	/**
@@ -177,7 +177,7 @@ public class MongoDefaultBatchConfiguration extends DefaultBatchConfiguration {
 	 * @since 6.0
 	 */
 	protected DataFieldMaxValueIncrementer getStepExecutionIncrementer() {
-		return new MongoSequenceIncrementer(getMongoOperations(), "BATCH_STEP_EXECUTION_SEQ");
+		return new MongoSequenceIncrementer(getMongoOperations(), "STEP_EXECUTION_SEQ", "BATCH_");
 	}
 
 }
