@@ -121,7 +121,7 @@ public class StepContext extends SynchronizedAttributeAccessor {
 	 */
 	public Map<String, Object> getJobParameters() {
 		Map<String, Object> result = new HashMap<>();
-		for (JobParameter<?> jobParameter : stepExecution.getJobParameters()) {
+		for (JobParameter<?> jobParameter : stepExecution.getJobExecution().getJobParameters()) {
 			result.put(jobParameter.name(), jobParameter.value());
 		}
 		return Collections.unmodifiableMap(result);

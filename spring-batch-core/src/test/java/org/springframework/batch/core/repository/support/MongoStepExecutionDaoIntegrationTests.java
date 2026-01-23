@@ -177,7 +177,7 @@ class MongoStepExecutionDaoIntegrationTests extends AbstractMongoDBDaoIntegratio
 		assertEquals(expected.getExitStatus(), actual.getExitStatus());
 		assertTemporalEquals(expected.getLastUpdated(), actual.getLastUpdated());
 		assertEquals(expected.getExitStatus(), actual.getExitStatus());
-		assertEquals(expected.getJobExecutionId(), actual.getJobExecutionId());
+		assertEquals(expected.getJobExecution().getId(), actual.getJobExecution().getId());
 		assertTemporalEquals(expected.getCreateTime(), actual.getCreateTime());
 	}
 
