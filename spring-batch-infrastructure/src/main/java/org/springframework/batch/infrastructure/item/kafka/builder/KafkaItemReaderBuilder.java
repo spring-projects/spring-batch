@@ -38,6 +38,7 @@ import org.springframework.util.Assert;
  *
  * @author Mathieu Ouellet
  * @author Mahmoud Ben Hassine
+ * @author Andrey Litvitski
  * @since 4.2
  * @see KafkaItemReader
  */
@@ -155,9 +156,6 @@ public class KafkaItemReaderBuilder<K, V> {
 	}
 
 	public KafkaItemReader<K, V> build() {
-		if (this.saveState) {
-			Assert.hasText(this.name, "A name is required when saveState is set to true");
-		}
 		Assert.notNull(consumerProperties, "Consumer properties must not be null");
 		Assert.isTrue(consumerProperties.containsKey(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG),
 				ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG + " property must be provided");

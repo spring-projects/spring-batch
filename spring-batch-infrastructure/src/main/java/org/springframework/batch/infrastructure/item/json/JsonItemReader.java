@@ -24,6 +24,7 @@ import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.batch.infrastructure.item.ItemStreamReader;
 import org.springframework.batch.infrastructure.item.file.ResourceAwareItemReaderItemStream;
 import org.springframework.batch.infrastructure.item.support.AbstractItemCountingItemStreamItemReader;
+import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 
@@ -48,10 +49,11 @@ import org.springframework.util.Assert;
  * @param <T> the type of json objects to read
  * @author Mahmoud Ben Hassine
  * @author Jimmy Praet
+ * @author Andrey Litvitski
  * @since 4.1
  */
 public class JsonItemReader<T> extends AbstractItemCountingItemStreamItemReader<T>
-		implements ResourceAwareItemReaderItemStream<T> {
+		implements ResourceAwareItemReaderItemStream<T>, BeanNameAware {
 
 	private static final Log LOGGER = LogFactory.getLog(JsonItemReader.class);
 
