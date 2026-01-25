@@ -77,6 +77,7 @@ import org.springframework.transaction.interceptor.TransactionAttribute;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.Assert;
 
+import static org.springframework.batch.core.BatchConstants.BATCH_STEP_TYPE;
 import static org.springframework.batch.core.observability.BatchMetrics.METRICS_PREFIX;
 
 /**
@@ -362,7 +363,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 
 	@Override
 	protected void doExecute(StepExecution stepExecution) throws Exception {
-		stepExecution.getExecutionContext().put(STEP_TYPE_KEY, this.getClass().getName());
+		stepExecution.getExecutionContext().put(BATCH_STEP_TYPE, this.getClass().getName());
 		while (this.chunkTracker.get().moreItems() && !interrupted(stepExecution)) {
 			// process next chunk in its own transaction
 			this.transactionTemplate.executeWithoutResult(transactionStatus -> {
