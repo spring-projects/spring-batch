@@ -48,6 +48,7 @@ import org.springframework.batch.infrastructure.support.transaction.Resourceless
  * @since 5.2.0
  * @author Mahmoud Ben Hassine
  * @author Sanghyuk Jung
+ * @author Yanming Zhou
  */
 public class ResourcelessJobRepository implements JobRepository {
 
@@ -266,6 +267,21 @@ public class ResourcelessJobRepository implements JobRepository {
 		stepExecution.setStatus(BatchStatus.STARTING);
 		stepExecution.setLastUpdated(LocalDateTime.now());
 		stepExecution.incrementVersion();
+		jobExecution.addStepExecution(stepExecution);
+		return stepExecution;
+	}
+
+	@Override
+	public StepExecution createStepExecution(String stepName, JobExecution jobExecution,
+			@Nullable ExecutionContext stepExecutionContext) {
+		StepExecution stepExecution = new StepExecution(++stepExecutionIdIncrementer, stepName, jobExecution);
+		stepExecution.setStartTime(LocalDateTime.now());
+		stepExecution.setStatus(BatchStatus.STARTING);
+		stepExecution.setLastUpdated(LocalDateTime.now());
+		stepExecution.incrementVersion();
+		if (stepExecutionContext != null && !stepExecutionContext.isEmpty()) {
+			stepExecution.setExecutionContext(new ExecutionContext(stepExecutionContext));
+		}
 		jobExecution.addStepExecution(stepExecution);
 		return stepExecution;
 	}
