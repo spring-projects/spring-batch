@@ -18,7 +18,6 @@ package org.springframework.batch.core.partition.support;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -200,10 +199,6 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter {
 
 	private boolean shouldStart(boolean allowStartIfComplete, StepExecution stepExecution,
 			StepExecution lastStepExecution) throws JobExecutionException {
-
-		if (lastStepExecution == null) {
-			return true;
-		}
 
 		BatchStatus stepStatus = lastStepExecution.getStatus();
 
