@@ -61,7 +61,7 @@ public class JobExecutionConverter {
 	public JobExecution fromJobExecution(org.springframework.batch.core.job.JobExecution source) {
 		JobExecution jobExecution = new JobExecution();
 		jobExecution.setJobExecutionId(source.getId());
-		jobExecution.setJobInstanceId(source.getJobInstance().getInstanceId());
+		jobExecution.setJobInstanceId(source.getJobInstance().getId());
 		Set<JobParameter<?>> parameters = new HashSet<>();
 		source.getJobParameters()
 			.parameters()
