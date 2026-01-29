@@ -90,7 +90,7 @@ public class StepContext extends SynchronizedAttributeAccessor {
 	 * current {@link StepExecution}
 	 */
 	public Long getJobInstanceId() {
-		return stepExecution.getJobExecution().getJobInstance().getInstanceId();
+		return stepExecution.getJobExecution().getJobInstance().getId();
 	}
 
 	/**
