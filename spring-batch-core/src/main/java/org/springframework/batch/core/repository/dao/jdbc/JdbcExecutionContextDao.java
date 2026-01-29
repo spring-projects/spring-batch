@@ -27,7 +27,6 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.locks.Lock;
@@ -65,7 +64,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 	private static final String FIND_JOB_EXECUTION_CONTEXT = """
 			SELECT SHORT_CONTEXT, SERIALIZED_CONTEXT
 			FROM %PREFIX%JOB_EXECUTION_CONTEXT
-			WHERE JOB_EXECUTION_ID = ?
+			WHERE JOB_EXECUTION_ID = :jobExecutionId
 			""";
 
 	private static final String INSERT_JOB_EXECUTION_CONTEXT = """
@@ -82,7 +81,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 	private static final String FIND_STEP_EXECUTION_CONTEXT = """
 			SELECT SHORT_CONTEXT, SERIALIZED_CONTEXT
 			FROM %PREFIX%STEP_EXECUTION_CONTEXT
-			WHERE STEP_EXECUTION_ID = ?
+			WHERE STEP_EXECUTION_ID = :stepExecutionId
 			""";
 
 	private static final String INSERT_STEP_EXECUTION_CONTEXT = """
@@ -98,12 +97,12 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 
 	private static final String DELETE_STEP_EXECUTION_CONTEXT = """
 			DELETE FROM %PREFIX%STEP_EXECUTION_CONTEXT
-			WHERE STEP_EXECUTION_ID = ?
+			WHERE STEP_EXECUTION_ID = :stepExecutionId
 			""";
 
 	private static final String DELETE_JOB_EXECUTION_CONTEXT = """
 			DELETE FROM %PREFIX%JOB_EXECUTION_CONTEXT
-			WHERE JOB_EXECUTION_ID = ?
+			WHERE JOB_EXECUTION_ID = :jobExecutionId
 			""";
 
 	private Charset charset = StandardCharsets.UTF_8;
@@ -154,14 +153,12 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 		Long executionId = jobExecution.getId();
 		Assert.notNull(executionId, "ExecutionId must not be null.");
 
-		List<ExecutionContext> results = getJdbcTemplate().query(getQuery(FIND_JOB_EXECUTION_CONTEXT),
-				new ExecutionContextRowMapper(), executionId);
-		if (!results.isEmpty()) {
-			return results.get(0);
-		}
-		else {
-			return new ExecutionContext();
-		}
+		return getJdbcClient().sql(getQuery(FIND_JOB_EXECUTION_CONTEXT))
+			.param("jobExecutionId", executionId)
+			.query(new ExecutionContextRowMapper())
+			.optional()
+			.orElseGet(ExecutionContext::new);
+
 	}
 
 	@Override
@@ -169,14 +166,11 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 		Long executionId = stepExecution.getId();
 		Assert.notNull(executionId, "ExecutionId must not be null.");
 
-		List<ExecutionContext> results = getJdbcTemplate().query(getQuery(FIND_STEP_EXECUTION_CONTEXT),
-				new ExecutionContextRowMapper(), executionId);
-		if (results.size() > 0) {
-			return results.get(0);
-		}
-		else {
-			return new ExecutionContext();
-		}
+		return getJdbcClient().sql(getQuery(FIND_STEP_EXECUTION_CONTEXT))
+			.param("stepExecutionId", executionId)
+			.query(new ExecutionContextRowMapper())
+			.optional()
+			.orElseGet(ExecutionContext::new);
 	}
 
 	@Override
@@ -256,7 +250,9 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 	 */
 	@Override
 	public void deleteExecutionContext(JobExecution jobExecution) {
-		getJdbcTemplate().update(getQuery(DELETE_JOB_EXECUTION_CONTEXT), jobExecution.getId());
+		getJdbcClient().sql(getQuery(DELETE_JOB_EXECUTION_CONTEXT))
+			.param("jobExecutionId", jobExecution.getId())
+			.update();
 	}
 
 	/**
@@ -265,7 +261,9 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 	 */
 	@Override
 	public void deleteExecutionContext(StepExecution stepExecution) {
-		getJdbcTemplate().update(getQuery(DELETE_STEP_EXECUTION_CONTEXT), stepExecution.getId());
+		getJdbcClient().sql(getQuery(DELETE_STEP_EXECUTION_CONTEXT))
+			.param("stepExecutionId", stepExecution.getId())
+			.update();
 	}
 
 	@Override
@@ -294,16 +292,13 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 			longContext = null;
 		}
 
-		getJdbcTemplate().update(getQuery(sql), ps -> {
-			ps.setString(1, shortContext);
-			if (longContext != null) {
-				ps.setString(2, longContext);
-			}
-			else {
-				ps.setNull(2, getClobTypeToUse());
-			}
-			ps.setLong(3, executionId);
-		});
+		getJdbcClient().sql(getQuery(sql))
+		// @formatter:off
+				.param(1, shortContext)
+				.param(2, longContext, getClobTypeToUse())
+				.param(3, executionId)
+		// @formatter:on
+			.update();
 	}
 
 	/**
