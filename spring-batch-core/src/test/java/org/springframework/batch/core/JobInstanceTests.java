@@ -50,7 +50,7 @@ class JobInstanceTests {
 
 	@Test
 	void testGetInstanceId() {
-		assertEquals(11, instance.getInstanceId());
+		assertEquals(11, instance.getId());
 	}
 
 }
