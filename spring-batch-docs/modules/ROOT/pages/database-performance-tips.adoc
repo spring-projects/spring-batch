@@ -11,7 +11,7 @@ This appendix provides database-specific tips, performance optimizations, and co
 [[postgresql-cursor-streaming]]
 === Cursor-Based Streaming with JdbcCursorItemReader
 
-When using `JdbcCursorItemReader` with PostgreSQL, you must disable auto-commit on the datasource to prevent the entire result set from being materialized in memory. By default, the PostgreSQL JDBC driver loads all rows into memory unless auto-commit is disabled.
+When using xref:readers-and-writers/database.adoc#JdbcCursorItemReader[`JdbcCursorItemReader`] with PostgreSQL, you must disable auto-commit on the datasource to prevent the entire result set from being materialized in memory. By default, the PostgreSQL JDBC driver loads all rows into memory unless auto-commit is disabled.
 
 .Configuring Auto-Commit for Streaming
 [source,java]
@@ -41,11 +41,21 @@ For more details, see the PostgreSQL JDBC documentation on https://jdbc.postgres
 
 When using `SELECT ... FOR UPDATE SKIP LOCKED` in a reader to process rows concurrently, be aware that the writer may get stuck if it attempts to update the same locked rows. This can happen when the reader locks rows and the writer tries to update them before the transaction commits.
 
-.Workaround
-[source,java]
+[WARNING]
+====
+In a chunk-oriented step, the reader and writer operate within the same transaction. If the reader locks rows with `FOR UPDATE`, the writer attempting to update those same rows may experience deadlocks or blocking.
+====
+
+.Recommended Approach
+[source,sql]
 ----
-// Use separate transactions for reading and writing
-// or process items in a way that avoids updating locked rows
+-- Use FOR UPDATE SKIP LOCKED to avoid blocking
+-- Process items in a way that doesn't update the same rows read
+SELECT id, status, data 
+FROM processing_queue 
+WHERE status = 'PENDING' 
+FOR UPDATE SKIP LOCKED 
+LIMIT 1000;
 ----
 
 For more information, see this https://stackoverflow.com/questions/77358701/how-to-enable-itemwriter-to-write-items-to-database-when-rows-are-locked-by-item/77373190#77373190[Stack Overflow discussion on PostgreSQL row locking].
@@ -120,7 +130,7 @@ For more details, see the https://dev.mysql.com/doc/connector-j/en/connector-j-r
 [[mysql-batch-writing]]
 === Batch Writing Performance with JdbcBatchItemWriter
 
-When using `JdbcBatchItemWriter` with MySQL, add `rewriteBatchedStatements=true` to the JDBC URL to significantly improve write performance. This parameter enables the JDBC driver to rewrite batched INSERT statements into a single multi-value INSERT.
+When using xref:appendix.adoc#itemWritersAppendix[`JdbcBatchItemWriter`] with MySQL, add `rewriteBatchedStatements=true` to the JDBC URL to significantly improve write performance. This parameter enables the JDBC driver to rewrite batched INSERT statements into a single multi-value INSERT.
 
 .JDBC URL with Batch Optimization
 [source,properties]
@@ -198,7 +208,7 @@ public void write(Chunk<? extends Customer> items) throws Exception {
 
 [IMPORTANT]
 ====
-The `JpaItemWriter` provided by Spring Batch already implements this pattern correctly. If you're creating custom JPA writers, ensure you follow this pattern.
+The xref:appendix.adoc#itemWritersAppendix[`JpaItemWriter`] provided by Spring Batch already implements this pattern correctly. If you're creating custom JPA writers, ensure you follow this pattern. See also the xref:readers-and-writers/database.adoc#databaseItemWriters[Database ItemWriters] documentation.
 ====
 
 [[indexing-strategies]]
@@ -226,6 +236,22 @@ For optimal performance, align these values or use a chunk size that's a multipl
 ----
 spring.jpa.properties.hibernate.jdbc.batch_size=25
 # Set chunk size to 25, 50, 75, etc. for optimal performance
+----
+
+.Step Configuration Example
+[source,java]
+----
+@Bean
+public Step exampleStep(JobRepository jobRepository,
+                         PlatformTransactionManager transactionManager,
+                         ItemReader<Customer> reader,
+                         ItemWriter<Customer> writer) {
+    return new StepBuilder("exampleStep", jobRepository)
+        .<Customer, Customer>chunk(25, transactionManager)  // Matches hibernate.jdbc.batch_size
+        .reader(reader)
+        .writer(writer)
+        .build();
+}
 ----
 
 [[additional-resources]]
