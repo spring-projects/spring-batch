@@ -1,0 +1,239 @@
+
+[appendix]
+[[database-performance-tips]]
+= Database Performance Tips and Tricks
+
+This appendix provides database-specific tips, performance optimizations, and common pitfalls when working with Spring Batch's database readers and writers. These recommendations are based on community experience and database-specific behaviors that can significantly impact batch job performance and reliability.
+
+[[postgresql-tips]]
+== PostgreSQL
+
+[[postgresql-cursor-streaming]]
+=== Cursor-Based Streaming with JdbcCursorItemReader
+
+When using `JdbcCursorItemReader` with PostgreSQL, you must disable auto-commit on the datasource to prevent the entire result set from being materialized in memory. By default, the PostgreSQL JDBC driver loads all rows into memory unless auto-commit is disabled.
+
+.Configuring Auto-Commit for Streaming
+[source,java]
+----
+@Bean
+@ConfigurationProperties("spring.datasource.configuration")
+public HikariDataSource dataSource(DataSourceProperties dataSourceProperties) {
+    HikariDataSource dataSource = dataSourceProperties
+        .initializeDataSourceBuilder()
+        .type(HikariDataSource.class)
+        .build();
+    
+    // Required for PostgreSQL cursor-based streaming
+    dataSource.setAutoCommit(false);
+    
+    return dataSource;
+}
+----
+
+[NOTE]
+====
+For more details, see the PostgreSQL JDBC documentation on https://jdbc.postgresql.org/documentation/query/#getting-results-based-on-a-cursor[getting results based on a cursor].
+====
+
+[[postgresql-row-locking]]
+=== Row Locking with SELECT FOR UPDATE
+
+When using `SELECT ... FOR UPDATE SKIP LOCKED` in a reader to process rows concurrently, be aware that the writer may get stuck if it attempts to update the same locked rows. This can happen when the reader locks rows and the writer tries to update them before the transaction commits.
+
+.Workaround
+[source,java]
+----
+// Use separate transactions for reading and writing
+// or process items in a way that avoids updating locked rows
+----
+
+For more information, see this https://stackoverflow.com/questions/77358701/how-to-enable-itemwriter-to-write-items-to-database-when-rows-are-locked-by-item/77373190#77373190[Stack Overflow discussion on PostgreSQL row locking].
+
+[[mysql-tips]]
+== MySQL
+
+[[mysql-streaming-results]]
+=== Streaming Results with JdbcCursorItemReader
+
+MySQL has specific requirements for streaming large result sets. There are two primary approaches to prevent loading the entire result set into memory:
+
+[[mysql-streaming-one-by-one]]
+==== Streaming Results One Row at a Time
+
+To stream results one row at a time, configure the fetch size to `Integer.MIN_VALUE`:
+
+.Streaming Configuration
+[source,java]
+----
+@Bean
+public JdbcCursorItemReader<Customer> reader(DataSource dataSource) {
+    return new JdbcCursorItemReaderBuilder<Customer>()
+        .name("customerReader")
+        .dataSource(dataSource)
+        .sql("SELECT id, name, credit FROM customer")
+        .rowMapper(new CustomerRowMapper())
+        .fetchSize(Integer.MIN_VALUE)  // Required for MySQL streaming
+        .verifyCursorPosition(false)   // Must be disabled with Integer.MIN_VALUE
+        .build();
+}
+----
+
+[IMPORTANT]
+====
+When using `fetchSize(Integer.MIN_VALUE)`, you **must** also call `verifyCursorPosition(false)` because cursor position verification is not supported in streaming mode.
+====
+
+[[mysql-cursor-based]]
+==== Cursor-Based Fetching
+
+Alternatively, you can use MySQL's cursor-based fetching by adding `useCursorFetch=true` to the JDBC URL:
+
+.JDBC URL Configuration
+[source,properties]
+----
+spring.datasource.url=jdbc:mysql://localhost:3306/batch?useCursorFetch=true
+----
+
+Then configure a specific fetch size:
+
+.Cursor-Based Fetch Configuration
+[source,java]
+----
+@Bean
+public JdbcCursorItemReader<Customer> reader(DataSource dataSource) {
+    return new JdbcCursorItemReaderBuilder<Customer>()
+        .name("customerReader")
+        .dataSource(dataSource)
+        .sql("SELECT id, name, credit FROM customer")
+        .rowMapper(new CustomerRowMapper())
+        .fetchSize(1000)  // Fetch 1000 rows at a time
+        .build();
+}
+----
+
+[NOTE]
+====
+For more details, see the https://dev.mysql.com/doc/connector-j/en/connector-j-reference-implementation-notes.html[MySQL Connector/J documentation] under the "ResultSet" section.
+====
+
+[[mysql-batch-writing]]
+=== Batch Writing Performance with JdbcBatchItemWriter
+
+When using `JdbcBatchItemWriter` with MySQL, add `rewriteBatchedStatements=true` to the JDBC URL to significantly improve write performance. This parameter enables the JDBC driver to rewrite batched INSERT statements into a single multi-value INSERT.
+
+.JDBC URL with Batch Optimization
+[source,properties]
+----
+spring.datasource.url=jdbc:mysql://localhost:3306/batch?rewriteBatchedStatements=true
+----
+
+.Performance Impact
+[source,java]
+----
+// Without rewriteBatchedStatements:
+// INSERT INTO table VALUES (1, 'a');
+// INSERT INTO table VALUES (2, 'b');
+// INSERT INTO table VALUES (3, 'c');
+
+// With rewriteBatchedStatements=true:
+// INSERT INTO table VALUES (1, 'a'), (2, 'b'), (3, 'c');
+----
+
+This optimization can provide **significant performance improvements** for batch insert operations, often reducing insert time by 50% or more.
+
+[[general-tips]]
+== General Database Performance Tips
+
+[[fetch-size-tuning]]
+=== Fetch Size Tuning
+
+The fetch size determines how many rows are retrieved from the database in a single network round trip. Tuning this value can significantly impact performance:
+
+* **Too small**: Excessive network round trips, poor performance
+* **Too large**: High memory consumption, potential OutOfMemoryError
+* **Recommended**: Start with 100-1000 and adjust based on row size and available memory
+
+.Example Fetch Size Configuration
+[source,java]
+----
+@Bean
+public JdbcCursorItemReader<Customer> reader(DataSource dataSource) {
+    return new JdbcCursorItemReaderBuilder<Customer>()
+        .fetchSize(500)  // Tune based on your data size
+        // ... other configuration
+        .build();
+}
+----
+
+[[connection-pooling]]
+=== Connection Pooling
+
+Always use a connection pool (such as HikariCP) in production environments. Configure appropriate pool sizes based on your concurrency requirements:
+
+.HikariCP Configuration Example
+[source,properties]
+----
+spring.datasource.hikari.maximum-pool-size=10
+spring.datasource.hikari.minimum-idle=5
+spring.datasource.hikari.connection-timeout=30000
+----
+
+[[flushing-writes]]
+=== Flushing JPA/Hibernate Writes
+
+When using JPA-based item writers, always flush the EntityManager in the `write()` method to ensure errors are detected immediately, not during transaction commit. This allows Spring Batch's skip and retry logic to work correctly.
+
+.Proper Flush Pattern
+[source,java]
+----
+@Override
+public void write(Chunk<? extends Customer> items) throws Exception {
+    for (Customer customer : items) {
+        entityManager.merge(customer);
+    }
+    entityManager.flush();  // Critical for proper error handling
+}
+----
+
+[IMPORTANT]
+====
+The `JpaItemWriter` provided by Spring Batch already implements this pattern correctly. If you're creating custom JPA writers, ensure you follow this pattern.
+====
+
+[[indexing-strategies]]
+=== Indexing Strategies
+
+Ensure proper indexing on columns used in:
+
+* WHERE clauses in reader queries
+* ORDER BY clauses for paging queries
+* JOIN conditions
+* Foreign key relationships
+
+Poor indexing can cause severe performance degradation, especially with large datasets.
+
+[[batch-size-tuning]]
+=== Batch Size vs Chunk Size
+
+* **Chunk size**: Number of items processed in a single transaction
+* **Batch size** (JDBC/JPA): Number of SQL statements executed as a batch
+
+For optimal performance, align these values or use a chunk size that's a multiple of the batch size.
+
+.JPA Batch Configuration
+[source,properties]
+----
+spring.jpa.properties.hibernate.jdbc.batch_size=25
+# Set chunk size to 25, 50, 75, etc. for optimal performance
+----
+
+[[additional-resources]]
+== Additional Resources
+
+For more detailed optimization strategies and database-specific configurations, see:
+
+* https://gist.github.com/benelog/e7560ccf29c4365d939e9c3d210f9086[MySQL Optimization Guide for Spring Batch] by @benelog
+* https://jdbc.postgresql.org/documentation/query/[PostgreSQL JDBC Documentation]
+* https://dev.mysql.com/doc/connector-j/en/[MySQL Connector/J Documentation]
+
