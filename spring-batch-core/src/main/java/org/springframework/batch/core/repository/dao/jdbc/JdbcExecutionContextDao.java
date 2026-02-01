@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -151,8 +151,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 
 	@Override
 	public ExecutionContext getExecutionContext(JobExecution jobExecution) {
-		Long executionId = jobExecution.getId();
-		Assert.notNull(executionId, "ExecutionId must not be null.");
+		long executionId = jobExecution.getId();
 
 		List<ExecutionContext> results = getJdbcTemplate().query(getQuery(FIND_JOB_EXECUTION_CONTEXT),
 				new ExecutionContextRowMapper(), executionId);
@@ -166,8 +165,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 
 	@Override
 	public ExecutionContext getExecutionContext(StepExecution stepExecution) {
-		Long executionId = stepExecution.getId();
-		Assert.notNull(executionId, "ExecutionId must not be null.");
+		long executionId = stepExecution.getId();
 
 		List<ExecutionContext> results = getJdbcTemplate().query(getQuery(FIND_STEP_EXECUTION_CONTEXT),
 				new ExecutionContextRowMapper(), executionId);
@@ -181,9 +179,8 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 
 	@Override
 	public void updateExecutionContext(JobExecution jobExecution) {
-		Long executionId = jobExecution.getId();
+		long executionId = jobExecution.getId();
 		ExecutionContext executionContext = jobExecution.getExecutionContext();
-		Assert.notNull(executionId, "ExecutionId must not be null.");
 		Assert.notNull(executionContext, "The ExecutionContext must not be null.");
 
 		String serializedContext = serializeContext(executionContext);
@@ -197,9 +194,8 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 		// someone is already trying to do it.
 		this.lock.lock();
 		try {
-			Long executionId = stepExecution.getId();
+			long executionId = stepExecution.getId();
 			ExecutionContext executionContext = stepExecution.getExecutionContext();
-			Assert.notNull(executionId, "ExecutionId must not be null.");
 			Assert.notNull(executionContext, "The ExecutionContext must not be null.");
 
 			String serializedContext = serializeContext(executionContext);
@@ -214,9 +210,8 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 	@Override
 	public void saveExecutionContext(JobExecution jobExecution) {
 
-		Long executionId = jobExecution.getId();
+		long executionId = jobExecution.getId();
 		ExecutionContext executionContext = jobExecution.getExecutionContext();
-		Assert.notNull(executionId, "ExecutionId must not be null.");
 		Assert.notNull(executionContext, "The ExecutionContext must not be null.");
 
 		String serializedContext = serializeContext(executionContext);
@@ -226,9 +221,8 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 
 	@Override
 	public void saveExecutionContext(StepExecution stepExecution) {
-		Long executionId = stepExecution.getId();
+		long executionId = stepExecution.getId();
 		ExecutionContext executionContext = stepExecution.getExecutionContext();
-		Assert.notNull(executionId, "ExecutionId must not be null.");
 		Assert.notNull(executionContext, "The ExecutionContext must not be null.");
 
 		String serializedContext = serializeContext(executionContext);
@@ -241,9 +235,8 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 		Assert.notNull(stepExecutions, "Attempt to save an null collection of step executions");
 		Map<Long, String> serializedContexts = CollectionUtils.newHashMap(stepExecutions.size());
 		for (StepExecution stepExecution : stepExecutions) {
-			Long executionId = stepExecution.getId();
+			long executionId = stepExecution.getId();
 			ExecutionContext executionContext = stepExecution.getExecutionContext();
-			Assert.notNull(executionId, "ExecutionId must not be null.");
 			Assert.notNull(executionContext, "The ExecutionContext must not be null.");
 			serializedContexts.put(executionId, serializeContext(executionContext));
 		}
@@ -279,7 +272,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 	 * @param serializedContext the serialized context to persist
 	 * @param sql with parameters (shortContext, longContext, executionId)
 	 */
-	private void persistSerializedContext(Long executionId, String serializedContext, String sql) {
+	private void persistSerializedContext(long executionId, String serializedContext, String sql) {
 
 		final String shortContext;
 		final String longContext;

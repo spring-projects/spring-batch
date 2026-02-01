@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -215,8 +215,6 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 	public void updateStepExecution(StepExecution stepExecution) {
 
 		validateStepExecution(stepExecution);
-		Assert.notNull(stepExecution.getId(),
-				"StepExecution Id cannot be null. StepExecution must saved" + " before it can be updated.");
 
 		// Do not check for existence of step execution considering
 		// it is saved at every commit point.
