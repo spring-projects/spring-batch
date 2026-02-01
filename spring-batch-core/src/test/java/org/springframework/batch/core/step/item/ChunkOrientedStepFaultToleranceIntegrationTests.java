@@ -86,7 +86,7 @@ public class ChunkOrientedStepFaultToleranceIntegrationTests {
 		Assertions.assertEquals(4, stepExecution.getReadCount());
 		Assertions.assertEquals(3, stepExecution.getWriteCount());
 		Assertions.assertEquals(3, stepExecution.getCommitCount());
-		Assertions.assertEquals(0, stepExecution.getRollbackCount());
+		Assertions.assertEquals(2, stepExecution.getRollbackCount());
 		Assertions.assertEquals(2, stepExecution.getReadSkipCount());
 		Assertions.assertEquals(1, stepExecution.getWriteSkipCount());
 		Assertions.assertEquals(3, stepExecution.getSkipCount());
@@ -117,7 +117,7 @@ public class ChunkOrientedStepFaultToleranceIntegrationTests {
 		Assertions.assertEquals(4, stepExecution.getReadCount());
 		Assertions.assertEquals(3, stepExecution.getWriteCount());
 		Assertions.assertEquals(3, stepExecution.getCommitCount());
-		Assertions.assertEquals(0, stepExecution.getRollbackCount());
+		Assertions.assertEquals(2, stepExecution.getRollbackCount());
 		Assertions.assertEquals(2, stepExecution.getReadSkipCount());
 		Assertions.assertEquals(1, stepExecution.getWriteSkipCount());
 		Assertions.assertEquals(3, stepExecution.getSkipCount());
@@ -151,7 +151,7 @@ public class ChunkOrientedStepFaultToleranceIntegrationTests {
 		Assertions.assertEquals(3, stepExecution.getReadCount());
 		Assertions.assertEquals(2, stepExecution.getWriteCount());
 		Assertions.assertEquals(1, stepExecution.getCommitCount());
-		Assertions.assertEquals(1, stepExecution.getRollbackCount());
+		Assertions.assertEquals(2, stepExecution.getRollbackCount());
 		Assertions.assertEquals(1, stepExecution.getReadSkipCount());
 		Assertions.assertEquals(0, stepExecution.getWriteSkipCount());
 		Assertions.assertEquals(1, stepExecution.getSkipCount());
@@ -185,7 +185,7 @@ public class ChunkOrientedStepFaultToleranceIntegrationTests {
 		Assertions.assertEquals(3, stepExecution.getReadCount());
 		Assertions.assertEquals(2, stepExecution.getWriteCount());
 		Assertions.assertEquals(1, stepExecution.getCommitCount());
-		Assertions.assertEquals(1, stepExecution.getRollbackCount());
+		Assertions.assertEquals(2, stepExecution.getRollbackCount());
 		Assertions.assertEquals(1, stepExecution.getReadSkipCount());
 		Assertions.assertEquals(0, stepExecution.getWriteSkipCount());
 		Assertions.assertEquals(1, stepExecution.getSkipCount());
@@ -269,6 +269,56 @@ public class ChunkOrientedStepFaultToleranceIntegrationTests {
 		Assertions.assertEquals(0, stepExecution.getReadSkipCount());
 		// no scan is triggered as the exception is non skippable
 		Assertions.assertEquals(0, stepExecution.getWriteSkipCount());
+	}
+
+	// Issue https://github.com/spring-projects/spring-batch/issues/5210
+	@Test
+	void testNoDuplicateWritesAfterScanModeInSequentialMode() throws Exception {
+		// given
+		ApplicationContext context = new AnnotationConfigApplicationContext(TestConfiguration.class,
+				DuplicateWriteDetectionStepConfiguration.class);
+		JobOperator jobOperator = context.getBean(JobOperator.class);
+		Job job = context.getBean(Job.class);
+		JdbcTemplate jdbcTemplate = context.getBean(JdbcTemplate.class);
+
+		// when
+		JobParameters jobParameters = new JobParametersBuilder().toJobParameters();
+		JobExecution jobExecution = jobOperator.start(job, jobParameters);
+
+		// then
+		Assertions.assertEquals(ExitStatus.COMPLETED.getExitCode(), jobExecution.getExitStatus().getExitCode());
+		StepExecution stepExecution = jobExecution.getStepExecutions().iterator().next();
+		Assertions.assertEquals(3, stepExecution.getReadCount());
+		Assertions.assertEquals(1, stepExecution.getWriteCount());
+		Assertions.assertEquals(2, stepExecution.getWriteSkipCount());
+		Assertions.assertEquals(1,
+				jdbcTemplate.queryForObject("SELECT COUNT(*) FROM delivery WHERE item_number = '1'", Integer.class));
+		Assertions.assertEquals(1, JdbcTestUtils.countRowsInTable(jdbcTemplate, "delivery"));
+	}
+
+	// Issue https://github.com/spring-projects/spring-batch/issues/5210
+	@Test
+	void testNoDuplicateWritesAfterScanModeInConcurrentMode() throws Exception {
+		// given
+		ApplicationContext context = new AnnotationConfigApplicationContext(TestConfiguration.class,
+				ConcurrentDuplicateWriteDetectionStepConfiguration.class);
+		JobOperator jobOperator = context.getBean(JobOperator.class);
+		Job job = context.getBean(Job.class);
+		JdbcTemplate jdbcTemplate = context.getBean(JdbcTemplate.class);
+
+		// when
+		JobParameters jobParameters = new JobParametersBuilder().toJobParameters();
+		JobExecution jobExecution = jobOperator.start(job, jobParameters);
+
+		// then
+		Assertions.assertEquals(ExitStatus.COMPLETED.getExitCode(), jobExecution.getExitStatus().getExitCode());
+		StepExecution stepExecution = jobExecution.getStepExecutions().iterator().next();
+		Assertions.assertEquals(3, stepExecution.getReadCount());
+		Assertions.assertEquals(1, stepExecution.getWriteCount());
+		Assertions.assertEquals(2, stepExecution.getWriteSkipCount());
+		Assertions.assertEquals(1,
+				jdbcTemplate.queryForObject("SELECT COUNT(*) FROM delivery WHERE item_number = '1'", Integer.class));
+		Assertions.assertEquals(1, JdbcTestUtils.countRowsInTable(jdbcTemplate, "delivery"));
 	}
 
 	@Configuration
@@ -409,6 +459,55 @@ public class ChunkOrientedStepFaultToleranceIntegrationTests {
 				.faultTolerant()
 				.retryPolicy(retryPolicy)
 				.skipPolicy(skipPolicy)
+				.build();
+		}
+
+	}
+
+	@Configuration
+	static class DuplicateWriteDetectionStepConfiguration {
+
+		@Bean
+		public Step step(JobRepository jobRepository, JdbcTransactionManager transactionManager,
+				JdbcTemplate jdbcTemplate) {
+			List<String> items = List.of("1", "2", "3");
+			return new ChunkOrientedStepBuilder<String, String>(jobRepository, 3).reader(new ListItemReader<>(items))
+				.writer(chunk -> {
+					for (String item : chunk) {
+						if ("2".equals(item) || "3".equals(item)) {
+							throw new RuntimeException("Simulated write error for item: " + item);
+						}
+						jdbcTemplate.update("INSERT INTO delivery (item_number) VALUES (?)", item);
+					}
+				})
+				.transactionManager(transactionManager)
+				.faultTolerant()
+				.skipPolicy(new AlwaysSkipItemSkipPolicy())
+				.build();
+		}
+
+	}
+
+	@Configuration
+	static class ConcurrentDuplicateWriteDetectionStepConfiguration {
+
+		@Bean
+		public Step step(JobRepository jobRepository, JdbcTransactionManager transactionManager,
+				JdbcTemplate jdbcTemplate) {
+			List<String> items = List.of("1", "2", "3");
+			return new ChunkOrientedStepBuilder<String, String>(jobRepository, 3).reader(new ListItemReader<>(items))
+				.writer(chunk -> {
+					for (String item : chunk) {
+						if ("2".equals(item) || "3".equals(item)) {
+							throw new RuntimeException("Simulated write error for item: " + item);
+						}
+						jdbcTemplate.update("INSERT INTO delivery (item_number) VALUES (?)", item);
+					}
+				})
+				.transactionManager(transactionManager)
+				.taskExecutor(new SimpleAsyncTaskExecutor())
+				.faultTolerant()
+				.skipPolicy(new AlwaysSkipItemSkipPolicy())
 				.build();
 		}
 
