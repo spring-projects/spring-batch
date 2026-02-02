@@ -86,6 +86,7 @@ import java.sql.Types;
  * </pre>
  *
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  * @since 6.0
  */
 @Configuration(proxyBeanMethods = false)
@@ -103,6 +104,9 @@ public class JdbcDefaultBatchConfiguration extends DefaultBatchConfiguration {
 			jobRepositoryFactoryBean.setJobKeyGenerator(getJobKeyGenerator());
 			jobRepositoryFactoryBean.setClobType(getClobType());
 			jobRepositoryFactoryBean.setTablePrefix(getTablePrefix());
+			jobRepositoryFactoryBean.setJobInstanceIncrementerName(getJobInstanceIncrementerName());
+			jobRepositoryFactoryBean.setJobExecutionIncrementerName(getJobExecutionIncrementerName());
+			jobRepositoryFactoryBean.setStepExecutionIncrementerName(getStepExecutionIncrementerName());
 			jobRepositoryFactoryBean.setSerializer(getExecutionContextSerializer());
 			jobRepositoryFactoryBean.setConversionService(getConversionService());
 			jobRepositoryFactoryBean.setJdbcOperations(getJdbcOperations());
@@ -181,6 +185,33 @@ public class JdbcDefaultBatchConfiguration extends DefaultBatchConfiguration {
 	 */
 	protected String getTablePrefix() {
 		return AbstractJdbcBatchMetadataDao.DEFAULT_TABLE_PREFIX;
+	}
+
+	/**
+	 * Return the job instance incrementer name. Defaults to
+	 * {@link AbstractJdbcBatchMetadataDao#DEFAULT_JOB_INSTANCE_INCREMENTER_NAME}.
+	 * @return job instance incrementer name
+	 */
+	protected String getJobInstanceIncrementerName() {
+		return AbstractJdbcBatchMetadataDao.DEFAULT_JOB_INSTANCE_INCREMENTER_NAME;
+	}
+
+	/**
+	 * Return the job execution incrementer name. Defaults to
+	 * {@link AbstractJdbcBatchMetadataDao#DEFAULT_JOB_EXECUTION_INCREMENTER_NAME}.
+	 * @return job execution incrementer name
+	 */
+	protected String getJobExecutionIncrementerName() {
+		return AbstractJdbcBatchMetadataDao.DEFAULT_JOB_EXECUTION_INCREMENTER_NAME;
+	}
+
+	/**
+	 * Return the step execution incrementer name. Defaults to
+	 * {@link AbstractJdbcBatchMetadataDao#DEFAULT_STEP_EXECUTION_INCREMENTER_NAME}.
+	 * @return step execution incrementer name
+	 */
+	protected String getStepExecutionIncrementerName() {
+		return AbstractJdbcBatchMetadataDao.DEFAULT_STEP_EXECUTION_INCREMENTER_NAME;
 	}
 
 	/**
