@@ -31,10 +31,6 @@ import org.springframework.batch.core.converter.StringToLocalTimeConverter;
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
 import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDao;
 import org.springframework.batch.core.repository.dao.DefaultExecutionContextSerializer;
-import org.springframework.batch.core.repository.dao.ExecutionContextDao;
-import org.springframework.batch.core.repository.dao.JobExecutionDao;
-import org.springframework.batch.core.repository.dao.JobInstanceDao;
-import org.springframework.batch.core.repository.dao.StepExecutionDao;
 import org.springframework.batch.core.repository.dao.jdbc.JdbcExecutionContextDao;
 import org.springframework.batch.core.repository.dao.jdbc.JdbcJobExecutionDao;
 import org.springframework.batch.core.repository.dao.jdbc.JdbcJobInstanceDao;
@@ -70,6 +66,7 @@ import static org.springframework.batch.infrastructure.support.DatabaseType.SYBA
  * @author Dave Syer
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  * @deprecated since 6.0 in favor of {@link JdbcJobRepositoryFactoryBean}. Scheduled for
  * removal in 6.2 or later.
  */
@@ -86,6 +83,12 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 	protected String databaseType;
 
 	protected String tablePrefix = AbstractJdbcBatchMetadataDao.DEFAULT_TABLE_PREFIX;
+
+	protected String jobInstanceIncrementerName = AbstractJdbcBatchMetadataDao.DEFAULT_JOB_INSTANCE_INCREMENTER_NAME;
+
+	protected String jobExecutionIncrementerName = AbstractJdbcBatchMetadataDao.DEFAULT_JOB_EXECUTION_INCREMENTER_NAME;
+
+	protected String stepExecutionIncrementerName = AbstractJdbcBatchMetadataDao.DEFAULT_STEP_EXECUTION_INCREMENTER_NAME;
 
 	protected DataFieldMaxValueIncrementerFactory incrementerFactory;
 
@@ -207,6 +210,30 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 		this.tablePrefix = tablePrefix;
 	}
 
+	/**
+	 * Sets the job instance incrementer name.
+	 * @param jobInstanceIncrementerName job instance incrementer name
+	 */
+	public void setJobInstanceIncrementerName(String jobInstanceIncrementerName) {
+		this.jobInstanceIncrementerName = jobInstanceIncrementerName;
+	}
+
+	/**
+	 * Sets the job execution incrementer name.
+	 * @param jobExecutionIncrementerName job execution incrementer name
+	 */
+	public void setJobExecutionIncrementerName(String jobExecutionIncrementerName) {
+		this.jobExecutionIncrementerName = jobExecutionIncrementerName;
+	}
+
+	/**
+	 * Sets the step execution incrementer name.
+	 * @param stepExecutionIncrementerName step execution incrementer name
+	 */
+	public void setStepExecutionIncrementerName(String stepExecutionIncrementerName) {
+		this.stepExecutionIncrementerName = stepExecutionIncrementerName;
+	}
+
 	public void setIncrementerFactory(DataFieldMaxValueIncrementerFactory incrementerFactory) {
 		this.incrementerFactory = incrementerFactory;
 	}
@@ -287,7 +314,7 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 		JdbcJobInstanceDao dao = new JdbcJobInstanceDao();
 		dao.setJdbcTemplate(jdbcOperations);
 		dao.setJobInstanceIncrementer(
-				incrementerFactory.getIncrementer(databaseType, tablePrefix + "JOB_INSTANCE_SEQ"));
+				incrementerFactory.getIncrementer(databaseType, tablePrefix + jobInstanceIncrementerName));
 		dao.setJobKeyGenerator(jobKeyGenerator);
 		dao.setTablePrefix(tablePrefix);
 		return dao;
@@ -298,7 +325,7 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 		JdbcJobExecutionDao dao = new JdbcJobExecutionDao();
 		dao.setJdbcTemplate(jdbcOperations);
 		dao.setJobExecutionIncrementer(
-				incrementerFactory.getIncrementer(databaseType, tablePrefix + "JOB_EXECUTION_SEQ"));
+				incrementerFactory.getIncrementer(databaseType, tablePrefix + jobExecutionIncrementerName));
 		dao.setTablePrefix(tablePrefix);
 		dao.setClobTypeToUse(determineClobTypeToUse(this.databaseType));
 		dao.setExitMessageLength(this.maxVarCharLengthForExitMessage);
@@ -311,7 +338,7 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 		JdbcStepExecutionDao dao = new JdbcStepExecutionDao();
 		dao.setJdbcTemplate(jdbcOperations);
 		dao.setStepExecutionIncrementer(
-				incrementerFactory.getIncrementer(databaseType, tablePrefix + "STEP_EXECUTION_SEQ"));
+				incrementerFactory.getIncrementer(databaseType, tablePrefix + stepExecutionIncrementerName));
 		dao.setTablePrefix(tablePrefix);
 		dao.setClobTypeToUse(determineClobTypeToUse(this.databaseType));
 		dao.setExitMessageLength(this.maxVarCharLengthForExitMessage);
