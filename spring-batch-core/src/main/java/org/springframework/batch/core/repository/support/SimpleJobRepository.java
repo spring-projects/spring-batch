@@ -53,6 +53,7 @@ import java.util.List;
  * @author Parikshit Dutta
  * @author Mark John Moreno
  * @author Yanming Zhou
+ * @author Andrey Litvitski
  * @see JobRepository
  * @see JobInstanceDao
  * @see JobExecutionDao
@@ -185,11 +186,13 @@ public class SimpleJobRepository extends SimpleJobExplorer implements JobReposit
 		validateStepExecution(stepExecution);
 		Assert.notNull(stepExecution.getId(), "StepExecution must already be saved (have an id assigned)");
 		ecDao.updateExecutionContext(stepExecution);
+		stepExecution.getExecutionContext().clearDirtyFlag();
 	}
 
 	@Override
 	public void updateExecutionContext(JobExecution jobExecution) {
 		ecDao.updateExecutionContext(jobExecution);
+		jobExecution.getExecutionContext().clearDirtyFlag();
 	}
 
 	@Override
