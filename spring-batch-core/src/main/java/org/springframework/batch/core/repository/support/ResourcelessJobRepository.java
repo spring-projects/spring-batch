@@ -1,5 +1,5 @@
 /*
- * Copyright 2024-2025 the original author or authors.
+ * Copyright 2024-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,6 +48,7 @@ import org.springframework.batch.infrastructure.support.transaction.Resourceless
  * @since 5.2.0
  * @author Mahmoud Ben Hassine
  * @author Sanghyuk Jung
+ * @author Andrey Litvitski
  */
 public class ResourcelessJobRepository implements JobRepository {
 
@@ -244,6 +245,7 @@ public class ResourcelessJobRepository implements JobRepository {
 	@Override
 	public void updateExecutionContext(JobExecution jobExecution) {
 		jobExecution.setLastUpdated(LocalDateTime.now());
+		jobExecution.getExecutionContext().clearDirtyFlag();
 	}
 
 	@Override
@@ -336,6 +338,7 @@ public class ResourcelessJobRepository implements JobRepository {
 	@Override
 	public void updateExecutionContext(StepExecution stepExecution) {
 		stepExecution.setLastUpdated(LocalDateTime.now());
+		stepExecution.getExecutionContext().clearDirtyFlag();
 	}
 
 	private boolean isJobKeyEquals(JobParameters jobParameters) {

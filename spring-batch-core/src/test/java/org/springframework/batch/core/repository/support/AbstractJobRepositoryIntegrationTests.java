@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2025 the original author or authors.
+ * Copyright 2008-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,9 +37,11 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Abstract repository tests using DAOs (rather than mocks).
@@ -48,6 +50,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * @author Dimitrios Liapis
  * @author Mahmoud Ben Hassine
  * @author Yanming Zhou
+ * @author Andrey Litvitski
  */
 abstract class AbstractJobRepositoryIntegrationTests {
 
@@ -272,6 +275,29 @@ abstract class AbstractJobRepositoryIntegrationTests {
 
 		assertEquals(0, jobRepository.findJobInstances(job.getName()).size());
 		assertNull(jobRepository.getLastJobExecution(job.getName(), jobParameters));
+	}
+
+	@Test
+	void testUpdateResetsDirtyFlag() {
+		JobInstance jobInstance = jobRepository.createJobInstance(job.getName(), jobParameters);
+		JobExecution jobExec = jobRepository.createJobExecution(jobInstance, jobParameters, new ExecutionContext());
+		jobExec.setStartTime(LocalDateTime.now());
+
+		ExecutionContext ctx = new ExecutionContext();
+		ctx.put("crashedPosition", 7);
+		jobExec.setExecutionContext(ctx);
+		assertTrue(ctx.isDirty());
+		jobRepository.updateExecutionContext(jobExec);
+		assertFalse(ctx.isDirty());
+
+		Step step = new StepSupport("step1");
+		StepExecution stepExec = jobRepository.createStepExecution(step.getName(), jobExec);
+		ctx = new ExecutionContext(ctx);
+		ctx.put("crashedPosition", 8);
+		stepExec.setExecutionContext(ctx);
+		assertTrue(ctx.isDirty());
+		jobRepository.updateExecutionContext(stepExec);
+		assertFalse(ctx.isDirty());
 	}
 
 }
