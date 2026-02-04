@@ -36,6 +36,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -48,6 +50,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * @author Dimitrios Liapis
  * @author Mahmoud Ben Hassine
  * @author Yanming Zhou
+ * @author Andrey Litvitski
  */
 abstract class AbstractJobRepositoryIntegrationTests {
 
@@ -272,6 +275,29 @@ abstract class AbstractJobRepositoryIntegrationTests {
 
 		assertEquals(0, jobRepository.findJobInstances(job.getName()).size());
 		assertNull(jobRepository.getLastJobExecution(job.getName(), jobParameters));
+	}
+
+	@Test
+	void testUpdateResetsDirtyFlag() {
+		JobInstance jobInstance = jobRepository.createJobInstance(job.getName(), jobParameters);
+		JobExecution jobExec = jobRepository.createJobExecution(jobInstance, jobParameters, new ExecutionContext());
+		jobExec.setStartTime(LocalDateTime.now());
+
+		ExecutionContext ctx = new ExecutionContext();
+		ctx.put("crashedPosition", 7);
+		jobExec.setExecutionContext(ctx);
+		assertTrue(ctx.isDirty());
+		jobRepository.updateExecutionContext(jobExec);
+		assertFalse(ctx.isDirty());
+
+		Step step = new StepSupport("step1");
+		StepExecution stepExec = jobRepository.createStepExecution(step.getName(), jobExec);
+		ctx = new ExecutionContext(ctx);
+		ctx.put("crashedPosition", 8);
+		stepExec.setExecutionContext(ctx);
+		assertTrue(ctx.isDirty());
+		jobRepository.updateExecutionContext(stepExec);
+		assertFalse(ctx.isDirty());
 	}
 
 }
