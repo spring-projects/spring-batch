@@ -42,6 +42,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.batch.core.BatchConstants.BATCH_VERSION;
 
 /**
  * Test class for {@link SpringBatchVersion}.
@@ -68,12 +69,8 @@ public class SpringBatchVersionTests {
 		// then
 		assertNotNull(jobExecution);
 		assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
-		assertTrue(jobExecution.getExecutionContext().containsKey(SpringBatchVersion.BATCH_VERSION_KEY));
-		assertTrue(jobExecution.getStepExecutions()
-			.iterator()
-			.next()
-			.getExecutionContext()
-			.containsKey(SpringBatchVersion.BATCH_VERSION_KEY));
+		assertTrue(jobExecution.getExecutionContext().containsKey(BATCH_VERSION));
+		assertTrue(jobExecution.getStepExecutions().iterator().next().getExecutionContext().containsKey(BATCH_VERSION));
 	}
 
 	@Configuration
