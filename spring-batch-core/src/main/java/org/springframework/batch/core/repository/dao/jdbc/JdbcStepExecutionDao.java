@@ -28,8 +28,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.step.StepExecution;
@@ -91,7 +89,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 	private static final String GET_STEP_EXECUTION = GET_RAW_STEP_EXECUTIONS + " WHERE STEP_EXECUTION_ID = ?";
 
 	private static final String GET_LAST_STEP_EXECUTION = """
-			SELECT SE.STEP_EXECUTION_ID, SE.STEP_NAME, SE.START_TIME, SE.END_TIME, SE.STATUS, SE.COMMIT_COUNT, SE.READ_COUNT, SE.FILTER_COUNT, SE.WRITE_COUNT, SE.EXIT_CODE, SE.EXIT_MESSAGE, SE.READ_SKIP_COUNT, SE.WRITE_SKIP_COUNT, SE.PROCESS_SKIP_COUNT, SE.ROLLBACK_COUNT, SE.LAST_UPDATED, SE.VERSION, SE.CREATE_TIME, JE.JOB_EXECUTION_ID, JE.START_TIME, JE.END_TIME, JE.STATUS, JE.EXIT_CODE, JE.EXIT_MESSAGE, JE.CREATE_TIME, JE.LAST_UPDATED, JE.VERSION
+			SELECT SE.STEP_EXECUTION_ID, SE.STEP_NAME, SE.JOB_EXECUTION_ID, SE.START_TIME, SE.END_TIME, SE.STATUS, SE.COMMIT_COUNT, SE.READ_COUNT, SE.FILTER_COUNT, SE.WRITE_COUNT, SE.EXIT_CODE, SE.EXIT_MESSAGE, SE.READ_SKIP_COUNT, SE.WRITE_SKIP_COUNT, SE.PROCESS_SKIP_COUNT, SE.ROLLBACK_COUNT, SE.LAST_UPDATED, SE.VERSION, SE.CREATE_TIME
 			FROM %PREFIX%JOB_EXECUTION JE
 				JOIN %PREFIX%STEP_EXECUTION SE ON SE.JOB_EXECUTION_ID = JE.JOB_EXECUTION_ID
 			WHERE JE.JOB_INSTANCE_ID = ? AND SE.STEP_NAME = ?
@@ -318,21 +316,9 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 					statement.setString(2, stepName);
 					try (ResultSet rs = statement.executeQuery()) {
 						if (rs.next()) {
-							Long jobExecutionId = rs.getLong(19);
-							JobExecution jobExecution = new JobExecution(jobExecutionId, jobInstance,
-									jobExecutionDao.getJobParameters(jobExecutionId));
-							jobExecution.setStartTime(
-									rs.getTimestamp(20) == null ? null : rs.getTimestamp(20).toLocalDateTime());
-							jobExecution
-								.setEndTime(rs.getTimestamp(21) == null ? null : rs.getTimestamp(21).toLocalDateTime());
-							jobExecution.setStatus(BatchStatus.valueOf(rs.getString(22)));
-							jobExecution.setExitStatus(new ExitStatus(rs.getString(23), rs.getString(24)));
-							jobExecution.setCreateTime(
-									rs.getTimestamp(25) == null ? null : rs.getTimestamp(25).toLocalDateTime());
-							jobExecution.setLastUpdated(
-									rs.getTimestamp(26) == null ? null : rs.getTimestamp(26).toLocalDateTime());
-							jobExecution.setVersion(rs.getInt(27));
-							return new StepExecutionRowMapper(jobExecution).mapRow(rs, 0);
+							return new StepExecutionRowMapper(
+									jobExecutionDao.getJobExecution(rs.getLong("JOB_EXECUTION_ID")))
+								.mapRow(rs, 0);
 						}
 						return null;
 					}
