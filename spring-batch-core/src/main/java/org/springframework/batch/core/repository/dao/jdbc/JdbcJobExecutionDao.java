@@ -91,18 +91,17 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 			WHERE JOB_EXECUTION_ID = ? AND VERSION = ?
 			""";
 
-	private static final String GET_JOB_EXECUTIONS = """
-			SELECT JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, CREATE_TIME, LAST_UPDATED, VERSION
-			FROM %PREFIX%JOB_EXECUTION
-			""";
-
 	private static final String GET_LAST_JOB_EXECUTION_ID = """
 			SELECT JOB_EXECUTION_ID
 			FROM %PREFIX%JOB_EXECUTION
 			WHERE JOB_INSTANCE_ID = ? AND JOB_EXECUTION_ID IN (SELECT MAX(JOB_EXECUTION_ID) FROM %PREFIX%JOB_EXECUTION E2 WHERE E2.JOB_INSTANCE_ID = ?)
 			""";
 
-	private static final String GET_EXECUTION_BY_ID = GET_JOB_EXECUTIONS + " WHERE JOB_EXECUTION_ID = ?";
+	private static final String GET_EXECUTION_BY_ID = """
+			SELECT JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, CREATE_TIME, LAST_UPDATED, VERSION
+			FROM %PREFIX%JOB_EXECUTION
+			WHERE JOB_EXECUTION_ID = ?
+			""";
 
 	private static final String GET_RUNNING_EXECUTION_FOR_INSTANCE = """
 			SELECT E.JOB_EXECUTION_ID
@@ -135,12 +134,6 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	private static final String DELETE_JOB_EXECUTION_PARAMETERS = """
 			DELETE FROM %PREFIX%JOB_EXECUTION_PARAMS
 			WHERE JOB_EXECUTION_ID = ?
-			""";
-
-	private static final String GET_JOB_INSTANCE_ID_FROM_JOB_EXECUTION_ID = """
-			SELECT JI.JOB_INSTANCE_ID
-			FROM %PREFIX%JOB_INSTANCE JI, %PREFIX%JOB_EXECUTION JE
-			WHERE JOB_EXECUTION_ID = ? AND JI.JOB_INSTANCE_ID = JE.JOB_INSTANCE_ID
 			""";
 
 	private static final String GET_JOB_EXECUTION_IDS_BY_INSTANCE_ID = """
@@ -319,21 +312,13 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 
 	@Override
 	public JobExecution getJobExecution(long jobExecutionId) {
-		long jobInstanceId = getJobInstanceId(jobExecutionId);
-		JobInstance jobInstance = jobInstanceDao.getJobInstance(jobInstanceId);
-		JobParameters jobParameters = getJobParameters(jobExecutionId);
 		try {
 			return getJdbcTemplate().queryForObject(getQuery(GET_EXECUTION_BY_ID),
-					new JobExecutionRowMapper(jobInstance, jobParameters), jobExecutionId);
+					new JobExecutionRowMapper(jobInstanceDao::getJobInstance, this::getJobParameters), jobExecutionId);
 		}
 		catch (EmptyResultDataAccessException e) {
 			return null;
 		}
-	}
-
-	private long getJobInstanceId(long jobExecutionId) {
-		return getJdbcTemplate().queryForObject(getQuery(GET_JOB_INSTANCE_ID_FROM_JOB_EXECUTION_ID), Long.class,
-				jobExecutionId);
 	}
 
 	@Override
