@@ -74,7 +74,7 @@ public class JdbcJobInstanceDaoTests {
 
 		Assertions.assertNotNull(jobInstance);
 		assertEquals("job", jobInstance.getJobName());
-		assertEquals(1, jobInstance.getInstanceId());
+		assertEquals(1, jobInstance.getId());
 		assertEquals(0, jobInstance.getJobExecutions().size());
 	}
 
@@ -86,7 +86,7 @@ public class JdbcJobInstanceDaoTests {
 
 		Assertions.assertNotNull(jobInstance);
 		assertEquals("job", jobInstance.getJobName());
-		assertEquals(1, jobInstance.getInstanceId());
+		assertEquals(1, jobInstance.getId());
 		assertEquals(0, jobInstance.getJobExecutions().size());
 	}
 

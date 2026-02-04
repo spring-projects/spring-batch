@@ -30,7 +30,7 @@ public class JobInstanceConverter {
 	public JobInstance fromJobInstance(org.springframework.batch.core.job.JobInstance source) {
 		JobInstance jobInstance = new JobInstance();
 		jobInstance.setJobName(source.getJobName());
-		jobInstance.setJobInstanceId(source.getInstanceId());
+		jobInstance.setJobInstanceId(source.getId());
 		return jobInstance;
 	}
 
