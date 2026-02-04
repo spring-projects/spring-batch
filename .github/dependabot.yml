@@ -1,0 +1,15 @@
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "type: task"
+  - package-ecosystem: "github-actions"
+    target-branch: "5.2.x"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "type: task"
