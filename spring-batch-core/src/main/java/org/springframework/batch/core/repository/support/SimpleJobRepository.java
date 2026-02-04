@@ -177,7 +177,7 @@ public class SimpleJobRepository extends SimpleJobExplorer implements JobReposit
 	private void validateStepExecution(StepExecution stepExecution) {
 		Assert.notNull(stepExecution, "StepExecution cannot be null.");
 		Assert.notNull(stepExecution.getStepName(), "StepExecution's step name cannot be null.");
-		Assert.notNull(stepExecution.getJobExecutionId(), "StepExecution must belong to persisted JobExecution");
+		Assert.notNull(stepExecution.getJobExecution().getId(), "StepExecution must belong to persisted JobExecution");
 	}
 
 	@Override
