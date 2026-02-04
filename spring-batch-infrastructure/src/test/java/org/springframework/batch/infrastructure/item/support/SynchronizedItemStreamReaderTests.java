@@ -15,6 +15,10 @@
  */
 package org.springframework.batch.infrastructure.item.support;
 
+import static org.mockito.Mockito.verify;
+
+import org.junit.jupiter.api.Test;
+
 /**
  * @author Matthew Ouyang
  * @author Mahmoud Ben Hassine
@@ -28,4 +32,21 @@ public class SynchronizedItemStreamReaderTests extends AbstractSynchronizedItemS
 		return new SynchronizedItemStreamReader<>(delegate);
 	}
 
+	@Test
+	void testSynchronizedItemStreamReaderWithoutUpdateSynchronization() {
+		this.synchronizedItemStreamReader.setSynchronizeUpdate(false);
+
+        this.synchronizedItemStreamReader.update(this.testExecutionContext);
+
+        verify(this.delegate).update(this.testExecutionContext);
+	}
+
+    @Test
+    void testSynchronizedItemStreamReaderWithUpdateSynchronization() {
+        this.synchronizedItemStreamReader.setSynchronizeUpdate(true);
+
+        this.synchronizedItemStreamReader.update(this.testExecutionContext);
+
+        verify(this.delegate).update(this.testExecutionContext);
+    }
 }

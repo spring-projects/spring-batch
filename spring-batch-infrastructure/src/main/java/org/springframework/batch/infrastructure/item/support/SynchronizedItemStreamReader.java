@@ -28,7 +28,9 @@ import org.springframework.util.Assert;
 /**
  *
  * This is a simple ItemStreamReader decorator with a synchronized ItemReader.read()
- * method - which makes a non-thread-safe ItemReader thread-safe.
+ * method - which makes a non-thread-safe ItemReader thread-safe. Optionally synchronize
+ * the ItemStreamReader.update() call for readers where the update\ method is not
+ * thread-safe.
  * <p>
  * However, if reprocessing an item is problematic, then using this will make a job not
  * restartable.
@@ -44,6 +46,8 @@ public class SynchronizedItemStreamReader<T> implements ItemStreamReader<T> {
 
 	private ItemStreamReader<T> delegate;
 
+	private boolean synchronizeUpdate;
+
 	private final Lock lock = new ReentrantLock();
 
 	/**
@@ -54,10 +58,15 @@ public class SynchronizedItemStreamReader<T> implements ItemStreamReader<T> {
 	public SynchronizedItemStreamReader(ItemStreamReader<T> delegate) {
 		Assert.notNull(delegate, "The delegate item reader must not be null");
 		this.delegate = delegate;
+		this.synchronizeUpdate = false;
 	}
 
 	public void setDelegate(ItemStreamReader<T> delegate) {
 		this.delegate = delegate;
+	}
+
+	public void setSynchronizeUpdate(boolean synchronizeUpdate) {
+		this.synchronizeUpdate = synchronizeUpdate;
 	}
 
 	/**
@@ -86,7 +95,17 @@ public class SynchronizedItemStreamReader<T> implements ItemStreamReader<T> {
 
 	@Override
 	public void update(ExecutionContext executionContext) {
-		this.delegate.update(executionContext);
+		if (this.synchronizeUpdate) {
+			this.lock.lock();
+		}
+		try {
+			this.delegate.update(executionContext);
+		}
+		finally {
+			if (this.synchronizeUpdate) {
+				this.lock.unlock();
+			}
+		}
 	}
 
 }
