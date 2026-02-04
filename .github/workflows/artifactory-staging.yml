@@ -32,7 +32,7 @@ jobs:
         run: mvn -DaltDeploymentRepository=local::file:deployment-repository --no-transfer-progress --batch-mode -Dmaven.test.skip=true deploy
 
       - name: Deploy to Artifactory
-        uses: spring-io/artifactory-deploy-action@v0.0.2
+        uses: spring-io/artifactory-deploy-action@v0.0.4
         with:
           uri: 'https://repo.spring.io'
           username: ${{ secrets.ARTIFACTORY_USERNAME }}
