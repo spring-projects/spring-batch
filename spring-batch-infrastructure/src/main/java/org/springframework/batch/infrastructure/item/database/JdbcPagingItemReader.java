@@ -34,6 +34,7 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.batch.infrastructure.item.ItemReader;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.batch.infrastructure.item.ItemStreamException;
+import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -75,9 +76,10 @@ import org.springframework.util.ClassUtils;
  * @author Mahmoud Ben Hassine
  * @author Stefano Cordio
  * @author Jimmy Praet
+ * @author Andrey Litvitski
  * @since 2.0
  */
-public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> implements InitializingBean {
+public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> implements InitializingBean, BeanNameAware {
 
 	private static final String START_AFTER_VALUE = "start.after";
 

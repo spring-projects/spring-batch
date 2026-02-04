@@ -66,6 +66,7 @@ import org.springframework.util.StringUtils;
  * @author François Martin
  * @author Stefano Cordio
  * @author Daeho Kwon
+ * @author Andrey Litvitski
  * @since 4.0
  * @see FlatFileItemReader
  */
@@ -466,9 +467,6 @@ public class FlatFileItemReaderBuilder<T> {
 	 * @return a {@link FlatFileItemReader}
 	 */
 	public FlatFileItemReader<T> build() {
-		if (this.saveState) {
-			Assert.state(StringUtils.hasText(this.name), "A name is required when saveState is set to true.");
-		}
 
 		if (this.resource == null) {
 			logger.debug("The resource is null.  This is only a valid scenario when "

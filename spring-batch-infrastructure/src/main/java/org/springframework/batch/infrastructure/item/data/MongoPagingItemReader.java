@@ -25,6 +25,7 @@ import org.bson.codecs.DecoderContext;
 import org.jspecify.annotations.Nullable;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.batch.infrastructure.item.ItemReader;
+import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -79,8 +80,10 @@ import org.springframework.util.StringUtils;
  * @author Mahmoud Ben Hassine
  * @author Parikshit Dutta
  * @author Jimmy Praet
+ * @author Andrey Litvitski
  */
-public class MongoPagingItemReader<T> extends AbstractPaginatedDataItemReader<T> implements InitializingBean {
+public class MongoPagingItemReader<T> extends AbstractPaginatedDataItemReader<T>
+		implements InitializingBean, BeanNameAware {
 
 	protected MongoOperations template;
 

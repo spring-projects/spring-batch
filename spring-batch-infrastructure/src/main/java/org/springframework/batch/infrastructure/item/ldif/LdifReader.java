@@ -25,6 +25,7 @@ import org.springframework.batch.infrastructure.item.ItemProcessor;
 import org.springframework.batch.infrastructure.item.file.FlatFileItemReader;
 import org.springframework.batch.infrastructure.item.file.ResourceAwareItemReaderItemStream;
 import org.springframework.batch.infrastructure.item.support.AbstractItemCountingItemStreamItemReader;
+import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.ldap.core.LdapAttributes;
@@ -62,10 +63,11 @@ import org.springframework.util.Assert;
  * @author Keith Barlow
  * @author Mahmoud Ben Hassine
  * @author Jimmy Praet
+ * @author Andrey Litvitski
  *
  */
 public class LdifReader extends AbstractItemCountingItemStreamItemReader<LdapAttributes>
-		implements ResourceAwareItemReaderItemStream<LdapAttributes>, InitializingBean {
+		implements ResourceAwareItemReaderItemStream<LdapAttributes>, InitializingBean, BeanNameAware {
 
 	private static final Log LOG = LogFactory.getLog(LdifReader.class);
 

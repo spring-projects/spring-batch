@@ -30,6 +30,7 @@ import org.springframework.batch.infrastructure.item.ReaderNotOpenException;
 import org.springframework.batch.infrastructure.item.file.separator.RecordSeparatorPolicy;
 import org.springframework.batch.infrastructure.item.file.separator.SimpleRecordSeparatorPolicy;
 import org.springframework.batch.infrastructure.item.support.AbstractItemCountingItemStreamItemReader;
+import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -50,12 +51,13 @@ import org.springframework.util.StringUtils;
  * @author Mahmoud Ben Hassine
  * @author Stefano Cordio
  * @author Jimmy Praet
+ * @author Andrey Litvitski
  */
 // FIXME the design of creating a flat file reader with an optional resource (to support
 // the multi-resource case) is broken.
 // FIXME The multi-resource reader should create the delegate with the current resource
 public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemReader<T>
-		implements ResourceAwareItemReaderItemStream<T> {
+		implements ResourceAwareItemReaderItemStream<T>, BeanNameAware {
 
 	private static final Log logger = LogFactory.getLog(FlatFileItemReader.class);
 
