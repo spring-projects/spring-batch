@@ -28,7 +28,11 @@ import org.springframework.core.convert.converter.Converter;
  *
  * @author Mahmoud Ben Hassine
  * @since 5.0.1
+ * @deprecated since 6.1 in favor of
+ * {@link ConversionServiceFactory#createConversionService()}. Scheduled for removal in
+ * 6.3 or later.
  */
+@Deprecated(since = "6.1", forRemoval = true)
 public class LocalTimeToStringConverter extends AbstractDateTimeConverter implements Converter<LocalTime, String> {
 
 	@Override
