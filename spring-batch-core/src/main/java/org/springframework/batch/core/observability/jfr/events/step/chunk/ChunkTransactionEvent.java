@@ -19,6 +19,7 @@ import jdk.jfr.Category;
 import jdk.jfr.Description;
 import jdk.jfr.Event;
 import jdk.jfr.Label;
+import org.jspecify.annotations.Nullable;
 
 @Label("Chunk Transaction")
 @Description("Chunk Transaction Event")
@@ -32,7 +33,7 @@ public class ChunkTransactionEvent extends Event {
 	public long stepExecutionId;
 
 	@Label("Transaction Status")
-	public String transactionStatus;
+	public @Nullable String transactionStatus;
 
 	public ChunkTransactionEvent(String stepName, long stepExecutionId) {
 		this.stepName = stepName;

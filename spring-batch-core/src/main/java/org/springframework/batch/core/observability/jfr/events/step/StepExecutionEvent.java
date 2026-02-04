@@ -19,6 +19,7 @@ import jdk.jfr.Category;
 import jdk.jfr.Description;
 import jdk.jfr.Event;
 import jdk.jfr.Label;
+import org.jspecify.annotations.Nullable;
 
 @Label("Step Execution")
 @Description("Step Execution Event")
@@ -38,7 +39,7 @@ public class StepExecutionEvent extends Event {
 	public long jobExecutionId;
 
 	@Label("Step Exit Status")
-	public String exitStatus;
+	public @Nullable String exitStatus;
 
 	public StepExecutionEvent(String stepName, String jobName, long stepExecutionId, long jobExecutionId) {
 		this.stepName = stepName;
