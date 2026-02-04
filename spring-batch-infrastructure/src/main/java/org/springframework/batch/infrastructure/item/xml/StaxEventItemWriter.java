@@ -834,7 +834,7 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T>
 					footerCallback.write(footerCallbackWriter);
 				}
 				delegateEventWriter.flush();
-				endDocument();
+				endDocument(delegateEventWriter);
 			}
 			catch (IOException e) {
 				throw new ItemStreamException("Failed to write footer items", e);
@@ -893,7 +893,7 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T>
 		 * @throws XMLStreamException thrown if error occurs.
 		 */
 		@SuppressWarnings("DataFlowIssue")
-		private void endDocument() throws XMLStreamException {
+		private void writeEndRootElement() throws XMLStreamException {
 
 			// writer.writeEndDocument(); <- this doesn't work after restart
 			// we need to write end tag of the root element manually
@@ -923,6 +923,16 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T>
 			}
 		}
 
+	}
+
+	/**
+	 * Writes the EndDocument tag manually.
+	 * @param writer XML event writer
+	 * @throws XMLStreamException thrown if error occurs.
+	 */
+	protected void endDocument(XMLEventWriter writer) throws XMLStreamException {
+		Assert.state(this.state != null, "OutputState is not initialized");
+		this.state.writeEndRootElement();
 	}
 
 }
