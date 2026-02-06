@@ -80,7 +80,7 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 
 	private static final String RESTART_DATA_NAME = "current.count";
 
-	private WritableResource resource;
+	protected WritableResource resource;
 
 	protected OutputState state = null;
 

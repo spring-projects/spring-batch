@@ -17,6 +17,7 @@
 package org.springframework.batch.item.json;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -25,16 +26,18 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.WritableResource;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  */
 @ExtendWith(MockitoExtension.class)
 class JsonFileItemWriterTests {
@@ -47,6 +50,7 @@ class JsonFileItemWriterTests {
 	@BeforeEach
 	void setUp() throws Exception {
 		File file = Files.createTempFile("test", "json").toFile();
+		file.deleteOnExit();
 		this.resource = new FileSystemResource(file);
 	}
 
@@ -73,6 +77,92 @@ class JsonFileItemWriterTests {
 		// then
 		Mockito.verify(this.jsonObjectMarshaller).marshal("foo");
 		Mockito.verify(this.jsonObjectMarshaller).marshal("bar");
+	}
+
+	@Test
+	void appendAllowed() throws Exception {
+		JsonFileItemWriter<String> writer = new JsonFileItemWriter<>(this.resource,
+				new JacksonJsonObjectMarshaller<>());
+		writer.setAppendAllowed(true);
+
+		writer.open(new ExecutionContext());
+		writer.close();
+
+		resourceShouldContain();
+
+		writer.open(new ExecutionContext());
+		writer.write(Chunk.of("aaa"));
+		writer.write(Chunk.of("bbb"));
+		writer.close();
+
+		resourceShouldContain("aaa", "bbb");
+
+		writer.open(new ExecutionContext());
+		writer.close();
+
+		resourceShouldContain("aaa", "bbb");
+
+		writer.open(new ExecutionContext());
+		writer.write(Chunk.of("ccc"));
+		writer.close();
+
+		resourceShouldContain("aaa", "bbb", "ccc");
+	}
+
+	@Test
+	void appendAllowedWithUnformattedJson() throws Exception {
+		JsonFileItemWriter<String> writer = new JsonFileItemWriter<>(this.resource,
+				new JacksonJsonObjectMarshaller<>());
+		writer.setAppendAllowed(true);
+
+		Files.writeString(this.resource.getFile().toPath(), "[\n \"foo\"]", StandardCharsets.UTF_8);
+
+		resourceShouldContain("foo");
+
+		writer.open(new ExecutionContext());
+		writer.write(Chunk.of("bar"));
+		writer.close();
+
+		resourceShouldContain("foo", "bar");
+	}
+
+	@Test
+	void appendNotAllowed() throws Exception {
+		JsonFileItemWriter<String> writer = new JsonFileItemWriter<>(this.resource,
+				new JacksonJsonObjectMarshaller<>());
+
+		writer.open(new ExecutionContext());
+		writer.close();
+
+		resourceShouldContain();
+
+		writer.open(new ExecutionContext());
+		writer.write(Chunk.of("aaa"));
+		writer.write(Chunk.of("bbb"));
+		writer.close();
+
+		resourceShouldContain("aaa", "bbb");
+
+		writer.open(new ExecutionContext());
+		writer.close();
+
+		resourceShouldContain();
+
+		writer.open(new ExecutionContext());
+		writer.write(Chunk.of("ccc"));
+		writer.close();
+
+		resourceShouldContain("ccc");
+
+		writer.open(new ExecutionContext());
+		writer.write(Chunk.of("ddd"));
+		writer.close();
+
+		resourceShouldContain("ddd");
+	}
+
+	private void resourceShouldContain(String... array) throws Exception {
+		assertArrayEquals(array, new JsonMapper().readValue(this.resource.getContentAsByteArray(), String[].class));
 	}
 
 }
