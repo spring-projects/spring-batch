@@ -16,9 +16,14 @@
 
 package org.springframework.batch.infrastructure.item.json;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.Iterator;
 
 import org.springframework.batch.infrastructure.item.Chunk;
+import org.springframework.batch.infrastructure.item.ExecutionContext;
+import org.springframework.batch.infrastructure.item.ItemStreamException;
 import org.springframework.batch.infrastructure.item.support.AbstractFileItemWriter;
 import org.springframework.core.io.WritableResource;
 import org.springframework.util.Assert;
@@ -46,6 +51,7 @@ import org.springframework.util.Assert;
  * @param <T> type of object to write as json representation
  * @author Mahmoud Ben Hassine
  * @author Jimmy Praet
+ * @author Yanming Zhou
  * @since 4.1
  */
 public class JsonFileItemWriter<T> extends AbstractFileItemWriter<T> {
@@ -57,6 +63,8 @@ public class JsonFileItemWriter<T> extends AbstractFileItemWriter<T> {
 	private static final char JSON_ARRAY_STOP = ']';
 
 	private JsonObjectMarshaller<T> jsonObjectMarshaller;
+
+	private boolean hasExistingItems;
 
 	/**
 	 * Create a new {@link JsonFileItemWriter} instance.
@@ -91,10 +99,27 @@ public class JsonFileItemWriter<T> extends AbstractFileItemWriter<T> {
 		this.jsonObjectMarshaller = jsonObjectMarshaller;
 	}
 
+	@Override
+	public void open(ExecutionContext executionContext) throws ItemStreamException {
+		try {
+			if (this.append && this.resource != null && this.resource.exists() && this.resource.contentLength() > 0) {
+				reopen(this.resource.getFile());
+			}
+		}
+		catch (IOException ex) {
+			throw new ItemStreamException(ex.getMessage(), ex);
+		}
+		super.open(executionContext);
+	}
+
 	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public String doWrite(Chunk<? extends T> items) {
 		StringBuilder lines = new StringBuilder();
+		if (this.hasExistingItems) {
+			lines.append(JSON_OBJECT_SEPARATOR).append(this.lineSeparator);
+			this.hasExistingItems = false;
+		}
 		Iterator<? extends T> iterator = items.iterator();
 		if (!items.isEmpty() && state.getLinesWritten() > 0) {
 			lines.append(JSON_OBJECT_SEPARATOR).append(this.lineSeparator);
@@ -107,6 +132,25 @@ public class JsonFileItemWriter<T> extends AbstractFileItemWriter<T> {
 			}
 		}
 		return lines.toString();
+	}
+
+	private void reopen(File file) throws IOException {
+		try (RandomAccessFile raf = new RandomAccessFile(file, "rw")) {
+			long pos = raf.length();
+			boolean stopFound = false;
+			while (--pos >= 0) {
+				raf.seek(pos);
+				int current = raf.readByte();
+				if (!stopFound && current == JSON_ARRAY_STOP) {
+					stopFound = true;
+				}
+				else if (stopFound && !Character.isWhitespace(current)) {
+					this.hasExistingItems = current != JSON_ARRAY_START;
+					raf.setLength(this.hasExistingItems ? pos + 1 : pos);
+					break;
+				}
+			}
+		}
 	}
 
 }
