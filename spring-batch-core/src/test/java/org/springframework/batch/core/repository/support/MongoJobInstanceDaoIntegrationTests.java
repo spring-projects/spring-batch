@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2025 the original author or authors.
+ * Copyright 2008-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -310,6 +310,44 @@ class MongoJobInstanceDaoIntegrationTests extends AbstractMongoDBDaoIntegrationT
 		jobInstance = dao.createJobInstance("testVersion", new JobParameters());
 
 		assertNotNull(jobInstance.getVersion());
+	}
+
+	@Test
+	void testGetJobNamesReturnDistinctAndSortedNames() {
+
+		dao.createJobInstance("charlie", new JobParameters());
+		dao.createJobInstance("alpha", new JobParameters());
+		dao.createJobInstance("bravo", new JobParameters());
+		dao.createJobInstance("alpha", new JobParametersBuilder().addLong("id", 1L).toJobParameters());
+
+		List<String> jobNames = dao.getJobNames();
+
+		assertEquals(3, jobNames.size());
+		assertEquals("alpha", jobNames.get(0));
+		assertEquals("bravo", jobNames.get(1));
+		assertEquals("charlie", jobNames.get(2));
+	}
+
+	@Test
+	void testGetJobInstancesPagination() {
+
+		String jobName = "paginationJob";
+		for (int i = 1; i <= 5; i++) {
+			JobParameters params = new JobParametersBuilder().addLong("id", (long) i).toJobParameters();
+			dao.createJobInstance(jobName, params);
+		}
+
+		assertEquals(2, dao.getJobInstances(jobName, 0, 2).size());
+		assertEquals(2, dao.getJobInstances(jobName, 2, 2).size());
+		assertEquals(1, dao.getJobInstances(jobName, 4, 2).size());
+		assertEquals(0, dao.getJobInstances(jobName, 10, 2).size());
+
+		// pages should not overlap
+		List<JobInstance> firstPage = dao.getJobInstances(jobName, 0, 2);
+		List<JobInstance> secondPage = dao.getJobInstances(jobName, 2, 2);
+		for (JobInstance instance : firstPage) {
+			assertFalse(secondPage.contains(instance), "Pages should not overlap");
+		}
 	}
 
 }
