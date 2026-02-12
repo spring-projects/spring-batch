@@ -99,8 +99,12 @@ public class GsonJsonObjectReader<T> implements JsonObjectReader<T> {
 
 	@Override
 	public void close() throws Exception {
-		this.inputStream.close();
-		this.jsonReader.close();
+		if (inputStream != null) {
+			inputStream.close();
+		}
+		if (jsonReader != null) {
+			jsonReader.close();
+		}
 	}
 
 	@Override

@@ -95,8 +95,12 @@ public class JacksonJsonObjectReader<T> implements JsonObjectReader<T> {
 
 	@Override
 	public void close() throws Exception {
-		this.inputStream.close();
-		this.jsonParser.close();
+		if (inputStream != null) {
+			inputStream.close();
+		}
+		if (jsonParser != null) {
+			jsonParser.close();
+		}
 	}
 
 	@Override
