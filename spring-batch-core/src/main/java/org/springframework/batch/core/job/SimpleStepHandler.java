@@ -124,9 +124,6 @@ public class SimpleStepHandler implements StepHandler {
 				currentStepExecution.setExecutionContext(new ExecutionContext(executionContext));
 			}
 
-			if (logger.isInfoEnabled()) {
-				logger.info("Executing step: [" + step.getName() + "]");
-			}
 			try {
 				step.execute(currentStepExecution);
 				currentStepExecution.getExecutionContext().put("batch.executed", true);
