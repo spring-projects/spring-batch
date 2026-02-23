@@ -326,14 +326,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	public JobExecution getJobExecution(long jobExecutionId) {
 		long jobInstanceId = getJobInstanceId(jobExecutionId);
 		JobInstance jobInstance = jobInstanceDao.getJobInstance(jobInstanceId);
-		JobParameters jobParameters = getJobParameters(jobExecutionId);
-		try {
-			return getJdbcTemplate().queryForObject(getQuery(GET_EXECUTION_BY_ID),
-					new JobExecutionRowMapper(jobInstance, jobParameters), jobExecutionId);
-		}
-		catch (EmptyResultDataAccessException e) {
-			return null;
-		}
+		return mapJobExecution(jobExecutionId, jobInstance);
 	}
 
 	private long getJobInstanceId(long jobExecutionId) {
