@@ -219,13 +219,14 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		Assert.notNull(jobInstance, "Job instance cannot be null.");
 		long jobInstanceId = jobInstance.getId();
 
-		// TODO Further reduce database round-trips by retrieving executions and parameters in fewer queries.
-		List<Long> executionIds = getJdbcTemplate()
-				.queryForList(getQuery(GET_JOB_EXECUTION_IDS_BY_INSTANCE_ID), Long.class, jobInstanceId);
+		// TODO Further reduce database round-trips by retrieving executions and
+		// parameters in fewer queries.
+		List<Long> executionIds = getJdbcTemplate().queryForList(getQuery(GET_JOB_EXECUTION_IDS_BY_INSTANCE_ID),
+				Long.class, jobInstanceId);
 
 		List<JobExecution> jobExecutions = new ArrayList<>(executionIds.size());
 		for (Long executionId : executionIds) {
-			JobExecution jobExecution = mapJobExecution(executionId, jobInstance);
+			JobExecution jobExecution = getJobExecution(executionId, jobInstance);
 			if (jobExecution != null) {
 				jobExecutions.add(jobExecution);
 			}
@@ -323,26 +324,30 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	}
 
 	@Override
-	public JobExecution getJobExecution(long jobExecutionId) {
+	@Nullable public JobExecution getJobExecution(long jobExecutionId) {
 		long jobInstanceId = getJobInstanceId(jobExecutionId);
 		JobInstance jobInstance = jobInstanceDao.getJobInstance(jobInstanceId);
-		return mapJobExecution(jobExecutionId, jobInstance);
+		return getJobExecution(jobExecutionId, jobInstance);
+	}
+
+	@Nullable private JobExecution getJobExecution(long jobExecutionId, JobInstance jobInstance) {
+		try {
+			return mapJobExecution(jobExecutionId, jobInstance);
+		}
+		catch (EmptyResultDataAccessException ex) {
+			return null;
+		}
+	}
+
+	private JobExecution mapJobExecution(long executionId, JobInstance jobInstance) {
+		JobParameters jobParameters = getJobParameters(executionId);
+		return getJdbcTemplate().queryForObject(getQuery(GET_EXECUTION_BY_ID),
+				new JobExecutionRowMapper(jobInstance, jobParameters), executionId);
 	}
 
 	private long getJobInstanceId(long jobExecutionId) {
 		return getJdbcTemplate().queryForObject(getQuery(GET_JOB_INSTANCE_ID_FROM_JOB_EXECUTION_ID), Long.class,
 				jobExecutionId);
-	}
-
-	private JobExecution mapJobExecution(long executionId, JobInstance jobInstance) {
-		JobParameters jobParameters = getJobParameters(executionId);
-		try {
-			return getJdbcTemplate().queryForObject(getQuery(GET_EXECUTION_BY_ID),
-					new JobExecutionRowMapper(jobInstance, jobParameters), executionId);
-		}
-		catch (EmptyResultDataAccessException ex) {
-			return null;
-		}
 	}
 
 	@Override
