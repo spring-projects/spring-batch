@@ -197,8 +197,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		Timestamp startTime = jobExecution.getStartTime() == null ? null
 				: Timestamp.valueOf(jobExecution.getStartTime());
 		Timestamp endTime = jobExecution.getEndTime() == null ? null : Timestamp.valueOf(jobExecution.getEndTime());
-		Timestamp createTime = jobExecution.getCreateTime() == null ? null
-				: Timestamp.valueOf(jobExecution.getCreateTime());
+		Timestamp createTime = Timestamp.valueOf(jobExecution.getCreateTime());
 		Timestamp lastUpdated = jobExecution.getLastUpdated() == null ? null
 				: Timestamp.valueOf(jobExecution.getLastUpdated());
 		Object[] parameters = new Object[] { jobExecution.getId(), jobInstance.getId(), startTime, endTime,
@@ -270,8 +269,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 			Timestamp startTime = jobExecution.getStartTime() == null ? null
 					: Timestamp.valueOf(jobExecution.getStartTime());
 			Timestamp endTime = jobExecution.getEndTime() == null ? null : Timestamp.valueOf(jobExecution.getEndTime());
-			Timestamp createTime = jobExecution.getCreateTime() == null ? null
-					: Timestamp.valueOf(jobExecution.getCreateTime());
+			Timestamp createTime = Timestamp.valueOf(jobExecution.getCreateTime());
 			Timestamp lastUpdated = jobExecution.getLastUpdated() == null ? null
 					: Timestamp.valueOf(jobExecution.getLastUpdated());
 			Object[] parameters = new Object[] { startTime, endTime, jobExecution.getStatus().toString(),

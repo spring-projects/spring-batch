@@ -181,8 +181,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 		Timestamp endTime = stepExecution.getEndTime() == null ? null : Timestamp.valueOf(stepExecution.getEndTime());
 		Timestamp lastUpdated = stepExecution.getLastUpdated() == null ? null
 				: Timestamp.valueOf(stepExecution.getLastUpdated());
-		Timestamp createTime = stepExecution.getCreateTime() == null ? null
-				: Timestamp.valueOf(stepExecution.getCreateTime());
+		Timestamp createTime = Timestamp.valueOf(stepExecution.getCreateTime());
 		Object[] parameterValues = new Object[] { stepExecution.getId(), stepExecution.getVersion(),
 				stepExecution.getStepName(), stepExecution.getJobExecutionId(), startTime, endTime,
 				stepExecution.getStatus().toString(), stepExecution.getCommitCount(), stepExecution.getReadCount(),
