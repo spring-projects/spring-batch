@@ -197,7 +197,7 @@ public class MongoJobInstanceDao implements JobInstanceDao {
 	@Override
 	public long getJobInstanceCount(String jobName) throws NoSuchJobException {
 		if (!getJobNames().contains(jobName)) {
-			throw new NoSuchJobException("Job not found " + jobName);
+			throw new NoSuchJobException("No job instances were found for job name " + jobName);
 		}
 		Query query = query(where("jobName").is(jobName));
 		return this.mongoOperations.count(query, COLLECTION_NAME);
