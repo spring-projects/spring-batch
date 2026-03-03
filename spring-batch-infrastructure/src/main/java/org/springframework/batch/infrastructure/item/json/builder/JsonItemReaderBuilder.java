@@ -26,7 +26,6 @@ import org.springframework.batch.infrastructure.item.ItemStreamSupport;
 import org.springframework.batch.infrastructure.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.batch.infrastructure.item.json.JsonItemReader;
 import org.springframework.batch.infrastructure.item.json.JsonObjectReader;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -156,11 +155,10 @@ public class JsonItemReaderBuilder<T> {
 		if (this.resource == null) {
 			logger.debug("The resource is null. This is only a valid scenario when "
 					+ "injecting it later as in when using the MultiResourceItemReader");
-			// TODO check if this is feasible
-			this.resource = new ByteArrayResource(new byte[0]);
 		}
-		JsonItemReader<T> reader = new JsonItemReader<>(this.resource, this.jsonObjectReader);
-		reader.setJsonObjectReader(this.jsonObjectReader);
+		JsonItemReader<T> reader = new JsonItemReader<>(this.jsonObjectReader);
+		reader.setResource(this.resource);
+
 		if (this.name != null) {
 			reader.setName(this.name);
 		}
