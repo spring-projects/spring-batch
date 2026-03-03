@@ -17,6 +17,7 @@ package org.springframework.batch.infrastructure.item.queue.builder;
 
 import java.util.concurrent.BlockingQueue;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.infrastructure.item.queue.BlockingQueueItemWriter;
 import org.springframework.util.Assert;
 
@@ -29,7 +30,7 @@ import org.springframework.util.Assert;
  */
 public class BlockingQueueItemWriterBuilder<T> {
 
-	private BlockingQueue<T> queue;
+	private @Nullable BlockingQueue<T> queue;
 
 	/**
 	 * Create a new {@link BlockingQueueItemWriterBuilder}
