@@ -64,6 +64,8 @@ import org.springframework.beans.factory.InitializingBean;
 import org.jspecify.annotations.Nullable;
 import org.springframework.util.Assert;
 
+import static org.springframework.batch.core.BatchConstants.BATCH_RECOVERED;
+
 /**
  * Simple implementation of the {@link JobOperator} interface. the following dependencies
  * are required:
@@ -416,7 +418,7 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 	@Override
 	public JobExecution recover(JobExecution jobExecution) {
 		Assert.notNull(jobExecution, "JobExecution must not be null");
-		if (jobExecution.getExecutionContext().containsKey("batch.recovered")) {
+		if (jobExecution.getExecutionContext().containsKey(BATCH_RECOVERED)) {
 			if (logger.isWarnEnabled()) {
 				logger.warn("Job execution already recovered: " + jobExecution);
 			}
@@ -443,14 +445,14 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 			if (stepStatus.isRunning()) {
 				stepExecution.setStatus(BatchStatus.FAILED);
 				stepExecution.setEndTime(LocalDateTime.now());
-				stepExecution.getExecutionContext().put("batch.recovered", true);
+				stepExecution.getExecutionContext().put(BATCH_RECOVERED, true);
 				jobRepository.update(stepExecution);
 			}
 		}
 
 		jobExecution.setStatus(BatchStatus.FAILED);
 		jobExecution.setEndTime(LocalDateTime.now());
-		jobExecution.getExecutionContext().put("batch.recovered", true);
+		jobExecution.getExecutionContext().put(BATCH_RECOVERED, true);
 		jobRepository.update(jobExecution);
 
 		return jobExecution;
