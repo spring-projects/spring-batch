@@ -31,6 +31,7 @@ import org.springframework.batch.infrastructure.item.ItemStreamReader;
  *
  * @author Mahmoud Ben Hassine
  * @author Elimelec Burghelea
+ * @author Yanming Zhou
  * @param <T> type of objects to read
  * @since 5.2
  */
@@ -38,7 +39,7 @@ public class CompositeItemReader<T> implements ItemStreamReader<T> {
 
 	private final List<ItemStreamReader<? extends T>> delegates;
 
-	private final Iterator<ItemStreamReader<? extends T>> delegatesIterator;
+	private @Nullable Iterator<ItemStreamReader<? extends T>> delegatesIterator;
 
 	private @Nullable ItemStreamReader<? extends T> currentDelegate;
 
@@ -48,27 +49,29 @@ public class CompositeItemReader<T> implements ItemStreamReader<T> {
 	 */
 	public CompositeItemReader(List<ItemStreamReader<? extends T>> delegates) {
 		this.delegates = delegates;
-		this.delegatesIterator = this.delegates.iterator();
-		this.currentDelegate = this.delegatesIterator.hasNext() ? this.delegatesIterator.next() : null;
 	}
 
 	// TODO: check if we need to open/close delegates on the fly in read() to avoid
 	// opening resources early for a long time
 	@Override
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
-		for (ItemStreamReader<? extends T> delegate : delegates) {
+
+		this.delegatesIterator = this.delegates.iterator();
+		this.currentDelegate = this.delegatesIterator.hasNext() ? this.delegatesIterator.next() : null;
+
+		for (ItemStreamReader<? extends T> delegate : this.delegates) {
 			delegate.open(executionContext);
 		}
 	}
 
 	@Override
 	public @Nullable T read() throws Exception {
-		if (this.currentDelegate == null) {
+		if (this.currentDelegate == null || this.delegatesIterator == null) {
 			return null;
 		}
-		T item = currentDelegate.read();
+		T item = this.currentDelegate.read();
 		if (item == null) {
-			currentDelegate = this.delegatesIterator.hasNext() ? this.delegatesIterator.next() : null;
+			this.currentDelegate = this.delegatesIterator.hasNext() ? this.delegatesIterator.next() : null;
 			return read();
 		}
 		return item;
@@ -89,9 +92,13 @@ public class CompositeItemReader<T> implements ItemStreamReader<T> {
 	 */
 	@Override
 	public void close() throws ItemStreamException {
+
+		this.delegatesIterator = null;
+		this.currentDelegate = null;
+
 		List<Exception> exceptions = new ArrayList<>();
 
-		for (ItemStreamReader<? extends T> delegate : delegates) {
+		for (ItemStreamReader<? extends T> delegate : this.delegates) {
 			try {
 				delegate.close();
 			}
