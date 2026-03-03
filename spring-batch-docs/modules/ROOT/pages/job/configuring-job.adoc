@@ -14,6 +14,7 @@ Java::
 @Bean
 public Job footballJob(JobRepository jobRepository) {
     return new JobBuilder("footballJob", jobRepository)
+                     .description("A job that processes football data")
                      .start(playerLoad())
                      .next(gameLoad())
                      .next(playerSummarization())
@@ -37,6 +38,7 @@ The following example creates a `footballJob`:
 [source, xml]
 ----
 <job id="footballJob">
+    <description>A job that processes football data</description>
     <step id="playerload"          parent="s1" next="gameLoad"/>
     <step id="gameLoad"            parent="s2" next="playerSummarization"/>
     <step id="playerSummarization" parent="s3"/>
