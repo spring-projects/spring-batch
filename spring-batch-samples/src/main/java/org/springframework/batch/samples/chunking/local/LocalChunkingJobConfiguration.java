@@ -99,7 +99,6 @@ public class LocalChunkingJobConfiguration {
 		return (chunk, contribution) -> transactionTemplate.executeWithoutResult(transactionStatus -> {
 			try {
 				itemWriter.write(chunk);
-				contribution.incrementWriteCount(chunk.size());
 				contribution.setExitStatus(ExitStatus.COMPLETED);
 			}
 			catch (Exception e) {

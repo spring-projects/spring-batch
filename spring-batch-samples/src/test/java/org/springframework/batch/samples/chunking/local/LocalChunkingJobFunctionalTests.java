@@ -51,6 +51,8 @@ public class LocalChunkingJobFunctionalTests {
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		int vetsCount = JdbcTestUtils.countRowsInTable(jdbcTemplate, "vets");
 		assertEquals(6, vetsCount);
+		long writeCount = jobExecution.getStepExecutions().iterator().next().getWriteCount();
+		assertEquals(6, writeCount);
 	}
 
 	@Test
@@ -72,6 +74,8 @@ public class LocalChunkingJobFunctionalTests {
 		assertTrue(jobExecution.getExitStatus().getExitDescription().contains("size limit: 30"));
 		int vetsCount = JdbcTestUtils.countRowsInTable(jdbcTemplate, "vets");
 		assertEquals(4, vetsCount);
+		long writeCount = jobExecution.getStepExecutions().iterator().next().getWriteCount();
+		assertEquals(4, writeCount);
 	}
 
 }
