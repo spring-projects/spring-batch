@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.core.launch.support;
 
+import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Assertions;
@@ -30,6 +32,7 @@ import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.util.ReflectionUtils;
 
 import static org.mockito.Mockito.mock;
 import static org.springframework.batch.core.launch.support.ExitCodeMapper.JVM_EXITCODE_GENERIC_ERROR;
@@ -199,6 +202,40 @@ class CommandLineJobOperatorTests {
 
 		// then
 		Mockito.verify(jobOperator).recover(jobExecution);
+	}
+
+	@Test
+	void parseShouldKeepEqualsSignsInParameterValues() {
+		// given
+		List<String> jobParameters = List.of("url=http://example.com?id=123");
+
+		// when
+		Properties properties = parse(jobParameters);
+
+		// then
+		Assertions.assertEquals("http://example.com?id=123", properties.getProperty("url"));
+	}
+
+	@Test
+	void parseShouldIgnoreMalformedParametersWithoutEquals() {
+		// given
+		List<String> jobParameters = List.of("malformed", "name=value");
+
+		// when
+		Properties properties = parse(jobParameters);
+
+		// then
+		Assertions.assertEquals(1, properties.size());
+		Assertions.assertEquals("value", properties.getProperty("name"));
+	}
+
+	private Properties parse(List<String> jobParameters) {
+		Method parseMethod = ReflectionUtils.findMethod(CommandLineJobOperator.class, "parse", List.class);
+		if (parseMethod == null) {
+			throw new IllegalStateException("Could not find parse(List<String>)");
+		}
+		ReflectionUtils.makeAccessible(parseMethod);
+		return (Properties) ReflectionUtils.invokeMethod(parseMethod, null, jobParameters);
 	}
 
 }
