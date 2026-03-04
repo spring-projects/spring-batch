@@ -234,6 +234,10 @@ public abstract class AbstractStep implements StoppableStep, InitializingBean, B
 			.start();
 		getJobRepository().update(stepExecution);
 
+		if (logger.isInfoEnabled()) {
+			logger.info("Executing step: [" + stepExecution.getStepName() + "]");
+		}
+
 		// Start with a default value that will be trumped by anything
 		ExitStatus exitStatus = ExitStatus.EXECUTING;
 
