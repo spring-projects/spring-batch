@@ -277,10 +277,9 @@ public class StepExecution extends Entity {
 	}
 
 	/**
-	 * Accessor for the job execution ID.
-	 * @return the {@code jobExecutionId}.
+	 * @deprecated use {@link #getJobExecution().getId()} instead
 	 */
-	// TODO What is the added value of that?
+	@Deprecated(since = "6.0", forRemoval = true)
 	public long getJobExecutionId() {
 		return this.jobExecution.getId();
 	}
@@ -449,11 +448,9 @@ public class StepExecution extends Entity {
 	}
 
 	/**
-	 * Convenience method to get the current job parameters.
-	 * @return the {@link JobParameters} from the enclosing job or empty if that is
-	 * {@code null}.
+	 * @deprecated use {@link #getJobExecution().getJobParameters()} instead
 	 */
-	// TODO What is the added value of that?
+	@Deprecated(since = "6.0", forRemoval = true)
 	public JobParameters getJobParameters() {
 		return this.jobExecution.getJobParameters();
 	}
@@ -461,18 +458,18 @@ public class StepExecution extends Entity {
 	@Override
 	public boolean equals(Object obj) {
 
-		Object jobExecutionId = getJobExecutionId();
+		Object jobExecutionId = jobExecution.getId();
 		if (jobExecutionId == null || !(obj instanceof StepExecution other)) {
 			return super.equals(obj);
 		}
 
-		return stepName.equals(other.getStepName()) && jobExecutionId.equals(other.getJobExecutionId())
+		return stepName.equals(other.getStepName()) && jobExecutionId.equals(other.getJobExecution().getId())
 				&& getId() == other.getId();
 	}
 
 	@Override
 	public int hashCode() {
-		Object jobExecutionId = getJobExecutionId();
+		Object jobExecutionId = jobExecution.getId();
 		Long id = getId();
 		return super.hashCode() + 31 * (stepName != null ? stepName.hashCode() : 0)
 				+ 91 * (jobExecutionId != null ? jobExecutionId.hashCode() : 0) + 59 * (id != null ? id.hashCode() : 0);
