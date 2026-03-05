@@ -34,6 +34,7 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.jdbc.support.incrementer.H2SequenceMaxValueIncrementer;
 import org.springframework.test.jdbc.JdbcTestUtils;
+import org.springframework.util.DigestUtils;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -189,6 +190,24 @@ public class JdbcJobInstanceDaoTests {
 		jdbcJobInstanceDao.createJobInstance("job", jobParameters);
 
 		assertThrows(IllegalStateException.class, () -> jdbcJobInstanceDao.createJobInstance("job", jobParameters));
+	}
+
+	@Test
+	void testGetExistingLegacyJobInstance() {
+		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "bar")
+			.addString("bar", "foo")
+			.toJobParameters();
+		String legacySerializedParameters = "bar={value=foo, type=class java.lang.String, identifying=true};"
+				+ "foo={value=bar, type=class java.lang.String, identifying=true};";
+		String legacyJobKey = DigestUtils.md5DigestAsHex(legacySerializedParameters.getBytes(StandardCharsets.UTF_8));
+
+		jdbcTemplate.update(
+				"INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION) VALUES (?, ?, ?, ?)", 3L,
+				"job", legacyJobKey, 0);
+
+		JobInstance jobInstance = jdbcJobInstanceDao.getJobInstance("job", jobParameters);
+		assertNotNull(jobInstance);
+		assertEquals(3L, jobInstance.getInstanceId());
 	}
 
 }
