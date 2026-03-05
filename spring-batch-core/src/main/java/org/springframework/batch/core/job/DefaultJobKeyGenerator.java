@@ -50,10 +50,15 @@ public class DefaultJobKeyGenerator implements JobKeyGenerator {
 		for (String key : keys) {
 			JobParameter<?> jobParameter = source.getParameter(key);
 			if (jobParameter != null && jobParameter.identifying()) {
-				stringBuffer.append(jobParameter);
+				stringBuffer.append(key).append("=").append(asLegacyParameterValue(jobParameter)).append(";");
 			}
 		}
 		return DigestUtils.md5DigestAsHex(stringBuffer.toString().getBytes(StandardCharsets.UTF_8));
+	}
+
+	private static String asLegacyParameterValue(JobParameter<?> jobParameter) {
+		return "{" + "value=" + jobParameter.value() + ", type=" + jobParameter.type() + ", identifying="
+				+ jobParameter.identifying() + '}';
 	}
 
 }
