@@ -71,6 +71,15 @@ class DefaultJobKeyGeneratorTests {
 	}
 
 	@Test
+	void testCreateJobKeyBackwardCompatibility() {
+		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "bar")
+			.addString("bar", "foo")
+			.toJobParameters();
+		String key = jobKeyGenerator.generateKey(jobParameters);
+		assertEquals("0e2a48a17d785b4ec5f073a849a79c9d", key);
+	}
+
+	@Test
 	public void testCreateJobKeyForEmptyParameters() {
 		JobParameters jobParameters1 = new JobParameters();
 		JobParameters jobParameters2 = new JobParameters();
