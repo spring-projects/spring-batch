@@ -42,6 +42,7 @@ import org.springframework.batch.infrastructure.support.ReflectionUtils;
  * @author Michael Minella
  * @author Taeik Lim
  * @author Mahmoud Ben Hassine
+ * @author Andrey Litvitski
  * @since 2.2
  */
 // FIXME remove once default constructors (required by the XML namespace) are removed
@@ -137,6 +138,9 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 	}
 
 	protected void enhance(AbstractStep step) {
+		if (step.getName() == null) {
+			step.setName(step.getClass().getSimpleName());
+		}
 		step.setJobRepository(properties.getJobRepository());
 
 		ObservationRegistry observationRegistry = properties.getObservationRegistry();
