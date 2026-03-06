@@ -218,12 +218,18 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 
 		Assert.notNull(jobInstance, "Job instance cannot be null.");
 		long jobInstanceId = jobInstance.getId();
-		// TODO optimize to a single query with a join if possible
-		List<Long> jobExecutionIdsSortedBackwardByCreationOrder = getJdbcTemplate()
-			.queryForList(getQuery(GET_JOB_EXECUTION_IDS_BY_INSTANCE_ID), Long.class, jobInstanceId);
-		List<JobExecution> jobExecutions = new ArrayList<>(jobExecutionIdsSortedBackwardByCreationOrder.size());
-		for (Long jobExecutionId : jobExecutionIdsSortedBackwardByCreationOrder) {
-			jobExecutions.add(getJobExecution(jobExecutionId));
+
+		// TODO Further reduce database round-trips by retrieving executions and
+		// parameters in fewer queries.
+		List<Long> executionIds = getJdbcTemplate().queryForList(getQuery(GET_JOB_EXECUTION_IDS_BY_INSTANCE_ID),
+				Long.class, jobInstanceId);
+
+		List<JobExecution> jobExecutions = new ArrayList<>(executionIds.size());
+		for (Long executionId : executionIds) {
+			JobExecution jobExecution = getJobExecution(executionId, jobInstance);
+			if (jobExecution != null) {
+				jobExecutions.add(jobExecution);
+			}
 		}
 		return jobExecutions;
 	}
@@ -321,14 +327,22 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	public JobExecution getJobExecution(long jobExecutionId) {
 		long jobInstanceId = getJobInstanceId(jobExecutionId);
 		JobInstance jobInstance = jobInstanceDao.getJobInstance(jobInstanceId);
-		JobParameters jobParameters = getJobParameters(jobExecutionId);
+		return getJobExecution(jobExecutionId, jobInstance);
+	}
+
+	private JobExecution getJobExecution(long jobExecutionId, JobInstance jobInstance) {
 		try {
-			return getJdbcTemplate().queryForObject(getQuery(GET_EXECUTION_BY_ID),
-					new JobExecutionRowMapper(jobInstance, jobParameters), jobExecutionId);
+			return mapJobExecution(jobExecutionId, jobInstance);
 		}
-		catch (EmptyResultDataAccessException e) {
+		catch (EmptyResultDataAccessException ex) {
 			return null;
 		}
+	}
+
+	private JobExecution mapJobExecution(long executionId, JobInstance jobInstance) {
+		JobParameters jobParameters = getJobParameters(executionId);
+		return getJdbcTemplate().queryForObject(getQuery(GET_EXECUTION_BY_ID),
+				new JobExecutionRowMapper(jobInstance, jobParameters), executionId);
 	}
 
 	private long getJobInstanceId(long jobExecutionId) {
