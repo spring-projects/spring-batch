@@ -201,6 +201,108 @@ class SimpleStepExecutionSplitterTests {
 		}
 	}
 
+	@Test
+	void testCompletedPartitionsSkippedByDefault() throws Exception {
+		SimpleStepExecutionSplitter provider = new SimpleStepExecutionSplitter(jobRepository, step.getName(),
+				new SimplePartitioner());
+		Set<StepExecution> split = provider.split(stepExecution, 2);
+		assertEquals(2, split.size());
+
+		stepExecution = update(split, stepExecution, BatchStatus.COMPLETED, false);
+
+		Set<StepExecution> restartSplit = provider.split(stepExecution, 2);
+		assertEquals(0, restartSplit.size());
+	}
+
+	@Test
+	void testCompletedPartitionsRestartWithAllowStartIfComplete() throws Exception {
+		SimpleStepExecutionSplitter provider = new SimpleStepExecutionSplitter(jobRepository, step.getName(),
+				new SimplePartitioner());
+		provider.setAllowStartIfComplete(true);
+
+		Set<StepExecution> split = provider.split(stepExecution, 2);
+		assertEquals(2, split.size());
+
+		stepExecution = update(split, stepExecution, BatchStatus.COMPLETED, false);
+
+		Set<StepExecution> restartSplit = provider.split(stepExecution, 2);
+		assertEquals(2, restartSplit.size());
+	}
+
+	@Test
+	void testCompletedPartitionsRestartInSameJobExecution() throws Exception {
+		SimpleStepExecutionSplitter provider = new SimpleStepExecutionSplitter(jobRepository, step.getName(),
+				new SimplePartitioner());
+
+		Set<StepExecution> split = provider.split(stepExecution, 2);
+		assertEquals(2, split.size());
+
+		stepExecution = update(split, stepExecution, BatchStatus.COMPLETED, true);
+
+		Set<StepExecution> restartSplit = provider.split(stepExecution, 2);
+		assertEquals(2, restartSplit.size());
+	}
+
+	@Test
+	void testMixedStatusPartitionsRestartWithAllowStartIfComplete() throws Exception {
+		SimpleStepExecutionSplitter provider = new SimpleStepExecutionSplitter(jobRepository, step.getName(),
+				new SimplePartitioner());
+		provider.setAllowStartIfComplete(true);
+
+		Set<StepExecution> split = provider.split(stepExecution, 2);
+		assertEquals(2, split.size());
+
+		StepExecution restartStepExecution = updateMixedStatus(split, stepExecution);
+
+		Set<StepExecution> restartSplit = provider.split(restartStepExecution, 2);
+		assertEquals(2, restartSplit.size());
+	}
+
+	@Test
+	void testMixedStatusPartitionsRestartWithoutAllowStartIfComplete() throws Exception {
+		SimpleStepExecutionSplitter provider = new SimpleStepExecutionSplitter(jobRepository, step.getName(),
+				new SimplePartitioner());
+		// allowStartIfComplete = false (default)
+
+		Set<StepExecution> split = provider.split(stepExecution, 2);
+		assertEquals(2, split.size());
+
+		StepExecution restartStepExecution = updateMixedStatus(split, stepExecution);
+
+		// Only FAILED partition should restart, COMPLETED should be skipped
+		Set<StepExecution> restartSplit = provider.split(restartStepExecution, 2);
+		assertEquals(1, restartSplit.size());
+	}
+
+	private StepExecution updateMixedStatus(Set<StepExecution> split, StepExecution stepExecution) throws Exception {
+		boolean first = true;
+		for (StepExecution child : split) {
+			child.setEndTime(LocalDateTime.now());
+			child.setStatus(first ? BatchStatus.COMPLETED : BatchStatus.FAILED);
+			jobRepository.update(child);
+			first = false;
+		}
+
+		stepExecution.setEndTime(LocalDateTime.now());
+		stepExecution.setStatus(BatchStatus.FAILED);
+		jobRepository.update(stepExecution);
+
+		JobExecution jobExecution = stepExecution.getJobExecution();
+		jobExecution.setStatus(BatchStatus.FAILED);
+		jobExecution.setEndTime(LocalDateTime.now());
+		jobRepository.update(jobExecution);
+
+		JobInstance jobInstance = jobExecution.getJobInstance();
+		JobExecution newJobExecution = jobRepository.createJobExecution(jobInstance, jobExecution.getJobParameters(),
+				jobExecution.getExecutionContext());
+		StepExecution newStepExecution = jobRepository.createStepExecution(stepExecution.getStepName(),
+				newJobExecution);
+		newStepExecution.setExecutionContext(stepExecution.getExecutionContext());
+		jobRepository.updateExecutionContext(newStepExecution);
+
+		return newStepExecution;
+	}
+
 	private StepExecution update(Set<StepExecution> split, StepExecution stepExecution, BatchStatus status)
 			throws Exception {
 		return update(split, stepExecution, status, true);
