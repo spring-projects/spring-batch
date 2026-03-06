@@ -32,7 +32,6 @@ import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDa
 import org.springframework.batch.core.repository.dao.JobInstanceDao;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.DataAccessException;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
@@ -74,30 +73,30 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 	private static final String FIND_JOBS_WITH_NAME = """
 			SELECT JOB_INSTANCE_ID, JOB_NAME
 			FROM %PREFIX%JOB_INSTANCE
-			WHERE JOB_NAME = ?
+			WHERE JOB_NAME = :jobName
 			""";
 
-	private static final String FIND_JOBS_WITH_KEY = FIND_JOBS_WITH_NAME + " AND JOB_KEY = ?";
+	private static final String FIND_JOBS_WITH_KEY = FIND_JOBS_WITH_NAME + " AND JOB_KEY = :jobKey";
 
 	private static final String COUNT_JOBS_WITH_NAME = """
 			SELECT COUNT(*)
 			FROM %PREFIX%JOB_INSTANCE
-			WHERE JOB_NAME = ?
+			WHERE JOB_NAME = :jobName
 			""";
 
 	private static final String FIND_JOBS_WITH_EMPTY_KEY = FIND_JOBS_WITH_NAME
-			+ " AND (JOB_KEY = ? OR JOB_KEY IS NULL)";
+			+ " AND (JOB_KEY = :jobKey OR JOB_KEY IS NULL)";
 
 	private static final String GET_JOB_FROM_ID = """
 			SELECT JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION
 			FROM %PREFIX%JOB_INSTANCE
-			WHERE JOB_INSTANCE_ID = ?
+			WHERE JOB_INSTANCE_ID = :jobInstanceId
 			""";
 
 	private static final String GET_JOB_FROM_EXECUTION_ID = """
 			SELECT JI.JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, JI.VERSION
 			FROM %PREFIX%JOB_INSTANCE JI, %PREFIX%JOB_EXECUTION JE
-			WHERE JOB_EXECUTION_ID = ? AND JI.JOB_INSTANCE_ID = JE.JOB_INSTANCE_ID
+			WHERE JOB_EXECUTION_ID = :jobExecutionId AND JI.JOB_INSTANCE_ID = JE.JOB_INSTANCE_ID
 			""";
 
 	private static final String FIND_JOB_NAMES = """
@@ -109,7 +108,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 	private static final String FIND_LAST_JOBS_BY_NAME = """
 			SELECT JOB_INSTANCE_ID, JOB_NAME
 			FROM %PREFIX%JOB_INSTANCE
-			WHERE JOB_NAME LIKE ?
+			WHERE JOB_NAME LIKE :jobName
 			ORDER BY JOB_INSTANCE_ID DESC
 			""";
 
@@ -122,12 +121,12 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 	private static final String FIND_LAST_JOB_INSTANCE_BY_JOB_NAME = """
 			SELECT JOB_INSTANCE_ID, JOB_NAME
 			FROM %PREFIX%JOB_INSTANCE I1
-			WHERE I1.JOB_NAME = ? AND I1.JOB_INSTANCE_ID = (SELECT MAX(I2.JOB_INSTANCE_ID) FROM %PREFIX%JOB_INSTANCE I2 WHERE I2.JOB_NAME = ?)
+			WHERE I1.JOB_NAME = :jobName AND I1.JOB_INSTANCE_ID = (SELECT MAX(I2.JOB_INSTANCE_ID) FROM %PREFIX%JOB_INSTANCE I2 WHERE I2.JOB_NAME = :jobName)
 			""";
 
 	private static final String DELETE_JOB_INSTANCE = """
 			DELETE FROM %PREFIX%JOB_INSTANCE
-			WHERE JOB_INSTANCE_ID = ? AND VERSION = ?
+			WHERE JOB_INSTANCE_ID = :jobInstanceId AND VERSION = :version
 			""";
 
 	private static final String GET_JOB_INSTANCE_IDS_BY_JOB_NAME = """
@@ -159,10 +158,14 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 		JobInstance jobInstance = new JobInstance(jobInstanceId, jobName);
 		jobInstance.incrementVersion();
 
-		Object[] parameters = new Object[] { jobInstanceId, jobName, jobKeyGenerator.generateKey(jobParameters),
-				jobInstance.getVersion() };
-		getJdbcTemplate().update(getQuery(CREATE_JOB_INSTANCE), parameters,
-				new int[] { Types.BIGINT, Types.VARCHAR, Types.VARCHAR, Types.INTEGER });
+		getJdbcClient().sql(getQuery(CREATE_JOB_INSTANCE))
+		// @formatter:off
+				.param(1, jobInstanceId, Types.BIGINT)
+				.param(2, jobName, Types.VARCHAR)
+				.param(3, jobKeyGenerator.generateKey(jobParameters), Types.VARCHAR)
+				.param(4, jobInstance.getVersion(), Types.INTEGER)
+		// @formatter:on
+			.update();
 
 		return jobInstance;
 	}
@@ -184,13 +187,12 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 
 		RowMapper<JobInstance> rowMapper = new JobInstanceRowMapper();
 
-		List<JobInstance> instances;
-		if (StringUtils.hasLength(jobKey)) {
-			instances = getJdbcTemplate().query(getQuery(FIND_JOBS_WITH_KEY), rowMapper, jobName, jobKey);
-		}
-		else {
-			instances = getJdbcTemplate().query(getQuery(FIND_JOBS_WITH_EMPTY_KEY), rowMapper, jobName, jobKey);
-		}
+		List<JobInstance> instances = getJdbcClient()
+			.sql(getQuery(StringUtils.hasLength(jobKey) ? FIND_JOBS_WITH_KEY : FIND_JOBS_WITH_EMPTY_KEY))
+			.param("jobName", jobName)
+			.param("jobKey", jobKey)
+			.query(rowMapper)
+			.list();
 
 		if (instances.isEmpty()) {
 			return null;
@@ -203,19 +205,16 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 
 	@Override
 	@Nullable public JobInstance getJobInstance(long instanceId) {
-
-		try {
-			return getJdbcTemplate().queryForObject(getQuery(GET_JOB_FROM_ID), new JobInstanceRowMapper(), instanceId);
-		}
-		catch (EmptyResultDataAccessException e) {
-			return null;
-		}
-
+		return getJdbcClient().sql(getQuery(GET_JOB_FROM_ID))
+			.param("jobInstanceId", instanceId)
+			.query(new JobInstanceRowMapper())
+			.optional()
+			.orElse(null);
 	}
 
 	@Override
 	public List<String> getJobNames() {
-		return getJdbcTemplate().query(getQuery(FIND_JOB_NAMES), (rs, rowNum) -> rs.getString(1));
+		return getJdbcClient().sql(getQuery(FIND_JOB_NAMES)).query(String.class).list();
 	}
 
 	@Override
@@ -245,7 +244,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 			jobName = jobName.replaceAll("\\" + STAR_WILDCARD, SQL_WILDCARD);
 		}
 
-		return getJdbcTemplate().query(getQuery(FIND_LAST_JOBS_BY_NAME), extractor, jobName);
+		return getJdbcClient().sql(getQuery(FIND_LAST_JOBS_BY_NAME)).param("jobName", jobName).query(extractor);
 	}
 
 	/**
@@ -266,13 +265,11 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 
 	@Override
 	@Nullable public JobInstance getLastJobInstance(String jobName) {
-		try {
-			return getJdbcTemplate().queryForObject(getQuery(FIND_LAST_JOB_INSTANCE_BY_JOB_NAME),
-					new JobInstanceRowMapper(), jobName, jobName);
-		}
-		catch (EmptyResultDataAccessException e) {
-			return null;
-		}
+		return getJdbcClient().sql(getQuery(FIND_LAST_JOB_INSTANCE_BY_JOB_NAME))
+			.param("jobName", jobName)
+			.query(new JobInstanceRowMapper())
+			.optional()
+			.orElse(null);
 	}
 
 	@Override
@@ -281,14 +278,11 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 	// TODO clients should use
 	// JobExecutionDao.getJobExecution(jobExecutionId).getJobInstance() instead
 	public JobInstance getJobInstance(JobExecution jobExecution) {
-
-		try {
-			return getJdbcTemplate().queryForObject(getQuery(GET_JOB_FROM_EXECUTION_ID), new JobInstanceRowMapper(),
-					jobExecution.getId());
-		}
-		catch (EmptyResultDataAccessException e) {
-			return null;
-		}
+		return getJdbcClient().sql(getQuery(GET_JOB_FROM_EXECUTION_ID))
+			.param("jobExecutionId", jobExecution.getId())
+			.query(new JobInstanceRowMapper())
+			.optional()
+			.orElse(null);
 	}
 
 	@Override
@@ -296,7 +290,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 		if (!getJobNames().contains(jobName)) {
 			throw new NoSuchJobException("No job instances were found for job name " + jobName);
 		}
-		return getJdbcTemplate().queryForObject(getQuery(COUNT_JOBS_WITH_NAME), Long.class, jobName);
+		return getJdbcClient().sql(getQuery(COUNT_JOBS_WITH_NAME)).param("jobName", jobName).query(Long.class).single();
 	}
 
 	/**
@@ -305,8 +299,10 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 	 */
 	@Override
 	public void deleteJobInstance(JobInstance jobInstance) {
-		int count = getJdbcTemplate().update(getQuery(DELETE_JOB_INSTANCE), jobInstance.getId(),
-				jobInstance.getVersion());
+		int count = getJdbcClient().sql(getQuery(DELETE_JOB_INSTANCE))
+			.param("jobInstanceId", jobInstance.getId())
+			.param("version", jobInstance.getVersion())
+			.update();
 
 		if (count == 0) {
 			throw new OptimisticLockingFailureException("Attempt to delete job instance id=" + jobInstance.getId()
