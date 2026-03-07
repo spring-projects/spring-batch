@@ -79,14 +79,24 @@ class GracefulShutdownFunctionalTests {
 
 		jobOperator.stop(jobExecution);
 
+		// Wait for the job to stop. The job needs to finish processing the current chunk
+		// before it can stop, so we need to be generous with the timeout.
+		// With 5 items, chunk size 2, and 500ms per item processing time:
+		// - Chunk 1: 2 items = 1000ms
+		// - Chunk 2: 2 items = 1000ms
+		// - Chunk 3: 1 item = 500ms
+		// If stop is called at the start of a chunk, we might need up to 1 second
+		// for the chunk to complete, plus time for the stop signal to be processed.
+		int maxWaitCount = 50; // 50 * 100ms = 5 seconds
 		int count = 0;
-		while (jobExecution.isRunning() && count <= 10) {
-			logger.info("Checking for end time in JobExecution: count=" + count);
+		while (jobExecution.isRunning() && count < maxWaitCount) {
+			logger.info("Checking for job to stop: status=" + jobExecution.getStatus() + ", count=" + count);
 			Thread.sleep(100);
 			count++;
 		}
 
-		assertFalse(jobExecution.isRunning(), "Timed out waiting for job to end.");
+		assertFalse(jobExecution.isRunning(), "Timed out waiting for job to stop after " + (count * 100)
+				+ "ms. Final status: " + jobExecution.getStatus());
 		assertEquals(BatchStatus.STOPPED, jobExecution.getStatus());
 	}
 
