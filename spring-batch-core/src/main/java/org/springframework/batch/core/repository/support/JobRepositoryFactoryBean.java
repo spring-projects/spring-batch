@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2025 the original author or authors.
+ * Copyright 2002-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,6 +67,7 @@ import static org.springframework.batch.infrastructure.support.DatabaseType.SYBA
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
  * @author Yanming Zhou
+ * @author Thomas Risberg
  * @deprecated since 6.0 in favor of {@link JdbcJobRepositoryFactoryBean}. Scheduled for
  * removal in 6.2 or later.
  */
@@ -75,6 +76,17 @@ import static org.springframework.batch.infrastructure.support.DatabaseType.SYBA
 public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean implements InitializingBean {
 
 	protected static final Log logger = LogFactory.getLog(JobRepositoryFactoryBean.class);
+
+	/**
+	 * Classic schema name of the job instance incrementer.
+	 */
+	private static final String CLASSIC_JOB_INSTANCE_INCREMENTER_NAME = "JOB_SEQ";
+
+	/**
+	 * Environment variable for using the classic schema name of the job instance
+	 * incrementer.
+	 */
+	private static final String SPRING_BATCH_JDBC_SCHEMA_CLASSIC = "SPRING_BATCH_JDBC_SCHEMA_CLASSIC";
 
 	protected DataSource dataSource;
 
@@ -312,6 +324,17 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 	@Override
 	protected JdbcJobInstanceDao createJobInstanceDao() {
 		JdbcJobInstanceDao dao = new JdbcJobInstanceDao();
+		String classicSchema = "false";
+		if (System.getenv(SPRING_BATCH_JDBC_SCHEMA_CLASSIC) != null) {
+			classicSchema = System.getenv(SPRING_BATCH_JDBC_SCHEMA_CLASSIC);
+		}
+		else if (System.getProperty("spring.batch.jdbc.schema.classic") != null) {
+			classicSchema = System.getProperty("spring.batch.jdbc.schema.classic");
+		}
+		if ("TRUE".equalsIgnoreCase(classicSchema) || "YES".equalsIgnoreCase(classicSchema)) {
+			jobInstanceIncrementerName = CLASSIC_JOB_INSTANCE_INCREMENTER_NAME;
+			logger.info("Using classic schema job instance incrementer name of " + jobInstanceIncrementerName);
+		}
 		dao.setJdbcTemplate(jdbcOperations);
 		dao.setJobInstanceIncrementer(
 				incrementerFactory.getIncrementer(databaseType, tablePrefix + jobInstanceIncrementerName));
