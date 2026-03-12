@@ -39,6 +39,16 @@ import java.util.concurrent.FutureTask;
  * requests to local workers from a {@link TaskExecutor} instead of sending them over a
  * message channel to remote workers.
  *
+ * <p>
+ * The aggregation of worker contributions is done in the {@code afterStep} method, which
+ * waits for all worker responses and updates the step execution accordingly. If any
+ * worker response indicates a failure, the step execution is marked as failed and the
+ * exception is added to the step execution's failure exceptions. Otherwise, the step
+ * execution is marked as completed and the write counts and skip counts from all worker
+ * contributions are aggregated into the step execution's write count and write skip
+ * count. The commit count is also incremented for each successful worker contribution,
+ * while the rollback count is incremented for each failed worker contribution.
+ *
  * @param <T> type of items
  * @see ChunkMessageChannelItemWriter
  * @author Mahmoud Ben Hassine
@@ -87,8 +97,12 @@ public class ChunkTaskExecutorItemWriter<T> implements ItemWriter<T>, StepExecut
 		try {
 			ExitStatus result = ExitStatus.COMPLETED
 				.addExitDescription("Waited for " + this.responses.size() + " results.");
+			resetCounter(stepExecution);
 			for (StepContribution contribution : getStepContributions()) {
-				stepExecution.apply(contribution);
+				// only write counts and skip counts are aggregated here
+				// read counts and process/filter counts are managed by the driving step
+				stepExecution.setWriteCount(stepExecution.getWriteCount() + contribution.getWriteCount());
+				stepExecution.setWriteSkipCount(stepExecution.getWriteSkipCount() + contribution.getWriteSkipCount());
 				ExitStatus exitStatus = contribution.getExitStatus();
 				if (ExitStatus.FAILED.getExitCode().equals(exitStatus.getExitCode())) {
 					result = exitStatus;
@@ -97,6 +111,10 @@ public class ChunkTaskExecutorItemWriter<T> implements ItemWriter<T>, StepExecut
 						stepExecution.addFailureException(exitException);
 					}
 					stepExecution.setStatus(BatchStatus.FAILED);
+					stepExecution.incrementRollbackCount();
+				}
+				else {
+					stepExecution.incrementCommitCount();
 				}
 			}
 			return result;
@@ -106,6 +124,20 @@ public class ChunkTaskExecutorItemWriter<T> implements ItemWriter<T>, StepExecut
 			stepExecution.addFailureException(e);
 			return ExitStatus.FAILED.addExitDescription(e);
 		}
+	}
+
+	/**
+	 * Reset the write count, write skip count, commit count and rollback count of the
+	 * step execution to avoid counting them twice as they are updated by workers and
+	 * aggregated in the afterStep method. The read count and process/filter count are not
+	 * reset as they are managed by the driving step
+	 * @param stepExecution the step execution to reset the counters for
+	 */
+	private void resetCounter(StepExecution stepExecution) {
+		stepExecution.setWriteCount(0);
+		stepExecution.setWriteSkipCount(0);
+		stepExecution.setCommitCount(0);
+		stepExecution.setRollbackCount(0);
 	}
 
 	private Collection<StepContribution> getStepContributions() throws ExecutionException, InterruptedException {

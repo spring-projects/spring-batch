@@ -240,6 +240,7 @@ public ChunkProcessor<Vet> chunkProcessor(DataSource dataSource, TransactionTemp
         }
         catch (Exception e) {
             transactionStatus.setRollbackOnly();
+            contribution.incrementWriteSkipCount(chunk.size());
             contribution.setExitStatus(ExitStatus.FAILED.addExitDescription(e));
         }
     });
