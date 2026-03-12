@@ -34,6 +34,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * Similar to {@code ChunkMessageChannelItemWriter}, this item writer submits chunk
  * requests to local workers from a {@link TaskExecutor} instead of sending them over a
@@ -55,6 +58,8 @@ import java.util.concurrent.FutureTask;
  * @since 6.0
  */
 public class ChunkTaskExecutorItemWriter<T> implements ItemWriter<T>, StepExecutionListener {
+
+	private static final Log logger = LogFactory.getLog(ChunkTaskExecutorItemWriter.class);
 
 	@SuppressWarnings("NullAway.Init")
 	private StepExecution stepExecution;
@@ -105,6 +110,8 @@ public class ChunkTaskExecutorItemWriter<T> implements ItemWriter<T>, StepExecut
 				stepExecution.setWriteSkipCount(stepExecution.getWriteSkipCount() + contribution.getWriteSkipCount());
 				ExitStatus exitStatus = contribution.getExitStatus();
 				if (ExitStatus.FAILED.getExitCode().equals(exitStatus.getExitCode())) {
+					logger.error("Chunk processing failed for contribution: " + contribution
+							+ ", marking step execution as failed.");
 					result = exitStatus;
 					Throwable exitException = exitStatus.getExitException();
 					if (exitException != null) {
