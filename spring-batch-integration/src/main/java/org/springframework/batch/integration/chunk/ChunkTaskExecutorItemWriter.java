@@ -52,6 +52,14 @@ import org.apache.commons.logging.LogFactory;
  * count. The commit count is also incremented for each successful worker contribution,
  * while the rollback count is incremented for each failed worker contribution.
  *
+ * <p>
+ * It should be noted that transaction management of the chunk as well as fault tolerance
+ * features are not handled by this item writer and are the responsibility of the delegate
+ * chunk processor.
+ *
+ * <p>
+ * Moreover, the lifecycle of the task executor is not handled by this item writer.
+ *
  * @param <T> type of items
  * @see ChunkMessageChannelItemWriter
  * @author Mahmoud Ben Hassine

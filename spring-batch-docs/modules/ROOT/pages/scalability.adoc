@@ -197,9 +197,8 @@ See the section on xref:step/controlling-flow.adoc#split-flows[Split Flows] for 
 Local chunking is a new feature in v6.0 that allows you to process chunks of items in parallel, locally within the same JVM using multiple threads.
 This is particularly useful when you have a large number of items to process and want to take advantage of multi-core processors.
 With local chunking, you can configure a chunk-oriented step to use multiple threads to process chunks of items concurrently.
-Each thread will read, process and write its own chunk of items independently, while the step will manage the overall execution and commit the results.
 
-This feature is possible by using the `ChunkMessageChannelItemWriter`, which is an item writer that submits chunk
+This feature is possible by using the `ChunkTaskExecutorItemWriter`, which is an item writer that submits chunk
 requests to local workers from a `TaskExecutor`:
 
 [source, java]
@@ -215,9 +214,11 @@ public ChunkTaskExecutorItemWriter<Vet> itemWriter(ChunkProcessor<Vet> chunkProc
 }
 ----
 
-The `ChunkMessageChannelItemWriter` requires a `TaskExecutor` to process chunk concurrently
-as well as a `ChunkProcessor` to define what to do with each chunk. Here is an example of
-a chunk processor that writes each chunk of items to a relational database table:
+The `ChunkMessageChannelItemWriter` requires a `TaskExecutor` to process chunk concurrently as well as a `ChunkProcessor`
+to define what to do with each chunk. Each thread from the task executor will receive its own chunk of items and is responsible
+for processing the chunk, and the step will manage the overall aggregation of the results.
+
+Here is an example of a chunk processor that writes each chunk of items to a relational database table:
 
 [source, java]
 ----
@@ -246,6 +247,13 @@ public ChunkProcessor<Vet> chunkProcessor(DataSource dataSource, TransactionTemp
     });
 }
 ----
+
+[IMPORTANT]
+====
+It should be noted that transaction management of the chunk as well as fault tolerance features (like retry, skip, chunk scanning, etc)
+are not handled by the `ChunkTaskExecutorItemWriter` nor the driving step, and are the responsibility of the delegate chunk processor.
+Moreover, the lifecycle of the task executor is not handled by the `ChunkTaskExecutorItemWriter`.
+====
 
 You can find an example of this scaling technique in the https://github.com/spring-projects/spring-batch/tree/main/spring-batch-samples/src/main/java/org/springframework/batch/samples/chunking/local[Local Chunking Sample].
 
