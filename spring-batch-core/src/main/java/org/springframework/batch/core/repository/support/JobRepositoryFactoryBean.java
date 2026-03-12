@@ -324,12 +324,16 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 	@Override
 	protected JdbcJobInstanceDao createJobInstanceDao() {
 		JdbcJobInstanceDao dao = new JdbcJobInstanceDao();
+		String classicSchema = "false";
 		if (System.getenv(SPRING_BATCH_JDBC_SCHEMA_CLASSIC) != null) {
-			String classicSchema = System.getenv(SPRING_BATCH_JDBC_SCHEMA_CLASSIC);
-			if ("TRUE".equalsIgnoreCase(classicSchema) || "YES".equalsIgnoreCase(classicSchema)) {
-				jobInstanceIncrementerName = CLASSIC_JOB_INSTANCE_INCREMENTER_NAME;
-				logger.info("Using classic schema job instance incrementer name of " + jobInstanceIncrementerName);
-			}
+			classicSchema = System.getenv(SPRING_BATCH_JDBC_SCHEMA_CLASSIC);
+		}
+		else if (System.getProperty("spring.batch.jdbc.schema.classic") != null) {
+			classicSchema = System.getProperty("spring.batch.jdbc.schema.classic");
+		}
+		if ("TRUE".equalsIgnoreCase(classicSchema) || "YES".equalsIgnoreCase(classicSchema)) {
+			jobInstanceIncrementerName = CLASSIC_JOB_INSTANCE_INCREMENTER_NAME;
+			logger.info("Using classic schema job instance incrementer name of " + jobInstanceIncrementerName);
 		}
 		dao.setJdbcTemplate(jdbcOperations);
 		dao.setJobInstanceIncrementer(
