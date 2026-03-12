@@ -85,19 +85,25 @@ public class ChunkTaskExecutorItemWriter<T> implements ItemWriter<T>, StepExecut
 	@Override
 	public ExitStatus afterStep(StepExecution stepExecution) {
 		try {
-			ExitStatus exitStatus = ExitStatus.COMPLETED
+			ExitStatus result = ExitStatus.COMPLETED
 				.addExitDescription("Waited for " + this.responses.size() + " results.");
 			for (StepContribution contribution : getStepContributions()) {
 				stepExecution.apply(contribution);
-				if (ExitStatus.FAILED.getExitCode().equals(contribution.getExitStatus().getExitCode())) {
-					exitStatus = contribution.getExitStatus();
+				ExitStatus exitStatus = contribution.getExitStatus();
+				if (ExitStatus.FAILED.getExitCode().equals(exitStatus.getExitCode())) {
+					result = exitStatus;
+					Throwable exitException = exitStatus.getExitException();
+					if (exitException != null) {
+						stepExecution.addFailureException(exitException);
+					}
 					stepExecution.setStatus(BatchStatus.FAILED);
 				}
 			}
-			return exitStatus;
+			return result;
 		}
 		catch (ExecutionException | InterruptedException e) {
 			stepExecution.setStatus(BatchStatus.FAILED);
+			stepExecution.addFailureException(e);
 			return ExitStatus.FAILED.addExitDescription(e);
 		}
 	}

@@ -103,7 +103,7 @@ public class LocalChunkingJobConfiguration {
 			}
 			catch (Exception e) {
 				transactionStatus.setRollbackOnly();
-				contribution.setExitStatus(ExitStatus.FAILED.addExitDescription(e));
+				contribution.setExitStatus(ExitStatus.FAILED.setExitException(e));
 			}
 		});
 	}

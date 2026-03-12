@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.samples.chunking.local;
 
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
@@ -25,11 +27,11 @@ import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class LocalChunkingJobFunctionalTests {
 
@@ -69,7 +71,11 @@ public class LocalChunkingJobFunctionalTests {
 
 		// then
 		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
-		assertTrue(jobExecution.getExitStatus().getExitDescription().contains("size limit: 30"));
+		List<Throwable> failureExceptions = jobExecution.getAllFailureExceptions();
+		assertFalse(failureExceptions.isEmpty());
+		Throwable throwable = failureExceptions.get(0);
+		assertInstanceOf(DataIntegrityViolationException.class, throwable);
+		assertTrue(throwable.getMessage().contains("size limit: 30"));
 		int vetsCount = JdbcTestUtils.countRowsInTable(jdbcTemplate, "vets");
 		assertEquals(4, vetsCount);
 	}

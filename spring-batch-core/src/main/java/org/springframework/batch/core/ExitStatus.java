@@ -73,6 +73,8 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 
 	private final String exitDescription;
 
+	@Nullable private Throwable exitException;
+
 	/**
 	 * Constructor that accepts the exit code and sets the exit description to an empty
 	 * {@link String}.
@@ -95,6 +97,19 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 	}
 
 	/**
+	 * Constructor that establishes the exit code and the exit description for the
+	 * {@link ExitStatus}.
+	 * @param exitCode The exit code to be used for the {@link ExitStatus}.
+	 * @param exitDescription The exit description to be used for the {@link ExitStatus}.
+	 * @param exitException The exit exception to the {@link ExitStatus}.
+	 * @since 6.0.3
+	 */
+	public ExitStatus(String exitCode, String exitDescription, Throwable exitException) {
+		this(exitCode, exitDescription);
+		this.exitException = exitException;
+	}
+
+	/**
 	 * Getter for the exit code (defaults to blank).
 	 * @return the exit code.
 	 */
@@ -108,6 +123,15 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 	 */
 	public String getExitDescription() {
 		return exitDescription;
+	}
+
+	/**
+	 * Public getter for the exit exception.
+	 * @return the exception that caused the step to exit
+	 * @since 6.0.3
+	 */
+	@Nullable public Throwable getExitException() {
+		return this.exitException;
 	}
 
 	/**
@@ -138,6 +162,10 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 			return this;
 		}
 		ExitStatus result = addExitDescription(status.exitDescription);
+		Throwable exitException = status.exitException;
+		if (exitException != null) {
+			result.setExitException(exitException);
+		}
 		if (compareTo(status) < 0) {
 			result = result.replaceExitCode(status.exitCode);
 		}
@@ -256,6 +284,16 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 		else {
 			return new ExitStatus(exitCode, description);
 		}
+	}
+
+	/**
+	 * Public setter for the exit exception.
+	 * @param exitException the last exception that caused the step to exit
+	 * @since 6.0.3
+	 */
+	public ExitStatus setExitException(Throwable exitException) {
+		this.exitException = exitException;
+		return this;
 	}
 
 	/**
