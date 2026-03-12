@@ -109,7 +109,17 @@ public class TaskExecutorJobOperator extends SimpleJobOperator {
 			JobExecutionAlreadyRunningException, JobRestartException, InvalidJobParametersException {
 		Assert.notNull(job, "Job must not be null");
 		Assert.notNull(jobParameters, "JobParameters must not be null");
-		new JobLaunchEvent(job.getName(), jobParameters.toString()).commit();
+		try {
+			new JobLaunchEvent(job.getName(), jobParameters.toString()).commit();
+		}
+		catch (NoClassDefFoundError e) {
+			// JFR is not available on this runtime (e.g., minimized JRE without jdk.jfr
+			// module)
+			// Silently ignore and continue without JFR events
+			if (logger.isDebugEnabled()) {
+				logger.debug("JFR is not available, skipping JFR event creation");
+			}
+		}
 		Observation observation = MicrometerMetrics
 			.createObservation(METRICS_PREFIX + "job.launch.count", this.observationRegistry)
 			.start();
