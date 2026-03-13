@@ -98,7 +98,7 @@ public abstract class AbstractJdbcBatchMetadataDao implements InitializingBean {
 		this.jdbcTemplate = jdbcTemplate;
 	}
 
-	@Nullable protected JdbcOperations getJdbcTemplate() {
+	protected @Nullable JdbcOperations getJdbcTemplate() {
 		return jdbcTemplate;
 	}
 
@@ -119,7 +119,7 @@ public abstract class AbstractJdbcBatchMetadataDao implements InitializingBean {
 		this.conversionService = conversionService;
 	}
 
-	@Nullable public ConfigurableConversionService getConversionService() {
+	public @Nullable ConfigurableConversionService getConversionService() {
 		return conversionService;
 	}
 
