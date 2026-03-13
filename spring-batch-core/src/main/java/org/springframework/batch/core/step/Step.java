@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.step;
 
+import org.springframework.batch.core.BatchConstants;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobInterruptedException;
 
@@ -32,8 +33,10 @@ public interface Step {
 
 	/**
 	 * The key to use when retrieving the batch step type.
+	 * @deprecated deprecated in favor of {@link BatchConstants#BATCH_STEP_TYPE}
 	 */
-	String STEP_TYPE_KEY = "batch.stepType";
+	@Deprecated(forRemoval = true)
+	String STEP_TYPE_KEY = BatchConstants.BATCH_STEP_TYPE;
 
 	/**
 	 * The name of the step. This is used to distinguish between different steps and must
