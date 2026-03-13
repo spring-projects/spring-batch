@@ -31,6 +31,7 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.batch.infrastructure.item.ItemReader;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.batch.infrastructure.item.database.orm.JpaQueryProvider;
+import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -83,9 +84,10 @@ import org.springframework.util.StringUtils;
  * @author Mahmoud Ben Hassine
  * @author Jinwoo Bae
  * @author Jimmy Praet
+ * @author Andrey Litvitski
  * @since 2.0
  */
-public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
+public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> implements BeanNameAware {
 
 	private EntityManagerFactory entityManagerFactory;
 
