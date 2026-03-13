@@ -41,9 +41,9 @@ public abstract class AbstractSynchronizedItemStreamReaderTests {
 	@Mock
 	protected ItemStreamReader<Object> delegate;
 
-	private SynchronizedItemStreamReader<Object> synchronizedItemStreamReader;
+	protected SynchronizedItemStreamReader<Object> synchronizedItemStreamReader;
 
-	private final ExecutionContext testExecutionContext = new ExecutionContext();
+	protected final ExecutionContext testExecutionContext = new ExecutionContext();
 
 	abstract protected SynchronizedItemStreamReader<Object> createNewSynchronizedItemStreamReader();
 
