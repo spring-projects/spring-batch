@@ -45,6 +45,7 @@ import java.util.Set;
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
  * @author Parikshit Dutta
+ * @author Yanming Zhou
  */
 @SuppressWarnings("removal")
 public interface JobRepository extends JobExplorer {
@@ -338,6 +339,21 @@ public interface JobRepository extends JobExplorer {
 	 * @since 6.0
 	 */
 	default StepExecution createStepExecution(String stepName, JobExecution jobExecution) {
+		return createStepExecution(stepName, jobExecution, null);
+	}
+
+	/**
+	 * Create a {@link StepExecution} for a given {@link JobExecution} and step name. The
+	 * {@link JobExecution} must already exist. The returned {@link StepExecution} should
+	 * be associated with the {@link JobExecution} (ie. should be added to the list of
+	 * {@link JobExecution#getStepExecutions()}.
+	 * @param stepName the name of the step
+	 * @param jobExecution the job execution to which the step execution belongs
+	 * @param stepExecutionContext the step execution context
+	 * @return a valid {@link StepExecution} for the arguments provided
+	 */
+	default StepExecution createStepExecution(String stepName, JobExecution jobExecution,
+			@Nullable ExecutionContext stepExecutionContext) {
 		throw new UnsupportedOperationException();
 	}
 
