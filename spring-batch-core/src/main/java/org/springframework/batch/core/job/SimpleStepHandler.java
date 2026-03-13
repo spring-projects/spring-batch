@@ -32,6 +32,7 @@ import org.springframework.batch.infrastructure.item.ExecutionContext;
  * Implementation of {@link StepHandler} that manages repository and restart concerns.
  *
  * @author Dave Syer
+ * @author Yanming Zhou
  *
  */
 @NullUnmarked
@@ -207,8 +208,8 @@ public class SimpleStepHandler implements StepHandler {
 		try {
 			stepExecutionCount = jobRepository.getStepExecutionCount(jobInstance, step.getName());
 		}
-		catch (NoSuchStepException e) {
-			throw new JobRestartException("Unable to count step executions for job instance " + jobInstance.getId(), e);
+		catch (NoSuchStepException ignored) {
+			// step is not executed before
 		}
 		if (stepExecutionCount < step.getStartLimit()) {
 			// step start count is less than start max, return true
