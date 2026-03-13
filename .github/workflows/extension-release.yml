@@ -25,7 +25,7 @@ jobs:
         shell: bash
         run: jf rt download --spec .github/extension-release-files-spec.json --spec-vars 'buildname=${{ github.event.inputs.buildName }};buildnumber=${{ github.event.inputs.buildNumber }}'
       - name: Sync to Maven Central
-        uses: spring-io/central-publish-action@0cdd90d12e6876341e82860d951e1bcddc1e51b6 # v0.2.0
+        uses: spring-io/central-publish-action@5ea05c77127404d89c374ac4cd17b6ec6b0e7293 # v0.4.0
         with:
           token-name: ${{ secrets.CENTRAL_TOKEN_USERNAME }}
           token: ${{ secrets.CENTRAL_TOKEN_PASSWORD }}
