@@ -26,5 +26,6 @@ interface accepts a list of items, rather than an item by itself. After writing 
 list, any flushing that may be necessary can be performed before returning from the write
 method. For example, if writing to a Hibernate DAO, multiple calls to write can be made,
 one for each item. The writer can then call `flush` on the hibernate session before
-returning.
-
+returning. Note that the chunk passed to `write` may be empty if all items in the chunk
+were filtered out by an `ItemProcessor` or skipped during fault-tolerant step processing.
+Implementations are expected to handle empty chunks gracefully.
