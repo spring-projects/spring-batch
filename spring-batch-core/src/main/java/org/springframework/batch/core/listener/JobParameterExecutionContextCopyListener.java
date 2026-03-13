@@ -58,7 +58,7 @@ public class JobParameterExecutionContextCopyListener implements StepExecutionLi
 	@Override
 	public void beforeStep(StepExecution stepExecution) {
 		ExecutionContext stepContext = stepExecution.getExecutionContext();
-		JobParameters jobParameters = stepExecution.getJobParameters();
+		JobParameters jobParameters = stepExecution.getJobExecution().getJobParameters();
 		Collection<String> keys = this.keys;
 		if (keys == null) {
 			keys = jobParameters.parameters().stream().map(JobParameter::name).collect(Collectors.toSet());
