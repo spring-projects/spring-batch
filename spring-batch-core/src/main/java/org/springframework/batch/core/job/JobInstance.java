@@ -86,7 +86,9 @@ public class JobInstance extends Entity {
 
 	/**
 	 * @return The current instance ID.
+	 * @deprecated in favor of {@link #getId()}
 	 */
+	@Deprecated(forRemoval = true)
 	public long getInstanceId() {
 		return super.getId();
 	}
