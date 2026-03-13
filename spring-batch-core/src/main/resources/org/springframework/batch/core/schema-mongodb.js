@@ -1,13 +1,22 @@
 // to execute in MongoShell after changing the database name `db.` as needed
-db.createCollection("BATCH_JOB_INSTANCE");
-db.createCollection("BATCH_JOB_EXECUTION");
-db.createCollection("BATCH_STEP_EXECUTION");
+// This script is idempotent and can be safely reapplied.
 
 // SEQUENCES
-db.createCollection("BATCH_SEQUENCES");
-db.getCollection("BATCH_SEQUENCES").insertOne({_id: "BATCH_JOB_INSTANCE_SEQ", count: Long(0)});
-db.getCollection("BATCH_SEQUENCES").insertOne({_id: "BATCH_JOB_EXECUTION_SEQ", count: Long(0)});
-db.getCollection("BATCH_SEQUENCES").insertOne({_id: "BATCH_STEP_EXECUTION_SEQ", count: Long(0)});
+db.getCollection("BATCH_SEQUENCES").updateOne(
+    {_id: "BATCH_JOB_INSTANCE_SEQ"},
+    {$setOnInsert: {count: NumberLong(0)}},
+    {upsert: true}
+);
+db.getCollection("BATCH_SEQUENCES").updateOne(
+    {_id: "BATCH_JOB_EXECUTION_SEQ"},
+    {$setOnInsert: {count: NumberLong(0)}},
+    {upsert: true}
+);
+db.getCollection("BATCH_SEQUENCES").updateOne(
+    {_id: "BATCH_STEP_EXECUTION_SEQ"},
+    {$setOnInsert: {count: NumberLong(0)}},
+    {upsert: true}
+);
 
 // INDICES
 db.getCollection("BATCH_JOB_INSTANCE").createIndex( {"jobName": 1}, {"name": "job_name_idx"});

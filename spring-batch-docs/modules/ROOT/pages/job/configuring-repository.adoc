@@ -92,7 +92,8 @@ The `max-varchar-length` defaults to `2500`, which is the length of the long
 Similar to the JDBC-based `JobRepository`, the MongoDB-based `JobRepository` requires some collections
 to store the batch metadata. These collections are defined in the `org/springframework/batch/core/schema-mongodb.jsonl`
 of the `spring-batch-core` jar. As with the JDBC-based `JobRepository`, you need to create these collections
-in your MongoDB database before running any job.
+in your MongoDB database before running any job. The provided MongoDB schema scripts are idempotent and
+can be safely reapplied without resetting sequence values.
 
 Moreover, since it is https://www.mongodb.com/docs/manual/core/dot-dollar-considerations/[not recommended] to use `.` in
 field names in MongoDB documents, you need to customize the `MongoTemplate` used by the `MongoJobRepositoryFactoryBean`
@@ -319,4 +320,3 @@ If even that does not work or if you are not using an RDBMS, the
 only option may be to implement the various `Dao`
 interfaces that the `SimpleJobRepository` depends
 on and wire one up manually in the normal Spring way.
-
