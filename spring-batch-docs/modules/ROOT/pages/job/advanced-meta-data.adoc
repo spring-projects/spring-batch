@@ -49,7 +49,7 @@ need to populate it manually with the jobs that you want to operate through the 
 
 Most of the methods on `JobOperator` are
 self-explanatory, and you can find more detailed explanations in the
-https://docs.spring.io/spring-batch/docs/current/api/org/springframework/batch/core/launch/JobOperator.html[Javadoc of the interface]. However, the
+https://docs.spring.io/spring-batch/reference/api/org/springframework/batch/core/launch/JobOperator.html[Javadoc of the interface]. However, the
 `startNextInstance` method is worth noting. This
 method always starts a new instance of a `Job`.
 This can be extremely useful if there are serious issues in a
