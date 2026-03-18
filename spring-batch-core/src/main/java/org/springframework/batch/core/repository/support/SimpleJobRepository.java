@@ -115,20 +115,15 @@ public class SimpleJobRepository extends SimpleJobExplorer implements JobReposit
 		return jobExecution;
 	}
 
-	/**
-	 * Create a new {@link StepExecution} for the given {@link JobExecution} and step
-	 * name, associate a new {@link ExecutionContext} with the new {@link StepExecution},
-	 * and add the new {@link StepExecution} to the {@link JobExecution}.
-	 * @param stepName the name of the step
-	 * @param jobExecution the job execution to which the step execution belongs
-	 * @return the new step execution
-	 * @since 6.0
-	 */
-	public StepExecution createStepExecution(String stepName, JobExecution jobExecution) {
+	public StepExecution createStepExecution(String stepName, JobExecution jobExecution,
+			@Nullable ExecutionContext stepExecutionContext) {
 		Assert.notNull(jobExecution, "JobExecution must not be null.");
 		Assert.notNull(stepName, "Step name must not be null.");
 
 		StepExecution stepExecution = stepExecutionDao.createStepExecution(stepName, jobExecution);
+		if (stepExecutionContext != null && !stepExecutionContext.isEmpty()) {
+			stepExecution.setExecutionContext(new ExecutionContext(stepExecutionContext));
+		}
 		ecDao.saveExecutionContext(stepExecution);
 		jobExecution.addStepExecution(stepExecution);
 
