@@ -17,8 +17,10 @@ package org.springframework.batch.infrastructure.item.file.mapping;
 
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import tools.jackson.core.exc.UnexpectedEndOfInputException;
 import org.junit.jupiter.api.Test;
+import org.springframework.core.OverridingClassLoader;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -44,6 +46,37 @@ class JsonLineMapperTests {
 	@Test
 	void testMappingError() {
 		assertThrows(UnexpectedEndOfInputException.class, () -> mapper.mapLine("{\"foo\": 1", 1));
+	}
+
+	@Test
+	void testMapLineWithJackson2ObjectMapper() throws Exception {
+		JsonLineMapper mapper = new JsonLineMapper(new ObjectMapper());
+		Map<String, Object> map = mapper.mapLine("{\"foo\": 1}", 1);
+		assertEquals(1, map.get("foo"));
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
+	void testMapLineWithDefaultConstructorAndJackson2Only() throws Exception {
+		ClassLoader classLoader = new OverridingClassLoader(JsonLineMapper.class.getClassLoader()) {
+			@Override
+			public Class<?> loadClass(String name) throws ClassNotFoundException {
+				if (name.startsWith("tools.jackson")) {
+					throw new ClassNotFoundException(name);
+				}
+				return super.loadClass(name);
+			}
+
+			@Override
+			protected boolean isEligibleForOverriding(String className) {
+				return className.startsWith(JsonLineMapper.class.getName())
+						|| JsonLineMapperJackson2OnlyRunner.class.getName().equals(className);
+			}
+		};
+		Class<?> runnerClass = classLoader.loadClass(JsonLineMapperJackson2OnlyRunner.class.getName());
+		Map<String, Object> map = (Map<String, Object>) runnerClass.getMethod("mapLine", String.class)
+			.invoke(null, "{\"foo\": 1}");
+		assertEquals(1, map.get("foo"));
 	}
 
 }

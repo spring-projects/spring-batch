@@ -15,11 +15,17 @@
  */
 package org.springframework.batch.infrastructure.item.file.mapping;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import tools.jackson.databind.json.JsonMapper;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.infrastructure.item.file.LineMapper;
+import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
 
 /**
  * Interpret a line as a JSON object and parse it up to a Map. The line should be a
@@ -42,13 +48,14 @@ import org.springframework.batch.infrastructure.item.file.LineMapper;
  */
 public class JsonLineMapper implements LineMapper<Map<String, Object>> {
 
-	private final JsonMapper jsonMapper;
+	private final JsonObjectMapper jsonMapper;
 
 	/**
-	 * Create a new {@link JsonLineMapper} with a default {@link JsonMapper}.
+	 * Create a new {@link JsonLineMapper} with a default Jackson 3 or Jackson 2 object
+	 * mapper.
 	 */
 	public JsonLineMapper() {
-		this(new JsonMapper());
+		this(createDefaultJsonObjectMapper());
 	}
 
 	/**
@@ -57,6 +64,21 @@ public class JsonLineMapper implements LineMapper<Map<String, Object>> {
 	 * @since 6.0
 	 */
 	public JsonLineMapper(JsonMapper jsonMapper) {
+		this((line) -> jsonMapper.readValue(line, Map.class));
+	}
+
+	/**
+	 * Create a new {@link JsonLineMapper} with the provided Jackson 2
+	 * {@link ObjectMapper}.
+	 * @param jsonMapper the json mapper to use
+	 * @since 6.0
+	 */
+	public JsonLineMapper(ObjectMapper jsonMapper) {
+		this((line) -> jsonMapper.readValue(line, Map.class));
+	}
+
+	private JsonLineMapper(JsonObjectMapper jsonMapper) {
+		Assert.notNull(jsonMapper, "jsonMapper must not be null");
 		this.jsonMapper = jsonMapper;
 	}
 
@@ -68,7 +90,81 @@ public class JsonLineMapper implements LineMapper<Map<String, Object>> {
 	@Override
 	@SuppressWarnings("unchecked")
 	public Map<String, Object> mapLine(String line, int lineNumber) throws Exception {
-		return this.jsonMapper.readValue(line, Map.class);
+		return this.jsonMapper.readValue(line);
+	}
+
+	private static JsonObjectMapper createDefaultJsonObjectMapper() {
+		ClassLoader classLoader = JsonLineMapper.class.getClassLoader();
+		Object jsonMapper = instantiateJsonMapper("tools.jackson.databind.json.JsonMapper", classLoader);
+		if (jsonMapper == null) {
+			jsonMapper = instantiateJsonMapper("com.fasterxml.jackson.databind.ObjectMapper", classLoader);
+		}
+		if (jsonMapper == null) {
+			throw new IllegalStateException("Either Jackson 3 or Jackson 2 is required to use JsonLineMapper");
+		}
+		Method readValueMethod = findReadValueMethod(jsonMapper.getClass());
+		return new ReflectionJsonObjectMapper(jsonMapper, readValueMethod);
+	}
+
+	private static @Nullable Object instantiateJsonMapper(String className, ClassLoader classLoader) {
+		try {
+			Class<?> mapperClass = ClassUtils.forName(className, classLoader);
+			return mapperClass.getConstructor().newInstance();
+		}
+		catch (ClassNotFoundException ex) {
+			return null;
+		}
+		catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException ex) {
+			throw new IllegalStateException("Failed to create JSON mapper of type " + className, ex);
+		}
+	}
+
+	private static Method findReadValueMethod(Class<?> mapperClass) {
+		try {
+			return mapperClass.getMethod("readValue", String.class, Class.class);
+		}
+		catch (NoSuchMethodException ex) {
+			throw new IllegalStateException(
+					"The JSON mapper of type " + mapperClass.getName() + " does not expose readValue(String, Class)",
+					ex);
+		}
+	}
+
+	private interface JsonObjectMapper {
+
+		Map<String, Object> readValue(String line) throws Exception;
+
+	}
+
+	private static final class ReflectionJsonObjectMapper implements JsonObjectMapper {
+
+		private final Object jsonMapper;
+
+		private final Method readValueMethod;
+
+		private ReflectionJsonObjectMapper(Object jsonMapper, Method readValueMethod) {
+			this.jsonMapper = jsonMapper;
+			this.readValueMethod = readValueMethod;
+		}
+
+		@Override
+		@SuppressWarnings("unchecked")
+		public Map<String, Object> readValue(String line) throws Exception {
+			try {
+				return (Map<String, Object>) this.readValueMethod.invoke(this.jsonMapper, line, Map.class);
+			}
+			catch (InvocationTargetException ex) {
+				Throwable targetException = ex.getTargetException();
+				if (targetException instanceof Exception exception) {
+					throw exception;
+				}
+				throw new IllegalStateException(targetException);
+			}
+			catch (IllegalAccessException ex) {
+				throw new IllegalStateException("Failed to invoke JSON mapper", ex);
+			}
+		}
+
 	}
 
 }
