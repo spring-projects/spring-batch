@@ -143,6 +143,19 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 	}
 
 	/**
+	 * Add a job execution listener. This is an alias for
+	 * {@link #listener(JobExecutionListener)} that makes it more explicit that the
+	 * listener is being added to a collection rather than replacing any existing
+	 * listeners.
+	 * @param listener a job execution listener
+	 * @return this to enable fluent chaining
+	 * @since 6.0.4
+	 */
+	public B addListener(JobExecutionListener listener) {
+		return listener(listener);
+	}
+
+	/**
 	 * Register a job execution listener.
 	 * @param listener a job execution listener
 	 * @return this to enable fluent chaining
