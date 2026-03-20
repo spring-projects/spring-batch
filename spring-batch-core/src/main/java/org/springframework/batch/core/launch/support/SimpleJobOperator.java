@@ -172,8 +172,10 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 
 	/**
 	 * Start a new instance of a job with the specified parameters. If the job defines a
-	 * {@link JobParametersIncrementer}, then the incrementer will be used to calculate
-	 * the next parameters in the sequence and the provided parameters will be ignored.
+	 * {@link JobParametersIncrementer} and there is no restartable job instance for the
+	 * provided parameters, then the incrementer will be used to calculate the next
+	 * parameters in the sequence. Otherwise, the job will be launched (or restarted) with
+	 * the provided parameters.
 	 * @param job the {@link Job} to start
 	 * @param jobParameters the {@link JobParameters} to start the job with
 	 * @return the {@link JobExecution} that was started
@@ -191,12 +193,21 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 		Assert.notNull(job, "The Job must not be null.");
 		Assert.notNull(jobParameters, "The JobParameters must not be null.");
 		if (job.getJobParametersIncrementer() != null) {
-			if (!jobParameters.isEmpty() && logger.isWarnEnabled()) {
-				logger.warn(String.format(
-						"Attempting to launch job: [%s] which defines an incrementer with additional parameters: [%s]. Additional parameters will be ignored.",
-						job.getName(), jobParameters));
+			// First, try to run the job with the provided parameters.
+			// This will restart failed/stopped job instances if they exist.
+			try {
+				return run(job, jobParameters);
 			}
-			return startNextInstance(job);
+			catch (JobInstanceAlreadyCompleteException e) {
+				// Job instance with these parameters is already complete.
+				// Use the incrementer to get the next parameters for a new instance.
+				if (!jobParameters.isEmpty() && logger.isWarnEnabled()) {
+					logger.warn(String.format(
+							"Job instance for [%s] with parameters [%s] is already complete. Using incrementer to get next parameters.",
+							job.getName(), jobParameters));
+				}
+				return startNextInstance(job);
+			}
 		}
 		return run(job, jobParameters);
 	}
