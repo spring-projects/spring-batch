@@ -67,10 +67,10 @@
 		<micrometer.version>1.14.15-SNAPSHOT</micrometer.version>
 
 		<!-- optional production dependencies -->
-		<spring-data-commons.version>3.4.14-SNAPSHOT</spring-data-commons.version>
-		<spring-data-jpa.version>3.4.14-SNAPSHOT</spring-data-jpa.version>
-		<spring-data-redis.version>3.4.14-SNAPSHOT</spring-data-redis.version>
-		<spring-data-mongodb.version>4.4.14-SNAPSHOT</spring-data-mongodb.version>
+		<spring-data-commons.version>3.4.13</spring-data-commons.version>
+		<spring-data-jpa.version>3.4.13</spring-data-jpa.version>
+		<spring-data-redis.version>3.4.13</spring-data-redis.version>
+		<spring-data-mongodb.version>4.4.13</spring-data-mongodb.version>
 		<spring-kafka.version>3.3.15-SNAPSHOT</spring-kafka.version>
 		<spring-amqp.version>3.2.10-SNAPSHOT</spring-amqp.version>
 		<spring-ldap.version>3.2.17-SNAPSHOT</spring-ldap.version>
