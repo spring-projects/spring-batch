@@ -1,5 +1,5 @@
 /*
- * Copyright 2024-2025 the original author or authors.
+ * Copyright 2024-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,12 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
@@ -116,18 +119,21 @@ public class MongoJobExecutionDao implements JobExecutionDao {
 	@Override
 	public Set<JobExecution> findRunningJobExecutions(String jobName) {
 		List<JobInstance> jobInstances = this.jobInstanceDao.findJobInstancesByName(jobName);
-		Set<JobExecution> runningJobExecutions = new HashSet<>();
-		for (JobInstance jobInstance : jobInstances) {
-			Query query = query(
-					where("jobInstanceId").is(jobInstance.getId()).and("status").in("STARTING", "STARTED", "STOPPING"));
-			this.mongoOperations
-				.find(query, org.springframework.batch.core.repository.persistence.JobExecution.class,
-						JOB_EXECUTIONS_COLLECTION_NAME)
-				.stream()
-				.map(jobExecution -> convert(jobExecution, jobInstance))
-				.forEach(runningJobExecutions::add);
+		if (jobInstances.isEmpty()) {
+			return Collections.emptySet();
 		}
-		return runningJobExecutions;
+		Map<Long, JobInstance> jobInstanceMap = new HashMap<>();
+		for (JobInstance jobInstance : jobInstances) {
+			jobInstanceMap.put(jobInstance.getId(), jobInstance);
+		}
+		Query query = query(
+				where("jobInstanceId").in(jobInstanceMap.keySet()).and("status").in("STARTING", "STARTED", "STOPPING"));
+		return this.mongoOperations
+			.find(query, org.springframework.batch.core.repository.persistence.JobExecution.class,
+					JOB_EXECUTIONS_COLLECTION_NAME)
+			.stream()
+			.map(jobExecution -> convert(jobExecution, jobInstanceMap.get(jobExecution.getJobInstanceId())))
+			.collect(Collectors.toSet());
 	}
 
 	@Override
