@@ -21,6 +21,7 @@ import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.JobKeyGenerator;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.repository.dao.AbstractMongoBatchMetadataDao;
 import org.springframework.batch.core.repository.dao.mongodb.MongoSequenceIncrementer;
 import org.springframework.batch.core.repository.support.MongoJobRepositoryFactoryBean;
 import org.springframework.context.annotation.Bean;
@@ -73,6 +74,7 @@ public class MongoDefaultBatchConfiguration extends DefaultBatchConfiguration {
 		try {
 			jobRepositoryFactoryBean.setMongoOperations(getMongoOperations());
 			jobRepositoryFactoryBean.setTransactionManager(getTransactionManager());
+			jobRepositoryFactoryBean.setCollectionPrefix(getCollectionPrefix());
 			jobRepositoryFactoryBean.setIsolationLevelForCreateEnum(getIsolationLevelForCreate());
 			jobRepositoryFactoryBean.setValidateTransactionState(getValidateTransactionState());
 			jobRepositoryFactoryBean.setJobKeyGenerator(getJobKeyGenerator());
@@ -154,12 +156,22 @@ public class MongoDefaultBatchConfiguration extends DefaultBatchConfiguration {
 	}
 
 	/**
+	 * Return the prefix of Batch meta-data collections. Defaults to
+	 * {@link AbstractMongoBatchMetadataDao#DEFAULT_COLLECTION_PREFIX}.
+	 * @return the prefix of meta-data collections
+	 * @since 6.1
+	 */
+	protected String getCollectionPrefix() {
+		return AbstractMongoBatchMetadataDao.DEFAULT_COLLECTION_PREFIX;
+	}
+
+	/**
 	 * Return the incrementer to be used to generate ids for new job instances.
 	 * @return the incrementer to be used to generate ids for new job instances
 	 * @since 6.0
 	 */
 	protected DataFieldMaxValueIncrementer getJobInstanceIncrementer() {
-		return new MongoSequenceIncrementer(getMongoOperations(), "BATCH_JOB_INSTANCE_SEQ");
+		return new MongoSequenceIncrementer(getMongoOperations(), "JOB_INSTANCE_SEQ", getCollectionPrefix());
 	}
 
 	/**
@@ -168,7 +180,7 @@ public class MongoDefaultBatchConfiguration extends DefaultBatchConfiguration {
 	 * @since 6.0
 	 */
 	protected DataFieldMaxValueIncrementer getJobExecutionIncrementer() {
-		return new MongoSequenceIncrementer(getMongoOperations(), "BATCH_JOB_EXECUTION_SEQ");
+		return new MongoSequenceIncrementer(getMongoOperations(), "JOB_EXECUTION_SEQ", getCollectionPrefix());
 	}
 
 	/**
@@ -177,7 +189,7 @@ public class MongoDefaultBatchConfiguration extends DefaultBatchConfiguration {
 	 * @since 6.0
 	 */
 	protected DataFieldMaxValueIncrementer getStepExecutionIncrementer() {
-		return new MongoSequenceIncrementer(getMongoOperations(), "BATCH_STEP_EXECUTION_SEQ");
+		return new MongoSequenceIncrementer(getMongoOperations(), "STEP_EXECUTION_SEQ", getCollectionPrefix());
 	}
 
 }

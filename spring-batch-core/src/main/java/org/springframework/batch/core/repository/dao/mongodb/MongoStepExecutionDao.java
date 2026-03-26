@@ -24,12 +24,14 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.step.StepExecution;
+import org.springframework.batch.core.repository.dao.AbstractMongoBatchMetadataDao;
 import org.springframework.batch.core.repository.dao.StepExecutionDao;
 import org.springframework.batch.core.repository.persistence.converter.JobExecutionConverter;
 import org.springframework.batch.core.repository.persistence.converter.StepExecutionConverter;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
+import org.springframework.util.Assert;
 
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 import static org.springframework.data.mongodb.core.query.Query.query;
@@ -37,15 +39,20 @@ import static org.springframework.data.mongodb.core.query.Query.query;
 /**
  * @author Mahmoud Ben Hassine
  * @author Yanming Zhou
+ * @author Myeongha Shin
  * @since 5.2.0
  */
-public class MongoStepExecutionDao implements StepExecutionDao {
+public class MongoStepExecutionDao extends AbstractMongoBatchMetadataDao implements StepExecutionDao {
 
-	private static final String STEP_EXECUTIONS_COLLECTION_NAME = "BATCH_STEP_EXECUTION";
+	private static final String STEP_EXECUTIONS_COLLECTION_NAME = "STEP_EXECUTION";
 
-	private static final String STEP_EXECUTIONS_SEQUENCE_NAME = "BATCH_STEP_EXECUTION_SEQ";
+	private static final String STEP_EXECUTIONS_SEQUENCE_NAME = "STEP_EXECUTION_SEQ";
 
-	private static final String JOB_EXECUTIONS_COLLECTION_NAME = "BATCH_JOB_EXECUTION";
+	private static final String JOB_EXECUTIONS_COLLECTION_NAME = "JOB_EXECUTION";
+
+	private String stepExecutionCollectionName;
+
+	private String jobExecutionCollectionName;
 
 	private final StepExecutionConverter stepExecutionConverter = new StepExecutionConverter();
 
@@ -57,17 +64,37 @@ public class MongoStepExecutionDao implements StepExecutionDao {
 
 	MongoJobExecutionDao jobExecutionDao;
 
+	private boolean useDefaultStepExecutionIncrementer = true;
+
 	public MongoStepExecutionDao(MongoOperations mongoOperations) {
+		Assert.notNull(mongoOperations, "mongoOperations must not be null.");
 		this.mongoOperations = mongoOperations;
-		this.stepExecutionIncrementer = new MongoSequenceIncrementer(mongoOperations, STEP_EXECUTIONS_SEQUENCE_NAME);
+		setCollectionPrefix(getCollectionPrefix());
+	}
+
+	public MongoStepExecutionDao(MongoOperations mongoOperations, String collectionPrefix) {
+		this(mongoOperations);
+		setCollectionPrefix(collectionPrefix);
 	}
 
 	public void setStepExecutionIncrementer(DataFieldMaxValueIncrementer stepExecutionIncrementer) {
+		this.useDefaultStepExecutionIncrementer = false;
 		this.stepExecutionIncrementer = stepExecutionIncrementer;
 	}
 
 	public void setJobExecutionDao(MongoJobExecutionDao jobExecutionDao) {
 		this.jobExecutionDao = jobExecutionDao;
+	}
+
+	@Override
+	public void setCollectionPrefix(String collectionPrefix) {
+		super.setCollectionPrefix(collectionPrefix);
+		this.stepExecutionCollectionName = getCollectionPrefix() + STEP_EXECUTIONS_COLLECTION_NAME;
+		this.jobExecutionCollectionName = getCollectionPrefix() + JOB_EXECUTIONS_COLLECTION_NAME;
+		if (this.useDefaultStepExecutionIncrementer) {
+			this.stepExecutionIncrementer = new MongoSequenceIncrementer(this.mongoOperations,
+					STEP_EXECUTIONS_SEQUENCE_NAME, getCollectionPrefix());
+		}
 	}
 
 	public StepExecution createStepExecution(String stepName, JobExecution jobExecution) {
@@ -76,7 +103,7 @@ public class MongoStepExecutionDao implements StepExecutionDao {
 		StepExecution stepExecution = new StepExecution(id, stepName, jobExecution);
 		org.springframework.batch.core.repository.persistence.StepExecution stepExecutionToSave = this.stepExecutionConverter
 			.fromStepExecution(stepExecution);
-		this.mongoOperations.insert(stepExecutionToSave, STEP_EXECUTIONS_COLLECTION_NAME);
+		this.mongoOperations.insert(stepExecutionToSave, stepExecutionCollectionName);
 
 		return stepExecution;
 	}
@@ -86,7 +113,7 @@ public class MongoStepExecutionDao implements StepExecutionDao {
 		Query query = query(where("stepExecutionId").is(stepExecution.getId()));
 		org.springframework.batch.core.repository.persistence.StepExecution stepExecutionToUpdate = this.stepExecutionConverter
 			.fromStepExecution(stepExecution);
-		this.mongoOperations.findAndReplace(query, stepExecutionToUpdate, STEP_EXECUTIONS_COLLECTION_NAME);
+		this.mongoOperations.findAndReplace(query, stepExecutionToUpdate, this.stepExecutionCollectionName);
 	}
 
 	@Nullable
@@ -95,7 +122,7 @@ public class MongoStepExecutionDao implements StepExecutionDao {
 		Query query = query(where("stepExecutionId").is(stepExecutionId));
 		org.springframework.batch.core.repository.persistence.StepExecution stepExecution = this.mongoOperations
 			.findOne(query, org.springframework.batch.core.repository.persistence.StepExecution.class,
-					STEP_EXECUTIONS_COLLECTION_NAME);
+					this.stepExecutionCollectionName);
 		return stepExecution != null ? this.stepExecutionConverter.toStepExecution(stepExecution,
 				jobExecutionDao.getJobExecution(stepExecution.getJobExecutionId())) : null;
 	}
@@ -106,7 +133,7 @@ public class MongoStepExecutionDao implements StepExecutionDao {
 		Query query = query(where("stepExecutionId").is(stepExecutionId));
 		org.springframework.batch.core.repository.persistence.StepExecution stepExecution = this.mongoOperations
 			.findOne(query, org.springframework.batch.core.repository.persistence.StepExecution.class,
-					STEP_EXECUTIONS_COLLECTION_NAME);
+					stepExecutionCollectionName);
 		return stepExecution != null ? this.stepExecutionConverter.toStepExecution(stepExecution, jobExecution) : null;
 	}
 
@@ -118,12 +145,12 @@ public class MongoStepExecutionDao implements StepExecutionDao {
 		Query query = query(where("jobInstanceId").is(jobInstance.getId()));
 		List<org.springframework.batch.core.repository.persistence.JobExecution> jobExecutions = this.mongoOperations
 			.find(query, org.springframework.batch.core.repository.persistence.JobExecution.class,
-					JOB_EXECUTIONS_COLLECTION_NAME);
+					jobExecutionCollectionName);
 		List<org.springframework.batch.core.repository.persistence.StepExecution> stepExecutions = this.mongoOperations
 			.find(query(where("jobExecutionId").in(jobExecutions.stream()
 				.map(org.springframework.batch.core.repository.persistence.JobExecution::getJobExecutionId)
 				.toList())), org.springframework.batch.core.repository.persistence.StepExecution.class,
-					STEP_EXECUTIONS_COLLECTION_NAME);
+					stepExecutionCollectionName);
 		// sort step executions by creation date then id (see contract) and return the
 		// last one
 		Optional<org.springframework.batch.core.repository.persistence.StepExecution> lastStepExecution = stepExecutions
@@ -157,7 +184,7 @@ public class MongoStepExecutionDao implements StepExecutionDao {
 		Query query = query(where("jobExecutionId").is(jobExecution.getId()));
 		return this.mongoOperations
 			.find(query, org.springframework.batch.core.repository.persistence.StepExecution.class,
-					STEP_EXECUTIONS_COLLECTION_NAME)
+					stepExecutionCollectionName)
 			.stream()
 			.map(stepExecution -> this.stepExecutionConverter.toStepExecution(stepExecution, jobExecution))
 			.toList();
@@ -168,7 +195,7 @@ public class MongoStepExecutionDao implements StepExecutionDao {
 		Query query = query(where("jobInstanceId").is(jobInstance.getId()));
 		List<org.springframework.batch.core.repository.persistence.JobExecution> jobExecutions = this.mongoOperations
 			.find(query, org.springframework.batch.core.repository.persistence.JobExecution.class,
-					JOB_EXECUTIONS_COLLECTION_NAME);
+					jobExecutionCollectionName);
 		return this.mongoOperations.count(
 				query(where("jobExecutionId")
 					.in(jobExecutions.stream()
@@ -176,14 +203,13 @@ public class MongoStepExecutionDao implements StepExecutionDao {
 						.toList())
 					.and("name")
 					.is(stepName)),
-				org.springframework.batch.core.repository.persistence.StepExecution.class,
-				STEP_EXECUTIONS_COLLECTION_NAME);
+				org.springframework.batch.core.repository.persistence.StepExecution.class, stepExecutionCollectionName);
 	}
 
 	@Override
 	public void deleteStepExecution(StepExecution stepExecution) {
 		this.mongoOperations.remove(query(where("stepExecutionId").is(stepExecution.getId())),
-				STEP_EXECUTIONS_COLLECTION_NAME);
+				stepExecutionCollectionName);
 	}
 
 }
