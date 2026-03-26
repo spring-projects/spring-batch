@@ -91,6 +91,7 @@ import static org.springframework.batch.core.observability.BatchMetrics.METRICS_
  * @author Andrey Litvitski
  * @author xeounxzxu
  * @author Minchul Son
+ * @author Yanming Zhou
  * @since 6.0
  */
 public class ChunkOrientedStep<I, O> extends AbstractStep {
@@ -100,16 +101,16 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 	/*
 	 * Step Input / Output parameters
 	 */
-	private final ItemReader<I> itemReader;
+	private final ItemReader<? extends I> itemReader;
 
 	private final CompositeItemReadListener<I> compositeItemReadListener = new CompositeItemReadListener<>();
 
 	@SuppressWarnings("unchecked")
-	private ItemProcessor<I, O> itemProcessor = item -> (O) item;
+	private ItemProcessor<? super I, ? extends O> itemProcessor = item -> (O) item;
 
 	private final CompositeItemProcessListener<I, O> compositeItemProcessListener = new CompositeItemProcessListener<>();
 
-	private final ItemWriter<O> itemWriter;
+	private final ItemWriter<? super O> itemWriter;
 
 	private final CompositeItemWriteListener<O> compositeItemWriteListener = new CompositeItemWriteListener<>();
 
@@ -168,8 +169,8 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 	 * @param itemWriter the item writer to write items
 	 * @param jobRepository the job repository to use for this step
 	 */
-	public ChunkOrientedStep(String name, int chunkSize, ItemReader<I> itemReader, ItemWriter<O> itemWriter,
-			JobRepository jobRepository) {
+	public ChunkOrientedStep(String name, int chunkSize, ItemReader<? extends I> itemReader,
+			ItemWriter<? super O> itemWriter, JobRepository jobRepository) {
 		super(jobRepository);
 		this.chunkSize = chunkSize;
 		this.itemReader = itemReader;
@@ -181,7 +182,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 	 * Set the item processor to use for processing items.
 	 * @param itemProcessor the item processor to set
 	 */
-	public void setItemProcessor(ItemProcessor<I, O> itemProcessor) {
+	public void setItemProcessor(ItemProcessor<? super I, ? extends O> itemProcessor) {
 		Assert.notNull(itemProcessor, "Item processor must not be null");
 		this.itemProcessor = itemProcessor;
 	}

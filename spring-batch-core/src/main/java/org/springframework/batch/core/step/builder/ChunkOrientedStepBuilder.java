@@ -71,17 +71,18 @@ import org.springframework.util.Assert;
  * to provide common properties and methods for building chunk-oriented steps.
  *
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  * @since 6.0
  */
 public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrientedStepBuilder<I, O>> {
 
 	private final int chunkSize;
 
-	private @Nullable ItemReader<I> reader;
+	private @Nullable ItemReader<? extends I> reader;
 
-	private @Nullable ItemProcessor<I, O> processor;
+	private @Nullable ItemProcessor<? super I, ? extends O> processor;
 
-	private @Nullable ItemWriter<O> writer;
+	private @Nullable ItemWriter<? super O> writer;
 
 	private PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
 
@@ -155,7 +156,7 @@ public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrien
 	 * @param reader an item reader
 	 * @return this for fluent chaining
 	 */
-	public ChunkOrientedStepBuilder<I, O> reader(ItemReader<I> reader) {
+	public ChunkOrientedStepBuilder<I, O> reader(ItemReader<? extends I> reader) {
 		this.reader = reader;
 		return self();
 	}
@@ -167,7 +168,7 @@ public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrien
 	 * @param processor an item processor
 	 * @return this for fluent chaining
 	 */
-	public ChunkOrientedStepBuilder<I, O> processor(ItemProcessor<I, O> processor) {
+	public ChunkOrientedStepBuilder<I, O> processor(ItemProcessor<? super I, ? extends O> processor) {
 		this.processor = processor;
 		return self();
 	}
@@ -179,7 +180,7 @@ public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrien
 	 * @param writer an item writer
 	 * @return this for fluent chaining
 	 */
-	public ChunkOrientedStepBuilder<I, O> writer(ItemWriter<O> writer) {
+	public ChunkOrientedStepBuilder<I, O> writer(ItemWriter<? super O> writer) {
 		this.writer = writer;
 		return self();
 	}
@@ -395,7 +396,6 @@ public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrien
 		return self();
 	}
 
-	@SuppressWarnings("unchecked")
 	public ChunkOrientedStep<I, O> build() {
 		Assert.notNull(this.reader, "Item reader must not be null");
 		Assert.notNull(this.writer, "Item writer must not be null");
@@ -457,6 +457,7 @@ public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrien
 		return chunkOrientedStep;
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void registerTypedListener(StepListener stepListener, ChunkOrientedStep<I, O> chunkOrientedStep) {
 		if (stepListener instanceof ItemReadListener listener) {
 			chunkOrientedStep.registerItemReadListener(listener);
