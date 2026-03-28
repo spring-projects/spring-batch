@@ -21,11 +21,11 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.springframework.batch.core.job.JobExecution;
@@ -122,10 +122,8 @@ public class MongoJobExecutionDao implements JobExecutionDao {
 		if (jobInstances.isEmpty()) {
 			return Collections.emptySet();
 		}
-		Map<Long, JobInstance> jobInstanceMap = new HashMap<>();
-		for (JobInstance jobInstance : jobInstances) {
-			jobInstanceMap.put(jobInstance.getId(), jobInstance);
-		}
+		Map<Long, JobInstance> jobInstanceMap = jobInstances.stream()
+			.collect(Collectors.toMap(JobInstance::getId, Function.identity()));
 		Query query = query(
 				where("jobInstanceId").in(jobInstanceMap.keySet()).and("status").in("STARTING", "STARTED", "STOPPING"));
 		return this.mongoOperations
