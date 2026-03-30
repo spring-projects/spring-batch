@@ -161,6 +161,54 @@ class MongoStepExecutionDaoIntegrationTests extends AbstractMongoDBDaoIntegratio
 		assertThrows(OptimisticLockingFailureException.class, () -> dao.updateStepExecution(exec2));
 	}
 
+	/**
+	 * Successful synchronization from STARTED to STOPPING status.
+	 */
+	@Test
+	void testSynchronizeStatusUpgrade() {
+
+		StepExecution exec1 = dao.createStepExecution("step", jobExecution);
+		exec1.setStatus(BatchStatus.STOPPING);
+		dao.updateStepExecution(exec1);
+
+		StepExecution exec2 = dao.getStepExecution(exec1.getId());
+		assertNotNull(exec2);
+		exec2.setStatus(BatchStatus.STARTED);
+		// exec2.setVersion(7);
+		// assertNotSame(exec1.getVersion(), exec2.getVersion());
+		assertNotSame(exec1.getStatus(), exec2.getStatus());
+
+		dao.synchronizeStatus(exec2);
+
+		// assertEquals(exec1.getVersion(), exec2.getVersion());
+		assertEquals(exec1.getStatus(), exec2.getStatus());
+	}
+
+	/**
+	 * UNKNOWN status won't be changed by synchronizeStatus, because it is the 'largest'
+	 * BatchStatus (will not downgrade).
+	 */
+	@Test
+	void testSynchronizeStatusDowngrade() {
+
+		StepExecution exec1 = dao.createStepExecution("step", jobExecution);
+		exec1.setStatus(BatchStatus.STARTED);
+		dao.updateStepExecution(exec1);
+
+		StepExecution exec2 = dao.getStepExecution(exec1.getId());
+		assertNotNull(exec2);
+
+		exec2.setStatus(BatchStatus.UNKNOWN);
+		// exec2.setVersion(7);
+		// assertNotSame(exec1.getVersion(), exec2.getVersion());
+		assertTrue(exec1.getStatus().isLessThan(exec2.getStatus()));
+
+		dao.synchronizeStatus(exec2);
+
+		// assertEquals(exec1.getVersion(), exec2.getVersion());
+		assertEquals(BatchStatus.UNKNOWN, exec2.getStatus());
+	}
+
 	private void assertStepExecutionsAreEqual(StepExecution expected, StepExecution actual) {
 		assertEquals(expected.getId(), actual.getId());
 		assertTemporalEquals(expected.getStartTime(), actual.getStartTime());
