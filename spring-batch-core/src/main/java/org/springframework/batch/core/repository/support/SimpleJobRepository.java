@@ -159,9 +159,12 @@ public class SimpleJobRepository extends SimpleJobExplorer implements JobReposit
 
 		stepExecution.setLastUpdated(LocalDateTime.now());
 
-		StepExecution latestStepExecution = getStepExecution(stepExecution.getId());
-		Assert.state(latestStepExecution != null,
-				"StepExecution with id " + stepExecution.getId() + "not found. Batch metadata state may be corrupted.");
+		StepExecution latestStepExecution = this.stepExecutionDao.getStepExecution(stepExecution.getId());
+		// CAUTION: use this.getStepExecution(stepExecution.getId()) will trigger queries
+		// for execution context which is not required here
+
+		Assert.state(latestStepExecution != null, "StepExecution with id (" + stepExecution.getId()
+				+ ") not found. Batch metadata state may be corrupted.");
 
 		if (latestStepExecution.getJobExecution().isStopped() || latestStepExecution.getJobExecution().isStopping()) {
 			Integer version = latestStepExecution.getVersion();
