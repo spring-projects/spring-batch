@@ -19,9 +19,7 @@ package org.springframework.batch.core.repository.dao.jdbc;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.sql.Types;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -89,6 +87,12 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 			+ " WHERE JOB_EXECUTION_ID = ? ORDER BY STEP_EXECUTION_ID";
 
 	private static final String GET_STEP_EXECUTION = GET_RAW_STEP_EXECUTIONS + " WHERE STEP_EXECUTION_ID = ?";
+
+	private static final String GET_VERSION_AND_STATUS = """
+			SELECT VERSION, STATUS
+			FROM %PREFIX%STEP_EXECUTION
+			WHERE STEP_EXECUTION_ID = ?
+			""";
 
 	private static final String GET_LAST_STEP_EXECUTION = """
 			SELECT SE.STEP_EXECUTION_ID, SE.STEP_NAME, SE.START_TIME, SE.END_TIME, SE.STATUS, SE.COMMIT_COUNT, SE.READ_COUNT, SE.FILTER_COUNT, SE.WRITE_COUNT, SE.EXIT_CODE, SE.EXIT_MESSAGE, SE.READ_SKIP_COUNT, SE.WRITE_SKIP_COUNT, SE.PROCESS_SKIP_COUNT, SE.ROLLBACK_COUNT, SE.LAST_UPDATED, SE.VERSION, SE.CREATE_TIME, JE.JOB_EXECUTION_ID, JE.START_TIME, JE.END_TIME, JE.STATUS, JE.EXIT_CODE, JE.EXIT_MESSAGE, JE.CREATE_TIME, JE.LAST_UPDATED, JE.VERSION
@@ -306,6 +310,20 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 		else {
 			return executions.get(0);
 		}
+	}
+
+	@Override
+	public void synchronizeStatus(StepExecution stepExecution) {
+		getJdbcTemplate().query(getQuery(GET_VERSION_AND_STATUS), rs -> {
+			Integer currentVersion = rs.getInt("VERSION");
+			if (!Objects.equals(currentVersion, stepExecution.getVersion())) {
+				BatchStatus currentStatus = BatchStatus.valueOf(rs.getString("STATUS"));
+				if (currentStatus.isGreaterThan(stepExecution.getStatus())) {
+					stepExecution.upgradeStatus(currentStatus);
+				}
+				stepExecution.setVersion(currentVersion);
+			}
+		}, stepExecution.getId());
 	}
 
 	@Nullable

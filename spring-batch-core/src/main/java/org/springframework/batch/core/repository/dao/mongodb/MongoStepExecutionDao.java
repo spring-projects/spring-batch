@@ -110,6 +110,17 @@ public class MongoStepExecutionDao implements StepExecutionDao {
 		return stepExecution != null ? this.stepExecutionConverter.toStepExecution(stepExecution, jobExecution) : null;
 	}
 
+	@Override
+	public void synchronizeStatus(StepExecution stepExecution) {
+		StepExecution currentStepExecution = getStepExecution(stepExecution.getId());
+		if (currentStepExecution != null && currentStepExecution.getStatus().isGreaterThan(stepExecution.getStatus())) {
+			stepExecution.upgradeStatus(currentStepExecution.getStatus());
+		}
+		// TODO the contract mentions to update the version as well. Double check if this
+		// is needed as the version is not used in the tests following the call sites of
+		// synchronizeStatus
+	}
+
 	@Nullable
 	@Override
 	public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
