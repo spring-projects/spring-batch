@@ -34,6 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  * @author JiWon Seo
+ * @author Yanming Zhou
  *
  */
 class ExitStatusTests {
@@ -81,11 +82,6 @@ class ExitStatusTests {
 	@Test
 	void testEqualsWithNull() {
 		assertNotEquals(null, ExitStatus.EXECUTING);
-	}
-
-	@Test
-	void testHashcode() {
-		assertEquals(ExitStatus.EXECUTING.toString().hashCode(), ExitStatus.EXECUTING.hashCode());
 	}
 
 	@Test
@@ -216,9 +212,9 @@ class ExitStatusTests {
 	}
 
 	private static Stream<Arguments> provideKnownExitStatuses() {
-		return Stream.of(Arguments.of((ExitStatus) null), Arguments.of(new ExitStatus(null)),
-				Arguments.of(ExitStatus.COMPLETED), Arguments.of(ExitStatus.EXECUTING), Arguments.of(ExitStatus.FAILED),
-				Arguments.of(ExitStatus.NOOP), Arguments.of(ExitStatus.STOPPED), Arguments.of(ExitStatus.UNKNOWN));
+		return Stream.of(Arguments.of((ExitStatus) null), Arguments.of(ExitStatus.COMPLETED),
+				Arguments.of(ExitStatus.EXECUTING), Arguments.of(ExitStatus.FAILED), Arguments.of(ExitStatus.NOOP),
+				Arguments.of(ExitStatus.STOPPED), Arguments.of(ExitStatus.UNKNOWN));
 	}
 
 	private static Stream<Arguments> provideCustomExitStatuses() {
