@@ -21,6 +21,7 @@ import org.springframework.util.StringUtils;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.io.StringWriter;
+import java.util.Objects;
 
 /**
  * Value object used to carry information about the status of a job or step execution.
@@ -30,6 +31,7 @@ import java.io.StringWriter;
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  * @author JiWon Seo
+ * @author Yanming Zhou
  *
  */
 public class ExitStatus implements Serializable, Comparable<ExitStatus> {
@@ -73,7 +75,7 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 
 	private final String exitDescription;
 
-	@Nullable private Throwable exitException;
+	private final @Nullable Throwable exitException;
 
 	/**
 	 * Constructor that accepts the exit code and sets the exit description to an empty
@@ -91,9 +93,7 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 	 * @param exitDescription The exit description to be used for the {@link ExitStatus}.
 	 */
 	public ExitStatus(String exitCode, String exitDescription) {
-		super();
-		this.exitCode = exitCode;
-		this.exitDescription = exitDescription == null ? "" : exitDescription;
+		this(exitCode, exitDescription, null);
 	}
 
 	/**
@@ -104,8 +104,9 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 	 * @param exitException The exit exception to the {@link ExitStatus}.
 	 * @since 6.0.3
 	 */
-	public ExitStatus(String exitCode, String exitDescription, Throwable exitException) {
-		this(exitCode, exitDescription);
+	public ExitStatus(String exitCode, @Nullable String exitDescription, @Nullable Throwable exitException) {
+		this.exitCode = exitCode;
+		this.exitDescription = exitDescription == null ? "" : exitDescription;
 		this.exitException = exitException;
 	}
 
@@ -157,14 +158,14 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 	 * @return a new {@link ExitStatus} combining the current value and the argument
 	 * provided.
 	 */
-	public ExitStatus and(ExitStatus status) {
+	public ExitStatus and(@Nullable ExitStatus status) {
 		if (status == null) {
 			return this;
 		}
 		ExitStatus result = addExitDescription(status.exitDescription);
 		Throwable exitException = status.exitException;
 		if (exitException != null) {
-			result.setExitException(exitException);
+			result = result.withExitException(exitException);
 		}
 		if (compareTo(status) < 0) {
 			result = result.replaceExitCode(status.exitCode);
@@ -219,7 +220,8 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 
 	@Override
 	public String toString() {
-		return String.format("exitCode=%s;exitDescription=%s", exitCode, exitDescription);
+		return String.format("exitCode=%s;exitDescription=%s;exitException=%s", exitCode, exitDescription,
+				exitException);
 	}
 
 	/**
@@ -228,11 +230,13 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
-	public boolean equals(@Nullable Object obj) {
-		if (obj == null) {
+	public boolean equals(@Nullable Object o) {
+		if (o == null || getClass() != o.getClass()) {
 			return false;
 		}
-		return toString().equals(obj.toString());
+		ExitStatus that = (ExitStatus) o;
+		return Objects.equals(exitCode, that.exitCode) && Objects.equals(exitDescription, that.exitDescription)
+				&& Objects.equals(exitException, that.exitException);
 	}
 
 	/**
@@ -242,7 +246,7 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 	 */
 	@Override
 	public int hashCode() {
-		return toString().hashCode();
+		return Objects.hash(exitCode, exitDescription, exitException);
 	}
 
 	/**
@@ -287,13 +291,12 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 	}
 
 	/**
-	 * Public setter for the exit exception.
+	 * Create new instance with the exit exception.
 	 * @param exitException the last exception that caused the step to exit
-	 * @since 6.0.3
+	 * @since 6.0.4
 	 */
-	public ExitStatus setExitException(Throwable exitException) {
-		this.exitException = exitException;
-		return this;
+	public ExitStatus withExitException(Throwable exitException) {
+		return new ExitStatus(this.exitCode, this.exitDescription, exitException);
 	}
 
 	/**
@@ -314,9 +317,8 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 	 * evaluated.
 	 * @return {@code true} if the value matches a known exit code.
 	 */
-	public static boolean isNonDefaultExitStatus(ExitStatus status) {
-		return status == null || status.getExitCode() == null
-				|| status.getExitCode().equals(ExitStatus.COMPLETED.getExitCode())
+	public static boolean isNonDefaultExitStatus(@Nullable ExitStatus status) {
+		return status == null || status.getExitCode().equals(ExitStatus.COMPLETED.getExitCode())
 				|| status.getExitCode().equals(ExitStatus.EXECUTING.getExitCode())
 				|| status.getExitCode().equals(ExitStatus.FAILED.getExitCode())
 				|| status.getExitCode().equals(ExitStatus.NOOP.getExitCode())
