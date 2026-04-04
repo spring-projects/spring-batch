@@ -106,11 +106,14 @@ public class JacksonJsonObjectReader<T> implements JsonObjectReader<T> {
 		return null;
 	}
 
-	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public void close() throws Exception {
-		this.inputStream.close();
-		this.jsonParser.close();
+		if (this.inputStream != null) {
+			this.inputStream.close();
+		}
+		if (this.jsonParser != null) {
+			this.jsonParser.close();
+		}
 	}
 
 	@SuppressWarnings("DataFlowIssue")
