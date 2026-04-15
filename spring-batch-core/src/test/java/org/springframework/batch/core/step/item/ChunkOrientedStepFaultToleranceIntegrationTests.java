@@ -85,7 +85,7 @@ public class ChunkOrientedStepFaultToleranceIntegrationTests {
 		Assertions.assertEquals(ExitStatus.COMPLETED.getExitCode(), stepExecutionExitStatus.getExitCode());
 		Assertions.assertEquals(4, stepExecution.getReadCount());
 		Assertions.assertEquals(3, stepExecution.getWriteCount());
-		Assertions.assertEquals(3, stepExecution.getCommitCount());
+		Assertions.assertEquals(2, stepExecution.getCommitCount());
 		Assertions.assertEquals(2, stepExecution.getRollbackCount());
 		Assertions.assertEquals(2, stepExecution.getReadSkipCount());
 		Assertions.assertEquals(1, stepExecution.getWriteSkipCount());
@@ -116,7 +116,7 @@ public class ChunkOrientedStepFaultToleranceIntegrationTests {
 		Assertions.assertEquals(ExitStatus.COMPLETED.getExitCode(), stepExecutionExitStatus.getExitCode());
 		Assertions.assertEquals(4, stepExecution.getReadCount());
 		Assertions.assertEquals(3, stepExecution.getWriteCount());
-		Assertions.assertEquals(3, stepExecution.getCommitCount());
+		Assertions.assertEquals(2, stepExecution.getCommitCount());
 		Assertions.assertEquals(2, stepExecution.getRollbackCount());
 		Assertions.assertEquals(2, stepExecution.getReadSkipCount());
 		Assertions.assertEquals(1, stepExecution.getWriteSkipCount());
@@ -471,13 +471,13 @@ public class ChunkOrientedStepFaultToleranceIntegrationTests {
 		public Step step(JobRepository jobRepository, JdbcTransactionManager transactionManager,
 				JdbcTemplate jdbcTemplate) {
 			List<String> items = List.of("1", "2", "3");
-			return new ChunkOrientedStepBuilder<String, String>(jobRepository, 3).reader(new ListItemReader<>(items))
+			return new ChunkOrientedStepBuilder<String, String>(jobRepository, 2).reader(new ListItemReader<>(items))
 				.writer(chunk -> {
 					for (String item : chunk) {
+						jdbcTemplate.update("INSERT INTO delivery (item_number) VALUES (?)", item);
 						if ("2".equals(item) || "3".equals(item)) {
 							throw new RuntimeException("Simulated write error for item: " + item);
 						}
-						jdbcTemplate.update("INSERT INTO delivery (item_number) VALUES (?)", item);
 					}
 				})
 				.transactionManager(transactionManager)
@@ -495,13 +495,13 @@ public class ChunkOrientedStepFaultToleranceIntegrationTests {
 		public Step step(JobRepository jobRepository, JdbcTransactionManager transactionManager,
 				JdbcTemplate jdbcTemplate) {
 			List<String> items = List.of("1", "2", "3");
-			return new ChunkOrientedStepBuilder<String, String>(jobRepository, 3).reader(new ListItemReader<>(items))
+			return new ChunkOrientedStepBuilder<String, String>(jobRepository, 2).reader(new ListItemReader<>(items))
 				.writer(chunk -> {
 					for (String item : chunk) {
+						jdbcTemplate.update("INSERT INTO delivery (item_number) VALUES (?)", item);
 						if ("2".equals(item) || "3".equals(item)) {
 							throw new RuntimeException("Simulated write error for item: " + item);
 						}
-						jdbcTemplate.update("INSERT INTO delivery (item_number) VALUES (?)", item);
 					}
 				})
 				.transactionManager(transactionManager)

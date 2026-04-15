@@ -90,6 +90,7 @@ import static org.springframework.batch.core.observability.BatchMetrics.METRICS_
  * @author Mahmoud Ben Hassine
  * @author Andrey Litvitski
  * @author xeounxzxu
+ * @author Minchul Son
  * @since 6.0
  */
 public class ChunkOrientedStep<I, O> extends AbstractStep {
@@ -375,6 +376,11 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 
 				// Skip update during rollback to avoid OptimisticLockingFailureException
 				if (transactionStatus.isRollbackOnly()) {
+					// Explicitly mark as locally rollback-only to prevent
+					// UnexpectedRollbackException when the transaction manager
+					// (eg JpaTransactionManager) has marked it as globally rollback-only
+					// (eg after a JPA flush failure) but not locally rollback-only.
+					transactionStatus.setRollbackOnly();
 					chunkTransactionEvent.transactionStatus = BatchMetrics.STATUS_ROLLED_BACK;
 					chunkTransactionEvent.commit();
 					return;
@@ -408,17 +414,26 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 		try {
 			if (tracker.isScanMode()) {
 				logger.info("Executing scan in new transaction after rollback");
-				Chunk<O> pendingChunk = tracker.getPendingChunk();
-				if (pendingChunk != null) {
+				O item = tracker.pollNextScanItem();
+				if (item != null) {
+					Chunk<O> singleItemChunk = new Chunk<>(item);
 					ChunkScanEvent chunkScanEvent = new ChunkScanEvent(stepExecution.getStepName(),
 							stepExecution.getId());
 					chunkScanEvent.begin();
-					scan(pendingChunk, contribution);
+					compositeChunkListener.beforeChunk(singleItemChunk);
+					scan(singleItemChunk, contribution, status);
+					if (!status.isRollbackOnly()) {
+						compositeChunkListener.afterChunk(singleItemChunk);
+					}
 					chunkScanEvent.skipCount = contribution.getSkipCount();
 					chunkScanEvent.commit();
+				}
+				if (!tracker.hasPendingScanItems()) {
 					logger.info("Chunk scan completed");
 					tracker.exitScanMode();
-					stepExecution.incrementCommitCount();
+					if (!status.isRollbackOnly()) {
+						stepExecution.incrementCommitCount();
+					}
 				}
 				return;
 			}
@@ -486,19 +501,26 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 		try {
 			if (tracker.isScanMode()) {
 				logger.info("Executing scan in new transaction after rollback");
-				Chunk<O> pendingChunk = tracker.getPendingChunk();
-				if (pendingChunk != null) {
+				O item = tracker.pollNextScanItem();
+				if (item != null) {
+					Chunk<O> singleItemChunk = new Chunk<>(item);
 					ChunkScanEvent chunkScanEvent = new ChunkScanEvent(stepExecution.getStepName(),
 							stepExecution.getId());
 					chunkScanEvent.begin();
-					compositeChunkListener.beforeChunk(new Chunk<>());
-					scan(pendingChunk, contribution);
-					compositeChunkListener.afterChunk(pendingChunk);
+					compositeChunkListener.beforeChunk(singleItemChunk);
+					scan(singleItemChunk, contribution, status);
+					if (!status.isRollbackOnly()) {
+						compositeChunkListener.afterChunk(singleItemChunk);
+					}
 					chunkScanEvent.skipCount = contribution.getSkipCount();
 					chunkScanEvent.commit();
+				}
+				if (!tracker.hasPendingScanItems()) {
 					logger.info("Chunk scan completed");
 					tracker.exitScanMode();
-					stepExecution.incrementCommitCount();
+					if (!status.isRollbackOnly()) {
+						stepExecution.incrementCommitCount();
+					}
 				}
 				return;
 			}
@@ -800,7 +822,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 		}
 	}
 
-	private void scan(Chunk<O> chunk, StepContribution contribution) {
+	private void scan(Chunk<O> chunk, StepContribution contribution, TransactionStatus status) {
 		for (O item : chunk) {
 			Chunk<O> singleItemChunk = new Chunk<>(item);
 			try {
@@ -814,6 +836,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 					this.compositeSkipListener.onSkipInWrite(item, exception);
 					contribution.incrementWriteSkipCount();
 					contribution.getStepExecution().incrementRollbackCount();
+					status.setRollbackOnly();
 				}
 				else {
 					logger.error("Failed to write item: " + item, exception);
@@ -838,12 +861,12 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 
 		private boolean scanMode;
 
-		@Nullable private Chunk<O> pendingChunk;
+		@Nullable private LinkedList<O> pendingScanItems;
 
 		void init() {
 			this.moreItems = true;
 			this.scanMode = false;
-			this.pendingChunk = null;
+			this.pendingScanItems = null;
 		}
 
 		void reset() {
@@ -856,20 +879,24 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 
 		void enterScanMode(Chunk<O> chunk) {
 			this.scanMode = true;
-			this.pendingChunk = new Chunk<>(chunk.getItems());
+			this.pendingScanItems = new LinkedList<>(chunk.getItems());
 		}
 
 		boolean isScanMode() {
 			return this.scanMode;
 		}
 
-		@Nullable Chunk<O> getPendingChunk() {
-			return this.pendingChunk;
+		@Nullable O pollNextScanItem() {
+			return (this.pendingScanItems != null) ? this.pendingScanItems.poll() : null;
+		}
+
+		boolean hasPendingScanItems() {
+			return this.pendingScanItems != null && !this.pendingScanItems.isEmpty();
 		}
 
 		void exitScanMode() {
 			this.scanMode = false;
-			this.pendingChunk = null;
+			this.pendingScanItems = null;
 		}
 
 	}
