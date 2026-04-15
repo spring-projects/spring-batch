@@ -451,7 +451,7 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T>
 	 * @param writer the {@link Writer} to be used by the {@link XMLEventWriter} for
 	 * writing to character streams.
 	 * @return an xml writer
-	 * @throws XMLStreamException thrown if error occured creating {@link XMLEventWriter}.
+	 * @throws XMLStreamException thrown if error occurred creating {@link XMLEventWriter}.
 	 */
 	protected XMLEventWriter createXmlEventWriter(XMLOutputFactory outputFactory, Writer writer)
 			throws XMLStreamException {
