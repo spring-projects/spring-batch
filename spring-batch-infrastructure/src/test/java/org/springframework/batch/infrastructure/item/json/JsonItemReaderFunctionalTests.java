@@ -16,6 +16,8 @@
 
 package org.springframework.batch.infrastructure.item.json;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 
 import org.junit.jupiter.api.Test;
@@ -25,9 +27,11 @@ import org.springframework.batch.infrastructure.item.ItemStreamException;
 import org.springframework.batch.infrastructure.item.ParseException;
 import org.springframework.batch.infrastructure.item.json.builder.JsonItemReaderBuilder;
 import org.springframework.batch.infrastructure.item.json.domain.Trade;
+import org.springframework.core.io.AbstractResource;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.ClassPathResource;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -128,6 +132,32 @@ abstract class JsonItemReaderFunctionalTests {
 
 		// then
 		assertTrue(getJsonParsingException().isInstance(expectedException.getCause()));
+	}
+
+	@Test
+	void testCloseWhenOpenFailsShouldNotThrowNpe() {
+		// given
+		AbstractResource failingResource = new AbstractResource() {
+			@Override
+			public String getDescription() {
+				return "failing resource";
+			}
+
+			@Override
+			public InputStream getInputStream() throws IOException {
+				throw new IOException("Simulated connection failure");
+			}
+		};
+		JsonItemReader<Trade> itemReader = new JsonItemReaderBuilder<Trade>().jsonObjectReader(getJsonObjectReader())
+			.resource(failingResource)
+			.name("tradeJsonItemReader")
+			.build();
+
+		// when
+		assertThrows(ItemStreamException.class, () -> itemReader.open(new ExecutionContext()));
+
+		// then
+		assertDoesNotThrow(itemReader::close);
 	}
 
 	@Test

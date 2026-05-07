@@ -97,11 +97,14 @@ public class GsonJsonObjectReader<T> implements JsonObjectReader<T> {
 		return null;
 	}
 
-	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public void close() throws Exception {
-		this.inputStream.close();
-		this.jsonReader.close();
+		if (this.inputStream != null) {
+			this.inputStream.close();
+		}
+		if (this.jsonReader != null) {
+			this.jsonReader.close();
+		}
 	}
 
 	@SuppressWarnings("DataFlowIssue")
