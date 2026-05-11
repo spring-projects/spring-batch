@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.JobInterruptedException;
+import org.springframework.batch.core.job.SimpleJob;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.job.flow.support.SimpleFlow;
@@ -162,6 +163,42 @@ class FlowStepTests {
 		assertEquals(ExitStatus.COMPLETED, stepExecution.getExitStatus());
 		assertEquals("bar", stepExecution.getExecutionContext().get("foo"));
 
+	}
+
+	@Test
+	void testDoExecuteWithAdditionalStep() throws Exception {
+		FlowStep flowStep = new FlowStep(jobRepository);
+
+		SimpleFlow flow = new SimpleFlow("flow");
+		List<StateTransition> transitions = new ArrayList<>();
+		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1")), "end0"));
+		transitions.add(StateTransition.createEndStateTransition(new EndState(FlowExecutionStatus.COMPLETED, "end0")));
+		flow.setStateTransitions(transitions);
+
+		flowStep.setFlow(flow);
+		flowStep.afterPropertiesSet();
+
+		List<BatchStatus> jobStatuses = new ArrayList<>();
+		StepSupport step2 = new StepSupport("step2") {
+			@Override
+			public void execute(StepExecution stepExecution) {
+				jobStatuses.add(stepExecution.getJobExecution().getStatus());
+				stepExecution.setStatus(BatchStatus.COMPLETED);
+				stepExecution.setExitStatus(ExitStatus.COMPLETED);
+				jobRepository.update(stepExecution);
+			}
+		};
+
+		SimpleJob job = new SimpleJob("job");
+		job.setJobRepository(jobRepository);
+		job.addStep(flowStep);
+		job.addStep(step2);
+		job.afterPropertiesSet();
+
+		job.execute(jobExecution);
+
+		assertEquals(List.of(BatchStatus.STARTED), jobStatuses);
+		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 	}
 
 	/**
