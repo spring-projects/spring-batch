@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.core.job.flow;
 
+import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecutionException;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
@@ -84,11 +86,12 @@ public class FlowStep extends AbstractStep {
 		try {
 			stepExecution.getExecutionContext().put(STEP_TYPE_KEY, this.getClass().getName());
 			StepHandler stepHandler = new SimpleStepHandler(getJobRepository(), stepExecution.getExecutionContext());
-			FlowExecutor executor = new JobFlowExecutor(getJobRepository(), stepHandler,
+			JobFlowExecutor executor = new JobFlowExecutor(getJobRepository(), stepHandler,
 					stepExecution.getJobExecution());
-			executor.updateJobExecutionStatus(flow.start(executor).getStatus());
-			stepExecution.upgradeStatus(executor.getJobExecution().getStatus());
-			stepExecution.setExitStatus(executor.getJobExecution().getExitStatus());
+			FlowExecutionStatus status = flow.start(executor).getStatus();
+			BatchStatus batchStatus = executor.findBatchStatus(status);
+			stepExecution.upgradeStatus(batchStatus);
+			stepExecution.setExitStatus(executor.exitStatus.and(new ExitStatus(status.getName())));
 		}
 		catch (FlowExecutionException e) {
 			if (e.getCause() instanceof JobExecutionException) {

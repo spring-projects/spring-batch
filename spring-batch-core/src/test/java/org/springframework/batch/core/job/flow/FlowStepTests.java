@@ -28,6 +28,7 @@ import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInterruptedException;
+import org.springframework.batch.core.job.SimpleJob;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.job.flow.support.SimpleFlow;
@@ -164,6 +165,42 @@ class FlowStepTests {
 		assertEquals(ExitStatus.COMPLETED, stepExecution.getExitStatus());
 		assertEquals("bar", stepExecution.getExecutionContext().get("foo"));
 
+	}
+
+	@Test
+	void testDoExecuteWithAdditionalStep() throws Exception {
+		FlowStep flowStep = new FlowStep();
+		flowStep.setJobRepository(jobRepository);
+		SimpleFlow flow = new SimpleFlow("flow");
+		List<StateTransition> transitions = new ArrayList<>();
+		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1")), "end0"));
+		transitions.add(StateTransition.createEndStateTransition(new EndState(FlowExecutionStatus.COMPLETED, "end0")));
+		flow.setStateTransitions(transitions);
+
+		flowStep.setFlow(flow);
+		flowStep.afterPropertiesSet();
+
+		List<BatchStatus> jobStatuses = new ArrayList<>();
+		StepSupport step2 = new StepSupport("step2") {
+			@Override
+			public void execute(StepExecution stepExecution) {
+				jobStatuses.add(stepExecution.getJobExecution().getStatus());
+				stepExecution.setStatus(BatchStatus.COMPLETED);
+				stepExecution.setExitStatus(ExitStatus.COMPLETED);
+				jobRepository.update(stepExecution);
+			}
+		};
+
+		SimpleJob job = new SimpleJob("job");
+		job.setJobRepository(jobRepository);
+		job.addStep(flowStep);
+		job.addStep(step2);
+		job.afterPropertiesSet();
+
+		job.execute(jobExecution);
+
+		assertEquals(List.of(BatchStatus.STARTED), jobStatuses);
+		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 	}
 
 	/**
