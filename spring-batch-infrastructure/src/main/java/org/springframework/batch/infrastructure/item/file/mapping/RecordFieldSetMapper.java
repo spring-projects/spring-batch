@@ -33,6 +33,7 @@ import org.springframework.util.Assert;
  * @param <T> type of mapped items
  * @author Mahmoud Ben Hassine
  * @author Seungyong Hong
+ * @author Yanming Zhou
  * @since 4.3
  */
 public class RecordFieldSetMapper<T> implements FieldSetMapper<T> {
@@ -76,14 +77,12 @@ public class RecordFieldSetMapper<T> implements FieldSetMapper<T> {
 		Assert.isTrue(fieldSet.getFieldCount() == this.constructorParameterNames.length,
 				"Fields count must be equal to record components count");
 		Assert.isTrue(fieldSet.hasNames(), "Field names must be specified");
-		Object[] args = new Object[this.constructorParameterNames.length];
+		@Nullable Object[] args = new Object[this.constructorParameterNames.length];
 		for (int i = 0; i < args.length; i++) {
 			String name = this.constructorParameterNames[i];
 			Class<?> type = this.constructorParameterTypes[i];
 			Assert.notNull(name, "Constructor parameter names must not be null");
 			Object converted = this.typeConverter.convertIfNecessary(fieldSet.readRawString(name), type);
-			Assert.notNull(converted,
-					() -> String.format("Cannot convert field '%s' to required type '%s'", name, type.getName()));
 			args[i] = converted;
 		}
 		return BeanUtils.instantiateClass(this.mappedConstructor, args);
