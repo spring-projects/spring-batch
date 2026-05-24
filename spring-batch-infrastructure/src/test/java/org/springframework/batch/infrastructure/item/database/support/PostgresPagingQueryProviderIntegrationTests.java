@@ -40,7 +40,7 @@ import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.BEFORE_TE
 class PostgresPagingQueryProviderIntegrationTests extends AbstractPagingQueryProviderIntegrationTests {
 
 	// TODO find the best way to externalize and manage image versions
-	private static final DockerImageName POSTGRESQL_IMAGE = DockerImageName.parse("postgres:17.5");
+	private static final DockerImageName POSTGRESQL_IMAGE = DockerImageName.parse("postgres:18.1");
 
 	@Container
 	public static PostgreSQLContainer postgres = new PostgreSQLContainer(POSTGRESQL_IMAGE);
