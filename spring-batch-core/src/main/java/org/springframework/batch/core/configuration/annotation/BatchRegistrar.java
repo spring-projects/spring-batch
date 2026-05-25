@@ -42,6 +42,7 @@ import org.springframework.util.StringUtils;
  * Batch in a declarative way through {@link EnableBatchProcessing}.
  *
  * @author Mahmoud Ben Hassine
+ * @author Myeongha Shin
  * @since 5.0
  * @see EnableBatchProcessing
  */
@@ -183,6 +184,11 @@ class BatchRegistrar implements ImportBeanDefinitionRegistrar {
 		Isolation isolationLevelForCreate = mongoJobRepositoryAnnotation.isolationLevelForCreate();
 		if (isolationLevelForCreate != null) {
 			beanDefinitionBuilder.addPropertyValue("isolationLevelForCreateEnum", isolationLevelForCreate);
+		}
+
+		String collectionPrefix = mongoJobRepositoryAnnotation.collectionPrefix();
+		if (collectionPrefix != null) {
+			beanDefinitionBuilder.addPropertyValue("collectionPrefix", collectionPrefix);
 		}
 
 		String jobKeyGeneratorRef = mongoJobRepositoryAnnotation.jobKeyGeneratorRef();

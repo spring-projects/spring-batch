@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.configuration.annotation;
 
+import org.springframework.batch.core.repository.dao.AbstractMongoBatchMetadataDao;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.MongoTransactionManager;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -97,5 +98,12 @@ public @interface EnableMongoJobRepository {
 	 * {@literal stepExecutionIncrementer}.
 	 */
 	String stepExecutionIncrementerRef() default "stepExecutionIncrementer";
+
+	/**
+	 * Set the prefix for MongoDB collection names. Defaults to
+	 * {@link AbstractMongoBatchMetadataDao#DEFAULT_COLLECTION_PREFIX}.
+	 * @return the collection prefix to use
+	 */
+	String collectionPrefix() default AbstractMongoBatchMetadataDao.DEFAULT_COLLECTION_PREFIX;
 
 }

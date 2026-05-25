@@ -33,6 +33,7 @@ import org.springframework.batch.core.converter.JsonJobParametersConverter;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.repository.dao.mongodb.MongoJobInstanceDao;
 import org.springframework.batch.core.repository.dao.jdbc.JdbcExecutionContextDao;
 import org.springframework.batch.core.repository.dao.jdbc.JdbcJobExecutionDao;
 import org.springframework.batch.core.repository.dao.jdbc.JdbcJobInstanceDao;
@@ -215,6 +216,21 @@ class BatchRegistrarTests {
 		Assertions.assertNotNull(jobRepository);
 	}
 
+	@Test
+	@DisplayName("Mongo collection prefix should be configured successfully with @EnableMongoJobRepository")
+	void testMongoCollectionPrefixConfiguredWithEnableMongoJobRepository() {
+		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(
+				MongoJobConfigurationWithCustomCollectionPrefix.class);
+
+		JobRepository jobRepository = context.getBean(JobRepository.class);
+		MongoJobInstanceDao jobInstanceDao = (MongoJobInstanceDao) ReflectionTestUtils.getField(jobRepository,
+				"jobInstanceDao");
+
+		Assertions.assertNotNull(jobRepository);
+		Assertions.assertEquals("TEST_COLLECTION_PREFIX_JOB_INSTANCE",
+				ReflectionTestUtils.getField(jobInstanceDao, "collectionName"));
+	}
+
 	@Configuration
 	@EnableBatchProcessing
 	public static class JobConfigurationWithUserDefinedInfrastructureBeans {
@@ -339,6 +355,23 @@ class BatchRegistrarTests {
 	@EnableBatchProcessing
 	@EnableMongoJobRepository
 	public static class MongoJobConfiguration {
+
+		@Bean
+		public MongoOperations mongoTemplate() {
+			return Mockito.mock(MongoOperations.class);
+		}
+
+		@Bean
+		public MongoTransactionManager transactionManager() {
+			return Mockito.mock(MongoTransactionManager.class);
+		}
+
+	}
+
+	@Configuration
+	@EnableBatchProcessing
+	@EnableMongoJobRepository(collectionPrefix = "TEST_COLLECTION_PREFIX_")
+	public static class MongoJobConfigurationWithCustomCollectionPrefix {
 
 		@Bean
 		public MongoOperations mongoTemplate() {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024-2025 the original author or authors.
+ * Copyright 2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,27 +26,19 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.mongodb.MongoTransactionManager;
-import org.springframework.data.mongodb.core.MongoTemplate;
 
 /**
- * @author Mahmoud Ben Hassine
- * @author Yanming Zhou
+ * Test configuration for MongoDB collection prefix functionality
+ *
+ * @author Myeongha Shin
  */
 @Configuration
 @Import(MongoDBTestInfrastructureConfiguration.class)
 @EnableBatchProcessing
-@EnableMongoJobRepository
-class MongoDBIntegrationTestConfiguration {
+@EnableMongoJobRepository(collectionPrefix = "TEST_COLLECTION_PREFIX_")
+class MongoDBCollectionPrefixTestConfiguration {
 
-	@Bean
-	public JobRepository jobRepository(MongoTemplate mongoTemplate, MongoTransactionManager transactionManager)
-			throws Exception {
-		MongoJobRepositoryFactoryBean jobRepositoryFactoryBean = new MongoJobRepositoryFactoryBean();
-		jobRepositoryFactoryBean.setMongoOperations(mongoTemplate);
-		jobRepositoryFactoryBean.setTransactionManager(transactionManager);
-		jobRepositoryFactoryBean.afterPropertiesSet();
-		return jobRepositoryFactoryBean.getObject();
-	}
+	static final String COLLECTION_PREFIX = "TEST_COLLECTION_PREFIX_";
 
 	@Bean
 	public Job job(JobRepository jobRepository, MongoTransactionManager transactionManager) {
