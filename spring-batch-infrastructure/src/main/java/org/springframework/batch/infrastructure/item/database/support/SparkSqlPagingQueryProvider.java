@@ -20,30 +20,31 @@ import org.springframework.batch.infrastructure.item.database.PagingQueryProvide
 import org.springframework.util.StringUtils;
 
 /**
- * SparkSQL implementation of a {@link PagingQueryProvider} using database specific features.
+ * SparkSQL implementation of a {@link PagingQueryProvider} using database specific
+ * features.
  *
  * @author Rahul Kumar
  * @since 2.0
  */
 public class SparkSqlPagingQueryProvider extends AbstractSqlPagingQueryProvider {
 
-    @Override
-    public String generateFirstPageQuery(int pageSize) {
-        return SqlPagingQueryUtils.generateLimitSqlQuery(this, false, buildLimitClause(pageSize));
-    }
+	@Override
+	public String generateFirstPageQuery(int pageSize) {
+		return SqlPagingQueryUtils.generateLimitSqlQuery(this, false, buildLimitClause(pageSize));
+	}
 
-    @Override
-    public String generateRemainingPagesQuery(int pageSize) {
-        if (StringUtils.hasText(getGroupClause())) {
-            return SqlPagingQueryUtils.generateLimitGroupedSqlQuery(this, buildLimitClause(pageSize));
-        }
-        else {
-            return SqlPagingQueryUtils.generateLimitSqlQuery(this, true, buildLimitClause(pageSize));
-        }
-    }
+	@Override
+	public String generateRemainingPagesQuery(int pageSize) {
+		if (StringUtils.hasText(getGroupClause())) {
+			return SqlPagingQueryUtils.generateLimitGroupedSqlQuery(this, buildLimitClause(pageSize));
+		}
+		else {
+			return SqlPagingQueryUtils.generateLimitSqlQuery(this, true, buildLimitClause(pageSize));
+		}
+	}
 
-    private String buildLimitClause(int pageSize) {
-        return "LIMIT " + pageSize;
-    }
+	private String buildLimitClause(int pageSize) {
+		return "LIMIT " + pageSize;
+	}
 
 }
