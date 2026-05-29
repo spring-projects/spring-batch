@@ -117,6 +117,28 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 		return self();
 	}
 
+	/**
+	 * Add a {@link StepExecutionListener} to the step.
+	 * This method makes the additive nature of adding listeners explicit.
+	 * @param listener the step execution listener to add
+	 * @return this for fluent chaining
+	 * @since 6.1
+	 */
+	public B addListener(StepExecutionListener listener) {
+		return listener(listener);
+	}
+
+	/**
+	 * Add a step execution listener using annotation-based configuration.
+	 * This method makes the additive nature of adding listeners explicit.
+	 * @param listener the object that has a method configured with listener annotation
+	 * @return this for fluent chaining
+	 * @since 6.1
+	 */
+	public B addListener(Object listener) {
+		return listener(listener);
+	}
+
 	public B allowStartIfComplete(boolean allowStartIfComplete) {
 		properties.allowStartIfComplete = allowStartIfComplete;
 		return self();
