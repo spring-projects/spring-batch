@@ -23,6 +23,7 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -79,8 +80,8 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 			WHERE JOB_EXECUTION_ID = ?
 			""";
 
-	private static final String GET_STATUS = """
-			SELECT STATUS
+	private static final String GET_VERSION_AND_STATUS = """
+			SELECT VERSION, STATUS
 			FROM %PREFIX%JOB_EXECUTION
 			WHERE JOB_EXECUTION_ID = ?
 			""";
@@ -349,14 +350,16 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 
 	@Override
 	public void synchronizeStatus(JobExecution jobExecution) {
-		int currentVersion = getJdbcTemplate().queryForObject(getQuery(CURRENT_VERSION_JOB_EXECUTION), Integer.class,
-				jobExecution.getId());
-
-		if (currentVersion != jobExecution.getVersion()) {
-			String status = getJdbcTemplate().queryForObject(getQuery(GET_STATUS), String.class, jobExecution.getId());
-			jobExecution.upgradeStatus(BatchStatus.valueOf(status));
-			jobExecution.setVersion(currentVersion);
-		}
+		getJdbcTemplate().query(getQuery(GET_VERSION_AND_STATUS), rs -> {
+			Integer currentVersion = rs.getInt("VERSION");
+			if (!Objects.equals(currentVersion, jobExecution.getVersion())) {
+				BatchStatus currentStatus = BatchStatus.valueOf(rs.getString("STATUS"));
+				if (currentStatus.isGreaterThan(jobExecution.getStatus())) {
+					jobExecution.upgradeStatus(currentStatus);
+				}
+				jobExecution.setVersion(currentVersion);
+			}
+		}, jobExecution.getId());
 	}
 
 	/**
