@@ -44,6 +44,10 @@ public SynchronizedItemStreamReader<Person> itemReader() {
 			.build();
 }
 ----
+As the update method of an ItemStreamReader may also be called in parallel,
+optionally you will be able to make the update method thread-safe.
+This can be done by supplying `synchronizeUpdateMethod`.
+For instance the `JpaCursorItemReader` has a non-thread-safe update method.
 
 [[singleItemPeekableItemReader]]
 === `SingleItemPeekableItemReader`

@@ -33,7 +33,7 @@ public class SynchronizedItemStreamReaderBuilderTests extends AbstractSynchroniz
 
 	@Override
 	protected SynchronizedItemStreamReader<Object> createNewSynchronizedItemStreamReader() {
-		return new SynchronizedItemStreamReaderBuilder<>().delegate(delegate).build();
+		return new SynchronizedItemStreamReaderBuilder<>().delegate(delegate).synchronizeUpdateMethod(false).build();
 	}
 
 	@Test
