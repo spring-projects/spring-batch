@@ -8,9 +8,12 @@ restart capabilities.
 
 ### Run the sample
 
-You can run the sample from the command line as following:
+For a command-line stop and restart walkthrough, use the
+[Graceful Shutdown sample](../../shutdown/README.md). It provides executable
+entry points to start, stop, and restart a job:
 
 ```
-$>cd spring-batch-samples
-$>../mvnw -Dtest=JobOperatorFunctionalTests#testStartStopResumeJob test
+$>./mvnw -pl org.springframework.batch:spring-batch-samples exec:java -Dexec.mainClass=org.springframework.batch.samples.shutdown.StartJobExecutionApp
+$>./mvnw -pl org.springframework.batch:spring-batch-samples exec:java -Dexec.mainClass=org.springframework.batch.samples.shutdown.StopJobExecutionApp
+$>./mvnw -pl org.springframework.batch:spring-batch-samples exec:java -Dexec.mainClass=org.springframework.batch.samples.shutdown.RestartJobExecutionApp
 ```
