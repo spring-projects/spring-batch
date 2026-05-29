@@ -47,9 +47,8 @@ class MultilineAggregateJobFunctionalTests {
 	@Test
 	void testJobLaunch() throws Exception {
 		this.jobOperatorTestUtils.startJob();
-		assertEquals(EXPECTED_RESULT,
-				StringUtils.replace(IOUtils.toString(output.getInputStream(), StandardCharsets.UTF_8),
-						System.getProperty("line.separator"), ""));
+		assertEquals(EXPECTED_RESULT, StringUtils
+			.replace(IOUtils.toString(output.getInputStream(), StandardCharsets.UTF_8), System.lineSeparator(), ""));
 	}
 
 }
