@@ -31,6 +31,7 @@ import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.batch.infrastructure.item.adapter.AbstractMethodInvokingDelegator.InvocationTargetThrowableWrapper;
 import org.springframework.batch.infrastructure.item.adapter.DynamicMethodInvocationException;
 import org.springframework.batch.infrastructure.item.support.AbstractItemCountingItemStreamItemReader;
+import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -80,9 +81,11 @@ import org.springframework.util.StringUtils;
  * @author Antoine Kapps
  * @author Mahmoud Ben Hassine
  * @author Jimmy Praet
+ * @author Andrey Litvitski
  * @since 2.2
  */
-public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> implements InitializingBean {
+public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemReader<T>
+		implements InitializingBean, BeanNameAware {
 
 	protected Log logger = LogFactory.getLog(getClass());
 

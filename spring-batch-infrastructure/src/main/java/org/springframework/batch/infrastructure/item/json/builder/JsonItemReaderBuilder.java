@@ -36,6 +36,7 @@ import org.springframework.util.StringUtils;
  *
  * @param <T> type of the target item
  * @author Mahmoud Ben Hassine
+ * @author Andrey Litvitski
  * @since 4.1
  */
 public class JsonItemReaderBuilder<T> {
@@ -149,9 +150,6 @@ public class JsonItemReaderBuilder<T> {
 	 */
 	public JsonItemReader<T> build() {
 		Assert.notNull(this.jsonObjectReader, "A json object reader is required.");
-		if (this.saveState) {
-			Assert.state(StringUtils.hasText(this.name), "A name is required when saveState is set to true.");
-		}
 
 		if (this.resource == null) {
 			logger.debug("The resource is null. This is only a valid scenario when "

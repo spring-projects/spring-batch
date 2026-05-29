@@ -28,6 +28,7 @@ import org.springframework.batch.infrastructure.item.ItemStreamException;
 import org.springframework.batch.infrastructure.item.ItemStreamReader;
 import org.springframework.batch.infrastructure.item.database.orm.JpaQueryProvider;
 import org.springframework.batch.infrastructure.item.support.AbstractItemCountingItemStreamItemReader;
+import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.util.Assert;
@@ -46,10 +47,12 @@ import org.springframework.util.StringUtils;
  * @author Jinwoo Bae
  * @author Stefano Cordio
  * @author Jimmy Praet
+ * @author Andrey Litvitski
  * @param <T> type of items to read
  * @since 4.3
  */
-public class JpaCursorItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> implements InitializingBean {
+public class JpaCursorItemReader<T> extends AbstractItemCountingItemStreamItemReader<T>
+		implements InitializingBean, BeanNameAware {
 
 	private EntityManagerFactory entityManagerFactory;
 
