@@ -76,6 +76,7 @@ public class MongoJobRepositoryFactoryBean extends AbstractJobRepositoryFactoryB
 		return new SimpleJobRepository(jobInstanceDao, jobExecutionDao, stepExecutionDao, executionContextDao);
 	}
 
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	protected MongoJobInstanceDao createJobInstanceDao() {
 		MongoJobInstanceDao mongoJobInstanceDao = new MongoJobInstanceDao(this.mongoOperations);
@@ -84,6 +85,7 @@ public class MongoJobRepositoryFactoryBean extends AbstractJobRepositoryFactoryB
 		return mongoJobInstanceDao;
 	}
 
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	protected MongoJobExecutionDao createJobExecutionDao() {
 		MongoJobExecutionDao mongoJobExecutionDao = new MongoJobExecutionDao(this.mongoOperations);
@@ -91,6 +93,7 @@ public class MongoJobRepositoryFactoryBean extends AbstractJobRepositoryFactoryB
 		return mongoJobExecutionDao;
 	}
 
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	protected MongoStepExecutionDao createStepExecutionDao() {
 		MongoStepExecutionDao mongoStepExecutionDao = new MongoStepExecutionDao(this.mongoOperations);
@@ -98,6 +101,7 @@ public class MongoJobRepositoryFactoryBean extends AbstractJobRepositoryFactoryB
 		return mongoStepExecutionDao;
 	}
 
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	protected MongoExecutionContextDao createExecutionContextDao() {
 		return new MongoExecutionContextDao(this.mongoOperations);

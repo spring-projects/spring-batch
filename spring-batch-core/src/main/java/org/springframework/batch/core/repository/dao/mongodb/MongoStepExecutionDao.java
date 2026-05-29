@@ -55,7 +55,7 @@ public class MongoStepExecutionDao implements StepExecutionDao {
 
 	private DataFieldMaxValueIncrementer stepExecutionIncrementer;
 
-	MongoJobExecutionDao jobExecutionDao;
+	private @Nullable MongoJobExecutionDao jobExecutionDao;
 
 	public MongoStepExecutionDao(MongoOperations mongoOperations) {
 		this.mongoOperations = mongoOperations;
@@ -96,13 +96,13 @@ public class MongoStepExecutionDao implements StepExecutionDao {
 		org.springframework.batch.core.repository.persistence.StepExecution stepExecution = this.mongoOperations
 			.findOne(query, org.springframework.batch.core.repository.persistence.StepExecution.class,
 					STEP_EXECUTIONS_COLLECTION_NAME);
-		return stepExecution != null ? this.stepExecutionConverter.toStepExecution(stepExecution,
-				jobExecutionDao.getJobExecution(stepExecution.getJobExecutionId())) : null;
+		return stepExecution != null && jobExecutionDao != null ? this.stepExecutionConverter
+			.toStepExecution(stepExecution, jobExecutionDao.getJobExecution(stepExecution.getJobExecutionId())) : null;
 	}
 
 	@Deprecated(since = "6.0", forRemoval = true)
 	@Override
-	public StepExecution getStepExecution(JobExecution jobExecution, long stepExecutionId) {
+	public @Nullable StepExecution getStepExecution(JobExecution jobExecution, long stepExecutionId) {
 		Query query = query(where("stepExecutionId").is(stepExecutionId));
 		org.springframework.batch.core.repository.persistence.StepExecution stepExecution = this.mongoOperations
 			.findOne(query, org.springframework.batch.core.repository.persistence.StepExecution.class,
