@@ -29,6 +29,7 @@ import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.util.StringUtils;
 
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -38,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Dave Syer
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
- *
+ * @author Stefano Cordio
  */
 class DefaultJobParametersConverterTests {
 
@@ -105,7 +106,7 @@ class DefaultJobParametersConverterTests {
 	}
 
 	@Test
-	void testGetParameters() throws Exception {
+	void testGetParameters() {
 		String jobKey = "job.key=myKey";
 		String scheduleDate = "schedule.date=2008-01-23,java.time.LocalDate,true";
 		String vendorId = "vendor.id=33243243,java.lang.Long,true";
@@ -156,13 +157,9 @@ class DefaultJobParametersConverterTests {
 
 		String[] args = new String[] { "value=1.03,java.lang.Long" };
 
-		try {
-			factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
-		}
-		catch (JobParametersConversionException e) {
-			String message = e.getMessage();
-			assertTrue(message.contains("1.03"), "Message should contain wrong number: " + message);
-		}
+		assertThatExceptionOfType(JobParametersConversionException.class)
+			.isThrownBy(() -> factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "=")))
+			.withMessageContaining("1.03");
 	}
 
 	@Test
@@ -170,13 +167,9 @@ class DefaultJobParametersConverterTests {
 
 		String[] args = new String[] { "value=foo,java.lang.Double" };
 
-		try {
-			factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
-		}
-		catch (JobParametersConversionException e) {
-			String message = e.getMessage();
-			assertTrue(message.contains("foo"), "Message should contain wrong number: " + message);
-		}
+		assertThatExceptionOfType(JobParametersConversionException.class)
+			.isThrownBy(() -> factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "=")))
+			.withMessageContaining("foo");
 	}
 
 	@Test
@@ -210,7 +203,41 @@ class DefaultJobParametersConverterTests {
 	}
 
 	@Test
-	void testGetProperties() throws Exception {
+	void testGetParametersWithZonedDateTime() {
+		// given
+		String[] args = new String[] { "parameter=2023-12-25T10:30:00+01:00[Europe/Paris],java.time.ZonedDateTime" };
+
+		// when
+		JobParameters jobParameters = factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
+
+		// then
+		assertEquals(1, jobParameters.parameters().size());
+		JobParameter<?> parameter = jobParameters.getParameter("parameter");
+		assertEquals("parameter", parameter.name());
+		assertEquals(ZonedDateTime.of(2023, 12, 25, 10, 30, 0, 0, ZoneId.of("Europe/Paris")), parameter.value());
+		assertEquals(ZonedDateTime.class, parameter.type());
+		assertTrue(parameter.identifying());
+	}
+
+	@Test
+	void testGetParametersWithOffsetDateTime() {
+		// given
+		String[] args = new String[] { "parameter=2023-12-25T10:30:00+01:00,java.time.OffsetDateTime" };
+
+		// when
+		JobParameters jobParameters = factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
+
+		// then
+		assertEquals(1, jobParameters.parameters().size());
+		JobParameter<?> parameter = jobParameters.getParameter("parameter");
+		assertEquals("parameter", parameter.name());
+		assertEquals(OffsetDateTime.of(2023, 12, 25, 10, 30, 0, 0, ZoneOffset.of("+01:00")), parameter.value());
+		assertEquals(OffsetDateTime.class, parameter.type());
+		assertTrue(parameter.identifying());
+	}
+
+	@Test
+	void testGetProperties() {
 		LocalDate date = LocalDate.of(2008, 1, 23);
 		JobParameters parameters = new JobParametersBuilder()
 			.addJobParameter("schedule.date", date, LocalDate.class, true)
@@ -263,32 +290,6 @@ class DefaultJobParametersConverterTests {
 	void testEmptyArgs() {
 		JobParameters props = factory.getJobParameters(new Properties());
 		assertTrue(props.parameters().isEmpty());
-	}
-
-	@Test
-	void testGetParametersWithZonedDateTime() {
-		String zonedDateTime = "schedule.zonedDateTime=2023-12-25T10:30:00+09:00[Asia/Seoul],java.time.ZonedDateTime,true";
-		String[] args = new String[] { zonedDateTime };
-
-		JobParameters parameters = factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
-		assertNotNull(parameters);
-		JobParameter<?> parameter = parameters.getParameter("schedule.zonedDateTime");
-		assertEquals(ZonedDateTime.class, parameter.type());
-		ZonedDateTime expected = ZonedDateTime.of(2023, 12, 25, 10, 30, 0, 0, ZoneId.of("Asia/Seoul"));
-		assertEquals(expected, parameter.value());
-	}
-
-	@Test
-	void testGetParametersWithOffsetDateTime() {
-		String offsetDateTime = "schedule.offsetDateTime=2023-12-25T10:30:00+09:00,java.time.OffsetDateTime,true";
-		String[] args = new String[] { offsetDateTime };
-
-		JobParameters parameters = factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
-		assertNotNull(parameters);
-		JobParameter<?> parameter = parameters.getParameter("schedule.offsetDateTime");
-		assertEquals(OffsetDateTime.class, parameter.type());
-		OffsetDateTime expected = OffsetDateTime.of(2023, 12, 25, 10, 30, 0, 0, ZoneOffset.of("+09:00"));
-		assertEquals(expected, parameter.value());
 	}
 
 	@Test
