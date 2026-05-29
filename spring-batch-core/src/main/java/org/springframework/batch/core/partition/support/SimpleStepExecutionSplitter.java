@@ -143,8 +143,13 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter {
 				set.add(currentStepExecution);
 			}
 			else { // restart
-				if (lastStepExecution.getStatus() != BatchStatus.COMPLETED
-						&& shouldStart(allowStartIfComplete, stepExecution, lastStepExecution)) {
+				if (lastStepExecution.getStatus() == BatchStatus.COMPLETED) {
+					// Keep completed partitions for aggregation on restart.
+					if (!isSameJobExecution(stepExecution, lastStepExecution)) {
+						set.add(lastStepExecution);
+					}
+				}
+				else if (shouldStart(allowStartIfComplete, stepExecution, lastStepExecution)) {
 					StepExecution currentStepExecution = jobRepository.createStepExecution(stepName, jobExecution);
 					currentStepExecution.setExecutionContext(lastStepExecution.getExecutionContext());
 					jobRepository.updateExecutionContext(currentStepExecution);

@@ -18,9 +18,11 @@ package org.springframework.batch.core.partition.support;
 import java.util.Collection;
 import java.util.Set;
 
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.partition.PartitionHandler;
 import org.springframework.batch.core.partition.StepExecutionSplitter;
+import org.springframework.util.CollectionUtils;
 
 /**
  * Base {@link PartitionHandler} implementation providing common base features. Subclasses
@@ -55,8 +57,25 @@ public abstract class AbstractPartitionHandler implements PartitionHandler {
 	public Collection<StepExecution> handle(StepExecutionSplitter stepSplitter,
 			final StepExecution managerStepExecution) throws Exception {
 		final Set<StepExecution> stepExecutions = stepSplitter.split(managerStepExecution, gridSize);
+		final Set<StepExecution> alreadyCompleted = CollectionUtils.newHashSet(stepExecutions.size());
+		final Set<StepExecution> toBeExecuted = CollectionUtils.newHashSet(stepExecutions.size());
 
-		return doHandle(managerStepExecution, stepExecutions);
+		for (StepExecution stepExecution : stepExecutions) {
+			if (stepExecution.getStatus() == BatchStatus.COMPLETED) {
+				alreadyCompleted.add(stepExecution);
+			}
+			else {
+				toBeExecuted.add(stepExecution);
+			}
+		}
+
+		final Set<StepExecution> updatedExecutions = CollectionUtils.newHashSet(stepExecutions.size());
+		final Set<StepExecution> handledExecutions = doHandle(managerStepExecution, toBeExecuted);
+		if (handledExecutions != null) {
+			updatedExecutions.addAll(handledExecutions);
+		}
+		updatedExecutions.addAll(alreadyCompleted);
+		return updatedExecutions;
 	}
 
 	/**
