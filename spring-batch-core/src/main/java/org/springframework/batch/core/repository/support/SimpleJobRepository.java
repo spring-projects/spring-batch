@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2024 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,6 +54,7 @@ import java.util.List;
  * @author Baris Cubukcuoglu
  * @author Parikshit Dutta
  * @author Mark John Moreno
+ * @author Andrey Litvitski
  * @see JobRepository
  * @see JobInstanceDao
  * @see JobExecutionDao
@@ -242,11 +243,13 @@ public class SimpleJobRepository implements JobRepository {
 		validateStepExecution(stepExecution);
 		Assert.notNull(stepExecution.getId(), "StepExecution must already be saved (have an id assigned)");
 		ecDao.updateExecutionContext(stepExecution);
+		stepExecution.getExecutionContext().clearDirtyFlag();
 	}
 
 	@Override
 	public void updateExecutionContext(JobExecution jobExecution) {
 		ecDao.updateExecutionContext(jobExecution);
+		jobExecution.getExecutionContext().clearDirtyFlag();
 	}
 
 	@Override
