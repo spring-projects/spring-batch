@@ -59,6 +59,7 @@
 ** xref:spring-batch-observability/jfr.adoc[]
 * Appendices
 ** xref:appendix.adoc[]
+** xref:database-performance-tips.adoc[]
 ** xref:schema-appendix.adoc[]
 ** xref:glossary.adoc[]
 ** xref:faq.adoc[]
