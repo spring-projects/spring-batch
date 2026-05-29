@@ -344,9 +344,8 @@ public Step step1Manager(JobRepository jobRepository) {
 }
 ----
 +
-Similar to the multi-threaded step's `throttleLimit` method, the `gridSize`
-method prevents the task executor from being saturated with requests from a single
-step.
+The `gridSize` method prevents the task executor from being saturated with requests
+from a single step.
 
 XML::
 +
@@ -362,16 +361,11 @@ configuration:
 </step>
 ----
 +
-Similar to the multi-threaded step's `throttle-limit` attribute, the `grid-size`
-attribute prevents the task executor from being saturated with requests from a single
-step.
+The `grid-size` attribute prevents the task executor from being saturated with requests
+from a single step.
 
 ====
 
-
-The unit test suite for
-https://github.com/spring-projects/spring-batch/tree/main/spring-batch-samples/src/main/resources/jobs[Spring
-Batch Samples] (see `partition*Job.xml` configuration) has a simple example that you can copy and extend.
 
 Spring Batch creates step executions for the partition called `step1:partition0` and so
 on. Many people prefer to call the manager step `step1:manager` for consistency. You can
@@ -553,6 +547,8 @@ The following example shows how to define late binding in XML:
 ----
 
 ====
+
+You can find a complete example in the https://github.com/spring-projects/spring-batch/tree/main/spring-batch-samples/src/main/java/org/springframework/batch/samples/partitioning[Partitioning Sample].
 
 [[remoteStep]]
 == Remote Step execution
