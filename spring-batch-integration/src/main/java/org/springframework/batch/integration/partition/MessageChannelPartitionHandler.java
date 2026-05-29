@@ -235,7 +235,7 @@ public class MessageChannelPartitionHandler extends AbstractPartitionHandler imp
 		Set<Long> partitionStepExecutionIds = split.stream().map(StepExecution::getId).collect(Collectors.toSet());
 
 		Callable<Set<StepExecution>> callback = () -> {
-			JobExecution jobExecution = jobRepository.getJobExecution(managerStepExecution.getJobExecutionId());
+			JobExecution jobExecution = jobRepository.getJobExecution(managerStepExecution.getJobExecution().getId());
 			Set<StepExecution> finishedStepExecutions = jobExecution.getStepExecutions()
 				.stream()
 				.filter(stepExecution -> partitionStepExecutionIds.contains(stepExecution.getId()))

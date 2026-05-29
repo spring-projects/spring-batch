@@ -239,7 +239,7 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter {
 	}
 
 	private boolean isSameJobExecution(StepExecution stepExecution, StepExecution lastStepExecution) {
-		return stepExecution.getJobExecutionId() == lastStepExecution.getJobExecutionId();
+		return stepExecution.getJobExecution().getId() == lastStepExecution.getJobExecution().getId();
 	}
 
 }
