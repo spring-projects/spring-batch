@@ -26,6 +26,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jspecify.annotations.NullUnmarked;
 
+import org.springframework.batch.core.BatchConstants;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.JobInterruptedException;
@@ -212,7 +213,7 @@ public abstract class AbstractStep implements StoppableStep, InitializingBean, B
 			throws JobInterruptedException, UnexpectedJobExecutionException {
 
 		Assert.notNull(stepExecution, "stepExecution must not be null");
-		stepExecution.getExecutionContext().put(SpringBatchVersion.BATCH_VERSION_KEY, SpringBatchVersion.getVersion());
+		stepExecution.getExecutionContext().put(BatchConstants.BATCH_VERSION, SpringBatchVersion.getVersion());
 
 		if (logger.isDebugEnabled()) {
 			logger.debug("Executing: id=" + stepExecution.getId());
