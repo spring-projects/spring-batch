@@ -61,7 +61,7 @@
 		<java.version>17</java.version>
 
 		<!-- production dependencies -->
-		<spring-framework.version>6.2.18-SNAPSHOT</spring-framework.version>
+		<spring-framework.version>6.2.19-SNAPSHOT</spring-framework.version>
 		<spring-retry.version>2.0.13-SNAPSHOT</spring-retry.version>
 		<spring-integration.version>6.4.11-SNAPSHOT</spring-integration.version>
 		<micrometer.version>1.14.15-SNAPSHOT</micrometer.version>
@@ -71,8 +71,8 @@
 		<spring-data-jpa.version>3.4.13</spring-data-jpa.version>
 		<spring-data-redis.version>3.4.13</spring-data-redis.version>
 		<spring-data-mongodb.version>4.4.13</spring-data-mongodb.version>
-		<spring-kafka.version>3.3.15-SNAPSHOT</spring-kafka.version>
-		<spring-amqp.version>3.2.10-SNAPSHOT</spring-amqp.version>
+		<spring-kafka.version>3.3.16-SNAPSHOT</spring-kafka.version>
+		<spring-amqp.version>3.2.11-SNAPSHOT</spring-amqp.version>
 		<spring-ldap.version>3.2.17-SNAPSHOT</spring-ldap.version>
 
 		<jackson.version>2.18.6</jackson.version>
