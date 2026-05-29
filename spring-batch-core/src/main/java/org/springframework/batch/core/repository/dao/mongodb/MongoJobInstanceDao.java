@@ -1,5 +1,5 @@
 /*
- * Copyright 2024-2025 the original author or authors.
+ * Copyright 2024-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -112,20 +112,14 @@ public class MongoJobInstanceDao implements JobInstanceDao {
 
 	@Override
 	public List<JobInstance> getJobInstances(String jobName, int start, int count) {
-		Query query = query(where("jobName").is(jobName));
-		Sort.Order sortOrder = Sort.Order.desc("jobInstanceId");
-		List<org.springframework.batch.core.repository.persistence.JobInstance> jobInstances = this.mongoOperations
-			.find(query.with(Sort.by(sortOrder)),
-					org.springframework.batch.core.repository.persistence.JobInstance.class, COLLECTION_NAME)
-			.stream()
-			.toList();
-		if (jobInstances.size() <= start) {
-			return Collections.emptyList();
-		}
-		return jobInstances.subList(start, Math.min(jobInstances.size(), start + jobInstances.size()))
+		Query query = query(where("jobName").is(jobName))
+			.with(Sort.by(Sort.Order.desc("jobInstanceId")))
+			.skip(start)
+			.limit(count);
+		return this.mongoOperations
+			.find(query, org.springframework.batch.core.repository.persistence.JobInstance.class, COLLECTION_NAME)
 			.stream()
 			.map(this.jobInstanceConverter::toJobInstance)
-			.limit(count)
 			.toList();
 	}
 
@@ -176,11 +170,8 @@ public class MongoJobInstanceDao implements JobInstanceDao {
 
 	@Override
 	public List<String> getJobNames() {
-		return this.mongoOperations
-			.findAll(org.springframework.batch.core.repository.persistence.JobInstance.class, COLLECTION_NAME)
-			.stream()
-			.map(org.springframework.batch.core.repository.persistence.JobInstance::getJobName)
-			.toList();
+		Query query = new Query().with(Sort.by(Sort.Order.asc("jobName")));
+		return this.mongoOperations.findDistinct(query, "jobName", COLLECTION_NAME, String.class);
 	}
 
 	/**
