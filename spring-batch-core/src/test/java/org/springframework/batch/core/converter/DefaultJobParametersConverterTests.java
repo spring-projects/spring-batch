@@ -340,4 +340,26 @@ class DefaultJobParametersConverterTests {
 				props.getProperty("schedule.offsetDateTime"));
 	}
 
+	@Test
+	void testValueWithComma() {
+		// Test that values containing commas are handled correctly
+		String[] args = new String[] { "items=apple,banana,orange" };
+
+		JobParameters parameters = factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
+		assertEquals("apple,banana,orange", parameters.getString("items"));
+	}
+
+	@Test
+	void testValueWithCommaRoundTrip() {
+		// Test round-trip encoding/decoding of values with commas
+		JobParametersBuilder builder = new JobParametersBuilder();
+		builder.addString("items", "apple,banana,orange");
+		JobParameters originalParameters = builder.toJobParameters();
+
+		Properties props = factory.getProperties(originalParameters);
+		JobParameters decodedParameters = factory.getJobParameters(props);
+
+		assertEquals("apple,banana,orange", decodedParameters.getString("items"));
+	}
+
 }

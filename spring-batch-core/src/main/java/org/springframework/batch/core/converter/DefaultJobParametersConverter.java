@@ -175,7 +175,36 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 		if (tokens.length == 0) {
 			return "";
 		}
-		return tokens[0];
+		if (tokens.length == 1) {
+			return tokens[0];
+		}
+		// For 2+ tokens, figure out which part is the type
+		int typeIndex = -1;
+		if (tokens.length == 2) {
+			// Could be: value,type OR value,value (both parts of value)
+			if (looksLikeClassName(tokens[1])) {
+				typeIndex = 1;
+			}
+		}
+		else if (tokens.length >= 3) {
+			// Could be: value,type,identifying OR value,value,value (all parts of value)
+			// Check if second-to-last looks like a class
+			if (looksLikeClassName(tokens[tokens.length - 2])) {
+				typeIndex = tokens.length - 2;
+			}
+		}
+
+		if (typeIndex == -1) {
+			// No valid type found, all commas are part of the value
+			return encodedJobParameter;
+		}
+
+		// Reconstruct value from all tokens before the type
+		StringBuilder value = new StringBuilder(tokens[0]);
+		for (int i = 1; i < typeIndex; i++) {
+			value.append(",").append(tokens[i]);
+		}
+		return value.toString();
 	}
 
 	private Class<?> parseType(String encodedJobParameter) {
@@ -183,12 +212,31 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 		if (tokens.length <= 1) {
 			return String.class;
 		}
+		// For 2+ tokens, figure out which part is the type
+		int typeIndex = -1;
+		if (tokens.length == 2) {
+			// Could be: value,type OR value,value (both parts of value)
+			if (looksLikeClassName(tokens[1])) {
+				typeIndex = 1;
+			}
+		}
+		else if (tokens.length >= 3) {
+			// Could be: value,type,identifying OR value,value,value (all parts of value)
+			// Check if second-to-last looks like a class
+			if (looksLikeClassName(tokens[tokens.length - 2])) {
+				typeIndex = tokens.length - 2;
+			}
+		}
+
+		if (typeIndex == -1) {
+			return String.class;
+		}
+
 		try {
-			Class<?> type = Class.forName(tokens[1]);
-			return type;
+			return Class.forName(tokens[typeIndex]);
 		}
 		catch (ClassNotFoundException e) {
-			throw new JobParametersConversionException("Unable to parse job parameter " + encodedJobParameter, e);
+			return String.class;
 		}
 	}
 
@@ -197,7 +245,35 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 		if (tokens.length <= 2) {
 			return true;
 		}
-		return Boolean.parseBoolean(tokens[2]);
+		// Check if the last token is a boolean (identifying flag)
+		String lastToken = tokens[tokens.length - 1];
+		if ("true".equalsIgnoreCase(lastToken) || "false".equalsIgnoreCase(lastToken)) {
+			// And the second-to-last token looks like a class name
+			String potentialType = tokens[tokens.length - 2];
+			if (looksLikeClassName(potentialType)) {
+				return Boolean.parseBoolean(lastToken);
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Simple heuristic to check if a string looks like a class name. Class names
+	 * typically contain dots (package names) or are primitive types.
+	 */
+	private boolean looksLikeClassName(String className) {
+		if (className.isEmpty()) {
+			return false;
+		}
+		// Check for primitive types
+		if (className.matches("^(int|long|double|float|boolean|char|byte|short|void)$")) {
+			return true;
+		}
+		// Check for fully qualified class name (contains dots)
+		if (className.contains(".")) {
+			return true;
+		}
+		return false;
 	}
 
 }
