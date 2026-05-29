@@ -39,6 +39,7 @@ import org.springframework.batch.infrastructure.support.transaction.Resourceless
 import org.jspecify.annotations.Nullable;
 import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.UnexpectedRollbackException;
+import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 import org.springframework.transaction.support.DefaultTransactionStatus;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
@@ -572,6 +573,64 @@ class TaskletStepExceptionTests {
 			return null;
 		}
 
+	}
+
+	@Test
+	void testCheckedExceptionPropagatedWhenRollbackDisabled() throws Exception {
+		// Test for regression of issue where checked exceptions were swallowed
+		// when transactionAttribute.rollbackOn(ex) returned false
+		taskletStep.setTransactionAttribute(new DefaultTransactionAttribute() {
+			@Override
+			public boolean rollbackOn(Throwable ex) {
+				// Simulate PROPAGATION_NOT_SUPPORTED behavior - no rollback for checked exceptions
+				if (ex instanceof RuntimeException) {
+					return true;
+				}
+				return false;
+			}
+		});
+
+		// Create a tasklet that throws a checked exception
+		taskletStep.setTasklet(new Tasklet() {
+			@Nullable
+			@Override
+			public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+				throw new Exception("Checked exception from tasklet");
+			}
+		});
+
+		// Execute should fail with the checked exception
+		taskletStep.execute(stepExecution);
+		assertEquals(FAILED, stepExecution.getStatus());
+		assertTrue(stepExecution.getFailureExceptions().get(0) instanceof Exception);
+		assertEquals("Checked exception from tasklet",
+				stepExecution.getFailureExceptions().get(0).getMessage());
+	}
+
+	@Test
+	void testRuntimeExceptionPropagatedWhenRollbackDisabled() throws Exception {
+		// Even for runtime exceptions, they should be propagated
+		taskletStep.setTransactionAttribute(new DefaultTransactionAttribute() {
+			@Override
+			public boolean rollbackOn(Throwable ex) {
+				// Disable rollback for all exceptions
+				return false;
+			}
+		});
+
+		// Create a tasklet that throws a runtime exception
+		taskletStep.setTasklet(new Tasklet() {
+			@Nullable
+			@Override
+			public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+				throw new RuntimeException("Runtime exception from tasklet");
+			}
+		});
+
+		// Execute should fail with the runtime exception
+		taskletStep.execute(stepExecution);
+		assertEquals(FAILED, stepExecution.getStatus());
+		assertTrue(stepExecution.getFailureExceptions().get(0) instanceof RuntimeException);
 	}
 
 	private static class FailingRollbackTransactionManager extends ResourcelessTransactionManager {
