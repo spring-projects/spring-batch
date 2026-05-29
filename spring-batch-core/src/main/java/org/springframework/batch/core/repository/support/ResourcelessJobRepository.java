@@ -27,6 +27,7 @@ import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.JobKeyGenerator;
 import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
@@ -48,6 +49,7 @@ import org.springframework.batch.infrastructure.support.transaction.Resourceless
  * @since 5.2.0
  * @author Mahmoud Ben Hassine
  * @author Sanghyuk Jung
+ * @author Yanming Zhou
  */
 public class ResourcelessJobRepository implements JobRepository {
 
@@ -160,9 +162,9 @@ public class ResourcelessJobRepository implements JobRepository {
 	}
 
 	@Override
-	public long getJobInstanceCount(String jobName) {
-		if (this.jobInstance == null || !this.jobInstance.getJobName().equals(jobName)) {
-			return 0;
+	public long getJobInstanceCount(String jobName) throws NoSuchJobException {
+		if (!getJobNames().contains(jobName)) {
+			throw new NoSuchJobException("No job instances were found for job name " + jobName);
 		}
 		return 1;
 	}
