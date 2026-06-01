@@ -112,8 +112,10 @@ public class MongoJobInstanceDao implements JobInstanceDao {
 
 	@Override
 	public List<JobInstance> getJobInstances(String jobName, int start, int count) {
-		Query query = query(where("jobName").is(jobName))
-			.with(Sort.by(Sort.Order.desc("jobInstanceId")))
+		if (count == 0) {
+			return Collections.emptyList();
+		}
+		Query query = query(where("jobName").is(jobName)).with(Sort.by(Sort.Order.desc("jobInstanceId")))
 			.skip(start)
 			.limit(count);
 		return this.mongoOperations
