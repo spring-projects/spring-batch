@@ -90,6 +90,15 @@ called from multiple threads at the same time. This means that the `ItemProcesso
 thread-safe. If you are using stateful components in the processing, you must ensure that
 they are properly synchronized for concurrent access.
 
+Since Spring transactions are thread-bound, the item processor calls that run in worker
+threads do not participate in the chunk transaction configured on the step. If an item
+processor needs transaction management, it should start its own transaction, for example
+with a propagation of `REQUIRED`. A processor that requires an existing transaction, for
+example with a propagation of `MANDATORY`, fails unless a transaction is already active in
+the worker thread. If you need an entire chunk to be processed in a worker thread, where
+the delegate can manage a transaction around the chunk, consider using
+<<localChunking,local chunking>> instead.
+
 The reading and writing of items is still done in serial by the main thread executing the step,
 so the `ItemReader` and `ItemWriter` do not have to be thread-safe or synchronized. However,
 the throughput of the step may be limited by the speed of reading and writing. If this is
@@ -608,4 +617,3 @@ public StepLocator stepLocator(BeanFactory beanFactory) {
 ----
 
 You can find a complete example in the https://github.com/spring-projects/spring-batch/tree/main/spring-batch-samples/src/main/java/org/springframework/batch/samples/remotestep[Remote Step Sample].
-
