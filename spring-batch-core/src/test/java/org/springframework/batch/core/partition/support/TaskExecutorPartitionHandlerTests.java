@@ -26,6 +26,7 @@ import java.util.TreeSet;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobExecutionException;
@@ -126,6 +127,33 @@ class TaskExecutorPartitionHandlerTests {
 		new DefaultStepExecutionAggregator().aggregate(stepExecution, executions);
 		assertEquals(1, count);
 		assertEquals(ExitStatus.FAILED.getExitCode(), stepExecution.getExitStatus().getExitCode());
+	}
+
+	@Test
+	void testCompletedStepExecutionsAreNotReExecutedButReturned() throws Exception {
+		StepExecutionSplitter splitter = new StepExecutionSplitter() {
+			@Override
+			public String getStepName() {
+				return stepExecution.getStepName();
+			}
+
+			@Override
+			public Set<StepExecution> split(StepExecution managerStepExecution, int gridSize) {
+				Set<StepExecution> split = new HashSet<>();
+				StepExecution completed = new StepExecution(10L, "completed", managerStepExecution.getJobExecution());
+				completed.setStatus(BatchStatus.COMPLETED);
+				completed.setExitStatus(ExitStatus.COMPLETED);
+				split.add(completed);
+				split.add(new StepExecution(11L, "started", managerStepExecution.getJobExecution()));
+				return split;
+			}
+		};
+
+		Collection<StepExecution> executions = handler.handle(splitter, stepExecution);
+
+		assertEquals(1, count);
+		assertEquals("[started]", stepExecutions.toString());
+		assertEquals(2, executions.size());
 	}
 
 }

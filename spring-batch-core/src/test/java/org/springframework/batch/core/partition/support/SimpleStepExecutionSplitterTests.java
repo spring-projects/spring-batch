@@ -120,6 +120,19 @@ class SimpleStepExecutionSplitterTests {
 	}
 
 	@Test
+	void testCompletedPartitionsAreReturnedForAggregationOnRestart() throws Exception {
+		SimpleStepExecutionSplitter provider = new SimpleStepExecutionSplitter(jobRepository, step.getName(),
+				new SimplePartitioner());
+		Set<StepExecution> split = provider.split(stepExecution, 2);
+		assertEquals(2, split.size());
+		stepExecution = update(split, stepExecution, BatchStatus.COMPLETED, false);
+
+		Set<StepExecution> restartSplit = provider.split(stepExecution, 2);
+		assertEquals(2, restartSplit.size());
+		assertTrue(restartSplit.stream().allMatch(execution -> execution.getStatus() == BatchStatus.COMPLETED));
+	}
+
+	@Test
 	void testRememberPartitionNames() throws Exception {
 		class CustomPartitioner implements Partitioner, PartitionNameProvider {
 

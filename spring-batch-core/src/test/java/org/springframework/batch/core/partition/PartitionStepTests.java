@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -243,6 +244,57 @@ class PartitionStepTests {
 		StepExecution stepExecution = jobRepository.createStepExecution("foo", jobExecution);
 		step.execute(stepExecution);
 		assertEquals(true, stepExecution.getExecutionContext().get("aggregated"));
+	}
+
+	@Test
+	void testRestartWhenAllPartitionsCompletedShouldAggregateCompletedPartitions() throws Exception {
+		AtomicInteger aggregateSizeOnRestart = new AtomicInteger(-1);
+		AtomicBoolean firstAggregation = new AtomicBoolean(true);
+		step.setStepExecutionAggregator((result, executions) -> {
+			if (firstAggregation.getAndSet(false)) {
+				return;
+			}
+			aggregateSizeOnRestart.set(executions.size());
+		});
+
+		SimpleStepExecutionSplitter stepExecutionSplitter = new SimpleStepExecutionSplitter(jobRepository,
+				step.getName(), new SimplePartitioner());
+		step.setStepExecutionSplitter(stepExecutionSplitter);
+		step.setPartitionHandler((stepSplitter, managerExecution) -> {
+			Set<StepExecution> executions = stepSplitter.split(managerExecution, 2);
+			for (StepExecution execution : executions) {
+				if (execution.getStatus() != BatchStatus.COMPLETED) {
+					execution.setStatus(BatchStatus.COMPLETED);
+					execution.setExitStatus(ExitStatus.COMPLETED);
+					jobRepository.update(execution);
+				}
+			}
+			return executions;
+		});
+
+		step.afterPropertiesSet();
+		JobParameters jobParameters = new JobParameters();
+		ExecutionContext executionContext = new ExecutionContext();
+		JobInstance jobInstance = jobRepository.createJobInstance("remotePartitionRestartJob", jobParameters);
+		JobExecution firstJobExecution = jobRepository.createJobExecution(jobInstance, jobParameters, executionContext);
+		StepExecution firstManagerStepExecution = jobRepository.createStepExecution("manager", firstJobExecution);
+		step.execute(firstManagerStepExecution);
+
+		firstManagerStepExecution.setStatus(BatchStatus.FAILED);
+		firstManagerStepExecution.setExitStatus(ExitStatus.FAILED);
+		jobRepository.update(firstManagerStepExecution);
+		firstJobExecution.setStatus(BatchStatus.FAILED);
+		firstJobExecution.setEndTime(LocalDateTime.now());
+		jobRepository.update(firstJobExecution);
+
+		JobExecution restartedJobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
+				executionContext);
+		StepExecution restartedManagerStepExecution = jobRepository.createStepExecution("manager",
+				restartedJobExecution);
+		step.execute(restartedManagerStepExecution);
+
+		assertEquals(BatchStatus.COMPLETED, restartedManagerStepExecution.getStatus());
+		assertEquals(2, aggregateSizeOnRestart.get());
 	}
 
 }
