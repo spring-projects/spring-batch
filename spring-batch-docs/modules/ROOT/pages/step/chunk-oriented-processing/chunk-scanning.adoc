@@ -1,0 +1,103 @@
+[[chunkScanning]]
+= Chunk Scanning
+
+When an exception is thrown from an `ItemWriter` (or from an `ItemProcessor` when
+`processorTransactional` is `true`) in a fault-tolerant step, Spring Batch performs
+_chunk scanning_ before deciding whether to skip or fail the step.
+
+== How Chunk Scanning Works
+
+Normally, Spring Batch processes items in chunks: it reads a whole chunk, processes it,
+and then writes the entire chunk in a single transaction. When a write exception occurs,
+it is impossible to tell which individual item caused the failure from within that batch
+write. Chunk scanning resolves this ambiguity:
+
+1. The current transaction is rolled back.
+2. Each item in the failed chunk is _scanned_ individually: it is processed and written
+   one at a time, each in its own transaction.
+3. If an individual item fails during the scan and the skip policy allows it, the item
+   is skipped and the scan continues with the next item.
+4. If the skip policy does not allow the exception, the step fails immediately.
+
+The net effect is that all non-failing items in the chunk are committed, and only the
+offending item(s) are skipped or cause a failure.
+
+[IMPORTANT]
+====
+Chunk scanning is triggered by write (or transactional-processor) exceptions and occurs
+*regardless* of the retry policy. Even when `NeverRetryPolicy` is configured, chunk
+scanning still takes place to identify which item failed. The item count for a failed
+chunk will therefore appear higher than `chunkSize` in the step execution metadata.
+====
+
+== Impact on the ItemProcessor
+
+During chunk scanning, the `ItemProcessor` is re-invoked for each item (unless
+`processorNonTransactional()` is set on the step). This means that for a chunk of N
+items, the processor is called at least N additional times during the scan phase. You
+have two options:
+
+- **Idempotent processor**: Design your `ItemProcessor` so that calling it multiple
+  times for the same input produces the same output and does not have observable
+  side-effects.
+- **Non-transactional processor** (`processorNonTransactional()`): Spring Batch caches
+  the processed items from the original chunk run and reuses them during the scan,
+  skipping the re-processing step.
+
+[tabs]
+====
+Java::
++
+[source, java]
+----
+@Bean
+public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+    return new StepBuilder("step1", jobRepository)
+            .<String, String>chunk(10).transactionManager(transactionManager)
+            .reader(itemReader())
+            .processor(itemProcessor())
+            .writer(itemWriter())
+            .faultTolerant()
+            .skip(MyException.class)
+            .skipLimit(5)
+            .processorNonTransactional() // <1>
+            .build();
+}
+----
+<1> Reuse cached processor output during chunk scanning instead of re-invoking the
+    processor for each scanned item.
+
+XML::
++
+[source,xml]
+----
+<step id="step1">
+    <tasklet>
+        <chunk reader="itemReader" processor="itemProcessor" writer="itemWriter"
+               commit-interval="10" skip-limit="5"
+               processor-transactional="false"> <!-- (1) -->
+            <skippable-exception-classes>
+                <include class="com.example.MyException"/>
+            </skippable-exception-classes>
+        </chunk>
+    </tasklet>
+</step>
+----
+<1> Setting `processor-transactional="false"` is the XML equivalent of
+    `processorNonTransactional()`.
+====
+
+== Relationship to Skip and Retry
+
+Chunk scanning and retry are independent mechanisms in fault-tolerant steps:
+
+- **Retry** re-processes the entire chunk (or a single item, if used together with
+  chunk scanning) up to a configured `retryLimit`. Retry is typically used for
+  transient errors such as a database deadlock.
+- **Chunk scanning** is always triggered on a write exception, irrespective of the
+  retry configuration. It operates at the level of a single item within the failed
+  chunk.
+
+If both retry and skip are configured, Spring Batch first exhausts the retry attempts
+for a failing item during the scan phase; only after all retries are consumed does the
+skip policy take effect.

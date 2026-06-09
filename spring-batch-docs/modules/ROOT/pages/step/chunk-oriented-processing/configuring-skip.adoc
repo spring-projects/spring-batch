@@ -72,3 +72,9 @@ skip triggers the exception, not the tenth.
 The skip limit applies to all skips (read, process and write).
 ====
 
+NOTE: When an exception is thrown from the `ItemWriter`, Spring Batch performs
+_chunk scanning_ to identify the specific item(s) that caused the failure before
+applying skip or fail semantics. This scanning phase occurs regardless of retry
+configuration. See xref:step/chunk-oriented-processing/chunk-scanning.adoc[Chunk Scanning]
+for details.
+
