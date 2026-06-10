@@ -660,7 +660,7 @@ class FaultTolerantStepFactoryBeanRetryTests {
 		// sufficiently high so we never hit it
 		factory.setSkipLimit(10);
 		// set the cache limit stupidly low
-		factory.setRetryContextCache(new MapRetryContextCache(0));
+		factory.setRetryContextCache(new MapRetryContextCache(0, false));
 		ItemReader<String> provider = new ItemReader<>() {
 			@Nullable
 			@Override
