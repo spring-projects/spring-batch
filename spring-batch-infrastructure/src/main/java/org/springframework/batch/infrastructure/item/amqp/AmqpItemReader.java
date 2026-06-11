@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2023 the original author or authors.
+ * Copyright 2012-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,7 +64,7 @@ public class AmqpItemReader<T> implements ItemReader<T> {
 		Object result = amqpTemplate.receiveAndConvert();
 
 		if (itemType != null && result != null) {
-			Assert.state(itemType.isAssignableFrom(result.getClass()),
+			Assert.state(itemType.isInstance(result),
 					"Received message payload of wrong type: expected [" + itemType + "]");
 		}
 

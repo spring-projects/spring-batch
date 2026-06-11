@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -213,7 +213,7 @@ public abstract class AbstractApplicationContextFactory implements ApplicationCo
 						parent.getBeanClassLoader());
 
 				for (BeanPostProcessor beanPostProcessor : new ArrayList<>(parentPostProcessors)) {
-					if (applicationContextAwareProcessorClass.isAssignableFrom(beanPostProcessor.getClass())) {
+					if (applicationContextAwareProcessorClass.isInstance(beanPostProcessor)) {
 						logger.debug("Removing parent ApplicationContextAwareProcessor");
 						parentPostProcessors.remove(beanPostProcessor);
 					}
@@ -229,7 +229,7 @@ public abstract class AbstractApplicationContextFactory implements ApplicationCo
 
 			for (BeanPostProcessor beanPostProcessor : new ArrayList<>(aggregatedPostProcessors)) {
 				for (Class<?> cls : beanPostProcessorExcludeClasses) {
-					if (cls.isAssignableFrom(beanPostProcessor.getClass())) {
+					if (cls.isInstance(beanPostProcessor)) {
 						if (logger.isDebugEnabled()) {
 							logger.debug("Removing bean post processor: " + beanPostProcessor + " of type " + cls);
 						}
