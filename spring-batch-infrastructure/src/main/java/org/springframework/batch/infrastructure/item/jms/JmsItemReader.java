@@ -96,7 +96,7 @@ public class JmsItemReader<T> implements ItemReader<T> {
 		}
 		Object result = jmsTemplate.receiveAndConvert();
 		if (itemType != null && result != null) {
-			Assert.state(itemType.isAssignableFrom(result.getClass()),
+			Assert.state(itemType.isInstance(result),
 					"Received message payload of wrong type: expected [" + itemType + "]");
 		}
 		return (T) result;
