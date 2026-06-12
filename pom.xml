@@ -58,10 +58,7 @@
         <micrometer.version>1.16.6</micrometer.version>
 
 		<!-- optional production dependencies -->
-        <spring-data-commons.version>4.0.6</spring-data-commons.version>
-        <spring-data-jpa.version>4.0.6</spring-data-jpa.version>
-        <spring-data-redis.version>4.0.6</spring-data-redis.version>
-        <spring-data-mongodb.version>5.0.6</spring-data-mongodb.version>
+        <spring-data-bom.version>2025.1.6</spring-data-bom.version>
         <spring-kafka.version>4.0.6</spring-kafka.version>
         <spring-amqp.version>4.0.4</spring-amqp.version>
         <spring-ldap.version>4.0.4</spring-ldap.version>
@@ -150,6 +147,18 @@
 		<error-prone.version>2.44.0</error-prone.version>
 		<nullaway.version>0.12.12</nullaway.version>
 	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.data</groupId>
+				<artifactId>spring-data-bom</artifactId>
+				<version>${spring-data-bom.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
 	<build>
 		<plugins>
