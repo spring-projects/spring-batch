@@ -52,16 +52,16 @@
 		<java.version>17</java.version>
 
 		<!-- production dependencies -->
-        <spring-framework.version>7.0.8</spring-framework.version>
-        <spring-retry.version>2.0.13</spring-retry.version>
-        <spring-integration.version>7.0.5</spring-integration.version>
-        <micrometer.version>1.16.6</micrometer.version>
+		<spring-framework.version>7.0.8</spring-framework.version>
+		<spring-retry.version>2.0.13</spring-retry.version>
+		<spring-integration.version>7.0.5</spring-integration.version>
+		<micrometer.version>1.16.6</micrometer.version>
 
 		<!-- optional production dependencies -->
-        <spring-data-bom.version>2025.1.6</spring-data-bom.version>
-        <spring-kafka.version>4.0.6</spring-kafka.version>
-        <spring-amqp.version>4.0.4</spring-amqp.version>
-        <spring-ldap.version>4.0.4</spring-ldap.version>
+		<spring-data-bom.version>2025.1.6</spring-data-bom.version>
+		<spring-kafka.version>4.0.6</spring-kafka.version>
+		<spring-amqp.version>4.0.4</spring-amqp.version>
+		<spring-ldap.version>4.0.4</spring-ldap.version>
 
 		<jackson2.version>2.20.2</jackson2.version>
 		<jackson3.version>3.0.4</jackson3.version>
@@ -128,7 +128,7 @@
 		<quartz.version>2.5.1</quartz.version>
 		<prometheus-metrics-exporter-pushgateway>1.4.2</prometheus-metrics-exporter-pushgateway>
 		<groovy.version>3.0.25</groovy.version> <!-- change to org.apache.groovy:groovy + update to latest 5.0.2 -->
-        <logback.version>1.5.21</logback.version>
+		<logback.version>1.5.21</logback.version>
 
 		<!-- documentation dependencies -->
 		<io.spring.maven.antora-version>0.0.4</io.spring.maven.antora-version>
@@ -212,8 +212,8 @@
 							-Xplugin:ErrorProne
 							<!-- Check JSpecify annotations -->
 							-Xep:NullAway:ERROR
-                            -XepOpt:NullAway:JSpecifyMode=true
-                            -XepOpt:NullAway:OnlyNullMarked
+							-XepOpt:NullAway:JSpecifyMode=true
+							-XepOpt:NullAway:OnlyNullMarked
 							-XepOpt:NullAway:SuppressionNameAliases=DataFlowIssue
 							<!-- https://github.com/uber/NullAway/issues/162 -->
 							-XepExcludedPaths:.*/src/test/java/.*
@@ -252,7 +252,7 @@
 				<configuration>
 					<includes>
 						<include>**/*IntegrationTests.java</include>
-                        <include>**/*FunctionalTests.java</include>
+						<include>**/*FunctionalTests.java</include>
 					</includes>
 				</configuration>
 				<executions>
