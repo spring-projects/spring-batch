@@ -52,12 +52,10 @@
 		<dependency>
 			<groupId>io.micrometer</groupId>
 			<artifactId>micrometer-core</artifactId>
-			<version>${micrometer.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>io.micrometer</groupId>
 			<artifactId>micrometer-observation</artifactId>
-			<version>${micrometer.version}</version>
 		</dependency>
 
 		<!-- optional production dependencies -->
@@ -383,7 +381,6 @@
 		<dependency>
 			<groupId>io.micrometer</groupId>
 			<artifactId>micrometer-test</artifactId>
-			<version>${micrometer.version}</version>
 			<scope>test</scope>
 			<exclusions>
 				<exclusion>
@@ -395,7 +392,6 @@
 		<dependency>
 			<groupId>io.micrometer</groupId>
 			<artifactId>micrometer-tracing-integration-test</artifactId>
-			<version>${micrometer-tracing.version}</version>
 			<scope>test</scope>
 			<exclusions>
 				<exclusion>
