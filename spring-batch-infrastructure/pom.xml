@@ -144,13 +144,11 @@
 		<dependency>
 			<groupId>org.springframework.data</groupId>
 			<artifactId>spring-data-commons</artifactId>
-			<version>${spring-data-commons.version}</version>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.data</groupId>
 			<artifactId>spring-data-mongodb</artifactId>
-			<version>${spring-data-mongodb.version}</version>
 			<optional>true</optional>
 			<exclusions>
 				<exclusion>
@@ -170,7 +168,6 @@
 		<dependency>
 			<groupId>org.springframework.data</groupId>
 			<artifactId>spring-data-jpa</artifactId>
-			<version>${spring-data-jpa.version}</version>
 			<optional>true</optional>
 			<exclusions>
 				<exclusion>
@@ -182,7 +179,6 @@
 		<dependency>
 			<groupId>org.springframework.data</groupId>
 			<artifactId>spring-data-redis</artifactId>
-			<version>${spring-data-redis.version}</version>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
