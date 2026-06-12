@@ -42,14 +42,12 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-messaging</artifactId>
-			<version>${spring-framework.version}</version>
 		</dependency>
 
 		<!-- optional production dependencies -->
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-jms</artifactId>
-			<version>${spring-framework.version}</version>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
@@ -81,7 +79,6 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-test</artifactId>
-			<version>${spring-framework.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
