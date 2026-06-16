@@ -31,6 +31,7 @@
 
 	<lang:groovy id="unzip-script">
 		<lang:inline-script>
+			import groovy.ant.AntBuilder
 			class UnzipTasklet {
 			void execute() {
 			def ant = new AntBuilder()
@@ -43,6 +44,7 @@
 
 	<lang:groovy id="zip-script">
 		<lang:inline-script>
+			import groovy.ant.AntBuilder
 			class ZipTasklet {
 			void execute() {
 			def ant = new AntBuilder()
