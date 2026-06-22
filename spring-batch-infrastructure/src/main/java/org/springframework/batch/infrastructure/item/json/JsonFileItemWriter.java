@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2025 the original author or authors.
+ * Copyright 2018-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -138,15 +138,25 @@ public class JsonFileItemWriter<T> extends AbstractFileItemWriter<T> {
 		try (RandomAccessFile raf = new RandomAccessFile(file, "rw")) {
 			long pos = raf.length();
 			boolean stopFound = false;
+			boolean trailingWhitespaceOnly = true;
 			while (--pos >= 0) {
 				raf.seek(pos);
 				int current = raf.readByte();
 				if (!stopFound && current == JSON_ARRAY_STOP) {
 					stopFound = true;
 				}
+				else if (!stopFound && current == JSON_ARRAY_START && trailingWhitespaceOnly) {
+					this.hasExistingItems = false;
+					raf.setLength(pos > 0 ? pos + 1 : pos);
+					break;
+				}
+				else if (!stopFound && !Character.isWhitespace(current)) {
+					trailingWhitespaceOnly = false;
+				}
 				else if (stopFound && !Character.isWhitespace(current)) {
 					this.hasExistingItems = current != JSON_ARRAY_START;
-					raf.setLength(this.hasExistingItems ? pos + 1 : pos);
+					boolean hasContentBeforeArrayStart = current == JSON_ARRAY_START && pos > 0;
+					raf.setLength(this.hasExistingItems || hasContentBeforeArrayStart ? pos + 1 : pos);
 					break;
 				}
 			}
