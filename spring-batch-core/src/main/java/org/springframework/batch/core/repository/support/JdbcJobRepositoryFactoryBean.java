@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2025 the original author or authors.
+ * Copyright 2002-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,9 @@
  */
 package org.springframework.batch.core.repository.support;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
 import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDao;
 import org.springframework.batch.core.repository.dao.DefaultExecutionContextSerializer;
@@ -28,6 +31,10 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.core.convert.support.ConfigurableConversionService;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.ResourceTransactionManager;
+import org.springframework.transaction.support.TransactionSynchronizationUtils;
 
 import javax.sql.DataSource;
 import java.nio.charset.Charset;
@@ -47,6 +54,8 @@ import java.nio.charset.Charset;
  */
 @SuppressWarnings("removal")
 public class JdbcJobRepositoryFactoryBean extends JobRepositoryFactoryBean {
+
+	private static final Log log = LogFactory.getLog(JdbcJobRepositoryFactoryBean.class);
 
 	/**
 	 * @param type a value from the {@link java.sql.Types} class to indicate the type to
@@ -210,6 +219,42 @@ public class JdbcJobRepositoryFactoryBean extends JobRepositoryFactoryBean {
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
+		validateTransactionManagerDataSource();
+	}
+
+	private void validateTransactionManagerDataSource() {
+		PlatformTransactionManager transactionManager = getTransactionManager();
+		if (!(transactionManager instanceof ResourceTransactionManager resourceTransactionManager)) {
+			return;
+		}
+
+		Object resourceFactory = resourceTransactionManager.getResourceFactory();
+		if (resourceFactory == null) {
+			return;
+		}
+
+		Object unwrappedResourceFactory = TransactionSynchronizationUtils.unwrapResourceIfNecessary(resourceFactory);
+		if (!(unwrappedResourceFactory instanceof DataSource)) {
+			return;
+		}
+
+		DataSource dataSource = getResourceFactoryDataSource(this.dataSource);
+
+		if (!TransactionSynchronizationUtils.sameResourceFactory(resourceTransactionManager, dataSource)) {
+			log.warn("The DataSource configured for the JobRepository does not appear to match the DataSource managed "
+					+ "by the configured transaction manager. Spring Batch metadata updates may not participate in "
+					+ "the same transaction.");
+		}
+	}
+
+	private DataSource getResourceFactoryDataSource(DataSource dataSource) {
+		if (dataSource instanceof TransactionAwareDataSourceProxy transactionAwareDataSourceProxy) {
+			DataSource targetDataSource = transactionAwareDataSourceProxy.getTargetDataSource();
+			if (targetDataSource != null) {
+				return targetDataSource;
+			}
+		}
+		return dataSource;
 	}
 
 }
