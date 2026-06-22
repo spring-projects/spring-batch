@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
 import org.junit.jupiter.api.Test;
@@ -27,16 +28,19 @@ import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.JobInterruptedException;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.partition.StepExecutionSplitter;
+import org.springframework.batch.core.step.StepInterruptionPolicy;
 import org.springframework.integration.MessageTimeoutException;
 import org.springframework.integration.core.MessagingTemplate;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.PollableChannel;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -249,6 +253,77 @@ class MessageChannelPartitionHandlerTests {
 		// execute
 		assertThrows(TimeoutException.class,
 				() -> messageChannelPartitionHandler.handle(stepExecutionSplitter, managerStepExecution));
+	}
+
+	@Test
+	void testShutdownCancelsHandle() throws Exception {
+		// execute with no default set
+		messageChannelPartitionHandler = new MessageChannelPartitionHandler();
+		// mock
+		JobExecution jobExecution = new JobExecution(5L, new JobInstance(1L, "job"), new JobParameters());
+		StepExecution managerStepExecution = new StepExecution(1L, "step1", jobExecution);
+		StepExecutionSplitter stepExecutionSplitter = mock();
+		MessagingTemplate operations = mock();
+		JobRepository jobRepository = mock();
+		// when
+		HashSet<StepExecution> stepExecutions = new HashSet<>();
+		StepExecution partition1 = new StepExecution(2L, "step1:partition1", jobExecution);
+		partition1.setStatus(BatchStatus.STARTED);
+		stepExecutions.add(partition1);
+		when(stepExecutionSplitter.split(any(StepExecution.class), eq(1))).thenReturn(stepExecutions);
+		JobExecution runningJobExecution = new JobExecution(5L, new JobInstance(1L, "job"), new JobParameters());
+		runningJobExecution.addStepExecutions(Arrays.asList(partition1));
+		when(jobRepository.getJobExecution(5L)).thenReturn(runningJobExecution);
+		managerStepExecution.setTerminateOnly();
+
+		// set
+		messageChannelPartitionHandler.setMessagingOperations(operations);
+		messageChannelPartitionHandler.setJobRepository(jobRepository);
+		messageChannelPartitionHandler.setStepName("step1");
+		messageChannelPartitionHandler.afterPropertiesSet();
+
+		// execute
+		Exception thrown = assertThrows(ExecutionException.class,
+				() -> messageChannelPartitionHandler.handle(stepExecutionSplitter, managerStepExecution));
+		assertInstanceOf(JobInterruptedException.class, thrown.getCause());
+	}
+
+	@Test
+	void testInterruptPolicy() throws Exception {
+		String testExceptionMessage = "test exception message";
+		// execute with no default set
+		messageChannelPartitionHandler = new MessageChannelPartitionHandler();
+
+		// mock
+		JobExecution jobExecution = new JobExecution(5L, new JobInstance(1L, "job"), new JobParameters());
+		StepExecution managerStepExecution = new StepExecution(1L, "step1", jobExecution);
+		StepExecutionSplitter stepExecutionSplitter = mock();
+		MessagingTemplate operations = mock();
+		JobRepository jobRepository = mock();
+		// when
+		HashSet<StepExecution> stepExecutions = new HashSet<>();
+		StepExecution partition1 = new StepExecution(2L, "step1:partition1", jobExecution);
+		partition1.setStatus(BatchStatus.STARTED);
+		stepExecutions.add(partition1);
+		when(stepExecutionSplitter.split(any(StepExecution.class), eq(1))).thenReturn(stepExecutions);
+		JobExecution runningJobExecution = new JobExecution(5L, new JobInstance(1L, "job"), new JobParameters());
+		runningJobExecution.addStepExecutions(Arrays.asList(partition1));
+		when(jobRepository.getJobExecution(5L)).thenReturn(runningJobExecution);
+
+		// set
+		messageChannelPartitionHandler.setMessagingOperations(operations);
+		messageChannelPartitionHandler.setJobRepository(jobRepository);
+		messageChannelPartitionHandler.setStepName("step1");
+		messageChannelPartitionHandler.setStepInterruptionPolicy(stepExecution -> {
+			throw new JobInterruptedException(testExceptionMessage);
+		});
+		messageChannelPartitionHandler.afterPropertiesSet();
+
+		// execute
+		ExecutionException exception = assertThrows(ExecutionException.class,
+				() -> messageChannelPartitionHandler.handle(stepExecutionSplitter, managerStepExecution));
+		assertInstanceOf(JobInterruptedException.class, exception.getCause());
+		assertEquals(testExceptionMessage, exception.getCause().getMessage());
 	}
 
 }
