@@ -137,7 +137,7 @@ public enum BatchStatus {
 
 	/**
 	 * @param other A status value to which to compare.
-	 * @return {@code true} if this is less than {@code other}.
+	 * @return {@code true} if this is less than or equal to {@code other}.
 	 */
 	public boolean isLessThanOrEqualTo(BatchStatus other) {
 		return this.compareTo(other) <= 0;
