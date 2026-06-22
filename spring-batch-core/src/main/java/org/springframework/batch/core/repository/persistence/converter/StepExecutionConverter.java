@@ -56,9 +56,9 @@ public class StepExecutionConverter {
 	public StepExecution fromStepExecution(org.springframework.batch.core.step.StepExecution source) {
 		StepExecution stepExecution = new StepExecution();
 		stepExecution.setStepExecutionId(source.getId());
-		stepExecution.setJobExecutionId(source.getJobExecutionId());
+		stepExecution.setJobExecutionId(source.getJobExecution().getId());
 		stepExecution.setName(source.getStepName());
-		stepExecution.setJobExecutionId(source.getJobExecutionId());
+		stepExecution.setJobExecutionId(source.getJobExecution().getId());
 		stepExecution.setStatus(source.getStatus());
 		stepExecution.setReadCount(source.getReadCount());
 		stepExecution.setWriteCount(source.getWriteCount());
