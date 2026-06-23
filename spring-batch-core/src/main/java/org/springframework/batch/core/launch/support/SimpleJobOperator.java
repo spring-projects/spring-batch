@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -245,9 +245,12 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 		try {
 			return run(job, parameters);
 		}
-		catch (Exception e) {
+		catch (JobExecutionAlreadyRunningException e) {
 			throw new JobRestartException(
 					String.format(ILLEGAL_STATE_MSG, "job execution already running", jobName, parameters), e);
+		}
+		catch (JobInstanceAlreadyCompleteException | InvalidJobParametersException e) {
+			throw new JobRestartException(e.getMessage(), e);
 		}
 
 	}

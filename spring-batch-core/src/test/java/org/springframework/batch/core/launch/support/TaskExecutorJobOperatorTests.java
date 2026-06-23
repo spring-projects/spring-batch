@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 package org.springframework.batch.core.launch.support;
+
+import java.time.LocalDateTime;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -125,6 +127,26 @@ class TaskExecutorJobOperatorTests {
 
 		Assertions.assertNotNull(jobExecution);
 		Assertions.assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
+	}
+
+	@Test
+	void testRestartFromUnknownStatusSurfacesRealReason() throws Exception {
+		JobParameters jobParameters = new JobParameters();
+		JobExecution jobExecution = jobOperator.start(job, jobParameters);
+
+		Assertions.assertNotNull(jobExecution);
+		Assertions.assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
+
+		// Simulate an execution that ended in UNKNOWN status.
+		jobExecution.setStatus(BatchStatus.UNKNOWN);
+		jobExecution.setEndTime(LocalDateTime.now());
+		jobRepository.update(jobExecution);
+
+		JobRestartException exception = Assertions.assertThrows(JobRestartException.class,
+				() -> jobOperator.restart(jobExecution));
+
+		Assertions.assertTrue(exception.getMessage().contains("Cannot restart job from UNKNOWN status"),
+				"Expected the UNKNOWN status reason to be surfaced but was: " + exception.getMessage());
 	}
 
 }
