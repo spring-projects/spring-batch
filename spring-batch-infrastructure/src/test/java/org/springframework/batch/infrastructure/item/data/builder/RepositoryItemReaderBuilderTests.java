@@ -43,6 +43,7 @@ import static org.mockito.Mockito.when;
  * @author Glenn Renfro
  * @author Drummond Dawson
  * @author Mahmoud Ben Hassine
+ * @author Andrey Litvitski
  */
 @MockitoSettings(strictness = Strictness.LENIENT)
 class RepositoryItemReaderBuilderTests {
@@ -134,13 +135,6 @@ class RepositoryItemReaderBuilderTests {
 
 	@Test
 	void testSaveState() {
-		var builder = new RepositoryItemReaderBuilder<>().repository(repository)
-			.methodName("foo")
-			.sorts(sorts)
-			.maxItemCount(5);
-		Exception exception = assertThrows(IllegalStateException.class, builder::build);
-		assertEquals("A name is required when saveState is set to true.", exception.getMessage());
-
 		// No IllegalStateException for a name that is not set, should not be thrown since
 		// saveState was false.
 		new RepositoryItemReaderBuilder<>().repository(repository)

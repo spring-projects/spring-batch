@@ -37,6 +37,7 @@ import org.springframework.util.StringUtils;
  * @author Glenn Renfro
  * @author Mahmoud Ben Hassine
  * @author Drummond Dawson
+ * @author Andrey Litvitski
  * @since 4.0
  * @see RepositoryItemReader
  */
@@ -192,9 +193,6 @@ public class RepositoryItemReaderBuilder<T> {
 		Assert.notNull(this.repository, "repository is required.");
 		Assert.isTrue(this.pageSize > 0, "Page size must be greater than 0");
 		Assert.hasText(this.methodName, "methodName is required.");
-		if (this.saveState) {
-			Assert.state(StringUtils.hasText(this.name), "A name is required when saveState is set to true.");
-		}
 
 		RepositoryItemReader<T> reader = new RepositoryItemReader<>(this.repository, this.sorts);
 		if (this.arguments != null) {

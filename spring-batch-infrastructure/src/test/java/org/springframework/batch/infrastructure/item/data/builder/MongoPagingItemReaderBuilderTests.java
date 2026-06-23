@@ -50,6 +50,7 @@ import static org.springframework.data.mongodb.core.query.Query.query;
  * @author Drummond Dawson
  * @author Parikshit Dutta
  * @author Mahmoud Ben Hassine
+ * @author Andrey Litvitski
  */
 @ExtendWith(MockitoExtension.class)
 class MongoPagingItemReaderBuilderTests {
@@ -218,15 +219,6 @@ class MongoPagingItemReaderBuilderTests {
 			.query(query(where("_id").is("10")))
 			.name("mongoReaderTest")
 			.pageSize(50), "sorts map is required.");
-	}
-
-	@Test
-	void testNullName() {
-		validateExceptionMessage(new MongoPagingItemReaderBuilder<String>().template(this.template)
-			.targetType(String.class)
-			.jsonQuery("{ }")
-			.sorts(this.sortOptions)
-			.pageSize(50), "A name is required when saveState is set to true");
 	}
 
 	private void validateExceptionMessage(MongoPagingItemReaderBuilder<String> builder, String message) {
