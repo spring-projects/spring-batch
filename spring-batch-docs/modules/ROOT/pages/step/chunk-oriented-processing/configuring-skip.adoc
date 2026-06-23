@@ -72,3 +72,31 @@ skip triggers the exception, not the tenth.
 The skip limit applies to all skips (read, process and write).
 ====
 
+[[chunkScanning]]
+=== Chunk Scanning
+
+When an exception is thrown from an `ItemProcessor` or `ItemWriter` (collectively the
+"`chunk processor`"), Spring Batch cannot know which individual item in the chunk caused
+the failure, because both components receive a batch of items at once. To isolate the
+faulty item, Spring Batch automatically re-processes the chunk item-by-item in a
+single-item mode — a process called _chunk scanning_.
+
+During chunk scanning each item is processed and written individually, allowing Spring
+Batch to identify which specific item triggered the exception. Once found, that item is
+counted toward the skip limit and excluded from the output. Items that do not cause an
+exception are written normally.
+
+[IMPORTANT]
+====
+Chunk scanning means that the `ItemProcessor` and `ItemWriter` are called more times than
+the number of items in the chunk. In the worst case (when the bad item is last), a chunk
+of N items causes N write attempts (N-1 successful single writes, then 1 failed write for
+the bad item). For this reason, `ItemProcessor` implementations in fault-tolerant steps
+must be _idempotent_ — processing the same item twice must produce the same result.
+If re-processing an item has side effects (for example, calling an external service), use
+`processorNonTransactional()` to instruct Spring Batch to cache the processed output and
+skip re-processing during chunk scanning.
+====
+
+See also: xref:processor.adoc#faultTolerant[Fault Tolerance in Item Processing].
+
