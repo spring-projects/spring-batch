@@ -245,9 +245,12 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 		try {
 			return run(job, parameters);
 		}
-		catch (Exception e) {
+		catch (JobExecutionAlreadyRunningException e) {
 			throw new JobRestartException(
 					String.format(ILLEGAL_STATE_MSG, "job execution already running", jobName, parameters), e);
+		}
+		catch (JobInstanceAlreadyCompleteException | InvalidJobParametersException e) {
+			throw new JobRestartException(e.getMessage(), e);
 		}
 
 	}
