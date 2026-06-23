@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 the original author or authors.
+ * Copyright 2023-2025 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import org.springframework.data.redis.core.ScanOptions;
  * Builder for {@link RedisItemReader}.
  *
  * @author Mahmoud Ben Hassine
+ * @author Hyunwoo Jung
  * @since 5.1
  * @param <K> type of keys
  * @param <V> type of values
@@ -32,6 +33,8 @@ public class RedisItemReaderBuilder<K, V> {
 	private RedisTemplate<K, V> redisTemplate;
 
 	private ScanOptions scanOptions;
+
+	private int fetchSize;
 
 	/**
 	 * Set the {@link RedisTemplate} to use in the reader.
@@ -54,11 +57,21 @@ public class RedisItemReaderBuilder<K, V> {
 	}
 
 	/**
+	 * Set the fetchSize to how many items from Redis in a single round-trip.
+	 * @param fetchSize the number of items to fetch per pipeline execution
+	 * @return the current builder instance for fluent chaining
+	 */
+	public RedisItemReaderBuilder<K, V> fetchSize(int fetchSize) {
+		this.fetchSize = fetchSize;
+		return this;
+	}
+
+	/**
 	 * Build a new {@link RedisItemReader}.
 	 * @return a new item reader
 	 */
 	public RedisItemReader<K, V> build() {
-		return new RedisItemReader<>(this.redisTemplate, this.scanOptions);
+		return new RedisItemReader<>(this.redisTemplate, this.scanOptions, this.fetchSize);
 	}
 
 }
