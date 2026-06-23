@@ -214,7 +214,7 @@ public class JobExecution extends Entity {
 	}
 
 	/**
-	 * Test if this {@link StepExecution} indicates that it has been stopped.
+	 * Test if this {@link JobExecution} indicates that it has been stopped.
 	 * @return {@code true} if the status is {@link BatchStatus#STOPPED}.
 	 */
 	public boolean isStopped() {
