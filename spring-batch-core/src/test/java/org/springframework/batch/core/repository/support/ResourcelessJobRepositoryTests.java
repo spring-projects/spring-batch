@@ -54,7 +54,7 @@ class ResourcelessJobRepositoryTests {
 		// then
 		assertNotNull(jobInstance);
 		assertEquals(jobName, jobInstance.getJobName());
-		assertEquals(1L, jobInstance.getInstanceId());
+		assertEquals(1L, jobInstance.getId());
 	}
 
 	@Test
@@ -72,7 +72,7 @@ class ResourcelessJobRepositoryTests {
 		assertNotNull(jobExecution);
 		assertEquals(1L, jobExecution.getId());
 		assertEquals(jobName, jobExecution.getJobInstance().getJobName());
-		assertEquals(1L, jobExecution.getJobInstance().getInstanceId());
+		assertEquals(1L, jobExecution.getJobInstance().getId());
 	}
 
 	@Test
@@ -90,7 +90,7 @@ class ResourcelessJobRepositoryTests {
 		assertNotNull(jobExecution);
 		assertEquals(1L, jobExecution.getId());
 		assertEquals(jobName, jobExecution.getJobInstance().getJobName());
-		assertEquals(1L, jobExecution.getJobInstance().getInstanceId());
+		assertEquals(1L, jobExecution.getJobInstance().getId());
 	}
 
 	@Test
@@ -194,7 +194,7 @@ class ResourcelessJobRepositoryTests {
 		// then
 		assertNotNull(jobInstance);
 		assertEquals(jobName, jobInstance.getJobName());
-		assertEquals(1L, jobInstance.getInstanceId());
+		assertEquals(1L, jobInstance.getId());
 	}
 
 	@Test
