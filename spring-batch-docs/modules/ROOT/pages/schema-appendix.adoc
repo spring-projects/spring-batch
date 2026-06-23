@@ -393,3 +393,33 @@ about indexing:
 |`BATCH_STEP_EXECUTION`|`STEP_NAME = ? and JOB_EXECUTION_ID = ?`|Before each step execution
 
 |===============
+
+=== Foreign Key Indexes
+
+The metadata tables contain several foreign key relationships.
+Some databases (MySQL/InnoDB in particular) automatically create an index on a foreign key column,
+but many others (PostgreSQL, Oracle, SQL Server, H2) do not.
+On those platforms, queries that JOIN on these columns — for example, when loading all step
+executions for a job execution — will perform a full table scan unless you add indexes manually.
+
+The following foreign key columns are candidates for an index:
+
+|===============
+|Table|Foreign Key Column|References
+|`BATCH_JOB_EXECUTION`|`JOB_INSTANCE_ID`|`BATCH_JOB_INSTANCE(JOB_INSTANCE_ID)`
+|`BATCH_JOB_EXECUTION_PARAMS`|`JOB_EXECUTION_ID`|`BATCH_JOB_EXECUTION(JOB_EXECUTION_ID)`
+|`BATCH_STEP_EXECUTION`|`JOB_EXECUTION_ID`|`BATCH_JOB_EXECUTION(JOB_EXECUTION_ID)`
+|===============
+
+NOTE: `BATCH_JOB_EXECUTION_CONTEXT.JOB_EXECUTION_ID` and
+`BATCH_STEP_EXECUTION_CONTEXT.STEP_EXECUTION_ID` are both primary keys and therefore
+already indexed.
+
+Example DDL for PostgreSQL:
+
+[source,sql]
+----
+CREATE INDEX BATCH_JOB_EXECUTION_JOB_INST_ID_IX ON BATCH_JOB_EXECUTION(JOB_INSTANCE_ID);
+CREATE INDEX BATCH_JOB_EXEC_PARAMS_JOB_EXEC_ID_IX ON BATCH_JOB_EXECUTION_PARAMS(JOB_EXECUTION_ID);
+CREATE INDEX BATCH_STEP_EXECUTION_JOB_EXEC_ID_IX ON BATCH_STEP_EXECUTION(JOB_EXECUTION_ID);
+----
