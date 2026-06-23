@@ -218,7 +218,7 @@ public abstract class AbstractListenerFactoryBean<T> implements FactoryBean<Obje
 		}
 		if (target instanceof Advised advised) {
 			TargetSource targetSource = advised.getTargetSource();
-			if (targetSource.getTargetClass() != null && listenerType.isAssignableFrom(targetSource.getTargetClass())) {
+			if (targetSource.getTargetClass() != null && listenerType.isInstance(targetSource)) {
 				return true;
 			}
 
