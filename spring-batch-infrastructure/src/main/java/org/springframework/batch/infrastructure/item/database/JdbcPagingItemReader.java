@@ -39,7 +39,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
 
 /**
  * <p>
@@ -75,6 +74,7 @@ import org.springframework.util.ClassUtils;
  * @author Mahmoud Ben Hassine
  * @author Stefano Cordio
  * @author Jimmy Praet
+ * @author Duyeor Kim
  * @since 2.0
  */
 public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> implements InitializingBean {
