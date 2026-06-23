@@ -110,7 +110,7 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
-		Assert.state(jobRegistry != null, "JobLocator must be provided");
+		Assert.state(jobRegistry != null, "JobRegistry must be provided");
 	}
 
 	/**
