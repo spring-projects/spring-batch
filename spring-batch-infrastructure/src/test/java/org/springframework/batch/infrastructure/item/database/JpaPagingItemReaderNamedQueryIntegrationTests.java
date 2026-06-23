@@ -47,7 +47,6 @@ public class JpaPagingItemReaderNamedQueryIntegrationTests extends AbstractPagin
 		jpaNamedQueryProvider.setEntityClass(Foo.class);
 		jpaNamedQueryProvider.afterPropertiesSet();
 
-		reader.setEntityManagerFactory(entityManagerFactory);
 		reader.setQueryProvider(jpaNamedQueryProvider);
 		reader.afterPropertiesSet();
 		reader.setSaveState(true);

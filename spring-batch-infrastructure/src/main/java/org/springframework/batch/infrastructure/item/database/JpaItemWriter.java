@@ -49,7 +49,7 @@ public class JpaItemWriter<T> implements ItemWriter<T> {
 
 	protected static final Log logger = LogFactory.getLog(JpaItemWriter.class);
 
-	private EntityManagerFactory entityManagerFactory;
+	private final EntityManagerFactory entityManagerFactory;
 
 	private boolean usePersist = false;
 
@@ -62,14 +62,6 @@ public class JpaItemWriter<T> implements ItemWriter<T> {
 	 */
 	public JpaItemWriter(EntityManagerFactory entityManagerFactory) {
 		Assert.notNull(entityManagerFactory, "EntityManagerFactory must not be null");
-		this.entityManagerFactory = entityManagerFactory;
-	}
-
-	/**
-	 * Set the EntityManager to be used internally.
-	 * @param entityManagerFactory the entityManagerFactory to set
-	 */
-	public void setEntityManagerFactory(EntityManagerFactory entityManagerFactory) {
 		this.entityManagerFactory = entityManagerFactory;
 	}
 
