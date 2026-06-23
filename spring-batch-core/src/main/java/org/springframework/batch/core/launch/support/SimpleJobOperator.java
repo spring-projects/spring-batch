@@ -364,16 +364,44 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 								if (tasklet instanceof StoppableTasklet stoppableTasklet) {
 									StepSynchronizationManager.register(stepExecution);
 									stoppableTasklet.stop(stepExecution);
-									jobRepository.update(stepExecution);
-									jobRepository.updateExecutionContext(stepExecution);
+									try {
+										jobRepository.update(stepExecution);
+										jobRepository.updateExecutionContext(stepExecution);
+									}
+									catch (org.springframework.dao.OptimisticLockingFailureException e) {
+										// Ignore - the job thread is likely updating the
+										// step execution
+										// The job will check the STOPPING status and stop
+										// anyway
+										if (logger.isDebugEnabled()) {
+											logger
+												.debug("OptimisticLockingFailureException while stopping step execution "
+														+ stepExecution.getId()
+														+ ". This is expected if the job thread is updating concurrently.",
+														e);
+										}
+									}
 									StepSynchronizationManager.release();
 								}
 							}
 							if (step instanceof StoppableStep stoppableStep) {
 								StepSynchronizationManager.register(stepExecution);
 								stoppableStep.stop(stepExecution);
-								jobRepository.update(stepExecution);
-								jobRepository.updateExecutionContext(stepExecution);
+								try {
+									jobRepository.update(stepExecution);
+									jobRepository.updateExecutionContext(stepExecution);
+								}
+								catch (org.springframework.dao.OptimisticLockingFailureException e) {
+									// Ignore - the job thread is likely updating the step
+									// execution
+									// The job will check the STOPPING status and stop
+									// anyway
+									if (logger.isDebugEnabled()) {
+										logger.debug("OptimisticLockingFailureException while stopping step execution "
+												+ stepExecution.getId()
+												+ ". This is expected if the job thread is updating concurrently.", e);
+									}
+								}
 								StepSynchronizationManager.release();
 							}
 						}
