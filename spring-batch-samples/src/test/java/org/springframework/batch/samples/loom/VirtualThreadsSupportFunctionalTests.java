@@ -33,7 +33,7 @@ import org.springframework.batch.core.launch.support.TaskExecutorJobOperator;
 import org.springframework.batch.core.partition.support.TaskExecutorPartitionHandler;
 import org.springframework.batch.core.step.builder.TaskletStepBuilder;
 import org.springframework.batch.core.step.tasklet.SystemCommandTasklet;
-import org.springframework.batch.integration.async.AsyncItemProcessor;
+import org.springframework.batch.core.step.item.AsyncItemProcessor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.core.task.TaskExecutor;
