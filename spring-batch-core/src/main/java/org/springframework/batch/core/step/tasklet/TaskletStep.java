@@ -417,8 +417,8 @@ public class TaskletStep extends AbstractStep {
 					catch (Exception e) {
 						if (transactionAttribute.rollbackOn(e)) {
 							chunkContext.setAttribute(ChunkListener.ROLLBACK_EXCEPTION_KEY, e);
-							throw e;
 						}
+						throw e;
 					}
 				}
 				finally {
@@ -489,7 +489,9 @@ public class TaskletStep extends AbstractStep {
 				if (logger.isDebugEnabled()) {
 					logger.debug("Rollback for Exception: " + e.getClass().getName() + ": " + e.getMessage());
 				}
-				rollback(stepExecution);
+				if (transactionAttribute.rollbackOn(e)) {
+					rollback(stepExecution);
+				}
 				// Allow checked exceptions
 				throw new UncheckedTransactionException(e);
 			}
