@@ -19,6 +19,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jspecify.annotations.NullUnmarked;
 
+import org.springframework.batch.core.BatchConstants;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.listener.ChunkListener;
 import org.springframework.batch.core.job.JobInterruptedException;
@@ -54,6 +55,9 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.concurrent.Semaphore;
+
+import static org.springframework.batch.core.BatchConstants.BATCH_STEP_TYPE;
+import static org.springframework.batch.core.BatchConstants.BATCH_TASKLET_TYPE;
 
 /**
  * Simple implementation of executing the step as a call to a {@link Tasklet}, possibly
@@ -103,7 +107,12 @@ public class TaskletStep extends AbstractStep {
 
 	private Tasklet tasklet;
 
-	public static final String TASKLET_TYPE_KEY = "batch.taskletType";
+	/**
+	 * The key to use when retrieving the batch tasklet type.
+	 * @deprecated deprecated in favor of {@link BatchConstants#BATCH_TASKLET_TYPE}
+	 */
+	@Deprecated(forRemoval = true)
+	public static final String TASKLET_TYPE_KEY = BatchConstants.BATCH_TASKLET_TYPE;
 
 	/**
 	 * Default constructor.
@@ -247,8 +256,8 @@ public class TaskletStep extends AbstractStep {
 	@Override
 	protected void doExecute(StepExecution stepExecution) throws Exception {
 		String taskletType = tasklet.getClass().getName();
-		stepExecution.getExecutionContext().put(TASKLET_TYPE_KEY, taskletType);
-		stepExecution.getExecutionContext().put(STEP_TYPE_KEY, this.getClass().getName());
+		stepExecution.getExecutionContext().put(BATCH_TASKLET_TYPE, taskletType);
+		stepExecution.getExecutionContext().put(BATCH_STEP_TYPE, this.getClass().getName());
 		TaskletExecutionEvent taskletExecutionEvent = new TaskletExecutionEvent(stepExecution.getStepName(),
 				stepExecution.getId(), taskletType);
 		taskletExecutionEvent.begin();
