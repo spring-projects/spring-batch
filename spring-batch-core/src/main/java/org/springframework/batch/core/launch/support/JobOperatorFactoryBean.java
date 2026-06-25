@@ -16,6 +16,7 @@
 package org.springframework.batch.core.launch.support;
 
 import java.lang.reflect.Method;
+import java.time.Duration;
 
 import io.micrometer.observation.ObservationRegistry;
 import org.apache.commons.logging.Log;
@@ -76,6 +77,8 @@ public class JobOperatorFactoryBean implements FactoryBean<JobOperator>, Applica
 	private JobRepository jobRepository;
 
 	private JobParametersConverter jobParametersConverter = new DefaultJobParametersConverter();
+
+	private Duration stopTimeout = Duration.ofSeconds(30);
 
 	@SuppressWarnings("NullAway.Init")
 	private TaskExecutor taskExecutor;
@@ -176,6 +179,18 @@ public class JobOperatorFactoryBean implements FactoryBean<JobOperator>, Applica
 	}
 
 	/**
+	 * Set how long {@code stop(JobExecution)} waits for the running step(s) to actually
+	 * stop before failing with a {@code JobExecutionStopException}. Defaults to 30
+	 * seconds.
+	 * @param stopTimeout the maximum time to wait for a job to stop
+	 * @since 6.0
+	 */
+	public void setStopTimeout(Duration stopTimeout) {
+		Assert.notNull(stopTimeout, "stopTimeout must not be null");
+		this.stopTimeout = stopTimeout;
+	}
+
+	/**
 	 * Set the transaction attributes source to use in the created proxy.
 	 * @param transactionAttributeSource the transaction attributes source to use in the
 	 * created proxy.
@@ -217,6 +232,8 @@ public class JobOperatorFactoryBean implements FactoryBean<JobOperator>, Applica
 			taskExecutorJobOperator.setObservationRegistry(this.observationRegistry);
 		}
 		taskExecutorJobOperator.setJobParametersConverter(this.jobParametersConverter);
+		taskExecutorJobOperator.setTransactionManager(this.transactionManager);
+		taskExecutorJobOperator.setStopTimeout(this.stopTimeout);
 		taskExecutorJobOperator.afterPropertiesSet();
 		return taskExecutorJobOperator;
 	}
@@ -226,10 +243,8 @@ public class JobOperatorFactoryBean implements FactoryBean<JobOperator>, Applica
 		public DefaultJobOperatorTransactionAttributeSource() {
 			DefaultTransactionAttribute transactionAttribute = new DefaultTransactionAttribute();
 			try {
-				Method stopMethod = TaskExecutorJobOperator.class.getMethod("stop", JobExecution.class);
 				Method abandonMethod = TaskExecutorJobOperator.class.getMethod("abandon", JobExecution.class);
 				Method recoverMethod = TaskExecutorJobOperator.class.getMethod("recover", JobExecution.class);
-				addTransactionalMethod(stopMethod, transactionAttribute);
 				addTransactionalMethod(abandonMethod, transactionAttribute);
 				addTransactionalMethod(recoverMethod, transactionAttribute);
 			}

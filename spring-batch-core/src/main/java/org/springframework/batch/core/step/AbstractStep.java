@@ -18,6 +18,10 @@ package org.springframework.batch.core.step;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import io.micrometer.observation.Observation;
@@ -73,6 +77,10 @@ public abstract class AbstractStep implements StoppableStep, InitializingBean, B
 	private boolean allowStartIfComplete = false;
 
 	private final CompositeStepExecutionListener stepExecutionListener = new CompositeStepExecutionListener();
+
+	private final Set<Long> executingStepExecutions = ConcurrentHashMap.newKeySet();
+
+	private final Map<Long, CompletableFuture<StepExecution>> terminationSignals = new ConcurrentHashMap<>();
 
 	private JobRepository jobRepository;
 
@@ -212,6 +220,7 @@ public abstract class AbstractStep implements StoppableStep, InitializingBean, B
 			throws JobInterruptedException, UnexpectedJobExecutionException {
 
 		Assert.notNull(stepExecution, "stepExecution must not be null");
+		this.executingStepExecutions.add(stepExecution.getId());
 		stepExecution.getExecutionContext().put(SpringBatchVersion.BATCH_VERSION_KEY, SpringBatchVersion.getVersion());
 
 		if (logger.isDebugEnabled()) {
@@ -355,7 +364,28 @@ public abstract class AbstractStep implements StoppableStep, InitializingBean, B
 			if (logger.isDebugEnabled()) {
 				logger.debug("Step execution complete: " + stepExecution.getSummary());
 			}
+
+			// Notify any caller of stop(StepExecution) that this execution has terminated
+			// and its final metadata has been saved.
+			this.executingStepExecutions.remove(stepExecution.getId());
+			CompletableFuture<StepExecution> terminationSignal = this.terminationSignals.remove(stepExecution.getId());
+			if (terminationSignal != null) {
+				terminationSignal.complete(stepExecution);
+			}
 		}
+	}
+
+	@Override
+	public CompletableFuture<StepExecution> subscribeToTermination(StepExecution stepExecution) {
+		Long stepExecutionId = stepExecution.getId();
+		CompletableFuture<StepExecution> terminationSignal = this.terminationSignals
+			.computeIfAbsent(stepExecutionId, key -> new CompletableFuture<>());
+		// If the execution is not running in this JVM, it has already terminated.
+		if (!this.executingStepExecutions.contains(stepExecution.getId())) {
+			terminationSignal.complete(stepExecution);
+			this.terminationSignals.remove(stepExecutionId, terminationSignal);
+		}
+		return terminationSignal;
 	}
 
 	private void stopObservation(StepExecution stepExecution, Observation observation) {

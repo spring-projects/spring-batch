@@ -164,7 +164,6 @@ public class SimpleJobRepository extends SimpleJobExplorer implements JobReposit
 		this.jobExecutionDao.synchronizeStatus(jobExecution);
 
 		if (jobExecution.isStopped() || jobExecution.isStopping()) {
-			this.stepExecutionDao.synchronizeStatus(stepExecution);
 			stepExecution.setTerminateOnly();
 		}
 

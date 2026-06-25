@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.launch.support;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -24,13 +25,16 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jspecify.annotations.NullUnmarked;
 
 import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
@@ -54,10 +58,13 @@ import org.springframework.batch.core.launch.JobExecutionAlreadyRunningException
 import org.springframework.batch.core.launch.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.launch.JobRestartException;
+import org.springframework.batch.core.launch.JobExecutionStopException;
+import org.springframework.batch.infrastructure.support.transaction.ResourcelessTransactionManager;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.batch.core.step.StepLocator;
 import org.springframework.batch.core.step.tasklet.StoppableTasklet;
-import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.infrastructure.support.PropertiesConverter;
 import org.springframework.beans.factory.InitializingBean;
@@ -101,6 +108,34 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 	protected JobParametersConverter jobParametersConverter = new DefaultJobParametersConverter();
 
 	private final Log logger = LogFactory.getLog(getClass());
+
+	private PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
+
+	private Duration stopTimeout = Duration.ofSeconds(30);
+
+	/**
+	 * Set the transaction manager used to persist the stopping state of a job execution
+	 * atomically before waiting for it to stop. Defaults to a
+	 * {@link ResourcelessTransactionManager}.
+	 * @param transactionManager the transaction manager to use
+	 * @since 6.0
+	 */
+	public void setTransactionManager(PlatformTransactionManager transactionManager) {
+		Assert.notNull(transactionManager, "transactionManager must not be null");
+		this.transactionManager = transactionManager;
+	}
+
+	/**
+	 * Set how long {@link #stop(JobExecution)} waits for the running step(s) to actually
+	 * stop before giving up with a {@link JobExecutionStopException}. Defaults to 30
+	 * seconds (aligned with the Spring graceful shutdown convention).
+	 * @param stopTimeout the maximum time to wait for the job to stop
+	 * @since 6.0
+	 */
+	public void setStopTimeout(Duration stopTimeout) {
+		Assert.notNull(stopTimeout, "stopTimeout must not be null");
+		this.stopTimeout = stopTimeout;
+	}
 
 	/**
 	 * Check mandatory properties.
@@ -342,49 +377,76 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 		if (logger.isInfoEnabled()) {
 			logger.info("Stopping job execution: " + jobExecution);
 		}
-		jobExecution.setStatus(BatchStatus.STOPPING); // will be upgraded to STOPPED in
-														// JobRepository.update
-		jobExecution.setExitStatus(ExitStatus.STOPPED);
-		jobExecution.setEndTime(LocalDateTime.now());
-		jobRepository.update(jobExecution);
-		jobRepository.updateExecutionContext(jobExecution);
 
+		List<CompletableFuture<StepExecution>> terminations = new ArrayList<>();
+		List<Runnable> stopSignals = new ArrayList<>();
 		Job job = jobRegistry.getJob(jobExecution.getJobInstance().getJobName());
-		if (job != null) {
-			if (job instanceof StepLocator stepLocator) {
-				// can only process as StepLocator is the only way to get the step object
-				// get the current stepExecution
-				for (StepExecution stepExecution : jobExecution.getStepExecutions()) {
-					if (stepExecution.getStatus().isRunning()) {
-						// have the step execution that's running -> need to 'stop' it
-						Step step = stepLocator.getStep(stepExecution.getStepName());
-						if (step != null) {
-							if (step instanceof TaskletStep taskletStep) {
-								Tasklet tasklet = taskletStep.getTasklet();
-								if (tasklet instanceof StoppableTasklet stoppableTasklet) {
-									StepSynchronizationManager.register(stepExecution);
-									stoppableTasklet.stop(stepExecution);
-									jobRepository.update(stepExecution);
-									jobRepository.updateExecutionContext(stepExecution);
-									StepSynchronizationManager.release();
-								}
-							}
-							if (step instanceof StoppableStep stoppableStep) {
-								StepSynchronizationManager.register(stepExecution);
-								stoppableStep.stop(stepExecution);
-								jobRepository.update(stepExecution);
-								jobRepository.updateExecutionContext(stepExecution);
-								StepSynchronizationManager.release();
-							}
+		if (job instanceof StepLocator stepLocator) {
+			for (StepExecution stepExecution : jobExecution.getStepExecutions()) {
+				if (!stepExecution.getStatus().isRunning()) {
+					continue;
+				}
+				Step step = stepLocator.getStep(stepExecution.getStepName());
+				if (step instanceof StoppableStep stoppableStep) {
+					terminations.add(stoppableStep.subscribeToTermination(stepExecution));
+					stopSignals.add(() -> {
+						StepSynchronizationManager.register(stepExecution);
+						try {
+							stoppableStep.stop(stepExecution);
 						}
-					}
+						finally {
+							StepSynchronizationManager.release();
+						}
+					});
+				}
+				if (step instanceof TaskletStep taskletStep
+						&& taskletStep.getTasklet() instanceof StoppableTasklet stoppableTasklet) {
+					stopSignals.add(() -> {
+						StepSynchronizationManager.register(stepExecution);
+						try {
+							stoppableTasklet.stop(stepExecution);
+						}
+						finally {
+							StepSynchronizationManager.release();
+						}
+					});
 				}
 			}
 			// TODO what if the job is not a StepLocator? ie a job with no steps?
 			// FIXME Job should provide a stop() method
 
 		}
+
+		// Persist STOPPING in its own short transaction that commits at once,
+		// so it is durable and holds no lock during the wait.
+		new TransactionTemplate(this.transactionManager).executeWithoutResult(transactionStatus -> {
+			jobExecution.setStatus(BatchStatus.STOPPING);
+			jobRepository.update(jobExecution);
+		});
+
+		stopSignals.forEach(Runnable::run);
+		awaitStop(jobExecution, terminations);
 		return true;
+	}
+
+	private void awaitStop(JobExecution jobExecution, List<CompletableFuture<StepExecution>> terminations) {
+		try {
+			CompletableFuture.allOf(terminations.toArray(new CompletableFuture[0]))
+				.get(this.stopTimeout.toMillis(), TimeUnit.MILLISECONDS);
+		}
+		catch (TimeoutException e) {
+			throw new JobExecutionStopException("Timed out after " + this.stopTimeout
+					+ " while waiting for job execution " + jobExecution.getId() + " to stop", e);
+		}
+		catch (ExecutionException e) {
+			throw new JobExecutionStopException(
+					"Failure while waiting for job execution " + jobExecution.getId() + " to stop", e.getCause());
+		}
+		catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+			throw new JobExecutionStopException(
+					"Interrupted while waiting for job execution " + jobExecution.getId() + " to stop", e);
+		}
 	}
 
 	@Override
