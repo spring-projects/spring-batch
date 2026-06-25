@@ -15,14 +15,15 @@
  */
 package org.springframework.batch.core.repository.dao.jdbc;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
+
 import org.springframework.batch.core.job.JobKeyGenerator;
 import org.springframework.batch.core.job.parameters.JobParameters;
 
 public class CustomJobKeyGenerator implements JobKeyGenerator {
 
 	@Override
-	public @NotNull String generateKey(@NotNull JobParameters source) {
+	public @NonNull String generateKey(@NonNull JobParameters source) {
 		return "1";
 	}
 
