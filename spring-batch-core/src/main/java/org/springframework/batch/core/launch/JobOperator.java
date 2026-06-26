@@ -187,14 +187,17 @@ public interface JobOperator extends JobLauncher {
 	boolean stop(long executionId) throws NoSuchJobExecutionException, JobExecutionNotRunningException;
 
 	/**
-	 * Send a stop signal to the supplied {@link JobExecution}. The signal is successfully
-	 * sent if this method returns true, but that doesn't mean that the job has stopped.
-	 * The only way to be sure of that is to poll the job execution status.
+	 * Stop the supplied {@link JobExecution} and wait for its running step(s) to stop.
+	 * The job execution is marked as
+	 * {@link org.springframework.batch.core.BatchStatus#STOPPING STOPPING}, the running
+	 * step(s) are signalled to stop, and this method blocks until they have terminated
+	 * and persisted their stopped state, up to a configurable timeout.
 	 * @param jobExecution the running {@link JobExecution}
-	 * @return true if the message was successfully sent (does not guarantee that the job
-	 * has stopped)
+	 * @return {@code true} once the job execution has stopped
 	 * @throws JobExecutionNotRunningException if the supplied {@link JobExecution} is not
 	 * running (so cannot be stopped)
+	 * @throws JobExecutionStopException if the running step(s) do not stop within the
+	 * configured timeout
 	 */
 	boolean stop(JobExecution jobExecution) throws JobExecutionNotRunningException;
 
