@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.springframework.batch</groupId>
 		<artifactId>spring-batch</artifactId>
-		<version>6.0.4-SNAPSHOT</version>
+		<version>6.0.5-SNAPSHOT</version>
 	</parent>
 	<artifactId>spring-batch-integration</artifactId>
 	<name>Spring Batch Integration</name>
@@ -42,14 +42,12 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-messaging</artifactId>
-			<version>${spring-framework.version}</version>
 		</dependency>
 
 		<!-- optional production dependencies -->
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-jms</artifactId>
-			<version>${spring-framework.version}</version>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
@@ -81,7 +79,6 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-test</artifactId>
-			<version>${spring-framework.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -102,12 +99,12 @@
 			<version>${jackson2.version}</version>
 			<scope>test</scope>
 		</dependency>
-        <dependency>
-            <groupId>tools.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>${jackson3.version}</version>
-            <scope>test</scope>
-        </dependency>
+		<dependency>
+			<groupId>tools.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>${jackson3.version}</version>
+			<scope>test</scope>
+		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-dbcp2</artifactId>
@@ -150,12 +147,12 @@
 			<version>${junit-platform-launcher.version}</version>
 			<scope>test</scope>
 		</dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-core</artifactId>
-            <version>${log4j.version}</version>
-            <scope>test</scope>
-        </dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+			<version>${log4j.version}</version>
+			<scope>test</scope>
+		</dependency>
 		<dependency>
 			<groupId>org.aspectj</groupId>
 			<artifactId>aspectjrt</artifactId>

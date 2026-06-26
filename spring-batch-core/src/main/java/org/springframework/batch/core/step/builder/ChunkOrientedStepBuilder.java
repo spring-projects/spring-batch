@@ -72,6 +72,7 @@ import org.springframework.util.Assert;
  *
  * @author Mahmoud Ben Hassine
  * @author Yanming Zhou
+ * @author Taeik Lim
  * @since 6.0
  */
 public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrientedStepBuilder<I, O>> {
@@ -106,7 +107,7 @@ public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrien
 
 	private @Nullable SkipPolicy skipPolicy;
 
-	private final Set<SkipListener<I, O>> skipListeners = new LinkedHashSet<>();
+	private final Set<SkipListener<? super I, ? super O>> skipListeners = new LinkedHashSet<>();
 
 	private final Set<Class<? extends Throwable>> skippableExceptions = new HashSet<>();
 
@@ -347,7 +348,7 @@ public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrien
 	 * @param skipListener the skip listener to add
 	 * @return this for fluent chaining
 	 */
-	public ChunkOrientedStepBuilder<I, O> skipListener(SkipListener<I, O> skipListener) {
+	public ChunkOrientedStepBuilder<I, O> skipListener(SkipListener<? super I, ? super O> skipListener) {
 		this.skipListeners.add(skipListener);
 		return self();
 	}

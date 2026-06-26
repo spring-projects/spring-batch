@@ -92,6 +92,7 @@ import static org.springframework.batch.core.observability.BatchMetrics.METRICS_
  * @author xeounxzxu
  * @author Minchul Son
  * @author Yanming Zhou
+ * @author Taeik Lim
  * @since 6.0
  */
 public class ChunkOrientedStep<I, O> extends AbstractStep {
@@ -316,7 +317,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 	 * register a {@link SkipListener} to be notified of item skip events.
 	 * @param skipListener the skip listener to register
 	 */
-	public void registerSkipListener(SkipListener<I, O> skipListener) {
+	public void registerSkipListener(SkipListener<? super I, ? super O> skipListener) {
 		Assert.notNull(skipListener, "Skip listener must not be null");
 		this.compositeSkipListener.register(skipListener);
 	}
