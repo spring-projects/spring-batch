@@ -242,6 +242,10 @@ public class Jackson2ExecutionContextStringSerializer implements ExecutionContex
 				String type = node.get(TYPE_KEY_NAME).asText();
 				JsonNode value = node.get(VALUE_KEY_NAME);
 				try {
+					if (!TrustedTypeIdResolver.TRUSTED_CLASS_NAMES.contains(type)) {
+						throw new IllegalArgumentException("The class '" + type
+								+ "' is not in the trusted classes list for JobParameter deserialization.");
+					}
 					Class<?> parameterType = Class.forName(type);
 					Object typedValue = objectMapper.convertValue(value, parameterType);
 					return new JobParameter(name, typedValue, parameterType, identifying);
