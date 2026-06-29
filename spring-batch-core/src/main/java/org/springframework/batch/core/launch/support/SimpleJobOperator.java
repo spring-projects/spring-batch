@@ -331,9 +331,8 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 	@Override
 	public boolean stop(JobExecution jobExecution) throws JobExecutionNotRunningException {
 		Assert.notNull(jobExecution, "JobExecution must not be null");
-		// Indicate the execution should be stopped by setting it's status to
-		// 'STOPPING'. It is assumed that
-		// the step implementation will check this status at chunk boundaries.
+		// Indicate the execution should be stopped. The step implementation is
+		// expected to check this status at chunk boundaries.
 		BatchStatus status = jobExecution.getStatus();
 		if (!(status == BatchStatus.STARTED || status == BatchStatus.STARTING)) {
 			throw new JobExecutionNotRunningException(
@@ -342,8 +341,7 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 		if (logger.isInfoEnabled()) {
 			logger.info("Stopping job execution: " + jobExecution);
 		}
-		jobExecution.setStatus(BatchStatus.STOPPING); // will be upgraded to STOPPED in
-														// JobRepository.update
+		jobExecution.setStatus(BatchStatus.STOPPED);
 		jobExecution.setExitStatus(ExitStatus.STOPPED);
 		jobExecution.setEndTime(LocalDateTime.now());
 		jobRepository.update(jobExecution);
@@ -364,16 +362,20 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 								if (tasklet instanceof StoppableTasklet stoppableTasklet) {
 									StepSynchronizationManager.register(stepExecution);
 									stoppableTasklet.stop(stepExecution);
-									jobRepository.update(stepExecution);
-									jobRepository.updateExecutionContext(stepExecution);
+									taskletStep.callUnderLock(stepExecution, () -> {
+										jobRepository.update(stepExecution);
+										jobRepository.updateExecutionContext(stepExecution);
+									});
 									StepSynchronizationManager.release();
 								}
 							}
 							if (step instanceof StoppableStep stoppableStep) {
 								StepSynchronizationManager.register(stepExecution);
 								stoppableStep.stop(stepExecution);
-								jobRepository.update(stepExecution);
-								jobRepository.updateExecutionContext(stepExecution);
+								stoppableStep.callUnderLock(stepExecution, () -> {
+									jobRepository.update(stepExecution);
+									jobRepository.updateExecutionContext(stepExecution);
+								});
 								StepSynchronizationManager.release();
 							}
 						}

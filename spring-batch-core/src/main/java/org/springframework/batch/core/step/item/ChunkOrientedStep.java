@@ -369,7 +369,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 		stepExecution.getExecutionContext().put(STEP_TYPE_KEY, this.getClass().getName());
 		while (this.chunkTracker.get().moreItems() && !interrupted(stepExecution)) {
 			// process next chunk in its own transaction
-			this.transactionTemplate.executeWithoutResult(transactionStatus -> {
+			callUnderLock(stepExecution, () -> this.transactionTemplate.executeWithoutResult(transactionStatus -> {
 				ChunkTransactionEvent chunkTransactionEvent = new ChunkTransactionEvent(stepExecution.getStepName(),
 						stepExecution.getId());
 				chunkTransactionEvent.begin();
@@ -393,7 +393,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 				getJobRepository().update(stepExecution);
 				chunkTransactionEvent.transactionStatus = BatchMetrics.STATUS_COMMITTED;
 				chunkTransactionEvent.commit();
-			});
+			}));
 		}
 	}
 
