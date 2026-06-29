@@ -187,12 +187,12 @@ public interface JobOperator extends JobLauncher {
 	boolean stop(long executionId) throws NoSuchJobExecutionException, JobExecutionNotRunningException;
 
 	/**
-	 * Send a stop signal to the supplied {@link JobExecution}. The signal is successfully
-	 * sent if this method returns true, but that doesn't mean that the job has stopped.
-	 * The only way to be sure of that is to poll the job execution status.
+	 * Stop the supplied {@link JobExecution}. The job execution is marked as STOPPED and
+	 * the currently running step is signalled to stop at the next chunk boundary.
+	 * Returning {@code true} means the stop was recorded; the worker thread may still be
+	 * winding down its current chunk when this method returns.
 	 * @param jobExecution the running {@link JobExecution}
-	 * @return true if the message was successfully sent (does not guarantee that the job
-	 * has stopped)
+	 * @return true if the stop was successfully recorded
 	 * @throws JobExecutionNotRunningException if the supplied {@link JobExecution} is not
 	 * running (so cannot be stopped)
 	 */
