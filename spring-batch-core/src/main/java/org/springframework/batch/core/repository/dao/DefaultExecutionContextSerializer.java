@@ -18,6 +18,7 @@ package org.springframework.batch.core.repository.dao;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputFilter;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
@@ -31,12 +32,43 @@ import org.springframework.util.Assert;
 /**
  * An implementation of the {@link ExecutionContextSerializer} that produces/consumes
  * Base64 content.
+ * <p>
+ * The {@link ObjectInputStream} used in {@link #deserialize(InputStream)} is constrained
+ * by an {@link ObjectInputFilter}. By default, only types defined in
+ * {@link #DEFAULT_FILTER_PATTERN} are accepted; any other class encountered in the stream
+ * causes deserialization to fail with an {@link java.io.InvalidClassException}.
+ * <p>
+ * Application code that needs to round-trip user-defined types outside the default list
+ * must extend the allow-list by supplying a custom filter via
+ * {@link #setObjectInputFilter(ObjectInputFilter)}.
  *
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
  * @since 2.2
  */
 public class DefaultExecutionContextSerializer implements ExecutionContextSerializer {
+
+	/**
+	 * Default {@link ObjectInputFilter} pattern applied to the {@link ObjectInputStream}
+	 * during {@link #deserialize(InputStream)}.
+	 * @since 5.2.7
+	 */
+	public static final String DEFAULT_FILTER_PATTERN = "java.lang.*;" + "java.util.*;" + "java.util.concurrent.*;"
+			+ "java.util.concurrent.atomic.*;" + "java.util.concurrent.locks.*;" + "java.time.*;"
+			+ "java.time.chrono.*;" + "java.time.zone.*;" + "java.math.*;" + "java.sql.*;" + "java.net.URL;"
+			+ "javax.xml.namespace.QName;" + "org.springframework.batch.**;" + "!*";
+
+	private ObjectInputFilter objectInputFilter = ObjectInputFilter.Config.createFilter(DEFAULT_FILTER_PATTERN);
+
+	/**
+	 * Set the {@link ObjectInputFilter} used to constrain deserialization.
+	 * @param objectInputFilter the filter to install; must not be {@code null}.
+	 * @since 5.2.7
+	 */
+	public void setObjectInputFilter(ObjectInputFilter objectInputFilter) {
+		Assert.notNull(objectInputFilter, "objectInputFilter must not be null");
+		this.objectInputFilter = objectInputFilter;
+	}
 
 	/**
 	 * Serializes an execution context to the provided {@link OutputStream}. The stream is
@@ -68,6 +100,11 @@ public class DefaultExecutionContextSerializer implements ExecutionContextSerial
 
 	/**
 	 * Deserializes an execution context from the provided {@link InputStream}.
+	 * <p>
+	 * The {@link ObjectInputFilter} configured on this serializer (with a default
+	 * allow-list) is applied to the {@link ObjectInputStream} before any object is read.
+	 * Classes outside the allow-list cause an {@link java.io.InvalidClassException} which
+	 * is rethrown wrapped in an {@link IllegalArgumentException}.
 	 * @param inputStream {@link InputStream} containing the information to be
 	 * deserialized.
 	 * @return the object serialized in the provided {@link InputStream}
@@ -78,6 +115,7 @@ public class DefaultExecutionContextSerializer implements ExecutionContextSerial
 		var decodingStream = Base64.getDecoder().wrap(inputStream);
 		try {
 			var objectInputStream = new ObjectInputStream(decodingStream);
+			objectInputStream.setObjectInputFilter(this.objectInputFilter);
 			return (Map<String, Object>) objectInputStream.readObject();
 		}
 		catch (IOException ex) {
