@@ -121,6 +121,10 @@ public class FlatFileItemReaderBuilder<T> {
 
 	private int currentItemCount;
 
+	private int maxLinesPerRecord = FlatFileItemReader.DEFAULT_MAX_LINES_PER_RECORD;
+
+	private int maxBytesPerRecord = FlatFileItemReader.DEFAULT_MAX_BYTES_PER_RECORD;
+
 	/**
 	 * Configure if the state of the {@link ItemStreamSupport} should be persisted within
 	 * the {@link ExecutionContext} for restart purposes.
@@ -167,6 +171,35 @@ public class FlatFileItemReaderBuilder<T> {
 	public FlatFileItemReaderBuilder<T> currentItemCount(int currentItemCount) {
 		this.currentItemCount = currentItemCount;
 
+		return this;
+	}
+
+	/**
+	 * Set the maximum number of physical lines that may be folded into a single logical
+	 * record by the configured {@link RecordSeparatorPolicy}. Defaults to
+	 * {@link FlatFileItemReader#DEFAULT_MAX_LINES_PER_RECORD}.
+	 * @param maxLinesPerRecord maximum number of lines per logical record; must be
+	 * positive.
+	 * @return The current instance of the builder.
+	 * @since 6.0.4
+	 * @see FlatFileItemReader#setMaxLinesPerRecord(int)
+	 */
+	public FlatFileItemReaderBuilder<T> maxLinesPerRecord(int maxLinesPerRecord) {
+		this.maxLinesPerRecord = maxLinesPerRecord;
+		return this;
+	}
+
+	/**
+	 * Set the maximum character length of a single accumulated logical record. Defaults
+	 * to {@link FlatFileItemReader#DEFAULT_MAX_BYTES_PER_RECORD} (1 MiB).
+	 * @param maxBytesPerRecord maximum character length per logical record; must be
+	 * positive.
+	 * @return The current instance of the builder.
+	 * @since 6.0.4
+	 * @see FlatFileItemReader#setMaxBytesPerRecord(int)
+	 */
+	public FlatFileItemReaderBuilder<T> maxBytesPerRecord(int maxBytesPerRecord) {
+		this.maxBytesPerRecord = maxBytesPerRecord;
 		return this;
 	}
 
@@ -560,6 +593,8 @@ public class FlatFileItemReaderBuilder<T> {
 		reader.setCurrentItemCount(this.currentItemCount);
 		reader.setSaveState(this.saveState);
 		reader.setStrict(this.strict);
+		reader.setMaxLinesPerRecord(this.maxLinesPerRecord);
+		reader.setMaxBytesPerRecord(this.maxBytesPerRecord);
 
 		return reader;
 	}
