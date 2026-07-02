@@ -63,6 +63,26 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 
 	public static final String[] DEFAULT_COMMENT_PREFIXES = new String[] { "#" };
 
+	/**
+	 * Default upper bound on the number of physical lines that may be folded into a
+	 * single logical record by the configured {@link RecordSeparatorPolicy}. Bounds
+	 * worst-case work for the multi-line-record accumulator so that a malformed input
+	 * (e.g. one unbalanced quote for {@code DefaultRecordSeparatorPolicy}) cannot pin a
+	 * CPU core for an extended period.
+	 *
+	 * @since 6.0.4
+	 */
+	public static final int DEFAULT_MAX_LINES_PER_RECORD = 1_000;
+
+	/**
+	 * Default upper bound on the character length of a single accumulated logical record.
+	 * Bounds heap allocation and concatenation cost for the multi-line-record
+	 * accumulator. 1 MiB worth of characters.
+	 *
+	 * @since 6.0.4
+	 */
+	public static final int DEFAULT_MAX_BYTES_PER_RECORD = 1_048_576;
+
 	private RecordSeparatorPolicy recordSeparatorPolicy = new SimpleRecordSeparatorPolicy();
 
 	private @Nullable Resource resource;
@@ -86,6 +106,10 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 	private boolean strict = true;
 
 	private BufferedReaderFactory bufferedReaderFactory = new DefaultBufferedReaderFactory();
+
+	private int maxLinesPerRecord = DEFAULT_MAX_LINES_PER_RECORD;
+
+	private int maxBytesPerRecord = DEFAULT_MAX_BYTES_PER_RECORD;
 
 	/**
 	 * Create a new {@link FlatFileItemReader} with a {@link LineMapper}.
@@ -163,6 +187,41 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 	 */
 	public void setBufferedReaderFactory(BufferedReaderFactory bufferedReaderFactory) {
 		this.bufferedReaderFactory = bufferedReaderFactory;
+	}
+
+	/**
+	 * Set the maximum number of physical lines that may be folded into a single logical
+	 * record by the configured {@link RecordSeparatorPolicy}. Defaults to
+	 * {@link #DEFAULT_MAX_LINES_PER_RECORD}. The accumulator throws a
+	 * {@link FlatFileParseException} as soon as this limit is exceeded, which bounds the
+	 * worst-case CPU and memory cost of a malformed input (e.g. an unbalanced quote or
+	 * brace that would otherwise cause {@code DefaultRecordSeparatorPolicy} /
+	 * {@code JsonRecordSeparatorPolicy} to fold the entire rest of the file into a single
+	 * record). Set to {@link Integer#MAX_VALUE} to effectively disable the limit (not
+	 * recommended on untrusted input).
+	 * @param maxLinesPerRecord the maximum number of lines accepted per logical record.
+	 * Must be positive.
+	 * @since 6.0.4
+	 */
+	public void setMaxLinesPerRecord(int maxLinesPerRecord) {
+		Assert.isTrue(maxLinesPerRecord > 0, "maxLinesPerRecord must be positive.");
+		this.maxLinesPerRecord = maxLinesPerRecord;
+	}
+
+	/**
+	 * Set the maximum character length of a single accumulated logical record. Defaults
+	 * to {@link #DEFAULT_MAX_BYTES_PER_RECORD} (1&nbsp;MiB). The accumulator throws a
+	 * {@link FlatFileParseException} as soon as a folded record would exceed this limit,
+	 * which bounds heap allocation and concatenation cost. Set to
+	 * {@link Integer#MAX_VALUE} to effectively disable the limit (not recommended on
+	 * untrusted input).
+	 * @param maxBytesPerRecord the maximum character length accepted per logical record.
+	 * Must be positive.
+	 * @since 6.0.4
+	 */
+	public void setMaxBytesPerRecord(int maxBytesPerRecord) {
+		Assert.isTrue(maxBytesPerRecord > 0, "maxBytesPerRecord must be positive.");
+		this.maxBytesPerRecord = maxBytesPerRecord;
 	}
 
 	/**
@@ -321,14 +380,20 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 		if (reader == null) {
 			throw new ReaderNotOpenException("Reader must be open before it can be read.");
 		}
-		String record = line;
-		while (!recordSeparatorPolicy.isEndOfRecord(record)) {
+		// Accumulate into a StringBuilder to avoid the per-iteration `record + line`
+		// allocation. The policy callbacks still operate on a String snapshot
+		// (their API contract), so we maintain a current snapshot alongside the
+		// builder; the snapshot is refreshed only when a new line is folded in.
+		StringBuilder record = new StringBuilder(line);
+		String snapshot = line;
+		int linesInRecord = 1;
+		while (!recordSeparatorPolicy.isEndOfRecord(snapshot)) {
 			line = this.reader.readLine();
 			if (line == null) {
-				if (StringUtils.hasText(record)) {
+				if (StringUtils.hasText(snapshot)) {
 					// A record was partially complete since it hasn't ended but
 					// the line is null
-					throw new FlatFileParseException("Unexpected end of file before record complete", record,
+					throw new FlatFileParseException("Unexpected end of file before record complete", snapshot,
 							lineCount);
 				}
 				else {
@@ -338,13 +403,34 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 					break;
 				}
 			}
-			else {
-				lineCount++;
+			lineCount++;
+			linesInRecord++;
+			if (linesInRecord > maxLinesPerRecord) {
+				throw new FlatFileParseException(
+						"Record at line " + lineCount + " exceeded the configured limit of " + maxLinesPerRecord
+								+ " lines per record. "
+								+ "If your records legitimately span more lines, raise the limit via "
+								+ "FlatFileItemReader#setMaxLinesPerRecord(int); otherwise check the input for an "
+								+ "unterminated record separator (e.g. unbalanced quote or brace).",
+						snapshot, lineCount);
 			}
-			record = recordSeparatorPolicy.preProcess(record) + line;
+			String preProcessed = recordSeparatorPolicy.preProcess(snapshot);
+			long projectedLength = (long) preProcessed.length() + line.length();
+			if (projectedLength > maxBytesPerRecord) {
+				throw new FlatFileParseException(
+						"Record at line " + lineCount + " exceeded the configured limit of " + maxBytesPerRecord
+								+ " bytes per record. "
+								+ "If your records legitimately exceed this size, raise the limit via "
+								+ "FlatFileItemReader#setMaxBytesPerRecord(int); otherwise check the input for an "
+								+ "unterminated record separator (e.g. unbalanced quote or brace).",
+						snapshot, lineCount);
+			}
+			record.setLength(0);
+			record.append(preProcessed).append(line);
+			snapshot = record.toString();
 		}
 
-		return recordSeparatorPolicy.postProcess(record);
+		return recordSeparatorPolicy.postProcess(snapshot);
 
 	}
 
