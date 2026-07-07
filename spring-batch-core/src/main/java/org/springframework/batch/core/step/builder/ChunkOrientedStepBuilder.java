@@ -27,10 +27,12 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.batch.core.annotation.AfterChunk;
 import org.springframework.batch.core.annotation.AfterProcess;
 import org.springframework.batch.core.annotation.AfterRead;
+import org.springframework.batch.core.annotation.AfterStep;
 import org.springframework.batch.core.annotation.AfterWrite;
 import org.springframework.batch.core.annotation.BeforeChunk;
 import org.springframework.batch.core.annotation.BeforeProcess;
 import org.springframework.batch.core.annotation.BeforeRead;
+import org.springframework.batch.core.annotation.BeforeStep;
 import org.springframework.batch.core.annotation.BeforeWrite;
 import org.springframework.batch.core.annotation.OnChunkError;
 import org.springframework.batch.core.annotation.OnProcessError;
@@ -236,6 +238,8 @@ public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrien
 	 */
 	public ChunkOrientedStepBuilder<I, O> listener(Object listener) {
 		Set<Method> listenerMethods = new HashSet<>();
+		listenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), BeforeStep.class));
+		listenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), AfterStep.class));
 		listenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), BeforeChunk.class));
 		listenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), AfterChunk.class));
 		listenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), OnChunkError.class));
