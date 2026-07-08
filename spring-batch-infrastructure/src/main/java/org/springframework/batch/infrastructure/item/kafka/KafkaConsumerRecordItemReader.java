@@ -36,15 +36,13 @@ import org.springframework.batch.infrastructure.item.ItemReader;
  * Since {@link KafkaConsumer} is not thread-safe, this reader is not thread-safe.
  * </p>
  *
- * @author Mathieu Ouellet
- * @author Mahmoud Ben Hassine
- * @author Hyunwoo Jung
- * @since 4.2
+ * @author djechelon@github.com
+ * @since 6.0
  */
-public class KafkaItemReader<K, V> extends AbstractKafkaItemReader<K, V, V> {
+public class KafkaConsumerRecordItemReader<K, V> extends AbstractKafkaItemReader<K, V, ConsumerRecord<K, V>> {
 
 	/**
-	 * Create a new {@link KafkaItemReader}.
+	 * Create a new {@link KafkaConsumerRecordItemReader}.
 	 * <p>
 	 * <strong>{@code consumerProperties} must contain the following keys:
 	 * 'bootstrap.servers', 'group.id', 'key.deserializer' and 'value.deserializer'
@@ -55,12 +53,12 @@ public class KafkaItemReader<K, V> extends AbstractKafkaItemReader<K, V, V> {
 	 * @param topicName name of the topic to read data from
 	 * @param partitions list of partitions to read data from
 	 */
-	public KafkaItemReader(Properties consumerProperties, String topicName, Integer... partitions) {
+	public KafkaConsumerRecordItemReader(Properties consumerProperties, String topicName, Integer... partitions) {
 		this(consumerProperties, topicName, Arrays.asList(partitions));
 	}
 
 	/**
-	 * Create a new {@link KafkaItemReader}.
+	 * Create a new {@link KafkaConsumerRecordItemReader}.
 	 * <p>
 	 * <strong>{@code consumerProperties} must contain the following keys:
 	 * 'bootstrap.servers', 'group.id', 'key.deserializer' and 'value.deserializer'
@@ -71,13 +69,13 @@ public class KafkaItemReader<K, V> extends AbstractKafkaItemReader<K, V, V> {
 	 * @param topicName name of the topic to read data from
 	 * @param partitions list of partitions to read data from
 	 */
-	public KafkaItemReader(Properties consumerProperties, String topicName, List<Integer> partitions) {
+	public KafkaConsumerRecordItemReader(Properties consumerProperties, String topicName, List<Integer> partitions) {
 		super(consumerProperties, topicName, partitions);
 	}
 
 	@Override
-	protected V mapRecord(ConsumerRecord<K, V> record) {
-		return record.value();
+	protected ConsumerRecord<K, V> mapRecord(ConsumerRecord<K, V> record) {
+		return record;
 	}
 
 }
