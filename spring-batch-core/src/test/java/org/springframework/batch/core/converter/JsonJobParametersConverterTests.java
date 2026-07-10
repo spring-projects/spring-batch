@@ -22,6 +22,7 @@ import org.springframework.batch.core.job.parameters.JobParameter;
 
 /**
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  */
 class JsonJobParametersConverterTests {
 
@@ -69,6 +70,21 @@ class JsonJobParametersConverterTests {
 		Assertions.assertEquals("foo", jobParameter.value());
 		Assertions.assertEquals(String.class, jobParameter.type());
 		Assertions.assertFalse(jobParameter.identifying());
+	}
+
+	@Test
+	void testDecodePrimitiveType() {
+		// given
+		JsonJobParametersConverter converter = new JsonJobParametersConverter();
+		String encodedJobParameter = "{\"name\":\"year\",\"value\":\"1984\",\"type\":\"long\"}";
+
+		// when
+		JobParameter<Long> jobParameter = converter.decode("year", encodedJobParameter);
+
+		// then
+		Assertions.assertNotNull(jobParameter);
+		Assertions.assertEquals(long.class, jobParameter.type());
+		Assertions.assertEquals(1984L, jobParameter.value());
 	}
 
 	@Test
