@@ -26,6 +26,7 @@ import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.core.convert.support.ConfigurableConversionService;
 import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
 /**
@@ -73,6 +74,7 @@ import org.springframework.util.StringUtils;
  * @author Dave Syer
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  *
  */
 public class DefaultJobParametersConverter implements JobParametersConverter {
@@ -184,8 +186,7 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 			return String.class;
 		}
 		try {
-			Class<?> type = Class.forName(tokens[1]);
-			return type;
+			return ClassUtils.forName(tokens[1], null);
 		}
 		catch (ClassNotFoundException e) {
 			throw new JobParametersConversionException("Unable to parse job parameter " + encodedJobParameter, e);

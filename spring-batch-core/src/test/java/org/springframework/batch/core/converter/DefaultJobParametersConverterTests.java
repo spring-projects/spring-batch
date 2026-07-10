@@ -38,6 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Dave Syer
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  *
  */
 class DefaultJobParametersConverterTests {
