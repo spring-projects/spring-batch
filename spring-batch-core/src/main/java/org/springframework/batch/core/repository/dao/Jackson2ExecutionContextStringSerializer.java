@@ -62,6 +62,7 @@ import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
 
 import static com.fasterxml.jackson.core.JsonToken.START_OBJECT;
 
@@ -242,7 +243,7 @@ public class Jackson2ExecutionContextStringSerializer implements ExecutionContex
 				String type = node.get(TYPE_KEY_NAME).asText();
 				JsonNode value = node.get(VALUE_KEY_NAME);
 				try {
-					Class<?> parameterType = Class.forName(type);
+					Class<?> parameterType = ClassUtils.forName(type, null);
 					Object typedValue = objectMapper.convertValue(value, parameterType);
 					return new JobParameter(name, typedValue, parameterType, identifying);
 				}

@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.converter;
 
+import org.springframework.util.ClassUtils;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.json.JsonMapper;
 
@@ -63,6 +64,7 @@ import org.springframework.batch.core.job.parameters.JobParameters;
  * </ul>
  *
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  * @since 5.0
  *
  */
@@ -113,7 +115,7 @@ public class JsonJobParametersConverter extends DefaultJobParametersConverter {
 					JobParameterDefinition.class);
 			Class<?> parameterType = String.class;
 			if (jobParameterDefinition.type() != null) {
-				parameterType = Class.forName(jobParameterDefinition.type());
+				parameterType = ClassUtils.forName(jobParameterDefinition.type(), null);
 			}
 			boolean parameterIdentifying = true;
 			if (jobParameterDefinition.identifying() != null && !jobParameterDefinition.identifying().isEmpty()) {

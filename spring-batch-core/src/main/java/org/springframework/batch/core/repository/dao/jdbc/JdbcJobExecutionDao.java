@@ -45,6 +45,7 @@ import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.jspecify.annotations.Nullable;
 import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
 
 /**
  * JDBC implementation of {@link JobExecutionDao}. Uses sequences (via Spring's
@@ -432,7 +433,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 
 			Class<?> parameterType = null;
 			try {
-				parameterType = Class.forName(rs.getString("PARAMETER_TYPE"));
+				parameterType = ClassUtils.forName(rs.getString("PARAMETER_TYPE"), null);
 			}
 			catch (ClassNotFoundException e) {
 				throw new RuntimeException(e);
