@@ -22,6 +22,7 @@ import org.springframework.batch.core.job.parameters.JobParameter;
 
 /**
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  */
 class JsonJobParametersConverterTests {
 
@@ -36,7 +37,7 @@ class JsonJobParametersConverterTests {
 
 		// then
 		Assertions.assertEquals(
-				"{\"name\":\"name\",\"value\":\"foo\",\"type\":\"java.lang.String\",\"identifying\":\"false\"}",
+				"{\"name\":\"name\",\"value\":\"foo\",\"type\":\"java.lang.String\",\"identifying\":false}",
 				encodedJobParameter);
 	}
 
@@ -51,7 +52,7 @@ class JsonJobParametersConverterTests {
 
 		// then
 		Assertions.assertEquals(
-				"{\"name\":\"name\",\"value\":\"foo\",\"type\":\"java.lang.String\",\"identifying\":\"true\"}",
+				"{\"name\":\"name\",\"value\":\"foo\",\"type\":\"java.lang.String\",\"identifying\":true}",
 				encodedJobParameter);
 	}
 
@@ -69,6 +70,22 @@ class JsonJobParametersConverterTests {
 		Assertions.assertEquals("foo", jobParameter.value());
 		Assertions.assertEquals(String.class, jobParameter.type());
 		Assertions.assertFalse(jobParameter.identifying());
+	}
+
+	@Test
+	void testDecodeWithBooleanIdentifyingFlag() {
+		// given
+		JsonJobParametersConverter converter = new JsonJobParametersConverter();
+		String encodedJobParameter = "{\"name\":\"name\",\"value\":\"foo\",\"type\":\"java.lang.String\",\"identifying\":true}";
+
+		// when
+		JobParameter<String> jobParameter = converter.decode("name", encodedJobParameter);
+
+		// then
+		Assertions.assertNotNull(jobParameter);
+		Assertions.assertEquals("foo", jobParameter.value());
+		Assertions.assertEquals(String.class, jobParameter.type());
+		Assertions.assertTrue(jobParameter.identifying());
 	}
 
 	@Test
