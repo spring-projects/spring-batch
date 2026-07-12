@@ -66,4 +66,30 @@
 		</dependencies>
 	</dependencyManagement>
 
+	<build>
+		<plugins>
+			<!--
+				The parent pom imports BOMs (Spring Framework, Spring Data, Micrometer) in its
+				dependencyManagement section. The flatten-maven-plugin is configured in the parent
+				to 'resolve' dependencyManagement, which would expand those imported BOMs into the
+				flattened spring-batch-bom. Override it here to 'keep' so the published BOM only
+				contains the spring-batch-* modules declared above.
+			-->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>flatten-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>flatten</id>
+						<configuration>
+							<pomElements>
+								<dependencyManagement>interpolate</dependencyManagement>
+							</pomElements>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
 </project>
