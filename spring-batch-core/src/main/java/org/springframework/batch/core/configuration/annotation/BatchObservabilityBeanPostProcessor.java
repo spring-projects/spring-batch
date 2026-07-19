@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2025 the original author or authors.
+ * Copyright 2022-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jspecify.annotations.Nullable;
 
+import org.springframework.aop.framework.AopProxyUtils;
 import org.springframework.batch.core.job.AbstractJob;
 import org.springframework.batch.core.launch.support.TaskExecutorJobOperator;
 import org.springframework.batch.core.step.AbstractStep;
@@ -34,6 +35,7 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
  * steps) with a Micrometer's observation registry.
  *
  * @author Mahmoud Ben Hassine
+ * @author Sanghyuk Jung
  * @since 5.0
  */
 public class BatchObservabilityBeanPostProcessor implements BeanFactoryPostProcessor, BeanPostProcessor {
@@ -54,16 +56,20 @@ public class BatchObservabilityBeanPostProcessor implements BeanFactoryPostProce
 			return bean;
 		}
 		try {
-			if (bean instanceof AbstractJob || bean instanceof AbstractStep
-					|| bean instanceof TaskExecutorJobOperator) {
+			Object target = AopProxyUtils.getSingletonTarget(bean);
+			if (target == null) {
+				target = bean;
+			}
+			if (target instanceof AbstractJob || target instanceof AbstractStep
+					|| target instanceof TaskExecutorJobOperator) {
 				ObservationRegistry observationRegistry = this.beanFactory.getBean(ObservationRegistry.class);
-				if (bean instanceof AbstractJob job) {
+				if (target instanceof AbstractJob job) {
 					job.setObservationRegistry(observationRegistry);
 				}
-				if (bean instanceof AbstractStep step) {
+				if (target instanceof AbstractStep step) {
 					step.setObservationRegistry(observationRegistry);
 				}
-				if (bean instanceof TaskExecutorJobOperator operator) {
+				if (target instanceof TaskExecutorJobOperator operator) {
 					operator.setObservationRegistry(observationRegistry);
 				}
 			}
