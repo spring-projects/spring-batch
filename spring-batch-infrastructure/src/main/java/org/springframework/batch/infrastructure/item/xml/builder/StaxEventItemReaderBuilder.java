@@ -66,7 +66,7 @@ public class StaxEventItemReaderBuilder<T> {
 
 	private XMLInputFactory xmlInputFactory = StaxUtils.createDefensiveInputFactory();
 
-	private String encoding = StaxEventItemReader.DEFAULT_ENCODING;
+	private @Nullable String encoding = StaxEventItemReader.DEFAULT_ENCODING;
 
 	/**
 	 * Configure if the state of the {@link ItemStreamSupport} should be persisted within
@@ -202,7 +202,7 @@ public class StaxEventItemReaderBuilder<T> {
 	 * @return the current instance of the builder
 	 * @see StaxEventItemReader#setEncoding(String)
 	 */
-	public StaxEventItemReaderBuilder<T> encoding(String encoding) {
+	public StaxEventItemReaderBuilder<T> encoding(@Nullable String encoding) {
 		this.encoding = encoding;
 
 		return this;

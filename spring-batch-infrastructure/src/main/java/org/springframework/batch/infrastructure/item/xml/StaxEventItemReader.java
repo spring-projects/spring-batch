@@ -154,7 +154,7 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 	 * @param encoding the encoding to be used. Can be {@code null}, in which case, the
 	 * XML event reader will attempt to auto-detect the encoding from tht input file.
 	 */
-	public void setEncoding(String encoding) {
+	public void setEncoding(@Nullable String encoding) {
 		this.encoding = encoding;
 	}
 
