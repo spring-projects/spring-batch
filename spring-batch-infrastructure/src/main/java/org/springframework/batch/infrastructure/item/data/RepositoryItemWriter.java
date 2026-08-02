@@ -89,9 +89,12 @@ public class RepositoryItemWriter<T> implements ItemWriter<T>, InitializingBean 
 
 	/**
 	 * Set the {@link org.springframework.data.repository.CrudRepository} implementation
-	 * for persistence
+	 * for persistence.
 	 * @param repository the Spring Data repository to be set
+	 * @deprecated since 6.1 in favor of passing the repository to the constructor.
+	 * Scheduled for removal in 7.0.
 	 */
+	@Deprecated(since = "6.1", forRemoval = true)
 	public void setRepository(CrudRepository<T, ?> repository) {
 		this.repository = repository;
 	}

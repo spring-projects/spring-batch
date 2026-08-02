@@ -62,10 +62,9 @@ public class RepositoryItemWriterBuilder<T> {
 
 	/**
 	 * Set the {@link org.springframework.data.repository.CrudRepository} implementation
-	 * for persistence
+	 * for persistence.
 	 * @param repository the Spring Data repository to be set
 	 * @return The current instance of the builder.
-	 * @see RepositoryItemWriter#setRepository(CrudRepository)
 	 */
 	public RepositoryItemWriterBuilder<T> repository(CrudRepository<T, ?> repository) {
 		this.repository = repository;
@@ -74,11 +73,10 @@ public class RepositoryItemWriterBuilder<T> {
 	}
 
 	/**
-	 * Specifies a repository and the type-safe method to call for the writer. The method
-	 * configured via this mechanism must take
-	 * {@link org.springframework.data.domain.Pageable} as the <em>last</em> argument.
-	 * This method can be used in place of {@link #repository(CrudRepository)},
-	 * {@link #methodName(String)}}.
+	 * Specifies a repository and the type-safe method to call for the writer. The
+	 * selected method must accept the item type as its <em>sole</em> argument. This
+	 * method can be used in place of {@link #repository(CrudRepository)},
+	 * {@link #methodName(String)}.
 	 * <p>
 	 * Note: The repository that is used by the repositoryMethodReference must be
 	 * non-final.
@@ -86,7 +84,6 @@ public class RepositoryItemWriterBuilder<T> {
 	 * method for use by the writer.
 	 * @return The current instance of the builder.
 	 * @see RepositoryItemWriter#setMethodName(String)
-	 * @see RepositoryItemWriter#setRepository(CrudRepository)
 	 *
 	 */
 	public RepositoryItemWriterBuilder<T> repository(
@@ -110,7 +107,6 @@ public class RepositoryItemWriterBuilder<T> {
 		Assert.notNull(this.repository, "repository is required.");
 
 		RepositoryItemWriter<T> writer = new RepositoryItemWriter<>(this.repository);
-		writer.setRepository(this.repository);
 		if (this.methodName != null) {
 			Assert.hasText(this.methodName, "methodName must not be empty.");
 			writer.setMethodName(this.methodName);
