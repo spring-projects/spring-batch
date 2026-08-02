@@ -52,15 +52,15 @@
 		<java.version>17</java.version>
 
 		<!-- production dependencies -->
-		<spring-framework.version>7.0.8</spring-framework.version>
+		<spring-framework.version>7.1.0-INTERNAL-SNAPSHOT</spring-framework.version>
 		<spring-retry.version>2.0.13</spring-retry.version>
-		<spring-integration.version>7.0.5</spring-integration.version>
-		<micrometer.version>1.16.6</micrometer.version>
+		<spring-integration.version>7.2.0-INTERNAL-SNAPSHOT</spring-integration.version>
+		<micrometer.version>1.18.0-INTERNAL-SNAPSHOT</micrometer.version>
 
 		<!-- optional production dependencies -->
 		<spring-data-bom.version>2025.1.6</spring-data-bom.version>
 		<spring-kafka.version>4.0.6</spring-kafka.version>
-		<spring-amqp.version>4.0.4</spring-amqp.version>
+		<spring-amqp.version>4.2.0-INTERNAL-SNAPSHOT</spring-amqp.version>
 		<spring-ldap.version>4.0.4</spring-ldap.version>
 
 		<jackson2.version>2.20.2</jackson2.version>
@@ -78,7 +78,7 @@
 		<junit-platform-launcher.version>6.0.3</junit-platform-launcher.version>
 
 		<!-- test dependencies -->
-		<micrometer-tracing.version>1.6.6</micrometer-tracing.version>
+		<micrometer-tracing.version>1.8.0-INTERNAL-SNAPSHOT</micrometer-tracing.version>
 
 		<xstream.version>1.4.21</xstream.version>
 		<junit.version>4.13.2</junit.version>
