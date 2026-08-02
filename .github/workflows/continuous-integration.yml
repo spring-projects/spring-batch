@@ -1,14 +1,19 @@
-name: CI/CD build
+name: Build for main-internal
 
-on: [push, pull_request, workflow_dispatch]
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "main-internal" ]
 
 jobs:
   build:
-    name: Build main branch
-    runs-on: ubuntu-latest
+    name: Build for main-internal
+    runs-on: ubuntu22-2-8
     steps:
       - name: Checkout source code
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          ref: 'main-internal'
 
       - name: Set up JDK 25
         uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5.2.0
@@ -18,17 +23,19 @@ jobs:
           cache: 'maven'
 
       - name: Build with Maven
-        run: mvn -DaltDeploymentRepository=local::file:deployment-repository --no-transfer-progress --batch-mode --update-snapshots deploy
+        env:
+          ARTIFACTORY_USERNAME: ${{ secrets.COMMERCIAL_ARTIFACTORY_USERNAME }}
+          ARTIFACTORY_PASSWORD: ${{ secrets.COMMERCIAL_ARTIFACTORY_PASSWORD }}
+        run: mvn -s settings.xml -DaltDeploymentRepository=local::file:deployment-repository --no-transfer-progress --batch-mode --update-snapshots deploy
 
       - name: Deploy to Artifactory
-        if: ${{ github.repository == 'spring-projects/spring-batch' && github.ref_name == 'main' }}
+        if: ${{ github.repository == 'spring-projects/spring-batch-commercial' }}
         uses: spring-io/artifactory-deploy-action@926d7f7cc810569395346bf3a4d91b380b3e355b # v0.0.4
         with:
-          uri: 'https://repo.spring.io'
-          username: ${{ secrets.ARTIFACTORY_USERNAME }}
-          password: ${{ secrets.ARTIFACTORY_PASSWORD }}
-          build-name: 'spring-batch-main'
-          repository: 'libs-snapshot-local'
+          uri: 'https://usw1.packages.broadcom.com'
+          username: ${{ secrets.COMMERCIAL_ARTIFACTORY_USERNAME }}
+          password: ${{ secrets.COMMERCIAL_ARTIFACTORY_PASSWORD }}
+          build-name: 'spring-batch-main-internal'
+          project: 'spring'
+          repository: 'spring-enterprise-maven-dev-local'
           folder: 'deployment-repository'
-          signing-key: ${{ secrets.GPG_PRIVATE_KEY }}
-          signing-passphrase: ${{ secrets.GPG_PASSPHRASE }}
