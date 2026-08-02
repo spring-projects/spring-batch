@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2025 the original author or authors.
+ * Copyright 2017-2026 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -24,8 +24,8 @@ import org.jspecify.annotations.Nullable;
 
 import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.batch.infrastructure.item.ItemStreamSupport;
-import org.springframework.batch.infrastructure.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.batch.infrastructure.item.data.RepositoryItemReader;
+import org.springframework.batch.infrastructure.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.util.Assert;
@@ -137,7 +137,7 @@ public class RepositoryItemReaderBuilder<T> {
 	 * order.
 	 * @param sorts the fields to sort by and the directions.
 	 * @return The current instance of the builder.
-	 * @see RepositoryItemReader#setSorts(Map)
+	 * @see RepositoryItemReader#RepositoryItemReader(PagingAndSortingRepository, Map)
 	 */
 	public RepositoryItemReaderBuilder<T> sorts(Map<String, Sort.Direction> sorts) {
 		this.sorts = sorts;
@@ -158,11 +158,10 @@ public class RepositoryItemReaderBuilder<T> {
 	}
 
 	/**
-	 * The {@link org.springframework.data.repository.PagingAndSortingRepository}
-	 * implementation used to read input from.
+	 * The {@link PagingAndSortingRepository} implementation used to read input from.
 	 * @param repository underlying repository for input to be read from.
 	 * @return The current instance of the builder.
-	 * @see RepositoryItemReader#setRepository(PagingAndSortingRepository)
+	 * @see RepositoryItemReader#RepositoryItemReader(PagingAndSortingRepository, Map)
 	 */
 	public RepositoryItemReaderBuilder<T> repository(PagingAndSortingRepository<?, ?> repository) {
 		this.repository = repository;
@@ -200,7 +199,6 @@ public class RepositoryItemReaderBuilder<T> {
 		if (this.arguments != null) {
 			reader.setArguments(this.arguments);
 		}
-		reader.setRepository(this.repository);
 		reader.setMethodName(this.methodName);
 		reader.setPageSize(this.pageSize);
 		reader.setCurrentItemCount(this.currentItemCount);
