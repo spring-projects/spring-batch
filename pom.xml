@@ -8,7 +8,7 @@
 		designed to enable the development of robust batch applications vital
 		for the daily operations of enterprise systems. Spring Batch is part of
 		the Spring Portfolio.</description>
-	<version>6.0.5-INTERNAL-SNAPSHOT</version>
+	<version>6.0.5</version>
 	<packaging>pom</packaging>
 	<url>https://projects.spring.io/spring-batch</url>
 
@@ -52,16 +52,16 @@
 		<java.version>17</java.version>
 
 		<!-- production dependencies -->
-		<spring-framework.version>7.0.9-INTERNAL-SNAPSHOT</spring-framework.version>
+		<spring-framework.version>7.0.9</spring-framework.version>
 		<spring-retry.version>2.0.13</spring-retry.version>
-		<spring-integration.version>7.0.6-INTERNAL-SNAPSHOT</spring-integration.version>
-		<micrometer.version>1.16.7-INTERNAL-SNAPSHOT</micrometer.version>
+		<spring-integration.version>7.0.6</spring-integration.version>
+		<micrometer.version>1.16.7</micrometer.version>
 
 		<!-- optional production dependencies -->
-		<spring-data-bom.version>2025.1.7-INTERNAL-SNAPSHOT</spring-data-bom.version>
-		<spring-kafka.version>4.0.7-INTERNAL-SNAPSHOT</spring-kafka.version>
-		<spring-amqp.version>4.0.5-INTERNAL-SNAPSHOT</spring-amqp.version>
-		<spring-ldap.version>4.0.5-INTERNAL-SNAPSHOT</spring-ldap.version>
+		<spring-data-bom.version>2025.1.7</spring-data-bom.version>
+		<spring-kafka.version>4.0.7</spring-kafka.version>
+		<spring-amqp.version>4.0.5</spring-amqp.version>
+		<spring-ldap.version>4.0.5</spring-ldap.version>
 
 		<jackson2.version>2.20.2</jackson2.version>
 		<jackson3.version>3.0.4</jackson3.version>
@@ -78,7 +78,7 @@
 		<junit-platform-launcher.version>6.0.3</junit-platform-launcher.version>
 
 		<!-- test dependencies -->
-		<micrometer-tracing.version>1.6.7-INTERNAL-SNAPSHOT</micrometer-tracing.version>
+		<micrometer-tracing.version>1.6.7</micrometer-tracing.version>
 
 		<xstream.version>1.4.21</xstream.version>
 		<junit.version>4.13.2</junit.version>
