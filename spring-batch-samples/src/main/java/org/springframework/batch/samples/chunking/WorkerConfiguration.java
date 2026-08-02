@@ -33,6 +33,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.config.EnableIntegration;
 import org.springframework.integration.dsl.IntegrationFlow;
+import org.springframework.integration.jms.DefaultJmsHeaderMapper;
 import org.springframework.integration.jms.dsl.Jms;
 
 /**
@@ -78,7 +79,10 @@ public class WorkerConfiguration {
 
 	@Bean
 	public IntegrationFlow inboundFlow(ActiveMQConnectionFactory connectionFactory) {
-		return IntegrationFlow.from(Jms.messageDrivenChannelAdapter(connectionFactory).destination("requests"))
+		return IntegrationFlow
+			.from(Jms.messageDrivenChannelAdapter(connectionFactory)
+				.headerMapper(new DefaultJmsHeaderMapper("*"))
+				.destination("requests"))
 			.channel(requests())
 			.get();
 	}
