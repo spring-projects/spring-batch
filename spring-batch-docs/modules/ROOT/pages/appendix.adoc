@@ -56,6 +56,8 @@ This reader stores message offsets in the execution context to support restart c
             query, provides items received from the `MongoOperations#find()` method.|Yes
 |`MongoCursorItemReader`|Given a `MongoOperations` object and a JSON-based MongoDB
             query, provides items received from the `MongoOperations#stream()` method.|Yes
+|`PageableItemReader`|Applies a query function to a Spring Data `Pageable` and returns
+            items from the resulting `Slice`.|Yes
 |`RepositoryItemReader`|Given a Spring Data `PagingAndSortingRepository` object,
             a `Sort`, and the name of method to execute, returns items provided by the
             Spring Data repository implementation.|Yes
