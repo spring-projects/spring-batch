@@ -507,13 +507,14 @@ public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrien
 		if (itemHandler instanceof ItemStream itemStream) {
 			this.streams.add(itemStream);
 		}
-		// Register as listener if implements the interface
-		if (itemHandler instanceof StepListener listener) {
-			this.stepListeners.add(listener);
-		}
-		// Register as listener if annotated methods are present
+		// Register as listener if it implements a listener interface or has annotated
+		// methods. The factory covers both cases, so the item handler is registered
+		// only once even if it mixes interfaces and annotations.
 		if (StepListenerFactoryBean.isListener(itemHandler)) {
 			StepListener listener = StepListenerFactoryBean.getListener(itemHandler);
+			this.stepListeners.add(listener);
+		}
+		else if (itemHandler instanceof StepListener listener) {
 			this.stepListeners.add(listener);
 		}
 	}
