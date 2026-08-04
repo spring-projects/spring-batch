@@ -94,7 +94,7 @@
 		<sqlite.version>3.53.2.0</sqlite.version>
 		<derby.version>10.16.1.1</derby.version> <!-- FIXME build failure with 10.17.1.0 -->
 		<hana.version>2.26.12</hana.version>
-		<artemis.version>2.54.0</artemis.version>
+		<artemis.version>2.55.0</artemis.version>
 		<jaxb-core.version>4.0.9</jaxb-core.version>
 		<log4j.version>2.26.0</log4j.version>
 		<hibernate-validator.version>9.0.1.Final</hibernate-validator.version>
@@ -120,7 +120,7 @@
 		<nashorn.version>15.7</nashorn.version>
 		<beanshell.version>2.0b6</beanshell.version>
 		<jruby.version>9.4.14.0</jruby.version> <!-- update to latest 10.0.2.0 -->
-		<lettuce.version>6.8.2.RELEASE</lettuce.version> <!-- update to 7.0.0.RELEASE -->
+		<lettuce.version>7.5.2.RELEASE</lettuce.version>
 		<jedis.version>7.5.2</jedis.version>
 
 		<!-- samples dependencies -->
