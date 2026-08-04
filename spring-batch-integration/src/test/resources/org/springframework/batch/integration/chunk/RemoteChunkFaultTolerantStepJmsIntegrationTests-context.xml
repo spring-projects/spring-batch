@@ -80,7 +80,7 @@
 		<integration:interceptors>
 			<bean id="pollerInterceptor" class="org.springframework.batch.integration.chunk.MessageSourcePollerInterceptor">
 				<constructor-arg name="source">
-					<bean class="org.springframework.integration.jms.JmsDestinationPollingSource">
+					<bean class="org.springframework.integration.jms.inbound.JmsDestinationPollingSource">
 						<constructor-arg>
 							<bean class="org.springframework.jms.core.JmsTemplate">
 								<property name="connectionFactory" ref="jmsConnectionFactory" />
