@@ -22,9 +22,11 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.ExitStatus;
+import org.springframework.batch.core.annotation.BeforeStep;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.listener.ItemProcessListener;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.ResourcelessJobRepository;
 import org.springframework.batch.core.step.FatalStepExecutionException;
@@ -33,6 +35,7 @@ import org.springframework.batch.core.step.builder.ChunkOrientedStepBuilder;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.core.step.skip.NeverSkipItemSkipPolicy;
 import org.springframework.batch.core.step.skip.NonSkippableProcessException;
+import org.springframework.batch.infrastructure.item.ItemProcessor;
 import org.springframework.batch.infrastructure.item.*;
 import org.springframework.batch.infrastructure.item.support.ListItemReader;
 import org.springframework.batch.infrastructure.item.support.ListItemWriter;
@@ -507,6 +510,124 @@ public class ChunkOrientedStepTests {
 		// then
 		assertEquals(itemCount, stepExecution.getProcessSkipCount(),
 				"Sequential mode should have accurate process skip count");
+	}
+
+	@Test
+	void testListenerCallbacksFireOnceWhenProcessorImplementsListenerOnly() throws Exception {
+		// given: a processor that only implements ItemProcessListener (no annotations)
+		ItemProcessListenerOnlyProcessor processor = new ItemProcessListenerOnlyProcessor();
+		JobRepository jobRepository = new ResourcelessJobRepository();
+		ChunkOrientedStep<String, String> step = new StepBuilder("step", jobRepository).<String, String>chunk(1)
+			.reader(new ListItemReader<>(List.of("item1", "item2")))
+			.processor(processor)
+			.writer(items -> {
+			})
+			.build();
+
+		JobInstance jobInstance = new JobInstance(1L, "job");
+		JobExecution jobExecution = new JobExecution(1L, jobInstance, new JobParameters());
+		StepExecution stepExecution = new StepExecution(1L, "step", jobExecution);
+
+		// when
+		step.execute(stepExecution);
+
+		// then: callbacks fire exactly once per item
+		assertEquals(List.of("beforeProcess:item1", "afterProcess:item1", "beforeProcess:item2", "afterProcess:item2"),
+				processor.getEvents(), "Interface listener callbacks should fire exactly once per item");
+	}
+
+	@Test
+	void testListenerCallbacksFireOnceWhenProcessorAlsoHasAnnotatedMethod() throws Exception {
+		// given: a processor that implements ItemProcessListener AND has a @BeforeStep
+		// annotated method (the bug from issue #5466)
+		ItemProcessListenerWithAnnotatedMethodProcessor processor = new ItemProcessListenerWithAnnotatedMethodProcessor();
+		JobRepository jobRepository = new ResourcelessJobRepository();
+		ChunkOrientedStep<String, String> step = new StepBuilder("step", jobRepository).<String, String>chunk(1)
+			.reader(new ListItemReader<>(List.of("item1", "item2")))
+			.processor(processor)
+			.writer(items -> {
+			})
+			.build();
+
+		JobInstance jobInstance = new JobInstance(1L, "job");
+		JobExecution jobExecution = new JobExecution(1L, jobInstance, new JobParameters());
+		StepExecution stepExecution = new StepExecution(1L, "step", jobExecution);
+
+		// when
+		step.execute(stepExecution);
+
+		// then: interface callbacks must fire exactly once per item, not doubled
+		assertEquals(
+				List.of("beforeStep", "beforeProcess:item1", "afterProcess:item1", "beforeProcess:item2",
+						"afterProcess:item2"),
+				processor.getEvents(),
+				"Interface listener callbacks should fire exactly once per item even when annotated methods are present");
+	}
+
+	/**
+	 * A processor that only implements {@link ItemProcessListener}, without any listener
+	 * annotations.
+	 */
+	private static final class ItemProcessListenerOnlyProcessor
+			implements ItemProcessor<String, String>, ItemProcessListener<String, String> {
+
+		private final List<String> events = new java.util.ArrayList<>();
+
+		@Override
+		public void beforeProcess(String item) {
+			this.events.add("beforeProcess:" + item);
+		}
+
+		@Override
+		public void afterProcess(String item, String result) {
+			this.events.add("afterProcess:" + item);
+		}
+
+		@Override
+		public String process(String item) {
+			return item;
+		}
+
+		List<String> getEvents() {
+			return this.events;
+		}
+
+	}
+
+	/**
+	 * A processor that implements {@link ItemProcessListener} and also has an annotated
+	 * {@code @BeforeStep} method. This reproduces issue #5466 where the object is
+	 * registered as a listener twice when annotations are present.
+	 */
+	private static final class ItemProcessListenerWithAnnotatedMethodProcessor
+			implements ItemProcessor<String, String>, ItemProcessListener<String, String> {
+
+		private final List<String> events = new java.util.ArrayList<>();
+
+		@BeforeStep
+		public void beforeStep(StepExecution stepExecution) {
+			this.events.add("beforeStep");
+		}
+
+		@Override
+		public void beforeProcess(String item) {
+			this.events.add("beforeProcess:" + item);
+		}
+
+		@Override
+		public void afterProcess(String item, String result) {
+			this.events.add("afterProcess:" + item);
+		}
+
+		@Override
+		public String process(String item) {
+			return item;
+		}
+
+		List<String> getEvents() {
+			return this.events;
+		}
+
 	}
 
 }
