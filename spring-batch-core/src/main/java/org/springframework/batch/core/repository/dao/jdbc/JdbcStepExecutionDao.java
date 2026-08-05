@@ -326,17 +326,33 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 	}
 
 	/**
-	 * Read the last step execution id first and only then load the full
-	 * {@link StepExecution}. Dependent queries must not run while a row-limited
-	 * {@link ResultSet} is still open (see GH-5470).
+	 * Find the most recent {@link StepExecution} for the given job instance and step
+	 * name.
+	 * <p>
+	 * Implementation note (GH-5470): the id is selected with
+	 * {@code ORDER BY SE.CREATE_TIME DESC, SE.STEP_EXECUTION_ID DESC}, only the first row
+	 * is read in Java, the statement is allowed to complete, and only then is
+	 * {@link #getStepExecution(long)} used to load the full entity. JDBC
+	 * {@code setMaxRows(1)} is intentionally not used: with a non-zero max-rows limit,
+	 * some drivers (for example pgjdbc) send a protocol row count that can leave a
+	 * suspended portal after the first row, so a follow-up prepare on the same connection
+	 * fails on databases that disallow multiple active portals (for example CockroachDB).
+	 * Closing the Java {@link ResultSet} is not enough if the portal never reached
+	 * {@code CommandComplete}.
+	 * <p>
+	 * SQL {@code LIMIT} is also avoided for database portability. With the default JDBC
+	 * fetch size, the id query runs to completion and only the first ordered row is
+	 * consumed in application code; subsequent rows are not mapped. This keeps the two
+	 * statements strictly sequential and portable across the databases Spring Batch
+	 * targets.
 	 */
 	@Nullable
 	@Override
 	public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
 		Long stepExecutionId = getJdbcTemplate().execute(getQuery(GET_LAST_STEP_EXECUTION),
 				(PreparedStatementCallback<Long>) statement -> {
-					// Use JDBC max rows rather than SQL LIMIT for database portability
-					statement.setMaxRows(1);
+					// Do not call setMaxRows(1): a protocol row limit can leave a
+					// suspended portal; the first ordered row is taken in Java instead.
 					statement.setLong(1, jobInstance.getInstanceId());
 					statement.setString(2, stepName);
 					try (ResultSet rs = statement.executeQuery()) {
@@ -349,6 +365,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 		if (stepExecutionId == null) {
 			return null;
 		}
+		// Id statement is closed by JdbcTemplate; load the full StepExecution next.
 		return getStepExecution(stepExecutionId);
 	}
 
