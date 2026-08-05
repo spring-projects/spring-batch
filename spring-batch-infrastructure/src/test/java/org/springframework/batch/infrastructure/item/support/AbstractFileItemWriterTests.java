@@ -19,16 +19,17 @@ package org.springframework.batch.infrastructure.item.support;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
 
-import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.springframework.batch.infrastructure.item.Chunk;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.batch.infrastructure.item.ItemStreamException;
-import org.springframework.batch.infrastructure.item.support.AbstractFileItemWriter;
 import org.springframework.core.io.FileSystemResource;
 
 /**
@@ -40,23 +41,25 @@ class AbstractFileItemWriterTests {
 
 	@Test
 	void testFailedFileDeletionThrowsException() {
-		File outputFile = new File("target/data/output.tmp");
-		File mocked = Mockito.spy(outputFile);
 
 		TestFileItemWriter writer = new TestFileItemWriter();
 
-		writer.setResource(new FileSystemResource(mocked));
+		writer.setResource(new FileSystemResource("target/data/output.tmp"));
 		writer.setShouldDeleteIfEmpty(true);
 		writer.setName(writer.getClass().getSimpleName());
 		writer.open(new ExecutionContext());
 
-		when(mocked.delete()).thenReturn(false);
+		try (MockedStatic<Files> mocked = Mockito.mockStatic(Files.class, Mockito.CALLS_REAL_METHODS)) {
 
-		ItemStreamException exception = assertThrows(ItemStreamException.class, writer::close,
-				"Expected exception when file deletion fails");
+			mocked.when(() -> Files.delete(any())).thenThrow(new IOException("Failed to delete file"));
 
-		assertEquals("Failed to delete empty file on close", exception.getMessage(), "Wrong exception message");
-		assertNotNull(exception.getCause(), "Exception should have a cause");
+			ItemStreamException exception = assertThrows(ItemStreamException.class, writer::close,
+					"Expected exception when file deletion fails");
+
+			assertEquals("Failed to delete empty file on close", exception.getMessage());
+
+			assertNotNull(exception.getCause());
+		}
 	}
 
 	private static class TestFileItemWriter extends AbstractFileItemWriter<String> {

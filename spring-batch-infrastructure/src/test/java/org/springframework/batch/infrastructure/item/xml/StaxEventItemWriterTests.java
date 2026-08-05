@@ -17,6 +17,7 @@ package org.springframework.batch.infrastructure.item.xml;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Collections;
 
 import javax.xml.stream.XMLEventFactory;
@@ -28,6 +29,8 @@ import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.springframework.batch.infrastructure.item.Chunk;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.batch.infrastructure.item.ItemStreamException;
@@ -50,6 +53,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
@@ -833,18 +837,21 @@ class StaxEventItemWriterTests {
 	 */
 	@Test
 	void testFailedFileDeletionThrowsException() throws IOException {
-		File mockedFile = spy(resource.getFile());
-		writer.setResource(new FileSystemResource(mockedFile));
+
 		writer.setShouldDeleteIfEmpty(true);
 		writer.open(executionContext);
 
-		when(mockedFile.delete()).thenReturn(false);
+		try (MockedStatic<Files> mocked = Mockito.mockStatic(Files.class, Mockito.CALLS_REAL_METHODS)) {
 
-		ItemStreamException exception = assertThrows(ItemStreamException.class, () -> writer.close(),
-				"Expected exception when file deletion fails");
+			mocked.when(() -> Files.delete(any())).thenThrow(new IOException("Failed to delete file"));
 
-		assertEquals("Failed to delete empty file on close", exception.getMessage(), "Wrong exception message");
-		assertNotNull(exception.getCause(), "Exception should have a cause");
+			ItemStreamException exception = assertThrows(ItemStreamException.class, writer::close,
+					"Expected exception when file deletion fails");
+
+			assertEquals("Failed to delete empty file on close", exception.getMessage(), "Wrong exception message");
+
+			assertNotNull(exception.getCause(), "Exception should have a cause");
+		}
 	}
 
 	private void initWriterForSimpleCallbackTests() throws Exception {
