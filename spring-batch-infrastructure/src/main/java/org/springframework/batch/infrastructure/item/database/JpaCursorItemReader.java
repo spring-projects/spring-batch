@@ -174,7 +174,9 @@ public class JpaCursorItemReader<T> extends AbstractItemCountingItemStreamItemRe
 	@SuppressWarnings("DataFlowIssue")
 	@Override
 	protected void doClose() {
-		this.entityManager.close();
+		if (this.entityManager != null) {
+			this.entityManager.close();
+		}
 	}
 
 }
