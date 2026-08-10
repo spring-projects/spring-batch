@@ -24,7 +24,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
-import org.testcontainers.containers.MariaDBContainer;
+import org.testcontainers.mariadb.MariaDBContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
@@ -43,7 +43,7 @@ class MariaDBPagingQueryProviderIntegrationTests extends AbstractPagingQueryProv
 	private static final DockerImageName MARIADB_IMAGE = DockerImageName.parse("mariadb:11.8.2");
 
 	@Container
-	public static MariaDBContainer<?> mariaDBContainer = new MariaDBContainer<>(MARIADB_IMAGE);
+	public static MariaDBContainer mariaDBContainer = new MariaDBContainer(MARIADB_IMAGE);
 
 	MariaDBPagingQueryProviderIntegrationTests(@Autowired DataSource dataSource) {
 		super(dataSource, new MySqlPagingQueryProvider());

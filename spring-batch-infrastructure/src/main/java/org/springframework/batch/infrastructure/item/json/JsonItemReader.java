@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2025 the original author or authors.
+ * Copyright 2018-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,11 +55,21 @@ public class JsonItemReader<T> extends AbstractItemCountingItemStreamItemReader<
 
 	private static final Log LOGGER = LogFactory.getLog(JsonItemReader.class);
 
-	private Resource resource;
+	private @Nullable Resource resource;
 
 	private JsonObjectReader<T> jsonObjectReader;
 
 	private boolean strict = true;
+
+	/**
+	 * Create a new {@link JsonItemReader} instance.
+	 * @param jsonObjectReader the json object reader to use
+	 * @since 6.0.4
+	 */
+	public JsonItemReader(JsonObjectReader<T> jsonObjectReader) {
+		Assert.notNull(jsonObjectReader, "The json object reader must not be null.");
+		this.jsonObjectReader = jsonObjectReader;
+	}
 
 	/**
 	 * Create a new {@link JsonItemReader} instance.
@@ -92,7 +102,7 @@ public class JsonItemReader<T> extends AbstractItemCountingItemStreamItemReader<
 	}
 
 	@Override
-	public void setResource(Resource resource) {
+	public void setResource(@Nullable Resource resource) {
 		this.resource = resource;
 	}
 
@@ -103,6 +113,8 @@ public class JsonItemReader<T> extends AbstractItemCountingItemStreamItemReader<
 
 	@Override
 	protected void doOpen() throws Exception {
+		Assert.notNull(this.resource, "The resource must not be null.");
+
 		if (!this.resource.exists()) {
 			if (this.strict) {
 				throw new IllegalStateException("Input resource must exist (reader is in 'strict' mode)");

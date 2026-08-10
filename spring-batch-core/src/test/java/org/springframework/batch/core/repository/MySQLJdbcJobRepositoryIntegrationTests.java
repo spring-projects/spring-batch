@@ -26,7 +26,7 @@ import com.mysql.cj.jdbc.MysqlDataSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.configuration.annotation.EnableJdbcJobRepository;
-import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.mysql.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
@@ -65,7 +65,7 @@ class MySQLJdbcJobRepositoryIntegrationTests {
 	private static final DockerImageName MYSQL_IMAGE = DockerImageName.parse("mysql:9.2.0");
 
 	@Container
-	public static MySQLContainer<?> mysql = new MySQLContainer<>(MYSQL_IMAGE);
+	public static MySQLContainer mysql = new MySQLContainer(MYSQL_IMAGE);
 
 	@Autowired
 	private DataSource dataSource;

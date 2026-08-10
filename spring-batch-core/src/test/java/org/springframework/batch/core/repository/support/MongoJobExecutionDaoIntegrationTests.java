@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2025 the original author or authors.
+ * Copyright 2008-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -239,6 +240,39 @@ class MongoJobExecutionDaoIntegrationTests extends AbstractMongoDBDaoIntegration
 			.orElseThrow();
 		assertTemporalEquals(now.plusSeconds(3), value.getLastUpdated());
 
+	}
+
+	@Test
+	void testFindRunningExecutionsAcrossMultipleInstances(@Autowired JobInstanceDao jobInstanceDao) {
+		String jobName = "multiInstanceJob";
+		JobInstance instance1 = jobInstanceDao.createJobInstance(jobName,
+				new JobParametersBuilder().addLong("id", 1L).toJobParameters());
+		JobInstance instance2 = jobInstanceDao.createJobInstance(jobName,
+				new JobParametersBuilder().addLong("id", 2L).toJobParameters());
+		LocalDateTime now = LocalDateTime.now();
+
+		JobExecution running1 = dao.createJobExecution(instance1, jobParameters);
+		running1.setStatus(BatchStatus.STARTED);
+		running1.setStartTime(now);
+		dao.updateJobExecution(running1);
+
+		JobExecution completed = dao.createJobExecution(instance2, jobParameters);
+		completed.setStatus(BatchStatus.COMPLETED);
+		completed.setStartTime(now);
+		completed.setEndTime(now);
+		dao.updateJobExecution(completed);
+
+		JobExecution running2 = dao.createJobExecution(instance2, jobParameters);
+		running2.setStatus(BatchStatus.STARTED);
+		running2.setStartTime(now);
+		dao.updateJobExecution(running2);
+
+		Set<JobExecution> result = dao.findRunningJobExecutions(jobName);
+
+		assertEquals(2, result.size());
+		Set<Long> ids = result.stream().map(JobExecution::getId).collect(Collectors.toSet());
+		assertTrue(ids.contains(running1.getId()));
+		assertTrue(ids.contains(running2.getId()));
 	}
 
 	/**

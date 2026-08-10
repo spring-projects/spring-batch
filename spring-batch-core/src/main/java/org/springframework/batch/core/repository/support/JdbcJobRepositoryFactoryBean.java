@@ -42,6 +42,7 @@ import java.nio.charset.Charset;
  * @author Dave Syer
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  * @since 6.0
  */
 @SuppressWarnings("removal")
@@ -149,6 +150,33 @@ public class JdbcJobRepositoryFactoryBean extends JobRepositoryFactoryBean {
 	@Override
 	public void setTablePrefix(String tablePrefix) {
 		super.setTablePrefix(tablePrefix);
+	}
+
+	/**
+	 * Sets the job instance incrementer name.
+	 * @param jobInstanceIncrementerName job instance incrementer name
+	 */
+	@Override
+	public void setJobInstanceIncrementerName(String jobInstanceIncrementerName) {
+		super.setJobInstanceIncrementerName(jobInstanceIncrementerName);
+	}
+
+	/**
+	 * Sets the job execution incrementer name.
+	 * @param jobExecutionIncrementerName job execution incrementer name
+	 */
+	@Override
+	public void setJobExecutionIncrementerName(String jobExecutionIncrementerName) {
+		super.setJobExecutionIncrementerName(jobExecutionIncrementerName);
+	}
+
+	/**
+	 * Sets the step execution incrementer name.
+	 * @param stepExecutionIncrementerName step execution incrementer name
+	 */
+	@Override
+	public void setStepExecutionIncrementerName(String stepExecutionIncrementerName) {
+		super.setStepExecutionIncrementerName(stepExecutionIncrementerName);
 	}
 
 	@Override

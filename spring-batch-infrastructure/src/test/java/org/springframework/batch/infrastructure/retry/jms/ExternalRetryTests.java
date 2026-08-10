@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.infrastructure.item.Chunk;
@@ -40,6 +41,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@Disabled("Need to be refactored to remove usage of RepeatTemplate")
 @SpringJUnitConfig(locations = "/org/springframework/batch/infrastructure/jms/jms-context.xml")
 class ExternalRetryTests {
 

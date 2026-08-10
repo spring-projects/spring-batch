@@ -1,0 +1,13 @@
+changelog:
+  repository: spring-projects/spring-batch
+  sections:
+    - title: ":star: New features"
+      labels: [ "type: feature" ]
+    - title: ":rocket: Enhancements"
+      labels: [ "type: enhancement" ]
+    - title: ":lady_beetle: Bug fixes"
+      labels: [ "type: bug" ]
+    - title: ":notebook_with_decorative_cover: Documentation"
+      labels: [ "in: documentation" ]
+    - title: ":hammer: Tasks"
+      labels: [ "type: task" ]

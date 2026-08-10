@@ -23,6 +23,7 @@ import jakarta.jms.TextMessage;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.infrastructure.jms.BatchMessageListenerContainer;
@@ -38,6 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@Disabled("Need to be refactored to remove usage of RepeatTemplate")
 @SpringJUnitConfig(locations = "/org/springframework/batch/infrastructure/jms/jms-context.xml")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class AsynchronousTests {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 the original author or authors.
+ * Copyright 2025-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.launch.support;
 
+import java.util.List;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Assertions;
@@ -185,6 +186,58 @@ class CommandLineJobOperatorTests {
 		// then
 		Assertions.assertEquals(ExitCodeMapper.JVM_EXITCODE_GENERIC_ERROR, exitCode); // JVM_EXITCODE_GENERIC_ERROR
 		Mockito.verify(jobOperator, Mockito.never()).abandon(jobExecution);
+	}
+
+	@Test
+	void parseWithParameterContainingEqualsSign() {
+		// given
+		List<String> jobParameters = List.of("url=http://example.com?id=123");
+
+		// when
+		Properties properties = CommandLineJobOperator.parse(jobParameters);
+
+		// then
+		Assertions.assertEquals(1, properties.size());
+		Assertions.assertEquals("http://example.com?id=123", properties.get("url"));
+	}
+
+	@Test
+	void parseWithMultipleParameters() {
+		// given
+		List<String> jobParameters = List.of("name=test", "count=10");
+
+		// when
+		Properties properties = CommandLineJobOperator.parse(jobParameters);
+
+		// then
+		Assertions.assertEquals(2, properties.size());
+		Assertions.assertEquals("test", properties.get("name"));
+		Assertions.assertEquals("10", properties.get("count"));
+	}
+
+	@Test
+	void parseWithParameterContainingMultipleEqualsSign() {
+		// given
+		List<String> jobParameters = List.of("url=http://example.com?id=123&name=test");
+
+		// when
+		Properties properties = CommandLineJobOperator.parse(jobParameters);
+
+		// then
+		Assertions.assertEquals(1, properties.size());
+		Assertions.assertEquals("http://example.com?id=123&name=test", properties.get("url"));
+	}
+
+	@Test
+	void parseWithInvalidParameter() {
+		// given
+		List<String> jobParameters = List.of("invalidParam");
+
+		// when
+		Properties properties = CommandLineJobOperator.parse(jobParameters);
+
+		// then
+		Assertions.assertTrue(properties.isEmpty());
 	}
 
 	@Test

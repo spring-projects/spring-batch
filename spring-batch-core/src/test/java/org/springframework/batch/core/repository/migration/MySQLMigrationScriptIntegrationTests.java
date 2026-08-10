@@ -21,7 +21,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
-import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.mysql.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
@@ -37,7 +37,7 @@ import org.testcontainers.utility.DockerImageName;
 class MySQLMigrationScriptIntegrationTests {
 
 	@Container
-	public static MySQLContainer<?> mysql = new MySQLContainer<>(DockerImageName.parse("mysql:9.2.0"));
+	public static MySQLContainer mysql = new MySQLContainer(DockerImageName.parse("mysql:9.2.0"));
 
 	@Test
 	void migrationScriptShouldBeValid() {

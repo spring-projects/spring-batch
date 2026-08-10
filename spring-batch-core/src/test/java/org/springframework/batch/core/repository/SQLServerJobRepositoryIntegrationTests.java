@@ -22,7 +22,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.configuration.annotation.EnableJdbcJobRepository;
-import org.testcontainers.containers.MSSQLServerContainer;
+import org.testcontainers.mssqlserver.MSSQLServerContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
@@ -63,7 +63,7 @@ class SQLServerJobRepositoryIntegrationTests {
 		.parse("mcr.microsoft.com/mssql/server:2022-CU14-ubuntu-22.04");
 
 	@Container
-	public static MSSQLServerContainer<?> sqlserver = new MSSQLServerContainer<>(SQLSERVER_IMAGE).acceptLicense();
+	public static MSSQLServerContainer sqlserver = new MSSQLServerContainer(SQLSERVER_IMAGE).acceptLicense();
 
 	@Autowired
 	private DataSource dataSource;

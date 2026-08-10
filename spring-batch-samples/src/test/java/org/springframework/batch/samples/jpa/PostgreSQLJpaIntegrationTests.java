@@ -21,7 +21,7 @@ import jakarta.persistence.EntityManagerFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.postgresql.ds.PGSimpleDataSource;
-import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.postgresql.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
@@ -69,7 +69,7 @@ class PostgreSQLJpaIntegrationTests {
 	private static final DockerImageName POSTGRESQL_IMAGE = DockerImageName.parse("postgres:17.5");
 
 	@Container
-	public static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(POSTGRESQL_IMAGE);
+	public static PostgreSQLContainer postgres = new PostgreSQLContainer(POSTGRESQL_IMAGE);
 
 	@Autowired
 	private DataSource dataSource;

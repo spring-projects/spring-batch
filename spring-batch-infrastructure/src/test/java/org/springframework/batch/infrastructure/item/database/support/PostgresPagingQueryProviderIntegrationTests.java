@@ -24,7 +24,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
-import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.postgresql.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
@@ -43,7 +43,7 @@ class PostgresPagingQueryProviderIntegrationTests extends AbstractPagingQueryPro
 	private static final DockerImageName POSTGRESQL_IMAGE = DockerImageName.parse("postgres:17.5");
 
 	@Container
-	public static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(POSTGRESQL_IMAGE);
+	public static PostgreSQLContainer postgres = new PostgreSQLContainer(POSTGRESQL_IMAGE);
 
 	PostgresPagingQueryProviderIntegrationTests(@Autowired DataSource dataSource) {
 		super(dataSource, new PostgresPagingQueryProvider());

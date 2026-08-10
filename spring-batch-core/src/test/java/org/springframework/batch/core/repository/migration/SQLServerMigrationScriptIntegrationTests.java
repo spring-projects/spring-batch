@@ -21,7 +21,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
-import org.testcontainers.containers.MSSQLServerContainer;
+import org.testcontainers.mssqlserver.MSSQLServerContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
@@ -37,7 +37,7 @@ import org.testcontainers.utility.DockerImageName;
 class SQLServerMigrationScriptIntegrationTests {
 
 	@Container
-	public static MSSQLServerContainer<?> sqlserver = new MSSQLServerContainer<>(
+	public static MSSQLServerContainer sqlserver = new MSSQLServerContainer(
 			DockerImageName.parse("mcr.microsoft.com/mssql/server:2022-latest"))
 		.acceptLicense();
 

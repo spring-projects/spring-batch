@@ -24,7 +24,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
-import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.mysql.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
@@ -43,7 +43,7 @@ class MySqlPagingQueryProviderIntegrationTests extends AbstractPagingQueryProvid
 	private static final DockerImageName MYSQL_IMAGE = DockerImageName.parse("mysql:9.2.0");
 
 	@Container
-	public static MySQLContainer<?> mysql = new MySQLContainer<>(MYSQL_IMAGE);
+	public static MySQLContainer mysql = new MySQLContainer(MYSQL_IMAGE);
 
 	MySqlPagingQueryProviderIntegrationTests(@Autowired DataSource dataSource) {
 		super(dataSource, new MySqlPagingQueryProvider());

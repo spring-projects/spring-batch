@@ -26,6 +26,7 @@ import java.util.List;
 import jakarta.jms.ConnectionFactory;
 import jakarta.jms.JMSException;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.infrastructure.repeat.RepeatStatus;
@@ -46,6 +47,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
+@Disabled("Need to be refactored to remove usage of RepeatTemplate")
 @SpringJUnitConfig(locations = "/org/springframework/batch/infrastructure/jms/jms-context.xml")
 @DirtiesContext
 class SynchronousTests implements ApplicationContextAware {

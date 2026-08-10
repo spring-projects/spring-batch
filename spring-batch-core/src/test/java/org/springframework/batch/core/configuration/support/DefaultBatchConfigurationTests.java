@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2025 the original author or authors.
+ * Copyright 2022-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,11 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.ExitStatus;
+import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.launch.JobRestartException;
 import org.springframework.batch.core.repository.support.ResourcelessJobRepository;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.job.builder.JobBuilder;
@@ -42,8 +44,12 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+
 /**
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  */
 class DefaultBatchConfigurationTests {
 
@@ -85,6 +91,25 @@ class DefaultBatchConfigurationTests {
 		Assertions.assertNotNull(jobOperator);
 	}
 
+	@Test
+	void testConfigurationWithCustomJobRegistry() throws Exception {
+		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(
+				CustomJobRegistryJobConfiguration.class);
+		Job job = context.getBean(Job.class);
+		JobOperator jobOperator = context.getBean(JobOperator.class);
+		JobExecution jobExecution = jobOperator.start(job, new JobParameters());
+
+		try {
+			jobOperator.restart(jobExecution);
+		}
+		catch (JobRestartException ignored) {
+			// ignore
+		}
+
+		JobRegistry jobRegistry = context.getBean(JobRegistry.class);
+		verify(jobRegistry).getJob("job");
+	}
+
 	@Configuration
 	static class MyJobConfiguration extends JdbcDefaultBatchConfiguration {
 
@@ -121,6 +146,16 @@ class DefaultBatchConfigurationTests {
 		@Override
 		public JobRepository jobRepository() {
 			return new ResourcelessJobRepository();
+		}
+
+	}
+
+	@Configuration
+	static class CustomJobRegistryJobConfiguration extends MyJobConfiguration {
+
+		@Bean
+		public JobRegistry jobRegistry() {
+			return spy(new MapJobRegistry());
 		}
 
 	}

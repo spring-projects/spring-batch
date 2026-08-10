@@ -90,6 +90,15 @@ called from multiple threads at the same time. This means that the `ItemProcesso
 thread-safe. If you are using stateful components in the processing, you must ensure that
 they are properly synchronized for concurrent access.
 
+Since Spring transactions are thread-bound, the item processor calls that run in worker
+threads do not participate in the chunk transaction configured on the step. If an item
+processor needs transaction management, it should start its own transaction, for example
+with a propagation of `REQUIRED`. A processor that requires an existing transaction, for
+example with a propagation of `MANDATORY`, fails unless a transaction is already active in
+the worker thread. If you need an entire chunk to be processed in a worker thread, where
+the delegate can manage a transaction around the chunk, consider using
+<<localChunking,local chunking>> instead.
+
 The reading and writing of items is still done in serial by the main thread executing the step,
 so the `ItemReader` and `ItemWriter` do not have to be thread-safe or synchronized. However,
 the throughput of the step may be limited by the speed of reading and writing. If this is
@@ -197,9 +206,8 @@ See the section on xref:step/controlling-flow.adoc#split-flows[Split Flows] for 
 Local chunking is a new feature in v6.0 that allows you to process chunks of items in parallel, locally within the same JVM using multiple threads.
 This is particularly useful when you have a large number of items to process and want to take advantage of multi-core processors.
 With local chunking, you can configure a chunk-oriented step to use multiple threads to process chunks of items concurrently.
-Each thread will read, process and write its own chunk of items independently, while the step will manage the overall execution and commit the results.
 
-This feature is possible by using the `ChunkMessageChannelItemWriter`, which is an item writer that submits chunk
+This feature is possible by using the `ChunkTaskExecutorItemWriter`, which is an item writer that submits chunk
 requests to local workers from a `TaskExecutor`:
 
 [source, java]
@@ -215,9 +223,11 @@ public ChunkTaskExecutorItemWriter<Vet> itemWriter(ChunkProcessor<Vet> chunkProc
 }
 ----
 
-The `ChunkMessageChannelItemWriter` requires a `TaskExecutor` to process chunk concurrently
-as well as a `ChunkProcessor` to define what to do with each chunk. Here is an example of
-a chunk processor that writes each chunk of items to a relational database table:
+The `ChunkTaskExecutorItemWriter` requires a `TaskExecutor` to process chunk concurrently as well as a `ChunkProcessor`
+to define what to do with each chunk. Each thread from the task executor will receive its own chunk of items and is responsible
+for processing the chunk, and the step will manage the overall aggregation of the results.
+
+Here is an example of a chunk processor that writes each chunk of items to a relational database table:
 
 [source, java]
 ----
@@ -240,11 +250,19 @@ public ChunkProcessor<Vet> chunkProcessor(DataSource dataSource, TransactionTemp
         }
         catch (Exception e) {
             transactionStatus.setRollbackOnly();
+            contribution.incrementWriteSkipCount(chunk.size());
             contribution.setExitStatus(ExitStatus.FAILED.addExitDescription(e));
         }
     });
 }
 ----
+
+[IMPORTANT]
+====
+It should be noted that transaction management of the chunk as well as fault tolerance features (like retry, skip, chunk scanning, etc)
+are not handled by the `ChunkTaskExecutorItemWriter` nor the driving step, and are the responsibility of the delegate chunk processor.
+Moreover, the lifecycle of the task executor is not handled by the `ChunkTaskExecutorItemWriter`.
+====
 
 You can find an example of this scaling technique in the https://github.com/spring-projects/spring-batch/tree/main/spring-batch-samples/src/main/java/org/springframework/batch/samples/chunking/local[Local Chunking Sample].
 
@@ -335,9 +353,8 @@ public Step step1Manager(JobRepository jobRepository) {
 }
 ----
 +
-Similar to the multi-threaded step's `throttleLimit` method, the `gridSize`
-method prevents the task executor from being saturated with requests from a single
-step.
+The `gridSize` method prevents the task executor from being saturated with requests
+from a single step.
 
 XML::
 +
@@ -353,16 +370,11 @@ configuration:
 </step>
 ----
 +
-Similar to the multi-threaded step's `throttle-limit` attribute, the `grid-size`
-attribute prevents the task executor from being saturated with requests from a single
-step.
+The `grid-size` attribute prevents the task executor from being saturated with requests
+from a single step.
 
 ====
 
-
-The unit test suite for
-https://github.com/spring-projects/spring-batch/tree/main/spring-batch-samples/src/main/resources/jobs[Spring
-Batch Samples] (see `partition*Job.xml` configuration) has a simple example that you can copy and extend.
 
 Spring Batch creates step executions for the partition called `step1:partition0` and so
 on. Many people prefer to call the manager step `step1:manager` for consistency. You can
@@ -545,6 +557,8 @@ The following example shows how to define late binding in XML:
 
 ====
 
+You can find a complete example in the https://github.com/spring-projects/spring-batch/tree/main/spring-batch-samples/src/main/java/org/springframework/batch/samples/partitioning[Partitioning Sample].
+
 [[remoteStep]]
 == Remote Step execution
 
@@ -603,4 +617,3 @@ public StepLocator stepLocator(BeanFactory beanFactory) {
 ----
 
 You can find a complete example in the https://github.com/spring-projects/spring-batch/tree/main/spring-batch-samples/src/main/java/org/springframework/batch/samples/remotestep[Remote Step Sample].
-

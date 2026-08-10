@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameter;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.UnexpectedJobExecutionException;
-import org.springframework.batch.core.scope.StepScope;
+import org.springframework.batch.core.scope.JobScope;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.batch.infrastructure.repeat.context.SynchronizedAttributeAccessor;
 import org.springframework.util.Assert;
@@ -128,9 +128,9 @@ public class JobContext extends SynchronizedAttributeAccessor {
 	}
 
 	/**
-	 * Clean up the context at the end of a step execution. Must be called once at the end
-	 * of a step execution to honour the destruction callback contract from the
-	 * {@link StepScope}.
+	 * Clean up the context at the end of a job execution. Must be called once at the end
+	 * of a job execution to honour the destruction callback contract from the
+	 * {@link JobScope}.
 	 */
 	public void close() {
 
@@ -179,7 +179,7 @@ public class JobContext extends SynchronizedAttributeAccessor {
 	}
 
 	/**
-	 * @return unique identifier for this context based on the step execution
+	 * @return unique identifier for this context based on the job execution
 	 */
 	public String getId() {
 		return "jobExecution#" + jobExecution.getId();

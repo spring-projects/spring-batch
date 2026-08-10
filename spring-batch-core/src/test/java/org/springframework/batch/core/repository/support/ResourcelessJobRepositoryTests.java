@@ -21,6 +21,7 @@ import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersBuilder;
+import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -30,6 +31,7 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * @author Mahmoud Ben Hassine
  * @author Sanghyuk Jung
+ * @author Yanming Zhou
  */
 class ResourcelessJobRepositoryTests {
 
@@ -225,21 +227,17 @@ class ResourcelessJobRepositoryTests {
 	}
 
 	@Test
-	void getJobInstanceCountWithDifferentJobName() {
+	void getJobInstanceCountWithDifferentJobName() throws Exception {
 		// given
 		String jobName = "job";
 		JobParameters jobParameters = new JobParameters();
 		jobRepository.createJobInstance(jobName, jobParameters);
 
-		// when
-		long count = jobRepository.getJobInstanceCount("differentJob");
-
-		// then
-		assertEquals(0L, count);
+		assertThrows(NoSuchJobException.class, () -> jobRepository.getJobInstanceCount("differentJob"));
 	}
 
 	@Test
-	void getJobInstanceCountWithCorrectJobName() {
+	void getJobInstanceCountWithCorrectJobName() throws Exception {
 		// given
 		String jobName = "job";
 		JobParameters jobParameters = new JobParameters();

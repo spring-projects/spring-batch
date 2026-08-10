@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2025 the original author or authors.
+ * Copyright 2002-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,10 +31,6 @@ import org.springframework.batch.core.converter.StringToLocalTimeConverter;
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
 import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDao;
 import org.springframework.batch.core.repository.dao.DefaultExecutionContextSerializer;
-import org.springframework.batch.core.repository.dao.ExecutionContextDao;
-import org.springframework.batch.core.repository.dao.JobExecutionDao;
-import org.springframework.batch.core.repository.dao.JobInstanceDao;
-import org.springframework.batch.core.repository.dao.StepExecutionDao;
 import org.springframework.batch.core.repository.dao.jdbc.JdbcExecutionContextDao;
 import org.springframework.batch.core.repository.dao.jdbc.JdbcJobExecutionDao;
 import org.springframework.batch.core.repository.dao.jdbc.JdbcJobInstanceDao;
@@ -70,6 +66,8 @@ import static org.springframework.batch.infrastructure.support.DatabaseType.SYBA
  * @author Dave Syer
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
+ * @author Thomas Risberg
  * @deprecated since 6.0 in favor of {@link JdbcJobRepositoryFactoryBean}. Scheduled for
  * removal in 6.2 or later.
  */
@@ -79,6 +77,21 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 
 	protected static final Log logger = LogFactory.getLog(JobRepositoryFactoryBean.class);
 
+	/**
+	 * Legacy (v5) name of the job instance incrementer.
+	 */
+	protected static final String LEGACY_JOB_INSTANCE_INCREMENTER_NAME = "JOB_SEQ";
+
+	/**
+	 * Environment variable for using the legacy (v5) jdbc schema.
+	 */
+	protected static final String SPRING_BATCH_JDBC_SCHEMA_LEGACY = "SPRING_BATCH_JDBC_SCHEMA_LEGACY";
+
+	/**
+	 * System property for using the legacy (v5) jdbc schema.
+	 */
+	protected static final String SPRING_BATCH_JDBC_SCHEMA_LEGACY_PROPERTY = "spring.batch.jdbc.schema.legacy";
+
 	protected DataSource dataSource;
 
 	protected JdbcOperations jdbcOperations;
@@ -86,6 +99,12 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 	protected String databaseType;
 
 	protected String tablePrefix = AbstractJdbcBatchMetadataDao.DEFAULT_TABLE_PREFIX;
+
+	protected String jobInstanceIncrementerName = AbstractJdbcBatchMetadataDao.DEFAULT_JOB_INSTANCE_INCREMENTER_NAME;
+
+	protected String jobExecutionIncrementerName = AbstractJdbcBatchMetadataDao.DEFAULT_JOB_EXECUTION_INCREMENTER_NAME;
+
+	protected String stepExecutionIncrementerName = AbstractJdbcBatchMetadataDao.DEFAULT_STEP_EXECUTION_INCREMENTER_NAME;
 
 	protected DataFieldMaxValueIncrementerFactory incrementerFactory;
 
@@ -207,6 +226,30 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 		this.tablePrefix = tablePrefix;
 	}
 
+	/**
+	 * Sets the job instance incrementer name.
+	 * @param jobInstanceIncrementerName job instance incrementer name
+	 */
+	public void setJobInstanceIncrementerName(String jobInstanceIncrementerName) {
+		this.jobInstanceIncrementerName = jobInstanceIncrementerName;
+	}
+
+	/**
+	 * Sets the job execution incrementer name.
+	 * @param jobExecutionIncrementerName job execution incrementer name
+	 */
+	public void setJobExecutionIncrementerName(String jobExecutionIncrementerName) {
+		this.jobExecutionIncrementerName = jobExecutionIncrementerName;
+	}
+
+	/**
+	 * Sets the step execution incrementer name.
+	 * @param stepExecutionIncrementerName step execution incrementer name
+	 */
+	public void setStepExecutionIncrementerName(String stepExecutionIncrementerName) {
+		this.stepExecutionIncrementerName = stepExecutionIncrementerName;
+	}
+
 	public void setIncrementerFactory(DataFieldMaxValueIncrementerFactory incrementerFactory) {
 		this.incrementerFactory = incrementerFactory;
 	}
@@ -285,9 +328,20 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 	@Override
 	protected JdbcJobInstanceDao createJobInstanceDao() {
 		JdbcJobInstanceDao dao = new JdbcJobInstanceDao();
+		String legacySchema = "false";
+		if (System.getenv(SPRING_BATCH_JDBC_SCHEMA_LEGACY) != null) {
+			legacySchema = System.getenv(SPRING_BATCH_JDBC_SCHEMA_LEGACY);
+		}
+		else if (System.getProperty(SPRING_BATCH_JDBC_SCHEMA_LEGACY_PROPERTY) != null) {
+			legacySchema = System.getProperty(SPRING_BATCH_JDBC_SCHEMA_LEGACY_PROPERTY);
+		}
+		if ("TRUE".equalsIgnoreCase(legacySchema) || "YES".equalsIgnoreCase(legacySchema)) {
+			jobInstanceIncrementerName = LEGACY_JOB_INSTANCE_INCREMENTER_NAME;
+			logger.info("Using legacy name for job instance incrementer: " + jobInstanceIncrementerName);
+		}
 		dao.setJdbcTemplate(jdbcOperations);
 		dao.setJobInstanceIncrementer(
-				incrementerFactory.getIncrementer(databaseType, tablePrefix + "JOB_INSTANCE_SEQ"));
+				incrementerFactory.getIncrementer(databaseType, tablePrefix + jobInstanceIncrementerName));
 		dao.setJobKeyGenerator(jobKeyGenerator);
 		dao.setTablePrefix(tablePrefix);
 		return dao;
@@ -298,7 +352,7 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 		JdbcJobExecutionDao dao = new JdbcJobExecutionDao();
 		dao.setJdbcTemplate(jdbcOperations);
 		dao.setJobExecutionIncrementer(
-				incrementerFactory.getIncrementer(databaseType, tablePrefix + "JOB_EXECUTION_SEQ"));
+				incrementerFactory.getIncrementer(databaseType, tablePrefix + jobExecutionIncrementerName));
 		dao.setTablePrefix(tablePrefix);
 		dao.setClobTypeToUse(determineClobTypeToUse(this.databaseType));
 		dao.setExitMessageLength(this.maxVarCharLengthForExitMessage);
@@ -311,7 +365,7 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 		JdbcStepExecutionDao dao = new JdbcStepExecutionDao();
 		dao.setJdbcTemplate(jdbcOperations);
 		dao.setStepExecutionIncrementer(
-				incrementerFactory.getIncrementer(databaseType, tablePrefix + "STEP_EXECUTION_SEQ"));
+				incrementerFactory.getIncrementer(databaseType, tablePrefix + stepExecutionIncrementerName));
 		dao.setTablePrefix(tablePrefix);
 		dao.setClobTypeToUse(determineClobTypeToUse(this.databaseType));
 		dao.setExitMessageLength(this.maxVarCharLengthForExitMessage);

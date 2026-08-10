@@ -16,7 +16,7 @@
 package org.springframework.batch.samples.amqp;
 
 import org.junit.jupiter.api.Test;
-import org.testcontainers.containers.RabbitMQContainer;
+import org.testcontainers.rabbitmq.RabbitMQContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;

@@ -21,7 +21,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mariadb.jdbc.MariaDbDataSource;
 import org.springframework.batch.core.configuration.annotation.EnableJdbcJobRepository;
-import org.testcontainers.containers.MariaDBContainer;
+import org.testcontainers.mariadb.MariaDBContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
@@ -60,7 +60,7 @@ class MariaDBJobRepositoryIntegrationTests {
 	private static final DockerImageName MARIADB_IMAGE = DockerImageName.parse("mariadb:11.8.2");
 
 	@Container
-	public static MariaDBContainer<?> mariaDBContainer = new MariaDBContainer<>(MARIADB_IMAGE);
+	public static MariaDBContainer mariaDBContainer = new MariaDBContainer(MARIADB_IMAGE);
 
 	@Autowired
 	private DataSource dataSource;

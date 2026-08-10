@@ -86,7 +86,13 @@ public class SynchronizedItemStreamReader<T> implements ItemStreamReader<T> {
 
 	@Override
 	public void update(ExecutionContext executionContext) {
-		this.delegate.update(executionContext);
+		this.lock.lock();
+		try {
+			this.delegate.update(executionContext);
+		}
+		finally {
+			this.lock.unlock();
+		}
 	}
 
 }

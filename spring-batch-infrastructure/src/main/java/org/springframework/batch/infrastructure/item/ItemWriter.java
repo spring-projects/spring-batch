@@ -41,8 +41,10 @@ public interface ItemWriter<T> {
 
 	/**
 	 * Process the supplied data element. Will not be called with any null items in normal
-	 * operation.
-	 * @param chunk of items to be written. Must not be {@code null}.
+	 * operation but might be called with an empty chunk, for example when all items have
+	 * been filtered by an {@link ItemProcessor} or skipped by the fault-tolerant step
+	 * processing. Implementations are expected to handle empty chunks gracefully.
+	 * @param chunk of items to be written. Never {@code null} but may be empty.
 	 * @throws Exception if there are errors. The framework will catch the exception and
 	 * convert or rethrow it as appropriate.
 	 */

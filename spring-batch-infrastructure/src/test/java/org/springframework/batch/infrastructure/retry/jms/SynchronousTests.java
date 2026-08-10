@@ -17,6 +17,7 @@
 package org.springframework.batch.infrastructure.retry.jms;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.infrastructure.item.jms.JmsItemReader;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@Disabled("Need to be refactored to remove usage of RepeatTemplate")
 @SpringJUnitConfig(locations = "/org/springframework/batch/infrastructure/jms/jms-context.xml")
 public class SynchronousTests {
 

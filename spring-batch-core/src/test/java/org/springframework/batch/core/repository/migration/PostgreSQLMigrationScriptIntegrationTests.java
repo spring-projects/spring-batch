@@ -21,7 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.postgresql.ds.PGSimpleDataSource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
-import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.postgresql.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
@@ -37,7 +37,7 @@ import org.testcontainers.utility.DockerImageName;
 class PostgreSQLMigrationScriptIntegrationTests {
 
 	@Container
-	public static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(DockerImageName.parse("postgres:18.1"));
+	public static PostgreSQLContainer postgres = new PostgreSQLContainer(DockerImageName.parse("postgres:18.1"));
 
 	@Test
 	void migrationScriptShouldBeValid() {

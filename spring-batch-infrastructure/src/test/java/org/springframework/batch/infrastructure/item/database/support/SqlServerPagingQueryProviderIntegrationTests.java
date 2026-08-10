@@ -26,7 +26,7 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import org.junit.jupiter.api.Disabled;
-import org.testcontainers.containers.MSSQLServerContainer;
+import org.testcontainers.mssqlserver.MSSQLServerContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
@@ -47,7 +47,7 @@ class SqlServerPagingQueryProviderIntegrationTests extends AbstractPagingQueryPr
 		.parse("mcr.microsoft.com/mssql/server:2022-CU14-ubuntu-22.04");
 
 	@Container
-	public static MSSQLServerContainer<?> sqlserver = new MSSQLServerContainer<>(SQLSERVER_IMAGE).acceptLicense();
+	public static MSSQLServerContainer sqlserver = new MSSQLServerContainer(SQLSERVER_IMAGE).acceptLicense();
 
 	SqlServerPagingQueryProviderIntegrationTests(@Autowired DataSource dataSource) {
 		super(dataSource, new SqlServerPagingQueryProvider());

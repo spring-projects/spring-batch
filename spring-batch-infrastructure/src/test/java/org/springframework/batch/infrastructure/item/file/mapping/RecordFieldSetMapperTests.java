@@ -17,17 +17,18 @@ package org.springframework.batch.infrastructure.item.file.mapping;
 
 import org.junit.jupiter.api.Test;
 
-import org.springframework.batch.infrastructure.item.file.mapping.RecordFieldSetMapper;
 import org.springframework.batch.infrastructure.item.file.transform.DefaultFieldSet;
 import org.springframework.batch.infrastructure.item.file.transform.FieldSet;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Mahmoud Ben Hassine
  * @author Seungyong Hong
+ * @author Yanming Zhou
  */
 class RecordFieldSetMapperTests {
 
@@ -83,10 +84,25 @@ class RecordFieldSetMapperTests {
 		assertNotNull(empty);
 	}
 
+	@Test
+	void testMapFieldSetWhenFieldsMayBeNull() {
+		// given
+		RecordFieldSetMapper<User> recordFieldSetMapper = new RecordFieldSetMapper<>(User.class);
+		FieldSet fieldSet = new DefaultFieldSet(new String[] { "", "foo" }, new String[] { "id", "name" });
+
+		// when
+		User user = recordFieldSetMapper.mapFieldSet(fieldSet);
+		assertNotNull(user);
+		assertNull(user.id());
+	}
+
 	record Person(int id, String name) {
 	}
 
 	record EmptyRecord() {
+	}
+
+	record User(Integer id, String name) {
 	}
 
 }

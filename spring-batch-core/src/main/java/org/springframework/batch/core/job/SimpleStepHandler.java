@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -124,9 +124,6 @@ public class SimpleStepHandler implements StepHandler {
 				currentStepExecution.setExecutionContext(new ExecutionContext(executionContext));
 			}
 
-			if (logger.isInfoEnabled()) {
-				logger.info("Executing step: [" + step.getName() + "]");
-			}
 			try {
 				step.execute(currentStepExecution);
 				currentStepExecution.getExecutionContext().put("batch.executed", true);

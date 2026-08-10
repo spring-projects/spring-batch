@@ -41,6 +41,7 @@ import org.springframework.util.StringUtils;
  *
  * @author Robert Kasanicky
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  */
 public abstract class AbstractJdbcBatchMetadataDao implements InitializingBean {
 
@@ -48,6 +49,21 @@ public abstract class AbstractJdbcBatchMetadataDao implements InitializingBean {
 	 * Default value for the table prefix property.
 	 */
 	public static final String DEFAULT_TABLE_PREFIX = "BATCH_";
+
+	/**
+	 * Default name of the job instance incrementer.
+	 */
+	public static final String DEFAULT_JOB_INSTANCE_INCREMENTER_NAME = "JOB_INSTANCE_SEQ";
+
+	/**
+	 * Default name of the job execution incrementer.
+	 */
+	public static final String DEFAULT_JOB_EXECUTION_INCREMENTER_NAME = "JOB_EXECUTION_SEQ";
+
+	/**
+	 * Default name of the step execution incrementer.
+	 */
+	public static final String DEFAULT_STEP_EXECUTION_INCREMENTER_NAME = "STEP_EXECUTION_SEQ";
 
 	public static final int DEFAULT_EXIT_MESSAGE_LENGTH = 2500;
 

@@ -104,7 +104,8 @@ public class LocalChunkingJobConfiguration {
 			}
 			catch (Exception e) {
 				transactionStatus.setRollbackOnly();
-				contribution.setExitStatus(ExitStatus.FAILED.addExitDescription(e));
+				contribution.incrementWriteSkipCount(chunk.size());
+				contribution.setExitStatus(ExitStatus.FAILED.withExitException(e));
 			}
 		});
 	}

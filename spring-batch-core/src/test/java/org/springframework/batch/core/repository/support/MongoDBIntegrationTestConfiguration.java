@@ -29,7 +29,7 @@ import org.springframework.data.mongodb.MongoTransactionManager;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
-import org.testcontainers.containers.MongoDBContainer;
+import org.testcontainers.mongodb.MongoDBContainer;
 import org.testcontainers.utility.DockerImageName;
 
 /**
@@ -45,7 +45,7 @@ class MongoDBIntegrationTestConfiguration {
 
 	@Bean(initMethod = "start")
 	public MongoDBContainer mongoDBContainer() {
-		return new MongoDBContainer(MONGODB_IMAGE);
+		return new MongoDBContainer(MONGODB_IMAGE).withReplicaSet();
 	}
 
 	@Bean

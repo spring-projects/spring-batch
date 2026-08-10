@@ -69,6 +69,16 @@ public interface StepExecutionDao {
 	StepExecution getStepExecution(JobExecution jobExecution, long stepExecutionId);
 
 	/**
+	 * Because it may be possible that the status of a StepExecution is updated while
+	 * running, the following method will synchronize only the status and version fields.
+	 * @param stepExecution to be updated.
+	 * @since 6.0.4
+	 */
+	default void synchronizeStatus(StepExecution stepExecution) {
+		throw new UnsupportedOperationException();
+	}
+
+	/**
 	 * Retrieve the last {@link StepExecution} for a given {@link JobInstance} ordered by
 	 * creation time and then id.
 	 * @param jobInstance the parent {@link JobInstance}

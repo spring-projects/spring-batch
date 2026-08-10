@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.samples.chunking.local;
 
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.BatchStatus;
@@ -23,13 +25,14 @@ import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobOperator;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class LocalChunkingJobFunctionalTests {
 
@@ -51,6 +54,12 @@ public class LocalChunkingJobFunctionalTests {
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		int vetsCount = JdbcTestUtils.countRowsInTable(jdbcTemplate, "vets");
 		assertEquals(6, vetsCount);
+		StepExecution stepExecution = jobExecution.getStepExecutions().iterator().next();
+		assertEquals(6, stepExecution.getReadCount());
+		assertEquals(6, stepExecution.getWriteCount());
+		assertEquals(0, stepExecution.getWriteSkipCount());
+		assertEquals(3, stepExecution.getCommitCount());
+		assertEquals(0, stepExecution.getRollbackCount());
 	}
 
 	@Test
@@ -69,9 +78,19 @@ public class LocalChunkingJobFunctionalTests {
 
 		// then
 		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
-		assertTrue(jobExecution.getExitStatus().getExitDescription().contains("size limit: 30"));
+		List<Throwable> failureExceptions = jobExecution.getAllFailureExceptions();
+		assertFalse(failureExceptions.isEmpty());
+		Throwable throwable = failureExceptions.get(0);
+		assertInstanceOf(DataIntegrityViolationException.class, throwable);
+		assertTrue(throwable.getMessage().contains("size limit: 30"));
 		int vetsCount = JdbcTestUtils.countRowsInTable(jdbcTemplate, "vets");
 		assertEquals(4, vetsCount);
+		StepExecution stepExecution = jobExecution.getStepExecutions().iterator().next();
+		assertEquals(6, stepExecution.getReadCount());
+		assertEquals(4, stepExecution.getWriteCount());
+		assertEquals(2, stepExecution.getWriteSkipCount());
+		assertEquals(2, stepExecution.getCommitCount());
+		assertEquals(1, stepExecution.getRollbackCount());
 	}
 
 }

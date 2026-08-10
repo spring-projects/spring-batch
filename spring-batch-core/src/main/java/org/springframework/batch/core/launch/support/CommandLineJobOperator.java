@@ -34,6 +34,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.core.log.LogAccessor;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 import static org.springframework.batch.core.launch.support.ExitCodeMapper.JVM_EXITCODE_COMPLETED;
 import static org.springframework.batch.core.launch.support.ExitCodeMapper.JVM_EXITCODE_GENERIC_ERROR;
@@ -403,13 +404,9 @@ public class CommandLineJobOperator {
 		System.exit(exitCode);
 	}
 
-	private static Properties parse(List<String> jobParameters) {
-		Properties properties = new Properties();
-		for (String jobParameter : jobParameters) {
-			String[] tokens = jobParameter.split("=");
-			properties.put(tokens[0], tokens[1]);
-		}
-		return properties;
+	static Properties parse(List<String> jobParameters) {
+		Properties properties = StringUtils.splitArrayElementsIntoProperties(jobParameters.toArray(new String[0]), "=");
+		return (properties != null) ? properties : new Properties();
 	}
 
 }

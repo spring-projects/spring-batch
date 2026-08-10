@@ -201,9 +201,12 @@ The following example shows how to access the `ExecutionContext` in XML:
 
 NOTE: Any bean that uses late binding must be declared with `scope="step"`. See
 xref:step/late-binding.adoc#step-scope[Step Scope] for more information.
-A `Step` bean should not be step-scoped or job-scoped. If late binding is needed in a step
-definition, then the components of that step (tasklet, item reade/writer, completion policy, and so on)
-are the ones that should be scoped instead.
+A `Step` bean should not be step-scoped. If late binding is needed in a step
+definition, then the components of that step (tasklet, item reade/writer, and so on)
+are the ones that should be scoped instead. If that is not possible (ie if the step implementation does
+not use any batch artifacts that can be step-scoped), then the step itself can be job-scoped.
+A typical example of this is to dynamically bind the chunk size from job parameters in
+a `ChunkOrientedStep`. See xref:step/late-binding.adoc#job-scope[Job Scope] for more information.
 
 NOTE: If you use Spring 3.0 (or above), the expressions in step-scoped beans are in the
 Spring Expression Language, a powerful general purpose language with many interesting
@@ -299,31 +302,34 @@ properties from the job or job execution context and the job parameters.
 ====
 Java::
 +
-The following example shows an example of binding to job scope in Java:
+The following example shows how to dynamically bind the chunk size from job parameters in a
+chunk-oriented step by using the job scope in Java:
 +
 .Java Configuration
 [source, java]
 ----
-@JobScope
 @Bean
-public FlatFileItemReader flatFileItemReader(@Value("#{jobParameters[input]}") String name) {
-	return new FlatFileItemReaderBuilder<Foo>()
-			.name("flatFileItemReader")
-			.resource(new FileSystemResource(name))
-			...
+@JobScope
+public Step step(JobRepository jobRepository, @Value("#{jobParameters['chunkSize']}") int chunkSize) {
+    return new StepBuilder(jobRepository)
+            .<Integer, Integer>chunk(chunkSize)
+            .reader(...)
+            .writer(...)
+            .build();
 }
 ----
 +
 .Java Configuration
 [source, java]
 ----
-@JobScope
 @Bean
-public FlatFileItemReader flatFileItemReader(@Value("#{jobExecutionContext['input.name']}") String name) {
-	return new FlatFileItemReaderBuilder<Foo>()
-			.name("flatFileItemReader")
-			.resource(new FileSystemResource(name))
-			...
+@JobScope
+public Step step(JobRepository jobRepository, @Value("#{jobExecutionContext['chunkSize']}") int chunkSize) {
+    return new StepBuilder(jobRepository)
+            .<Integer, Integer>chunk(chunkSize)
+            .reader(...)
+            .writer(...)
+            .build();
 }
 ----
 
@@ -335,7 +341,7 @@ The following example shows an example of binding to job scope in XML:
 [source, xml]
 ----
 <bean id="..." class="..." scope="job">
-    <property name="name" value="#{jobParameters[input]}" />
+    <property name="name" value="#{jobParameters[chunkSize]}" />
 </bean>
 ----
 +
@@ -343,7 +349,7 @@ The following example shows an example of binding to job scope in XML:
 [source, xml]
 ----
 <bean id="..." class="..." scope="job">
-    <property name="name" value="#{jobExecutionContext['input.name']}.txt" />
+    <property name="name" value="#{jobExecutionContext['chunkSize']}.txt" />
 </bean>
 ----
 

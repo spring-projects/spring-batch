@@ -267,6 +267,17 @@ public abstract class AbstractJobDaoTests {
 		assertEquals("jobKey", lastExecution.getJobParameters().getString("job.key"));
 	}
 
+	@Transactional
+	@Test
+	void testGetLastJobExecutionNoExecution() {
+		jobExecutionDao.deleteJobExecutionParameters(jobExecution);
+		jobExecutionDao.deleteJobExecution(jobExecution);
+
+		JobExecution je = jobExecutionDao.getLastJobExecution(jobInstance);
+
+		assertNull(je);
+	}
+
 	/**
 	 * Trying to create instance twice for the same job+parameters causes error
 	 */

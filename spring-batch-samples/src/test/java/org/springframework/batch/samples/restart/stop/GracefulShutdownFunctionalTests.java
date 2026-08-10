@@ -22,6 +22,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -62,6 +63,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Mahmoud Ben Hassine
  *
  */
+@Disabled("Fails intermittently") // https://github.com/spring-projects/spring-batch/issues/5308
 @ExtendWith(SpringExtension.class)
 class GracefulShutdownFunctionalTests {
 
