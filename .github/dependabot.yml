@@ -7,7 +7,7 @@ updates:
     labels:
       - "type: task"
   - package-ecosystem: "github-actions"
-    target-branch: "5.2.x"
+    target-branch: "6.0.x"
     directory: "/"
     schedule:
       interval: "weekly"
