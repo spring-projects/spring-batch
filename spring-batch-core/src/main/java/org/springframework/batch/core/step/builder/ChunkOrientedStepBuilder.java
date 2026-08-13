@@ -97,6 +97,8 @@ public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrien
 
 	private boolean faultTolerant;
 
+	private boolean processorTransactional = true;
+
 	private @Nullable RetryPolicy retryPolicy;
 
 	private final Set<RetryListener> retryListeners = new LinkedHashSet<>();
@@ -283,6 +285,25 @@ public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrien
 	}
 
 	/**
+	 * Mark the item processor as non-transactional (the default is the opposite). By
+	 * default, the {@link ItemProcessor} is re-invoked for every item that is
+	 * re-attempted while scanning a chunk, ie after a write failure has rolled back the
+	 * chunk transaction. If this flag is set, the results of item processing are cached
+	 * and re-used during chunk scanning instead.
+	 * <p>
+	 * Set this flag only if the output of the processor is safe to write again after a
+	 * failed, rolled back write. This is typically not the case for items that the writer
+	 * mutates, like JPA entities: a failed flush can leave the entity in a state that
+	 * makes the next write attempt fail with an unrelated exception.
+	 * @return this for fluent chaining
+	 * @since 6.0.6
+	 */
+	public ChunkOrientedStepBuilder<I, O> processorNonTransactional() {
+		this.processorTransactional = false;
+		return self();
+	}
+
+	/**
 	 * Set the retry policy for the step. This policy determines how the step handles
 	 * retries in case of failures. It can be used to define the number of retry attempts
 	 * and the conditions under which retries should occur. Defaults to no retry policy.
@@ -437,6 +458,7 @@ public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrien
 		}
 		chunkOrientedStep.setSkipPolicy(this.skipPolicy);
 		chunkOrientedStep.setFaultTolerant(this.faultTolerant);
+		chunkOrientedStep.setProcessorTransactional(this.processorTransactional);
 		if (this.asyncTaskExecutor != null) {
 			chunkOrientedStep.setTaskExecutor(this.asyncTaskExecutor);
 		}
