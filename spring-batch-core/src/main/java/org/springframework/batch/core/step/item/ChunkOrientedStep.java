@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.step.item;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Future;
@@ -137,7 +138,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 	 */
 	private final int chunkSize;
 
-	private final ThreadLocal<ChunkTracker<O>> chunkTracker = ThreadLocal.withInitial(ChunkTracker::create);
+	private final ThreadLocal<ChunkTracker<I, O>> chunkTracker = ThreadLocal.withInitial(ChunkTracker::create);
 
 	private final CompositeChunkListener<I, O> compositeChunkListener = new CompositeChunkListener<>();
 
@@ -145,6 +146,8 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 	 * Fault-tolerance parameters
 	 */
 	private boolean faultTolerant = false;
+
+	private boolean processorTransactional = true;
 
 	private RetryPolicy retryPolicy = throwable -> false;
 
@@ -272,6 +275,25 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 	 */
 	public void setFaultTolerant(boolean faultTolerant) {
 		this.faultTolerant = faultTolerant;
+	}
+
+	/**
+	 * Set whether the {@link ItemProcessor} is transactional. Defaults to {@code true},
+	 * which means that the processor is re-invoked for every item that is re-attempted
+	 * during chunk scanning (ie after a write failure has rolled back the chunk
+	 * transaction). Set this flag to {@code false} to cache the results of item
+	 * processing and re-use them during chunk scanning instead.
+	 * <p>
+	 * Only set this flag to {@code false} if the output of the processor is safe to write
+	 * again after a failed, rolled back write. This is typically not the case for items
+	 * that the writer mutates, like JPA entities: a failed flush can leave the entity in
+	 * a state that makes the next write attempt fail with an unrelated exception.
+	 * @param processorTransactional {@code true} to re-invoke the processor during chunk
+	 * scanning (the default), {@code false} to re-use the cached processor output
+	 * @since 6.0.6
+	 */
+	public void setProcessorTransactional(boolean processorTransactional) {
+		this.processorTransactional = processorTransactional;
 	}
 
 	/**
@@ -409,21 +431,22 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 
 	private void processChunkConcurrently(TransactionStatus status, StepContribution contribution,
 			StepExecution stepExecution) {
-		List<Future<O>> itemProcessingTasks = new LinkedList<>();
+		List<Future<O>> itemProcessingTasks = new ArrayList<>();
+		List<I> inputItems = new ArrayList<>();
+		List<ScanItem<I, O>> scanItems = new ArrayList<>();
 		Chunk<O> processedChunk = new Chunk<>();
-		ChunkTracker<O> tracker = this.chunkTracker.get();
+		ChunkTracker<I, O> tracker = this.chunkTracker.get();
 
 		try {
 			if (tracker.isScanMode()) {
 				logger.info("Executing scan in new transaction after rollback");
-				O item = tracker.pollNextScanItem();
-				if (item != null) {
-					Chunk<O> singleItemChunk = new Chunk<>(item);
+				ScanItem<I, O> scanItem = tracker.pollNextScanItem();
+				if (scanItem != null) {
 					ChunkScanEvent chunkScanEvent = new ChunkScanEvent(stepExecution.getStepName(),
 							stepExecution.getId());
 					chunkScanEvent.begin();
-					compositeChunkListener.beforeChunk(singleItemChunk);
-					scan(singleItemChunk, contribution, status);
+					compositeChunkListener.beforeChunk(new Chunk<>(scanItem.input()));
+					Chunk<O> singleItemChunk = scan(scanItem, contribution, status);
 					if (!status.isRollbackOnly()) {
 						compositeChunkListener.afterChunk(singleItemChunk);
 					}
@@ -444,6 +467,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			for (int i = 0; i < this.chunkSize && this.chunkTracker.get().moreItems(); i++) {
 				I item = readItem(contribution);
 				if (item != null) {
+					inputItems.add(item);
 					Future<O> itemProcessingFuture = this.taskExecutor.submit(() -> {
 						try {
 							StepSynchronizationManager.register(stepExecution);
@@ -461,16 +485,18 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 				return;
 			}
 
-			// collect processed items
-			for (Future<O> future : itemProcessingTasks) {
-				O processedItem = future.get();
+			// collect processed items, keeping track of the input item each output item
+			// was produced from, so that it can be re-processed during a chunk scan
+			for (int i = 0; i < itemProcessingTasks.size(); i++) {
+				O processedItem = itemProcessingTasks.get(i).get();
 				if (processedItem != null) {
 					processedChunk.add(processedItem);
+					scanItems.add(new ScanItem<>(inputItems.get(i), processedItem));
 				}
 			}
 
 			// write processed items
-			writeChunk(processedChunk, contribution);
+			writeChunk(processedChunk, scanItems, contribution);
 			stepExecution.incrementCommitCount();
 		}
 		catch (Exception e) {
@@ -479,7 +505,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			stepExecution.incrementRollbackCount();
 
 			if (tracker.isScanMode()) {
-				if (e instanceof SkipLimitExceededException || e instanceof NonSkippableWriteException) {
+				if (isFatalDuringScan(e)) {
 					tracker.exitScanMode();
 					throw new FatalStepExecutionException("Unable to process chunk during scan", e);
 				}
@@ -498,19 +524,19 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			StepExecution stepExecution) {
 		Chunk<I> inputChunk = new Chunk<>();
 		Chunk<O> processedChunk = new Chunk<>();
-		ChunkTracker<O> tracker = this.chunkTracker.get();
+		List<ScanItem<I, O>> scanItems = new ArrayList<>();
+		ChunkTracker<I, O> tracker = this.chunkTracker.get();
 
 		try {
 			if (tracker.isScanMode()) {
 				logger.info("Executing scan in new transaction after rollback");
-				O item = tracker.pollNextScanItem();
-				if (item != null) {
-					Chunk<O> singleItemChunk = new Chunk<>(item);
+				ScanItem<I, O> scanItem = tracker.pollNextScanItem();
+				if (scanItem != null) {
 					ChunkScanEvent chunkScanEvent = new ChunkScanEvent(stepExecution.getStepName(),
 							stepExecution.getId());
 					chunkScanEvent.begin();
-					compositeChunkListener.beforeChunk(singleItemChunk);
-					scan(singleItemChunk, contribution, status);
+					compositeChunkListener.beforeChunk(new Chunk<>(scanItem.input()));
+					Chunk<O> singleItemChunk = scan(scanItem, contribution, status);
 					if (!status.isRollbackOnly()) {
 						compositeChunkListener.afterChunk(singleItemChunk);
 					}
@@ -532,8 +558,8 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 				return;
 			}
 			compositeChunkListener.beforeChunk(inputChunk);
-			processedChunk = processChunk(inputChunk, contribution);
-			writeChunk(processedChunk, contribution);
+			processedChunk = processChunk(inputChunk, contribution, scanItems);
+			writeChunk(processedChunk, scanItems, contribution);
 			compositeChunkListener.afterChunk(processedChunk);
 			stepExecution.incrementCommitCount();
 		}
@@ -543,7 +569,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			stepExecution.incrementRollbackCount();
 
 			if (tracker.isScanMode()) {
-				if (e instanceof SkipLimitExceededException || e instanceof NonSkippableWriteException) {
+				if (isFatalDuringScan(e)) {
 					tracker.exitScanMode();
 					compositeChunkListener.onChunkError(e, processedChunk);
 					throw new FatalStepExecutionException("Unable to process chunk during scan", e);
@@ -558,6 +584,16 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 		finally {
 			stepExecution.apply(contribution);
 		}
+	}
+
+	/*
+	 * A failure while scanning a chunk is only fatal if the item cannot be skipped. Any
+	 * other failure means the current scan attempt is rolled back and the scan carries on
+	 * with the next pending item in the following transaction.
+	 */
+	private boolean isFatalDuringScan(Exception exception) {
+		return exception instanceof SkipLimitExceededException || exception instanceof NonSkippableWriteException
+				|| exception instanceof NonSkippableProcessException;
 	}
 
 	/*
@@ -666,12 +702,16 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 		}
 	}
 
-	private Chunk<O> processChunk(Chunk<I> chunk, StepContribution contribution) throws Exception {
+	private Chunk<O> processChunk(Chunk<I> chunk, StepContribution contribution, List<ScanItem<I, O>> scanItems)
+			throws Exception {
 		Chunk<O> processedChunk = new Chunk<>();
 		for (I item : chunk) {
 			O processedItem = processItem(item, contribution);
 			if (processedItem != null) {
 				processedChunk.add(processedItem);
+				// keep track of the input item each output item was produced from, so
+				// that it can be re-processed during a chunk scan
+				scanItems.add(new ScanItem<>(item, processedItem));
 			}
 		}
 		return processedChunk;
@@ -762,7 +802,8 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 		}
 	}
 
-	private void writeChunk(Chunk<O> chunk, StepContribution contribution) throws Exception {
+	private void writeChunk(Chunk<O> chunk, List<ScanItem<I, O>> scanItems, StepContribution contribution)
+			throws Exception {
 		ChunkWriteEvent chunkWriteEvent = new ChunkWriteEvent(contribution.getStepExecution().getStepName(),
 				contribution.getStepExecution().getId(), chunk.size());
 		String fullyQualifiedMetricName = METRICS_PREFIX + "chunk.write";
@@ -790,7 +831,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			if (this.faultTolerant && exception instanceof RetryException retryException
 					&& this.skipPolicy.shouldSkip(retryException.getCause(), -1)) {
 				logger.info("Retry exhausted, entering scan mode for next transaction", retryException);
-				this.chunkTracker.get().enterScanMode(chunk);
+				this.chunkTracker.get().enterScanMode(scanItems);
 			}
 			else {
 				logger.error("Retry exhausted after last attempt in recovery path, but exception is not skippable");
@@ -824,38 +865,65 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 		}
 	}
 
-	private void scan(Chunk<O> chunk, StepContribution contribution, TransactionStatus status) {
-		for (O item : chunk) {
-			Chunk<O> singleItemChunk = new Chunk<>(item);
-			try {
-				this.compositeItemWriteListener.beforeWrite(singleItemChunk);
-				this.itemWriter.write(singleItemChunk);
-				contribution.incrementWriteCount(singleItemChunk.size());
-				this.compositeItemWriteListener.afterWrite(singleItemChunk);
+	/*
+	 * Re-attempt a single item in its own transaction after the enclosing chunk has been
+	 * rolled back. Unless the item processor has been marked as non-transactional, the
+	 * item is re-processed first: the output produced in the rolled back transaction may
+	 * have been mutated by the failed write (a JPA entity whose flush failed, for
+	 * example) and would otherwise fail again for an unrelated reason.
+	 *
+	 * Returns the chunk that was actually written, which is empty if the re-processed
+	 * item was filtered out or skipped in processing.
+	 */
+	private Chunk<O> scan(ScanItem<I, O> scanItem, StepContribution contribution, TransactionStatus status)
+			throws Exception {
+		O item = this.processorTransactional ? processItem(scanItem.input(), contribution) : scanItem.output();
+		if (item == null) {
+			// the item was filtered out or skipped while being re-processed: there is
+			// nothing left to write
+			return new Chunk<>();
+		}
+		Chunk<O> singleItemChunk = new Chunk<>(item);
+		try {
+			this.compositeItemWriteListener.beforeWrite(singleItemChunk);
+			this.itemWriter.write(singleItemChunk);
+			contribution.incrementWriteCount(singleItemChunk.size());
+			this.compositeItemWriteListener.afterWrite(singleItemChunk);
+		}
+		catch (Exception exception) {
+			if (this.skipPolicy.shouldSkip(exception, contribution.getStepSkipCount())) {
+				this.compositeSkipListener.onSkipInWrite(item, exception);
+				contribution.incrementWriteSkipCount();
+				contribution.getStepExecution().incrementRollbackCount();
+				status.setRollbackOnly();
 			}
-			catch (Exception exception) {
-				if (this.skipPolicy.shouldSkip(exception, contribution.getStepSkipCount())) {
-					this.compositeSkipListener.onSkipInWrite(item, exception);
-					contribution.incrementWriteSkipCount();
-					contribution.getStepExecution().incrementRollbackCount();
-					status.setRollbackOnly();
-				}
-				else {
-					logger.error("Failed to write item: " + item, exception);
-					this.compositeItemWriteListener.onWriteError(exception, singleItemChunk);
-					throw new NonSkippableWriteException("Skip policy rejected skipping item", exception);
-				}
+			else {
+				logger.error("Failed to write item: " + item, exception);
+				this.compositeItemWriteListener.onWriteError(exception, singleItemChunk);
+				throw new NonSkippableWriteException("Skip policy rejected skipping item", exception);
 			}
 		}
+		return singleItemChunk;
 	}
 
 	private boolean isConcurrent() {
 		return this.taskExecutor != null;
 	}
 
-	private static class ChunkTracker<O> {
+	/**
+	 * An input item together with the output item produced for it by the
+	 * {@link ItemProcessor}, retained so that the item can be re-attempted during a chunk
+	 * scan.
+	 *
+	 * @param input the item as read by the item reader
+	 * @param output the item as produced by the item processor
+	 */
+	private record ScanItem<I, O>(I input, O output) {
+	}
 
-		static <T> ChunkTracker<T> create() {
+	private static class ChunkTracker<I, O> {
+
+		static <T, U> ChunkTracker<T, U> create() {
 			return new ChunkTracker<>();
 		}
 
@@ -863,7 +931,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 
 		private boolean scanMode;
 
-		@Nullable private LinkedList<O> pendingScanItems;
+		@Nullable private LinkedList<ScanItem<I, O>> pendingScanItems;
 
 		void init() {
 			this.moreItems = true;
@@ -879,16 +947,16 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			return this.moreItems || this.scanMode;
 		}
 
-		void enterScanMode(Chunk<O> chunk) {
+		void enterScanMode(List<ScanItem<I, O>> scanItems) {
 			this.scanMode = true;
-			this.pendingScanItems = new LinkedList<>(chunk.getItems());
+			this.pendingScanItems = new LinkedList<>(scanItems);
 		}
 
 		boolean isScanMode() {
 			return this.scanMode;
 		}
 
-		@Nullable O pollNextScanItem() {
+		@Nullable ScanItem<I, O> pollNextScanItem() {
 			return (this.pendingScanItems != null) ? this.pendingScanItems.poll() : null;
 		}
 
