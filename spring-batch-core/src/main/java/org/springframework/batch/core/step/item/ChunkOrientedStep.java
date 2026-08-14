@@ -55,7 +55,6 @@ import org.springframework.batch.core.step.skip.NeverSkipItemSkipPolicy;
 import org.springframework.batch.core.step.skip.NonSkippableProcessException;
 import org.springframework.batch.core.step.skip.NonSkippableReadException;
 import org.springframework.batch.core.step.skip.NonSkippableWriteException;
-import org.springframework.batch.core.step.skip.SkipLimitExceededException;
 import org.springframework.batch.core.step.skip.SkipPolicy;
 import org.springframework.batch.infrastructure.item.Chunk;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
@@ -436,20 +435,19 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 		List<ScanItem<I, O>> scanItems = new ArrayList<>();
 		Chunk<O> processedChunk = new Chunk<>();
 		ChunkTracker<I, O> tracker = this.chunkTracker.get();
+		boolean scanning = tracker.isScanMode();
 
 		try {
-			if (tracker.isScanMode()) {
+			if (scanning) {
 				logger.info("Executing scan in new transaction after rollback");
 				ScanItem<I, O> scanItem = tracker.pollNextScanItem();
 				if (scanItem != null) {
 					ChunkScanEvent chunkScanEvent = new ChunkScanEvent(stepExecution.getStepName(),
 							stepExecution.getId());
 					chunkScanEvent.begin();
-					compositeChunkListener.beforeChunk(new Chunk<>(scanItem.input()));
-					Chunk<O> singleItemChunk = scan(scanItem, contribution, status);
-					if (!status.isRollbackOnly()) {
-						compositeChunkListener.afterChunk(singleItemChunk);
-					}
+					// no chunk listener callbacks here: ChunkListener is not called in
+					// concurrent steps
+					scan(scanItem, contribution, status);
 					chunkScanEvent.skipCount = contribution.getSkipCount();
 					chunkScanEvent.commit();
 				}
@@ -504,13 +502,20 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			status.setRollbackOnly();
 			stepExecution.incrementRollbackCount();
 
-			if (tracker.isScanMode()) {
-				if (isFatalDuringScan(e)) {
-					tracker.exitScanMode();
-					throw new FatalStepExecutionException("Unable to process chunk during scan", e);
-				}
+			// the write of this chunk has just failed with a skippable exception and the
+			// chunk has been queued for scanning: roll back and start the scan in the
+			// next transaction
+			if (!scanning && tracker.isScanMode()) {
 				logger.info("Rollback complete, scan will execute in next transaction");
 				return;
+			}
+
+			// a scan attempt itself failed: the pending item has already been polled off
+			// the scan queue, so carrying on would silently lose it. Fail the step
+			// instead, leaving the job restartable.
+			if (scanning) {
+				tracker.exitScanMode();
+				throw new FatalStepExecutionException("Unable to process chunk during scan", e);
 			}
 
 			throw new FatalStepExecutionException("Unable to process chunk", e);
@@ -526,9 +531,10 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 		Chunk<O> processedChunk = new Chunk<>();
 		List<ScanItem<I, O>> scanItems = new ArrayList<>();
 		ChunkTracker<I, O> tracker = this.chunkTracker.get();
+		boolean scanning = tracker.isScanMode();
 
 		try {
-			if (tracker.isScanMode()) {
+			if (scanning) {
 				logger.info("Executing scan in new transaction after rollback");
 				ScanItem<I, O> scanItem = tracker.pollNextScanItem();
 				if (scanItem != null) {
@@ -568,17 +574,25 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			status.setRollbackOnly();
 			stepExecution.incrementRollbackCount();
 
-			if (tracker.isScanMode()) {
-				if (isFatalDuringScan(e)) {
-					tracker.exitScanMode();
-					compositeChunkListener.onChunkError(e, processedChunk);
-					throw new FatalStepExecutionException("Unable to process chunk during scan", e);
-				}
+			// the write of this chunk has just failed with a skippable exception and the
+			// chunk has been queued for scanning: roll back and start the scan in the
+			// next transaction
+			if (!scanning && tracker.isScanMode()) {
+				notifyChunkError(e, processedChunk);
 				logger.info("Rollback complete, scan will execute in next transaction");
 				return;
 			}
 
-			compositeChunkListener.onChunkError(e, processedChunk);
+			// a scan attempt itself failed: the pending item has already been polled off
+			// the scan queue, so carrying on would silently lose it. Fail the step
+			// instead, leaving the job restartable. Failures of the scanned item itself
+			// have already been reported to the chunk listener by scan().
+			if (scanning) {
+				tracker.exitScanMode();
+				throw new FatalStepExecutionException("Unable to process chunk during scan", e);
+			}
+
+			notifyChunkError(e, processedChunk);
 			throw new FatalStepExecutionException("Unable to process chunk", e);
 		}
 		finally {
@@ -587,13 +601,15 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 	}
 
 	/*
-	 * A failure while scanning a chunk is only fatal if the item cannot be skipped. Any
-	 * other failure means the current scan attempt is rolled back and the scan carries on
-	 * with the next pending item in the following transaction.
+	 * Report a chunk failure to the chunk listener. The listener is never called with an
+	 * empty chunk: a failure that happens before any item was processed (a read failure,
+	 * for example) has no processed chunk to report and is signalled by the read or
+	 * process listeners instead. The listener is not called in concurrent steps either.
 	 */
-	private boolean isFatalDuringScan(Exception exception) {
-		return exception instanceof SkipLimitExceededException || exception instanceof NonSkippableWriteException
-				|| exception instanceof NonSkippableProcessException;
+	private void notifyChunkError(Exception exception, Chunk<O> processedChunk) {
+		if (!isConcurrent() && !processedChunk.isEmpty()) {
+			this.compositeChunkListener.onChunkError(exception, processedChunk);
+		}
 	}
 
 	/*
@@ -891,15 +907,22 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			this.compositeItemWriteListener.afterWrite(singleItemChunk);
 		}
 		catch (Exception exception) {
+			// the chunk listener is notified from here rather than from the caller's
+			// error handling, because this is where the item that failed is known:
+			// the skip path below does not propagate the exception at all, and by the
+			// time the other path does, the caller no longer has a processed chunk to
+			// report
 			if (this.skipPolicy.shouldSkip(exception, contribution.getStepSkipCount())) {
 				this.compositeSkipListener.onSkipInWrite(item, exception);
 				contribution.incrementWriteSkipCount();
 				contribution.getStepExecution().incrementRollbackCount();
 				status.setRollbackOnly();
+				notifyChunkError(exception, singleItemChunk);
 			}
 			else {
 				logger.error("Failed to write item: " + item, exception);
 				this.compositeItemWriteListener.onWriteError(exception, singleItemChunk);
+				notifyChunkError(exception, singleItemChunk);
 				throw new NonSkippableWriteException("Skip policy rejected skipping item", exception);
 			}
 		}
