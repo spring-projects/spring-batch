@@ -111,7 +111,7 @@ public interface ChunkListener<I, O> extends StepListener {
 
     void beforeChunk(Chunk<I> chunk);
     void afterChunk(Chunk<O> chunk);
-    void afterChunkError(Exception exception, Chunk<O> chunk);
+    void onChunkError(Exception exception, Chunk<O> chunk);
 
 }
 ----
@@ -120,13 +120,52 @@ The `beforeChunk` method is called after the transaction is started after readin
 of items but before processing start. Conversely, `afterChunk` is called after the chunk
 is written but before the transaction is committed or rolled back.
 
+`onChunkError` is never called with an empty chunk: a failure that happens before any item
+was processed, such as a read failure, has no processed chunk to report and is signalled by
+`ItemReadListener#onReadError` or `ItemProcessListener#onProcessError` instead. This means
+an implementation does not need to guard against an empty chunk.
+
 NOTE: The `ChunkListener` listener interface is not called in concurrent steps
+
+When a fault-tolerant step scans a chunk after a write failure (see
+xref:step/chunk-oriented-processing/configuring-skip.adoc#skippingWriteFailures[Skipping Write Failures and Chunk Scanning]),
+each item is re-attempted in its own transaction, and the callbacks are invoked for the
+whole chunk as well as for each scanned item:
+
+* `beforeChunk` is called once for the chunk that was read, then once per scanned item,
+  with a chunk holding that single input item.
+* `afterChunk` is called only for the scanned items that were successfully written.
+* `onChunkError` is called once for the whole chunk that failed to be written, then once
+  per scanned item that turns out to be faulty, whether that item is skipped or fails the
+  step.
+
+For example, for a chunk of three items whose write fails because the second and third
+items are invalid, a listener is called as follows:
+
+[source]
+----
+beforeChunk([1, 2, 3])   onChunkError(ex, [1, 2, 3])   <1>
+beforeChunk([1])         afterChunk([1])               <2>
+beforeChunk([2])         onChunkError(ex, [2])         <3>
+beforeChunk([3])         onChunkError(ex, [3])
+----
+<1> The initial chunk transaction, which is rolled back.
+<2> The first scan transaction, which commits.
+<3> A scan transaction for a faulty item, which is rolled back after the item is skipped.
+
+[WARNING]
+====
+As stated above, a `ChunkListener` must handle its own errors. An exception thrown from a
+listener callback terminates the step, including during a chunk scan: at that point the
+item being scanned can no longer be written or skipped, so the step is failed rather than
+completed with the item unaccounted for. The job can then be restarted.
+====
 
 The annotations corresponding to this interface are:
 
 * `@BeforeChunk`
 * `@AfterChunk`
-* `@AfterChunkError`
+* `@OnChunkError`
 
 A `ChunkListener` is not designed to throw checked exceptions. Errors must be handled in the
 implementation or the step will terminate.
