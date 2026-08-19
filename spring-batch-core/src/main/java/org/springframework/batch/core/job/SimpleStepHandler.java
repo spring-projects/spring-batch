@@ -23,6 +23,7 @@ import org.jspecify.annotations.NullUnmarked;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.launch.JobRestartException;
+import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.core.step.NoSuchStepException;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
@@ -88,6 +89,13 @@ public class SimpleStepHandler implements StepHandler {
 			throws JobInterruptedException, JobRestartException, StartLimitExceededException {
 		if (execution.isStopping()) {
 			throw new JobInterruptedException("JobExecution interrupted.");
+		}
+
+		if (step.getName() == null && step instanceof AbstractStep abstractStep) {
+			// The step is not a Spring bean (its name was never set explicitly nor
+			// derived from a bean name), so fall back to the Step contract's default:
+			// the fully qualified class name (see Step#getName()).
+			abstractStep.setName(step.getClass().getName());
 		}
 
 		JobInstance jobInstance = execution.getJobInstance();
