@@ -24,7 +24,7 @@ In your favorite IDE, create a new Maven-based Java 17+ project and add the foll
     <dependency>
         <groupId>org.springframework.batch</groupId>
         <artifactId>spring-batch-core</artifactId>
-        <version>6.0.4</version>
+        <version>6.0.5</version>
     </dependency>
 </dependencies>
 ```
