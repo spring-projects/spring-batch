@@ -1,5 +1,6 @@
 # Latest news
 
+* August 20, 2026: [Spring Batch 6.0.5 and 6.1.0-M1 released](https://spring.io/blog/2026/08/20/spring-batch-6-0-5-and-6-1-0-M1-available-now)
 * June 10, 2026: [Spring Batch 6.0.4 and 5.2.6 released](https://spring.io/blog/2026/06/10/spring-batch-6-0-4-and-5-2-6-available-now)
 * March 18, 2026: [Spring Batch 6.0.3 and 5.2.5 released](https://spring.io/blog/2026/03/18/spring-batch-6-0-3-and-5-2-5-available-now)
 * January 21, 2026: [Spring Batch 6.0.2 is out](https://spring.io/blog/2026/01/21/spring-batch-6-0-2-available-now)
