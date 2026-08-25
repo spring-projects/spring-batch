@@ -147,7 +147,7 @@ public class JsonFileItemWriter<T> extends AbstractFileItemWriter<T> {
 				}
 				else if (!stopFound && current == JSON_ARRAY_START && trailingWhitespaceOnly) {
 					this.hasExistingItems = false;
-					raf.setLength(pos > 0 ? pos + 1 : pos);
+					raf.setLength(pos + 1);
 					break;
 				}
 				else if (!stopFound && !Character.isWhitespace(current)) {
@@ -155,8 +155,7 @@ public class JsonFileItemWriter<T> extends AbstractFileItemWriter<T> {
 				}
 				else if (stopFound && !Character.isWhitespace(current)) {
 					this.hasExistingItems = current != JSON_ARRAY_START;
-					boolean hasContentBeforeArrayStart = current == JSON_ARRAY_START && pos > 0;
-					raf.setLength(this.hasExistingItems || hasContentBeforeArrayStart ? pos + 1 : pos);
+					raf.setLength(pos + 1);
 					break;
 				}
 			}
