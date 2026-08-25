@@ -18,6 +18,7 @@
 *** xref:step/chunk-oriented-processing/restart.adoc[]
 *** xref:step/chunk-oriented-processing/configuring-skip.adoc[]
 *** xref:step/chunk-oriented-processing/retry-logic.adoc[]
+*** xref:step/chunk-oriented-processing/chunk-scanning.adoc[]
 *** xref:step/chunk-oriented-processing/transaction-attributes.adoc[]
 *** xref:step/chunk-oriented-processing/registering-item-streams.adoc[]
 *** xref:step/chunk-oriented-processing/intercepting-execution.adoc[]
