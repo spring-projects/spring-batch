@@ -51,7 +51,7 @@ public class DefaultExecutionContextSerializer implements ExecutionContextSerial
 	/**
 	 * Default {@link ObjectInputFilter} pattern applied to the {@link ObjectInputStream}
 	 * during {@link #deserialize(InputStream)}.
-	 * @since 5.2.7
+	 * @since 6.0.5
 	 */
 	public static final String DEFAULT_FILTER_PATTERN = "java.lang.*;" + "java.util.*;" + "java.util.concurrent.*;"
 			+ "java.util.concurrent.atomic.*;" + "java.util.concurrent.locks.*;" + "java.time.*;"
@@ -63,7 +63,7 @@ public class DefaultExecutionContextSerializer implements ExecutionContextSerial
 	/**
 	 * Set the {@link ObjectInputFilter} used to constrain deserialization.
 	 * @param objectInputFilter the filter to install; must not be {@code null}.
-	 * @since 5.2.7
+	 * @since 6.0.5
 	 */
 	public void setObjectInputFilter(ObjectInputFilter objectInputFilter) {
 		Assert.notNull(objectInputFilter, "objectInputFilter must not be null");

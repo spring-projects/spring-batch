@@ -70,7 +70,7 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 	 * (e.g. one unbalanced quote for {@code DefaultRecordSeparatorPolicy}) cannot pin a
 	 * CPU core for an extended period.
 	 *
-	 * @since 6.0.4
+	 * @since 6.0.5
 	 */
 	public static final int DEFAULT_MAX_LINES_PER_RECORD = 1_000;
 
@@ -79,7 +79,7 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 	 * Bounds heap allocation and concatenation cost for the multi-line-record
 	 * accumulator. 1 MiB worth of characters.
 	 *
-	 * @since 6.0.4
+	 * @since 6.0.5
 	 */
 	public static final int DEFAULT_MAX_BYTES_PER_RECORD = 1_048_576;
 
@@ -201,7 +201,7 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 	 * recommended on untrusted input).
 	 * @param maxLinesPerRecord the maximum number of lines accepted per logical record.
 	 * Must be positive.
-	 * @since 6.0.4
+	 * @since 6.0.5
 	 */
 	public void setMaxLinesPerRecord(int maxLinesPerRecord) {
 		Assert.isTrue(maxLinesPerRecord > 0, "maxLinesPerRecord must be positive.");
@@ -217,7 +217,7 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 	 * untrusted input).
 	 * @param maxBytesPerRecord the maximum character length accepted per logical record.
 	 * Must be positive.
-	 * @since 6.0.4
+	 * @since 6.0.5
 	 */
 	public void setMaxBytesPerRecord(int maxBytesPerRecord) {
 		Assert.isTrue(maxBytesPerRecord > 0, "maxBytesPerRecord must be positive.");

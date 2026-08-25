@@ -181,7 +181,7 @@ public class FlatFileItemReaderBuilder<T> {
 	 * @param maxLinesPerRecord maximum number of lines per logical record; must be
 	 * positive.
 	 * @return The current instance of the builder.
-	 * @since 6.0.4
+	 * @since 6.0.5
 	 * @see FlatFileItemReader#setMaxLinesPerRecord(int)
 	 */
 	public FlatFileItemReaderBuilder<T> maxLinesPerRecord(int maxLinesPerRecord) {
@@ -195,7 +195,7 @@ public class FlatFileItemReaderBuilder<T> {
 	 * @param maxBytesPerRecord maximum character length per logical record; must be
 	 * positive.
 	 * @return The current instance of the builder.
-	 * @since 6.0.4
+	 * @since 6.0.5
 	 * @see FlatFileItemReader#setMaxBytesPerRecord(int)
 	 */
 	public FlatFileItemReaderBuilder<T> maxBytesPerRecord(int maxBytesPerRecord) {
