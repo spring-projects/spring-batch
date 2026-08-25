@@ -62,3 +62,14 @@ In XML, retry should be configured as follows:
 The `Step` allows a limit for the number of times an individual item can be retried and a
 list of exceptions that are "`retryable`".
 
+[NOTE]
+====
+Configuring a `NeverRetryPolicy` (or setting `retry-limit="0"`) disables Spring Batch's
+own retry loop, but it does not suppress _chunk scanning_. When an exception is thrown
+from an `ItemProcessor` or `ItemWriter`, Spring Batch still re-processes the chunk
+item-by-item to identify the bad item before skipping it. If you observe more writer
+invocations than the number of items in the chunk, this is expected behaviour.
+See xref:step/chunk-oriented-processing/configuring-skip.adoc#chunkScanning[Chunk Scanning]
+for details.
+====
+

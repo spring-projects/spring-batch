@@ -396,5 +396,53 @@ When a chunk is rolled back, items that have been cached during reading may be
 reprocessed. If a step is configured to be fault-tolerant (typically by using skip or
 retry processing), any `ItemProcessor` used should be implemented in a way that is
 idempotent. Typically that would consist of performing no changes on the input item for
-the `ItemProcessor` and updating only the
-instance that is the result.
+the `ItemProcessor` and updating only the instance that is the result.
+
+This behaviour is driven by _chunk scanning_: when an exception is thrown from an
+`ItemWriter`, Spring Batch re-processes each item individually to determine which specific
+item caused the failure. As a result, the `ItemProcessor` may be called more than once for
+the same item. If re-processing the same input twice is not safe (for example, because it
+invokes a non-idempotent external service), you can mark the processor as non-transactional
+so that its output is cached and reused during chunk scanning:
+
+[tabs]
+====
+Java::
++
+[source, java]
+----
+@Bean
+public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+    return new StepBuilder("step1", jobRepository)
+                .<String, String>chunk(10).transactionManager(transactionManager)
+                .reader(itemReader())
+                .processor(itemProcessor())
+                .writer(itemWriter())
+                .faultTolerant()
+                .skip(Exception.class)
+                .skipLimit(10)
+                .processorNonTransactional() // cache processor output; skip re-processing during chunk scanning
+                .build();
+}
+----
+
+XML::
++
+[source, xml]
+----
+<step id="step1">
+    <tasklet>
+        <chunk reader="itemReader" processor="itemProcessor" writer="itemWriter"
+               commit-interval="10" skip-limit="10"
+               processor-transactional="false">
+            <skippable-exception-classes>
+                <include class="java.lang.Exception"/>
+            </skippable-exception-classes>
+        </chunk>
+    </tasklet>
+</step>
+----
+====
+
+For a full explanation of the chunk scanning mechanism, see
+xref:step/chunk-oriented-processing/configuring-skip.adoc#chunkScanning[Chunk Scanning].
