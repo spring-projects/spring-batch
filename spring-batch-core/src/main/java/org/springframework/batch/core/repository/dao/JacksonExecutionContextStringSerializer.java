@@ -36,6 +36,7 @@ import org.springframework.batch.core.repository.ExecutionContextSerializer;
  * provide your own {@link JsonMapper} instance through the constructor.
  *
  * @author Mahmoud Ben Hassine
+ * @author Soonjae Jung
  * @since 6.0.0
  */
 public class JacksonExecutionContextStringSerializer implements ExecutionContextSerializer {
@@ -55,7 +56,7 @@ public class JacksonExecutionContextStringSerializer implements ExecutionContext
 			.allowIfSubType("java.math.")
 			.allowIfSubType("java.time.")
 			.allowIfSubType("java.net.")
-			.allowIfSubType("java.xml.")
+			.allowIfSubType("javax.xml.namespace.QName")
 			.allowIfSubType("org.springframework.batch.")
 			.build();
 		this.jsonMapper = JsonMapper.builder().activateDefaultTyping(polymorphicTypeValidator).build();
