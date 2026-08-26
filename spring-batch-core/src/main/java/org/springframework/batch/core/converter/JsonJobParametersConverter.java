@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.converter;
 
+import org.jspecify.annotations.Nullable;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.json.JsonMapper;
 
@@ -63,6 +64,7 @@ import org.springframework.batch.core.job.parameters.JobParameters;
  * </ul>
  *
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  * @since 5.0
  *
  */
@@ -98,16 +100,16 @@ public class JsonJobParametersConverter extends DefaultJobParametersConverter {
 		}
 		try {
 			return this.jsonMapper.writeValueAsString(new JobParameterDefinition(parameterName, parameterStringValue,
-					parameterType.getName(), Boolean.toString(parameterIdentifying)));
+					parameterType.getName(), parameterIdentifying));
 		}
 		catch (JacksonException e) {
 			throw new JobParametersConversionException("Unable to encode job parameter " + jobParameter, e);
 		}
 	}
 
-	@SuppressWarnings(value = { "unchecked", "rawtypes" })
+	@SuppressWarnings("unchecked")
 	@Override
-	protected JobParameter decode(String parameterName, String encodedJobParameter) {
+	protected <T> JobParameter<T> decode(String parameterName, String encodedJobParameter) {
 		try {
 			JobParameterDefinition jobParameterDefinition = this.jsonMapper.readValue(encodedJobParameter,
 					JobParameterDefinition.class);
@@ -116,18 +118,20 @@ public class JsonJobParametersConverter extends DefaultJobParametersConverter {
 				parameterType = Class.forName(jobParameterDefinition.type());
 			}
 			boolean parameterIdentifying = true;
-			if (jobParameterDefinition.identifying() != null && !jobParameterDefinition.identifying().isEmpty()) {
-				parameterIdentifying = Boolean.parseBoolean(jobParameterDefinition.identifying());
+			if (jobParameterDefinition.identifying() != null) {
+				parameterIdentifying = jobParameterDefinition.identifying();
 			}
-			Object parameterTypedValue = this.conversionService.convert(jobParameterDefinition.value(), parameterType);
-			return new JobParameter(parameterName, parameterTypedValue, parameterType, parameterIdentifying);
+			Class<T> parameterTypeToUse = (Class<T>) parameterType;
+			T parameterTypedValue = this.conversionService.convert(jobParameterDefinition.value(), parameterTypeToUse);
+			return new JobParameter<>(parameterName, parameterTypedValue, parameterTypeToUse, parameterIdentifying);
 		}
 		catch (JacksonException | ClassNotFoundException e) {
 			throw new JobParametersConversionException("Unable to decode job parameter " + encodedJobParameter, e);
 		}
 	}
 
-	public record JobParameterDefinition(String name, String value, String type, String identifying) {
+	public record JobParameterDefinition(String name, String value, @Nullable String type,
+			@Nullable Boolean identifying) {
 	}
 
 }

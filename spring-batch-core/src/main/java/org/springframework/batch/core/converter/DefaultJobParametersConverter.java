@@ -73,6 +73,7 @@ import org.springframework.util.StringUtils;
  * @author Dave Syer
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  *
  */
 public class DefaultJobParametersConverter implements JobParametersConverter {
@@ -155,14 +156,14 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 	 * @param encodedJobParameter the encoded job parameter
 	 * @return the decoded job parameter
 	 */
-	@SuppressWarnings(value = { "unchecked", "rawtypes" })
-	protected JobParameter decode(String parameterName, String encodedJobParameter) {
+	@SuppressWarnings("unchecked")
+	protected <T> JobParameter<T> decode(String parameterName, String encodedJobParameter) {
 		String parameterStringValue = parseValue(encodedJobParameter);
-		Class<?> parameterType = parseType(encodedJobParameter);
+		Class<T> parameterType = (Class<T>) parseType(encodedJobParameter);
 		boolean parameterIdentifying = parseIdentifying(encodedJobParameter);
 		try {
-			Object typedValue = this.conversionService.convert(parameterStringValue, parameterType);
-			return new JobParameter(parameterName, typedValue, parameterType, parameterIdentifying);
+			T typedValue = this.conversionService.convert(parameterStringValue, parameterType);
+			return new JobParameter<>(parameterName, typedValue, parameterType, parameterIdentifying);
 		}
 		catch (Exception e) {
 			throw new JobParametersConversionException(
