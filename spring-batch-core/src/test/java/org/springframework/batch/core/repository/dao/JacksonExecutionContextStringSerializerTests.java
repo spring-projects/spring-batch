@@ -26,6 +26,8 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.xml.namespace.QName;
+
 import org.junit.jupiter.api.Test;
 import tools.jackson.databind.json.JsonMapper;
 
@@ -34,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Mahmoud Ben Hassine
+ * @author Soonjae Jung
  */
 class JacksonExecutionContextStringSerializerTests {
 
@@ -94,6 +97,25 @@ class JacksonExecutionContextStringSerializerTests {
 		// then
 		LocalDate deserializedNow = (LocalDate) deserializedContext.get("now");
 		assertEquals(now, deserializedNow);
+	}
+
+	@Test
+	void testQNameSerialization() throws IOException {
+		// given
+		JacksonExecutionContextStringSerializer serializer = new JacksonExecutionContextStringSerializer();
+		Map<String, Object> context = new HashMap<>();
+		QName qName = new QName("https://www.springframework.org/batch", "element");
+		context.put("qName", qName);
+
+		// when
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		serializer.serialize(context, outputStream);
+		InputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
+		Map<String, Object> deserializedContext = serializer.deserialize(inputStream);
+
+		// then
+		QName deserializedQName = (QName) deserializedContext.get("qName");
+		assertEquals(qName, deserializedQName);
 	}
 
 }
