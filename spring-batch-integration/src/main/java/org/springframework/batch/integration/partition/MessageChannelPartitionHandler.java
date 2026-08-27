@@ -34,6 +34,8 @@ import org.springframework.batch.core.partition.PartitionHandler;
 import org.springframework.batch.core.partition.StepExecutionSplitter;
 import org.springframework.batch.core.partition.support.AbstractPartitionHandler;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.StepInterruptionPolicy;
+import org.springframework.batch.core.step.ThreadStepInterruptionPolicy;
 import org.springframework.batch.infrastructure.poller.DirectPoller;
 import org.springframework.batch.infrastructure.poller.Poller;
 import org.springframework.beans.factory.InitializingBean;
@@ -99,6 +101,8 @@ public class MessageChannelPartitionHandler extends AbstractPartitionHandler imp
 	private boolean pollRepositoryForResults;
 
 	private long timeout = -1;
+
+	private StepInterruptionPolicy stepInterruptionPolicy = new ThreadStepInterruptionPolicy();
 
 	/**
 	 * pollable channel for the replies
@@ -193,6 +197,15 @@ public class MessageChannelPartitionHandler extends AbstractPartitionHandler imp
 	}
 
 	/**
+	 * Set the step interrupt policy for the manager step. Policy called during polling
+	 * @param stepInterruptionPolicy policy to use for polling
+	 */
+	public void setStepInterruptionPolicy(StepInterruptionPolicy stepInterruptionPolicy) {
+		Assert.notNull(stepInterruptionPolicy, "StepInterruptionPolicy cannot be null");
+		this.stepInterruptionPolicy = stepInterruptionPolicy;
+	}
+
+	/**
 	 * Sends {@link StepExecutionRequest} objects to the request channel of the
 	 * {@link MessagingTemplate}, and then receives the result back as a list of
 	 * {@link StepExecution} on a reply channel. Use the {@link #aggregate(List)} method
@@ -235,6 +248,9 @@ public class MessageChannelPartitionHandler extends AbstractPartitionHandler imp
 		Set<Long> partitionStepExecutionIds = split.stream().map(StepExecution::getId).collect(Collectors.toSet());
 
 		Callable<Set<StepExecution>> callback = () -> {
+
+			stepInterruptionPolicy.checkInterrupted(managerStepExecution);
+
 			JobExecution jobExecution = jobRepository.getJobExecution(managerStepExecution.getJobExecutionId());
 			Set<StepExecution> finishedStepExecutions = jobExecution.getStepExecutions()
 				.stream()
