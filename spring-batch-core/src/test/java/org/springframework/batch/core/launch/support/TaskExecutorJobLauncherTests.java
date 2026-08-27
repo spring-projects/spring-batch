@@ -15,8 +15,6 @@
  */
 package org.springframework.batch.core.launch.support;
 
-import java.util.List;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -62,7 +60,7 @@ class TaskExecutorJobLauncherTests {
 		JobExecution runningJobExecution = new JobExecution(2L, jobInstance, jobParameters);
 		runningJobExecution.setStatus(BatchStatus.STARTED);
 		Mockito.when(jobRepository.getJobInstance(jobName, jobParameters)).thenReturn(jobInstance);
-		Mockito.when(jobRepository.getJobExecutions(jobInstance)).thenReturn(List.of(runningJobExecution));
+		Mockito.when(jobRepository.getLastJobExecution(jobInstance)).thenReturn(runningJobExecution);
 
 		// when
 		JobExecutionAlreadyRunningException exception = Assertions
