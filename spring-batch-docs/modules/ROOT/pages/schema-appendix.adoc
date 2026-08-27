@@ -393,3 +393,36 @@ about indexing:
 |`BATCH_STEP_EXECUTION`|`STEP_NAME = ? and JOB_EXECUTION_ID = ?`|Before each step execution
 
 |===============
+
+=== Foreign Key Columns
+
+Several Spring Batch tables reference each other via foreign key relationships.
+On some database platforms (notably PostgreSQL), foreign key columns are **not** automatically indexed.
+Unindexed foreign keys can cause significant performance degradation for queries that join these tables, which Spring Batch performs frequently when loading step executions for a job execution, looking up job execution parameters, and so on.
+
+The following foreign key columns are candidates for additional indexes:
+
+[cols="2,2", options="header"]
+|===
+| Table | Foreign Key Column(s)
+
+| `BATCH_JOB_EXECUTION_PARAMS`
+| `JOB_EXECUTION_ID` (references `BATCH_JOB_EXECUTION`)
+
+| `BATCH_JOB_EXECUTION`
+| `JOB_INSTANCE_ID` (references `BATCH_JOB_INSTANCE`)
+
+| `BATCH_STEP_EXECUTION`
+| `JOB_EXECUTION_ID` (references `BATCH_JOB_EXECUTION`)
+
+| `BATCH_JOB_EXECUTION_CONTEXT`
+| `JOB_EXECUTION_ID` (references `BATCH_JOB_EXECUTION`)
+
+| `BATCH_STEP_EXECUTION_CONTEXT`
+| `STEP_EXECUTION_ID` (references `BATCH_STEP_EXECUTION`)
+
+|===
+
+NOTE: Check whether your database automatically creates indexes for foreign keys.
+MySQL and Oracle create them automatically; PostgreSQL does not.
+You can use database-specific queries to detect unindexed foreign keys — for example, the https://wiki.postgresql.org/wiki/Unindexed_foreign_keys[PostgreSQL unindexed foreign keys query].
