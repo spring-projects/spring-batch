@@ -30,8 +30,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.springframework.batch.core.job.JobExecution;
 
@@ -59,6 +57,7 @@ import org.springframework.util.CollectionUtils;
  * @author Michael Minella
  * @author David Turanski
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  */
 public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implements ExecutionContextDao {
 
@@ -114,7 +113,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 
 	private ExecutionContextSerializer serializer = new DefaultExecutionContextSerializer();
 
-	private final Lock lock = new ReentrantLock();
+	private final FineGrainedLock<Long> lock = new FineGrainedLock<>();
 
 	/**
 	 * Setter for {@link Serializer} implementation
@@ -192,9 +191,9 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 	public void updateExecutionContext(StepExecution stepExecution) {
 		// Attempt to prevent concurrent modification errors by blocking here if
 		// someone is already trying to do it.
-		this.lock.lock();
+		Long executionId = stepExecution.getId();
+		this.lock.lock(executionId);
 		try {
-			long executionId = stepExecution.getId();
 			ExecutionContext executionContext = stepExecution.getExecutionContext();
 			Assert.notNull(executionContext, "The ExecutionContext must not be null.");
 
@@ -203,7 +202,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 			persistSerializedContext(executionId, serializedContext, UPDATE_STEP_EXECUTION_CONTEXT);
 		}
 		finally {
-			this.lock.unlock();
+			this.lock.unlock(executionId);
 		}
 	}
 
