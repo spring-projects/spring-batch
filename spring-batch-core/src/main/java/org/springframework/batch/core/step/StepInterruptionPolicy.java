@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,10 @@ import org.springframework.batch.core.job.JobInterruptedException;
  * implementations to check if a job has been interrupted.
  *
  * @author Lucas Ward
+ * @author Daegeon Lee
  *
  */
+@FunctionalInterface
 public interface StepInterruptionPolicy {
 
 	/**
