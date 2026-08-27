@@ -155,6 +155,28 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 	}
 
 	/**
+	 * Add a {@link JobExecutionListener} to the job.
+	 * This method makes the additive nature of adding listeners explicit.
+	 * @param listener the job execution listener to add
+	 * @return this for fluent chaining
+	 * @since 6.1
+	 */
+	public B addListener(JobExecutionListener listener) {
+		return listener(listener);
+	}
+
+	/**
+	 * Add a job execution listener using annotation-based configuration.
+	 * This method makes the additive nature of adding listeners explicit.
+	 * @param listener the object that has a method configured with listener annotation
+	 * @return this for fluent chaining
+	 * @since 6.1
+	 */
+	public B addListener(Object listener) {
+		return listener(listener);
+	}
+
+	/**
 	 * Set a flag to prevent restart an execution of this job even if it has failed.
 	 * @return this to enable fluent chaining
 	 */
