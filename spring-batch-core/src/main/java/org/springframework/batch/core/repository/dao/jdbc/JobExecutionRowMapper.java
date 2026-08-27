@@ -2,6 +2,7 @@ package org.springframework.batch.core.repository.dao.jdbc;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.function.Function;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
@@ -13,11 +14,13 @@ import org.springframework.jdbc.core.RowMapper;
 /**
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  * <p>
  * Expects a result set with the following columns: *
  * <ul>
  * *
  * <li>JOB_EXECUTION_ID</li> *
+ * <li>JOB_INSTANCE_ID</li> *
  * <li>START_TIME</li> *
  * <li>END_TIME</li> *
  * <li>STATUS</li> *
@@ -31,19 +34,21 @@ import org.springframework.jdbc.core.RowMapper;
  */
 class JobExecutionRowMapper implements RowMapper<JobExecution> {
 
-	private final JobInstance jobInstance;
+	private final Function<Long, JobInstance> jobInstanceMapper;
 
-	private final JobParameters jobParameters;
+	private final Function<Long, JobParameters> jobParametersMapper;
 
-	public JobExecutionRowMapper(JobInstance jobInstance, JobParameters jobParameters) {
-		this.jobInstance = jobInstance;
-		this.jobParameters = jobParameters;
+	public JobExecutionRowMapper(Function<Long, JobInstance> jobInstanceMapper,
+			Function<Long, JobParameters> jobParametersMapper) {
+		this.jobInstanceMapper = jobInstanceMapper;
+		this.jobParametersMapper = jobParametersMapper;
 	}
 
 	@Override
 	public JobExecution mapRow(ResultSet rs, int rowNum) throws SQLException {
 		long id = rs.getLong("JOB_EXECUTION_ID");
-		JobExecution jobExecution = new JobExecution(id, this.jobInstance, this.jobParameters);
+		JobExecution jobExecution = new JobExecution(id, this.jobInstanceMapper.apply(rs.getLong("JOB_INSTANCE_ID")),
+				this.jobParametersMapper.apply(id));
 		jobExecution.setStartTime(
 				rs.getTimestamp("START_TIME") == null ? null : rs.getTimestamp("START_TIME").toLocalDateTime());
 		jobExecution
