@@ -31,6 +31,8 @@ import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.util.Assert;
 
+import static org.springframework.batch.core.BatchConstants.BATCH_STEP_TYPE;
+
 /**
  * A {@link Step} that delegates to a {@link Job} to do its work. This is a great tool for
  * managing dependencies between jobs, and also to modularise complex step logic into
@@ -113,7 +115,7 @@ public class JobStep extends AbstractStep {
 
 		ExecutionContext executionContext = stepExecution.getExecutionContext();
 
-		executionContext.put(STEP_TYPE_KEY, this.getClass().getName());
+		executionContext.put(BATCH_STEP_TYPE, this.getClass().getName());
 
 		JobParameters jobParameters;
 		if (executionContext.containsKey(JOB_PARAMETERS_KEY)) {

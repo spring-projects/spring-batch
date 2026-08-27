@@ -50,6 +50,8 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.util.Assert;
 
+import static org.springframework.batch.core.BatchConstants.BATCH_RECOVERED;
+
 /**
  * @author Mahmoud Ben Hassine
  * @author Yanming Zhou
@@ -163,7 +165,7 @@ public class MongoDBJobRestartIntegrationTests {
 
 		// Step 4: recover the job execution
 		JobExecution recoveredJobExecution = jobOperator.recover(jobExecution);
-		Assert.notNull(recoveredJobExecution.getExecutionContext().get("batch.recovered"),
+		Assert.notNull(recoveredJobExecution.getExecutionContext().get(BATCH_RECOVERED),
 				"Job execution should be marked as recovered");
 
 		// Step 5: restart the job
