@@ -29,7 +29,7 @@ import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.amqp.support.converter.JacksonJsonMessageConverter;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.repository.JobRepository;
@@ -132,7 +132,7 @@ class AmqpJobFunctionalTests {
 		@Bean
 		public AmqpTemplate rabbitOutputTemplate(CachingConnectionFactory connectionFactory) {
 			RabbitTemplate template = new RabbitTemplate(connectionFactory);
-			template.setMessageConverter(new Jackson2JsonMessageConverter());
+			template.setMessageConverter(new JacksonJsonMessageConverter());
 			template.setExchange(EXCHANGE_NAME);
 			return template;
 		}
@@ -143,7 +143,7 @@ class AmqpJobFunctionalTests {
 		@Bean
 		public RabbitTemplate rabbitInputTemplate(CachingConnectionFactory connectionFactory) {
 			RabbitTemplate template = new RabbitTemplate(connectionFactory);
-			template.setMessageConverter(new Jackson2JsonMessageConverter());
+			template.setMessageConverter(new JacksonJsonMessageConverter());
 			template.setDefaultReceiveQueue(QUEUE_NAME);
 			return template;
 		}
