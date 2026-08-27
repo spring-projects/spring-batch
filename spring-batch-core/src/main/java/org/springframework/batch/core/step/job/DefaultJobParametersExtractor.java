@@ -65,7 +65,7 @@ public class DefaultJobParametersExtractor implements JobParametersExtractor {
 	@Override
 	public JobParameters getJobParameters(Job job, StepExecution stepExecution) {
 		JobParametersBuilder builder = new JobParametersBuilder();
-		JobParameters jobParameters = stepExecution.getJobParameters();
+		JobParameters jobParameters = stepExecution.getJobExecution().getJobParameters();
 		ExecutionContext executionContext = stepExecution.getExecutionContext();
 		if (useAllParentParameters) {
 			for (JobParameter<?> jobParameter : jobParameters) {

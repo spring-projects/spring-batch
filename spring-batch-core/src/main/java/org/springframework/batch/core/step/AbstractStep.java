@@ -219,7 +219,7 @@ public abstract class AbstractStep implements StoppableStep, InitializingBean, B
 		}
 		StepExecutionEvent stepExecutionEvent = new StepExecutionEvent(stepExecution.getStepName(),
 				stepExecution.getJobExecution().getJobInstance().getJobName(), stepExecution.getId(),
-				stepExecution.getJobExecutionId());
+				stepExecution.getJobExecution().getId());
 		stepExecutionEvent.begin();
 		stepExecution.setStartTime(LocalDateTime.now());
 		stepExecution.setStatus(BatchStatus.STARTED);
