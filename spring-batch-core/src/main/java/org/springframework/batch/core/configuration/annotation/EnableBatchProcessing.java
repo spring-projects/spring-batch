@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2025 the original author or authors.
+ * Copyright 2012-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,7 +59,7 @@ import java.lang.annotation.Target;
  * }
  * </pre>
  *
- * By default,this annotation configures a resouceless batch infrastructure (ie based on a
+ * By default, this annotation configures a resourceless batch infrastructure (i.e. based on a
  * {@link org.springframework.batch.core.repository.support.ResourcelessJobRepository} and
  * a {@link ResourcelessTransactionManager}).
  *
