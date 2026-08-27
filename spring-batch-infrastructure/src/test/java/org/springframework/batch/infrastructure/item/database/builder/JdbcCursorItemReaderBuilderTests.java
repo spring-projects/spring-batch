@@ -49,6 +49,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Parikshit Dutta
  * @author Mahmoud Ben Hassine
  * @author Juyoung Kim
+ * @author Andrey Litvitski
  */
 class JdbcCursorItemReaderBuilderTests {
 
@@ -313,12 +314,8 @@ class JdbcCursorItemReaderBuilderTests {
 
 	@Test
 	void testValidation() {
-		var builder = new JdbcCursorItemReaderBuilder<Foo>().saveState(true);
+		var builder = new JdbcCursorItemReaderBuilder<Foo>().saveState(false);
 		Exception exception = assertThrows(IllegalArgumentException.class, builder::build);
-		assertEquals("A name is required when saveState is set to true", exception.getMessage());
-
-		builder = new JdbcCursorItemReaderBuilder<Foo>().saveState(false);
-		exception = assertThrows(IllegalArgumentException.class, builder::build);
 		assertEquals("A query is required", exception.getMessage());
 
 		builder = new JdbcCursorItemReaderBuilder<Foo>().saveState(false).sql("select 1");

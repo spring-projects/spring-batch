@@ -50,6 +50,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Mahmoud Ben Hassine
+ * @author Andrey Litvitski
  */
 class JpaCursorItemReaderBuilderTests {
 
@@ -198,10 +199,6 @@ class JpaCursorItemReaderBuilderTests {
 		var builder = new JpaCursorItemReaderBuilder<Foo>();
 		Exception exception = assertThrows(IllegalArgumentException.class, builder::build);
 		assertEquals("An EntityManagerFactory is required", exception.getMessage());
-
-		builder = new JpaCursorItemReaderBuilder<Foo>().entityManagerFactory(this.entityManagerFactory).saveState(true);
-		exception = assertThrows(IllegalArgumentException.class, builder::build);
-		assertEquals("A name is required when saveState is set to true", exception.getMessage());
 
 		builder = new JpaCursorItemReaderBuilder<Foo>().entityManagerFactory(this.entityManagerFactory)
 			.saveState(false);

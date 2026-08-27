@@ -30,6 +30,7 @@ import org.springframework.util.Assert;
  * Creates a fully qualified LdifReader.
  *
  * @author Glenn Renfro
+ * @author Andrey Litvitski
  * @since 4.0
  */
 public class LdifReaderBuilder {
@@ -164,9 +165,6 @@ public class LdifReaderBuilder {
 		LdifReader reader = new LdifReader(this.resource);
 		reader.setRecordsToSkip(this.recordsToSkip);
 		reader.setSaveState(this.saveState);
-		if (this.name != null) {
-			reader.setName(this.name);
-		}
 		reader.setCurrentItemCount(this.currentItemCount);
 		reader.setMaxItemCount(this.maxItemCount);
 		if (this.skippedRecordsCallback != null) {
