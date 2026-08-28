@@ -311,7 +311,7 @@ public class ExtendedConnectionDataSourceProxy implements SmartDataSource, Initi
 	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public boolean isWrapperFor(Class<?> iface) {
-		return iface.isAssignableFrom(SmartDataSource.class) || iface.isAssignableFrom(dataSource.getClass());
+		return iface.isAssignableFrom(SmartDataSource.class) || iface.isInstance(dataSource);
 	}
 
 	/**
@@ -327,7 +327,7 @@ public class ExtendedConnectionDataSourceProxy implements SmartDataSource, Initi
 			T casted = (T) this;
 			return casted;
 		}
-		else if (iface.isAssignableFrom(dataSource.getClass())) {
+		else if (iface.isInstance(dataSource)) {
 			@SuppressWarnings("unchecked")
 			T casted = (T) dataSource;
 			return casted;

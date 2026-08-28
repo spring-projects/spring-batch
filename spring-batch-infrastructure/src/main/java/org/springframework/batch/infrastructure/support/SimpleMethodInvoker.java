@@ -109,7 +109,7 @@ public class SimpleMethodInvoker implements MethodInvoker {
 			if (source instanceof Advised) {
 				source = extractTarget(source, method);
 			}
-			if (method.getDeclaringClass().isAssignableFrom(source.getClass())) {
+			if (method.getDeclaringClass().isInstance(source)) {
 				target = source;
 			}
 		}

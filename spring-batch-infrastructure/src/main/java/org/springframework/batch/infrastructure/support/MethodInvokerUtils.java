@@ -99,7 +99,7 @@ public abstract class MethodInvokerUtils {
 	public static @Nullable MethodInvoker getMethodInvokerForInterface(Class<?> cls, String methodName, Object object,
 			Class<?>... paramTypes) {
 
-		if (cls.isAssignableFrom(object.getClass())) {
+		if (cls.isInstance(object)) {
 			return MethodInvokerUtils.getMethodInvokerByName(object, methodName, true, paramTypes);
 		}
 		else {

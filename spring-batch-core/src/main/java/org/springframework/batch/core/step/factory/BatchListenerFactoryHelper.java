@@ -32,7 +32,7 @@ abstract class BatchListenerFactoryHelper {
 	public static <T> List<T> getListeners(StepListener[] listeners, Class<? super T> cls) {
 		List<T> list = new ArrayList<>();
 		for (StepListener stepListener : listeners) {
-			if (cls.isAssignableFrom(stepListener.getClass())) {
+			if (cls.isInstance(stepListener)) {
 				@SuppressWarnings("unchecked")
 				T listener = (T) stepListener;
 				list.add(listener);
