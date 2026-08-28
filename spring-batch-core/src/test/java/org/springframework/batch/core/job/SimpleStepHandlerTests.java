@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,8 +27,11 @@ import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.JdbcJobRepositoryFactoryBean;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.core.step.StepSupport;
+import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
+import org.springframework.batch.infrastructure.repeat.RepeatStatus;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
@@ -67,6 +70,19 @@ class SimpleStepHandlerTests {
 	@Test
 	void testHandleStep() throws Exception {
 		StepExecution stepExecution = stepHandler.handleStep(new StubStep("step"), jobExecution);
+		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
+	}
+
+	// https://github.com/spring-projects/spring-batch/issues/5278
+	@Test
+	void testHandleStepWithNoNameAndNotDefinedAsABean() throws Exception {
+		TaskletStep step = new StepBuilder(jobRepository).tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED)
+			.build();
+
+		StepExecution stepExecution = stepHandler.handleStep(step, jobExecution);
+
+		assertEquals(TaskletStep.class.getName(), step.getName());
+		assertEquals(TaskletStep.class.getName(), stepExecution.getStepName());
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 	}
 
