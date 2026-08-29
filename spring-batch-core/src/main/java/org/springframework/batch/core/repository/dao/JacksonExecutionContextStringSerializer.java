@@ -56,7 +56,7 @@ public class JacksonExecutionContextStringSerializer implements ExecutionContext
 			.allowIfSubType("java.math.")
 			.allowIfSubType("java.time.")
 			.allowIfSubType("java.net.")
-			.allowIfSubType("javax.xml.")
+			.allowIfSubType("javax.xml.namespace.QName")
 			.allowIfSubType("org.springframework.batch.")
 			.build();
 		this.jsonMapper = JsonMapper.builder().activateDefaultTyping(polymorphicTypeValidator).build();
