@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,8 +34,9 @@ import org.springframework.batch.core.job.parameters.JobParametersIncrementer;
 import org.springframework.batch.core.job.parameters.JobParametersValidator;
 import org.springframework.batch.core.listener.JobExecutionListener;
 import org.springframework.batch.core.SpringBatchVersion;
+import org.springframework.batch.core.observability.BatchEventRecorder;
+import org.springframework.batch.core.observability.BatchEventRecorder.BatchEvent;
 import org.springframework.batch.core.observability.BatchMetrics;
-import org.springframework.batch.core.observability.jfr.events.job.JobExecutionEvent;
 import org.springframework.batch.core.observability.micrometer.MicrometerMetrics;
 import org.springframework.batch.core.step.ListableStepLocator;
 import org.springframework.batch.core.step.Step;
@@ -58,6 +59,7 @@ import org.springframework.util.ClassUtils;
  * @author Lucas Ward
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
+ * @author Fabio Molignoni
  */
 @NullUnmarked // FIXME to remove once default constructors (required by the batch XML
 				// namespace) are removed
@@ -80,6 +82,8 @@ public abstract class AbstractJob implements Job, ListableStepLocator, BeanNameA
 	private StepHandler stepHandler;
 
 	private ObservationRegistry observationRegistry;
+
+	private BatchEventRecorder batchEventRecorder = BatchEventRecorder.DEFAULT;
 
 	/**
 	 * Default constructor.
@@ -269,8 +273,8 @@ public abstract class AbstractJob implements Job, ListableStepLocator, BeanNameA
 		}
 
 		JobSynchronizationManager.register(execution);
-		JobExecutionEvent jobExecutionEvent = new JobExecutionEvent(execution.getJobInstance().getJobName(),
-				execution.getJobInstance().getId(), execution.getId());
+		BatchEvent jobExecutionEvent = this.batchEventRecorder.createJobExecutionEvent(
+				execution.getJobInstance().getJobName(), execution.getJobInstance().getId(), execution.getId());
 		jobExecutionEvent.begin();
 		Observation observation = MicrometerMetrics
 			.createObservation(BatchMetrics.METRICS_PREFIX + "job", this.observationRegistry)
@@ -336,7 +340,7 @@ public abstract class AbstractJob implements Job, ListableStepLocator, BeanNameA
 					execution.setExitStatus(exitStatus.and(newExitStatus));
 				}
 				stopObservation(execution, observation);
-				jobExecutionEvent.exitStatus = execution.getExitStatus().getExitCode();
+				jobExecutionEvent.setStatus(execution.getExitStatus().getExitCode());
 				jobExecutionEvent.commit();
 				execution.setEndTime(LocalDateTime.now());
 
@@ -422,6 +426,16 @@ public abstract class AbstractJob implements Job, ListableStepLocator, BeanNameA
 
 	public void setObservationRegistry(ObservationRegistry observationRegistry) {
 		this.observationRegistry = observationRegistry;
+	}
+
+	/**
+	 * Set the batch event recorder. Defaults to {@link BatchEventRecorder#DEFAULT}.
+	 * @param batchEventRecorder the batch event recorder
+	 * @since 6.1
+	 */
+	public void setBatchEventRecorder(BatchEventRecorder batchEventRecorder) {
+		Assert.notNull(batchEventRecorder, "BatchEventRecorder must not be null");
+		this.batchEventRecorder = batchEventRecorder;
 	}
 
 	@Override

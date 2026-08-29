@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,7 @@ import org.springframework.batch.core.annotation.AfterJob;
 import org.springframework.batch.core.annotation.BeforeJob;
 import org.springframework.batch.core.job.AbstractJob;
 import org.springframework.batch.core.listener.JobListenerFactoryBean;
+import org.springframework.batch.core.observability.BatchEventRecorder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.infrastructure.support.ReflectionUtils;
 
@@ -44,6 +45,7 @@ import org.springframework.batch.infrastructure.support.ReflectionUtils;
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  * @author Taeik Lim
+ * @author Fabio Molignoni
  * @since 2.2
  */
 @NullUnmarked // FIXME to remove once default constructors (required by the batch XML
@@ -122,6 +124,20 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 	}
 
 	/**
+	 * Set the batch event recorder for the job. Defaults to
+	 * {@link BatchEventRecorder#DEFAULT}.
+	 * @param batchEventRecorder the batch event recorder
+	 * @return this for fluent chaining
+	 * @since 6.1
+	 */
+	public B batchEventRecorder(BatchEventRecorder batchEventRecorder) {
+		properties.batchEventRecorder = batchEventRecorder;
+		@SuppressWarnings("unchecked")
+		B result = (B) this;
+		return result;
+	}
+
+	/**
 	 * Registers objects using the annotation based listener configuration.
 	 * @param listener the object that has a method configured with listener annotation
 	 * @return this for fluent chaining
@@ -192,6 +208,7 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 		if (observationRegistry != null) {
 			job.setObservationRegistry(observationRegistry);
 		}
+		job.setBatchEventRecorder(properties.getBatchEventRecorder());
 
 		Boolean restartable = properties.getRestartable();
 		if (restartable != null) {
@@ -216,6 +233,8 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 
 		private ObservationRegistry observationRegistry;
 
+		private BatchEventRecorder batchEventRecorder = BatchEventRecorder.DEFAULT;
+
 		private JobParametersIncrementer jobParametersIncrementer;
 
 		private JobParametersValidator jobParametersValidator;
@@ -228,6 +247,7 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 			this.restartable = properties.restartable;
 			this.jobRepository = properties.jobRepository;
 			this.observationRegistry = properties.observationRegistry;
+			this.batchEventRecorder = properties.batchEventRecorder;
 			this.jobExecutionListeners = new LinkedHashSet<>(properties.jobExecutionListeners);
 			this.jobParametersIncrementer = properties.jobParametersIncrementer;
 			this.jobParametersValidator = properties.jobParametersValidator;
@@ -263,6 +283,24 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 
 		public void setObservationRegistry(ObservationRegistry observationRegistry) {
 			this.observationRegistry = observationRegistry;
+		}
+
+		/**
+		 * Return the batch event recorder.
+		 * @return the batch event recorder
+		 * @since 6.1
+		 */
+		public BatchEventRecorder getBatchEventRecorder() {
+			return this.batchEventRecorder;
+		}
+
+		/**
+		 * Set the batch event recorder.
+		 * @param batchEventRecorder the batch event recorder
+		 * @since 6.1
+		 */
+		public void setBatchEventRecorder(BatchEventRecorder batchEventRecorder) {
+			this.batchEventRecorder = batchEventRecorder;
 		}
 
 		public String getName() {

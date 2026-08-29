@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import org.jspecify.annotations.NullUnmarked;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.listener.ChunkListener;
 import org.springframework.batch.core.job.JobInterruptedException;
-import org.springframework.batch.core.observability.jfr.events.step.tasklet.TaskletExecutionEvent;
+import org.springframework.batch.core.observability.BatchEventRecorder.BatchEvent;
 import org.springframework.batch.core.step.StepContribution;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.listener.StepExecutionListener;
@@ -74,6 +74,7 @@ import java.util.concurrent.Semaphore;
  * @author Michael Minella
  * @author Will Schipp
  * @author Mahmoud Ben Hassine
+ * @author Fabio Molignoni
  */
 // FIXME remove once default constructors (required by the XML namespace) are removed
 @NullUnmarked
@@ -249,8 +250,8 @@ public class TaskletStep extends AbstractStep {
 		String taskletType = tasklet.getClass().getName();
 		stepExecution.getExecutionContext().put(TASKLET_TYPE_KEY, taskletType);
 		stepExecution.getExecutionContext().put(STEP_TYPE_KEY, this.getClass().getName());
-		TaskletExecutionEvent taskletExecutionEvent = new TaskletExecutionEvent(stepExecution.getStepName(),
-				stepExecution.getId(), taskletType);
+		BatchEvent taskletExecutionEvent = this.batchEventRecorder
+			.createTaskletExecutionEvent(stepExecution.getStepName(), stepExecution.getId(), taskletType);
 		taskletExecutionEvent.begin();
 		stream.update(stepExecution.getExecutionContext());
 		getJobRepository().updateExecutionContext(stepExecution);
@@ -293,7 +294,7 @@ public class TaskletStep extends AbstractStep {
 
 		});
 
-		taskletExecutionEvent.taskletStatus = stepExecution.getExitStatus().getExitCode();
+		taskletExecutionEvent.setStatus(stepExecution.getExitStatus().getExitCode());
 		taskletExecutionEvent.commit();
 	}
 

@@ -20,10 +20,12 @@ import jdk.jfr.Description;
 import jdk.jfr.Event;
 import jdk.jfr.Label;
 
+import org.springframework.batch.core.observability.BatchEventRecorder.BatchEvent;
+
 @Label("Partition Aggregate")
 @Description("Partition Aggregate Event")
 @Category({ "Spring Batch", "Step", "Partition" })
-public class PartitionAggregateEvent extends Event {
+public class PartitionAggregateEvent extends Event implements BatchEvent {
 
 	@Label("Step Name")
 	public String stepName;

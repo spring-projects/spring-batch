@@ -19,17 +19,23 @@ import io.micrometer.observation.ObservationRegistry;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.aop.framework.ProxyFactory;
+import org.springframework.batch.core.job.SimpleJob;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.launch.support.TaskExecutorJobOperator;
+import org.springframework.batch.core.observability.BatchEventRecorder;
+import org.springframework.batch.core.repository.support.ResourcelessJobRepository;
+import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.mockito.Mockito.mock;
 
 /**
  * Test class for {@link BatchObservabilityBeanPostProcessor}.
  *
  * @author Sanghyuk Jung
+ * @author Fabio Molignoni
  */
 class BatchObservabilityBeanPostProcessorTests {
 
@@ -37,12 +43,43 @@ class BatchObservabilityBeanPostProcessorTests {
 
 	private final ObservationRegistry observationRegistry = ObservationRegistry.create();
 
+	private final BatchEventRecorder batchEventRecorder = mock();
+
 	private final BatchObservabilityBeanPostProcessor postProcessor = new BatchObservabilityBeanPostProcessor();
 
 	@Test
-	void observationRegistryShouldBeSetOnJobOperator() {
+	void observabilityComponentsShouldBeSetOnJob() {
+		this.beanFactory.registerSingleton("observationRegistry", this.observationRegistry);
+		this.beanFactory.registerSingleton("batchEventRecorder", this.batchEventRecorder);
+		this.postProcessor.postProcessBeanFactory(this.beanFactory);
+		SimpleJob job = new SimpleJob("job");
+		job.setJobRepository(new ResourcelessJobRepository());
+
+		this.postProcessor.postProcessAfterInitialization(job, "job");
+
+		assertSame(this.observationRegistry, ReflectionTestUtils.getField(job, "observationRegistry"));
+		assertSame(this.batchEventRecorder, ReflectionTestUtils.getField(job, "batchEventRecorder"));
+	}
+
+	@Test
+	void observabilityComponentsShouldBeSetOnStep() {
+		this.beanFactory.registerSingleton("observationRegistry", this.observationRegistry);
+		this.beanFactory.registerSingleton("batchEventRecorder", this.batchEventRecorder);
+		this.postProcessor.postProcessBeanFactory(this.beanFactory);
+		TaskletStep step = new TaskletStep(new ResourcelessJobRepository());
+		step.setName("step");
+
+		this.postProcessor.postProcessAfterInitialization(step, "step");
+
+		assertSame(this.observationRegistry, ReflectionTestUtils.getField(step, "observationRegistry"));
+		assertSame(this.batchEventRecorder, ReflectionTestUtils.getField(step, "batchEventRecorder"));
+	}
+
+	@Test
+	void observabilityComponentsShouldBeSetOnJobOperator() {
 		// given
 		this.beanFactory.registerSingleton("observationRegistry", this.observationRegistry);
+		this.beanFactory.registerSingleton("batchEventRecorder", this.batchEventRecorder);
 		this.postProcessor.postProcessBeanFactory(this.beanFactory);
 		TaskExecutorJobOperator jobOperator = new TaskExecutorJobOperator();
 
@@ -51,12 +88,14 @@ class BatchObservabilityBeanPostProcessorTests {
 
 		// then
 		assertSame(this.observationRegistry, ReflectionTestUtils.getField(jobOperator, "observationRegistry"));
+		assertSame(this.batchEventRecorder, ReflectionTestUtils.getField(jobOperator, "batchEventRecorder"));
 	}
 
 	@Test
-	void observationRegistryShouldBeSetOnProxiedJobOperator() {
+	void observabilityComponentsShouldBeSetOnProxiedJobOperator() {
 		// given
 		this.beanFactory.registerSingleton("observationRegistry", this.observationRegistry);
+		this.beanFactory.registerSingleton("batchEventRecorder", this.batchEventRecorder);
 		this.postProcessor.postProcessBeanFactory(this.beanFactory);
 		TaskExecutorJobOperator target = new TaskExecutorJobOperator();
 		ProxyFactory proxyFactory = new ProxyFactory();
@@ -70,6 +109,7 @@ class BatchObservabilityBeanPostProcessorTests {
 
 		// then
 		assertSame(this.observationRegistry, ReflectionTestUtils.getField(target, "observationRegistry"));
+		assertSame(this.batchEventRecorder, ReflectionTestUtils.getField(target, "batchEventRecorder"));
 	}
 
 }
