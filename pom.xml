@@ -127,12 +127,12 @@
 		<!-- samples dependencies -->
 		<spring-rabbit.version>${spring-amqp.version}</spring-rabbit.version>
 		<quartz.version>2.5.2</quartz.version>
-		<prometheus-metrics-exporter-pushgateway>1.4.2</prometheus-metrics-exporter-pushgateway>
+		<prometheus-metrics-exporter-pushgateway.version>1.4.2</prometheus-metrics-exporter-pushgateway.version>
 		<groovy.version>5.1.2</groovy.version>
 		<logback.version>1.6.3</logback.version>
 
 		<!-- documentation dependencies -->
-		<io.spring.maven.antora-version>0.0.4</io.spring.maven.antora-version>
+		<io.spring.maven.antora.version>0.0.4</io.spring.maven.antora.version>
 		<antora-maven-plugin.version>1.0.0-alpha.5</antora-maven-plugin.version>
 
 		<!-- plugin versions -->
