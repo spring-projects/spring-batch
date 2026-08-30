@@ -26,10 +26,13 @@ import org.springframework.batch.infrastructure.item.ItemReader;
 import org.springframework.batch.infrastructure.item.file.FlatFileItemReader;
 import org.springframework.batch.infrastructure.item.file.LineMapper;
 import org.springframework.batch.infrastructure.item.file.MultiResourceItemReader;
+import org.springframework.batch.infrastructure.item.file.mapping.PassThroughLineMapper;
 import org.springframework.batch.infrastructure.item.sample.Foo;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
@@ -79,7 +82,26 @@ class MultiResourceItemReaderBuilderTests extends AbstractItemStreamItemReaderTe
 	void testNullResources() {
 		Exception exception = assertThrows(IllegalArgumentException.class,
 				() -> new MultiResourceItemReaderBuilder<String>().delegate(mock(FlatFileItemReader.class)).build());
-		assertEquals("resources array is required.", exception.getMessage());
+		assertEquals("resources array or filesPattern is required.", exception.getMessage());
+	}
+
+	@Test
+	void testFilesPattern() throws Exception {
+		FlatFileItemReader<String> delegate = new FlatFileItemReaderBuilder<String>().name("textReader")
+			.lineMapper(new PassThroughLineMapper())
+			.build();
+
+		String basePath = new ClassPathResource("", this.getClass()).getFile().getPath();
+		MultiResourceItemReader<String> reader = new MultiResourceItemReaderBuilder<String>().delegate(delegate)
+			.filesPattern(basePath + "/test?.txt")
+			.name("multiFileReader")
+			.build();
+
+		reader.open(new ExecutionContext());
+		assertEquals("1", reader.read());
+		assertEquals("2", reader.read());
+		assertNull(reader.read());
+		reader.close();
 	}
 
 	@Override
