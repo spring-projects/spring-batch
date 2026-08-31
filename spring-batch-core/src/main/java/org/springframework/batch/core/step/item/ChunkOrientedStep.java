@@ -494,7 +494,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			}
 
 			// write processed items
-			writeChunk(processedChunk, scanItems, contribution);
+			writeChunk(processedChunk, scanItems, contribution, status);
 			stepExecution.incrementCommitCount();
 		}
 		catch (Exception e) {
@@ -565,7 +565,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			}
 			compositeChunkListener.beforeChunk(inputChunk);
 			processedChunk = processChunk(inputChunk, contribution, scanItems);
-			writeChunk(processedChunk, scanItems, contribution);
+			writeChunk(processedChunk, scanItems, contribution, status);
 			compositeChunkListener.afterChunk(processedChunk);
 			stepExecution.incrementCommitCount();
 		}
@@ -818,8 +818,8 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 		}
 	}
 
-	private void writeChunk(Chunk<O> chunk, List<ScanItem<I, O>> scanItems, StepContribution contribution)
-			throws Exception {
+	private void writeChunk(Chunk<O> chunk, List<ScanItem<I, O>> scanItems, StepContribution contribution,
+			TransactionStatus status) throws Exception {
 		ChunkWriteEvent chunkWriteEvent = new ChunkWriteEvent(contribution.getStepExecution().getStepName(),
 				contribution.getStepExecution().getId(), chunk.size());
 		String fullyQualifiedMetricName = METRICS_PREFIX + "chunk.write";
@@ -833,6 +833,15 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 		try (var scope = observation.openScope()) {
 			this.compositeItemWriteListener.beforeWrite(chunk);
 			doWrite(chunk);
+			// the write may return normally (eg because a retried write attempt no
+			// longer throws) even though a participant (eg a JPA transaction manager,
+			// after a resource-level failure like an OptimisticLockException) has
+			// independently marked the transaction rollback-only: the chunk must not be
+			// counted as written in that case
+			if (status.isRollbackOnly()) {
+				throw new SilentlyRolledBackException(
+						"The chunk write completed without an exception, but the transaction is rollback-only");
+			}
 			contribution.incrementWriteCount(chunk.size());
 			this.compositeItemWriteListener.afterWrite(chunk);
 			chunkWriteEvent.chunkWriteStatus = BatchMetrics.STATUS_SUCCESS;
@@ -844,7 +853,11 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			observation.lowCardinalityKeyValue(fullyQualifiedMetricName + ".status", BatchMetrics.STATUS_FAILURE);
 			observation.error(exception);
 
-			if (this.faultTolerant && exception instanceof RetryException retryException
+			if (exception instanceof SilentlyRolledBackException) {
+				logger.error("Chunk write completed but the transaction was independently marked rollback-only",
+						exception);
+			}
+			else if (this.faultTolerant && exception instanceof RetryException retryException
 					&& this.skipPolicy.shouldSkip(retryException.getCause(), -1)) {
 				logger.info("Retry exhausted, entering scan mode for next transaction", retryException);
 				this.chunkTracker.get().enterScanMode(scanItems);
@@ -903,6 +916,12 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 		try {
 			this.compositeItemWriteListener.beforeWrite(singleItemChunk);
 			this.itemWriter.write(singleItemChunk);
+			// see the equivalent check in writeChunk(): the write may return normally
+			// even though the transaction has independently been marked rollback-only
+			if (status.isRollbackOnly()) {
+				throw new SilentlyRolledBackException(
+						"The scanned item write completed without an exception, but the transaction is rollback-only");
+			}
 			contribution.incrementWriteCount(singleItemChunk.size());
 			this.compositeItemWriteListener.afterWrite(singleItemChunk);
 		}
@@ -931,6 +950,22 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 
 	private boolean isConcurrent() {
 		return this.taskExecutor != null;
+	}
+
+	/*
+	 * Signals that a write returned normally while the transaction it ran in had already
+	 * been independently marked rollback-only by a participant (eg a JPA transaction
+	 * manager, after a resource-level failure like an OptimisticLockException that a
+	 * retried write no longer raises). It is used internally to route this case into the
+	 * same failure handling as a write that threw, so that the chunk is never counted as
+	 * committed.
+	 */
+	private static class SilentlyRolledBackException extends RuntimeException {
+
+		SilentlyRolledBackException(String message) {
+			super(message);
+		}
+
 	}
 
 	/**
