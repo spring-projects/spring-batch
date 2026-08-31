@@ -17,7 +17,7 @@ package org.springframework.batch.core.configuration.annotation;
 
 import org.springframework.batch.core.repository.dao.AbstractMongoBatchMetadataDao;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.mongodb.MongoTransactionManager;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.transaction.annotation.Isolation;
 
@@ -35,8 +35,8 @@ import java.lang.annotation.Target;
  * necessary beans for a MongoDB-based infrastructure, including a job repository.
  * <p>
  * The default configuration assumes that a {@link MongoOperations} bean named
- * "mongoTemplate" and a {@link MongoTransactionManager} bean named "transactionManager"
- * are available in the application context.
+ * "mongoTemplate" and a {@link PlatformTransactionManager} bean named
+ * "transactionManager" are available in the application context.
  *
  * @author Mahmoud Ben Hassine
  * @since 6.0
@@ -50,7 +50,7 @@ public @interface EnableMongoJobRepository {
 	String mongoOperationsRef() default "mongoTemplate";
 
 	/**
-	 * Set the {@link MongoTransactionManager} to use in the job repository.
+	 * Set the {@link PlatformTransactionManager} to use in the job repository.
 	 * @return the bean name of the transaction manager to use. Defaults to
 	 * {@literal transactionManager}
 	 */
