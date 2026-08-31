@@ -296,12 +296,27 @@ The annotations corresponding to this interface are:
 
 One of the most common use cases for a `SkipListener` is to log out a skipped item, so
 that another batch process or even human process can be used to evaluate and fix the
-issue that leads to the skip. Because there are many cases in which the original transaction
-may be rolled back, Spring Batch makes two guarantees:
+issue that leads to the skip.
 
-* The appropriate skip method (depending on when the error happened) is called only once
-per item.
-* The `SkipListener` is always called just before the transaction is committed. This is
-to ensure that any transactional resources call by the listener are not rolled back by a
-failure within the `ItemWriter`.
+`onSkipInWrite` is called during a
+xref:step/chunk-oriented-processing/configuring-skip.adoc#skippingWriteFailures[chunk scan],
+inside the single-item transaction used to re-attempt the faulty item. That transaction
+is always rolled back right after the callback returns, since the item is being skipped
+rather than committed. `onSkipInRead` and `onSkipInProcess`, on the other hand, are
+called inside the chunk's own ongoing transaction, before the rest of the chunk has been
+read, processed, and written. Whether that transaction is ultimately committed or rolled
+back depends on the outcome of the remaining items in the chunk.
+
+[WARNING]
+====
+Because a `SkipListener` callback can run in a transaction that ends up rolled back, any
+transactional resource used by the listener (for example, to log the skipped item to a
+database) is not guaranteed to be committed. As a result, you should use
+`PROPAGATION_REQUIRES_NEW` for any transactional operation called from a `SkipListener`
+method, the same guidance given for `ChunkListener#onChunkError` and
+`ItemWriteListener#onWriteError`.
+====
+
+Regardless of the fate of the transaction, Spring Batch guarantees that the appropriate
+skip method (depending on when the error happened) is called only once per item.
 
