@@ -82,6 +82,12 @@ public class JobFlowExecutor implements FlowExecutor {
 			stepExecution.getExecutionContext().put("batch.restart", true);
 		}
 
+		// Preserve the step's exit description (e.g., the stack trace recorded by
+		// AbstractStep when a step fails) so it survives the flow's final
+		// updateJobExecutionStatus() call, which only carries the FlowExecutionStatus
+		// name and would otherwise discard it.
+		exitStatus = exitStatus.addExitDescription(stepExecution.getExitStatus().getExitDescription());
+
 		return stepExecution.getExitStatus().getExitCode();
 	}
 
