@@ -17,6 +17,7 @@ package org.springframework.batch.infrastructure.item.xml;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.Collections;
 
 import javax.xml.stream.XMLEventFactory;
@@ -832,19 +833,29 @@ class StaxEventItemWriterTests {
 	 * indicate the deletion attempt failed.
 	 */
 	@Test
-	void testFailedFileDeletionThrowsException() throws IOException {
-		File mockedFile = spy(resource.getFile());
-		writer.setResource(new FileSystemResource(mockedFile));
+	void testFailedFileDeletionThrowsException() throws Exception {
+
+		File outputFile = resource.getFile();
+
+		writer.setResource(new FileSystemResource(outputFile));
 		writer.setShouldDeleteIfEmpty(true);
 		writer.open(executionContext);
 
-		when(mockedFile.delete()).thenReturn(false);
+		// Keep the file locked so Files.delete(...) fails on Windows
+		RandomAccessFile lock = new RandomAccessFile(outputFile, "rw");
 
-		ItemStreamException exception = assertThrows(ItemStreamException.class, () -> writer.close(),
-				"Expected exception when file deletion fails");
+		try {
+			ItemStreamException exception = assertThrows(ItemStreamException.class, writer::close,
+					"Expected exception when file deletion fails");
 
-		assertEquals("Failed to delete empty file on close", exception.getMessage(), "Wrong exception message");
-		assertNotNull(exception.getCause(), "Exception should have a cause");
+			assertEquals("Failed to delete empty file on close", exception.getMessage());
+
+			assertNotNull(exception.getCause());
+			assertTrue(exception.getCause() instanceof IOException);
+		}
+		finally {
+			lock.close();
+		}
 	}
 
 	private void initWriterForSimpleCallbackTests() throws Exception {

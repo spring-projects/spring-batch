@@ -16,12 +16,12 @@
 
 package org.springframework.batch.infrastructure.item.support;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -39,24 +39,32 @@ import org.springframework.core.io.FileSystemResource;
 class AbstractFileItemWriterTests {
 
 	@Test
-	void testFailedFileDeletionThrowsException() {
+	void testFailedFileDeletionThrowsException() throws Exception {
+
 		File outputFile = new File("target/data/output.tmp");
-		File mocked = Mockito.spy(outputFile);
+		outputFile.getParentFile().mkdirs();
 
 		TestFileItemWriter writer = new TestFileItemWriter();
-
-		writer.setResource(new FileSystemResource(mocked));
+		writer.setResource(new FileSystemResource(outputFile));
 		writer.setShouldDeleteIfEmpty(true);
 		writer.setName(writer.getClass().getSimpleName());
+
 		writer.open(new ExecutionContext());
 
-		when(mocked.delete()).thenReturn(false);
+		// Keep the file open so Files.delete(...) cannot delete it (Windows)
+		RandomAccessFile lock = new RandomAccessFile(outputFile, "rw");
 
-		ItemStreamException exception = assertThrows(ItemStreamException.class, writer::close,
-				"Expected exception when file deletion fails");
+		try {
+			ItemStreamException exception = assertThrows(ItemStreamException.class, writer::close);
 
-		assertEquals("Failed to delete empty file on close", exception.getMessage(), "Wrong exception message");
-		assertNotNull(exception.getCause(), "Exception should have a cause");
+			assertEquals("Failed to delete empty file on close", exception.getMessage());
+
+			assertNotNull(exception.getCause());
+			assertTrue(exception.getCause() instanceof IOException);
+		}
+		finally {
+			lock.close();
+		}
 	}
 
 	private static class TestFileItemWriter extends AbstractFileItemWriter<String> {
