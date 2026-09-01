@@ -112,6 +112,19 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 		return self();
 	}
 
+	/**
+	 * Add a step execution listener. This is an alias for
+	 * {@link #listener(StepExecutionListener)} that makes it more explicit that the
+	 * listener is being added to a collection rather than replacing any existing
+	 * listeners.
+	 * @param listener a step execution listener
+	 * @return this for fluent chaining
+	 * @since 6.0.4
+	 */
+	public B addListener(StepExecutionListener listener) {
+		return listener(listener);
+	}
+
 	public B listener(StepExecutionListener listener) {
 		properties.addStepExecutionListener(listener);
 		return self();
