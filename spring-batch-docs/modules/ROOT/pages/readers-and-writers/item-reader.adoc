@@ -41,8 +41,13 @@ is no requirement in the contract to do so.
 
 It is expected that implementations of the `ItemReader` interface are forward only.
 However, if the underlying resource is transactional (such as a JMS queue) then calling
-`read` may return the same logical item on subsequent calls in a rollback scenario. It is
-also worth noting that a lack of items to process by an `ItemReader` does not cause an
-exception to be thrown. For example, a database `ItemReader` that is configured with a
-query that returns 0 results returns `null` on the first invocation of `read`.
+`read` may return the same logical item on subsequent calls in a rollback scenario. The
+same is true when a fault-tolerant step retries a failed `read` call (see
+xref:step/chunk-oriented-processing/retry-logic.adoc#retryLogicAndReaders[Retry and
+`ItemReader`]): a retried `read` is expected to return the same logical item again, not
+the next one, provided the reader implementation does not advance its position until an
+item has been read successfully. It is also worth noting that a lack of items to process
+by an `ItemReader` does not cause an exception to be thrown. For example, a database
+`ItemReader` that is configured with a query that returns 0 results returns `null` on the
+first invocation of `read`.
 
