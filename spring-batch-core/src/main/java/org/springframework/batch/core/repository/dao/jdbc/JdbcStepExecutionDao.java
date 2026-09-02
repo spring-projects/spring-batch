@@ -27,7 +27,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.step.StepExecution;
@@ -95,7 +94,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 			""";
 
 	private static final String GET_LAST_STEP_EXECUTION = """
-			SELECT SE.STEP_EXECUTION_ID, SE.STEP_NAME, SE.START_TIME, SE.END_TIME, SE.STATUS, SE.COMMIT_COUNT, SE.READ_COUNT, SE.FILTER_COUNT, SE.WRITE_COUNT, SE.EXIT_CODE, SE.EXIT_MESSAGE, SE.READ_SKIP_COUNT, SE.WRITE_SKIP_COUNT, SE.PROCESS_SKIP_COUNT, SE.ROLLBACK_COUNT, SE.LAST_UPDATED, SE.VERSION, SE.CREATE_TIME, JE.JOB_EXECUTION_ID, JE.START_TIME, JE.END_TIME, JE.STATUS, JE.EXIT_CODE, JE.EXIT_MESSAGE, JE.CREATE_TIME, JE.LAST_UPDATED, JE.VERSION
+			SELECT SE.STEP_EXECUTION_ID
 			FROM %PREFIX%JOB_EXECUTION JE
 				JOIN %PREFIX%STEP_EXECUTION SE ON SE.JOB_EXECUTION_ID = JE.JOB_EXECUTION_ID
 			WHERE JE.JOB_INSTANCE_ID = ? AND SE.STEP_NAME = ?
@@ -326,35 +325,48 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 		}, stepExecution.getId());
 	}
 
+	/**
+	 * Find the most recent {@link StepExecution} for the given job instance and step
+	 * name.
+	 * <p>
+	 * Implementation note (GH-5470): the id is selected with
+	 * {@code ORDER BY SE.CREATE_TIME DESC, SE.STEP_EXECUTION_ID DESC}, only the first row
+	 * is read in Java, the statement is allowed to complete, and only then is
+	 * {@link #getStepExecution(long)} used to load the full entity. JDBC
+	 * {@code setMaxRows(1)} is intentionally not used: with a non-zero max-rows limit,
+	 * some drivers (for example pgjdbc) send a protocol row count that can leave a
+	 * suspended portal after the first row, so a follow-up prepare on the same connection
+	 * fails on databases that disallow multiple active portals (for example CockroachDB).
+	 * Closing the Java {@link ResultSet} is not enough if the portal never reached
+	 * {@code CommandComplete}.
+	 * <p>
+	 * SQL {@code LIMIT} is also avoided for database portability. With the default JDBC
+	 * fetch size, the id query runs to completion and only the first ordered row is
+	 * consumed in application code; subsequent rows are not mapped. This keeps the two
+	 * statements strictly sequential and portable across the databases Spring Batch
+	 * targets.
+	 */
 	@Nullable
 	@Override
 	public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
-		return getJdbcTemplate().execute(getQuery(GET_LAST_STEP_EXECUTION),
-				(PreparedStatementCallback<StepExecution>) statement -> {
-					statement.setMaxRows(1);
+		Long stepExecutionId = getJdbcTemplate().execute(getQuery(GET_LAST_STEP_EXECUTION),
+				(PreparedStatementCallback<Long>) statement -> {
+					// Do not call setMaxRows(1): a protocol row limit can leave a
+					// suspended portal; the first ordered row is taken in Java instead.
 					statement.setLong(1, jobInstance.getInstanceId());
 					statement.setString(2, stepName);
 					try (ResultSet rs = statement.executeQuery()) {
 						if (rs.next()) {
-							Long jobExecutionId = rs.getLong(19);
-							JobExecution jobExecution = new JobExecution(jobExecutionId, jobInstance,
-									jobExecutionDao.getJobParameters(jobExecutionId));
-							jobExecution.setStartTime(
-									rs.getTimestamp(20) == null ? null : rs.getTimestamp(20).toLocalDateTime());
-							jobExecution
-								.setEndTime(rs.getTimestamp(21) == null ? null : rs.getTimestamp(21).toLocalDateTime());
-							jobExecution.setStatus(BatchStatus.valueOf(rs.getString(22)));
-							jobExecution.setExitStatus(new ExitStatus(rs.getString(23), rs.getString(24)));
-							jobExecution.setCreateTime(
-									rs.getTimestamp(25) == null ? null : rs.getTimestamp(25).toLocalDateTime());
-							jobExecution.setLastUpdated(
-									rs.getTimestamp(26) == null ? null : rs.getTimestamp(26).toLocalDateTime());
-							jobExecution.setVersion(rs.getInt(27));
-							return new StepExecutionRowMapper(jobExecution).mapRow(rs, 0);
+							return rs.getLong(1);
 						}
 						return null;
 					}
 				});
+		if (stepExecutionId == null) {
+			return null;
+		}
+		// Id statement is closed by JdbcTemplate; load the full StepExecution next.
+		return getStepExecution(stepExecutionId);
 	}
 
 	/**
