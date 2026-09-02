@@ -101,16 +101,6 @@ public class RemoteChunkHandlerFactoryBean<T> implements FactoryBean<ChunkReques
 	}
 
 	/**
-	 * Optimization for the bean factory (always returns true).
-	 *
-	 * @see FactoryBean#isSingleton()
-	 */
-	@Override
-	public boolean isSingleton() {
-		return true;
-	}
-
-	/**
 	 * Builds a {@link ChunkRequestHandler} from the {@link ChunkProcessor} extracted from
 	 * the {@link #setStep(TaskletStep) step} provided. Also modifies the step to send
 	 * chunks to the chunk handler via the {@link #setChunkWriter(ItemWriter) chunk

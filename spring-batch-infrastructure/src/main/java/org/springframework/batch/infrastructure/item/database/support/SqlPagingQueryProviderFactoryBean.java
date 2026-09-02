@@ -194,13 +194,4 @@ public class SqlPagingQueryProviderFactoryBean implements FactoryBean<PagingQuer
 		return PagingQueryProvider.class;
 	}
 
-	/**
-	 * Always returns true.
-	 * @see FactoryBean#isSingleton()
-	 */
-	@Override
-	public boolean isSingleton() {
-		return true;
-	}
-
 }
