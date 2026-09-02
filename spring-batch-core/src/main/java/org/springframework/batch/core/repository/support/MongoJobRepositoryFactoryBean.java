@@ -1,5 +1,5 @@
 /*
- * Copyright 2024-2025 the original author or authors.
+ * Copyright 2024-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.Assert;
 
 /**
@@ -107,16 +108,19 @@ public class MongoJobRepositoryFactoryBean extends AbstractJobRepositoryFactoryB
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
 		Assert.notNull(this.mongoOperations, "MongoOperations must not be null.");
+		PlatformTransactionManager transactionManager = getTransactionManager();
+		Assert.notNull(transactionManager, "TransactionManager must not be null.");
 		if (this.jobInstanceIncrementer == null) {
-			this.jobInstanceIncrementer = new MongoSequenceIncrementer(this.mongoOperations, "BATCH_JOB_INSTANCE_SEQ");
+			this.jobInstanceIncrementer = new MongoSequenceIncrementer(this.mongoOperations, "BATCH_JOB_INSTANCE_SEQ",
+					transactionManager);
 		}
 		if (this.jobExecutionIncrementer == null) {
-			this.jobExecutionIncrementer = new MongoSequenceIncrementer(this.mongoOperations,
-					"BATCH_JOB_EXECUTION_SEQ");
+			this.jobExecutionIncrementer = new MongoSequenceIncrementer(this.mongoOperations, "BATCH_JOB_EXECUTION_SEQ",
+					transactionManager);
 		}
 		if (this.stepExecutionIncrementer == null) {
 			this.stepExecutionIncrementer = new MongoSequenceIncrementer(this.mongoOperations,
-					"BATCH_STEP_EXECUTION_SEQ");
+					"BATCH_STEP_EXECUTION_SEQ", transactionManager);
 		}
 	}
 

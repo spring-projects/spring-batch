@@ -15,9 +15,12 @@
  */
 package org.springframework.batch.core.repository.dao.mongodb;
 
+import java.util.Objects;
+
 import com.mongodb.client.model.FindOneAndUpdateOptions;
 import com.mongodb.client.model.ReturnDocument;
 import org.bson.Document;
+import org.jspecify.annotations.Nullable;
 
 import org.springframework.core.retry.RetryException;
 import org.springframework.core.retry.RetryPolicy;
@@ -26,6 +29,9 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.support.TransactionTemplate;
 
 // Based on https://www.mongodb.com/blog/post/generating-globally-unique-identifiers-for-use-with-mongodb
 // Section: Use a single counter document to generate unique identifiers one at a time
@@ -54,13 +60,54 @@ public class MongoSequenceIncrementer implements DataFieldMaxValueIncrementer {
 
 	private final String sequenceName;
 
+	/*
+	 * Transaction template used to increment the sequence outside of any ongoing
+	 * transaction, when a transaction manager is provided.
+	 * https://github.com/spring-projects/spring-batch/issues/5507
+	 */
+	private final @Nullable TransactionTemplate transactionTemplate;
+
 	public MongoSequenceIncrementer(MongoOperations mongoTemplate, String sequenceName) {
 		this.mongoTemplate = mongoTemplate;
 		this.sequenceName = sequenceName;
+		this.transactionTemplate = null;
+	}
+
+	/**
+	 * Create a new {@link MongoSequenceIncrementer} that increments the sequence outside
+	 * of any ongoing transaction.
+	 * <p>
+	 * The increment runs with {@link TransactionDefinition#PROPAGATION_NOT_SUPPORTED},
+	 * suspending whatever transaction may be active on the calling thread for the
+	 * duration of the call. As a result, the sequence value is not rolled back if that
+	 * transaction later fails for an unrelated reason; the value is simply consumed and
+	 * skipped, which is the same behavior as other sequence generators (for example,
+	 * database sequences).
+	 * @param mongoTemplate the {@link MongoOperations} to use
+	 * @param sequenceName the name of the sequence to increment
+	 * @param transactionManager the transaction manager used to suspend any ongoing
+	 * transaction while incrementing the sequence
+	 * @since 6.0.6
+	 */
+	public MongoSequenceIncrementer(MongoOperations mongoTemplate, String sequenceName,
+			PlatformTransactionManager transactionManager) {
+		this.mongoTemplate = mongoTemplate;
+		this.sequenceName = sequenceName;
+		TransactionTemplate template = new TransactionTemplate(transactionManager);
+		template.setPropagationBehavior(TransactionDefinition.PROPAGATION_NOT_SUPPORTED);
+		this.transactionTemplate = template;
 	}
 
 	@Override
 	public long nextLongValue() throws DataAccessException {
+		if (this.transactionTemplate != null) {
+			return Objects.requireNonNull(this.transactionTemplate.execute(status -> incrementSequence()),
+					"The transaction callback must return a value");
+		}
+		return incrementSequence();
+	}
+
+	private long incrementSequence() throws DataAccessException {
 		try {
 			return retryTemplate
 				.execute(() -> mongoTemplate.execute("BATCH_SEQUENCES", collection -> collection
