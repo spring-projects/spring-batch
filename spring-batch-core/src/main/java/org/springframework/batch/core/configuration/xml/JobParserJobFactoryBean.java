@@ -151,18 +151,8 @@ public class JobParserJobFactoryBean implements SmartFactoryBean<FlowJob> {
 	}
 
 	@Override
-	public boolean isSingleton() {
-		return true;
-	}
-
-	@Override
 	public boolean isEagerInit() {
 		return true;
-	}
-
-	@Override
-	public boolean isPrototype() {
-		return false;
 	}
 
 }
