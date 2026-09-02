@@ -113,7 +113,7 @@ public class MultiResourceItemReaderBuilder<T> {
 	 * @see MultiResourceItemReader#setStrict(boolean)
 	 * @deprecated as of 6.1.0 in favor of {@link #strict(boolean)}
 	 */
-	@Deprecated(since = "6.1.0", forRemoval = false)
+	@Deprecated(since = "6.1.0", forRemoval = true)
 	public MultiResourceItemReaderBuilder<T> setStrict(boolean strict) {
 		this.strict = strict;
 
