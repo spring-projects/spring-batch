@@ -311,6 +311,10 @@ public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrien
 	 * Set the retry policy for the step. This policy determines how the step handles
 	 * retries in case of failures. It can be used to define the number of retry attempts
 	 * and the conditions under which retries should occur. Defaults to no retry policy.
+	 * <p>
+	 * Reserve retryable exceptions for genuinely transient conditions (for example, a
+	 * transient connection drop) and route deterministic failures (such as parsing
+	 * errors) to a {@link SkipPolicy} instead.
 	 * @param retryPolicy the retry policy to use
 	 * @return this for fluent chaining
 	 */
@@ -331,6 +335,14 @@ public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrien
 		return self();
 	}
 
+	/**
+	 * Register exception types that should be retried. Reserve retryable exceptions for
+	 * genuinely transient conditions (for example, a transient connection drop) and
+	 * register deterministic failures (such as parsing errors) as {@link #skip(Class[])}
+	 * skippable exceptions.
+	 * @param retryableExceptions the exception types to retry
+	 * @return this for fluent chaining
+	 */
 	@SafeVarargs
 	public final ChunkOrientedStepBuilder<I, O> retry(Class<? extends Throwable>... retryableExceptions) {
 		this.retryableExceptions.addAll(Arrays.stream(retryableExceptions).toList());
