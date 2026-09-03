@@ -24,6 +24,7 @@ import org.mockito.Mockito;
 
 import org.springframework.aop.Advisor;
 import org.springframework.aop.framework.Advised;
+import org.springframework.batch.core.configuration.support.MongoDefaultBatchConfiguration;
 import org.springframework.batch.core.job.DefaultJobKeyGenerator;
 import org.springframework.batch.core.job.JobKeyGenerator;
 import org.springframework.batch.core.configuration.JobRegistry;
@@ -37,6 +38,7 @@ import org.springframework.batch.core.repository.dao.jdbc.JdbcExecutionContextDa
 import org.springframework.batch.core.repository.dao.jdbc.JdbcJobExecutionDao;
 import org.springframework.batch.core.repository.dao.jdbc.JdbcJobInstanceDao;
 import org.springframework.batch.core.repository.dao.jdbc.JdbcStepExecutionDao;
+import org.springframework.batch.infrastructure.support.transaction.ResourcelessTransactionManager;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -54,6 +56,7 @@ import org.springframework.transaction.interceptor.TransactionInterceptor;
  * Test class for {@link BatchRegistrar}.
  *
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  */
 class BatchRegistrarTests {
 
@@ -215,6 +218,30 @@ class BatchRegistrarTests {
 		Assertions.assertNotNull(jobRepository);
 	}
 
+	@Test
+	@DisplayName("Mongo job repository should be configured successfully with @EnableMongoJobRepository and ResourcelessTransactionManager")
+	void testMongoJobRepositoryConfiguredWithEnableMongoJobRepositoryAndResourcelessTransactionManager() {
+		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(
+				MongoJobConfigurationWithResourcelessTransactionManager.class);
+
+		JobRepository jobRepository = context.getBean(JobRepository.class);
+
+		Assertions.assertInstanceOf(ResourcelessTransactionManager.class,
+				getTransactionManagerSetOnJobRepository(jobRepository));
+	}
+
+	@Test
+	@DisplayName("Mongo job repository should be configured successfully with ResourcelessTransactionManager")
+	void testMongoJobRepositoryConfiguredWithResourcelessTransactionManager() {
+		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(
+				MongoBatchConfigurationWithResourcelessTransactionManager.class);
+
+		JobRepository jobRepository = context.getBean(JobRepository.class);
+
+		Assertions.assertInstanceOf(ResourcelessTransactionManager.class,
+				getTransactionManagerSetOnJobRepository(jobRepository));
+	}
+
 	@Configuration
 	@EnableBatchProcessing
 	public static class JobConfigurationWithUserDefinedInfrastructureBeans {
@@ -348,6 +375,40 @@ class BatchRegistrarTests {
 		@Bean
 		public MongoTransactionManager transactionManager() {
 			return Mockito.mock(MongoTransactionManager.class);
+		}
+
+	}
+
+	@Configuration
+	@EnableBatchProcessing
+	@EnableMongoJobRepository
+	public static class MongoJobConfigurationWithResourcelessTransactionManager {
+
+		@Bean
+		public MongoOperations mongoTemplate() {
+			return Mockito.mock(MongoOperations.class);
+		}
+
+		@Bean
+		public ResourcelessTransactionManager transactionManager() {
+			return new ResourcelessTransactionManager();
+		}
+
+	}
+
+	@Configuration
+	@EnableBatchProcessing
+	public static class MongoBatchConfigurationWithResourcelessTransactionManager
+			extends MongoDefaultBatchConfiguration {
+
+		@Override
+		protected MongoOperations getMongoOperations() {
+			return Mockito.mock(MongoOperations.class);
+		}
+
+		@Override
+		protected ResourcelessTransactionManager getTransactionManager() {
+			return new ResourcelessTransactionManager();
 		}
 
 	}
