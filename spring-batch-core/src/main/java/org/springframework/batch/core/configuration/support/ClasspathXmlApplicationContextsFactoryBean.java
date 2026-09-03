@@ -141,16 +141,6 @@ public class ClasspathXmlApplicationContextsFactoryBean
 	}
 
 	/**
-	 * Optimization hint for bean factory.
-	 * @return {@code true}
-	 * @see FactoryBean#isSingleton()
-	 */
-	@Override
-	public boolean isSingleton() {
-		return true;
-	}
-
-	/**
 	 * An application context that can be used as a parent context for all the factories.
 	 * @param applicationContext the {@link ApplicationContext} to set
 	 * @see ApplicationContextAware#setApplicationContext(org.springframework.context.ApplicationContext)

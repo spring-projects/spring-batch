@@ -190,11 +190,6 @@ public class JobOperatorFactoryBean implements FactoryBean<JobOperator>, Applica
 		return JobOperator.class;
 	}
 
-	@Override
-	public boolean isSingleton() {
-		return true;
-	}
-
 	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public JobOperator getObject() throws Exception {

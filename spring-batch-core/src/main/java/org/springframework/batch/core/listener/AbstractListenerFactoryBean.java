@@ -182,11 +182,6 @@ public abstract class AbstractListenerFactoryBean<T> implements FactoryBean<Obje
 		}
 	}
 
-	@Override
-	public boolean isSingleton() {
-		return true;
-	}
-
 	public void setDelegate(Object delegate) {
 		this.delegate = delegate;
 	}

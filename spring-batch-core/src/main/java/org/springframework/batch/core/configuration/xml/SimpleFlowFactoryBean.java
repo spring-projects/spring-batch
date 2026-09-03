@@ -164,11 +164,6 @@ public class SimpleFlowFactoryBean implements FactoryBean<SimpleFlow>, Initializ
 		return SimpleFlow.class;
 	}
 
-	@Override
-	public boolean isSingleton() {
-		return true;
-	}
-
 	/**
 	 * A State that proxies a delegate and changes its name but leaves its behavior
 	 * unchanged.
