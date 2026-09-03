@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -121,6 +121,25 @@ class FixedLengthTokenizerTests {
 		assertEquals(30, exception.getExpectedLength());
 		assertEquals(35, exception.getActualLength());
 		assertEquals(line, exception.getInput());
+	}
+
+	@Test
+	void testLongerLinesSingleOpenRange() {
+		tokenizer.setColumns(new Range(1));
+		line = "H1        12345678       1234567890";
+		FieldSet tokens = tokenizer.tokenize(line);
+		assertEquals(1, tokens.getFieldCount());
+		assertEquals(line.trim(), tokens.readString(0));
+	}
+
+	@Test
+	void testLongerLinesOpenRangeStartingAtFirstColumnMin() {
+		tokenizer.setColumns(new Range(11), new Range(1, 10));
+		line = "H1        12345678       1234567890";
+		FieldSet tokens = tokenizer.tokenize(line);
+		assertEquals(2, tokens.getFieldCount());
+		assertEquals(line.substring(10).trim(), tokens.readString(0));
+		assertEquals(line.substring(0, 10).trim(), tokens.readString(1));
 	}
 
 	@Test
