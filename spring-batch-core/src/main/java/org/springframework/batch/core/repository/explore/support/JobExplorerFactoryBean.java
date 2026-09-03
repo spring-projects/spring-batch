@@ -21,17 +21,10 @@ import java.nio.charset.StandardCharsets;
 
 import javax.sql.DataSource;
 
+import org.springframework.batch.core.converter.ConversionServiceFactory;
 import org.springframework.batch.core.job.DefaultJobKeyGenerator;
 
 import org.springframework.batch.core.job.JobKeyGenerator;
-import org.springframework.batch.core.converter.DateToStringConverter;
-import org.springframework.batch.core.converter.LocalDateTimeToStringConverter;
-import org.springframework.batch.core.converter.LocalDateToStringConverter;
-import org.springframework.batch.core.converter.LocalTimeToStringConverter;
-import org.springframework.batch.core.converter.StringToDateConverter;
-import org.springframework.batch.core.converter.StringToLocalDateConverter;
-import org.springframework.batch.core.converter.StringToLocalDateTimeConverter;
-import org.springframework.batch.core.converter.StringToLocalTimeConverter;
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
 import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDao;
 import org.springframework.batch.core.repository.dao.DefaultExecutionContextSerializer;
@@ -48,7 +41,6 @@ import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.convert.support.ConfigurableConversionService;
-import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.incrementer.AbstractDataFieldMaxValueIncrementer;
@@ -88,7 +80,7 @@ public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean imple
 
 	protected Charset charset = StandardCharsets.UTF_8;
 
-	protected ConfigurableConversionService conversionService;
+	protected ConfigurableConversionService conversionService = ConversionServiceFactory.createConversionService();
 
 	/**
 	 * A custom implementation of {@link ExecutionContextSerializer}. The default, if not
@@ -179,24 +171,11 @@ public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean imple
 			serializer = new DefaultExecutionContextSerializer();
 		}
 
-		if (this.conversionService == null) {
-			DefaultConversionService conversionService = new DefaultConversionService();
-			conversionService.addConverter(new DateToStringConverter());
-			conversionService.addConverter(new StringToDateConverter());
-			conversionService.addConverter(new LocalDateToStringConverter());
-			conversionService.addConverter(new StringToLocalDateConverter());
-			conversionService.addConverter(new LocalTimeToStringConverter());
-			conversionService.addConverter(new StringToLocalTimeConverter());
-			conversionService.addConverter(new LocalDateTimeToStringConverter());
-			conversionService.addConverter(new StringToLocalDateTimeConverter());
-			this.conversionService = conversionService;
-		}
-
 		super.afterPropertiesSet();
 	}
 
 	@Override
-	protected ExecutionContextDao createExecutionContextDao() throws Exception {
+	protected ExecutionContextDao createExecutionContextDao() {
 		JdbcExecutionContextDao dao = new JdbcExecutionContextDao();
 		dao.setJdbcTemplate(jdbcOperations);
 		dao.setTablePrefix(tablePrefix);
@@ -206,7 +185,7 @@ public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean imple
 	}
 
 	@Override
-	protected JobInstanceDao createJobInstanceDao() throws Exception {
+	protected JobInstanceDao createJobInstanceDao() {
 		JdbcJobInstanceDao dao = new JdbcJobInstanceDao();
 		dao.setJdbcTemplate(jdbcOperations);
 		dao.setJobInstanceIncrementer(incrementer);
@@ -216,7 +195,7 @@ public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean imple
 	}
 
 	@Override
-	protected JobExecutionDao createJobExecutionDao() throws Exception {
+	protected JobExecutionDao createJobExecutionDao() {
 		JdbcJobExecutionDao dao = new JdbcJobExecutionDao();
 		dao.setJdbcTemplate(jdbcOperations);
 		dao.setJobExecutionIncrementer(incrementer);
@@ -226,7 +205,7 @@ public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean imple
 	}
 
 	@Override
-	protected StepExecutionDao createStepExecutionDao() throws Exception {
+	protected StepExecutionDao createStepExecutionDao() {
 		JdbcStepExecutionDao dao = new JdbcStepExecutionDao();
 		dao.setJdbcTemplate(jdbcOperations);
 		dao.setStepExecutionIncrementer(incrementer);
