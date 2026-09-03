@@ -52,7 +52,7 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 @ExtendWith(SpringExtension.class)
 class RedisItemReaderIntegrationTests {
 
-	private static final DockerImageName REDIS_IMAGE = DockerImageName.parse("redis:8.0.3");
+	private static final DockerImageName REDIS_IMAGE = DockerImageName.parse("redis:8.2.2");
 
 	@Container
 	public static RedisContainer redis = new RedisContainer(REDIS_IMAGE);
@@ -82,7 +82,7 @@ class RedisItemReaderIntegrationTests {
 
 		RedisTemplate<String, Person> redisTemplate = setUpRedisTemplate(connectionFactory);
 		ScanOptions scanOptions = ScanOptions.scanOptions().match("person:*").count(10).build();
-		this.reader = new RedisItemReader<>(redisTemplate, scanOptions);
+		this.reader = new RedisItemReader<>(redisTemplate, scanOptions, 10);
 
 		this.reader.open(new ExecutionContext());
 

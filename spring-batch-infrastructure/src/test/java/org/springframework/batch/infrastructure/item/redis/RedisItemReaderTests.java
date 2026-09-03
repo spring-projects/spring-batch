@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 the original author or authors.
+ * Copyright 2023-2025 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,21 +16,26 @@
 package org.springframework.batch.infrastructure.item.redis;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Answers;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-
 import org.springframework.batch.infrastructure.item.ExecutionContext;
-import org.springframework.batch.infrastructure.item.redis.RedisItemReader;
 import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ScanOptions;
+import org.springframework.data.redis.core.SessionCallback;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class RedisItemReaderTests {
+class RedisItemReaderTests {
 
 	@Mock(answer = Answers.RETURNS_DEEP_STUBS)
 	private RedisTemplate<String, String> redisTemplate;
@@ -41,15 +46,35 @@ public class RedisItemReaderTests {
 	@Mock
 	private Cursor<String> cursor;
 
+	private List<String> results;
+
+	@BeforeEach
+	void setUp() {
+		this.results = new ArrayList<>();
+		when(this.redisTemplate.executePipelined(any(SessionCallback.class))).thenAnswer(invocation -> {
+			SessionCallback<?> sessionCallback = invocation.getArgument(0);
+			sessionCallback.execute(this.redisTemplate);
+			return this.results;
+		});
+	}
+
 	@Test
 	void testRead() throws Exception {
 		// given
-		Mockito.when(this.redisTemplate.scan(this.scanOptions)).thenReturn(this.cursor);
-		Mockito.when(this.cursor.hasNext()).thenReturn(true, true, false);
-		Mockito.when(this.cursor.next()).thenReturn("person:1", "person:2");
-		Mockito.when(this.redisTemplate.opsForValue().get("person:1")).thenReturn("foo");
-		Mockito.when(this.redisTemplate.opsForValue().get("person:2")).thenReturn("bar");
-		RedisItemReader<String, String> redisItemReader = new RedisItemReader<>(this.redisTemplate, this.scanOptions);
+		when(this.redisTemplate.scan(this.scanOptions)).thenReturn(this.cursor);
+		when(this.cursor.hasNext()).thenReturn(true, true, false);
+		when(this.cursor.next()).thenReturn("person:1", "person:2");
+		when(this.redisTemplate.opsForValue().get("person:1")).thenAnswer(invocation -> {
+			results.add("foo");
+			return null;
+		});
+		when(this.redisTemplate.opsForValue().get("person:2")).thenAnswer(invocation -> {
+			results.add("bar");
+			return null;
+		});
+
+		RedisItemReader<String, String> redisItemReader = new RedisItemReader<>(this.redisTemplate, this.scanOptions,
+				10);
 		redisItemReader.open(new ExecutionContext());
 
 		// when
