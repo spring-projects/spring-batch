@@ -82,7 +82,7 @@ public abstract class AbstractApplicationContextFactory implements ApplicationCo
 		/*
 		 * Assume that a BeanPostProcessor that is BeanFactoryAware must be specific to
 		 * the parent and remove it from the child (e.g. an AutoProxyCreator will not work
-		 * properly). Unfortunately there might still be a a BeanPostProcessor with a
+		 * properly). Unfortunately there might still be a BeanPostProcessor with a
 		 * dependency that itself is BeanFactoryAware, but we can't legislate for that
 		 * here.
 		 */

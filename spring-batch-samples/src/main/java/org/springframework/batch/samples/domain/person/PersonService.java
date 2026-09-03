@@ -26,8 +26,8 @@ import org.springframework.batch.samples.file.patternmatching.Address;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Custom class that contains logic that would normally be be contained in
- * {@link ItemReader} and {@link ItemWriter}.
+ * Custom class that contains logic that would normally be contained in {@link ItemReader}
+ * and {@link ItemWriter}.
  *
  * @author tomas.slanina
  * @author Robert Kasanicky
