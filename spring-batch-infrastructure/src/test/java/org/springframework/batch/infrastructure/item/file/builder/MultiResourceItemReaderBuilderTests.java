@@ -90,4 +90,49 @@ class MultiResourceItemReaderBuilderTests extends AbstractItemStreamItemReaderTe
 		multiReader.open(new ExecutionContext());
 	}
 
+
+	@Test
+	@SuppressWarnings("unchecked")
+	void testStrictMethodChaining() {
+		LineMapper<Foo> fooLineMapper = (line, lineNumber) -> {
+			Foo foo = new Foo();
+			foo.setValue(Integer.parseInt(line));
+			return foo;
+		};
+		FlatFileItemReader<Foo> fileReader = new FlatFileItemReader<>(fooLineMapper);
+
+		// Test that strict() returns the builder for method chaining
+		MultiResourceItemReader<Foo> reader = new MultiResourceItemReaderBuilder<Foo>().delegate(fileReader)
+			.resources(new Resource[] {})
+			.strict(false)
+			.name("TEST")
+			.saveState(true)
+			.build();
+
+		// If chaining works, build() should succeed
+		assertEquals("TEST", reader.getName());
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
+	void testSetStrictStillWorks() {
+		LineMapper<Foo> fooLineMapper = (line, lineNumber) -> {
+			Foo foo = new Foo();
+			foo.setValue(Integer.parseInt(line));
+			return foo;
+		};
+		FlatFileItemReader<Foo> fileReader = new FlatFileItemReader<>(fooLineMapper);
+
+		// Test that setStrict() still works for backward compatibility
+		MultiResourceItemReader<Foo> reader = new MultiResourceItemReaderBuilder<Foo>().delegate(fileReader)
+			.resources(new Resource[] {})
+			.setStrict(true)
+			.name("TEST")
+			.build();
+
+		Exception exception = assertThrows(IllegalStateException.class, () -> reader.open(new ExecutionContext()));
+		assertEquals("No resources to read. Set strict=false if this is not an error condition.",
+				exception.getMessage());
+	}
+
 }

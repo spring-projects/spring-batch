@@ -34,6 +34,7 @@ import org.springframework.util.StringUtils;
  * @author Glenn Renfro
  * @author Drummond Dawson
  * @author Stefano Cordio
+ * @author Usman Ijaz
  * @since 4.0
  * @see MultiResourceItemReader
  */
@@ -110,8 +111,25 @@ public class MultiResourceItemReaderBuilder<T> {
 	 * @param strict false by default.
 	 * @return this instance for method chaining.
 	 * @see MultiResourceItemReader#setStrict(boolean)
+	 * @deprecated as of 6.1.0 in favor of {@link #strict(boolean)}
 	 */
+	@Deprecated(since = "6.1.0", forRemoval = true)
 	public MultiResourceItemReaderBuilder<T> setStrict(boolean strict) {
+		this.strict = strict;
+
+		return this;
+	}
+
+	/**
+	 * In strict mode the reader will throw an exception on
+	 * {@link MultiResourceItemReader#open(ExecutionContext)} if there are no resources to
+	 * read.
+	 * @param strict false by default.
+	 * @return this instance for method chaining.
+	 * @see MultiResourceItemReader#setStrict(boolean)
+	 * @since 6.1.0
+	 */
+	public MultiResourceItemReaderBuilder<T> strict(boolean strict) {
 		this.strict = strict;
 
 		return this;
