@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -243,6 +243,21 @@ class DelimitedLineTokenizerTests {
 		assertEquals(3, line.getFieldCount());
 		assertEquals("\"b", line.readString(1));
 		assertEquals("c", line.readString(2));
+	}
+
+	@Test
+	void testTokenizeWithLoneQuoteCharacterField() {
+		FieldSet line = tokenizer.tokenize("a,\"");
+		assertEquals(2, line.getFieldCount());
+		assertEquals("a", line.readString(0));
+		assertEquals("\"", line.readString(1));
+	}
+
+	@Test
+	void testTokenizeWithLoneQuoteCharacterLine() {
+		FieldSet line = tokenizer.tokenize("\"");
+		assertEquals(1, line.getFieldCount());
+		assertEquals("\"", line.readString(0));
 	}
 
 	@Test
