@@ -15,8 +15,7 @@
  */
 package org.springframework.batch.infrastructure.item.redis.builder;
 
-import org.jspecify.annotations.NonNull;
-
+import org.jspecify.annotations.Nullable;
 import org.springframework.batch.infrastructure.item.redis.RedisItemWriter;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -30,9 +29,9 @@ import org.springframework.util.Assert;
  */
 public class RedisItemWriterBuilder<K, V> {
 
-	private RedisTemplate<K, V> redisTemplate;
+	private @Nullable RedisTemplate<K, V> redisTemplate;
 
-	private Converter<@NonNull V, @NonNull K> itemKeyMapper;
+	private @Nullable Converter<V, K> itemKeyMapper;
 
 	private boolean delete;
 
@@ -53,7 +52,7 @@ public class RedisItemWriterBuilder<K, V> {
 	 * @return The current instance of the builder.
 	 * @see RedisItemWriter#setItemKeyMapper(Converter)
 	 */
-	public RedisItemWriterBuilder<K, V> itemKeyMapper(Converter<@NonNull V, @NonNull K> itemKeyMapper) {
+	public RedisItemWriterBuilder<K, V> itemKeyMapper(Converter<V, K> itemKeyMapper) {
 		this.itemKeyMapper = itemKeyMapper;
 		return this;
 	}
@@ -73,11 +72,11 @@ public class RedisItemWriterBuilder<K, V> {
 	 * Validates and builds a {@link RedisItemWriter}.
 	 * @return a {@link RedisItemWriter}
 	 */
-	public RedisItemWriter<@NonNull K, @NonNull V> build() {
+	public RedisItemWriter<K, V> build() {
 		Assert.notNull(this.redisTemplate, "RedisTemplate is required.");
 		Assert.notNull(this.itemKeyMapper, "itemKeyMapper is required.");
 
-		RedisItemWriter<@NonNull K, @NonNull V> writer = new RedisItemWriter<>(this.itemKeyMapper, this.redisTemplate);
+		RedisItemWriter<K, V> writer = new RedisItemWriter<>(this.itemKeyMapper, this.redisTemplate);
 		writer.setDelete(this.delete);
 		return writer;
 	}

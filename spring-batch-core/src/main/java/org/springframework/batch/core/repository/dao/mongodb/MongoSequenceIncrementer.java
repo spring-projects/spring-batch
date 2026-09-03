@@ -98,6 +98,7 @@ public class MongoSequenceIncrementer implements DataFieldMaxValueIncrementer {
 		this.transactionTemplate = template;
 	}
 
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public long nextLongValue() throws DataAccessException {
 		if (this.transactionTemplate != null) {

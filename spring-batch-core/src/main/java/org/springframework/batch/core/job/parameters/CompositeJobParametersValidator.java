@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.job.parameters;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.jspecify.annotations.Nullable;
@@ -27,11 +28,11 @@ import org.springframework.util.Assert;
  *
  * @author Morten Andersen-Gott
  * @author Mahmoud Ben Hassine
- *
+ * @author Stefano Cordio
  */
 public class CompositeJobParametersValidator implements JobParametersValidator, InitializingBean {
 
-	private List<JobParametersValidator> validators;
+	private List<JobParametersValidator> validators = Collections.emptyList();
 
 	/**
 	 * Validates the JobParameters according to the injected JobParameterValidators
@@ -57,7 +58,6 @@ public class CompositeJobParametersValidator implements JobParametersValidator, 
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.state(validators != null, "The 'validators' may not be null");
 		Assert.state(!validators.isEmpty(), "The 'validators' may not be empty");
 	}
 

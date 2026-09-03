@@ -19,6 +19,7 @@ import jdk.jfr.Category;
 import jdk.jfr.Description;
 import jdk.jfr.Event;
 import jdk.jfr.Label;
+import org.jspecify.annotations.Nullable;
 
 @Label("Tasklet Execution")
 @Description("Tasklet Execution Event")
@@ -35,7 +36,7 @@ public class TaskletExecutionEvent extends Event {
 	public String taskletType;
 
 	@Label("Tasklet Status")
-	public String taskletStatus;
+	public @Nullable String taskletStatus;
 
 	public TaskletExecutionEvent(String stepName, long stepExecutionId, String taskletType) {
 		this.taskletType = taskletType;
