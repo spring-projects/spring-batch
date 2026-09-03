@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2025 the original author or authors.
+ * Copyright 2012-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,6 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
 import org.springframework.util.MethodInvoker;
 import org.springframework.util.StringUtils;
 
@@ -130,7 +129,10 @@ public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemR
 	 * Use a {@link java.util.LinkedHashMap} in case of multiple sort entries to keep the
 	 * order.
 	 * @param sorts the fields to sort by and the directions
+	 * @deprecated since 6.1 in favor of passing sorts to the constructor. Scheduled for
+	 * removal in 7.0.
 	 */
+	@Deprecated(since = "6.1", forRemoval = true)
 	public void setSorts(Map<String, Sort.Direction> sorts) {
 		this.sorts = sorts;
 	}
@@ -145,7 +147,10 @@ public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemR
 	/**
 	 * The {@link PagingAndSortingRepository} implementation used to read input from.
 	 * @param repository underlying repository for input to be read from.
+	 * @deprecated since 6.1 in favor of passing the repository to the constructor.
+	 * Scheduled for removal in 7.0.
 	 */
+	@Deprecated(since = "6.1", forRemoval = true)
 	public void setRepository(PagingAndSortingRepository<?, ?> repository) {
 		this.repository = repository;
 	}
@@ -162,7 +167,7 @@ public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemR
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(pageSize > 0, "Page size must be greater than 0");
-		Assert.state(this.methodName != null && !this.methodName.isEmpty(), "methodName is required.");
+		Assert.state(StringUtils.hasText(this.methodName), "methodName is required.");
 		if (isSaveState()) {
 			Assert.state(StringUtils.hasText(getName()), "A name is required when saveState is set to true.");
 		}
