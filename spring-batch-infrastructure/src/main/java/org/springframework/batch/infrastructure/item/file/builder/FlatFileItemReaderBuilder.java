@@ -224,7 +224,7 @@ public class FlatFileItemReaderBuilder<T> {
 	 * @see FlatFileItemReader#setComments(String[])
 	 */
 	public FlatFileItemReaderBuilder<T> comments(String... comments) {
-		this.comments = Arrays.asList(comments);
+		this.comments = new ArrayList<>(Arrays.asList(comments));
 		return this;
 	}
 
