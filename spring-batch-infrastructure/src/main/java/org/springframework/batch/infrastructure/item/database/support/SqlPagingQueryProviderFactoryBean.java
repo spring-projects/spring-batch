@@ -30,6 +30,7 @@ import static org.springframework.batch.infrastructure.support.DatabaseType.POST
 import static org.springframework.batch.infrastructure.support.DatabaseType.SQLITE;
 import static org.springframework.batch.infrastructure.support.DatabaseType.SQLSERVER;
 import static org.springframework.batch.infrastructure.support.DatabaseType.SYBASE;
+import static org.springframework.batch.infrastructure.support.DatabaseType.SPARKSQL;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -89,6 +90,7 @@ public class SqlPagingQueryProviderFactoryBean implements FactoryBean<PagingQuer
 		providers.put(SQLITE, new SqlitePagingQueryProvider());
 		providers.put(SQLSERVER, new SqlServerPagingQueryProvider());
 		providers.put(SYBASE, new SybasePagingQueryProvider());
+		providers.put(SPARKSQL, new SparkSqlPagingQueryProvider());
 	}
 
 	/**
