@@ -255,9 +255,10 @@ public class TaskletStep extends AbstractStep {
 		stream.update(stepExecution.getExecutionContext());
 		getJobRepository().updateExecutionContext(stepExecution);
 
-		// Shared semaphore per step execution, so other step executions can run
-		// in parallel without needing the lock
-		final Semaphore semaphore = createSemaphore();
+		// Lock guarding updates to this step execution's metadata, created in
+		// AbstractStep.execute and shared with any thread that stops the step, so a
+		// chunk commit never races the stop's update on the optimistic-locking version.
+		final Semaphore semaphore = getStepExecutionLock(stepExecution);
 
 		stepOperations.iterate(new StepContextRepeatCallback(stepExecution) {
 
@@ -295,15 +296,6 @@ public class TaskletStep extends AbstractStep {
 
 		taskletExecutionEvent.taskletStatus = stepExecution.getExitStatus().getExitCode();
 		taskletExecutionEvent.commit();
-	}
-
-	/**
-	 * Extension point mainly for test purposes so that the behaviour of the lock can be
-	 * manipulated to simulate various pathologies.
-	 * @return a semaphore for locking access to the JobRepository
-	 */
-	protected Semaphore createSemaphore() {
-		return new Semaphore(1);
 	}
 
 	@Override
