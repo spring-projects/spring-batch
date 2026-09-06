@@ -67,6 +67,7 @@ import org.springframework.util.ClassUtils;
  * @author Philippe Marschall
  * @author Jinwoo Bae
  * @author Yanming Zhou
+ * @author Taeik Lim
  */
 public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements JobExecutionDao, InitializingBean {
 
@@ -307,9 +308,8 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		}
 	}
 
-	@Nullable
 	@Override
-	public JobExecution getLastJobExecution(JobInstance jobInstance) {
+	public @Nullable JobExecution getLastJobExecution(JobInstance jobInstance) {
 		JobExecutionRow jobExecutionRow = getJdbcClient().sql(getQuery(GET_LAST_JOB_EXECUTION))
 			.param("jobInstanceId", jobInstance.getId())
 			.query(new JobExecutionRowMapper())

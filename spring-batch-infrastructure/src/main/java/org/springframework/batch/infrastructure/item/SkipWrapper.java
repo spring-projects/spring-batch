@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import org.jspecify.annotations.Nullable;
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
+ * @author Taeik Lim
  * @deprecated since 6.0 with no replacement. Scheduled for removal in 7.0.
  */
 @NullUnmarked
@@ -51,7 +52,7 @@ public class SkipWrapper<T> {
 	 * Public getter for the exception.
 	 * @return the exception
 	 */
-	@Nullable public Throwable getException() {
+	public @Nullable Throwable getException() {
 		return exception;
 	}
 
