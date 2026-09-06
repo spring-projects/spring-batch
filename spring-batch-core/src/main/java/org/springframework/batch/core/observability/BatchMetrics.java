@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2025 the original author or authors.
+ * Copyright 2019-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ import org.jspecify.annotations.Nullable;
  *
  * @author Mahmoud Ben Hassine
  * @author Glenn Renfro
+ * @author Taeik Lim
  * @since 4.2
  */
 public final class BatchMetrics {
@@ -53,7 +54,8 @@ public final class BatchMetrics {
 	 * @param endTime the end time
 	 * @return the duration between start time and end time
 	 */
-	@Nullable public static Duration calculateDuration(@Nullable LocalDateTime startTime, @Nullable LocalDateTime endTime) {
+	public static @Nullable Duration calculateDuration(@Nullable LocalDateTime startTime,
+			@Nullable LocalDateTime endTime) {
 		if (startTime == null || endTime == null) {
 			return null;
 		}
