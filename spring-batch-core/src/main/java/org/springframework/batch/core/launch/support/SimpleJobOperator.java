@@ -84,6 +84,7 @@ import org.springframework.util.Assert;
  * @author Andrey Litvitski
  * @author Yejeong Ham
  * @author Hyunsang Han
+ * @author Taeik Lim
  * @since 2.0
  * @deprecated since 6.0 in favor of {@link TaskExecutorJobOperator}. Scheduled for
  * removal in 6.2 or later.
@@ -494,9 +495,8 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 	}
 
 	@Override
-	@Nullable
 	@Deprecated(since = "6.0", forRemoval = true)
-	public JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
+	public @Nullable JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
 		return this.jobRepository.getJobInstance(jobName, jobParameters);
 	}
 

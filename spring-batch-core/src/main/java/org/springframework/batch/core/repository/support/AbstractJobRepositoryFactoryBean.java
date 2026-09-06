@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,6 +53,7 @@ import org.springframework.util.Assert;
  * @author Lucas Ward
  * @author Robert Kasanicky
  * @author Mahmoud Ben Hassine
+ * @author Taeik Lim
  */
 public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean<JobRepository>, InitializingBean {
 
@@ -161,7 +162,7 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean<Jo
 	 * to ensure that they are using the same instance.
 	 * @return the transactionManager
 	 */
-	@Nullable public PlatformTransactionManager getTransactionManager() {
+	public @Nullable PlatformTransactionManager getTransactionManager() {
 		return transactionManager;
 	}
 

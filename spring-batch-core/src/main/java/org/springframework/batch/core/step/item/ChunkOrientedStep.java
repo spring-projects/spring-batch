@@ -989,7 +989,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 
 		private boolean scanMode;
 
-		@Nullable private LinkedList<ScanItem<I, O>> pendingScanItems;
+		private @Nullable LinkedList<ScanItem<I, O>> pendingScanItems;
 
 		void init() {
 			this.moreItems = true;
