@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2024 the original author or authors.
+ * Copyright 2006-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -165,6 +165,12 @@ public class SimpleFlow implements Flow, InitializingBean {
 				}
 				status = state.handle(executor);
 				stepExecution = executor.getStepExecution();
+
+				if (logger.isDebugEnabled()) {
+					logger.debug("Completed state=" + stateName + " with status=" + status);
+				}
+
+				state = nextState(stateName, status, stepExecution);
 			}
 			catch (FlowExecutionException e) {
 				executor.close(new FlowExecution(stateName, status));
@@ -175,12 +181,6 @@ public class SimpleFlow implements Flow, InitializingBean {
 				throw new FlowExecutionException(
 						String.format("Ended flow=%s at state=%s with exception", name, stateName), e);
 			}
-
-			if (logger.isDebugEnabled()) {
-				logger.debug("Completed state=" + stateName + " with status=" + status);
-			}
-
-			state = nextState(stateName, status, stepExecution);
 		}
 
 		FlowExecution result = new FlowExecution(stateName, status);
