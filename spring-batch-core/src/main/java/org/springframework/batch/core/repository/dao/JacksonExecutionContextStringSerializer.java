@@ -21,6 +21,9 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.xml.namespace.QName;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
@@ -33,7 +36,10 @@ import org.springframework.batch.core.repository.ExecutionContextSerializer;
  * execution context as JSON. By default, this serializer enables default typing with a
  * {@link BasicPolymorphicTypeValidator} that allows only classes from certain packages to
  * be deserialized, for security reasons. If you need a different configuration, you can
- * provide your own {@link JsonMapper} instance through the constructor.
+ * provide your own {@link JsonMapper} instance through the constructor. Note that a
+ * custom {@link JsonMapper} does not inherit the format overrides configured here, so
+ * {@link QName} values are serialized without their prefix unless
+ * {@link JsonFormat.Shape#OBJECT} is enabled for that type as well.
  *
  * @author Mahmoud Ben Hassine
  * @author Soonjae Jung
@@ -59,7 +65,11 @@ public class JacksonExecutionContextStringSerializer implements ExecutionContext
 			.allowIfSubType("javax.xml.namespace.QName")
 			.allowIfSubType("org.springframework.batch.")
 			.build();
-		this.jsonMapper = JsonMapper.builder().activateDefaultTyping(polymorphicTypeValidator).build();
+		this.jsonMapper = JsonMapper.builder()
+			.activateDefaultTyping(polymorphicTypeValidator)
+			.withConfigOverride(QName.class,
+					configOverride -> configOverride.setFormat(JsonFormat.Value.forShape(JsonFormat.Shape.OBJECT)))
+			.build();
 	}
 
 	/**
