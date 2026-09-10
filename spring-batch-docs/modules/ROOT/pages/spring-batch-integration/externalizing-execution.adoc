@@ -12,6 +12,25 @@ provides dedicated support for:
 * Remote Chunking
 * Remote Partitioning
 
+[NOTE]
+====
+When using JMS as the transport for remote chunking or remote partitioning, make sure to
+configure the `DefaultJmsHeaderMapper` to map the headers Spring Batch relies on
+(`correlationId`, `sequenceNumber`, and `sequenceSize`) on any
+`Jms.messageDrivenChannelAdapter` used to receive replies. Spring Batch uses Spring
+Integration's generic `correlationId` message header to correlate replies coming back from
+workers. That header is mapped by `DefaultJmsHeaderMapper` like any other user-defined JMS
+property: on the inbound side, it is only copied back into the message headers if it matches
+the mapper's `propertyNames` allowlist, which, as of Spring Integration 7.0.6+, defaults to
+mapping only the `content_type` property. Without an explicit allowlist, the `correlationId`,
+`sequenceNumber` and `sequenceSize` headers are silently dropped on the way back in, and the
+reply aggregator can hang or fail with an `IllegalStateException: Null correlation not allowed`.
+
+You can map all JMS properties with `new DefaultJmsHeaderMapper("*")`, or, if that is too
+permissive for your security requirements, restrict the allowlist to just the headers
+Spring Batch needs: `new DefaultJmsHeaderMapper("correlationId", "sequenceNumber", "sequenceSize")`.
+====
+
 [[remote-chunking]]
 === Remote Chunking
 
@@ -133,7 +152,9 @@ public QueueChannel replies() {
 @Bean
 public IntegrationFlow inboundFlow(ActiveMQConnectionFactory connectionFactory) {
     return IntegrationFlow
-            .from(Jms.messageDrivenChannelAdapter(connectionFactory).destination("replies"))
+            .from(Jms.messageDrivenChannelAdapter(connectionFactory)
+                    .headerMapper(new DefaultJmsHeaderMapper("*"))
+                    .destination("replies"))
             .channel(replies())
             .get();
 }
@@ -231,7 +252,9 @@ public DirectChannel requests() {
 @Bean
 public IntegrationFlow inboundFlow(ActiveMQConnectionFactory connectionFactory) {
     return IntegrationFlow
-            .from(Jms.messageDrivenChannelAdapter(connectionFactory).destination("requests"))
+            .from(Jms.messageDrivenChannelAdapter(connectionFactory)
+                    .headerMapper(new DefaultJmsHeaderMapper("*"))
+                    .destination("requests"))
             .channel(requests())
             .get();
 }
@@ -519,6 +542,7 @@ public IntegrationFlow inboundJmsStaging() {
     return IntegrationFlow
             .from(Jms.messageDrivenChannelAdapter(connectionFactory())
                     .configureListenerContainer(c -> c.subscriptionDurable(false))
+                    .headerMapper(new DefaultJmsHeaderMapper("*"))
                     .destination("stagingQueue"))
             .channel(inboundStaging())
             .get();
@@ -550,6 +574,7 @@ public IntegrationFlow inboundJmsRequests() {
     return IntegrationFlow
             .from(Jms.messageDrivenChannelAdapter(connectionFactory())
                     .configureListenerContainer(c -> c.subscriptionDurable(false))
+                    .headerMapper(new DefaultJmsHeaderMapper("*"))
                     .destination("requestsQueue"))
             .channel(inboundRequests())
             .get();
