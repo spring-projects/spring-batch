@@ -34,6 +34,7 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.batch.infrastructure.item.ItemReader;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.batch.infrastructure.item.support.AbstractItemStreamItemReader;
+import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.util.Assert;
 
 /**
@@ -50,9 +51,10 @@ import org.springframework.util.Assert;
  * @author Mathieu Ouellet
  * @author Mahmoud Ben Hassine
  * @author Hyunwoo Jung
+ * @author Andrey Litvitski
  * @since 4.2
  */
-public class KafkaItemReader<K, V> extends AbstractItemStreamItemReader<V> {
+public class KafkaItemReader<K, V> extends AbstractItemStreamItemReader<V> implements BeanNameAware {
 
 	private static final String TOPIC_PARTITION_OFFSETS = "topic.partition.offsets";
 

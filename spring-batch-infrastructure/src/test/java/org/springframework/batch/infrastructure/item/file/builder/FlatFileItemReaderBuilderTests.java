@@ -61,6 +61,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  * @author Patrick Baumgartner
  * @author François Martin
  * @author Daeho Kwon
+ * @author Andrey Litvitski
  */
 class FlatFileItemReaderBuilderTests {
 
@@ -476,43 +477,6 @@ class FlatFileItemReaderBuilderTests {
 		assertEquals(3, item.getSecond());
 		assertEquals("foo", item.getThird());
 		assertNull(reader.read());
-	}
-
-	@Test
-	void testName() {
-		var builder = new FlatFileItemReaderBuilder<Foo>().resource(getResource("1  2  3"))
-			.fixedLength()
-			.columns(new Range(1, 3), new Range(4, 6), new Range(7))
-			.names("first", "second", "third")
-			.targetType(Foo.class);
-		Exception exception = assertThrows(IllegalStateException.class, builder::build);
-		assertEquals("A name is required when saveState is set to true.", exception.getMessage());
-
-		builder = new FlatFileItemReaderBuilder<Foo>().resource(getResource("1  2  3"))
-			.fixedLength()
-			.columns(new Range(1, 3), new Range(4, 6), new Range(7))
-			.names("first", "second", "third")
-			.targetType(Foo.class)
-			.name(null);
-		exception = assertThrows(IllegalStateException.class, builder::build);
-		assertEquals("A name is required when saveState is set to true.", exception.getMessage());
-
-		assertNotNull(new FlatFileItemReaderBuilder<Foo>().resource(getResource("1  2  3"))
-			.fixedLength()
-			.columns(new Range(1, 3), new Range(4, 6), new Range(7))
-			.names("first", "second", "third")
-			.targetType(Foo.class)
-			.saveState(false)
-			.build(), "builder should return new instance of FlatFileItemReader");
-
-		assertNotNull(new FlatFileItemReaderBuilder<Foo>().resource(getResource("1  2  3"))
-			.fixedLength()
-			.columns(new Range(1, 3), new Range(4, 6), new Range(7))
-			.names("first", "second", "third")
-			.targetType(Foo.class)
-			.name("foobar")
-			.build(), "builder should return new instance of FlatFileItemReader");
-
 	}
 
 	@Test

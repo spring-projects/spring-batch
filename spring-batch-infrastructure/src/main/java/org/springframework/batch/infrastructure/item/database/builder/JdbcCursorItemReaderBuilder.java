@@ -46,6 +46,7 @@ import org.springframework.util.StringUtils;
  * @author Fabio Molignoni
  * @author Juyoung Kim
  * @author Stefano Cordio
+ * @author Andrey Litvitski
  * @since 4.0
  */
 public class JdbcCursorItemReaderBuilder<T> {
@@ -349,10 +350,6 @@ public class JdbcCursorItemReaderBuilder<T> {
 	 * @return a fully constructed {@link JdbcCursorItemReader}
 	 */
 	public JdbcCursorItemReader<T> build() {
-		if (this.saveState) {
-			Assert.hasText(this.name, "A name is required when saveState is set to true");
-		}
-
 		Assert.hasText(this.sql, "A query is required");
 		Assert.notNull(this.dataSource, "A datasource is required");
 		Assert.notNull(this.rowMapper, "A rowmapper is required");

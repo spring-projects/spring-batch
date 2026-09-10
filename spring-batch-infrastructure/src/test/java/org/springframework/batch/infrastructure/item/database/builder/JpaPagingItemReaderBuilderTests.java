@@ -53,6 +53,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * @author Michael Minella
  * @author Parikshit Dutta
  * @author Mahmoud Ben Hassine
+ * @author Andrey Litvitski
  */
 class JpaPagingItemReaderBuilderTests {
 
@@ -211,10 +212,6 @@ class JpaPagingItemReaderBuilderTests {
 		builder = new JpaPagingItemReaderBuilder<>();
 		exception = assertThrows(IllegalArgumentException.class, builder::build);
 		assertEquals("An EntityManagerFactory is required", exception.getMessage());
-
-		builder = new JpaPagingItemReaderBuilder<Foo>().entityManagerFactory(this.entityManagerFactory).saveState(true);
-		exception = assertThrows(IllegalArgumentException.class, builder::build);
-		assertEquals("A name is required when saveState is set to true", exception.getMessage());
 
 		builder = new JpaPagingItemReaderBuilder<Foo>().entityManagerFactory(this.entityManagerFactory)
 			.saveState(false);

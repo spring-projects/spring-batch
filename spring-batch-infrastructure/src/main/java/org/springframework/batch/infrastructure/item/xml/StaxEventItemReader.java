@@ -41,6 +41,7 @@ import org.springframework.batch.infrastructure.item.file.ResourceAwareItemReade
 import org.springframework.batch.infrastructure.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.batch.infrastructure.item.xml.stax.DefaultFragmentEventReader;
 import org.springframework.batch.infrastructure.item.xml.stax.FragmentEventReader;
+import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.oxm.Unmarshaller;
@@ -61,9 +62,10 @@ import org.springframework.util.xml.StaxUtils;
  * @author Mahmoud Ben Hassine
  * @author Glenn Renfro
  * @author Jimmy Praet
+ * @author Andrey Litvitski
  */
 public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemReader<T>
-		implements ResourceAwareItemReaderItemStream<T>, InitializingBean {
+		implements ResourceAwareItemReaderItemStream<T>, InitializingBean, BeanNameAware {
 
 	private static final Log logger = LogFactory.getLog(StaxEventItemReader.class);
 

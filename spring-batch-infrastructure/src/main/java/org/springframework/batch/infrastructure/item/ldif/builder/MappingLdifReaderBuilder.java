@@ -31,6 +31,7 @@ import org.springframework.util.Assert;
  * Creates a fully qualified MappingLdifReader.
  *
  * @author Glenn Renfro
+ * @author Andrey Litvitski
  * @since 4.0
  */
 public class MappingLdifReaderBuilder<T> {
@@ -174,9 +175,6 @@ public class MappingLdifReaderBuilder<T> {
 	public MappingLdifReader<T> build() throws Exception {
 		Assert.notNull(this.resource, "Resource is required.");
 		Assert.notNull(this.recordMapper, "RecordMapper is required.");
-		if (this.saveState) {
-			Assert.hasText(this.name, "A name is required when saveState is set to true");
-		}
 		MappingLdifReader<T> reader = new MappingLdifReader<>(this.resource);
 		reader.setRecordsToSkip(this.recordsToSkip);
 		reader.setSaveState(saveState);
