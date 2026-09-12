@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
@@ -156,6 +157,52 @@ class JdbcStepExecutionDaoTests {
 
 		// Then
 		Assertions.assertEquals(0, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_STEP_EXECUTION"));
+	}
+
+	@Test
+	void testGetLastStepExecution() {
+		// Given
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = jdbcJobInstanceDao.createJobInstance("job", jobParameters);
+		JobExecution jobExecution = jdbcJobExecutionDao.createJobExecution(jobInstance, jobParameters);
+		jdbcStepExecutionDao.createStepExecution("step1", jobExecution);
+		StepExecution olderStep2 = jdbcStepExecutionDao.createStepExecution("step2", jobExecution);
+		StepExecution latestStep2 = jdbcStepExecutionDao.createStepExecution("step2", jobExecution);
+
+		// When
+		StepExecution lastStepExecution = jdbcStepExecutionDao.getLastStepExecution(jobInstance, "step2");
+
+		// Then — id-based: latest step2, not the older one or step1
+		Assertions.assertNotNull(lastStepExecution);
+		assertEquals(latestStep2.getId(), lastStepExecution.getId());
+		assertEquals(jobExecution.getId(), lastStepExecution.getJobExecutionId());
+		assertEquals("step2", lastStepExecution.getStepName());
+		Assertions.assertNotEquals(olderStep2.getId(), lastStepExecution.getId());
+		Assertions.assertNull(jdbcStepExecutionDao.getLastStepExecution(jobInstance, "missing"));
+	}
+
+	@Test
+	void testGetLastStepExecutionAcrossJobExecutions() {
+		// Given — restart path: a prior step execution exists under the same job instance
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = jdbcJobInstanceDao.createJobInstance("job", jobParameters);
+		JobExecution firstJobExecution = jdbcJobExecutionDao.createJobExecution(jobInstance, jobParameters);
+		StepExecution firstStepExecution = jdbcStepExecutionDao.createStepExecution("step", firstJobExecution);
+		firstStepExecution.setStatus(BatchStatus.COMPLETED);
+		jdbcStepExecutionDao.updateStepExecution(firstStepExecution);
+
+		JobExecution secondJobExecution = jdbcJobExecutionDao.createJobExecution(jobInstance, jobParameters);
+		StepExecution secondStepExecution = jdbcStepExecutionDao.createStepExecution("step", secondJobExecution);
+
+		// When — id query must complete before getStepExecution (no setMaxRows; GH-5470)
+		StepExecution lastStepExecution = jdbcStepExecutionDao.getLastStepExecution(jobInstance, "step");
+
+		// Then — id-based selection of the latest step across job executions
+		Assertions.assertNotNull(lastStepExecution);
+		assertEquals(secondStepExecution.getId(), lastStepExecution.getId());
+		assertEquals(secondJobExecution.getId(), lastStepExecution.getJobExecutionId());
+		assertEquals("step", lastStepExecution.getStepName());
+		Assertions.assertNotEquals(firstStepExecution.getId(), lastStepExecution.getId());
 	}
 
 }
