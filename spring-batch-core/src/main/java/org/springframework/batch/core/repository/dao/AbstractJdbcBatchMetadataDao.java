@@ -90,7 +90,8 @@ public abstract class AbstractJdbcBatchMetadataDao implements InitializingBean {
 		this.jdbcTemplate = jdbcTemplate;
 	}
 
-	@Nullable protected JdbcOperations getJdbcTemplate() {
+	protected JdbcOperations getJdbcTemplate() {
+		Assert.state(jdbcTemplate != null, "JdbcOperations is required");
 		return jdbcTemplate;
 	}
 
