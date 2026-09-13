@@ -116,6 +116,13 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 		this.queryProvider = pagingQueryProvider;
 	}
 
+	/**
+	 * Set the data source to use.
+	 * @param dataSource the DataSource to use
+	 * @deprecated since 6.1 in favor of passing the data source to the constructor.
+	 * Scheduled for removal in 7.0.
+	 */
+	@Deprecated(since = "6.1", forRemoval = true)
 	public void setDataSource(DataSource dataSource) {
 		this.dataSource = dataSource;
 	}
@@ -135,7 +142,10 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 	 * A {@link PagingQueryProvider}. Supplies all the platform dependent query generation
 	 * capabilities needed by the reader.
 	 * @param queryProvider the {@link PagingQueryProvider} to use
+	 * @deprecated since 6.1 in favor of passing the paging query provider to the
+	 * constructor. Scheduled for removal in 7.0.
 	 */
+	@Deprecated(since = "6.1", forRemoval = true)
 	public void setQueryProvider(PagingQueryProvider queryProvider) {
 		this.queryProvider = queryProvider;
 	}

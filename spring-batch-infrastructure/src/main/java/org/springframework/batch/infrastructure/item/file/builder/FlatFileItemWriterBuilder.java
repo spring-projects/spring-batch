@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2025 the original author or authors.
+ * Copyright 2016-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -157,7 +157,6 @@ public class FlatFileItemWriterBuilder<T> {
 	 * Line aggregator used to build the String version of each item.
 	 * @param lineAggregator {@link LineAggregator} implementation
 	 * @return The current instance of the builder.
-	 * @see FlatFileItemWriter#setLineAggregator(LineAggregator)
 	 */
 	public FlatFileItemWriterBuilder<T> lineAggregator(LineAggregator<T> lineAggregator) {
 		this.lineAggregator = lineAggregator;
@@ -641,9 +640,6 @@ public class FlatFileItemWriterBuilder<T> {
 			writer.setHeaderCallback(this.headerCallback);
 		}
 		writer.setLineSeparator(this.lineSeparator);
-		if (this.resource != null) {
-			writer.setResource(this.resource);
-		}
 		writer.setSaveState(this.saveState);
 		writer.setShouldDeleteIfEmpty(this.shouldDeleteIfEmpty);
 		writer.setShouldDeleteIfExists(this.shouldDeleteIfExists);

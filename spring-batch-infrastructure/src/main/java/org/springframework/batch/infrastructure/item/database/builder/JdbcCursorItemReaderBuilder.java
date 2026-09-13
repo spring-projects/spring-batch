@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2025 the original author or authors.
+ * Copyright 2016-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -135,7 +135,6 @@ public class JdbcCursorItemReaderBuilder<T> {
 	 * The {@link DataSource} to read from
 	 * @param dataSource a relational data base
 	 * @return this instance for method chaining
-	 * @see JdbcCursorItemReader#setDataSource(DataSource)
 	 */
 	public JdbcCursorItemReaderBuilder<T> dataSource(DataSource dataSource) {
 		this.dataSource = dataSource;
@@ -286,7 +285,6 @@ public class JdbcCursorItemReaderBuilder<T> {
 	 * The query to be executed for this reader
 	 * @param sql query
 	 * @return this instance for method chaining
-	 * @see JdbcCursorItemReader#setSql(String)
 	 */
 	public JdbcCursorItemReaderBuilder<T> sql(String sql) {
 		this.sql = sql;
@@ -298,7 +296,6 @@ public class JdbcCursorItemReaderBuilder<T> {
 	 * The {@link RowMapper} used to map the results of the cursor to each item.
 	 * @param rowMapper {@link RowMapper}
 	 * @return this instance for method chaining
-	 * @see JdbcCursorItemReader#setRowMapper(RowMapper)
 	 */
 	public JdbcCursorItemReaderBuilder<T> rowMapper(RowMapper<T> rowMapper) {
 		this.rowMapper = rowMapper;

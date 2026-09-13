@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2025 the original author or authors.
+ * Copyright 2017-present the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -128,7 +128,6 @@ public class MongoPagingItemReaderBuilder<T> {
 	 * @param template the MongoOperations instance to use
 	 * @see MongoOperations
 	 * @return The current instance of the builder
-	 * @see MongoPagingItemReader#setTemplate(MongoOperations)
 	 */
 	public MongoPagingItemReaderBuilder<T> template(MongoOperations template) {
 		this.template = template;
@@ -155,7 +154,6 @@ public class MongoPagingItemReaderBuilder<T> {
 	 * call.
 	 * @param targetType the type of object to return
 	 * @return The current instance of the builder
-	 * @see MongoPagingItemReader#setTargetType(Class)
 	 */
 	public MongoPagingItemReaderBuilder<T> targetType(Class<? extends T> targetType) {
 		this.targetType = targetType;
@@ -274,8 +272,6 @@ public class MongoPagingItemReaderBuilder<T> {
 		}
 
 		MongoPagingItemReader<T> reader = new MongoPagingItemReader<>(this.template, this.targetType);
-		reader.setTemplate(this.template);
-		reader.setTargetType(this.targetType);
 		if (StringUtils.hasText(this.jsonQuery)) {
 			reader.setQuery(this.jsonQuery);
 		}

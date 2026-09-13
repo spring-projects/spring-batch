@@ -60,7 +60,6 @@ public class JsonItemReaderBuilder<T> {
 	 * objects.
 	 * @param jsonObjectReader to use
 	 * @return The current instance of the builder.
-	 * @see JsonItemReader#setJsonObjectReader(JsonObjectReader)
 	 */
 	public JsonItemReaderBuilder<T> jsonObjectReader(JsonObjectReader<T> jsonObjectReader) {
 		this.jsonObjectReader = jsonObjectReader;

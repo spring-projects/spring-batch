@@ -148,7 +148,6 @@ public class JdbcPagingItemReaderBuilder<T> {
 	 * The {@link DataSource} to query against. Required.
 	 * @param dataSource the {@link DataSource}
 	 * @return this instance for method chaining
-	 * @see JdbcPagingItemReader#setDataSource(DataSource)
 	 */
 	public JdbcPagingItemReaderBuilder<T> dataSource(DataSource dataSource) {
 		this.dataSource = dataSource;
@@ -302,7 +301,6 @@ public class JdbcPagingItemReaderBuilder<T> {
 	 * and {@link #sortKeys(Map)} are ignored.
 	 * @param provider the db-specific query provider
 	 * @return this instance for method chaining
-	 * @see JdbcPagingItemReader#setQueryProvider(PagingQueryProvider)
 	 */
 	public JdbcPagingItemReaderBuilder<T> queryProvider(PagingQueryProvider provider) {
 		this.queryProvider = provider;

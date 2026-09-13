@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,9 +51,6 @@ import org.springframework.util.StringUtils;
  * @author Stefano Cordio
  * @author Jimmy Praet
  */
-// FIXME the design of creating a flat file reader with an optional resource (to support
-// the multi-resource case) is broken.
-// FIXME The multi-resource reader should create the delegate with the current resource
 public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemReader<T>
 		implements ResourceAwareItemReaderItemStream<T> {
 
@@ -164,7 +161,10 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 	/**
 	 * Setter for line mapper. This property is required to be set.
 	 * @param lineMapper maps line to item
+	 * @deprecated since 6.1 in favor of passing the line mapper to the constructor.
+	 * Scheduled for removal in 7.0.
 	 */
+	@Deprecated(since = "6.1", forRemoval = true)
 	public void setLineMapper(LineMapper<T> lineMapper) {
 		this.lineMapper = lineMapper;
 	}

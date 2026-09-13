@@ -129,7 +129,6 @@ public class MongoCursorItemReaderBuilder<T> {
 	 * @param template the MongoOperations instance to use
 	 * @see MongoOperations
 	 * @return The current instance of the builder
-	 * @see MongoCursorItemReader#setTemplate(MongoOperations)
 	 */
 	public MongoCursorItemReaderBuilder<T> template(MongoOperations template) {
 		this.template = template;
@@ -142,7 +141,6 @@ public class MongoCursorItemReaderBuilder<T> {
 	 * {@link MongoCursorItemReader#read()} call.
 	 * @param targetType the targetType of object to return
 	 * @return The current instance of the builder
-	 * @see MongoCursorItemReader#setTargetType(Class)
 	 */
 	public MongoCursorItemReaderBuilder<T> targetType(Class<? extends T> targetType) {
 		this.targetType = targetType;
@@ -296,8 +294,6 @@ public class MongoCursorItemReaderBuilder<T> {
 		reader.setCurrentItemCount(this.currentItemCount);
 		reader.setMaxItemCount(this.maxItemCount);
 
-		reader.setTemplate(this.template);
-		reader.setTargetType(this.targetType);
 		if (this.collection != null) {
 			reader.setCollection(this.collection);
 		}
