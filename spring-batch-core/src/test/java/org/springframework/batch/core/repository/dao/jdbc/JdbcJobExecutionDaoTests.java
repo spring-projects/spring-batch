@@ -39,6 +39,7 @@ import org.springframework.test.jdbc.JdbcTestUtils;
 /**
  * @author Parikshit Dutta
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  */
 public class JdbcJobExecutionDaoTests {
 
@@ -88,6 +89,20 @@ public class JdbcJobExecutionDaoTests {
 		Assertions.assertEquals(jobInstance, jobExecution.getJobInstance());
 		int batchJobExecutionsCount = JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_EXECUTION");
 		Assertions.assertEquals(1, batchJobExecutionsCount);
+	}
+
+	@Test
+	void testGetJobExecution() {
+		// given
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = jdbcJobInstanceDao.createJobInstance("job", jobParameters);
+
+		// when
+		JobExecution createdJobExecution = jdbcJobExecutionDao.createJobExecution(jobInstance, jobParameters);
+		JobExecution retrievedJobExecution = jdbcJobExecutionDao.getJobExecution(createdJobExecution.getId());
+
+		// then
+		Assertions.assertEquals(createdJobExecution, retrievedJobExecution);
 	}
 
 	@Test
