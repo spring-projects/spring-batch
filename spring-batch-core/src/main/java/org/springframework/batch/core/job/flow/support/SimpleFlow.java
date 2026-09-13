@@ -30,6 +30,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jspecify.annotations.Nullable;
 
+import org.springframework.batch.core.BatchConstants;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.job.flow.Flow;
@@ -248,8 +249,8 @@ public class SimpleFlow implements Flow, InitializingBean {
 		boolean continued = state != null && status != FlowExecutionStatus.STOPPED;
 
 		if (stepExecution != null) {
-			Boolean reRun = (Boolean) stepExecution.getExecutionContext().get("batch.restart");
-			Boolean executed = (Boolean) stepExecution.getExecutionContext().get("batch.executed");
+			Boolean reRun = (Boolean) stepExecution.getExecutionContext().get(BatchConstants.BATCH_RESTART);
+			Boolean executed = (Boolean) stepExecution.getExecutionContext().get(BatchConstants.BATCH_EXECUTED);
 
 			if ((executed == null || !executed) && reRun != null && reRun && status == FlowExecutionStatus.STOPPED
 					&& !state.getName().endsWith(stepExecution.getStepName())) {

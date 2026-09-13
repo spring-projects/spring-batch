@@ -45,6 +45,8 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.batch.core.BatchConstants.BATCH_STEP_TYPE;
+import static org.springframework.batch.core.BatchConstants.BATCH_TASKLET_TYPE;
 import static org.springframework.batch.core.BatchStatus.COMPLETED;
 import static org.springframework.batch.core.BatchStatus.FAILED;
 import static org.springframework.batch.core.BatchStatus.STOPPED;
@@ -248,8 +250,8 @@ class TaskletStepExceptionTests {
 		// counts as
 		// rollback
 		assertEquals(3, stepExecution.getExecutionContext().size());
-		assertTrue(stepExecution.getExecutionContext().containsKey(Step.STEP_TYPE_KEY));
-		assertTrue(stepExecution.getExecutionContext().containsKey(TaskletStep.TASKLET_TYPE_KEY));
+		assertTrue(stepExecution.getExecutionContext().containsKey(BATCH_STEP_TYPE));
+		assertTrue(stepExecution.getExecutionContext().containsKey(BATCH_TASKLET_TYPE));
 	}
 
 	@Test
@@ -283,8 +285,8 @@ class TaskletStepExceptionTests {
 		// counts as
 		// rollback
 		assertEquals(3, stepExecution.getExecutionContext().size());
-		assertTrue(stepExecution.getExecutionContext().containsKey(Step.STEP_TYPE_KEY));
-		assertTrue(stepExecution.getExecutionContext().containsKey(TaskletStep.TASKLET_TYPE_KEY));
+		assertTrue(stepExecution.getExecutionContext().containsKey(BATCH_STEP_TYPE));
+		assertTrue(stepExecution.getExecutionContext().containsKey(BATCH_TASKLET_TYPE));
 	}
 
 	@Test

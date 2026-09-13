@@ -26,6 +26,8 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.util.Assert;
 
+import static org.springframework.batch.core.BatchConstants.BATCH_STEP_TYPE;
+
 /**
  * A {@link Step} implementation that delegates to a {@link Flow}. Useful for logical
  * grouping of steps, and especially for partitioning with multiple steps per execution.
@@ -87,7 +89,7 @@ public class FlowStep extends AbstractStep {
 	@Override
 	protected void doExecute(StepExecution stepExecution) throws Exception {
 		try {
-			stepExecution.getExecutionContext().put(STEP_TYPE_KEY, this.getClass().getName());
+			stepExecution.getExecutionContext().put(BATCH_STEP_TYPE, this.getClass().getName());
 			StepHandler stepHandler = new SimpleStepHandler(getJobRepository(), stepExecution.getExecutionContext());
 			JobFlowExecutor executor = new JobFlowExecutor(getJobRepository(), stepHandler,
 					stepExecution.getJobExecution());

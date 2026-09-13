@@ -32,6 +32,8 @@ import java.util.Collection;
 
 import org.jspecify.annotations.NullUnmarked;
 
+import static org.springframework.batch.core.BatchConstants.BATCH_STEP_TYPE;
+
 /**
  * Implementation of {@link Step} which partitions the execution and spreads the load
  * using a {@link PartitionHandler}.
@@ -111,7 +113,7 @@ public class PartitionStep extends AbstractStep {
 	 */
 	@Override
 	protected void doExecute(StepExecution stepExecution) throws Exception {
-		stepExecution.getExecutionContext().put(STEP_TYPE_KEY, this.getClass().getName());
+		stepExecution.getExecutionContext().put(BATCH_STEP_TYPE, this.getClass().getName());
 
 		// Split execution into partitions and wait for task completion
 		PartitionSplitEvent partitionSplitEvent = new PartitionSplitEvent(stepExecution.getStepName(),
