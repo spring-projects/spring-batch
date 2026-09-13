@@ -272,13 +272,21 @@ public class TaskletStep extends AbstractStep {
 				interruptionPolicy.checkInterrupted(stepExecution);
 
 				RepeatStatus result;
+				ChunkTransactionCallback callback = new ChunkTransactionCallback(chunkContext, semaphore);
 				try {
-					result = new TransactionTemplate(transactionManager, transactionAttribute)
-						.execute(new ChunkTransactionCallback(chunkContext, semaphore));
+					result = new TransactionTemplate(transactionManager, transactionAttribute).execute(callback);
 				}
 				catch (UncheckedTransactionException e) {
 					// Allow checked exceptions to be thrown inside callback
 					throw (Exception) e.getCause();
+				}
+				finally {
+					// When transaction synchronization is not active (e.g. with a
+					// transaction manager configured with SYNCHRONIZATION_NEVER or
+					// SYNCHRONIZATION_ON_ACTUAL_TRANSACTION and no actual
+					// transaction), the afterCompletion callback is never invoked,
+					// so release the lock here, after the commit/rollback.
+					callback.releaseLockIfHeld();
 				}
 
 				chunkListener.afterChunk(chunkContext);
@@ -382,17 +390,22 @@ public class TaskletStep extends AbstractStep {
 			finally {
 				// Only release the lock if we acquired it, and release as late
 				// as possible
-				if (locked) {
-					semaphore.release();
-				}
+				releaseLockIfHeld();
+			}
+		}
 
+		private void releaseLockIfHeld() {
+			if (locked) {
+				semaphore.release();
 				locked = false;
 			}
 		}
 
 		@Override
 		public RepeatStatus doInTransaction(TransactionStatus status) {
-			TransactionSynchronizationManager.registerSynchronization(this);
+			if (TransactionSynchronizationManager.isSynchronizationActive()) {
+				TransactionSynchronizationManager.registerSynchronization(this);
+			}
 
 			RepeatStatus result = RepeatStatus.CONTINUABLE;
 

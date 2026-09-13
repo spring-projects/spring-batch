@@ -39,8 +39,11 @@ import org.springframework.batch.infrastructure.support.transaction.Resourceless
 import org.jspecify.annotations.Nullable;
 import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.UnexpectedRollbackException;
+import org.springframework.transaction.support.AbstractPlatformTransactionManager;
 import org.springframework.transaction.support.DefaultTransactionStatus;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -90,6 +93,30 @@ class TaskletStepExceptionTests {
 		taskletStep.execute(stepExecution);
 		assertEquals(FAILED, stepExecution.getStatus());
 		assertEquals(FAILED.toString(), stepExecution.getExitStatus().getExitCode());
+	}
+
+	@Test
+	void testTaskletRunsWithoutTransactionSynchronization() throws Exception {
+		ResourcelessTransactionManager transactionManager = new ResourcelessTransactionManager();
+		transactionManager.setTransactionSynchronization(AbstractPlatformTransactionManager.SYNCHRONIZATION_NEVER);
+		taskletStep.setTransactionManager(transactionManager);
+		taskletStep.setTasklet((contribution, chunkContext) -> RepeatStatus.FINISHED);
+		taskletStep.execute(stepExecution);
+		assertEquals(COMPLETED, stepExecution.getStatus());
+	}
+
+	@Test
+	void testTaskletRepeatsWithoutTransactionSynchronization() throws Exception {
+		ResourcelessTransactionManager transactionManager = new ResourcelessTransactionManager();
+		transactionManager.setTransactionSynchronization(AbstractPlatformTransactionManager.SYNCHRONIZATION_NEVER);
+		taskletStep.setTransactionManager(transactionManager);
+		AtomicInteger executions = new AtomicInteger();
+		taskletStep.setTasklet((contribution, chunkContext) -> executions.incrementAndGet() < 2
+				? RepeatStatus.CONTINUABLE : RepeatStatus.FINISHED);
+		taskletStep.execute(stepExecution);
+		assertEquals(COMPLETED, stepExecution.getStatus());
+		assertEquals(2, executions.get());
+		assertEquals(2, stepExecution.getCommitCount());
 	}
 
 	@Test
