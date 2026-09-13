@@ -58,3 +58,8 @@ itemWriter.write(processedItems);
 For more details about item processors and their use cases, see the
 xref:processor.adoc[Item processing] section.
 
+When a chunk-oriented step is configured as fault-tolerant, an exception
+thrown during writing may trigger _chunk scanning_, in which the items of the
+failing chunk are replayed one at a time so the failing item can be isolated and
+skipped. See xref:retry.adoc#chunk-scanning[Chunk Scanning] for details.
+
