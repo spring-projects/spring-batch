@@ -64,7 +64,7 @@ public class AmqpItemReader<T> implements ItemReader<T> {
 		Object result = amqpTemplate.receiveAndConvert();
 
 		if (itemType != null && result != null) {
-			Assert.state(itemType.isAssignableFrom(result.getClass()),
+			Assert.state(itemType.isInstance(result),
 					"Received message payload of wrong type: expected [" + itemType + "]");
 		}
 
