@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,6 +45,7 @@ import java.util.Set;
  * @author Parikshit Dutta
  * @author Glenn Renfro
  * @author Yanming Zhou
+ * @author Taeik Lim
  * @see JobExplorer
  * @see JobInstanceDao
  * @see JobExecutionDao
@@ -120,21 +121,18 @@ public class SimpleJobExplorer implements JobExplorer {
 		return getJobInstances(jobName, start, count);
 	}
 
-	@Nullable
 	@Override
-	public JobInstance getJobInstance(long instanceId) {
+	public @Nullable JobInstance getJobInstance(long instanceId) {
 		return jobInstanceDao.getJobInstance(instanceId);
 	}
 
-	@Nullable
 	@Override
-	public JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
+	public @Nullable JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
 		return jobInstanceDao.getJobInstance(jobName, jobParameters);
 	}
 
-	@Nullable
 	@Override
-	public JobInstance getLastJobInstance(String jobName) {
+	public @Nullable JobInstance getLastJobInstance(String jobName) {
 		return jobInstanceDao.getLastJobInstance(jobName);
 	}
 
@@ -166,9 +164,8 @@ public class SimpleJobExplorer implements JobExplorer {
 		return executions;
 	}
 
-	@Nullable
 	@Override
-	public JobExecution getLastJobExecution(JobInstance jobInstance) {
+	public @Nullable JobExecution getLastJobExecution(JobInstance jobInstance) {
 		JobExecution lastJobExecution = jobExecutionDao.getLastJobExecution(jobInstance);
 		if (lastJobExecution != null) {
 			fillJobExecutionDependencies(lastJobExecution);
@@ -191,7 +188,7 @@ public class SimpleJobExplorer implements JobExplorer {
 	}
 
 	@Override
-	@Nullable public JobExecution getLastJobExecution(String jobName, JobParameters jobParameters) {
+	public @Nullable JobExecution getLastJobExecution(String jobName, JobParameters jobParameters) {
 		JobInstance jobInstance = jobInstanceDao.getJobInstance(jobName, jobParameters);
 		if (jobInstance == null) {
 			return null;
@@ -216,9 +213,8 @@ public class SimpleJobExplorer implements JobExplorer {
 		return executions;
 	}
 
-	@Nullable
 	@Override
-	public JobExecution getJobExecution(long executionId) {
+	public @Nullable JobExecution getJobExecution(long executionId) {
 		JobExecution jobExecution = jobExecutionDao.getJobExecution(executionId);
 		if (jobExecution == null) {
 			return null;
@@ -249,9 +245,8 @@ public class SimpleJobExplorer implements JobExplorer {
 	 */
 
 	@Deprecated(since = "6.0", forRemoval = true)
-	@Nullable
 	@Override
-	public StepExecution getStepExecution(long jobExecutionId, long executionId) {
+	public @Nullable StepExecution getStepExecution(long jobExecutionId, long executionId) {
 		JobExecution jobExecution = jobExecutionDao.getJobExecution(jobExecutionId);
 		if (jobExecution == null) {
 			return null;
@@ -263,7 +258,7 @@ public class SimpleJobExplorer implements JobExplorer {
 	}
 
 	@Override
-	@Nullable public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
+	public @Nullable StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
 		StepExecution latest = stepExecutionDao.getLastStepExecution(jobInstance, stepName);
 
 		if (latest != null) {

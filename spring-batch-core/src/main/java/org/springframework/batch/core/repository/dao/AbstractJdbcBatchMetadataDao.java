@@ -34,6 +34,7 @@ import org.springframework.util.StringUtils;
  * @author Robert Kasanicky
  * @author Mahmoud Ben Hassine
  * @author Yanming Zhou
+ * @author Taeik Lim
  */
 public abstract class AbstractJdbcBatchMetadataDao implements InitializingBean {
 
@@ -90,7 +91,7 @@ public abstract class AbstractJdbcBatchMetadataDao implements InitializingBean {
 		this.jdbcTemplate = jdbcTemplate;
 	}
 
-	@Nullable protected JdbcOperations getJdbcTemplate() {
+	protected @Nullable JdbcOperations getJdbcTemplate() {
 		return jdbcTemplate;
 	}
 

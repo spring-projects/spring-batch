@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,7 @@ import org.jspecify.annotations.Nullable;
  * @author Will Schipp
  * @author Mahmoud Ben Hassine
  * @author Parikshit Dutta
+ * @author Taeik Lim
  * @since 2.0
  * @deprecated since 6.0 in favor of {@link JobRepository}. Scheduled for removal in 6.2
  * or later.
@@ -131,7 +132,7 @@ public interface JobExplorer {
 	 * @param instanceId {@link Long} The ID for the {@link JobInstance} to obtain.
 	 * @return the {@code JobInstance} that has this ID, or {@code null} if not found.
 	 */
-	@Nullable default JobInstance getJobInstance(long instanceId) {
+	default @Nullable JobInstance getJobInstance(long instanceId) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -142,7 +143,7 @@ public interface JobExplorer {
 	 *
 	 * @since 4.2
 	 */
-	@Nullable default JobInstance getLastJobInstance(String jobName) {
+	default @Nullable JobInstance getLastJobInstance(String jobName) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -154,7 +155,7 @@ public interface JobExplorer {
 	 *
 	 * @since 5.0
 	 */
-	@Nullable default JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
+	default @Nullable JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -185,7 +186,7 @@ public interface JobExplorer {
 	 * @param executionId The job execution ID.
 	 * @return the {@link JobExecution} that has this ID or {@code null} if not found.
 	 */
-	@Nullable default JobExecution getJobExecution(long executionId) {
+	default @Nullable JobExecution getJobExecution(long executionId) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -225,7 +226,7 @@ public interface JobExplorer {
 	 *
 	 * @since 4.2
 	 */
-	@Nullable default JobExecution getLastJobExecution(JobInstance jobInstance) {
+	default @Nullable JobExecution getLastJobExecution(JobInstance jobInstance) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -234,7 +235,7 @@ public interface JobExplorer {
 	 * @param jobParameters parameters identifying the {@link JobInstance}
 	 * @return the last execution of job if exists, null otherwise
 	 */
-	@Nullable default JobExecution getLastJobExecution(String jobName, JobParameters jobParameters) {
+	default @Nullable JobExecution getLastJobExecution(String jobName, JobParameters jobParameters) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -269,7 +270,7 @@ public interface JobExplorer {
 	 */
 	// FIXME incorrect contract: stepExecutionId is globally unique, no need for
 	// jobExecutionId
-	@Nullable default StepExecution getStepExecution(long jobExecutionId, long stepExecutionId) {
+	default @Nullable StepExecution getStepExecution(long jobExecutionId, long stepExecutionId) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -278,7 +279,7 @@ public interface JobExplorer {
 	 * @param stepName the name of the step execution that might have run.
 	 * @return the last execution of step for the given job instance.
 	 */
-	@Nullable default StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
+	default @Nullable StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
 		throw new UnsupportedOperationException();
 	}
 
