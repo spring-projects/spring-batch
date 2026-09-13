@@ -38,7 +38,9 @@ import org.springframework.batch.infrastructure.repeat.RepeatStatus;
 import org.springframework.batch.infrastructure.support.transaction.ResourcelessTransactionManager;
 import org.jspecify.annotations.Nullable;
 import org.springframework.transaction.TransactionException;
+import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.UnexpectedRollbackException;
+import org.springframework.transaction.interceptor.RuleBasedTransactionAttribute;
 import org.springframework.transaction.support.DefaultTransactionStatus;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
@@ -90,6 +92,31 @@ class TaskletStepExceptionTests {
 		taskletStep.execute(stepExecution);
 		assertEquals(FAILED, stepExecution.getStatus());
 		assertEquals(FAILED.toString(), stepExecution.getExitStatus().getExitCode());
+	}
+
+	@Test
+	void testCheckedExceptionWithNoRollbackStillFailsStep() throws Exception {
+		final int[] invocations = new int[1];
+		taskletStep.setTasklet(new Tasklet() {
+			@Nullable
+			@Override
+			public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+				invocations[0]++;
+				if (invocations[0] == 1) {
+					throw new Exception("Planned checked exception");
+				}
+				return RepeatStatus.FINISHED;
+			}
+		});
+		RuleBasedTransactionAttribute transactionAttribute = new RuleBasedTransactionAttribute();
+		transactionAttribute.setPropagationBehavior(TransactionDefinition.PROPAGATION_NOT_SUPPORTED);
+		taskletStep.setTransactionAttribute(transactionAttribute);
+
+		taskletStep.execute(stepExecution);
+
+		assertEquals(FAILED, stepExecution.getStatus());
+		assertEquals(1, invocations[0]);
+		assertEquals("Planned checked exception", stepExecution.getFailureExceptions().get(0).getMessage());
 	}
 
 	@Test
