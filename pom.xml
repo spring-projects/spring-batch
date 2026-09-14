@@ -362,27 +362,52 @@
 
 	<repositories>
 		<repository>
-			<id>maven-central</id>
-			<url>https://repo.maven.apache.org/maven2/</url>
+			<id>spring-commercial-snapshot</id>
+			<name>Spring Commercial Snapshot Repository</name>
+			<url>https://usw1.packages.broadcom.com/artifactory/spring-enterprise-maven-dev-local</url>
 			<snapshots>
-				<enabled>false</enabled>
+				<enabled>true</enabled>
 			</snapshots>
 			<releases>
-				<enabled>true</enabled>
+				<enabled>false</enabled>
 			</releases>
 		</repository>
 		<repository>
-			<id>spring-snapshots</id>
-			<name>Spring Snapshots</name>
-			<url>https://repo.spring.io/snapshot</url>
+			<id>spring-commercial-releases</id>
+			<name>Spring Commercial Release Repository</name>
+			<url>https://usw1.packages.broadcom.com/artifactory/spring-enterprise-maven-prod-local</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+		</repository>
+	</repositories>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>spring-commercial-snapshot</id>
+			<name>Spring Commercial Snapshot Repository</name>
+			<url>https://usw1.packages.broadcom.com/artifactory/spring-enterprise-maven-dev-local</url>
 			<snapshots>
 				<enabled>true</enabled>
 			</snapshots>
 			<releases>
 				<enabled>false</enabled>
 			</releases>
-		</repository>
-	</repositories>
+		</pluginRepository>
+		<pluginRepository>
+			<id>spring-commercial-releases</id>
+			<name>Spring Commercial Release Repository</name>
+			<url>https://usw1.packages.broadcom.com/artifactory/spring-enterprise-maven-prod-local</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+		</pluginRepository>
+	</pluginRepositories>
 
 	<developers>
 		<developer>
