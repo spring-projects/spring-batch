@@ -28,6 +28,7 @@ import javax.sql.DataSource;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 
 import org.jspecify.annotations.Nullable;
+import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.SqlOutParameter;
 import org.springframework.jdbc.core.SqlParameter;
@@ -64,6 +65,7 @@ import org.springframework.util.Assert;
  * @author Thomas Risberg
  * @author Mahmoud Ben Hassine
  * @author Jimmy Praet
+ * @author Hyunwoo Jung
  */
 public class StoredProcedureItemReader<T> extends AbstractCursorItemReader<T> {
 
@@ -215,13 +217,26 @@ public class StoredProcedureItemReader<T> extends AbstractCursorItemReader<T> {
 			if (results) {
 				rs = callableStatement.getResultSet();
 			}
+			else if (function) {
+				rs = (ResultSet) callableStatement.getObject(1);
+			}
+			else if (refCursorPosition > 0) {
+				rs = (ResultSet) callableStatement.getObject(refCursorPosition);
+			}
 			else {
-				if (function) {
-					rs = (ResultSet) callableStatement.getObject(1);
+				// Without a configured REF CURSOR, the ResultSet is returned implicitly
+				// through the statement. Some drivers report update counts before it, so
+				// walk the result chain until the first ResultSet shows up.
+				while (!results && callableStatement.getUpdateCount() != -1) {
+					results = callableStatement.getMoreResults();
 				}
-				else {
-					rs = (ResultSet) callableStatement.getObject(refCursorPosition);
+				if (!results) {
+					close();
+					throw new InvalidDataAccessResourceUsageException("Stored procedure '" + procedureName
+							+ "' did not return a ResultSet. If the cursor is returned through an OUT parameter, "
+							+ "set its position with setRefCursorPosition (or setFunction(true) for a function).");
 				}
+				rs = callableStatement.getResultSet();
 			}
 			handleWarnings(callableStatement);
 		}
