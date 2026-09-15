@@ -172,6 +172,18 @@ class FlowJobBuilderTests {
 	}
 
 	@Test
+	void testBuildOnExitStatus() throws JobInterruptedException {
+		FlowJobBuilder builder = new JobBuilder("flow", jobRepository).start(step1)
+			.on(ExitStatus.COMPLETED)
+			.to(step2)
+			.end();
+		builder.preventRestart();
+		builder.build().execute(execution);
+		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
+		assertEquals(2, execution.getStepExecutions().size());
+	}
+
+	@Test
 	void testBuildSubflow() throws JobInterruptedException {
 		Flow flow = new FlowBuilder<Flow>("subflow").from(step1).end();
 		JobFlowBuilder builder = new JobBuilder("flow", jobRepository).start(flow);
@@ -273,6 +285,24 @@ class FlowJobBuilderTests {
 		};
 		JobFlowBuilder builder = new JobBuilder("flow", jobRepository).start(decider);
 		builder.on("COMPLETED").end().from(decider).on("*").to(step1).end();
+		builder.build().preventRestart().build().execute(execution);
+		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
+		assertEquals(1, execution.getStepExecutions().size());
+	}
+
+	@Test
+	void testBuildWithDeciderAtStartOnExitStatus() throws JobInterruptedException {
+		JobExecutionDecider decider = new JobExecutionDecider() {
+			private int count = 0;
+
+			@Override
+			public FlowExecutionStatus decide(JobExecution jobExecution, @Nullable StepExecution stepExecution) {
+				count++;
+				return count < 2 ? new FlowExecutionStatus("ONGOING") : FlowExecutionStatus.COMPLETED;
+			}
+		};
+		JobFlowBuilder builder = new JobBuilder("flow", jobRepository).start(decider);
+		builder.on(ExitStatus.COMPLETED).end().from(decider).on("*").to(step1).end();
 		builder.build().preventRestart().build().execute(execution);
 		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
 		assertEquals(1, execution.getStepExecutions().size());
