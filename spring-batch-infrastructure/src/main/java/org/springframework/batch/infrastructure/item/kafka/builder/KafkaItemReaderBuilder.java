@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 the original author or authors.
+ * Copyright 2019-2026 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -30,16 +30,20 @@ import org.jspecify.annotations.Nullable;
 
 import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.batch.infrastructure.item.ItemStreamSupport;
+import org.springframework.batch.infrastructure.item.kafka.KafkaConsumerRecordItemReader;
 import org.springframework.batch.infrastructure.item.kafka.KafkaItemReader;
 import org.springframework.util.Assert;
 
 /**
- * A builder implementation for the {@link KafkaItemReader}.
+ * A builder implementation for the Kafka-based
+ * {@link org.springframework.batch.infrastructure.item.ItemReader}s.
  *
  * @author Mathieu Ouellet
  * @author Mahmoud Ben Hassine
+ * @author djechelon@github.com
  * @since 4.2
  * @see KafkaItemReader
+ * @see KafkaConsumerRecordItemReader
  */
 public class KafkaItemReaderBuilder<K, V> {
 
@@ -154,6 +158,11 @@ public class KafkaItemReaderBuilder<K, V> {
 		return this;
 	}
 
+	/**
+	 * Constructs the reader in order to read only the message body from Kafka.
+	 * @return an instance of {@link KafkaItemReader} to be considered as an
+	 * <pre>ItemReader&lt;V&gt;</pre>
+	 */
 	public KafkaItemReader<K, V> build() {
 		if (this.saveState) {
 			Assert.hasText(this.name, "A name is required when saveState is set to true");
@@ -174,6 +183,43 @@ public class KafkaItemReaderBuilder<K, V> {
 		Assert.isTrue(!partitions.isEmpty(), "At least one partition must be provided");
 
 		KafkaItemReader<K, V> reader = new KafkaItemReader<>(this.consumerProperties, this.topic, this.partitions);
+		reader.setPollTimeout(this.pollTimeout);
+		reader.setSaveState(this.saveState);
+		if (this.name != null) {
+			reader.setName(this.name);
+		}
+		if (this.partitionOffsets != null) {
+			reader.setPartitionOffsets(this.partitionOffsets);
+		}
+		return reader;
+	}
+
+	/**
+	 * Constructs the reader in order to read the whole message envelope from Kafka.
+	 * @return an instance of {@link KafkaItemReader} to be considered as an
+	 * <pre>ItemReader&lt;ConsumerRecord&lt;K,V&gt;&gt;</pre>
+	 */
+	public KafkaConsumerRecordItemReader<K, V> buildWithConsumerRecord() {
+		if (this.saveState) {
+			Assert.hasText(this.name, "A name is required when saveState is set to true");
+		}
+		Assert.notNull(consumerProperties, "Consumer properties must not be null");
+		Assert.isTrue(consumerProperties.containsKey(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG),
+				ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG + " property must be provided");
+		Assert.isTrue(consumerProperties.containsKey(ConsumerConfig.GROUP_ID_CONFIG),
+				ConsumerConfig.GROUP_ID_CONFIG + " property must be provided");
+		Assert.isTrue(consumerProperties.containsKey(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG),
+				ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG + " property must be provided");
+		Assert.isTrue(consumerProperties.containsKey(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG),
+				ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG + " property must be provided");
+		Assert.hasLength(topic, "Topic name must not be null or empty");
+		Assert.notNull(pollTimeout, "pollTimeout must not be null");
+		Assert.isTrue(!pollTimeout.isZero(), "pollTimeout must not be zero");
+		Assert.isTrue(!pollTimeout.isNegative(), "pollTimeout must not be negative");
+		Assert.isTrue(!partitions.isEmpty(), "At least one partition must be provided");
+
+		KafkaConsumerRecordItemReader<K, V> reader = new KafkaConsumerRecordItemReader<>(this.consumerProperties,
+				this.topic, this.partitions);
 		reader.setPollTimeout(this.pollTimeout);
 		reader.setSaveState(this.saveState);
 		if (this.name != null) {
