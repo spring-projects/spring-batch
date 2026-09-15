@@ -36,8 +36,9 @@ import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.launch.support.ExitCodeMapper;
 import org.springframework.batch.core.listener.CompositeStepExecutionListener;
+import org.springframework.batch.core.observability.BatchEventRecorder;
+import org.springframework.batch.core.observability.BatchEventRecorder.BatchEvent;
 import org.springframework.batch.core.observability.BatchMetrics;
-import org.springframework.batch.core.observability.jfr.events.step.StepExecutionEvent;
 import org.springframework.batch.core.observability.micrometer.MicrometerMetrics;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
@@ -59,6 +60,7 @@ import org.springframework.util.ClassUtils;
  * @author Chris Schaefer
  * @author Mahmoud Ben Hassine
  * @author Jinwoo Bae
+ * @author Fabio Molignoni
  */
 // FIXME remove once default constructors (required by the XML namespace) are removed
 @NullUnmarked
@@ -77,6 +79,8 @@ public abstract class AbstractStep implements StoppableStep, InitializingBean, B
 	private JobRepository jobRepository;
 
 	protected ObservationRegistry observationRegistry;
+
+	protected BatchEventRecorder batchEventRecorder = BatchEventRecorder.DEFAULT;
 
 	/**
 	 * Create a new {@link AbstractStep}.
@@ -217,7 +221,7 @@ public abstract class AbstractStep implements StoppableStep, InitializingBean, B
 		if (logger.isDebugEnabled()) {
 			logger.debug("Executing: id=" + stepExecution.getId());
 		}
-		StepExecutionEvent stepExecutionEvent = new StepExecutionEvent(stepExecution.getStepName(),
+		BatchEvent stepExecutionEvent = this.batchEventRecorder.createStepExecutionEvent(stepExecution.getStepName(),
 				stepExecution.getJobExecution().getJobInstance().getJobName(), stepExecution.getId(),
 				stepExecution.getJobExecution().getId());
 		stepExecutionEvent.begin();
@@ -320,7 +324,7 @@ public abstract class AbstractStep implements StoppableStep, InitializingBean, B
 						stepExecution.getJobExecution().getJobInstance().getJobName()), e);
 			}
 
-			stepExecutionEvent.exitStatus = stepExecution.getExitStatus().getExitCode();
+			stepExecutionEvent.setStatus(stepExecution.getExitStatus().getExitCode());
 			stepExecutionEvent.commit();
 			stopObservation(stepExecution, observation);
 			stepExecution.setExitStatus(exitStatus);
@@ -466,6 +470,16 @@ public abstract class AbstractStep implements StoppableStep, InitializingBean, B
 
 	public void setObservationRegistry(ObservationRegistry observationRegistry) {
 		this.observationRegistry = observationRegistry;
+	}
+
+	/**
+	 * Set the batch event recorder. Defaults to {@link BatchEventRecorder#DEFAULT}.
+	 * @param batchEventRecorder the batch event recorder
+	 * @since 6.1
+	 */
+	public void setBatchEventRecorder(BatchEventRecorder batchEventRecorder) {
+		Assert.notNull(batchEventRecorder, "BatchEventRecorder must not be null");
+		this.batchEventRecorder = batchEventRecorder;
 	}
 
 }

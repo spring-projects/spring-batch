@@ -36,12 +36,8 @@ import org.springframework.batch.core.listener.ItemProcessListener;
 import org.springframework.batch.core.listener.ItemReadListener;
 import org.springframework.batch.core.listener.ItemWriteListener;
 import org.springframework.batch.core.listener.SkipListener;
+import org.springframework.batch.core.observability.BatchEventRecorder.BatchEvent;
 import org.springframework.batch.core.observability.BatchMetrics;
-import org.springframework.batch.core.observability.jfr.events.step.chunk.ChunkScanEvent;
-import org.springframework.batch.core.observability.jfr.events.step.chunk.ChunkTransactionEvent;
-import org.springframework.batch.core.observability.jfr.events.step.chunk.ChunkWriteEvent;
-import org.springframework.batch.core.observability.jfr.events.step.chunk.ItemProcessEvent;
-import org.springframework.batch.core.observability.jfr.events.step.chunk.ItemReadEvent;
 import org.springframework.batch.core.scope.context.StepContext;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.batch.core.step.StepContribution;
@@ -93,6 +89,7 @@ import static org.springframework.batch.core.observability.BatchMetrics.METRICS_
  * @author Minchul Son
  * @author Yanming Zhou
  * @author Taeik Lim
+ * @author Fabio Molignoni
  * @since 6.0
  */
 public class ChunkOrientedStep<I, O> extends AbstractStep {
@@ -391,8 +388,8 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 		while (this.chunkTracker.get().moreItems() && !interrupted(stepExecution)) {
 			// process next chunk in its own transaction
 			this.transactionTemplate.executeWithoutResult(transactionStatus -> {
-				ChunkTransactionEvent chunkTransactionEvent = new ChunkTransactionEvent(stepExecution.getStepName(),
-						stepExecution.getId());
+				BatchEvent chunkTransactionEvent = this.batchEventRecorder
+					.createChunkTransactionEvent(stepExecution.getStepName(), stepExecution.getId());
 				chunkTransactionEvent.begin();
 				StepContribution contribution = stepExecution.createStepContribution();
 				processNextChunk(transactionStatus, contribution, stepExecution);
@@ -404,7 +401,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 					// (eg JpaTransactionManager) has marked it as globally rollback-only
 					// (eg after a JPA flush failure) but not locally rollback-only.
 					transactionStatus.setRollbackOnly();
-					chunkTransactionEvent.transactionStatus = BatchMetrics.STATUS_ROLLED_BACK;
+					chunkTransactionEvent.setStatus(BatchMetrics.STATUS_ROLLED_BACK);
 					chunkTransactionEvent.commit();
 					return;
 				}
@@ -412,7 +409,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 				this.compositeItemStream.update(stepExecution.getExecutionContext());
 				getJobRepository().updateExecutionContext(stepExecution);
 				getJobRepository().update(stepExecution);
-				chunkTransactionEvent.transactionStatus = BatchMetrics.STATUS_COMMITTED;
+				chunkTransactionEvent.setStatus(BatchMetrics.STATUS_COMMITTED);
 				chunkTransactionEvent.commit();
 			});
 		}
@@ -442,13 +439,13 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 				logger.info("Executing scan in new transaction after rollback");
 				ScanItem<I, O> scanItem = tracker.pollNextScanItem();
 				if (scanItem != null) {
-					ChunkScanEvent chunkScanEvent = new ChunkScanEvent(stepExecution.getStepName(),
-							stepExecution.getId());
+					BatchEvent chunkScanEvent = this.batchEventRecorder
+						.createChunkScanEvent(stepExecution.getStepName(), stepExecution.getId());
 					chunkScanEvent.begin();
 					// no chunk listener callbacks here: ChunkListener is not called in
 					// concurrent steps
 					scan(scanItem, contribution, status);
-					chunkScanEvent.skipCount = contribution.getSkipCount();
+					chunkScanEvent.setCount(contribution.getSkipCount());
 					chunkScanEvent.commit();
 				}
 				if (!tracker.hasPendingScanItems()) {
@@ -538,15 +535,15 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 				logger.info("Executing scan in new transaction after rollback");
 				ScanItem<I, O> scanItem = tracker.pollNextScanItem();
 				if (scanItem != null) {
-					ChunkScanEvent chunkScanEvent = new ChunkScanEvent(stepExecution.getStepName(),
-							stepExecution.getId());
+					BatchEvent chunkScanEvent = this.batchEventRecorder
+						.createChunkScanEvent(stepExecution.getStepName(), stepExecution.getId());
 					chunkScanEvent.begin();
 					compositeChunkListener.beforeChunk(new Chunk<>(scanItem.input()));
 					Chunk<O> singleItemChunk = scan(scanItem, contribution, status);
 					if (!status.isRollbackOnly()) {
 						compositeChunkListener.afterChunk(singleItemChunk);
 					}
-					chunkScanEvent.skipCount = contribution.getSkipCount();
+					chunkScanEvent.setCount(contribution.getSkipCount());
 					chunkScanEvent.commit();
 				}
 				if (!tracker.hasPendingScanItems()) {
@@ -643,8 +640,8 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 	}
 
 	private @Nullable I readItem(StepContribution contribution) throws Exception {
-		ItemReadEvent itemReadEvent = new ItemReadEvent(contribution.getStepExecution().getStepName(),
-				contribution.getStepExecution().getId());
+		BatchEvent itemReadEvent = this.batchEventRecorder.createItemReadEvent(
+				contribution.getStepExecution().getStepName(), contribution.getStepExecution().getId());
 		String fullyQualifiedMetricName = BatchMetrics.METRICS_PREFIX + "item.read";
 		Observation observation = Observation.createNotStarted(fullyQualifiedMetricName, this.observationRegistry)
 			.lowCardinalityKeyValue(fullyQualifiedMetricName + ".job.name",
@@ -664,7 +661,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 				contribution.incrementReadCount();
 				this.compositeItemReadListener.afterRead(item);
 			}
-			itemReadEvent.itemReadStatus = BatchMetrics.STATUS_SUCCESS;
+			itemReadEvent.setStatus(BatchMetrics.STATUS_SUCCESS);
 			observation.lowCardinalityKeyValue(fullyQualifiedMetricName + ".status", BatchMetrics.STATUS_SUCCESS);
 		}
 		catch (Exception exception) {
@@ -675,7 +672,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			else {
 				throw exception;
 			}
-			itemReadEvent.itemReadStatus = BatchMetrics.STATUS_FAILURE;
+			itemReadEvent.setStatus(BatchMetrics.STATUS_FAILURE);
 			observation.lowCardinalityKeyValue(fullyQualifiedMetricName + ".status", BatchMetrics.STATUS_FAILURE);
 			observation.error(exception);
 		}
@@ -734,8 +731,8 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 	}
 
 	private @Nullable O processItem(I item, StepContribution contribution) throws Exception {
-		ItemProcessEvent itemProcessEvent = new ItemProcessEvent(contribution.getStepExecution().getStepName(),
-				contribution.getStepExecution().getId());
+		BatchEvent itemProcessEvent = this.batchEventRecorder.createItemProcessEvent(
+				contribution.getStepExecution().getStepName(), contribution.getStepExecution().getId());
 		String fullyQualifiedMetricName = METRICS_PREFIX + "item.process";
 		Observation observation = Observation.createNotStarted(fullyQualifiedMetricName, this.observationRegistry)
 			.lowCardinalityKeyValue(fullyQualifiedMetricName + ".job.name",
@@ -752,7 +749,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 				contribution.incrementFilterCount();
 			}
 			this.compositeItemProcessListener.afterProcess(item, processedItem);
-			itemProcessEvent.itemProcessStatus = BatchMetrics.STATUS_SUCCESS;
+			itemProcessEvent.setStatus(BatchMetrics.STATUS_SUCCESS);
 			observation.lowCardinalityKeyValue(fullyQualifiedMetricName + ".status", BatchMetrics.STATUS_SUCCESS);
 		}
 		catch (Exception exception) {
@@ -763,7 +760,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			else {
 				throw exception;
 			}
-			itemProcessEvent.itemProcessStatus = BatchMetrics.STATUS_FAILURE;
+			itemProcessEvent.setStatus(BatchMetrics.STATUS_FAILURE);
 			observation.lowCardinalityKeyValue(fullyQualifiedMetricName + ".status", BatchMetrics.STATUS_FAILURE);
 			observation.error(exception);
 		}
@@ -820,8 +817,8 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 
 	private void writeChunk(Chunk<O> chunk, List<ScanItem<I, O>> scanItems, StepContribution contribution,
 			TransactionStatus status) throws Exception {
-		ChunkWriteEvent chunkWriteEvent = new ChunkWriteEvent(contribution.getStepExecution().getStepName(),
-				contribution.getStepExecution().getId(), chunk.size());
+		BatchEvent chunkWriteEvent = this.batchEventRecorder.createChunkWriteEvent(
+				contribution.getStepExecution().getStepName(), contribution.getStepExecution().getId(), chunk.size());
 		String fullyQualifiedMetricName = METRICS_PREFIX + "chunk.write";
 		Observation observation = Observation.createNotStarted(fullyQualifiedMetricName, this.observationRegistry)
 			.lowCardinalityKeyValue(fullyQualifiedMetricName + ".job.name",
@@ -844,12 +841,12 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			}
 			contribution.incrementWriteCount(chunk.size());
 			this.compositeItemWriteListener.afterWrite(chunk);
-			chunkWriteEvent.chunkWriteStatus = BatchMetrics.STATUS_SUCCESS;
+			chunkWriteEvent.setStatus(BatchMetrics.STATUS_SUCCESS);
 			observation.lowCardinalityKeyValue(fullyQualifiedMetricName + ".status", BatchMetrics.STATUS_SUCCESS);
 		}
 		catch (Exception exception) {
 			this.compositeItemWriteListener.onWriteError(exception, chunk);
-			chunkWriteEvent.chunkWriteStatus = BatchMetrics.STATUS_FAILURE;
+			chunkWriteEvent.setStatus(BatchMetrics.STATUS_FAILURE);
 			observation.lowCardinalityKeyValue(fullyQualifiedMetricName + ".status", BatchMetrics.STATUS_FAILURE);
 			observation.error(exception);
 

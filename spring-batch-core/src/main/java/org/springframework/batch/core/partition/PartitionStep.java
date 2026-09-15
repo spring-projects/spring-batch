@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,7 @@ package org.springframework.batch.core.partition;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.job.JobExecutionException;
-import org.springframework.batch.core.observability.jfr.events.step.partition.PartitionAggregateEvent;
-import org.springframework.batch.core.observability.jfr.events.step.partition.PartitionSplitEvent;
+import org.springframework.batch.core.observability.BatchEventRecorder.BatchEvent;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
@@ -38,6 +37,7 @@ import org.jspecify.annotations.NullUnmarked;
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
+ * @author Fabio Molignoni
  * @since 2.0
  */
 @NullUnmarked // FIXME to remove once default constructors (required by the batch XML
@@ -114,17 +114,17 @@ public class PartitionStep extends AbstractStep {
 		stepExecution.getExecutionContext().put(STEP_TYPE_KEY, this.getClass().getName());
 
 		// Split execution into partitions and wait for task completion
-		PartitionSplitEvent partitionSplitEvent = new PartitionSplitEvent(stepExecution.getStepName(),
+		BatchEvent partitionSplitEvent = this.batchEventRecorder.createPartitionSplitEvent(stepExecution.getStepName(),
 				stepExecution.getId());
 		partitionSplitEvent.begin();
 		Collection<StepExecution> executions = partitionHandler.handle(stepExecutionSplitter, stepExecution);
-		partitionSplitEvent.partitionCount = executions.size();
+		partitionSplitEvent.setCount(executions.size());
 		stepExecution.upgradeStatus(BatchStatus.COMPLETED);
 		partitionSplitEvent.commit();
 
 		// aggregate the results of the executions
-		PartitionAggregateEvent partitionAggregateEvent = new PartitionAggregateEvent(stepExecution.getStepName(),
-				stepExecution.getId());
+		BatchEvent partitionAggregateEvent = this.batchEventRecorder
+			.createPartitionAggregateEvent(stepExecution.getStepName(), stepExecution.getId());
 		partitionAggregateEvent.begin();
 		stepExecutionAggregator.aggregate(stepExecution, executions);
 		partitionAggregateEvent.commit();

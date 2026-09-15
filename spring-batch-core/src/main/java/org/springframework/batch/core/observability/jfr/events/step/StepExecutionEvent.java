@@ -20,10 +20,12 @@ import jdk.jfr.Description;
 import jdk.jfr.Event;
 import jdk.jfr.Label;
 
+import org.springframework.batch.core.observability.BatchEventRecorder.BatchEvent;
+
 @Label("Step Execution")
 @Description("Step Execution Event")
 @Category({ "Spring Batch", "Step" })
-public class StepExecutionEvent extends Event {
+public class StepExecutionEvent extends Event implements BatchEvent {
 
 	@Label("Step Name")
 	public String stepName;
@@ -45,6 +47,11 @@ public class StepExecutionEvent extends Event {
 		this.jobName = jobName;
 		this.stepExecutionId = stepExecutionId;
 		this.jobExecutionId = jobExecutionId;
+	}
+
+	@Override
+	public void setStatus(String status) {
+		this.exitStatus = status;
 	}
 
 }

@@ -23,6 +23,7 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.aop.framework.AopProxyUtils;
 import org.springframework.batch.core.job.AbstractJob;
 import org.springframework.batch.core.launch.support.TaskExecutorJobOperator;
+import org.springframework.batch.core.observability.BatchEventRecorder;
 import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -32,10 +33,11 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 
 /**
  * Bean post processor that configures observable batch artifacts (typically jobs and
- * steps) with a Micrometer's observation registry.
+ * steps) with the available observability components.
  *
  * @author Mahmoud Ben Hassine
  * @author Sanghyuk Jung
+ * @author Fabio Molignoni
  * @since 5.0
  */
 public class BatchObservabilityBeanPostProcessor implements BeanFactoryPostProcessor, BeanPostProcessor {
@@ -55,13 +57,13 @@ public class BatchObservabilityBeanPostProcessor implements BeanFactoryPostProce
 			LOGGER.debug("BeanFactory is not initialized, skipping observation registry injection");
 			return bean;
 		}
-		try {
-			Object target = AopProxyUtils.getSingletonTarget(bean);
-			if (target == null) {
-				target = bean;
-			}
-			if (target instanceof AbstractJob || target instanceof AbstractStep
-					|| target instanceof TaskExecutorJobOperator) {
+		Object target = AopProxyUtils.getSingletonTarget(bean);
+		if (target == null) {
+			target = bean;
+		}
+		if (target instanceof AbstractJob || target instanceof AbstractStep
+				|| target instanceof TaskExecutorJobOperator) {
+			try {
 				ObservationRegistry observationRegistry = this.beanFactory.getBean(ObservationRegistry.class);
 				if (target instanceof AbstractJob job) {
 					job.setObservationRegistry(observationRegistry);
@@ -73,9 +75,24 @@ public class BatchObservabilityBeanPostProcessor implements BeanFactoryPostProce
 					operator.setObservationRegistry(observationRegistry);
 				}
 			}
-		}
-		catch (NoSuchBeanDefinitionException e) {
-			LOGGER.debug("No Micrometer observation registry found, defaulting to ObservationRegistry.NOOP");
+			catch (NoSuchBeanDefinitionException e) {
+				LOGGER.debug("No Micrometer observation registry found, defaulting to ObservationRegistry.NOOP");
+			}
+			try {
+				BatchEventRecorder batchEventRecorder = this.beanFactory.getBean(BatchEventRecorder.class);
+				if (target instanceof AbstractJob job) {
+					job.setBatchEventRecorder(batchEventRecorder);
+				}
+				if (target instanceof AbstractStep step) {
+					step.setBatchEventRecorder(batchEventRecorder);
+				}
+				if (target instanceof TaskExecutorJobOperator operator) {
+					operator.setBatchEventRecorder(batchEventRecorder);
+				}
+			}
+			catch (NoSuchBeanDefinitionException e) {
+				LOGGER.debug("No batch event recorder found, defaulting to BatchEventRecorder.DEFAULT");
+			}
 		}
 		return bean;
 	}

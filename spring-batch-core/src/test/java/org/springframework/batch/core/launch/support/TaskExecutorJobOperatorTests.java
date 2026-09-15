@@ -32,6 +32,8 @@ import org.springframework.batch.core.job.parameters.InvalidJobParametersExcepti
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.launch.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.launch.JobInstanceAlreadyCompleteException;
+import org.springframework.batch.core.observability.BatchEventRecorder;
+import org.springframework.batch.core.observability.BatchEventRecorder.BatchEvent;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.launch.JobRestartException;
 import org.springframework.batch.core.repository.support.JdbcJobRepositoryFactoryBean;
@@ -44,6 +46,11 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.jdbc.support.JdbcTransactionManager;
+
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Dave Syer
@@ -97,6 +104,20 @@ class TaskExecutorJobOperatorTests {
 
 		Assertions.assertNotNull(jobExecution);
 		Assertions.assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
+	}
+
+	@Test
+	void testStartRecordsJobLaunchEvent() throws Exception {
+		BatchEventRecorder eventRecorder = mock();
+		BatchEvent jobLaunchEvent = mock();
+		when(eventRecorder.createJobLaunchEvent(anyString(), anyString())).thenReturn(jobLaunchEvent);
+		jobOperator.setBatchEventRecorder(eventRecorder);
+		JobParameters jobParameters = new JobParameters();
+
+		jobOperator.start(job, jobParameters);
+
+		verify(eventRecorder).createJobLaunchEvent("job", jobParameters.toString());
+		verify(jobLaunchEvent).commit();
 	}
 
 	@Test

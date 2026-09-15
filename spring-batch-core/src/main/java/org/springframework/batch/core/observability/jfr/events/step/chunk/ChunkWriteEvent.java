@@ -20,10 +20,12 @@ import jdk.jfr.Description;
 import jdk.jfr.Event;
 import jdk.jfr.Label;
 
+import org.springframework.batch.core.observability.BatchEventRecorder.BatchEvent;
+
 @Label("Chunk Write")
 @Description("Chunk Write Event")
 @Category({ "Spring Batch", "Step", "Chunk" })
-public class ChunkWriteEvent extends Event {
+public class ChunkWriteEvent extends Event implements BatchEvent {
 
 	@Label("Step Name")
 	public String stepName;
@@ -41,6 +43,11 @@ public class ChunkWriteEvent extends Event {
 		this.itemCount = itemCount;
 		this.stepName = stepName;
 		this.stepExecutionId = stepExecutionId;
+	}
+
+	@Override
+	public void setStatus(String status) {
+		this.chunkWriteStatus = status;
 	}
 
 }

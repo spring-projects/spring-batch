@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2025 the original author or authors.
+ * Copyright 2022-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.InvalidJobParametersException;
 import org.springframework.batch.core.launch.JobExecutionNotRunningException;
 import org.springframework.batch.core.launch.JobOperator;
-import org.springframework.batch.core.observability.jfr.events.job.JobLaunchEvent;
+import org.springframework.batch.core.observability.BatchEventRecorder;
 import org.springframework.batch.core.observability.micrometer.MicrometerMetrics;
 import org.springframework.batch.core.launch.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.launch.JobInstanceAlreadyCompleteException;
@@ -57,6 +57,7 @@ import static org.springframework.batch.core.observability.BatchMetrics.METRICS_
  * @author Will Schipp
  * @author Mahmoud Ben Hassine
  * @author Yejeong Ham
+ * @author Fabio Molignoni
  * @since 6.0
  */
 @SuppressWarnings("removal")
@@ -65,6 +66,8 @@ public class TaskExecutorJobOperator extends SimpleJobOperator {
 	private static final Log logger = LogFactory.getLog(TaskExecutorJobOperator.class.getName());
 
 	protected @Nullable ObservationRegistry observationRegistry;
+
+	private BatchEventRecorder batchEventRecorder = BatchEventRecorder.DEFAULT;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -104,12 +107,22 @@ public class TaskExecutorJobOperator extends SimpleJobOperator {
 		this.observationRegistry = observationRegistry;
 	}
 
+	/**
+	 * Set the batch event recorder. Defaults to {@link BatchEventRecorder#DEFAULT}.
+	 * @param batchEventRecorder the batch event recorder
+	 * @since 6.1
+	 */
+	public void setBatchEventRecorder(BatchEventRecorder batchEventRecorder) {
+		Assert.notNull(batchEventRecorder, "BatchEventRecorder must not be null");
+		this.batchEventRecorder = batchEventRecorder;
+	}
+
 	@Override
 	public JobExecution start(Job job, JobParameters jobParameters) throws JobInstanceAlreadyCompleteException,
 			JobExecutionAlreadyRunningException, JobRestartException, InvalidJobParametersException {
 		Assert.notNull(job, "Job must not be null");
 		Assert.notNull(jobParameters, "JobParameters must not be null");
-		new JobLaunchEvent(job.getName(), jobParameters.toString()).commit();
+		this.batchEventRecorder.createJobLaunchEvent(job.getName(), jobParameters.toString()).commit();
 		Observation observation = MicrometerMetrics
 			.createObservation(METRICS_PREFIX + "job.launch.count", this.observationRegistry)
 			.start();

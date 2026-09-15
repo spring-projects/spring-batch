@@ -20,10 +20,12 @@ import jdk.jfr.Description;
 import jdk.jfr.Event;
 import jdk.jfr.Label;
 
+import org.springframework.batch.core.observability.BatchEventRecorder.BatchEvent;
+
 @Label("Partition Split")
 @Description("Partition Split Event")
 @Category({ "Spring Batch", "Step", "Partition" })
-public class PartitionSplitEvent extends Event {
+public class PartitionSplitEvent extends Event implements BatchEvent {
 
 	@Label("Step Name")
 	public String stepName;
@@ -37,6 +39,11 @@ public class PartitionSplitEvent extends Event {
 	public PartitionSplitEvent(String stepName, long stepExecutionId) {
 		this.stepName = stepName;
 		this.stepExecutionId = stepExecutionId;
+	}
+
+	@Override
+	public void setCount(long count) {
+		this.partitionCount = count;
 	}
 
 }

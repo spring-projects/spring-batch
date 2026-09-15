@@ -20,10 +20,12 @@ import jdk.jfr.Description;
 import jdk.jfr.Event;
 import jdk.jfr.Label;
 
+import org.springframework.batch.core.observability.BatchEventRecorder.BatchEvent;
+
 @Label("Job Launch Request")
 @Description("Job Launch Request Event")
 @Category({ "Spring Batch", "Job" })
-public class JobLaunchEvent extends Event {
+public class JobLaunchEvent extends Event implements BatchEvent {
 
 	@Label("Job Name")
 	public String jobName;
