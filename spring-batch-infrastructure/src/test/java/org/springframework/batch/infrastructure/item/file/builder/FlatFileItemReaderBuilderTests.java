@@ -19,6 +19,7 @@ import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
@@ -28,6 +29,7 @@ import org.springframework.batch.infrastructure.item.file.FlatFileItemReader;
 import org.springframework.batch.infrastructure.item.file.builder.FlatFileItemReaderBuilder;
 import org.springframework.batch.infrastructure.item.file.mapping.BeanWrapperFieldSetMapper;
 import org.springframework.batch.infrastructure.item.file.mapping.DefaultLineMapper;
+import org.springframework.batch.infrastructure.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.infrastructure.item.file.mapping.RecordFieldSetMapper;
 import org.springframework.batch.infrastructure.item.file.separator.DefaultRecordSeparatorPolicy;
 import org.springframework.batch.infrastructure.item.file.transform.DefaultFieldSet;
@@ -45,6 +47,7 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -61,6 +64,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  * @author Patrick Baumgartner
  * @author François Martin
  * @author Daeho Kwon
+ * @author snowykte0426
  */
 class FlatFileItemReaderBuilderTests {
 
@@ -568,14 +572,26 @@ class FlatFileItemReaderBuilderTests {
 	}
 
 	@Test
-	void testErrorWhenTargetTypeAndFieldSetMapperIsProvided() {
-		var builder = new FlatFileItemReaderBuilder<Foo>().name("fooReader")
-			.resource(getResource("1;2;3"))
-			.lineTokenizer(line -> new DefaultFieldSet(line.split(";")))
-			.targetType(Foo.class)
-			.fieldSetMapper(fieldSet -> new Foo());
-		var exception = assertThrows(IllegalStateException.class, builder::build);
-		assertEquals("Either a TargetType or FieldSetMapper can be set, can't be both.", exception.getMessage());
+	void testCompileTimeSafety() {
+		// Verify that valid usage patterns work correctly
+		// Pattern 1: Using targetType only (tokenizer configured first)
+		assertDoesNotThrow(() -> {
+			new FlatFileItemReaderBuilder<Foo>().name("fooReader")
+				.resource(getResource("1;2;3"))
+				.delimited()
+				.names("first", "second", "third")
+				.targetType(Foo.class)
+				.build();
+		});
+
+		// Pattern 2: Using fieldSetMapper only
+		assertDoesNotThrow(() -> {
+			new FlatFileItemReaderBuilder<Foo>().name("fooReader")
+				.resource(getResource("1;2;3"))
+				.lineTokenizer(line -> new DefaultFieldSet(line.split(";")))
+				.fieldSetMapper(fieldSet -> new Foo())
+				.build();
+		});
 	}
 
 	@Test
@@ -584,12 +600,12 @@ class FlatFileItemReaderBuilderTests {
 		record Person(int id, String name) {
 		}
 
-		// when
+		// when - tokenizer configured before targetType() for compile-time safety
 		FlatFileItemReader<Person> reader = new FlatFileItemReaderBuilder<Person>().name("personReader")
 			.resource(getResource("1,foo"))
-			.targetType(Person.class)
 			.delimited()
 			.names("id", "name")
+			.targetType(Person.class)
 			.build();
 
 		// then
@@ -613,12 +629,12 @@ class FlatFileItemReaderBuilderTests {
 
 		}
 
-		// when
+		// when - tokenizer configured before targetType() for compile-time safety
 		FlatFileItemReader<Person> reader = new FlatFileItemReaderBuilder<Person>().name("personReader")
 			.resource(getResource("1,foo"))
-			.targetType(Person.class)
 			.delimited()
 			.names("id", "name")
+			.targetType(Person.class)
 			.build();
 
 		// then
@@ -628,6 +644,57 @@ class FlatFileItemReaderBuilderTests {
 		Object fieldSetMapper = ReflectionTestUtils.getField(lineMapper, "fieldSetMapper");
 		assertNotNull(fieldSetMapper);
 		assertInstanceOf(BeanWrapperFieldSetMapper.class, fieldSetMapper);
+	}
+
+	@Test
+	void testFieldSetMapperStageAPI() {
+		FlatFileItemReader<Foo> reader = new FlatFileItemReaderBuilder<Foo>().name("fooReader")
+			.resource(getResource("1;2;3"))
+			.lineTokenizer(line -> new DefaultFieldSet(line.split(";")))
+			.fieldSetMapper(fieldSet -> {
+				Foo item = new Foo();
+				item.setFirst(Integer.parseInt(fieldSet.readString(0)));
+				item.setSecond(Integer.parseInt(fieldSet.readString(1)));
+				item.setThird(fieldSet.readString(2));
+				return item;
+			})
+			.build();
+
+		assertNotNull(reader);
+	}
+
+	@Test
+	void testTargetTypeStageAPI() {
+		FlatFileItemReader<Foo> reader = new FlatFileItemReaderBuilder<Foo>().name("fooReader")
+			.resource(getResource("1;2;3"))
+			.delimited()
+			.names("first", "second", "third")
+			.targetType(Foo.class)
+			.beanMapperStrict(true)
+			.build();
+
+		assertNotNull(reader);
+	}
+
+	@Test
+	void testTargetTypeStageMethodsAvailable() {
+		var stage = new FlatFileItemReaderBuilder<Foo>().name("fooReader")
+			.resource(getResource("1;2;3"))
+			.delimited()
+			.names("first", "second", "third")
+			.targetType(Foo.class);
+
+		assertDoesNotThrow(() -> stage.beanMapperStrict(true).distanceLimit(2).customEditors(Map.of()).build());
+	}
+
+	@Test
+	void testFieldSetMapperStageMethodsAvailable() {
+		var stage = new FlatFileItemReaderBuilder<Foo>().name("fooReader")
+			.resource(getResource("1;2;3"))
+			.lineTokenizer(line -> new DefaultFieldSet(line.split(";")))
+			.fieldSetMapper(fieldSet -> new Foo());
+
+		assertDoesNotThrow(() -> stage.saveState(false).maxItemCount(100).strict(false).encoding("UTF-8").build());
 	}
 
 	@Test
