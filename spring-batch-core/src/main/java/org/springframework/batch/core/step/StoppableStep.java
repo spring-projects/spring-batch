@@ -43,4 +43,18 @@ public interface StoppableStep extends Step {
 		stepExecution.setEndTime(LocalDateTime.now());
 	}
 
+	/**
+	 * Run the given action while holding the lock that serialises updates to the given
+	 * step execution's metadata. This lets a caller that persists the stopped state (for
+	 * example a job operator on its own thread) run mutually exclusive with the step's
+	 * own concurrent updates, such as chunk commits on the worker thread, so that neither
+	 * writer observes a stale version. The default implementation runs the action
+	 * directly without any locking.
+	 * @param stepExecution the step execution whose updates should be serialised
+	 * @param action the action to run while holding the lock
+	 */
+	default void callUnderLock(StepExecution stepExecution, Runnable action) {
+		action.run();
+	}
+
 }

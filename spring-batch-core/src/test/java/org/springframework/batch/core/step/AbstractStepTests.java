@@ -16,6 +16,13 @@
 package org.springframework.batch.core.step;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.jupiter.api.Test;
 
@@ -26,7 +33,10 @@ import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.listener.StepExecutionListener;
 import org.springframework.batch.core.repository.JobRepository;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -54,6 +64,56 @@ class AbstractStepTests {
 
 		// then
 		assertNotNull(stepListener.getStepEndTime());
+	}
+
+	@Test
+	void testCallUnderLockSerializesConcurrentUpdates() throws Exception {
+		// given
+		StepExecution execution = new StepExecution(1L, "step",
+				new JobExecution(0L, new JobInstance(1L, "job"), new JobParameters()));
+		JobRepository jobRepository = mock();
+		AtomicInteger concurrent = new AtomicInteger();
+		AtomicBoolean overlap = new AtomicBoolean(false);
+		AtomicInteger completed = new AtomicInteger();
+		int threads = 8;
+		int iterations = 200;
+		AbstractStep tested = new AbstractStep(jobRepository) {
+			@Override
+			protected void doExecute(StepExecution stepExecution) throws Exception {
+				// While the step is executing, the per-execution lock is registered, so
+				// concurrent callers (the worker and a stopping thread) are serialized.
+				ExecutorService pool = Executors.newFixedThreadPool(threads);
+				try {
+					List<Future<?>> futures = new ArrayList<>();
+					for (int t = 0; t < threads; t++) {
+						futures.add(pool.submit(() -> {
+							for (int i = 0; i < iterations; i++) {
+								callUnderLock(stepExecution, () -> {
+									if (concurrent.incrementAndGet() != 1) {
+										overlap.set(true);
+									}
+									completed.incrementAndGet();
+									concurrent.decrementAndGet();
+								});
+							}
+						}));
+					}
+					for (Future<?> future : futures) {
+						future.get();
+					}
+				}
+				finally {
+					pool.shutdown();
+				}
+			}
+		};
+
+		// when
+		tested.execute(execution);
+
+		// then
+		assertFalse(overlap.get(), "callUnderLock allowed concurrent updates to the same step execution");
+		assertEquals(threads * iterations, completed.get());
 	}
 
 	static class Listener implements StepExecutionListener {
