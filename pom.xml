@@ -62,7 +62,7 @@
 		<spring-data-bom.version>2026.1.0-INTERNAL-SNAPSHOT</spring-data-bom.version>
 		<spring-kafka.version>4.2.0-INTERNAL-SNAPSHOT</spring-kafka.version>
 		<spring-amqp.version>4.2.0-INTERNAL-SNAPSHOT</spring-amqp.version>
-		<spring-ldap.version>4.1.1</spring-ldap.version>
+		<spring-ldap.version>4.2.0-INTERNAL-SNAPSHOT</spring-ldap.version>
 
 		<jackson2.version>2.22.2</jackson2.version>
 		<jackson3.version>3.2.2</jackson3.version>
