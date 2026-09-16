@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.repository.dao.jdbc;
 
+import org.springframework.batch.infrastructure.support.DatabaseType;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -48,8 +49,8 @@ public class JdbcJobInstanceDaoTests {
 	@BeforeEach
 	void setup() throws Exception {
 		EmbeddedDatabase database = new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2)
-			.addScript("/org/springframework/batch/core/schema-drop-h2.sql")
-			.addScript("/org/springframework/batch/core/schema-h2.sql")
+			.addScript(DatabaseType.H2.getProductSchemaDrop())
+			.addScript(DatabaseType.H2.getProductSchema())
 			.build();
 		jdbcTemplate = new JdbcTemplate(database);
 		jdbcJobInstanceDao = new JdbcJobInstanceDao();

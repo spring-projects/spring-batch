@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.step.item;
 
+import org.springframework.batch.infrastructure.support.DatabaseType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -135,8 +136,8 @@ class ChunkOrientedStepReadRetryIllustrationTests {
 		@Bean
 		public DataSource dataSource() {
 			EmbeddedDatabaseBuilder builder = new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2)
-				.addScript("/org/springframework/batch/core/schema-drop-h2.sql")
-				.addScript("/org/springframework/batch/core/schema-h2.sql")
+				.addScript(DatabaseType.H2.getProductSchemaDrop())
+				.addScript(DatabaseType.H2.getProductSchema())
 				.generateUniqueName(true);
 			return builder.build();
 		}

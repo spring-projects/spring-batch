@@ -74,6 +74,7 @@ import org.springframework.batch.core.scope.context.JobContext;
 import org.springframework.batch.core.scope.context.StepContext;
 import org.springframework.batch.infrastructure.item.Chunk;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
+import org.springframework.batch.infrastructure.support.DatabaseType;
 import org.springframework.core.DecoratingProxy;
 import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
@@ -100,18 +101,9 @@ public class CoreRuntimeHints implements RuntimeHintsRegistrar {
 				"java.util.concurrent.ConcurrentHashMap$Segment");
 
 		// resource hints
-		hints.resources().registerPattern("org/springframework/batch/core/schema-h2.sql");
-		hints.resources().registerPattern("org/springframework/batch/core/schema-derby.sql");
-		hints.resources().registerPattern("org/springframework/batch/core/schema-hsqldb.sql");
-		hints.resources().registerPattern("org/springframework/batch/core/schema-sqlite.sql");
-		hints.resources().registerPattern("org/springframework/batch/core/schema-db2.sql");
-		hints.resources().registerPattern("org/springframework/batch/core/schema-hana.sql");
-		hints.resources().registerPattern("org/springframework/batch/core/schema-mysql.sql");
-		hints.resources().registerPattern("org/springframework/batch/core/schema-mariadb.sql");
-		hints.resources().registerPattern("org/springframework/batch/core/schema-oracle.sql");
-		hints.resources().registerPattern("org/springframework/batch/core/schema-postgresql.sql");
-		hints.resources().registerPattern("org/springframework/batch/core/schema-sqlserver.sql");
-		hints.resources().registerPattern("org/springframework/batch/core/schema-sybase.sql");
+		for (DatabaseType databaseType : DatabaseType.values()) {
+			hints.resources().registerPattern(databaseType.getProductSchema());
+		}
 		hints.resources().registerPattern("org/springframework/batch/core/schema-mongodb.jsonl");
 		hints.resources().registerPattern("org/springframework/batch/core/schema-mongodb.js");
 		hints.resources().registerPattern("org/springframework/batch/core/schema-drop-mongodb.jsonl");

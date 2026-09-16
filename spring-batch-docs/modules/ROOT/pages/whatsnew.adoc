@@ -12,6 +12,7 @@ Spring Batch 6.1 includes the following features and improvements:
 * xref:whatsnew.adoc#flushing-support-in-repositoryitemwriter[Flushing support in `RepositoryItemWriter`]
 * xref:whatsnew.adoc#location-patterns-in-multiresourceitemreaderbuilder[Location patterns in `MultiResourceItemReaderBuilder`]
 * xref:whatsnew.adoc#new-resourcesitemreaderbuilder[New `ResourcesItemReaderBuilder`]
+* xref:whatsnew.adoc#schema-locations-in-databasetype[Schema locations in `DatabaseType`]
 * xref:whatsnew.adoc#deprecations[Deprecations]
 
 [[dependencies-upgrade]]
@@ -212,6 +213,32 @@ ResourcesItemReader reader = new ResourcesItemReaderBuilder()
 For more details, please refer to the
 xref:readers-and-writers/item-reader-writer-implementations.adoc#resourcesItemReader[`ResourcesItemReader`]
 section.
+
+[[schema-locations-in-databasetype]]
+== Schema locations in `DatabaseType`
+
+`DatabaseType` now exposes the classpath locations of the schema creation and drop
+scripts for each supported database, through the new `getProductSchema()` and
+`getProductSchemaDrop()` methods. This avoids hard-coding these locations (and the risk
+of typos) when configuring a `DataSource` or a `ResourceDatabasePopulator`:
+
+[source, java]
+----
+// before
+new EmbeddedDatabaseBuilder()
+    .addScript("/org/springframework/batch/core/schema-drop-h2.sql")
+    .addScript("/org/springframework/batch/core/schema-h2.sql")
+    .build();
+
+// after
+new EmbeddedDatabaseBuilder()
+    .addScript(DatabaseType.H2.getProductSchemaDrop())
+    .addScript(DatabaseType.H2.getProductSchema())
+    .build();
+----
+
+For more details, please refer to the
+xref:schema-appendix.adoc#exampleDDLScripts[Example DDL Scripts] section.
 
 [[deprecations]]
 == Deprecations

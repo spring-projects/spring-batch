@@ -16,6 +16,7 @@
 
 package org.springframework.batch.samples.restart.stop;
 
+import org.springframework.batch.infrastructure.support.DatabaseType;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -119,8 +120,8 @@ class GracefulShutdownFunctionalTests {
 		@Bean
 		public DataSource dataSource() {
 			return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.HSQL)
-				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-				.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
+				.addScript(DatabaseType.HSQL.getProductSchemaDrop())
+				.addScript(DatabaseType.HSQL.getProductSchema())
 				.generateUniqueName(true)
 				.build();
 		}

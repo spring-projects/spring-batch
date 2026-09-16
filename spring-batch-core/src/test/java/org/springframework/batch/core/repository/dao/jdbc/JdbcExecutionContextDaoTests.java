@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2025 the original author or authors.
+ * Copyright 2008-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.repository.dao.jdbc;
 
+import org.springframework.batch.infrastructure.support.DatabaseType;
 import java.util.Map;
 
 import org.jspecify.annotations.Nullable;
@@ -49,8 +50,8 @@ class JdbcExecutionContextDaoTests {
 	@BeforeEach
 	void setup() throws Exception {
 		EmbeddedDatabase database = new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2)
-			.addScript("/org/springframework/batch/core/schema-drop-h2.sql")
-			.addScript("/org/springframework/batch/core/schema-h2.sql")
+			.addScript(DatabaseType.H2.getProductSchemaDrop())
+			.addScript(DatabaseType.H2.getProductSchema())
 			.build();
 		jdbcTemplate = new JdbcTemplate(database);
 
