@@ -10,6 +10,7 @@ Spring Batch 6.1 includes the following features and improvements:
 * xref:whatsnew.adoc#default-conversion-service-based-on-defaultformattingconversionservice[Default conversion service based on `DefaultFormattingConversionService`]
 * xref:whatsnew.adoc#async-processing-apis-and-local-chunking-moved-to-core[Async processing APIs and local chunking moved to `spring-batch-core`]
 * xref:whatsnew.adoc#flushing-support-in-repositoryitemwriter[Flushing support in `RepositoryItemWriter`]
+* xref:whatsnew.adoc#location-patterns-in-multiresourceitemreaderbuilder[Location patterns in `MultiResourceItemReaderBuilder`]
 * xref:whatsnew.adoc#deprecations[Deprecations]
 
 [[dependencies-upgrade]]
@@ -149,6 +150,41 @@ public class FlushingRepositoryItemWriter<T> extends RepositoryItemWriter<T> {
 For more details, please refer to the
 xref:readers-and-writers/item-reader-writer-implementations.adoc#repositoryItemWriter[`RepositoryItemWriter`]
 section.
+
+[[location-patterns-in-multiresourceitemreaderbuilder]]
+== Location patterns in `MultiResourceItemReaderBuilder`
+
+`MultiResourceItemReaderBuilder` now accepts resource location patterns directly, so
+resources no longer need to be resolved and injected before configuring the reader:
+
+[source, java]
+----
+// before
+@Bean
+public MultiResourceItemReader<Foo> multiResourceReader() throws IOException {
+	PathMatchingResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
+	Resource[] resources = resourcePatternResolver.getResources("classpath:data/input/file-*.txt");
+	return new MultiResourceItemReaderBuilder<Foo>()
+					.delegate(flatFileItemReader())
+					.resources(resources)
+					.build();
+}
+
+// after
+@Bean
+public MultiResourceItemReader<Foo> multiResourceReader() {
+	return new MultiResourceItemReaderBuilder<Foo>()
+					.delegate(flatFileItemReader())
+					.resources("classpath:data/input/file-*.txt")
+					.build();
+}
+----
+
+Each pattern is resolved with a `PathMatchingResourcePatternResolver`, so any resource
+prefix supported by Spring (`file:`, `classpath:`, `classpath*:`, and so on) can be used,
+in addition to Ant-style wildcards (`*`, `**`, and `?`). For more details, please refer to
+the xref:readers-and-writers/multi-file-input.adoc#multiFileInputLocationPatterns[Specifying
+Resources With a Location Pattern] section.
 
 [[deprecations]]
 == Deprecations

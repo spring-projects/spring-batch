@@ -82,18 +82,18 @@ class MultiResourceItemReaderBuilderTests extends AbstractItemStreamItemReaderTe
 	void testNullResources() {
 		Exception exception = assertThrows(IllegalArgumentException.class,
 				() -> new MultiResourceItemReaderBuilder<String>().delegate(mock(FlatFileItemReader.class)).build());
-		assertEquals("resources array or filesPattern is required.", exception.getMessage());
+		assertEquals("resources array is required.", exception.getMessage());
 	}
 
 	@Test
-	void testFilesPattern() throws Exception {
+	void testResourcesFromLocationPattern() throws Exception {
 		FlatFileItemReader<String> delegate = new FlatFileItemReaderBuilder<String>().name("textReader")
 			.lineMapper(new PassThroughLineMapper())
 			.build();
 
 		String basePath = new ClassPathResource("", this.getClass()).getFile().getPath();
 		MultiResourceItemReader<String> reader = new MultiResourceItemReaderBuilder<String>().delegate(delegate)
-			.filesPattern(basePath + "/test?.txt")
+			.resources("file:" + basePath + "/test?.txt")
 			.name("multiFileReader")
 			.build();
 

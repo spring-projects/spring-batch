@@ -17,7 +17,9 @@
 package org.springframework.batch.infrastructure.item.file.builder;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 
 import org.jspecify.annotations.Nullable;
 
@@ -47,8 +49,6 @@ public class MultiResourceItemReaderBuilder<T> {
 	private @Nullable ResourceAwareItemReaderItemStream<? extends T> delegate;
 
 	private Resource @Nullable [] resources;
-
-	private @Nullable String filesPattern;
 
 	private boolean strict = false;
 
@@ -98,14 +98,29 @@ public class MultiResourceItemReaderBuilder<T> {
 	}
 
 	/**
-	 * The location pattern of files that the {@link MultiResourceItemReader} will use to
-	 * retrieve items. This is an Ant-style pattern that supports wildcards like `*`, `**`
-	 * and `?`(for example `/data/*.csv`or `data/**\/user?.txt`).
-	 * @param filesPattern the location pattern of files to use.
+	 * The location patterns of resources that the {@link MultiResourceItemReader} will
+	 * use to retrieve items. Each pattern is resolved through a
+	 * {@link PathMatchingResourcePatternResolver}, so it can use any resource prefix
+	 * supported by Spring (for example {@code file:}, {@code classpath:} or
+	 * {@code classpath*:}) combined with Ant-style wildcards like {@code *}, {@code **}
+	 * and {@code ?} (for example {@code file:/data/*.csv} or
+	 * {@code classpath*:data/**&#47;user?.txt}).
+	 * @param locationPatterns the location patterns of resources to use.
 	 * @return this instance for method chaining.
+	 * @since 6.1.0
 	 */
-	public MultiResourceItemReaderBuilder<T> filesPattern(String filesPattern) {
-		this.filesPattern = filesPattern;
+	public MultiResourceItemReaderBuilder<T> resources(String... locationPatterns) {
+		ResourcePatternResolver patternResolver = new PathMatchingResourcePatternResolver();
+		List<Resource> resolvedResources = new ArrayList<>();
+		for (String locationPattern : locationPatterns) {
+			try {
+				resolvedResources.addAll(List.of(patternResolver.getResources(locationPattern)));
+			}
+			catch (IOException e) {
+				throw new IllegalArgumentException("Unable to resolve resources for pattern " + locationPattern, e);
+			}
+		}
+		this.resources = resolvedResources.toArray(new Resource[0]);
 
 		return this;
 	}
@@ -172,31 +187,14 @@ public class MultiResourceItemReaderBuilder<T> {
 	 * @return a {@link MultiResourceItemReader}
 	 */
 	public MultiResourceItemReader<T> build() {
-		Assert.isTrue(this.resources != null || this.filesPattern != null,
-				"resources array or filesPattern is required.");
-
+		Assert.notNull(this.resources, "resources array is required.");
 		Assert.notNull(this.delegate, "delegate is required.");
 		if (this.saveState) {
 			Assert.state(StringUtils.hasText(this.name), "A name is required when saveState is set to true.");
 		}
 
 		MultiResourceItemReader<T> reader = new MultiResourceItemReader<>(this.delegate);
-
-		if (this.resources != null) {
-			reader.setResources(this.resources);
-		}
-		else if (this.filesPattern != null) {
-			ResourcePatternResolver patternResolver = new PathMatchingResourcePatternResolver();
-			try {
-				Resource[] resources = patternResolver.getResources("file:" + this.filesPattern);
-				reader.setResources(resources);
-			}
-			catch (IOException e) {
-				throw new IllegalArgumentException("Unable to initialize resources by the pattern " + this.filesPattern,
-						e);
-			}
-		}
-
+		reader.setResources(this.resources);
 		reader.setSaveState(this.saveState);
 		reader.setStrict(this.strict);
 
