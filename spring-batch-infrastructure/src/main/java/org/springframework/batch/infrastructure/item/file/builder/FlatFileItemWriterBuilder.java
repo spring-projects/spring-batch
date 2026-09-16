@@ -267,10 +267,10 @@ public class FlatFileItemWriterBuilder<T> {
 
 	/**
 	 * Configure a {@link DelimitedSpec} using a lambda.
-	 * @return the current builder instance
+	 * @return a stage that prevents calling formatted()
 	 * @since 6.0
 	 */
-	public FlatFileItemWriterBuilder<T> delimited(Consumer<DelimitedSpec<T>> config) {
+	public DelimitedStage<T> delimited(Consumer<DelimitedSpec<T>> config) {
 		DelimitedSpecImpl<T> spec = new DelimitedSpecImpl<>();
 		config.accept(spec);
 
@@ -286,7 +286,7 @@ public class FlatFileItemWriterBuilder<T> {
 		if (!spec.names.isEmpty()) {
 			builder.names(spec.names.toArray(new String[0]));
 		}
-		return this;
+		return new DelimitedStageImpl<>(this);
 	}
 
 	/**
@@ -304,10 +304,10 @@ public class FlatFileItemWriterBuilder<T> {
 
 	/**
 	 * Configure a {@link FormattedSpec} using a lambda.
-	 * @return the current builder instance
+	 * @return a stage that prevents calling delimited()
 	 * @since 6.0
 	 */
-	public FlatFileItemWriterBuilder<T> formatted(Consumer<FormattedSpec<T>> config) {
+	public FormattedStage<T> formatted(Consumer<FormattedSpec<T>> config) {
 		FormattedSpecImpl<T> spec = new FormattedSpecImpl<>();
 		config.accept(spec);
 
@@ -327,7 +327,7 @@ public class FlatFileItemWriterBuilder<T> {
 		if (!spec.names.isEmpty()) {
 			builder.names(spec.names.toArray(new String[0]));
 		}
-		return this;
+		return new FormattedStageImpl<>(this);
 	}
 
 	/**
@@ -416,11 +416,11 @@ public class FlatFileItemWriterBuilder<T> {
 		/**
 		 * Set the {@link FieldExtractor} to use to extract fields from each item.
 		 * @param fieldExtractor to use to extract fields from each item
-		 * @return The current instance of the builder
+		 * @return A stage that prevents calling delimited()
 		 */
-		public FlatFileItemWriterBuilder<T> fieldExtractor(FieldExtractor<T> fieldExtractor) {
+		public FormattedStage<T> fieldExtractor(FieldExtractor<T> fieldExtractor) {
 			this.fieldExtractor = fieldExtractor;
-			return this.parent;
+			return new FormattedStageImpl<>(this.parent);
 		}
 
 		/**
@@ -429,12 +429,12 @@ public class FlatFileItemWriterBuilder<T> {
 		 * {@link BeanWrapperFieldExtractor} only if no explicit field extractor is set
 		 * via {@link FormattedBuilder#fieldExtractor(FieldExtractor)}.
 		 * @param names names of each field
-		 * @return The parent {@link FlatFileItemWriterBuilder}
+		 * @return A stage that prevents calling delimited()
 		 * @see BeanWrapperFieldExtractor#setNames(String[])
 		 */
-		public FlatFileItemWriterBuilder<T> names(String... names) {
+		public FormattedStage<T> names(String... names) {
 			this.names.addAll(Arrays.asList(names));
-			return this.parent;
+			return new FormattedStageImpl<>(this.parent);
 		}
 
 		public FormatterLineAggregator<T> build() {
@@ -539,22 +539,22 @@ public class FlatFileItemWriterBuilder<T> {
 		 * {@link BeanWrapperFieldExtractor} only if no explicit field extractor is set
 		 * via {@link DelimitedBuilder#fieldExtractor(FieldExtractor)}.
 		 * @param names names of each field
-		 * @return The parent {@link FlatFileItemWriterBuilder}
+		 * @return A stage that prevents calling formatted()
 		 * @see BeanWrapperFieldExtractor#setNames(String[])
 		 */
-		public FlatFileItemWriterBuilder<T> names(String... names) {
+		public DelimitedStage<T> names(String... names) {
 			this.names.addAll(Arrays.asList(names));
-			return this.parent;
+			return new DelimitedStageImpl<>(this.parent);
 		}
 
 		/**
 		 * Set the {@link FieldExtractor} to use to extract fields from each item.
 		 * @param fieldExtractor to use to extract fields from each item
-		 * @return The parent {@link FlatFileItemWriterBuilder}
+		 * @return A stage that prevents calling formatted()
 		 */
-		public FlatFileItemWriterBuilder<T> fieldExtractor(FieldExtractor<T> fieldExtractor) {
+		public DelimitedStage<T> fieldExtractor(FieldExtractor<T> fieldExtractor) {
 			this.fieldExtractor = fieldExtractor;
-			return this.parent;
+			return new DelimitedStageImpl<>(this.parent);
 		}
 
 		public DelimitedLineAggregator<T> build() {
@@ -642,6 +642,500 @@ public class FlatFileItemWriterBuilder<T> {
 		writer.setTransactional(this.transactional);
 
 		return writer;
+	}
+
+	/**
+	 * Stage reached once a delimited {@link LineAggregator} has been configured (via
+	 * {@link #delimited()} or {@link #delimited(Consumer)}). It exposes the common
+	 * configuration methods of {@link FlatFileItemWriterBuilder}, but not
+	 * {@link #formatted()} or {@link #formatted(Consumer)}, preventing a delimited and a
+	 * formatted line aggregator from being configured on the same builder instance.
+	 *
+	 * @param <T> the type of object to write
+	 * @since 6.1
+	 */
+	public interface DelimitedStage<T> {
+
+		/**
+		 * Configure if the state of the {@link ItemStreamSupport} should be persisted
+		 * within the {@link ExecutionContext} for restart purposes.
+		 * @param saveState defaults to true
+		 * @return The current instance of the stage.
+		 */
+		DelimitedStage<T> saveState(boolean saveState);
+
+		/**
+		 * The name used to calculate the key within the {@link ExecutionContext}.
+		 * Required if {@link #saveState(boolean)} is set to true.
+		 * @param name name of the writer instance
+		 * @return The current instance of the stage.
+		 * @see ItemStreamSupport#setName(String)
+		 */
+		DelimitedStage<T> name(String name);
+
+		/**
+		 * The {@link WritableResource} to be used as output.
+		 * @param resource the output of the writer.
+		 * @return The current instance of the stage.
+		 * @see FlatFileItemWriter#setResource(WritableResource)
+		 */
+		DelimitedStage<T> resource(WritableResource resource);
+
+		/**
+		 * A flag indicating that changes should be force-synced to disk on flush.
+		 * Defaults to false.
+		 * @param forceSync value to set the flag to
+		 * @return The current instance of the stage.
+		 * @see FlatFileItemWriter#setForceSync(boolean)
+		 */
+		DelimitedStage<T> forceSync(boolean forceSync);
+
+		/**
+		 * String used to separate lines in output. Defaults to the System property
+		 * line.separator.
+		 * @param lineSeparator value to use for a line separator
+		 * @return The current instance of the stage.
+		 * @see FlatFileItemWriter#setLineSeparator(String)
+		 */
+		DelimitedStage<T> lineSeparator(String lineSeparator);
+
+		/**
+		 * Line aggregator used to build the String version of each item.
+		 * @param lineAggregator {@link LineAggregator} implementation
+		 * @return The current instance of the stage.
+		 */
+		DelimitedStage<T> lineAggregator(LineAggregator<T> lineAggregator);
+
+		/**
+		 * Encoding used for output.
+		 * @param encoding encoding type.
+		 * @return The current instance of the stage.
+		 * @see FlatFileItemWriter#setEncoding(String)
+		 */
+		DelimitedStage<T> encoding(String encoding);
+
+		/**
+		 * If set to true, once the step is complete, if the resource previously provided
+		 * is empty, it will be deleted.
+		 * @param shouldDelete defaults to false
+		 * @return The current instance of the stage.
+		 * @see FlatFileItemWriter#setShouldDeleteIfEmpty(boolean)
+		 */
+		DelimitedStage<T> shouldDeleteIfEmpty(boolean shouldDelete);
+
+		/**
+		 * If set to true, upon the start of the step, if the resource already exists, it
+		 * will be deleted and recreated.
+		 * @param shouldDelete defaults to true
+		 * @return The current instance of the stage.
+		 * @see FlatFileItemWriter#setShouldDeleteIfExists(boolean)
+		 */
+		DelimitedStage<T> shouldDeleteIfExists(boolean shouldDelete);
+
+		/**
+		 * If set to true and the file exists, the output will be appended to the existing
+		 * file.
+		 * @param append defaults to false
+		 * @return The current instance of the stage.
+		 * @see FlatFileItemWriter#setAppendAllowed(boolean)
+		 */
+		DelimitedStage<T> append(boolean append);
+
+		/**
+		 * A callback for header processing.
+		 * @param callback {@link FlatFileHeaderCallback} impl
+		 * @return The current instance of the stage.
+		 * @see FlatFileItemWriter#setHeaderCallback(FlatFileHeaderCallback)
+		 */
+		DelimitedStage<T> headerCallback(FlatFileHeaderCallback callback);
+
+		/**
+		 * A callback for footer processing.
+		 * @param callback {@link FlatFileFooterCallback} impl
+		 * @return The current instance of the stage.
+		 * @see FlatFileItemWriter#setFooterCallback(FlatFileFooterCallback)
+		 */
+		DelimitedStage<T> footerCallback(FlatFileFooterCallback callback);
+
+		/**
+		 * If set to true, the flushing of the buffer is delayed while a transaction is
+		 * active.
+		 * @param transactional defaults to true
+		 * @return The current instance of the stage.
+		 * @see FlatFileItemWriter#setTransactional(boolean)
+		 */
+		DelimitedStage<T> transactional(boolean transactional);
+
+		/**
+		 * Returns an instance of a {@link DelimitedBuilder} for building a
+		 * {@link DelimitedLineAggregator}.
+		 * @return a {@link DelimitedBuilder}
+		 */
+		DelimitedBuilder<T> delimited();
+
+		/**
+		 * Configure a {@link DelimitedSpec} using a lambda.
+		 * @param config the lambda used to configure the {@link DelimitedSpec}
+		 * @return The current instance of the stage.
+		 */
+		DelimitedStage<T> delimited(Consumer<DelimitedSpec<T>> config);
+
+		/**
+		 * Validates and builds a {@link FlatFileItemWriter}.
+		 * @return a {@link FlatFileItemWriter}
+		 */
+		FlatFileItemWriter<T> build();
+
+	}
+
+	/**
+	 * Stage reached once a formatted {@link LineAggregator} has been configured (via
+	 * {@link #formatted()} or {@link #formatted(Consumer)}). It exposes the common
+	 * configuration methods of {@link FlatFileItemWriterBuilder}, but not
+	 * {@link #delimited()} or {@link #delimited(Consumer)}, preventing a delimited and a
+	 * formatted line aggregator from being configured on the same builder instance.
+	 *
+	 * @param <T> the type of object to write
+	 * @since 6.1
+	 */
+	public interface FormattedStage<T> {
+
+		/**
+		 * Configure if the state of the {@link ItemStreamSupport} should be persisted
+		 * within the {@link ExecutionContext} for restart purposes.
+		 * @param saveState defaults to true
+		 * @return The current instance of the stage.
+		 */
+		FormattedStage<T> saveState(boolean saveState);
+
+		/**
+		 * The name used to calculate the key within the {@link ExecutionContext}.
+		 * Required if {@link #saveState(boolean)} is set to true.
+		 * @param name name of the writer instance
+		 * @return The current instance of the stage.
+		 * @see ItemStreamSupport#setName(String)
+		 */
+		FormattedStage<T> name(String name);
+
+		/**
+		 * The {@link WritableResource} to be used as output.
+		 * @param resource the output of the writer.
+		 * @return The current instance of the stage.
+		 * @see FlatFileItemWriter#setResource(WritableResource)
+		 */
+		FormattedStage<T> resource(WritableResource resource);
+
+		/**
+		 * A flag indicating that changes should be force-synced to disk on flush.
+		 * Defaults to false.
+		 * @param forceSync value to set the flag to
+		 * @return The current instance of the stage.
+		 * @see FlatFileItemWriter#setForceSync(boolean)
+		 */
+		FormattedStage<T> forceSync(boolean forceSync);
+
+		/**
+		 * String used to separate lines in output. Defaults to the System property
+		 * line.separator.
+		 * @param lineSeparator value to use for a line separator
+		 * @return The current instance of the stage.
+		 * @see FlatFileItemWriter#setLineSeparator(String)
+		 */
+		FormattedStage<T> lineSeparator(String lineSeparator);
+
+		/**
+		 * Line aggregator used to build the String version of each item.
+		 * @param lineAggregator {@link LineAggregator} implementation
+		 * @return The current instance of the stage.
+		 */
+		FormattedStage<T> lineAggregator(LineAggregator<T> lineAggregator);
+
+		/**
+		 * Encoding used for output.
+		 * @param encoding encoding type.
+		 * @return The current instance of the stage.
+		 * @see FlatFileItemWriter#setEncoding(String)
+		 */
+		FormattedStage<T> encoding(String encoding);
+
+		/**
+		 * If set to true, once the step is complete, if the resource previously provided
+		 * is empty, it will be deleted.
+		 * @param shouldDelete defaults to false
+		 * @return The current instance of the stage.
+		 * @see FlatFileItemWriter#setShouldDeleteIfEmpty(boolean)
+		 */
+		FormattedStage<T> shouldDeleteIfEmpty(boolean shouldDelete);
+
+		/**
+		 * If set to true, upon the start of the step, if the resource already exists, it
+		 * will be deleted and recreated.
+		 * @param shouldDelete defaults to true
+		 * @return The current instance of the stage.
+		 * @see FlatFileItemWriter#setShouldDeleteIfExists(boolean)
+		 */
+		FormattedStage<T> shouldDeleteIfExists(boolean shouldDelete);
+
+		/**
+		 * If set to true and the file exists, the output will be appended to the existing
+		 * file.
+		 * @param append defaults to false
+		 * @return The current instance of the stage.
+		 * @see FlatFileItemWriter#setAppendAllowed(boolean)
+		 */
+		FormattedStage<T> append(boolean append);
+
+		/**
+		 * A callback for header processing.
+		 * @param callback {@link FlatFileHeaderCallback} impl
+		 * @return The current instance of the stage.
+		 * @see FlatFileItemWriter#setHeaderCallback(FlatFileHeaderCallback)
+		 */
+		FormattedStage<T> headerCallback(FlatFileHeaderCallback callback);
+
+		/**
+		 * A callback for footer processing.
+		 * @param callback {@link FlatFileFooterCallback} impl
+		 * @return The current instance of the stage.
+		 * @see FlatFileItemWriter#setFooterCallback(FlatFileFooterCallback)
+		 */
+		FormattedStage<T> footerCallback(FlatFileFooterCallback callback);
+
+		/**
+		 * If set to true, the flushing of the buffer is delayed while a transaction is
+		 * active.
+		 * @param transactional defaults to true
+		 * @return The current instance of the stage.
+		 * @see FlatFileItemWriter#setTransactional(boolean)
+		 */
+		FormattedStage<T> transactional(boolean transactional);
+
+		/**
+		 * Returns an instance of a {@link FormattedBuilder} for building a
+		 * {@link FormatterLineAggregator}.
+		 * @return a {@link FormattedBuilder}
+		 */
+		FormattedBuilder<T> formatted();
+
+		/**
+		 * Configure a {@link FormattedSpec} using a lambda.
+		 * @param config the lambda used to configure the {@link FormattedSpec}
+		 * @return The current instance of the stage.
+		 */
+		FormattedStage<T> formatted(Consumer<FormattedSpec<T>> config);
+
+		/**
+		 * Validates and builds a {@link FlatFileItemWriter}.
+		 * @return a {@link FlatFileItemWriter}
+		 */
+		FlatFileItemWriter<T> build();
+
+	}
+
+	private static class DelimitedStageImpl<T> implements DelimitedStage<T> {
+
+		private final FlatFileItemWriterBuilder<T> parent;
+
+		private DelimitedStageImpl(FlatFileItemWriterBuilder<T> parent) {
+			this.parent = parent;
+		}
+
+		@Override
+		public DelimitedStage<T> saveState(boolean saveState) {
+			this.parent.saveState(saveState);
+			return this;
+		}
+
+		@Override
+		public DelimitedStage<T> name(String name) {
+			this.parent.name(name);
+			return this;
+		}
+
+		@Override
+		public DelimitedStage<T> resource(WritableResource resource) {
+			this.parent.resource(resource);
+			return this;
+		}
+
+		@Override
+		public DelimitedStage<T> forceSync(boolean forceSync) {
+			this.parent.forceSync(forceSync);
+			return this;
+		}
+
+		@Override
+		public DelimitedStage<T> lineSeparator(String lineSeparator) {
+			this.parent.lineSeparator(lineSeparator);
+			return this;
+		}
+
+		@Override
+		public DelimitedStage<T> lineAggregator(LineAggregator<T> lineAggregator) {
+			this.parent.lineAggregator(lineAggregator);
+			return this;
+		}
+
+		@Override
+		public DelimitedStage<T> encoding(String encoding) {
+			this.parent.encoding(encoding);
+			return this;
+		}
+
+		@Override
+		public DelimitedStage<T> shouldDeleteIfEmpty(boolean shouldDelete) {
+			this.parent.shouldDeleteIfEmpty(shouldDelete);
+			return this;
+		}
+
+		@Override
+		public DelimitedStage<T> shouldDeleteIfExists(boolean shouldDelete) {
+			this.parent.shouldDeleteIfExists(shouldDelete);
+			return this;
+		}
+
+		@Override
+		public DelimitedStage<T> append(boolean append) {
+			this.parent.append(append);
+			return this;
+		}
+
+		@Override
+		public DelimitedStage<T> headerCallback(FlatFileHeaderCallback callback) {
+			this.parent.headerCallback(callback);
+			return this;
+		}
+
+		@Override
+		public DelimitedStage<T> footerCallback(FlatFileFooterCallback callback) {
+			this.parent.footerCallback(callback);
+			return this;
+		}
+
+		@Override
+		public DelimitedStage<T> transactional(boolean transactional) {
+			this.parent.transactional(transactional);
+			return this;
+		}
+
+		@Override
+		public DelimitedBuilder<T> delimited() {
+			return this.parent.delimited();
+		}
+
+		@Override
+		public DelimitedStage<T> delimited(Consumer<DelimitedSpec<T>> config) {
+			return this.parent.delimited(config);
+		}
+
+		@Override
+		public FlatFileItemWriter<T> build() {
+			return this.parent.build();
+		}
+
+	}
+
+	private static class FormattedStageImpl<T> implements FormattedStage<T> {
+
+		private final FlatFileItemWriterBuilder<T> parent;
+
+		private FormattedStageImpl(FlatFileItemWriterBuilder<T> parent) {
+			this.parent = parent;
+		}
+
+		@Override
+		public FormattedStage<T> saveState(boolean saveState) {
+			this.parent.saveState(saveState);
+			return this;
+		}
+
+		@Override
+		public FormattedStage<T> name(String name) {
+			this.parent.name(name);
+			return this;
+		}
+
+		@Override
+		public FormattedStage<T> resource(WritableResource resource) {
+			this.parent.resource(resource);
+			return this;
+		}
+
+		@Override
+		public FormattedStage<T> forceSync(boolean forceSync) {
+			this.parent.forceSync(forceSync);
+			return this;
+		}
+
+		@Override
+		public FormattedStage<T> lineSeparator(String lineSeparator) {
+			this.parent.lineSeparator(lineSeparator);
+			return this;
+		}
+
+		@Override
+		public FormattedStage<T> lineAggregator(LineAggregator<T> lineAggregator) {
+			this.parent.lineAggregator(lineAggregator);
+			return this;
+		}
+
+		@Override
+		public FormattedStage<T> encoding(String encoding) {
+			this.parent.encoding(encoding);
+			return this;
+		}
+
+		@Override
+		public FormattedStage<T> shouldDeleteIfEmpty(boolean shouldDelete) {
+			this.parent.shouldDeleteIfEmpty(shouldDelete);
+			return this;
+		}
+
+		@Override
+		public FormattedStage<T> shouldDeleteIfExists(boolean shouldDelete) {
+			this.parent.shouldDeleteIfExists(shouldDelete);
+			return this;
+		}
+
+		@Override
+		public FormattedStage<T> append(boolean append) {
+			this.parent.append(append);
+			return this;
+		}
+
+		@Override
+		public FormattedStage<T> headerCallback(FlatFileHeaderCallback callback) {
+			this.parent.headerCallback(callback);
+			return this;
+		}
+
+		@Override
+		public FormattedStage<T> footerCallback(FlatFileFooterCallback callback) {
+			this.parent.footerCallback(callback);
+			return this;
+		}
+
+		@Override
+		public FormattedStage<T> transactional(boolean transactional) {
+			this.parent.transactional(transactional);
+			return this;
+		}
+
+		@Override
+		public FormattedBuilder<T> formatted() {
+			return this.parent.formatted();
+		}
+
+		@Override
+		public FormattedStage<T> formatted(Consumer<FormattedSpec<T>> config) {
+			return this.parent.formatted(config);
+		}
+
+		@Override
+		public FlatFileItemWriter<T> build() {
+			return this.parent.build();
+		}
+
 	}
 
 	/**
