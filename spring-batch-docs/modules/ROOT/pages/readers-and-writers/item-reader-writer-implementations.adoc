@@ -262,6 +262,7 @@ Spring Batch offers the following specialized readers:
 * xref:readers-and-writers/item-reader-writer-implementations.adoc#ldifReader[`LdifReader`]
 * xref:readers-and-writers/item-reader-writer-implementations.adoc#mappingLdifReader[`MappingLdifReader`]
 * xref:readers-and-writers/item-reader-writer-implementations.adoc#avroItemReader[`AvroItemReader`]
+* xref:readers-and-writers/item-reader-writer-implementations.adoc#resourcesItemReader[`ResourcesItemReader`]
 
 [[ldifReader]]
 === `LdifReader`
@@ -283,6 +284,27 @@ The `AvroItemReader` reads serialized Avro data from a Resource.
 Each read returns an instance of the type specified by a Java class or Avro Schema.
 The reader may be optionally configured  for input that embeds an Avro schema or not.
 Spring Batch provides an `AvroItemReaderBuilder` to construct an instance of the `AvroItemReader`.
+
+[[resourcesItemReader]]
+=== `ResourcesItemReader`
+The `ResourcesItemReader` serves up `Resource` items themselves, instead of their
+content, one `Resource` per `read`. It is typically used as the reader of a step that
+processes each matching resource individually (for example, an archiving or file-moving
+step). Spring Batch provides a `ResourcesItemReaderBuilder` to construct an instance of
+the `ResourcesItemReader`, which can resolve resources directly from one or more location
+patterns:
+
+[source, java]
+----
+ResourcesItemReader reader = new ResourcesItemReaderBuilder()
+				.resources("file:/data/inputs/*.csv")
+				.name("resourcesReader")
+				.build();
+----
+
+Each pattern is resolved with a `PathMatchingResourcePatternResolver`, so any resource
+prefix supported by Spring (`file:`, `classpath:`, `classpath*:`, and so on) can be used,
+in addition to Ant-style wildcards (`*`, `**`, and `?`).
 
 [[specializedWriters]]
 == Specialized Writers

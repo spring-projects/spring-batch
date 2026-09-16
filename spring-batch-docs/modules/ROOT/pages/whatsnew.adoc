@@ -11,6 +11,7 @@ Spring Batch 6.1 includes the following features and improvements:
 * xref:whatsnew.adoc#async-processing-apis-and-local-chunking-moved-to-core[Async processing APIs and local chunking moved to `spring-batch-core`]
 * xref:whatsnew.adoc#flushing-support-in-repositoryitemwriter[Flushing support in `RepositoryItemWriter`]
 * xref:whatsnew.adoc#location-patterns-in-multiresourceitemreaderbuilder[Location patterns in `MultiResourceItemReaderBuilder`]
+* xref:whatsnew.adoc#new-resourcesitemreaderbuilder[New `ResourcesItemReaderBuilder`]
 * xref:whatsnew.adoc#deprecations[Deprecations]
 
 [[dependencies-upgrade]]
@@ -185,6 +186,32 @@ prefix supported by Spring (`file:`, `classpath:`, `classpath*:`, and so on) can
 in addition to Ant-style wildcards (`*`, `**`, and `?`). For more details, please refer to
 the xref:readers-and-writers/multi-file-input.adoc#multiFileInputLocationPatterns[Specifying
 Resources With a Location Pattern] section.
+
+[[new-resourcesitemreaderbuilder]]
+== New `ResourcesItemReaderBuilder`
+
+This release introduces a builder for `ResourcesItemReader`, called `ResourcesItemReaderBuilder`.
+Like `MultiResourceItemReaderBuilder`, it can resolve resources directly from one
+or more location patterns:
+
+[source, java]
+----
+// before
+PathMatchingResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
+ResourcesItemReader reader = new ResourcesItemReader();
+reader.setResources(resourcePatternResolver.getResources("file:/data/inputs/*.csv"));
+reader.setName("resourcesReader");
+
+// after
+ResourcesItemReader reader = new ResourcesItemReaderBuilder()
+				.resources("file:/data/inputs/*.csv")
+				.name("resourcesReader")
+				.build();
+----
+
+For more details, please refer to the
+xref:readers-and-writers/item-reader-writer-implementations.adoc#resourcesItemReader[`ResourcesItemReader`]
+section.
 
 [[deprecations]]
 == Deprecations

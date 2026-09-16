@@ -53,10 +53,10 @@ class ResourcesItemReaderBuilderTests {
 	}
 
 	@Test
-	void testFilesPattern() throws Exception {
+	void testResourcesFromLocationPattern() throws Exception {
 		String basePath = new ClassPathResource("", this.getClass()).getFile().getPath();
 
-		ResourcesItemReader reader = new ResourcesItemReaderBuilder().filesPattern(basePath + "/resource?.txt")
+		ResourcesItemReader reader = new ResourcesItemReaderBuilder().resources("file:" + basePath + "/resource?.txt")
 			.name("resourcesReader")
 			.build();
 
@@ -84,10 +84,10 @@ class ResourcesItemReaderBuilderTests {
 	}
 
 	@Test
-	void testMissingResourcesAndFilesPattern() {
+	void testMissingResources() {
 		Exception exception = assertThrows(IllegalArgumentException.class,
 				() -> new ResourcesItemReaderBuilder().build());
-		assertEquals("resources array or filesPattern is required.", exception.getMessage());
+		assertEquals("resources array is required.", exception.getMessage());
 	}
 
 }
