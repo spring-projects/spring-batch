@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -96,9 +97,9 @@ public class FlatFileItemReaderBuilder<T> {
 
 	private @Nullable LineTokenizer lineTokenizer;
 
-	private @Nullable DelimitedBuilder<T> delimitedBuilder;
+	private @Nullable DelimitedBuilder<T, ?> delimitedBuilder;
 
-	private @Nullable FixedLengthBuilder<T> fixedLengthBuilder;
+	private @Nullable FixedLengthBuilder<T, ?> fixedLengthBuilder;
 
 	private @Nullable Class<T> targetType;
 
@@ -336,9 +337,13 @@ public class FlatFileItemReaderBuilder<T> {
 	 * @see DefaultLineMapper#setLineTokenizer(LineTokenizer)
 	 */
 	public FlatFileItemReaderBuilder<T> lineTokenizer(LineTokenizer tokenizer) {
+		return lineTokenizer(tokenizer, () -> this);
+	}
+
+	private <R> R lineTokenizer(LineTokenizer tokenizer, Supplier<R> stage) {
 		this.tokenizerValidator = this.tokenizerValidator.flipBit(0);
 		this.lineTokenizer = tokenizer;
-		return this;
+		return stage.get();
 	}
 
 	/**
@@ -349,10 +354,15 @@ public class FlatFileItemReaderBuilder<T> {
 	 * @return a {@link DelimitedBuilder}
 	 *
 	 */
-	public DelimitedBuilder<T> delimited() {
-		this.delimitedBuilder = new DelimitedBuilder<>(this);
+	public DelimitedBuilder<T, FlatFileItemReaderBuilder<T>> delimited() {
+		return delimited(() -> this);
+	}
+
+	private <R> DelimitedBuilder<T, R> delimited(Supplier<R> stage) {
+		DelimitedBuilder<T, R> builder = new DelimitedBuilder<>(stage);
+		this.delimitedBuilder = builder;
 		this.tokenizerValidator = this.tokenizerValidator.flipBit(1);
-		return this.delimitedBuilder;
+		return builder;
 	}
 
 	/**
@@ -361,10 +371,14 @@ public class FlatFileItemReaderBuilder<T> {
 	 * @since 6.0
 	 */
 	public FlatFileItemReaderBuilder<T> delimited(Consumer<DelimitedSpec<T>> config) {
+		return delimited(config, () -> this);
+	}
+
+	private <R> R delimited(Consumer<DelimitedSpec<T>> config, Supplier<R> stage) {
 		DelimitedSpecImpl<T> spec = new DelimitedSpecImpl<>();
 		config.accept(spec);
 
-		DelimitedBuilder<T> builder = this.delimited();
+		DelimitedBuilder<T, R> builder = this.delimited(stage);
 		if (spec.delimiter != null) {
 			builder.delimiter(spec.delimiter);
 		}
@@ -381,7 +395,7 @@ public class FlatFileItemReaderBuilder<T> {
 		builder.fieldSetFactory(spec.fieldSetFactory);
 		builder.strict(spec.strict);
 
-		return this;
+		return stage.get();
 	}
 
 	/**
@@ -391,10 +405,15 @@ public class FlatFileItemReaderBuilder<T> {
 	 * has not been configured.
 	 * @return a {@link FixedLengthBuilder}
 	 */
-	public FixedLengthBuilder<T> fixedLength() {
-		this.fixedLengthBuilder = new FixedLengthBuilder<>(this);
+	public FixedLengthBuilder<T, FlatFileItemReaderBuilder<T>> fixedLength() {
+		return fixedLength(() -> this);
+	}
+
+	private <R> FixedLengthBuilder<T, R> fixedLength(Supplier<R> stage) {
+		FixedLengthBuilder<T, R> builder = new FixedLengthBuilder<>(stage);
+		this.fixedLengthBuilder = builder;
 		this.tokenizerValidator = this.tokenizerValidator.flipBit(2);
-		return this.fixedLengthBuilder;
+		return builder;
 	}
 
 	/**
@@ -403,10 +422,14 @@ public class FlatFileItemReaderBuilder<T> {
 	 * @since 6.0
 	 */
 	public FlatFileItemReaderBuilder<T> fixedLength(Consumer<FixedLengthSpec<T>> config) {
+		return fixedLength(config, () -> this);
+	}
+
+	private <R> R fixedLength(Consumer<FixedLengthSpec<T>> config, Supplier<R> stage) {
 		FixedLengthSpecImpl<T> spec = new FixedLengthSpecImpl<>();
 		config.accept(spec);
 
-		FixedLengthBuilder<T> builder = this.fixedLength();
+		FixedLengthBuilder<T, R> builder = this.fixedLength(stage);
 
 		if (!spec.ranges.isEmpty()) {
 			builder.columns(spec.ranges.toArray(new Range[0]));
@@ -418,7 +441,7 @@ public class FlatFileItemReaderBuilder<T> {
 		builder.fieldSetFactory(spec.fieldSetFactory);
 		builder.strict(spec.strict);
 
-		return this;
+		return stage.get();
 	}
 
 	/**
@@ -600,10 +623,13 @@ public class FlatFileItemReaderBuilder<T> {
 	 * A builder for constructing a {@link DelimitedLineTokenizer}
 	 *
 	 * @param <T> the type of the parent {@link FlatFileItemReaderBuilder}
+	 * @param <R> the type returned once the tokenizer configuration is complete (either
+	 * the {@link FlatFileItemReaderBuilder} itself, or a stage such as
+	 * {@link TargetTypeStage} or {@link FieldSetMapperStage})
 	 */
-	public static class DelimitedBuilder<T> {
+	public static class DelimitedBuilder<T, R> {
 
-		private final FlatFileItemReaderBuilder<T> parent;
+		private final Supplier<R> stage;
 
 		private final List<String> names = new ArrayList<>();
 
@@ -617,8 +643,8 @@ public class FlatFileItemReaderBuilder<T> {
 
 		private boolean strict = true;
 
-		protected DelimitedBuilder(FlatFileItemReaderBuilder<T> parent) {
-			this.parent = parent;
+		protected DelimitedBuilder(Supplier<R> stage) {
+			this.stage = stage;
 		}
 
 		/**
@@ -627,7 +653,7 @@ public class FlatFileItemReaderBuilder<T> {
 		 * @return The instance of the builder for chaining.
 		 * @see DelimitedLineTokenizer#setDelimiter(String)
 		 */
-		public DelimitedBuilder<T> delimiter(String delimiter) {
+		public DelimitedBuilder<T, R> delimiter(String delimiter) {
 			this.delimiter = delimiter;
 			return this;
 		}
@@ -638,7 +664,7 @@ public class FlatFileItemReaderBuilder<T> {
 		 * @return The instance of the builder for chaining.
 		 * @see DelimitedLineTokenizer#setQuoteCharacter(char)
 		 */
-		public DelimitedBuilder<T> quoteCharacter(char quoteCharacter) {
+		public DelimitedBuilder<T, R> quoteCharacter(char quoteCharacter) {
 			this.quoteCharacter = quoteCharacter;
 			return this;
 		}
@@ -649,7 +675,7 @@ public class FlatFileItemReaderBuilder<T> {
 		 * @return The instance of the builder for chaining.
 		 * @see DelimitedLineTokenizer#setIncludedFields(int[])
 		 */
-		public DelimitedBuilder<T> includedFields(Integer... fields) {
+		public DelimitedBuilder<T, R> includedFields(Integer... fields) {
 			this.includedFields.addAll(Arrays.asList(fields));
 			return this;
 		}
@@ -660,7 +686,7 @@ public class FlatFileItemReaderBuilder<T> {
 		 * @return The instance of the builder for chaining.
 		 * @see DelimitedLineTokenizer#setIncludedFields(int[])
 		 */
-		public DelimitedBuilder<T> addIncludedField(int field) {
+		public DelimitedBuilder<T, R> addIncludedField(int field) {
 			this.includedFields.add(field);
 			return this;
 		}
@@ -672,7 +698,7 @@ public class FlatFileItemReaderBuilder<T> {
 		 * @return The instance of the builder for chaining.
 		 * @see DelimitedLineTokenizer#setFieldSetFactory(FieldSetFactory)
 		 */
-		public DelimitedBuilder<T> fieldSetFactory(FieldSetFactory fieldSetFactory) {
+		public DelimitedBuilder<T, R> fieldSetFactory(FieldSetFactory fieldSetFactory) {
 			this.fieldSetFactory = fieldSetFactory;
 			return this;
 		}
@@ -681,12 +707,13 @@ public class FlatFileItemReaderBuilder<T> {
 		 * Names of each of the fields within the fields that are returned in the order
 		 * they occur within the delimited file. Required.
 		 * @param names names of each field
-		 * @return The parent {@link FlatFileItemReaderBuilder}
+		 * @return The parent {@link FlatFileItemReaderBuilder}, or the stage it was
+		 * reached from
 		 * @see DelimitedLineTokenizer#setNames(String[])
 		 */
-		public FlatFileItemReaderBuilder<T> names(String... names) {
+		public R names(String... names) {
 			this.names.addAll(Arrays.asList(names));
-			return this.parent;
+			return this.stage.get();
 		}
 
 		/**
@@ -698,7 +725,7 @@ public class FlatFileItemReaderBuilder<T> {
 		 * @since 5.1
 		 * @param strict the strict flag to set
 		 */
-		public DelimitedBuilder<T> strict(boolean strict) {
+		public DelimitedBuilder<T, R> strict(boolean strict) {
 			this.strict = strict;
 			return this;
 		}
@@ -756,10 +783,13 @@ public class FlatFileItemReaderBuilder<T> {
 	 * A builder for constructing a {@link FixedLengthTokenizer}
 	 *
 	 * @param <T> the type of the parent {@link FlatFileItemReaderBuilder}
+	 * @param <R> the type returned once the tokenizer configuration is complete (either
+	 * the {@link FlatFileItemReaderBuilder} itself, or a stage such as
+	 * {@link TargetTypeStage} or {@link FieldSetMapperStage})
 	 */
-	public static class FixedLengthBuilder<T> {
+	public static class FixedLengthBuilder<T, R> {
 
-		private final FlatFileItemReaderBuilder<T> parent;
+		private final Supplier<R> stage;
 
 		private final List<Range> ranges = new ArrayList<>();
 
@@ -769,8 +799,8 @@ public class FlatFileItemReaderBuilder<T> {
 
 		private FieldSetFactory fieldSetFactory = new DefaultFieldSetFactory();
 
-		protected FixedLengthBuilder(FlatFileItemReaderBuilder<T> parent) {
-			this.parent = parent;
+		protected FixedLengthBuilder(Supplier<R> stage) {
+			this.stage = stage;
 		}
 
 		/**
@@ -779,7 +809,7 @@ public class FlatFileItemReaderBuilder<T> {
 		 * @return This instance for chaining
 		 * @see FixedLengthTokenizer#setColumns(Range[])
 		 */
-		public FixedLengthBuilder<T> columns(Range... ranges) {
+		public FixedLengthBuilder<T, R> columns(Range... ranges) {
 			this.ranges.addAll(Arrays.asList(ranges));
 			return this;
 		}
@@ -790,7 +820,7 @@ public class FlatFileItemReaderBuilder<T> {
 		 * @return This instance for chaining
 		 * @see FixedLengthTokenizer#setColumns(Range[])
 		 */
-		public FixedLengthBuilder<T> addColumns(Range range) {
+		public FixedLengthBuilder<T, R> addColumns(Range range) {
 			this.ranges.add(range);
 			return this;
 		}
@@ -802,7 +832,7 @@ public class FlatFileItemReaderBuilder<T> {
 		 * @return This instance for chaining
 		 * @see FixedLengthTokenizer#setColumns(Range[])
 		 */
-		public FixedLengthBuilder<T> addColumns(Range range, int index) {
+		public FixedLengthBuilder<T, R> addColumns(Range range, int index) {
 			this.ranges.add(index, range);
 			return this;
 		}
@@ -810,12 +840,12 @@ public class FlatFileItemReaderBuilder<T> {
 		/**
 		 * The names of the fields to be parsed from the file. Required.
 		 * @param names names of fields
-		 * @return The parent builder
+		 * @return The parent builder, or the stage it was reached from
 		 * @see FixedLengthTokenizer#setNames(String[])
 		 */
-		public FlatFileItemReaderBuilder<T> names(String... names) {
+		public R names(String... names) {
 			this.names.addAll(Arrays.asList(names));
-			return this.parent;
+			return this.stage.get();
 		}
 
 		/**
@@ -825,7 +855,7 @@ public class FlatFileItemReaderBuilder<T> {
 		 * @return This instance for chaining
 		 * @see FixedLengthTokenizer#setStrict(boolean)
 		 */
-		public FixedLengthBuilder<T> strict(boolean strict) {
+		public FixedLengthBuilder<T, R> strict(boolean strict) {
 			this.strict = strict;
 			return this;
 		}
@@ -837,7 +867,7 @@ public class FlatFileItemReaderBuilder<T> {
 		 * @return The instance of the builder for chaining.
 		 * @see FixedLengthTokenizer#setFieldSetFactory(FieldSetFactory)
 		 */
-		public FixedLengthBuilder<T> fieldSetFactory(FieldSetFactory fieldSetFactory) {
+		public FixedLengthBuilder<T, R> fieldSetFactory(FieldSetFactory fieldSetFactory) {
 			this.fieldSetFactory = fieldSetFactory;
 			return this;
 		}
@@ -1103,6 +1133,8 @@ public class FlatFileItemReaderBuilder<T> {
 	 * Stage interface that prevents calling targetType() after fieldSetMapper() has been
 	 * called. This provides compile-time safety to ensure mutual exclusivity between
 	 * these two methods.
+	 *
+	 * @since 6.1
 	 */
 	public interface FieldSetMapperStage<T> {
 
@@ -1135,6 +1167,27 @@ public class FlatFileItemReaderBuilder<T> {
 		 * @return this instance for method chaining
 		 */
 		FieldSetMapperStage<T> currentItemCount(int currentItemCount);
+
+		/**
+		 * Set the maximum number of physical lines that may be folded into a single
+		 * logical record by the configured {@link RecordSeparatorPolicy}. Defaults to
+		 * {@link FlatFileItemReader#DEFAULT_MAX_LINES_PER_RECORD}.
+		 * @param maxLinesPerRecord maximum number of lines per logical record; must be
+		 * positive.
+		 * @return The current instance of the builder.
+		 * @see FlatFileItemReader#setMaxLinesPerRecord(int)
+		 */
+		FieldSetMapperStage<T> maxLinesPerRecord(int maxLinesPerRecord);
+
+		/**
+		 * Set the maximum character length of a single accumulated logical record.
+		 * Defaults to {@link FlatFileItemReader#DEFAULT_MAX_BYTES_PER_RECORD} (1 MiB).
+		 * @param maxBytesPerRecord maximum character length per logical record; must be
+		 * positive.
+		 * @return The current instance of the builder.
+		 * @see FlatFileItemReader#setMaxBytesPerRecord(int)
+		 */
+		FieldSetMapperStage<T> maxBytesPerRecord(int maxBytesPerRecord);
 
 		/**
 		 * The {@link Resource} to be used as input.
@@ -1180,6 +1233,16 @@ public class FlatFileItemReaderBuilder<T> {
 		FieldSetMapperStage<T> addComment(String comments);
 
 		/**
+		 * Set an array of Strings that indicate lines that are comments (and therefore
+		 * skipped by the reader). This method overrides the default comment prefixes
+		 * which are {@link FlatFileItemReader#DEFAULT_COMMENT_PREFIXES}.
+		 * @param comments an array of strings to identify comments.
+		 * @return The current instance of the builder.
+		 * @see FlatFileItemReader#setComments(String[])
+		 */
+		FieldSetMapperStage<T> comments(String... comments);
+
+		/**
 		 * Configures the {@link RecordSeparatorPolicy} for this reader.
 		 * @param policy the policy to be used
 		 * @return The current instance of the builder.
@@ -1194,6 +1257,40 @@ public class FlatFileItemReaderBuilder<T> {
 		FieldSetMapperStage<T> bufferedReaderFactory(BufferedReaderFactory bufferedReaderFactory);
 
 		/**
+		 * A {@link LineTokenizer} implementation to be used.
+		 * @param tokenizer a {@link LineTokenizer}
+		 * @return The current instance of the builder.
+		 * @see DefaultLineMapper#setLineTokenizer(LineTokenizer)
+		 */
+		FieldSetMapperStage<T> lineTokenizer(LineTokenizer tokenizer);
+
+		/**
+		 * Returns an instance of a {@link DelimitedBuilder} for building a
+		 * {@link DelimitedLineTokenizer}.
+		 * @return a {@link DelimitedBuilder}
+		 */
+		DelimitedBuilder<T, FieldSetMapperStage<T>> delimited();
+
+		/**
+		 * Configure a {@link DelimitedSpec} using a lambda.
+		 * @return the current stage instance
+		 */
+		FieldSetMapperStage<T> delimited(Consumer<DelimitedSpec<T>> config);
+
+		/**
+		 * Returns an instance of a {@link FixedLengthBuilder} for building a
+		 * {@link FixedLengthTokenizer}.
+		 * @return a {@link FixedLengthBuilder}
+		 */
+		FixedLengthBuilder<T, FieldSetMapperStage<T>> fixedLength();
+
+		/**
+		 * Configure a {@link FixedLengthSpec} using a lambda.
+		 * @return the current stage instance
+		 */
+		FieldSetMapperStage<T> fixedLength(Consumer<FixedLengthSpec<T>> config);
+
+		/**
 		 * Builds the {@link FlatFileItemReader}.
 		 * @return a {@link FlatFileItemReader}
 		 */
@@ -1205,6 +1302,8 @@ public class FlatFileItemReaderBuilder<T> {
 	 * Stage interface that prevents calling fieldSetMapper() after targetType() has been
 	 * called. This provides compile-time safety to ensure mutual exclusivity between
 	 * these two methods.
+	 *
+	 * @since 6.1
 	 */
 	public interface TargetTypeStage<T> {
 
@@ -1237,6 +1336,27 @@ public class FlatFileItemReaderBuilder<T> {
 		 * @return this instance for method chaining
 		 */
 		TargetTypeStage<T> currentItemCount(int currentItemCount);
+
+		/**
+		 * Set the maximum number of physical lines that may be folded into a single
+		 * logical record by the configured {@link RecordSeparatorPolicy}. Defaults to
+		 * {@link FlatFileItemReader#DEFAULT_MAX_LINES_PER_RECORD}.
+		 * @param maxLinesPerRecord maximum number of lines per logical record; must be
+		 * positive.
+		 * @return The current instance of the builder.
+		 * @see FlatFileItemReader#setMaxLinesPerRecord(int)
+		 */
+		TargetTypeStage<T> maxLinesPerRecord(int maxLinesPerRecord);
+
+		/**
+		 * Set the maximum character length of a single accumulated logical record.
+		 * Defaults to {@link FlatFileItemReader#DEFAULT_MAX_BYTES_PER_RECORD} (1 MiB).
+		 * @param maxBytesPerRecord maximum character length per logical record; must be
+		 * positive.
+		 * @return The current instance of the builder.
+		 * @see FlatFileItemReader#setMaxBytesPerRecord(int)
+		 */
+		TargetTypeStage<T> maxBytesPerRecord(int maxBytesPerRecord);
 
 		/**
 		 * The {@link Resource} to be used as input.
@@ -1321,6 +1441,16 @@ public class FlatFileItemReaderBuilder<T> {
 		TargetTypeStage<T> addComment(String comments);
 
 		/**
+		 * Set an array of Strings that indicate lines that are comments (and therefore
+		 * skipped by the reader). This method overrides the default comment prefixes
+		 * which are {@link FlatFileItemReader#DEFAULT_COMMENT_PREFIXES}.
+		 * @param comments an array of strings to identify comments.
+		 * @return The current instance of the builder.
+		 * @see FlatFileItemReader#setComments(String[])
+		 */
+		TargetTypeStage<T> comments(String... comments);
+
+		/**
 		 * Configures the {@link RecordSeparatorPolicy} for this reader.
 		 * @param policy the policy to be used
 		 * @return The current instance of the builder.
@@ -1333,6 +1463,40 @@ public class FlatFileItemReaderBuilder<T> {
 		 * @return The current instance of the builder.
 		 */
 		TargetTypeStage<T> bufferedReaderFactory(BufferedReaderFactory bufferedReaderFactory);
+
+		/**
+		 * A {@link LineTokenizer} implementation to be used.
+		 * @param tokenizer a {@link LineTokenizer}
+		 * @return The current instance of the builder.
+		 * @see DefaultLineMapper#setLineTokenizer(LineTokenizer)
+		 */
+		TargetTypeStage<T> lineTokenizer(LineTokenizer tokenizer);
+
+		/**
+		 * Returns an instance of a {@link DelimitedBuilder} for building a
+		 * {@link DelimitedLineTokenizer}.
+		 * @return a {@link DelimitedBuilder}
+		 */
+		DelimitedBuilder<T, TargetTypeStage<T>> delimited();
+
+		/**
+		 * Configure a {@link DelimitedSpec} using a lambda.
+		 * @return the current stage instance
+		 */
+		TargetTypeStage<T> delimited(Consumer<DelimitedSpec<T>> config);
+
+		/**
+		 * Returns an instance of a {@link FixedLengthBuilder} for building a
+		 * {@link FixedLengthTokenizer}.
+		 * @return a {@link FixedLengthBuilder}
+		 */
+		FixedLengthBuilder<T, TargetTypeStage<T>> fixedLength();
+
+		/**
+		 * Configure a {@link FixedLengthSpec} using a lambda.
+		 * @return the current stage instance
+		 */
+		TargetTypeStage<T> fixedLength(Consumer<FixedLengthSpec<T>> config);
 
 		/**
 		 * Builds the {@link FlatFileItemReader}.
@@ -1365,6 +1529,18 @@ public class FlatFileItemReaderBuilder<T> {
 		@Override
 		public FieldSetMapperStage<T> currentItemCount(int currentItemCount) {
 			FlatFileItemReaderBuilder.this.currentItemCount(currentItemCount);
+			return this;
+		}
+
+		@Override
+		public FieldSetMapperStage<T> maxLinesPerRecord(int maxLinesPerRecord) {
+			FlatFileItemReaderBuilder.this.maxLinesPerRecord(maxLinesPerRecord);
+			return this;
+		}
+
+		@Override
+		public FieldSetMapperStage<T> maxBytesPerRecord(int maxBytesPerRecord) {
+			FlatFileItemReaderBuilder.this.maxBytesPerRecord(maxBytesPerRecord);
 			return this;
 		}
 
@@ -1405,6 +1581,12 @@ public class FlatFileItemReaderBuilder<T> {
 		}
 
 		@Override
+		public FieldSetMapperStage<T> comments(String... comments) {
+			FlatFileItemReaderBuilder.this.comments(comments);
+			return this;
+		}
+
+		@Override
 		public FieldSetMapperStage<T> recordSeparatorPolicy(RecordSeparatorPolicy policy) {
 			FlatFileItemReaderBuilder.this.recordSeparatorPolicy(policy);
 			return this;
@@ -1414,6 +1596,31 @@ public class FlatFileItemReaderBuilder<T> {
 		public FieldSetMapperStage<T> bufferedReaderFactory(BufferedReaderFactory bufferedReaderFactory) {
 			FlatFileItemReaderBuilder.this.bufferedReaderFactory(bufferedReaderFactory);
 			return this;
+		}
+
+		@Override
+		public FieldSetMapperStage<T> lineTokenizer(LineTokenizer tokenizer) {
+			return FlatFileItemReaderBuilder.this.lineTokenizer(tokenizer, () -> this);
+		}
+
+		@Override
+		public DelimitedBuilder<T, FieldSetMapperStage<T>> delimited() {
+			return FlatFileItemReaderBuilder.this.delimited(() -> this);
+		}
+
+		@Override
+		public FieldSetMapperStage<T> delimited(Consumer<DelimitedSpec<T>> config) {
+			return FlatFileItemReaderBuilder.this.delimited(config, () -> this);
+		}
+
+		@Override
+		public FixedLengthBuilder<T, FieldSetMapperStage<T>> fixedLength() {
+			return FlatFileItemReaderBuilder.this.fixedLength(() -> this);
+		}
+
+		@Override
+		public FieldSetMapperStage<T> fixedLength(Consumer<FixedLengthSpec<T>> config) {
+			return FlatFileItemReaderBuilder.this.fixedLength(config, () -> this);
 		}
 
 		@Override
@@ -1446,6 +1653,18 @@ public class FlatFileItemReaderBuilder<T> {
 		@Override
 		public TargetTypeStage<T> currentItemCount(int currentItemCount) {
 			FlatFileItemReaderBuilder.this.currentItemCount(currentItemCount);
+			return this;
+		}
+
+		@Override
+		public TargetTypeStage<T> maxLinesPerRecord(int maxLinesPerRecord) {
+			FlatFileItemReaderBuilder.this.maxLinesPerRecord(maxLinesPerRecord);
+			return this;
+		}
+
+		@Override
+		public TargetTypeStage<T> maxBytesPerRecord(int maxBytesPerRecord) {
+			FlatFileItemReaderBuilder.this.maxBytesPerRecord(maxBytesPerRecord);
 			return this;
 		}
 
@@ -1516,6 +1735,12 @@ public class FlatFileItemReaderBuilder<T> {
 		}
 
 		@Override
+		public TargetTypeStage<T> comments(String... comments) {
+			FlatFileItemReaderBuilder.this.comments(comments);
+			return this;
+		}
+
+		@Override
 		public TargetTypeStage<T> recordSeparatorPolicy(RecordSeparatorPolicy policy) {
 			FlatFileItemReaderBuilder.this.recordSeparatorPolicy(policy);
 			return this;
@@ -1525,6 +1750,31 @@ public class FlatFileItemReaderBuilder<T> {
 		public TargetTypeStage<T> bufferedReaderFactory(BufferedReaderFactory bufferedReaderFactory) {
 			FlatFileItemReaderBuilder.this.bufferedReaderFactory(bufferedReaderFactory);
 			return this;
+		}
+
+		@Override
+		public TargetTypeStage<T> lineTokenizer(LineTokenizer tokenizer) {
+			return FlatFileItemReaderBuilder.this.lineTokenizer(tokenizer, () -> this);
+		}
+
+		@Override
+		public DelimitedBuilder<T, TargetTypeStage<T>> delimited() {
+			return FlatFileItemReaderBuilder.this.delimited(() -> this);
+		}
+
+		@Override
+		public TargetTypeStage<T> delimited(Consumer<DelimitedSpec<T>> config) {
+			return FlatFileItemReaderBuilder.this.delimited(config, () -> this);
+		}
+
+		@Override
+		public FixedLengthBuilder<T, TargetTypeStage<T>> fixedLength() {
+			return FlatFileItemReaderBuilder.this.fixedLength(() -> this);
+		}
+
+		@Override
+		public TargetTypeStage<T> fixedLength(Consumer<FixedLengthSpec<T>> config) {
+			return FlatFileItemReaderBuilder.this.fixedLength(config, () -> this);
 		}
 
 		@Override

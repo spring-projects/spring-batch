@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2025 the original author or authors.
+ * Copyright 2016-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -678,7 +678,13 @@ class FlatFileItemReaderBuilderTests {
 			.names("first", "second", "third")
 			.targetType(Foo.class);
 
-		assertDoesNotThrow(() -> stage.beanMapperStrict(true).distanceLimit(2).customEditors(Map.of()).build());
+		assertDoesNotThrow(() -> stage.beanMapperStrict(true)
+			.distanceLimit(2)
+			.customEditors(Map.of())
+			.maxLinesPerRecord(1)
+			.maxBytesPerRecord(1024)
+			.comments("#")
+			.build());
 	}
 
 	@Test
@@ -688,7 +694,69 @@ class FlatFileItemReaderBuilderTests {
 			.lineTokenizer(line -> new DefaultFieldSet(line.split(";")))
 			.fieldSetMapper(fieldSet -> new Foo());
 
-		assertDoesNotThrow(() -> stage.saveState(false).maxItemCount(100).strict(false).encoding("UTF-8").build());
+		assertDoesNotThrow(() -> stage.saveState(false)
+			.maxItemCount(100)
+			.strict(false)
+			.encoding("UTF-8")
+			.maxLinesPerRecord(1)
+			.maxBytesPerRecord(1024)
+			.comments("#")
+			.build());
+	}
+
+	@Test
+	void testTargetTypeThenDelimited() {
+		// targetType() configured before the tokenizer: no longer required to call
+		// delimited()/fixedLength()/lineTokenizer() first.
+		FlatFileItemReader<Foo> reader = new FlatFileItemReaderBuilder<Foo>().name("fooReader")
+			.resource(getResource("1;2;3"))
+			.targetType(Foo.class)
+			.delimited()
+			.names("first", "second", "third")
+			.build();
+
+		assertNotNull(reader);
+	}
+
+	@Test
+	void testFieldSetMapperThenDelimited() {
+		// fieldSetMapper() configured before the tokenizer: no longer required to call
+		// delimited()/fixedLength()/lineTokenizer() first.
+		FlatFileItemReader<Foo> reader = new FlatFileItemReaderBuilder<Foo>().name("fooReader")
+			.resource(getResource("1;2;3"))
+			.fieldSetMapper(fieldSet -> new Foo())
+			.delimited()
+			.names("first", "second", "third")
+			.build();
+
+		assertNotNull(reader);
+	}
+
+	@Test
+	void testTargetTypeThenFixedLength() {
+		record Person(int id, String name) {
+		}
+
+		FlatFileItemReader<Person> reader = new FlatFileItemReaderBuilder<Person>().name("personReader")
+			.resource(getResource("1,foo"))
+			.targetType(Person.class)
+			.fixedLength()
+			.columns(new Range(1, 1), new Range(3, 5))
+			.names("id", "name")
+			.build();
+
+		assertNotNull(reader);
+	}
+
+	@Test
+	void testTargetTypeThenLineTokenizer() {
+		FlatFileItemReader<Foo> reader = new FlatFileItemReaderBuilder<Foo>().name("fooReader")
+			.resource(getResource("1;2;3"))
+			.targetType(Foo.class)
+			.lineTokenizer(line -> new DefaultFieldSet(line.split(";"), new String[] { "first", "second", "third" }))
+			.build();
+
+		assertNotNull(reader);
 	}
 
 	@Test
