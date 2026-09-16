@@ -257,10 +257,11 @@ public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
 		}
 	}
 
-	@SuppressWarnings("DataFlowIssue")
 	@Override
 	protected void doClose() throws Exception {
-		entityManager.close();
+		if (entityManager != null) {
+			entityManager.close();
+		}
 		super.doClose();
 	}
 
