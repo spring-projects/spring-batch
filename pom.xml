@@ -56,7 +56,7 @@
 		<spring-framework.version>7.1.0-INTERNAL-SNAPSHOT</spring-framework.version>
 		<spring-retry.version>2.0.13</spring-retry.version>
 		<spring-integration.version>7.2.0-INTERNAL-SNAPSHOT</spring-integration.version>
-		<micrometer.version>1.18.0-M1</micrometer.version>
+		<micrometer.version>1.18.0-INTERNAL-SNAPSHOT</micrometer.version>
 
 		<!-- optional production dependencies -->
 		<spring-data-bom.version>2026.1.0-INTERNAL-SNAPSHOT</spring-data-bom.version>
@@ -79,7 +79,7 @@
 		<junit-platform-launcher.version>6.1.3</junit-platform-launcher.version>
 
 		<!-- test dependencies -->
-		<micrometer-tracing.version>1.8.0-M1</micrometer-tracing.version>
+		<micrometer-tracing.version>1.8.0-INTERNAL-SNAPSHOT</micrometer-tracing.version>
 
 		<xstream.version>1.4.21</xstream.version>
 		<junit.version>4.13.2</junit.version>
