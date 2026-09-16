@@ -221,12 +221,14 @@ class MongoPagingItemReaderBuilderTests {
 	}
 
 	@Test
-	void testNullName() {
-		validateExceptionMessage(new MongoPagingItemReaderBuilder<String>().template(this.template)
+	void testDefaultName() {
+		MongoPagingItemReader<String> reader = new MongoPagingItemReaderBuilder<String>().template(this.template)
 			.targetType(String.class)
 			.jsonQuery("{ }")
 			.sorts(this.sortOptions)
-			.pageSize(50), "A name is required when saveState is set to true");
+			.pageSize(50)
+			.build();
+		assertEquals("MongoPagingItemReader", reader.getName());
 	}
 
 	private void validateExceptionMessage(MongoPagingItemReaderBuilder<String> builder, String message) {

@@ -158,9 +158,6 @@ public class LdifReaderBuilder {
 	 */
 	public LdifReader build() throws Exception {
 		Assert.notNull(this.resource, "Resource is required.");
-		if (this.saveState) {
-			Assert.hasText(this.name, "A name is required when saveState is set to true");
-		}
 		LdifReader reader = new LdifReader(this.resource);
 		reader.setRecordsToSkip(this.recordsToSkip);
 		reader.setSaveState(this.saveState);

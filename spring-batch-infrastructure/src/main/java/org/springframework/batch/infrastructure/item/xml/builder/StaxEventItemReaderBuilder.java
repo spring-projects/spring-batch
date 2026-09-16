@@ -32,7 +32,6 @@ import org.springframework.batch.infrastructure.item.xml.StaxEventItemReader;
 import org.springframework.core.io.Resource;
 import org.springframework.oxm.Unmarshaller;
 import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
 import org.springframework.util.xml.StaxUtils;
 
 /**
@@ -222,9 +221,6 @@ public class StaxEventItemReaderBuilder<T> {
 		else {
 			logger.debug("The resource is null. This is only a valid scenario when "
 					+ "injecting resource later as in when using the MultiResourceItemReader");
-		}
-		if (this.saveState) {
-			Assert.state(StringUtils.hasText(this.name), "A name is required when saveState is set to true.");
 		}
 
 		Assert.notEmpty(this.fragmentRootElements, "At least one fragment root element is required");

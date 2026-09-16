@@ -28,7 +28,6 @@ import org.springframework.batch.infrastructure.item.json.JsonItemReader;
 import org.springframework.batch.infrastructure.item.json.JsonObjectReader;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
 
 /**
  * A builder for {@link JsonItemReader}.
@@ -147,9 +146,6 @@ public class JsonItemReaderBuilder<T> {
 	 */
 	public JsonItemReader<T> build() {
 		Assert.notNull(this.jsonObjectReader, "A json object reader is required.");
-		if (this.saveState) {
-			Assert.state(StringUtils.hasText(this.name), "A name is required when saveState is set to true.");
-		}
 
 		if (this.resource == null) {
 			logger.debug("The resource is null. This is only a valid scenario when "

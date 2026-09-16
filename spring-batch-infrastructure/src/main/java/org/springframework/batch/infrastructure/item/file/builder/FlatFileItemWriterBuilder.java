@@ -603,10 +603,6 @@ public class FlatFileItemWriterBuilder<T> {
 		Assert.isTrue(this.lineAggregator != null || this.delimitedBuilder != null || this.formattedBuilder != null,
 				"A LineAggregator or a DelimitedBuilder or a FormattedBuilder is required");
 
-		if (this.saveState) {
-			Assert.hasText(this.name, "A name is required when saveState is true");
-		}
-
 		if (this.resource == null) {
 			logger.debug("The resource is null. This is only a valid scenario when "
 					+ "injecting it later as in when using the MultiResourceItemWriter");

@@ -479,24 +479,18 @@ class FlatFileItemReaderBuilderTests {
 	}
 
 	@Test
-	void testName() {
-		var builder = new FlatFileItemReaderBuilder<Foo>().resource(getResource("1  2  3"))
-			.fixedLength()
-			.columns(new Range(1, 3), new Range(4, 6), new Range(7))
-			.names("first", "second", "third")
-			.targetType(Foo.class);
-		Exception exception = assertThrows(IllegalStateException.class, builder::build);
-		assertEquals("A name is required when saveState is set to true.", exception.getMessage());
-
-		builder = new FlatFileItemReaderBuilder<Foo>().resource(getResource("1  2  3"))
+	void testDefaultName() {
+		FlatFileItemReader<Foo> reader = new FlatFileItemReaderBuilder<Foo>().resource(getResource("1  2  3"))
 			.fixedLength()
 			.columns(new Range(1, 3), new Range(4, 6), new Range(7))
 			.names("first", "second", "third")
 			.targetType(Foo.class)
-			.name(null);
-		exception = assertThrows(IllegalStateException.class, builder::build);
-		assertEquals("A name is required when saveState is set to true.", exception.getMessage());
+			.build();
+		assertEquals("FlatFileItemReader", reader.getName());
+	}
 
+	@Test
+	void testName() {
 		assertNotNull(new FlatFileItemReaderBuilder<Foo>().resource(getResource("1  2  3"))
 			.fixedLength()
 			.columns(new Range(1, 3), new Range(4, 6), new Range(7))

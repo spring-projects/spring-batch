@@ -27,7 +27,6 @@ import org.springframework.batch.infrastructure.item.avro.AvroItemReader;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
 
 /**
  * A builder implementation for the {@link AvroItemReader}.
@@ -175,10 +174,6 @@ public class AvroItemReaderBuilder<T> {
 		}
 
 		avroItemReader.setSaveState(this.saveState);
-
-		if (this.saveState) {
-			Assert.state(StringUtils.hasText(this.name), "A name is required when saveState is set to true.");
-		}
 
 		avroItemReader.setName(this.name);
 		avroItemReader.setCurrentItemCount(this.currentItemCount);

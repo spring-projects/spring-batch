@@ -316,10 +316,6 @@ public class JdbcPagingItemReaderBuilder<T> {
 		Assert.isTrue(pageSize > 0, "pageSize must be greater than zero");
 		Assert.notNull(dataSource, "dataSource is required");
 
-		if (saveState) {
-			Assert.hasText(name, "A name is required when saveState is set to true");
-		}
-
 		JdbcPagingItemReader<T> reader = new JdbcPagingItemReader<>(this.dataSource,
 				queryProvider == null ? determineQueryProvider(dataSource) : queryProvider);
 

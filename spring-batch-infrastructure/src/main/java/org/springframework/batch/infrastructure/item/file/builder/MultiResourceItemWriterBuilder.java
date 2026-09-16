@@ -132,10 +132,6 @@ public class MultiResourceItemWriterBuilder<T> {
 		Assert.notNull(this.resource, "resource is required.");
 		Assert.notNull(this.delegate, "delegate is required.");
 
-		if (this.saveState) {
-			org.springframework.util.Assert.hasText(this.name, "A name is required when saveState is true.");
-		}
-
 		MultiResourceItemWriter<T> writer = new MultiResourceItemWriter<>(this.delegate);
 		writer.setResource(this.resource);
 		writer.setItemCountLimitPerResource(this.itemCountLimitPerResource);

@@ -168,9 +168,6 @@ public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemR
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(pageSize > 0, "Page size must be greater than 0");
 		Assert.state(StringUtils.hasText(this.methodName), "methodName is required.");
-		if (isSaveState()) {
-			Assert.state(StringUtils.hasText(getName()), "A name is required when saveState is set to true.");
-		}
 	}
 
 	@Override

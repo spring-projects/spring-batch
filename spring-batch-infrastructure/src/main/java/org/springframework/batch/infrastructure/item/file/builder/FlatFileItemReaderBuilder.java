@@ -498,9 +498,6 @@ public class FlatFileItemReaderBuilder<T> {
 	 * @return a {@link FlatFileItemReader}
 	 */
 	public FlatFileItemReader<T> build() {
-		if (this.saveState) {
-			Assert.state(StringUtils.hasText(this.name), "A name is required when saveState is set to true.");
-		}
 
 		if (this.resource == null) {
 			logger.debug("The resource is null.  This is only a valid scenario when "
