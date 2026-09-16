@@ -13,6 +13,7 @@ Spring Batch 6.1 includes the following features and improvements:
 * xref:whatsnew.adoc#location-patterns-in-multiresourceitemreaderbuilder[Location patterns in `MultiResourceItemReaderBuilder`]
 * xref:whatsnew.adoc#new-resourcesitemreaderbuilder[New `ResourcesItemReaderBuilder`]
 * xref:whatsnew.adoc#schema-locations-in-databasetype[Schema locations in `DatabaseType`]
+* xref:whatsnew.adoc#default-name-for-item-readers-and-writers[Default name for item readers and writers]
 * xref:whatsnew.adoc#deprecations[Deprecations]
 
 [[dependencies-upgrade]]
@@ -239,6 +240,38 @@ new EmbeddedDatabaseBuilder()
 
 For more details, please refer to the
 xref:schema-appendix.adoc#exampleDDLScripts[Example DDL Scripts] section.
+
+[[default-name-for-item-readers-and-writers]]
+== Default name for item readers and writers
+
+Builders for item readers and writers that persist their state in the `ExecutionContext`
+(for example `FlatFileItemReaderBuilder`, `JdbcCursorItemReaderBuilder`,
+`JdbcPagingItemReaderBuilder`, `RepositoryItemReaderBuilder`, and others) no longer
+require an explicit name to be set when `saveState` is `true`:
+
+[source, java]
+----
+// before: required an explicit name, or building the reader would fail
+// after: builds successfully, using a default name
+@Bean
+public FlatFileItemReader<Foo> fooReader() {
+    return new FlatFileItemReaderBuilder<Foo>()
+                    .resource(resource)
+                    .delimited()
+                    .names("first", "second", "third")
+                    .targetType(Foo.class)
+                    .build();
+}
+----
+
+This is possible because these readers and writers extend `ItemStreamSupport`, which
+already defaults the name to the short class name and overrides it with the Spring bean
+name when the reader or writer is declared as a bean. The strict name requirement in the
+builders was redundant with this existing behavior. An explicit name is still recommended,
+and required, when the default is not unique enough, such as when two instances of the
+same reader or writer type are used within the same step. For more details, please refer
+to the xref:readers-and-writers/custom.adoc[Custom `ItemReader`s and `ItemWriter`s]
+section.
 
 [[deprecations]]
 == Deprecations
