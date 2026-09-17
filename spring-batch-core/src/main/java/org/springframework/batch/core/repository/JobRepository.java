@@ -137,8 +137,26 @@ public interface JobRepository extends JobExplorer {
 	 * repository.
 	 * @throws NoSuchJobException thrown when there is no {@link JobInstance} for the
 	 * jobName specified.
+	 * @deprecated since 6.1 in favor of {@link #countJobInstances(String)}. The job
+	 * repository has no access to the registry of known jobs, so it cannot soundly
+	 * determine whether a job name is unknown as opposed to simply never having been
+	 * persisted yet; validating that a job name is known is a concern of the job operator
+	 * at start/restart time. Scheduled for removal in 7.0.
 	 */
+	@Deprecated(since = "6.1", forRemoval = true)
 	default long getJobInstanceCount(String jobName) throws NoSuchJobException {
+		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 * Query the repository for the number of unique {@link JobInstance} objects
+	 * associated with the supplied job name.
+	 * @param jobName The name of the job for which to query.
+	 * @return the number of {@link JobInstance}s that exist within the associated job
+	 * repository, or {@code 0} if none is found.
+	 * @since 6.1
+	 */
+	default long countJobInstances(String jobName) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -254,8 +272,25 @@ public interface JobRepository extends JobExplorer {
 	 * @param jobInstance {@link JobInstance} instance containing the step executions.
 	 * @param stepName the name of the step execution that might have run.
 	 * @return the execution count of the step within the given job instance.
+	 * @deprecated since 6.1 in favor of
+	 * {@link #countStepExecutions(JobInstance, String)}. The job repository has no access
+	 * to the job's step definitions, so it cannot soundly determine whether a step name
+	 * is unknown as opposed to simply never having run yet for this job instance.
+	 * Scheduled for removal in 7.0.
 	 */
+	@Deprecated(since = "6.1", forRemoval = true)
 	default long getStepExecutionCount(JobInstance jobInstance, String stepName) throws NoSuchStepException {
+		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 * @param jobInstance {@link JobInstance} instance containing the step executions.
+	 * @param stepName the name of the step execution that might have run.
+	 * @return the execution count of the step within the given job instance, or {@code 0}
+	 * if none is found.
+	 * @since 6.1
+	 */
+	default long countStepExecutions(JobInstance jobInstance, String stepName) {
 		throw new UnsupportedOperationException();
 	}
 

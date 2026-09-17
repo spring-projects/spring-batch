@@ -24,7 +24,6 @@ import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.launch.JobRestartException;
 import org.springframework.batch.core.step.AbstractStep;
-import org.springframework.batch.core.step.NoSuchStepException;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
@@ -210,13 +209,7 @@ public class SimpleStepHandler implements StepHandler {
 		}
 
 		JobInstance jobInstance = jobExecution.getJobInstance();
-		long stepExecutionCount = 0;
-		try {
-			stepExecutionCount = jobRepository.getStepExecutionCount(jobInstance, step.getName());
-		}
-		catch (NoSuchStepException e) {
-			throw new JobRestartException("Unable to count step executions for job instance " + jobInstance.getId(), e);
-		}
+		long stepExecutionCount = jobRepository.countStepExecutions(jobInstance, step.getName());
 		if (stepExecutionCount < step.getStartLimit()) {
 			// step start count is less than start max, return true
 			return true;

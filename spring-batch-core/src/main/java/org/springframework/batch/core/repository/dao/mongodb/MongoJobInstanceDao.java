@@ -208,11 +208,24 @@ public class MongoJobInstanceDao extends AbstractMongoBatchMetadataDao implement
 		return getJobInstances(jobName, start, count);
 	}
 
+	/**
+	 * @deprecated since 6.1 in favor of {@link #countJobInstances(String)}. Scheduled for
+	 * removal in 7.0.
+	 */
+	@Deprecated(since = "6.1", forRemoval = true)
 	@Override
 	public long getJobInstanceCount(String jobName) throws NoSuchJobException {
 		if (!getJobNames().contains(jobName)) {
 			throw new NoSuchJobException("No job instances were found for job name " + jobName);
 		}
+		return countJobInstances(jobName);
+	}
+
+	/**
+	 * @since 6.1
+	 */
+	@Override
+	public long countJobInstances(String jobName) {
 		Query query = query(where("jobName").is(jobName));
 		return this.mongoOperations.count(query, getCollectionName(COLLECTION_NAME));
 	}
