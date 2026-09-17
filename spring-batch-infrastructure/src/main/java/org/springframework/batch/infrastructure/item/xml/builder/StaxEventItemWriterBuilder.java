@@ -68,8 +68,9 @@ public class StaxEventItemWriterBuilder<T> {
 	private @Nullable String name;
 
 	/**
-	 * The name used to calculate the key within the {@link ExecutionContext}. Required if
-	 * {@link StaxEventItemWriterBuilder#saveState(boolean)} is set to true.
+	 * The name used to calculate the key within the {@link ExecutionContext}. Defaults to
+	 * the bean name, or to the short class name if this instance is not a bean. Set it
+	 * explicitly to disambiguate several non-bean instances of the same type in a step.
 	 * @param name name of the reader instance
 	 * @return The current instance of the builder.
 	 * @see StaxEventItemWriter#setName(String)
@@ -262,10 +263,6 @@ public class StaxEventItemWriterBuilder<T> {
 	public StaxEventItemWriter<T> build() {
 		Assert.notNull(this.marshaller, "A marshaller is required");
 		Assert.notNull(this.resource, "A resource is required");
-
-		if (this.saveState) {
-			Assert.notNull(this.name, "A name is required");
-		}
 
 		StaxEventItemWriter<T> writer = new StaxEventItemWriter<>(this.resource, this.marshaller);
 
