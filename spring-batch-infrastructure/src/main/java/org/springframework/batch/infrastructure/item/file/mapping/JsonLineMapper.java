@@ -15,15 +15,17 @@
  */
 package org.springframework.batch.infrastructure.item.file.mapping;
 
+import java.lang.reflect.Type;
 import java.util.Map;
 
+import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.json.JsonMapper;
 
 import org.springframework.batch.infrastructure.item.file.LineMapper;
 
 /**
- * Interpret a line as a JSON object and parse it up to a Map. The line should be a
- * standard JSON object, starting with "{" and ending with "}" and composed of
+ * Interpret a line as a JSON object and parse it up to provided target type. The line
+ * should be a standard JSON object, starting with "{" and ending with "}" and composed of
  * <code>name:value</code> pairs separated by commas. Whitespace is ignored, e.g.
  *
  * <pre>
@@ -38,37 +40,96 @@ import org.springframework.batch.infrastructure.item.file.LineMapper;
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  *
  */
-public class JsonLineMapper implements LineMapper<Map<String, Object>> {
+public class JsonLineMapper<T> implements LineMapper<T> {
 
 	private final JsonMapper jsonMapper;
 
+	private final TypeReference<T> type;
+
 	/**
-	 * Create a new {@link JsonLineMapper} with a default {@link JsonMapper}.
+	 * Create a new {@link JsonLineMapper} with a default {@link JsonMapper} and
+	 * {@code Map<String, Object>} target type.
+	 * @deprecated in favor of {@code new JsonLineMapper<Map<String, Object>>(new
+	 * TypeReference<>() {})}
 	 */
+	@Deprecated(forRemoval = true)
 	public JsonLineMapper() {
 		this(new JsonMapper());
 	}
 
 	/**
-	 * Create a new {@link JsonLineMapper} with the provided {@link JsonMapper}.
+	 * Create a new {@link JsonLineMapper} with the provided {@link JsonMapper} and
+	 * {@code Map<String, Object>} target type.
 	 * @param jsonMapper the json mapper to use
 	 * @since 6.0
+	 * @deprecated in favor of {@code new JsonLineMapper<Map<String, Object>>(jsonMapper,
+	 * new TypeReference<>() {})}
 	 */
+	@Deprecated(forRemoval = true)
+	@SuppressWarnings("unchecked")
 	public JsonLineMapper(JsonMapper jsonMapper) {
-		this.jsonMapper = jsonMapper;
+		this(jsonMapper, (TypeReference<T>) new TypeReference<Map<String, Object>>() {
+		});
 	}
 
 	/**
-	 * Interpret the line as a Json object and create a Map from it.
+	 * Create a new {@link JsonLineMapper} with the provided {@link JsonMapper} and
+	 * provided target type.
+	 * @param type the target type
+	 * @since 6.1
+	 */
+	public JsonLineMapper(Class<T> type) {
+		this(new JsonMapper(), type);
+	}
+
+	/**
+	 * Create a new {@link JsonLineMapper} with the provided {@link JsonMapper} and
+	 * provided target type.
+	 * @param type the target type
+	 * @since 6.1
+	 */
+	public JsonLineMapper(TypeReference<T> type) {
+		this(new JsonMapper(), type);
+	}
+
+	/**
+	 * Create a new {@link JsonLineMapper} with the provided {@link JsonMapper} and
+	 * provided target type.
+	 * @param jsonMapper the json mapper to use
+	 * @param type the target type
+	 * @since 6.1
+	 */
+	public JsonLineMapper(JsonMapper jsonMapper, Class<T> type) {
+		this(jsonMapper, new TypeReference<>() {
+			@Override
+			public Type getType() {
+				return type;
+			}
+		});
+	}
+
+	/**
+	 * Create a new {@link JsonLineMapper} with the provided {@link JsonMapper}.
+	 * @param jsonMapper the json mapper to use
+	 * @param type the target type
+	 * @since 6.1
+	 */
+	public JsonLineMapper(JsonMapper jsonMapper, TypeReference<T> type) {
+		this.jsonMapper = jsonMapper;
+		this.type = type;
+	}
+
+	/**
+	 * Interpret the line as a Json object and convert it to target type.
 	 *
 	 * @see LineMapper#mapLine(String, int)
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
-	public Map<String, Object> mapLine(String line, int lineNumber) throws Exception {
-		return this.jsonMapper.readValue(line, Map.class);
+	public T mapLine(String line, int lineNumber) throws Exception {
+		return this.jsonMapper.readValue(line, type);
 	}
 
 }
