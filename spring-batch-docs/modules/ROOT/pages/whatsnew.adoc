@@ -14,6 +14,7 @@ Spring Batch 6.1 includes the following features and improvements:
 * xref:whatsnew.adoc#new-resourcesitemreaderbuilder[New `ResourcesItemReaderBuilder`]
 * xref:whatsnew.adoc#schema-locations-in-databasetype[Schema locations in `DatabaseType`]
 * xref:whatsnew.adoc#default-name-for-item-readers-and-writers[Default name for item readers and writers]
+* xref:whatsnew.adoc#compile-time-safety-for-mutually-exclusive-builder-methods[Compile-time safety for mutually exclusive builder methods]
 * xref:whatsnew.adoc#deprecations[Deprecations]
 
 [[dependencies-upgrade]]
@@ -272,6 +273,58 @@ and required, when the default is not unique enough, such as when two instances 
 same reader or writer type are used within the same step. For more details, please refer
 to the xref:readers-and-writers/custom.adoc[Custom `ItemReader`s and `ItemWriter`s]
 section.
+
+[[compile-time-safety-for-mutually-exclusive-builder-methods]]
+== Compile-time safety for mutually exclusive builder methods
+
+A few builders exposed pairs of methods that configure mutually exclusive strategies,
+but allowed calling both on the same instance, only failing with an
+`IllegalStateException` when `build()` was called:
+
+* `FlatFileItemReaderBuilder#targetType(Class)` and `#fieldSetMapper(FieldSetMapper)`
+* `FlatFileItemWriterBuilder#delimited()`/`#delimited(Consumer)` and
+  `#formatted()`/`#formatted(Consumer)`
+* `JdbcBatchItemWriterBuilder#columnMapped()` and `#beanMapped()`
+
+These builders now use a staged DSL: calling one of the two methods returns a stage
+that exposes every other configuration method of the builder, except the conflicting
+one, so invalid combinations are now rejected by the compiler instead of at runtime:
+
+[source, java]
+----
+// before: compiles, but throws IllegalStateException at build() time
+new FlatFileItemReaderBuilder<Foo>()
+    .name("fooReader")
+    .resource(resource)
+    .lineTokenizer(tokenizer)
+    .targetType(Foo.class)
+    .fieldSetMapper(fieldSetMapper) // IllegalStateException at build()
+    .build();
+
+// after: fieldSetMapper() is not available once targetType() has been called
+new FlatFileItemReaderBuilder<Foo>()
+    .name("fooReader")
+    .resource(resource)
+    .lineTokenizer(tokenizer)
+    .targetType(Foo.class)
+    .fieldSetMapper(fieldSetMapper) // compile error
+    .build();
+----
+
+The tokenizer/line mapping methods (`delimited()`, `fixedLength()`, `lineTokenizer()`)
+can still be configured before or after `targetType()`/`fieldSetMapper()`, in any order.
+
+TIP: This is a source and binary breaking change for code compiled against Spring Batch
+6.0 that calls `targetType()`, `fieldSetMapper()`, `delimited()`/`formatted()` (on
+`FlatFileItemWriterBuilder`), or `columnMapped()`/`beanMapped()`, since the return type
+of these methods changed from the builder itself to a dedicated stage type. Code that
+only chains calls fluently (the vast majority of usages) needs no changes beyond a
+recompile; code that stores the return value in a variable typed as the builder class,
+or that relied on catching the `IllegalStateException` from an invalid combination, needs
+to be updated.
+
+For more details, see
+https://github.com/spring-projects/spring-batch/issues/4888[issue #4888].
 
 [[deprecations]]
 == Deprecations
