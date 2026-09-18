@@ -600,11 +600,6 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 		return TaskletStep.class;
 	}
 
-	@Override
-	public boolean isSingleton() {
-		return true;
-	}
-
 	// =========================================================
 	// Step Attributes
 	// =========================================================

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2025 the original author or authors.
+ * Copyright 2023-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -93,7 +93,10 @@ public class MongoCursorItemReader<T> extends AbstractItemCountingItemStreamItem
 	 * of documents to objects.
 	 * @param template the MongoOperations instance to use
 	 * @see MongoOperations
+	 * @deprecated since 6.1 in favor of passing the template to the constructor.
+	 * Scheduled for removal in 7.0.
 	 */
+	@Deprecated(since = "6.1", forRemoval = true)
 	public void setTemplate(MongoOperations template) {
 		this.template = template;
 	}
@@ -101,7 +104,10 @@ public class MongoCursorItemReader<T> extends AbstractItemCountingItemStreamItem
 	/**
 	 * The targetType of object to be returned for each {@link #read()} call.
 	 * @param targetType the targetType of object to return
+	 * @deprecated since 6.1 in favor of passing the target type to the constructor.
+	 * Scheduled for removal in 7.0.
 	 */
+	@Deprecated(since = "6.1", forRemoval = true)
 	public void setTargetType(Class<? extends T> targetType) {
 		this.targetType = targetType;
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2025 the original author or authors.
+ * Copyright 2022-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.test.context;
 
+import org.springframework.batch.infrastructure.support.DatabaseType;
 import javax.sql.DataSource;
 
 import org.junit.jupiter.api.AfterEach;
@@ -99,8 +100,8 @@ class BatchTestContextBeanPostProcessorTests {
 		@Bean
 		DataSource dataSource() {
 			return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.HSQL)
-				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-				.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
+				.addScript(DatabaseType.HSQL.getProductSchemaDrop())
+				.addScript(DatabaseType.HSQL.getProductSchema())
 				.generateUniqueName(true)
 				.build();
 		}

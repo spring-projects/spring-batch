@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.sql.DataSource;
 
@@ -117,6 +116,13 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 		this.queryProvider = pagingQueryProvider;
 	}
 
+	/**
+	 * Set the data source to use.
+	 * @param dataSource the DataSource to use
+	 * @deprecated since 6.1 in favor of passing the data source to the constructor.
+	 * Scheduled for removal in 7.0.
+	 */
+	@Deprecated(since = "6.1", forRemoval = true)
 	public void setDataSource(DataSource dataSource) {
 		this.dataSource = dataSource;
 	}
@@ -136,7 +142,10 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 	 * A {@link PagingQueryProvider}. Supplies all the platform dependent query generation
 	 * capabilities needed by the reader.
 	 * @param queryProvider the {@link PagingQueryProvider} to use
+	 * @deprecated since 6.1 in favor of passing the paging query provider to the
+	 * constructor. Scheduled for removal in 7.0.
 	 */
+	@Deprecated(since = "6.1", forRemoval = true)
 	public void setQueryProvider(PagingQueryProvider queryProvider) {
 		this.queryProvider = queryProvider;
 	}
@@ -184,7 +193,7 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 	@Override
 	protected void doReadPage() {
 		if (results == null) {
-			results = new CopyOnWriteArrayList<>();
+			results = new ArrayList<>();
 		}
 		else {
 			results.clear();

@@ -69,8 +69,9 @@ public class KafkaItemReaderBuilder<K, V> {
 	}
 
 	/**
-	 * The name used to calculate the key within the {@link ExecutionContext}. Required if
-	 * {@link #saveState(boolean)} is set to true.
+	 * The name used to calculate the key within the {@link ExecutionContext}. Defaults to
+	 * the bean name, or to the short class name if this instance is not a bean. Set it
+	 * explicitly to disambiguate several non-bean instances of the same type in a step.
 	 * @param name name of the reader instance
 	 * @return The current instance of the builder.
 	 * @see ItemStreamSupport#setName(String)
@@ -155,9 +156,6 @@ public class KafkaItemReaderBuilder<K, V> {
 	}
 
 	public KafkaItemReader<K, V> build() {
-		if (this.saveState) {
-			Assert.hasText(this.name, "A name is required when saveState is set to true");
-		}
 		Assert.notNull(consumerProperties, "Consumer properties must not be null");
 		Assert.isTrue(consumerProperties.containsKey(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG),
 				ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG + " property must be provided");

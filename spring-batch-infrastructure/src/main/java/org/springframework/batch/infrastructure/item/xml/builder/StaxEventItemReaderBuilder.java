@@ -32,7 +32,6 @@ import org.springframework.batch.infrastructure.item.xml.StaxEventItemReader;
 import org.springframework.core.io.Resource;
 import org.springframework.oxm.Unmarshaller;
 import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
 import org.springframework.util.xml.StaxUtils;
 
 /**
@@ -81,8 +80,9 @@ public class StaxEventItemReaderBuilder<T> {
 	}
 
 	/**
-	 * The name used to calculate the key within the {@link ExecutionContext}. Required if
-	 * {@link #saveState(boolean)} is set to true.
+	 * The name used to calculate the key within the {@link ExecutionContext}. Defaults to
+	 * the bean name, or to the short class name if this instance is not a bean. Set it
+	 * explicitly to disambiguate several non-bean instances of the same type in a step.
 	 * @param name name of the reader instance
 	 * @return The current instance of the builder.
 	 * @see ItemStreamSupport#setName(String)
@@ -222,9 +222,6 @@ public class StaxEventItemReaderBuilder<T> {
 		else {
 			logger.debug("The resource is null. This is only a valid scenario when "
 					+ "injecting resource later as in when using the MultiResourceItemReader");
-		}
-		if (this.saveState) {
-			Assert.state(StringUtils.hasText(this.name), "A name is required when saveState is set to true.");
 		}
 
 		Assert.notEmpty(this.fragmentRootElements, "At least one fragment root element is required");

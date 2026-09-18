@@ -1,269 +1,341 @@
 [[whatsNew]]
-= What's new in Spring Batch 6
+= What's new in Spring Batch 6.1
 
-This section highlights the major changes in Spring Batch 6.0. For the complete list of changes, please refer to the https://github.com/spring-projects/spring-batch/releases[release notes].
+This section highlights the major changes in Spring Batch 6.1. For the complete list of changes, please refer to the https://github.com/spring-projects/spring-batch/releases[release notes].
 
-Spring Batch 6.0 includes the following features and improvements:
+Spring Batch 6.1 includes the following features and improvements:
 
 * xref:whatsnew.adoc#dependencies-upgrade[Dependencies upgrade]
-* xref:whatsnew.adoc#batch-infrastrucutre-configuration-improvements[Batch infrastructure configuration improvements]
-* xref:whatsnew.adoc#new-implementation-of-the-chunk-oriented-processing-model[New implementation of the chunk-oriented processing model]
-* xref:whatsnew.adoc#new-concurrency-model[New concurrency model]
-* xref:whatsnew.adoc#new-command-line-operator[New command line operator]
-* xref:whatsnew.adoc#ability-to-recover-failed-job-executions[Ability to recover failed job executions]
-* xref:whatsnew.adoc#ability-to-stop-all-kind-of-steps[Ability to stop all kinds of steps]
-* xref:whatsnew.adoc#graceful-shutdown[Graceful Shutdown support]
-* xref:whatsnew.adoc#observability-with-jfr[Observability support with the Java Flight Recorder (JFR)]
-* xref:whatsnew.adoc#jspecify[Null safety annotations with JSpecify]
-* xref:whatsnew.adoc#local-chunking[Local chunking support]
-* xref:whatsnew.adoc#seda-with-si[SEDA style with Spring Integration message channels]
-* xref:whatsnew.adoc#jackson-3-support[Jackson 3 support]
-* xref:whatsnew.adoc#remote-step-support[Remote step support]
-* xref:whatsnew.adoc#lambda-style-configuration[Lambda style configuration]
-* xref:whatsnew.adoc#deprecations-and-pruning[Deprecations and pruning]
+* xref:whatsnew.adoc#collection-prefix-for-the-mongodb-job-repository[Collection prefix for the MongoDB job repository]
+* xref:whatsnew.adoc#default-conversion-service-based-on-defaultformattingconversionservice[Default conversion service based on `DefaultFormattingConversionService`]
+* xref:whatsnew.adoc#async-processing-apis-and-local-chunking-moved-to-core[Async processing APIs and local chunking moved to `spring-batch-core`]
+* xref:whatsnew.adoc#flushing-support-in-repositoryitemwriter[Flushing support in `RepositoryItemWriter`]
+* xref:whatsnew.adoc#location-patterns-in-multiresourceitemreaderbuilder[Location patterns in `MultiResourceItemReaderBuilder`]
+* xref:whatsnew.adoc#new-resourcesitemreaderbuilder[New `ResourcesItemReaderBuilder`]
+* xref:whatsnew.adoc#schema-locations-in-databasetype[Schema locations in `DatabaseType`]
+* xref:whatsnew.adoc#default-name-for-item-readers-and-writers[Default name for item readers and writers]
+* xref:whatsnew.adoc#compile-time-safety-for-mutually-exclusive-builder-methods[Compile-time safety for mutually exclusive builder methods]
+* xref:whatsnew.adoc#deprecations[Deprecations]
 
 [[dependencies-upgrade]]
 == Dependencies upgrade
 
-In this major release, the Spring dependencies are upgraded to the following versions:
+In this release, Spring dependencies are upgraded to the following versions:
 
-* Spring Framework 7.0
-* Spring Integration 7.0
-* Spring Data 4.0
-* Spring LDAP 4.0
-* Spring AMQP 4.0
-* Spring Kafka 4.0
-* Micrometer 1.16
+* Spring Framework 7.1
+* Spring Integration 7.2
+* Spring Data 2026.1.0
+* Spring LDAP 4.1
+* Spring AMQP 4.2
+* Spring Kafka 4.2
+* Micrometer 1.18
 
-[[batch-infrastrucutre-configuration-improvements]]
-== Batch infrastructure configuration improvements
+[[collection-prefix-for-the-mongodb-job-repository]]
+== Collection prefix for the MongoDB job repository
 
-=== New annotations and classes for batch infrastructure configuration
-
-Before v6, the `@EnableBatchProcessing` annotation was tied to a JDBC-based infrastructure. This is not the case anymore. Two new annotations have been introduced to configure the underlying job repository: `@EnableJdbcJobRepository` and `@EnableMongoJobRepository`.
-
-Starting from v6, `@EnableBatchProcessing` allows you to configure common attributes for the batch infrastructure, while store-specific attributes can be specified with the new dedicated annotations.
-
-Here is an example of how to use these annotations:
+The MongoDB job repository now supports a configurable collection prefix, similar to the
+table prefix of the JDBC job repository. This makes it possible to run several
+applications against the same MongoDB database, or to isolate environments from each
+other:
 
 [source, java]
 ----
-@EnableBatchProcessing(taskExecutorRef = "batchTaskExecutor")
-@EnableJdbcJobRepository(dataSourceRef = "batchDataSource", transactionManagerRef = "batchTransactionManager")
+@EnableBatchProcessing
+@EnableMongoJobRepository(collectionPrefix = "MY_APP_")
 class MyJobConfiguration {
 
-	@Bean
-	public Job job(JobRepository jobRepository) {
-		return new JobBuilder("job", jobRepository)
-                    // job flow omitted
-                    .build();
+	// job definition omitted
+
+}
+----
+
+The prefix defaults to `BATCH_`, so existing applications are not affected. For more
+details, please refer to the
+xref:job/configuring-repository.adoc#repositoryCollectionPrefix[Changing the Collection Prefix]
+section.
+
+[[default-conversion-service-based-on-defaultformattingconversionservice]]
+== Default conversion service based on `DefaultFormattingConversionService`
+
+The job repository and job explorer now build their default `ConfigurableConversionService`
+on top of Spring Framework's `DefaultFormattingConversionService` instead of a set of
+hand-written converters. This is exposed through the new `ConversionServiceFactory`
+utility class:
+
+[source, java]
+----
+ConfigurableConversionService conversionService = ConversionServiceFactory.createConversionService();
+----
+
+The default conversion service keeps the same formats Spring Batch has always used for
+job parameters (`ISO_INSTANT` for `java.util.Date`, and the standard ISO formats for
+`LocalDate`, `LocalTime`, `LocalDateTime`, `ZonedDateTime`, and `OffsetDateTime`), while
+benefiting from the broader set of converters and formatters that
+`DefaultFormattingConversionService` provides out of the box. Existing extension points,
+such as `JdbcDefaultBatchConfiguration#getConversionService()` and the `setConversionService`
+setters on `JobRepositoryFactoryBean`, `JobExplorerFactoryBean`,
+`AbstractJdbcBatchMetadataDao`, and `DefaultJobParametersConverter`, are unaffected and can
+still be used to fully customize job parameter conversion.
+
+As a result, the previous custom converters (`DateToStringConverter`, `StringToDateConverter`,
+`LocalDateToStringConverter`, `StringToLocalDateConverter`, `LocalTimeToStringConverter`,
+`StringToLocalTimeConverter`, `LocalDateTimeToStringConverter`, and
+`StringToLocalDateTimeConverter`) are now deprecated. See the
+xref:whatsnew.adoc#deprecations[Deprecations] section for more details.
+
+[[async-processing-apis-and-local-chunking-moved-to-core]]
+== Async processing APIs and local chunking moved to `spring-batch-core`
+
+`AsyncItemProcessor`, `AsyncItemWriter`, and `ChunkTaskExecutorItemWriter` (used for
+local chunking) have been moved from `spring-batch-integration` to
+`org.springframework.batch.core.step.item` in `spring-batch-core`. These APIs only rely
+on a `TaskExecutor` and have no dependency on Spring Integration, so they no longer need
+to live in the integration module. This lets applications use asynchronous item
+processing and local chunking without pulling in `spring-batch-integration` and its
+transitive dependencies.
+
+This is a packaging change only, and no functional changes are introduced. The classes
+in `spring-batch-integration` are kept as deprecated subclasses of their new counterparts
+in `spring-batch-core` for backward compatibility, and will be removed in a future
+release. Existing applications continue to work as-is, but are encouraged to migrate to
+the new package:
+
+[source, java]
+----
+// before
+import org.springframework.batch.integration.async.AsyncItemProcessor;
+import org.springframework.batch.integration.async.AsyncItemWriter;
+import org.springframework.batch.integration.chunk.ChunkTaskExecutorItemWriter;
+
+// after
+import org.springframework.batch.core.step.item.AsyncItemProcessor;
+import org.springframework.batch.core.step.item.AsyncItemWriter;
+import org.springframework.batch.core.step.item.ChunkTaskExecutorItemWriter;
+----
+
+[[flushing-support-in-repositoryitemwriter]]
+== Flushing support in `RepositoryItemWriter`
+
+`RepositoryItemWriter` now supports flushing the underlying Spring Data repository after
+writing a chunk, in two ways:
+
+* If the repository exposes a single method that both saves and flushes items, such as
+`JpaRepository#saveAllAndFlush(Iterable)`, that method name can be set with
+`setMethodName`. `RepositoryItemWriter` now detects, once at initialization, whether the
+named method accepts an `Iterable` (in which case it is invoked once with the whole
+chunk) or a single item (in which case it is invoked once per item, as before):
+
+[source, java]
+----
+RepositoryItemWriter<Foo> writer = new RepositoryItemWriter<>(jpaRepository);
+writer.setMethodName("saveAllAndFlush");
+----
+
+* If saving and flushing are separate operations, the new `flush` method can be
+overridden in a subclass to flush the repository after the chunk has been written. The
+`repository` field is now `protected` so that subclasses can access it directly:
+
+[source, java]
+----
+public class FlushingRepositoryItemWriter<T> extends RepositoryItemWriter<T> {
+
+	public FlushingRepositoryItemWriter(JpaRepository<T, ?> repository) {
+		super(repository);
 	}
+
+	@Override
+	protected void flush() {
+		((JpaRepository<T, ?>) this.repository).flush();
+	}
+
 }
 ----
 
-Similarly, the programmatic model based on `DefaultBatchConfiguration` has been updated by introducing two new configuration classes to define store-specific attributes: `JdbcDefaultBatchConfiguration` and `MongoDefaultBatchConfiguration`.
-These classes can be used to configure specific attributes of each job repository as well as other batch infrastructure beans programmatically.
+For more details, please refer to the
+xref:readers-and-writers/item-reader-writer-implementations.adoc#repositoryItemWriter[`RepositoryItemWriter`]
+section.
 
-=== Resourceless batch infrastructure by default
+[[location-patterns-in-multiresourceitemreaderbuilder]]
+== Location patterns in `MultiResourceItemReaderBuilder`
 
-The `DefaultBatchConfiguration` class has been updated to provide a "resourceless" batch infrastructure by default (based on the `ResourcelessJobRepository` implementation introduced in v5.2). This means that it no longer requires an in-memory database (like H2 or HSQLDB) for the job repository, which was previously necessary for batch metadata storage.
-
-Moreover, this change will improve the default performance of batch applications when the meta-data is not used, as the `ResourcelessJobRepository` does not require any database connections or transactions.
-
-Finally, this change will help to reduce the memory footprint of batch applications, as the in-memory database is no longer required for metadata storage.
-
-=== Batch infrastructure configuration simplification
-
-Before v6, the typical configuration of a non-trivial Spring Batch application was quite complex and required a lot of beans: `JobRepository`, `JobLauncher`, `JobExplorer`, `JobOperator`, `JobRegistry`, `JobRegistrySmartInitializingSingleton` and so on. This required a lot of configuration code, like for example the need to configure the same execution context serializer on both the `JobRepository` and `JobExplorer`.
-
-In this release, several changes have been made to simplify the batch infrastructure configuration:
-
-* The `JobRepository` now extends the `JobExplorer` interface, so there is no need to define a separate `JobExplorer` bean.
-* The `JobOperator` now extends the `JobLauncher` interface, so there is no need to define a separate `JobLauncher` bean.
-* The `JobRegistry` is now optional, and smart enough to register jobs automatically, so there is no need to define a separate `JobRegistrySmartInitializingSingleton` bean.
-* The transaction manager is now optional, and a default `ResourcelessTransactionManager` is used if none is provided.
-
-This reduces the number of beans required for a typical batch application and simplifies the configuration code.
-
-[[new-implementation-of-the-chunk-oriented-processing-model]]
-== New implementation of the chunk-oriented processing model
-
-This is not a new feature, but rather a new implementation of the chunk-oriented processing model. This new implementation was introduced as an experimental addition in version 5.1, and is now available as stable in version 6.0.
-
-The new implementation is provided in the `ChunkOrientedStep` class, which is a replacement for the `ChunkOrientedTasklet` / `TaskletStep` classes.
-
-Here is an example of how to define a `ChunkOrientedStep` by using its builder:
+`MultiResourceItemReaderBuilder` now accepts resource location patterns directly, so
+resources no longer need to be resolved and injected before configuring the reader:
 
 [source, java]
 ----
+// before
 @Bean
-public Step chunkOrientedStep(JobRepository jobRepository, ItemReader<Person> itemReader, ItemWriter<Person> itemWriter) {
-    int chunkSize = 100;
-    return new ChunkOrientedStepBuilder<Person, Person>("step", jobRepository, chunkSize)
-            .reader(itemReader)
-            .writer(itemWriter)
-            .build();
+public MultiResourceItemReader<Foo> multiResourceReader() throws IOException {
+	PathMatchingResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
+	Resource[] resources = resourcePatternResolver.getResources("classpath:data/input/file-*.txt");
+	return new MultiResourceItemReaderBuilder<Foo>()
+					.delegate(flatFileItemReader())
+					.resources(resources)
+					.build();
 }
-----
 
-Moreover, fault-tolerance features were adapted as follows:
-
-- The retry feature is now based on the retry functionality introduced in https://docs.spring.io/spring/reference/7.0/core/resilience.html[Spring Framework 7], instead of the previous Spring Retry library
-- The skip feature has been slightly adapted to the new implementation, which is now only based entirely on the `SkipPolicy` interface
-
-Here is a quick example of how to use the retry and skip features with the new `ChunkOrientedStep`:
-
-[source, java]
-----
+// after
 @Bean
-public Step faultTolerantChunkOrientedStep(JobRepository jobRepository, ItemReader<Person> itemReader, ItemWriter<Person> itemWriter) {
-
-    // retry policy configuration
-    int maxRetries = 10;
-    var retryableExceptions = Set.of(TransientException.class);
-    RetryPolicy retryPolicy = RetryPolicy.builder()
-        .maxRetries(maxRetries)
-        .includes(retryableExceptions)
-        .build();
-
-    // skip policy configuration
-    int skipLimit = 50;
-    var skippableExceptions = Set.of(FlatFileParseException.class);
-    SkipPolicy skipPolicy = new LimitCheckingExceptionHierarchySkipPolicy(skippableExceptions, skipLimit);
-
-    // step configuration
-    int chunkSize = 100;
-    return new ChunkOrientedStepBuilder<Person, Person>("step", jobRepository, chunkSize)
-        .reader(itemReader)
-        .writer(itemWriter)
-        .faultTolerant()
-        .retryPolicy(retryPolicy)
-        .skipPolicy(skipPolicy)
-        .build();
+public MultiResourceItemReader<Foo> multiResourceReader() {
+	return new MultiResourceItemReaderBuilder<Foo>()
+					.delegate(flatFileItemReader())
+					.resources("classpath:data/input/file-*.txt")
+					.build();
 }
 ----
 
-Please refer to the https://github.com/spring-projects/spring-batch/wiki/Spring-Batch-6.0-Migration-Guide[migration guide] for more details on how to migrate from the previous implementation to the new one.
+Each pattern is resolved with a `PathMatchingResourcePatternResolver`, so any resource
+prefix supported by Spring (`file:`, `classpath:`, `classpath*:`, and so on) can be used,
+in addition to Ant-style wildcards (`*`, `**`, and `?`). For more details, please refer to
+the xref:readers-and-writers/multi-file-input.adoc#multiFileInputLocationPatterns[Specifying
+Resources With a Location Pattern] section.
 
-[[new-concurrency-model]]
-== New concurrency model
+[[new-resourcesitemreaderbuilder]]
+== New `ResourcesItemReaderBuilder`
 
-Prior to this release, the concurrency model based on the "parallel iteration" concept required a lot of state synchronization at different levels and had several limitations related to throttling and backpressure leading to confusing transaction semantics and poor performance.
-
-This release revisits that model and comes with a new, simplified approach to concurrency based on the producer-consumer pattern. A concurrent chunk-oriented step now uses a bounded internal queue between the producer thread and consumer threads. Items are put in the queue as soon as they are ready to be processed, and consumer threads take items from the queue as soon as they are available for processing. Once a chunk is ready to be written, the producer thread pauses until the chunk is written, and then resumes producing items.
-
-This new model is more efficient, easier to understand and provides better performance for concurrent executions.
-
-[[new-command-line-operator]]
-== New command line operator
-
-Spring Batch provided a `CommandLineJobRunner` since version 1. While this runner served its purpose well over the years, it started to show some limitations when it comes to extensibility and customisation. Many issues like static initialisation, non-standard way of handling options and parameters, lack of extensibility, etc have been reported.
-
-Moreover, all these issues made it impossible to reuse that runner in Spring Boot, which resulted in duplicate code in both projects as well behaviour divergence (like job parameters incrementer behaviour differences) that is confusing to many users.
-
-This release introduces a modern version of `CommandLineJobRunner`, named `CommandLineJobOperator`, that allows you to operate batch jobs from the command line (start, stop, restart and so on) and that is customisable, extensible and updated to the new changes introduced in Spring Batch 6.
-
-[[ability-to-recover-failed-job-executions]]
-== Ability to recover failed job executions
-
-Prior to this release, if a job execution fails abruptly, it was not possible to recover it without a manual database update. This was error-prone and not consistent across different job repositories (as it required a few SQL statements for JDBC databases and some custom statements for NoSQL stores).
-
-This release introduces a new method named `recover` in the `JobOperator` interface that allows you to recover failed job executions consistently across all job repositories.
-
-[[ability-to-stop-all-kind-of-steps]]
-== Ability to stop all kinds of steps
-
-As of v5.2, it is only possible to externally stop `Tasklet` steps through  `JobOperator#stop`.
-If a custom `Step` implementation wants to handle external stop signals, it just can't.
-
-This release adds a new interface, named `StoppableStep`, that extends `Step` and which can be implemented by any step that is able to handle stop signals.
-
-[[graceful-shutdown]]
-== Graceful Shutdown support
-
-Spring Batch 6.0 introduces support for graceful shutdown of batch jobs. This feature allows you to stop a running job execution in a controlled manner, ensuring that interruption signals are correctly sent to running steps.
-
-When a graceful shutdown is initiated, the job execution will stop currently active steps and updates the job repository with a consistent state that enables restartability. Once running steps have finished, the job execution will be marked as stopped, and any necessary cleanup operations will be performed.
-
-
-[[observability-with-jfr]]
-== Observability with the Java Flight Recorder (JFR)
-
-In addition to the existing Micrometer metrics, Spring Batch 6.0 introduces support for the Java Flight Recorder (JFR) to provide enhanced observability capabilities.
-
-JFR is a powerful profiling and event collection framework built into the Java Virtual Machine (JVM). It allows you to capture detailed information about the runtime behavior of your applications with minimal performance overhead.
-
-This release introduces several JFR events to monitor key aspects of a batch job execution, including job and step executions, item reads and writes, as well as transaction boundaries.
-
-[[jspecify]]
-== Null safety annotations with JSpecify
-
-Spring Batch 6.0 APIs are now annotated with https://jspecify.dev/[JSpecify] annotations to provide better null-safety guarantees and improve code quality.
-
-[[local-chunking]]
-== Local chunking support
-
-Similar to remote chunking, local chunking is a new feature that allows you to process chunks of items in parallel, locally within the same JVM using multiple threads. This is particularly useful when you have a large number of items to process and want to take advantage of multi-core processors.
-With local chunking, you can configure a chunk-oriented step to use multiple threads to process chunks of items concurrently. Each thread will read, process and write its own chunk of items independently, while the step will manage the overall execution and commit the results.
-
-[[seda-with-si]]
-== SEDA style with Spring Integration message channels
-
-In Spring Batch 5.2, we introduced the concept of SEDA (Staged Event-Driven Architecture) style processing using local threads with the `BlockingQueueItemReader` and `BlockingQueueItemWriter` components. Building on that foundation,
-Spring Batch 6.0 introduces support for SEDA style processing at scale using Spring Integration messaging channels. This allows you to decouple the different stages of a batch job and process them asynchronously using message channels. By leveraging Spring Integration, you can easily configure and manage the messaging channels, as well as take advantage of features like message transformation, filtering, and routing.
-
-[[jackson-3-support]]
-== Jackson 3 support
-
-Spring Batch 6.0 has been upgraded to support Jackson 3.x for JSON processing. This upgrade ensures compatibility with the latest features and improvements in the Jackson library, while also providing better performance and security. All JSON-related components in Spring Batch, such as the `JsonItemReader` and `JsonFileItemWriter`, as well as the `JacksonExecutionContextStringSerializer` have been updated to use Jackson 3.x by default.
-
-The support for Jackson 2.x has been deprecated and will be removed in a future release. If you are currently using Jackson 2.x in your Spring Batch applications, it is recommended to upgrade to Jackson 3.x to take advantage of the latest features and improvements.
-
-[[remote-step-support]]
-== Remote step support
-
-This release introduces support for remote step executions, allowing you to execute steps of a batch job on remote machines or clusters.
-This feature is particularly useful for large-scale batch processing scenarios where you want to distribute the workload across multiple nodes to improve performance and scalability. Remote step execution is facilitated through the use of Spring Integration messaging channels, which enable communication between the local job execution environment and the remote step executors.
-
-[[lambda-style-configuration]]
-== Lambda style configuration
-
-This release introduces the use of contextual lambda expressions to configure batch artefacts. This new style of configuration provides a more concise and readable way to define item readers and writers.
-
-For example, instead of using the traditional builder pattern like this:
+This release introduces a builder for `ResourcesItemReader`, called `ResourcesItemReaderBuilder`.
+Like `MultiResourceItemReaderBuilder`, it can resolve resources directly from one
+or more location patterns:
 
 [source, java]
 ----
-var reader = new FlatFileItemReaderBuilder()
- .resource(...)
- .delimited()
- .delimiter(",")
- .quoteCharacter('"')
- ...
- .build();
+// before
+PathMatchingResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
+ResourcesItemReader reader = new ResourcesItemReader();
+reader.setResources(resourcePatternResolver.getResources("file:/data/inputs/*.csv"));
+reader.setName("resourcesReader");
+
+// after
+ResourcesItemReader reader = new ResourcesItemReaderBuilder()
+				.resources("file:/data/inputs/*.csv")
+				.name("resourcesReader")
+				.build();
 ----
 
-You can now use a lambda expression to configure the delimited options like this:
+For more details, please refer to the
+xref:readers-and-writers/item-reader-writer-implementations.adoc#resourcesItemReader[`ResourcesItemReader`]
+section.
+
+[[schema-locations-in-databasetype]]
+== Schema locations in `DatabaseType`
+
+`DatabaseType` now exposes the classpath locations of the schema creation and drop
+scripts for each supported database, through the new `getProductSchema()` and
+`getProductSchemaDrop()` methods. This avoids hard-coding these locations (and the risk
+of typos) when configuring a `DataSource` or a `ResourceDatabasePopulator`:
 
 [source, java]
 ----
-var reader = new FlatFileItemReaderBuilder()
- .resource(...)
- .delimited (config -> config.delimiter(',').quoteCharcter( '"' ))
- ...
- .build();
+// before
+new EmbeddedDatabaseBuilder()
+    .addScript("/org/springframework/batch/core/schema-drop-h2.sql")
+    .addScript("/org/springframework/batch/core/schema-h2.sql")
+    .build();
+
+// after
+new EmbeddedDatabaseBuilder()
+    .addScript(DatabaseType.H2.getProductSchemaDrop())
+    .addScript(DatabaseType.H2.getProductSchema())
+    .build();
 ----
 
-[[deprecations-and-pruning]]
-== Deprecations and pruning
+For more details, please refer to the
+xref:schema-appendix.adoc#exampleDDLScripts[Example DDL Scripts] section.
 
-As with any major release, some features have been deprecated or removed in Spring Batch 6.0. The following changes are worth noting:
+[[default-name-for-item-readers-and-writers]]
+== Default name for item readers and writers
 
-* All deprecated APIs and features from previous versions have been removed
-* Modular configuration through `@EnableBatchProcessing(modular = true)` has been deprecated
-* Several APIs have been deprecated in this version, in order to simplify the core API and reduce its scope
-* Deprecate JUnit 4 support in the `spring-batch-test` module
-* Deprecate Jackson 2 support
-* Deprecate XML configuration through the `batch:...` namespace
+Builders for item readers and writers that persist their state in the `ExecutionContext`
+(for example `FlatFileItemReaderBuilder`, `JdbcCursorItemReaderBuilder`,
+`JdbcPagingItemReaderBuilder`, `RepositoryItemReaderBuilder`, and others) no longer
+require an explicit name to be set when `saveState` is `true`:
 
-Fore more details, please refer to the https://github.com/spring-projects/spring-batch/wiki/Spring-Batch-6.0-Migration-Guide[migration guide].
+[source, java]
+----
+// before: required an explicit name, or building the reader would fail
+// after: builds successfully, using a default name
+@Bean
+public FlatFileItemReader<Foo> fooReader() {
+    return new FlatFileItemReaderBuilder<Foo>()
+                    .resource(resource)
+                    .delimited()
+                    .names("first", "second", "third")
+                    .targetType(Foo.class)
+                    .build();
+}
+----
+
+This is possible because these readers and writers extend `ItemStreamSupport`, which
+already defaults the name to the short class name and overrides it with the Spring bean
+name when the reader or writer is declared as a bean. The strict name requirement in the
+builders was redundant with this existing behavior. An explicit name is still recommended,
+and required, when the default is not unique enough, such as when two instances of the
+same reader or writer type are used within the same step. For more details, please refer
+to the xref:readers-and-writers/custom.adoc[Custom `ItemReader`s and `ItemWriter`s]
+section.
+
+[[compile-time-safety-for-mutually-exclusive-builder-methods]]
+== Compile-time safety for mutually exclusive builder methods
+
+A few builders exposed pairs of methods that configure mutually exclusive strategies,
+but allowed calling both on the same instance, only failing with an
+`IllegalStateException` when `build()` was called:
+
+* `FlatFileItemReaderBuilder#targetType(Class)` and `#fieldSetMapper(FieldSetMapper)`
+* `FlatFileItemWriterBuilder#delimited()`/`#delimited(Consumer)` and
+  `#formatted()`/`#formatted(Consumer)`
+* `JdbcBatchItemWriterBuilder#columnMapped()` and `#beanMapped()`
+
+These builders now use a staged DSL: calling one of the two methods returns a stage
+that exposes every other configuration method of the builder, except the conflicting
+one, so invalid combinations are now rejected by the compiler instead of at runtime:
+
+[source, java]
+----
+// before: compiles, but throws IllegalStateException at build() time
+new FlatFileItemReaderBuilder<Foo>()
+    .name("fooReader")
+    .resource(resource)
+    .lineTokenizer(tokenizer)
+    .targetType(Foo.class)
+    .fieldSetMapper(fieldSetMapper) // IllegalStateException at build()
+    .build();
+
+// after: fieldSetMapper() is not available once targetType() has been called
+new FlatFileItemReaderBuilder<Foo>()
+    .name("fooReader")
+    .resource(resource)
+    .lineTokenizer(tokenizer)
+    .targetType(Foo.class)
+    .fieldSetMapper(fieldSetMapper) // compile error
+    .build();
+----
+
+The tokenizer/line mapping methods (`delimited()`, `fixedLength()`, `lineTokenizer()`)
+can still be configured before or after `targetType()`/`fieldSetMapper()`, in any order.
+
+TIP: This is a source and binary breaking change for code compiled against Spring Batch
+6.0 that calls `targetType()`, `fieldSetMapper()`, `delimited()`/`formatted()` (on
+`FlatFileItemWriterBuilder`), or `columnMapped()`/`beanMapped()`, since the return type
+of these methods changed from the builder itself to a dedicated stage type. Code that
+only chains calls fluently (the vast majority of usages) needs no changes beyond a
+recompile; code that stores the return value in a variable typed as the builder class,
+or that relied on catching the `IllegalStateException` from an invalid combination, needs
+to be updated.
+
+For more details, see
+https://github.com/spring-projects/spring-batch/issues/4888[issue #4888].
+
+[[deprecations]]
+== Deprecations
+
+The following features have been deprecated in Spring Batch 6.1:
+
+* Deprecate Apache Derby support (`DatabaseType.DERBY`, `DerbyPagingQueryProvider` and the Derby DDL scripts), scheduled for removal in version 7.0.0
+* Deprecate the legacy date/time converters (`DateToStringConverter`, `StringToDateConverter`, `LocalDateToStringConverter`, `StringToLocalDateConverter`, `LocalTimeToStringConverter`, `StringToLocalTimeConverter`, `LocalDateTimeToStringConverter` and `StringToLocalDateTimeConverter`) in favor of `ConversionServiceFactory#createConversionService()`, scheduled for removal in version 7.0.0
+* Deprecate `StepExecution#getJobExecutionId()` and `StepExecution#getJobParameters()` in favor of `StepExecution#getJobExecution()`, scheduled for removal in version 7.0
+* Deprecate `JobExecution#getJobInstanceId()` in favor of `JobExecution#getJobInstance()`, scheduled for removal in version 7.0
+* Deprecate `RepositoryItemReader#setSorts(Map)` and `RepositoryItemReader#setRepository(PagingAndSortingRepository)` in favor of passing the sorts and the repository to the constructor, scheduled for removal in version 7.0
+* Deprecate `RepositoryItemWriter#setRepository(CrudRepository)` in favor of passing the repository to the constructor, scheduled for removal in version 7.0
+* Deprecate `org.springframework.batch.integration.async.AsyncItemProcessor`, `org.springframework.batch.integration.async.AsyncItemWriter`, and `org.springframework.batch.integration.chunk.ChunkTaskExecutorItemWriter` in favor of their counterparts in `org.springframework.batch.core.step.item`, see the xref:whatsnew.adoc#async-processing-apis-and-local-chunking-moved-to-core[Async processing APIs and local chunking moved to `spring-batch-core`] section for more details
+* Deprecate `JobRepository#getJobInstanceCount(String)`, `JobExplorer#getJobInstanceCount(String)`, and `JobInstanceDao#getJobInstanceCount(String)` in favor of `countJobInstances(String)`, and `JobRepository#getStepExecutionCount(JobInstance, String)` and `JobExplorer#getStepExecutionCount(JobInstance, String)` in favor of `countStepExecutions(JobInstance, String)`. These methods cannot soundly determine whether a job or step name is unknown, as opposed to simply never having been persisted or executed yet; that validation belongs at the job operator level, where the job registry is available. Scheduled for removal in version 7.0

@@ -162,12 +162,25 @@ public class ResourcelessJobRepository implements JobRepository {
 		return false;
 	}
 
+	/**
+	 * @deprecated since 6.1 in favor of {@link #countJobInstances(String)}. Scheduled for
+	 * removal in 7.0.
+	 */
+	@Deprecated(since = "6.1", forRemoval = true)
 	@Override
 	public long getJobInstanceCount(String jobName) throws NoSuchJobException {
 		if (!getJobNames().contains(jobName)) {
 			throw new NoSuchJobException("No job instances were found for job name " + jobName);
 		}
-		return 1;
+		return countJobInstances(jobName);
+	}
+
+	/**
+	 * @since 6.1
+	 */
+	@Override
+	public long countJobInstances(String jobName) {
+		return getJobNames().contains(jobName) ? 1 : 0;
 	}
 
 	@Override
@@ -317,8 +330,21 @@ public class ResourcelessJobRepository implements JobRepository {
 			.orElse(null);
 	}
 
+	/**
+	 * @deprecated since 6.1 in favor of
+	 * {@link #countStepExecutions(JobInstance, String)}. Scheduled for removal in 7.0.
+	 */
+	@Deprecated(since = "6.1", forRemoval = true)
 	@Override
 	public long getStepExecutionCount(JobInstance jobInstance, String stepName) {
+		return countStepExecutions(jobInstance, stepName);
+	}
+
+	/**
+	 * @since 6.1
+	 */
+	@Override
+	public long countStepExecutions(JobInstance jobInstance, String stepName) {
 		if (this.jobExecution == null || !(this.jobExecution.getJobInstance().getId() == jobInstance.getId())) {
 			throw new IllegalStateException(
 					"The job instance passed as a parameter is not recognized by this job repository");

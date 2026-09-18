@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2025 the original author or authors.
+ * Copyright 2023-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.repository;
 
+import org.springframework.batch.infrastructure.support.DatabaseType;
 import javax.sql.DataSource;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -74,7 +75,7 @@ class MariaDBJobRepositoryIntegrationTests {
 	@BeforeEach
 	void setUp() {
 		ResourceDatabasePopulator databasePopulator = new ResourceDatabasePopulator();
-		databasePopulator.addScript(new ClassPathResource("/org/springframework/batch/core/schema-mariadb.sql"));
+		databasePopulator.addScript(new ClassPathResource(DatabaseType.MARIADB.getProductSchema()));
 		databasePopulator.execute(this.dataSource);
 	}
 

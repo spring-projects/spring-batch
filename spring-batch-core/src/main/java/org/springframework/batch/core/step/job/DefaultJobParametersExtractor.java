@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,7 +65,7 @@ public class DefaultJobParametersExtractor implements JobParametersExtractor {
 	@Override
 	public JobParameters getJobParameters(Job job, StepExecution stepExecution) {
 		JobParametersBuilder builder = new JobParametersBuilder();
-		JobParameters jobParameters = stepExecution.getJobParameters();
+		JobParameters jobParameters = stepExecution.getJobExecution().getJobParameters();
 		ExecutionContext executionContext = stepExecution.getExecutionContext();
 		if (useAllParentParameters) {
 			for (JobParameter<?> jobParameter : jobParameters) {

@@ -31,12 +31,16 @@ import javax.xml.namespace.QName;
 import org.junit.jupiter.api.Test;
 import tools.jackson.databind.json.JsonMapper;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.springframework.batch.core.job.parameters.JobParameter;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.job.parameters.JobParametersBuilder;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Mahmoud Ben Hassine
  * @author Soonjae Jung
+ * @author Yanming Zhou
  */
 class JacksonExecutionContextStringSerializerTests {
 
@@ -116,6 +120,36 @@ class JacksonExecutionContextStringSerializerTests {
 		// then
 		QName deserializedQName = (QName) deserializedContext.get("qName");
 		assertEquals(qName, deserializedQName);
+	}
+
+	@Test
+	void testJobParametersSerialization() throws IOException {
+		// given
+		JacksonExecutionContextStringSerializer serializer = new JacksonExecutionContextStringSerializer();
+		LocalDate now = LocalDate.now();
+		JobParameters jobParameters = new JobParametersBuilder()
+			.addJobParameter("date", LocalDate.now(), LocalDate.class)
+			.addJobParameter("foo", "bar", String.class, false)
+			.toJobParameters();
+		Map<String, Object> map = new HashMap<>();
+		map.put("jobParameters", jobParameters);
+
+		// when
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		serializer.serialize(map, outputStream);
+		InputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
+		Map<String, Object> deserializedContext = serializer.deserialize(inputStream);
+
+		// then
+		JobParameters deserializedJobParameters = (JobParameters) deserializedContext.get("jobParameters");
+		JobParameter<?> dateJobParameter = deserializedJobParameters.getParameter("date");
+		assertNotNull(dateJobParameter);
+		assertEquals(now, dateJobParameter.value());
+		assertTrue(dateJobParameter.identifying());
+		JobParameter<?> fooJobParameter = deserializedJobParameters.getParameter("foo");
+		assertNotNull(fooJobParameter);
+		assertEquals("bar", fooJobParameter.value());
+		assertFalse(fooJobParameter.identifying());
 	}
 
 }

@@ -135,8 +135,9 @@ class LdifReaderBuilderTests extends LdifReaderTestSupport {
 	}
 
 	@Test
-	void itemReaderWithNoNameAndDefaultSaveStateShouldFail() {
-		assertThrows(IllegalArgumentException.class, () -> new LdifReaderBuilder().resource(ldifResource).build());
+	void itemReaderWithNoNameAndDefaultSaveStateShouldUseDefaultName() throws Exception {
+		LdifReader reader = new LdifReaderBuilder().resource(ldifResource).build();
+		assertEquals("LdifReader", reader.getName());
 	}
 
 	@Test

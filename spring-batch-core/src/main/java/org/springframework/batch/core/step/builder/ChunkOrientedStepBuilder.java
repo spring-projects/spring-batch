@@ -37,6 +37,9 @@ import org.springframework.batch.core.annotation.BeforeWrite;
 import org.springframework.batch.core.annotation.OnChunkError;
 import org.springframework.batch.core.annotation.OnProcessError;
 import org.springframework.batch.core.annotation.OnReadError;
+import org.springframework.batch.core.annotation.OnSkipInProcess;
+import org.springframework.batch.core.annotation.OnSkipInRead;
+import org.springframework.batch.core.annotation.OnSkipInWrite;
 import org.springframework.batch.core.annotation.OnWriteError;
 import org.springframework.batch.core.listener.ChunkListener;
 import org.springframework.batch.core.listener.ItemProcessListener;
@@ -254,6 +257,9 @@ public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrien
 		listenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), BeforeWrite.class));
 		listenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), AfterWrite.class));
 		listenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), OnWriteError.class));
+		listenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), OnSkipInRead.class));
+		listenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), OnSkipInProcess.class));
+		listenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), OnSkipInWrite.class));
 
 		if (!listenerMethods.isEmpty()) {
 			StepListenerFactoryBean factory = new StepListenerFactoryBean();

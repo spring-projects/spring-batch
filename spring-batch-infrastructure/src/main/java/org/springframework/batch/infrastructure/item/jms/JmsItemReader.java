@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,7 +66,10 @@ public class JmsItemReader<T> implements ItemReader<T> {
 	/**
 	 * Setter for JMS template.
 	 * @param jmsTemplate a {@link JmsOperations} instance
+	 * @deprecated since 6.1 in favor of passing the JMS template to the constructor.
+	 * Scheduled for removal in 7.0.
 	 */
+	@Deprecated(since = "6.1", forRemoval = true)
 	public void setJmsTemplate(JmsOperations jmsTemplate) {
 		this.jmsTemplate = jmsTemplate;
 		if (jmsTemplate instanceof JmsTemplate template) {

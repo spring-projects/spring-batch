@@ -21,11 +21,14 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 import tools.jackson.databind.jsontype.PolymorphicTypeValidator;
 
+import org.springframework.batch.core.job.parameters.JobParameter;
+import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
 
 /**
@@ -37,9 +40,21 @@ import org.springframework.batch.core.repository.ExecutionContextSerializer;
  *
  * @author Mahmoud Ben Hassine
  * @author Soonjae Jung
+ * @author Yanming Zhou
  * @since 6.0.0
  */
 public class JacksonExecutionContextStringSerializer implements ExecutionContextSerializer {
+
+	private static final PolymorphicTypeValidator polymorphicTypeValidator = BasicPolymorphicTypeValidator.builder()
+		.allowIfSubType("java.util.")
+		.allowIfSubType("java.sql.")
+		.allowIfSubType("java.lang.")
+		.allowIfSubType("java.math.")
+		.allowIfSubType("java.time.")
+		.allowIfSubType("java.net.")
+		.allowIfSubType("javax.xml.namespace.QName")
+		.allowIfSubType("org.springframework.batch.")
+		.build();
 
 	private final JsonMapper jsonMapper;
 
@@ -49,17 +64,19 @@ public class JacksonExecutionContextStringSerializer implements ExecutionContext
 	 * deserialized).
 	 */
 	public JacksonExecutionContextStringSerializer() {
-		PolymorphicTypeValidator polymorphicTypeValidator = BasicPolymorphicTypeValidator.builder()
-			.allowIfSubType("java.util.")
-			.allowIfSubType("java.sql.")
-			.allowIfSubType("java.lang.")
-			.allowIfSubType("java.math.")
-			.allowIfSubType("java.time.")
-			.allowIfSubType("java.net.")
-			.allowIfSubType("javax.xml.namespace.QName")
-			.allowIfSubType("org.springframework.batch.")
-			.build();
-		this.jsonMapper = JsonMapper.builder().activateDefaultTyping(polymorphicTypeValidator).build();
+		this(JsonMapper.builder());
+	}
+
+	/**
+	 * Create a new {@link JacksonExecutionContextStringSerializer} with a custom
+	 * {@link JsonMapper.Builder}.
+	 * @param jsonMapperBuilder the {@link JsonMapper.Builder} to use for
+	 * serialization/deserialization
+	 */
+	public JacksonExecutionContextStringSerializer(JsonMapper.Builder jsonMapperBuilder) {
+		this(jsonMapperBuilder.activateDefaultTyping(polymorphicTypeValidator)
+			.addMixIns(Map.of(JobParameters.class, JobParametersMixIn.class))
+			.build());
 	}
 
 	/**
@@ -81,6 +98,17 @@ public class JacksonExecutionContextStringSerializer implements ExecutionContext
 	@Override
 	public void serialize(Map<String, Object> object, OutputStream outputStream) throws IOException {
 		this.jsonMapper.writeValue(outputStream, object);
+	}
+
+	@SuppressWarnings("unused")
+	private abstract static class JobParametersMixIn {
+
+		@JsonIgnore
+		abstract boolean isEmpty();
+
+		@JsonIgnore
+		abstract Map<String, JobParameter<?>> getIdentifyingParameters();
+
 	}
 
 }

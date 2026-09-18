@@ -22,6 +22,7 @@ import com.mongodb.client.model.ReturnDocument;
 import org.bson.Document;
 import org.jspecify.annotations.Nullable;
 
+import org.springframework.batch.core.repository.dao.AbstractMongoBatchMetadataDao;
 import org.springframework.core.retry.RetryException;
 import org.springframework.core.retry.RetryPolicy;
 import org.springframework.core.retry.RetryTemplate;
@@ -32,6 +33,7 @@ import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.util.Assert;
 
 // Based on https://www.mongodb.com/blog/post/generating-globally-unique-identifiers-for-use-with-mongodb
 // Section: Use a single counter document to generate unique identifiers one at a time
@@ -59,6 +61,8 @@ public class MongoSequenceIncrementer implements DataFieldMaxValueIncrementer {
 	private final MongoOperations mongoTemplate;
 
 	private final String sequenceName;
+
+	private String collectionPrefix = AbstractMongoBatchMetadataDao.DEFAULT_COLLECTION_PREFIX;
 
 	/*
 	 * Transaction template used to increment the sequence outside of any ongoing
@@ -98,6 +102,18 @@ public class MongoSequenceIncrementer implements DataFieldMaxValueIncrementer {
 		this.transactionTemplate = template;
 	}
 
+	/**
+	 * Set the prefix prepended to the collection holding the sequences. Defaults to
+	 * {@link AbstractMongoBatchMetadataDao#DEFAULT_COLLECTION_PREFIX}.
+	 * @param collectionPrefix the prefix prepended to the collection holding the
+	 * sequences
+	 * @since 6.1.0
+	 */
+	public void setCollectionPrefix(String collectionPrefix) {
+		Assert.notNull(collectionPrefix, "Collection prefix must not be null.");
+		this.collectionPrefix = collectionPrefix;
+	}
+
 	@Override
 	public long nextLongValue() throws DataAccessException {
 		if (this.transactionTemplate != null) {
@@ -108,9 +124,11 @@ public class MongoSequenceIncrementer implements DataFieldMaxValueIncrementer {
 	}
 
 	private long incrementSequence() throws DataAccessException {
+		String sequencesCollectionName = this.collectionPrefix
+				+ AbstractMongoBatchMetadataDao.DEFAULT_SEQUENCES_COLLECTION_NAME;
 		try {
 			return retryTemplate
-				.execute(() -> mongoTemplate.execute("BATCH_SEQUENCES", collection -> collection
+				.execute(() -> mongoTemplate.execute(sequencesCollectionName, collection -> collection
 					.findOneAndUpdate(new Document("_id", sequenceName), new Document("$inc", new Document("count", 1)),
 							new FindOneAndUpdateOptions().returnDocument(ReturnDocument.AFTER))
 					.getLong("count")));

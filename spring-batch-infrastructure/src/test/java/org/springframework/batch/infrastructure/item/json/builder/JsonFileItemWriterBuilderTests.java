@@ -67,10 +67,11 @@ class JsonFileItemWriterBuilderTests {
 	}
 
 	@Test
-	void testMandatoryNameWhenSaveStateIsSet() {
-		var builder = new JsonFileItemWriterBuilder<String>().resource(this.resource)
-			.jsonObjectMarshaller(this.jsonObjectMarshaller);
-		assertThrows(IllegalArgumentException.class, builder::build);
+	void testDefaultNameWhenSaveStateIsSet() {
+		JsonFileItemWriter<String> writer = new JsonFileItemWriterBuilder<String>().resource(this.resource)
+			.jsonObjectMarshaller(this.jsonObjectMarshaller)
+			.build();
+		assertEquals("JsonFileItemWriter", writer.getName());
 	}
 
 	@Test

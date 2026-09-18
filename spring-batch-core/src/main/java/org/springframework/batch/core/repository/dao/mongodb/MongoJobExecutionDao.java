@@ -1,5 +1,5 @@
 /*
- * Copyright 2024-2026 the original author or authors.
+ * Copyright 2024-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,9 +28,12 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.repository.dao.AbstractMongoBatchMetadataDao;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.persistence.JobParameter;
 import org.springframework.batch.core.repository.persistence.converter.JobExecutionConverter;
@@ -47,25 +50,23 @@ import static org.springframework.data.mongodb.core.query.Query.query;
 /**
  * @author Mahmoud Ben Hassine
  * @author Yanming Zhou
+ * @author Myeongha Shin
  * @since 5.2.0
  */
-public class MongoJobExecutionDao implements JobExecutionDao {
+public class MongoJobExecutionDao extends AbstractMongoBatchMetadataDao implements JobExecutionDao {
 
-	private static final String JOB_EXECUTIONS_COLLECTION_NAME = "BATCH_JOB_EXECUTION";
-
-	private static final String JOB_EXECUTIONS_SEQUENCE_NAME = "BATCH_JOB_EXECUTION_SEQ";
+	private static final String JOB_EXECUTIONS_COLLECTION_NAME = "JOB_EXECUTION";
 
 	private final MongoOperations mongoOperations;
 
 	private final JobExecutionConverter jobExecutionConverter = new JobExecutionConverter();
 
-	private DataFieldMaxValueIncrementer jobExecutionIncrementer;
+	private @Nullable DataFieldMaxValueIncrementer jobExecutionIncrementer;
 
 	private MongoJobInstanceDao jobInstanceDao;
 
 	public MongoJobExecutionDao(MongoOperations mongoOperations) {
 		this.mongoOperations = mongoOperations;
-		this.jobExecutionIncrementer = new MongoSequenceIncrementer(mongoOperations, JOB_EXECUTIONS_SEQUENCE_NAME);
 	}
 
 	public void setJobExecutionIncrementer(DataFieldMaxValueIncrementer jobExecutionIncrementer) {
@@ -76,13 +77,27 @@ public class MongoJobExecutionDao implements JobExecutionDao {
 		this.jobInstanceDao = jobInstanceDao;
 	}
 
+	/*
+	 * The incrementer is created lazily so that it picks up the configured collection
+	 * prefix, whenever it is set. It is typically injected by the enclosing factory bean.
+	 */
+	private DataFieldMaxValueIncrementer getJobExecutionIncrementer() {
+		if (this.jobExecutionIncrementer == null) {
+			MongoSequenceIncrementer incrementer = new MongoSequenceIncrementer(this.mongoOperations,
+					getSequenceName(DEFAULT_JOB_EXECUTION_INCREMENTER_NAME));
+			incrementer.setCollectionPrefix(getCollectionPrefix());
+			this.jobExecutionIncrementer = incrementer;
+		}
+		return this.jobExecutionIncrementer;
+	}
+
 	public JobExecution createJobExecution(JobInstance jobInstance, JobParameters jobParameters) {
-		long id = jobExecutionIncrementer.nextLongValue();
+		long id = getJobExecutionIncrementer().nextLongValue();
 		JobExecution jobExecution = new JobExecution(id, jobInstance, jobParameters);
 
 		org.springframework.batch.core.repository.persistence.JobExecution jobExecutionToSave = this.jobExecutionConverter
 			.fromJobExecution(jobExecution);
-		this.mongoOperations.insert(jobExecutionToSave, JOB_EXECUTIONS_COLLECTION_NAME);
+		this.mongoOperations.insert(jobExecutionToSave, getCollectionName(JOB_EXECUTIONS_COLLECTION_NAME));
 
 		return jobExecution;
 	}
@@ -92,7 +107,8 @@ public class MongoJobExecutionDao implements JobExecutionDao {
 		Query query = query(where("jobExecutionId").is(jobExecution.getId()));
 		org.springframework.batch.core.repository.persistence.JobExecution jobExecutionToUpdate = this.jobExecutionConverter
 			.fromJobExecution(jobExecution);
-		this.mongoOperations.findAndReplace(query, jobExecutionToUpdate, JOB_EXECUTIONS_COLLECTION_NAME);
+		this.mongoOperations.findAndReplace(query, jobExecutionToUpdate,
+				getCollectionName(JOB_EXECUTIONS_COLLECTION_NAME));
 	}
 
 	@Override
@@ -101,7 +117,7 @@ public class MongoJobExecutionDao implements JobExecutionDao {
 			.with(Sort.by(Sort.Direction.DESC, "jobExecutionId"));
 		List<org.springframework.batch.core.repository.persistence.JobExecution> jobExecutions = this.mongoOperations
 			.find(query, org.springframework.batch.core.repository.persistence.JobExecution.class,
-					JOB_EXECUTIONS_COLLECTION_NAME);
+					getCollectionName(JOB_EXECUTIONS_COLLECTION_NAME));
 		return jobExecutions.stream().map(jobExecution -> convert(jobExecution, jobInstance)).toList();
 	}
 
@@ -112,7 +128,7 @@ public class MongoJobExecutionDao implements JobExecutionDao {
 		org.springframework.batch.core.repository.persistence.JobExecution jobExecution = this.mongoOperations.findOne(
 				query.with(Sort.by(sortOrder)),
 				org.springframework.batch.core.repository.persistence.JobExecution.class,
-				JOB_EXECUTIONS_COLLECTION_NAME);
+				getCollectionName(JOB_EXECUTIONS_COLLECTION_NAME));
 		return jobExecution != null ? convert(jobExecution, jobInstance) : null;
 	}
 
@@ -128,7 +144,7 @@ public class MongoJobExecutionDao implements JobExecutionDao {
 				where("jobInstanceId").in(jobInstanceMap.keySet()).and("status").in("STARTING", "STARTED", "STOPPING"));
 		return this.mongoOperations
 			.find(query, org.springframework.batch.core.repository.persistence.JobExecution.class,
-					JOB_EXECUTIONS_COLLECTION_NAME)
+					getCollectionName(JOB_EXECUTIONS_COLLECTION_NAME))
 			.stream()
 			.map(jobExecution -> convert(jobExecution, jobInstanceMap.get(jobExecution.getJobInstanceId())))
 			.collect(Collectors.toSet());
@@ -139,7 +155,7 @@ public class MongoJobExecutionDao implements JobExecutionDao {
 		Query jobExecutionQuery = query(where("jobExecutionId").is(executionId));
 		org.springframework.batch.core.repository.persistence.JobExecution jobExecution = this.mongoOperations.findOne(
 				jobExecutionQuery, org.springframework.batch.core.repository.persistence.JobExecution.class,
-				JOB_EXECUTIONS_COLLECTION_NAME);
+				getCollectionName(JOB_EXECUTIONS_COLLECTION_NAME));
 		if (jobExecution == null) {
 			return null;
 		}
@@ -162,7 +178,7 @@ public class MongoJobExecutionDao implements JobExecutionDao {
 	@Override
 	public void deleteJobExecution(JobExecution jobExecution) {
 		this.mongoOperations.remove(query(where("jobExecutionId").is(jobExecution.getId())),
-				JOB_EXECUTIONS_COLLECTION_NAME);
+				getCollectionName(JOB_EXECUTIONS_COLLECTION_NAME));
 
 	}
 
@@ -170,7 +186,8 @@ public class MongoJobExecutionDao implements JobExecutionDao {
 	public void deleteJobExecutionParameters(JobExecution jobExecution) {
 		Query query = new Query(where("jobExecutionId").is(jobExecution.getId()));
 		Update jobParametersRemovalUpdate = new Update().set("jobParameters", Collections.emptyList());
-		this.mongoOperations.updateFirst(query, jobParametersRemovalUpdate, JOB_EXECUTIONS_COLLECTION_NAME);
+		this.mongoOperations.updateFirst(query, jobParametersRemovalUpdate,
+				getCollectionName(JOB_EXECUTIONS_COLLECTION_NAME));
 	}
 
 	private JobExecution convert(org.springframework.batch.core.repository.persistence.JobExecution jobExecution,

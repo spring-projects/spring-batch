@@ -61,8 +61,9 @@ public class MultiResourceItemWriterBuilder<T> {
 	}
 
 	/**
-	 * The name used to calculate the key within the {@link ExecutionContext}. Required if
-	 * {@link #saveState(boolean)} is set to true.
+	 * The name used to calculate the key within the {@link ExecutionContext}. Defaults to
+	 * the bean name, or to the short class name if this instance is not a bean. Set it
+	 * explicitly to disambiguate several non-bean instances of the same type in a step.
 	 * @param name name of the reader instance
 	 * @return The current instance of the builder.
 	 * @see ItemStreamSupport#setName(String)
@@ -131,10 +132,6 @@ public class MultiResourceItemWriterBuilder<T> {
 	public MultiResourceItemWriter<T> build() {
 		Assert.notNull(this.resource, "resource is required.");
 		Assert.notNull(this.delegate, "delegate is required.");
-
-		if (this.saveState) {
-			org.springframework.util.Assert.hasText(this.name, "A name is required when saveState is true.");
-		}
 
 		MultiResourceItemWriter<T> writer = new MultiResourceItemWriter<>(this.delegate);
 		writer.setResource(this.resource);

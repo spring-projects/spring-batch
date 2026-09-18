@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2026 the original author or authors.
+ * Copyright 2010-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,6 +44,7 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.JdbcJobRepositoryFactoryBean;
 import org.springframework.batch.core.step.StepSupport;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
+import org.springframework.batch.infrastructure.support.DatabaseType;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
@@ -67,8 +68,8 @@ class FlowJobFailureTests {
 	@BeforeEach
 	void init() throws Exception {
 		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
-			.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-			.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
+			.addScript(DatabaseType.HSQL.getProductSchemaDrop())
+			.addScript(DatabaseType.HSQL.getProductSchema())
 			.generateUniqueName(true)
 			.build();
 		JdbcJobRepositoryFactoryBean factory = new JdbcJobRepositoryFactoryBean();
