@@ -163,8 +163,9 @@ The following example shows how to inject an `ItemReader` into a `Step` in XML:
 
 ====
 
-
-
+NOTE: When using `JdbcCursorItemReader` with PostgreSQL, the JDBC driver fetches the entire result set into memory by default unless `auto-commit` is disabled on the connection.
+To enable server-side cursoring and avoid out-of-memory errors on large data sets, set `auto-commit` to `false` on the `DataSource` (for example, `spring.datasource.hikari.auto-commit=false` when using HikariCP).
+See the https://jdbc.postgresql.org/documentation/query/#getting-results-based-on-a-cursor[PostgreSQL JDBC documentation] for details.
 
 [[JdbcCursorItemReaderProperties]]
 ==== Additional Properties
