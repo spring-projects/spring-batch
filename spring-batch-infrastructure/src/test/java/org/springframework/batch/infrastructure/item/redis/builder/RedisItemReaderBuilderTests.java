@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 the original author or authors.
+ * Copyright 2023-2025 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -31,8 +31,9 @@ import static org.mockito.Mockito.mock;
  * Test class for {@link RedisItemReaderBuilder}.
  *
  * @author Mahmoud Ben Hassine
+ * @author Hyunwoo Jung
  */
-public class RedisItemReaderBuilderTests {
+class RedisItemReaderBuilderTests {
 
 	@Test
 	void testRedisItemReaderCreation() {
@@ -44,12 +45,14 @@ public class RedisItemReaderBuilderTests {
 		RedisItemReader<String, String> reader = new RedisItemReaderBuilder<String, String>()
 			.redisTemplate(redisTemplate)
 			.scanOptions(scanOptions)
+			.fetchSize(10)
 			.build();
 
 		// then
 		assertNotNull(reader);
 		assertEquals(redisTemplate, ReflectionTestUtils.getField(reader, "redisTemplate"));
 		assertEquals(scanOptions, ReflectionTestUtils.getField(reader, "scanOptions"));
+		assertEquals(10, ReflectionTestUtils.getField(reader, "fetchSize"));
 	}
 
 }
