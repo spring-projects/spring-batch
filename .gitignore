@@ -24,6 +24,10 @@ build
 .gradle
 out
 
+# Claude artifacts
+.claude/*
+CLAUDE.md
+
 /.gradletasknamecache
 **/*.flattened-pom.xml
 
