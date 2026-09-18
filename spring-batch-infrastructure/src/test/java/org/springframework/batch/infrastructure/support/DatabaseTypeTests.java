@@ -23,24 +23,12 @@ import javax.sql.DataSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.springframework.batch.infrastructure.support.DatabaseType.DB2;
-import static org.springframework.batch.infrastructure.support.DatabaseType.DB2VSE;
-import static org.springframework.batch.infrastructure.support.DatabaseType.DB2ZOS;
-import static org.springframework.batch.infrastructure.support.DatabaseType.DB2AS400;
-import static org.springframework.batch.infrastructure.support.DatabaseType.DERBY;
-import static org.springframework.batch.infrastructure.support.DatabaseType.HSQL;
-import static org.springframework.batch.infrastructure.support.DatabaseType.MYSQL;
-import static org.springframework.batch.infrastructure.support.DatabaseType.ORACLE;
-import static org.springframework.batch.infrastructure.support.DatabaseType.POSTGRES;
-import static org.springframework.batch.infrastructure.support.DatabaseType.SQLITE;
-import static org.springframework.batch.infrastructure.support.DatabaseType.SQLSERVER;
-import static org.springframework.batch.infrastructure.support.DatabaseType.SYBASE;
-import static org.springframework.batch.infrastructure.support.DatabaseType.HANA;
-import static org.springframework.batch.infrastructure.support.DatabaseType.fromProductName;
+import static org.springframework.batch.infrastructure.support.DatabaseType.*;
 
 /**
  * @author Lucas Ward
  * @author Will Schipp
+ * @author Yanming Zhou
  *
  */
 class DatabaseTypeTests {
@@ -161,6 +149,27 @@ class DatabaseTypeTests {
 	void testBadMetaData() throws Exception {
 		DataSource ds = DatabaseTypeTestUtils.getMockDataSource(new MetaDataAccessException("Bad!"));
 		assertThrows(MetaDataAccessException.class, () -> DatabaseType.fromMetaData(ds));
+	}
+
+	@Test
+	void testSchemaLocation() {
+		String location = "org/springframework/batch/core/";
+
+		// implicit
+		assertEquals(location + "schema-db2.sql", DB2.getProductSchema());
+		assertEquals(location + "schema-drop-db2.sql", DB2.getProductSchemaDrop());
+
+		// explicit
+		assertEquals(location + "schema-db2.sql", DB2VSE.getProductSchema());
+		assertEquals(location + "schema-drop-db2.sql", DB2VSE.getProductSchemaDrop());
+		assertEquals(location + "schema-db2.sql", DB2ZOS.getProductSchema());
+		assertEquals(location + "schema-drop-db2.sql", DB2ZOS.getProductSchemaDrop());
+		assertEquals(location + "schema-db2.sql", DB2AS400.getProductSchema());
+		assertEquals(location + "schema-drop-db2.sql", DB2AS400.getProductSchemaDrop());
+		assertEquals(location + "schema-hsqldb.sql", HSQL.getProductSchema());
+		assertEquals(location + "schema-drop-hsqldb.sql", HSQL.getProductSchemaDrop());
+		assertEquals(location + "schema-postgresql.sql", POSTGRES.getProductSchema());
+		assertEquals(location + "schema-drop-postgresql.sql", POSTGRES.getProductSchemaDrop());
 	}
 
 }
