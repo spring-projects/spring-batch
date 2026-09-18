@@ -19,9 +19,10 @@ package org.springframework.batch.core.repository.dao.jdbc;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.sql.Types;
-import java.util.*;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -131,7 +132,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 
 	private JdbcJobExecutionDao jobExecutionDao;
 
-	private final Lock lock = new ReentrantLock();
+	private final FineGrainedLock<Long> lock = new FineGrainedLock<>();
 
 	/**
 	 * Public setter for the exit message length in database. Do not set this if you
@@ -226,7 +227,8 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 
 		// Attempt to prevent concurrent modification errors by blocking here if
 		// someone is already trying to do it.
-		this.lock.lock();
+		Long executionId = stepExecution.getId();
+		this.lock.lock(executionId);
 		try {
 
 			Timestamp startTime = stepExecution.getStartTime() == null ? null
@@ -259,7 +261,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 
 		}
 		finally {
-			this.lock.unlock();
+			this.lock.unlock(executionId);
 		}
 	}
 
