@@ -436,7 +436,12 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 			catch (ClassNotFoundException e) {
 				throw new RuntimeException(e);
 			}
+			// Oracle stores empty strings as SQL NULL; restore the empty serialization
+			// so converters can reconstruct empty String/List values.
 			String stringValue = rs.getString("PARAMETER_VALUE");
+			if (stringValue == null) {
+				stringValue = "";
+			}
 			Object typedValue = getConversionService().convert(stringValue, parameterType);
 
 			boolean identifying = rs.getString("IDENTIFYING").equalsIgnoreCase("Y");
