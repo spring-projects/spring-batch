@@ -120,7 +120,7 @@
 		<groovy-jsr223.version>5.1.2</groovy-jsr223.version>
 		<nashorn.version>15.7</nashorn.version>
 		<beanshell.version>2.0b6</beanshell.version>
-		<jruby.version>9.4.14.0</jruby.version> <!-- update to latest 10.0.2.0 -->
+		<jruby.version>10.1.1.0</jruby.version>
 		<lettuce.version>7.7.0.RELEASE</lettuce.version>
 		<jedis.version>8.0.1</jedis.version>
 
