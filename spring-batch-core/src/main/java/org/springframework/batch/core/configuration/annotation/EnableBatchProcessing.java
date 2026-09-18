@@ -59,7 +59,8 @@ import java.lang.annotation.Target;
  * }
  * </pre>
  *
- * By default, this annotation configures a resourceless batch infrastructure (i.e. based on a
+ * By default, this annotation configures a resourceless batch infrastructure (i.e. based
+ * on a
  * {@link org.springframework.batch.core.repository.support.ResourcelessJobRepository} and
  * a {@link ResourcelessTransactionManager}).
  *
