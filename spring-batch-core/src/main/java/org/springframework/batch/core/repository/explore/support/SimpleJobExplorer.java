@@ -289,8 +289,6 @@ public class SimpleJobExplorer implements JobExplorer {
 
 	/**
 	 * @return number of executions of the step within given job instance
-	 */
-	/**
 	 * @deprecated since 6.1 in favor of
 	 * {@link #countStepExecutions(JobInstance, String)}.
 	 */
