@@ -15,6 +15,7 @@ Spring Batch 6.1 includes the following features and improvements:
 * xref:whatsnew.adoc#schema-locations-in-databasetype[Schema locations in `DatabaseType`]
 * xref:whatsnew.adoc#default-name-for-item-readers-and-writers[Default name for item readers and writers]
 * xref:whatsnew.adoc#compile-time-safety-for-mutually-exclusive-builder-methods[Compile-time safety for mutually exclusive builder methods]
+* xref:whatsnew.adoc#avro-reflection-based-deserialization-now-requires-trusted-classes[Avro reflection-based (de)serialization now requires trusted classes]
 * xref:whatsnew.adoc#deprecations[Deprecations]
 
 [[dependencies-upgrade]]
@@ -325,6 +326,31 @@ to be updated.
 
 For more details, see
 https://github.com/spring-projects/spring-batch/issues/4888[issue #4888].
+
+[[avro-reflection-based-deserialization-now-requires-trusted-classes]]
+== Avro reflection-based (de)serialization now requires trusted classes
+
+Apache Avro 1.12.2 rejects reflection-based (de)serialization (as done by
+`SpecificDatumReader`/`SpecificDatumWriter` and their reflect-based counterparts, used by
+`AvroItemReader`/`AvroItemWriter` for `SpecificRecord` and plain Java item types) of
+classes that are not explicitly trusted, throwing a `SecurityException` at runtime
+otherwise. `GenericRecord` item types are not affected.
+
+Trust the item type (and, transitively, any custom class reachable from its fields) with
+either of the `org.apache.avro.SERIALIZABLE_CLASSES` or
+`org.apache.avro.SERIALIZABLE_PACKAGES` system properties:
+
+[source]
+----
+-Dorg.apache.avro.SERIALIZABLE_PACKAGES=com.example.domain
+----
+
+or programmatically, through `org.apache.avro.util.ClassSecurityValidator`. See that
+class's Javadoc for details.
+
+TIP: This is a breaking change for applications that use `AvroItemReader`/
+`AvroItemWriter` with a `SpecificRecord` or plain Java item type: such jobs now fail at
+runtime unless the item type is explicitly trusted as shown above.
 
 [[deprecations]]
 == Deprecations
