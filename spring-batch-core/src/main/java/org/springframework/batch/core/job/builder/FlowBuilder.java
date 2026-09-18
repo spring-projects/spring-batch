@@ -225,6 +225,16 @@ public class FlowBuilder<Q> {
 	}
 
 	/**
+	 * Start a transition to a new state if the exit status from the previous state
+	 * matches the status given.
+	 * @param status the exit status on which to take this transition
+	 * @return a builder to enable fluent chaining
+	 */
+	public TransitionBuilder<Q> on(ExitStatus status) {
+		return on(status.getExitCode());
+	}
+
+	/**
 	 * A synonym for {@link #build()} which callers might find useful. Subclasses can
 	 * override build to create an object of the desired type (e.g. a parent builder or an
 	 * actual flow).
@@ -435,6 +445,16 @@ public class FlowBuilder<Q> {
 		 */
 		public TransitionBuilder<Q> on(String pattern) {
 			return new TransitionBuilder<>(parent, pattern);
+		}
+
+		/**
+		 * Start a transition to a new state if the exit status from the previous state
+		 * matches the status given.
+		 * @param status the exit status on which to take this transition
+		 * @return a TransitionBuilder
+		 */
+		public TransitionBuilder<Q> on(ExitStatus status) {
+			return on(status.getExitCode());
 		}
 
 	}
