@@ -20,6 +20,11 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.junit.jupiter.api.Test;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.Logger;
+import org.apache.logging.log4j.core.appender.ListAppender;
+
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.job.Job;
@@ -229,6 +234,32 @@ class ChunkOrientedStepScanModeChunkListenerTests {
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 		assertEquals(stepExecution.getReadCount(),
 				stepExecution.getWriteCount() + stepExecution.getWriteSkipCount() + stepExecution.getFilterCount());
+	}
+
+	@Test
+	void testExpectedScanFailureIsNotLoggedAsAnErrorOrRetryExhaustion() throws Exception {
+		Logger logger = (Logger) LogManager.getLogger(ChunkOrientedStep.class);
+		ListAppender appender = new ListAppender("scan-mode-test");
+		appender.start();
+		Level previousLevel = logger.getLevel();
+		logger.addAppender(appender);
+		logger.setLevel(Level.DEBUG);
+		try {
+			JobExecution jobExecution = run(step(new RecordingChunkListener(), false));
+			assertEquals(BatchStatus.COMPLETED, jobExecution.getStepExecutions().iterator().next().getStatus());
+			assertTrue(appender.getEvents()
+				.stream()
+				.noneMatch(event -> event.getLevel() == Level.ERROR
+						&& event.getMessage().getFormattedMessage().contains("Rolling back chunk transaction")));
+			assertTrue(appender.getEvents()
+				.stream()
+				.noneMatch(event -> event.getMessage().getFormattedMessage().contains("Retry exhausted")));
+		}
+		finally {
+			logger.removeAppender(appender);
+			logger.setLevel(previousLevel);
+			appender.stop();
+		}
 	}
 
 	/*
