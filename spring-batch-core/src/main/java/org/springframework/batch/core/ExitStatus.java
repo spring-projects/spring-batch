@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@ import java.util.Objects;
  * @author Mahmoud Ben Hassine
  * @author JiWon Seo
  * @author Yanming Zhou
+ * @author Taeik Lim
  *
  */
 public class ExitStatus implements Serializable, Comparable<ExitStatus> {
@@ -131,7 +132,7 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 	 * @return the exception that caused the step to exit
 	 * @since 6.0.3
 	 */
-	@Nullable public Throwable getExitException() {
+	public @Nullable Throwable getExitException() {
 		return this.exitException;
 	}
 
