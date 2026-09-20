@@ -166,6 +166,12 @@ public class SimpleFlow implements Flow, InitializingBean {
 				}
 				status = state.handle(executor);
 				stepExecution = executor.getStepExecution();
+
+				if (logger.isDebugEnabled()) {
+					logger.debug("Completed state=" + stateName + " with status=" + status);
+				}
+
+				state = nextState(stateName, status, stepExecution);
 			}
 			catch (FlowExecutionException e) {
 				executor.close(new FlowExecution(stateName, status));
@@ -176,12 +182,6 @@ public class SimpleFlow implements Flow, InitializingBean {
 				throw new FlowExecutionException(
 						String.format("Ended flow=%s at state=%s with exception", name, stateName), e);
 			}
-
-			if (logger.isDebugEnabled()) {
-				logger.debug("Completed state=" + stateName + " with status=" + status);
-			}
-
-			state = nextState(stateName, status, stepExecution);
 		}
 
 		FlowExecution result = new FlowExecution(stateName, status);

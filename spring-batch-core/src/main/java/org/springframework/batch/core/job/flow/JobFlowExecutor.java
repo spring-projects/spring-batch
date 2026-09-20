@@ -42,7 +42,7 @@ import org.springframework.batch.core.launch.JobRestartException;
  */
 public class JobFlowExecutor implements FlowExecutor {
 
-	private static final ThreadLocal<StepExecution> stepExecutionHolder = new ThreadLocal<>();
+	private final ThreadLocal<StepExecution> stepExecutionHolder = new ThreadLocal<>();
 
 	private final JobExecution execution;
 
