@@ -499,7 +499,6 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			stepExecution.incrementCommitCount();
 		}
 		catch (Exception e) {
-			logger.error("Rolling back chunk transaction", e);
 			status.setRollbackOnly();
 			stepExecution.incrementRollbackCount();
 
@@ -510,6 +509,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 				logger.info("Rollback complete, scan will execute in next transaction");
 				return;
 			}
+			logger.error("Rolling back chunk transaction", e);
 
 			// a scan attempt itself failed: the pending item has already been polled off
 			// the scan queue, so carrying on would silently lose it. Fail the step
@@ -571,7 +571,6 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			stepExecution.incrementCommitCount();
 		}
 		catch (Exception e) {
-			logger.error("Rolling back chunk transaction", e);
 			status.setRollbackOnly();
 			stepExecution.incrementRollbackCount();
 
@@ -583,6 +582,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 				logger.info("Rollback complete, scan will execute in next transaction");
 				return;
 			}
+			logger.error("Rolling back chunk transaction", e);
 
 			// a scan attempt itself failed: the pending item has already been polled off
 			// the scan queue, so carrying on would silently lose it. Fail the step
@@ -860,7 +860,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			}
 			else if (this.faultTolerant && exception instanceof RetryException retryException
 					&& this.skipPolicy.shouldSkip(retryException.getCause(), -1)) {
-				logger.info("Retry exhausted, entering scan mode for next transaction", retryException);
+				logger.debug("Skipped item encountered, entering scan mode for next transaction");
 				this.chunkTracker.get().enterScanMode(scanItems);
 			}
 			else {
