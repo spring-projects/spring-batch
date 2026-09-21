@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,8 @@ import org.springframework.util.Assert;
 import java.util.Collection;
 
 import org.jspecify.annotations.NullUnmarked;
+
+import static org.springframework.batch.core.BatchConstants.BATCH_STEP_TYPE;
 
 /**
  * Implementation of {@link Step} which partitions the execution and spreads the load
@@ -111,7 +113,7 @@ public class PartitionStep extends AbstractStep {
 	 */
 	@Override
 	protected void doExecute(StepExecution stepExecution) throws Exception {
-		stepExecution.getExecutionContext().put(STEP_TYPE_KEY, this.getClass().getName());
+		stepExecution.getExecutionContext().put(BATCH_STEP_TYPE, this.getClass().getName());
 
 		// Split execution into partitions and wait for task completion
 		PartitionSplitEvent partitionSplitEvent = new PartitionSplitEvent(stepExecution.getStepName(),

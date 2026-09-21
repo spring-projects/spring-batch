@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2025 the original author or authors.
+ * Copyright 2016-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.infrastructure.item.Chunk;
 import org.springframework.batch.infrastructure.item.database.JdbcBatchItemWriter;
-import org.springframework.batch.infrastructure.item.database.builder.JdbcBatchItemWriterBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -44,6 +43,7 @@ import org.springframework.jdbc.datasource.init.DataSourceInitializer;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -181,14 +181,30 @@ class JdbcBatchItemWriterBuilderTests {
 			.dataSource(this.dataSource);
 		exception = assertThrows(IllegalArgumentException.class, builder::build);
 		assertEquals("A SQL statement is required", exception.getMessage());
+	}
 
-		builder = new JdbcBatchItemWriterBuilder<Map<String, Object>>().dataSource(this.dataSource)
+	@Test
+	void testCompileTimeSafetyForColumnMappedAndBeanMapped() {
+		// Pattern 1: Using columnMapped() only
+		assertDoesNotThrow(() -> new JdbcBatchItemWriterBuilder<Map<String, Object>>().dataSource(this.dataSource)
 			.sql("INSERT INTO FOO VALUES (?, ?, ?)")
 			.columnMapped()
-			.beanMapped();
-		exception = assertThrows(IllegalStateException.class, builder::build);
-		assertEquals("Either an item can be mapped via db column or via bean spec, can't be both",
-				exception.getMessage());
+			.build());
+
+		// Pattern 2: Using beanMapped() only
+		assertDoesNotThrow(() -> new JdbcBatchItemWriterBuilder<Foo>().dataSource(this.dataSource)
+			.sql("INSERT INTO FOO (first, second, third) VALUES (:first, :second, :third)")
+			.beanMapped()
+			.build());
+
+		// The following would not compile, providing the same guarantee that used to be
+		// enforced at runtime via an IllegalStateException:
+		//
+		// new JdbcBatchItemWriterBuilder<Map<String,
+		// Object>>().dataSource(this.dataSource)
+		// .sql("INSERT INTO FOO VALUES (?, ?, ?)")
+		// .columnMapped()
+		// .beanMapped(); // compile error: method not available on ColumnMappedStage
 	}
 
 	private void verifyWrite() {

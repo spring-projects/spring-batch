@@ -116,7 +116,10 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 
 	/**
 	 * @param unmarshaller maps xml fragments corresponding to records to objects
+	 * @deprecated since 6.1 in favor of passing the unmarshaller to the constructor.
+	 * Scheduled for removal in 7.0.
 	 */
+	@Deprecated(since = "6.1", forRemoval = true)
 	public void setUnmarshaller(Unmarshaller unmarshaller) {
 		this.unmarshaller = unmarshaller;
 	}

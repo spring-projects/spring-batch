@@ -31,10 +31,14 @@ import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.partition.StepExecutionSplitter;
+import org.springframework.integration.IntegrationMessageHeaderAccessor;
 import org.springframework.integration.MessageTimeoutException;
+import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.core.MessagingTemplate;
+import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.Message;
-import org.springframework.messaging.PollableChannel;
+import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.SubscribableChannel;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -42,6 +46,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -72,7 +77,6 @@ class MessageChannelPartitionHandlerTests {
 		assertTrue(executions.isEmpty());
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Test
 	void testHandleNoReply() throws Exception {
 		// execute with no default set
@@ -81,7 +85,6 @@ class MessageChannelPartitionHandlerTests {
 		StepExecution managerStepExecution = mock();
 		StepExecutionSplitter stepExecutionSplitter = mock();
 		MessagingTemplate operations = mock();
-		Message message = mock();
 		// when
 		HashSet<StepExecution> stepExecutions = new HashSet<>();
 		JobInstance jobInstance = new JobInstance(1L, "job");
@@ -89,11 +92,13 @@ class MessageChannelPartitionHandlerTests {
 		StepExecution stepExecution = new StepExecution(1L, "step1", jobExecution);
 		stepExecutions.add(stepExecution);
 		when(stepExecutionSplitter.split(any(StepExecution.class), eq(1))).thenReturn(stepExecutions);
-		when(message.getPayload()).thenReturn(Collections.emptySet());
-		when(operations.receive((PollableChannel) any())).thenReturn(message);
 		when(managerStepExecution.getJobExecution()).thenReturn(jobExecution);
+		doAnswer(invocation -> replyWith(invocation.getArgument(0), Collections.emptySet())).when(operations)
+			.send(any());
 		// set
 		messageChannelPartitionHandler.setMessagingOperations(operations);
+		messageChannelPartitionHandler.setStepName("step1");
+		messageChannelPartitionHandler.afterPropertiesSet();
 
 		// execute
 		Collection<StepExecution> executions = messageChannelPartitionHandler.handle(stepExecutionSplitter,
@@ -103,7 +108,6 @@ class MessageChannelPartitionHandlerTests {
 		assertTrue(executions.isEmpty());
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Test
 	void testHandleWithReplyChannel() throws Exception {
 		// execute with no default set
@@ -112,8 +116,7 @@ class MessageChannelPartitionHandlerTests {
 		StepExecution managerStepExecution = mock();
 		StepExecutionSplitter stepExecutionSplitter = mock();
 		MessagingTemplate operations = mock();
-		Message message = mock();
-		PollableChannel replyChannel = mock();
+		SubscribableChannel replyChannel = new DirectChannel();
 		// when
 		HashSet<StepExecution> stepExecutions = new HashSet<>();
 		JobInstance jobInstance = new JobInstance(1L, "job");
@@ -121,12 +124,14 @@ class MessageChannelPartitionHandlerTests {
 		StepExecution stepExecution = new StepExecution(1L, "step1", jobExecution);
 		stepExecutions.add(stepExecution);
 		when(stepExecutionSplitter.split(any(StepExecution.class), eq(1))).thenReturn(stepExecutions);
-		when(message.getPayload()).thenReturn(Collections.emptySet());
-		when(operations.receive(replyChannel)).thenReturn(message);
 		when(managerStepExecution.getJobExecution()).thenReturn(jobExecution);
+		doAnswer(invocation -> replyWith(invocation.getArgument(0), Collections.emptySet())).when(operations)
+			.send(any());
 		// set
 		messageChannelPartitionHandler.setMessagingOperations(operations);
 		messageChannelPartitionHandler.setReplyChannel(replyChannel);
+		messageChannelPartitionHandler.setStepName("step1");
+		messageChannelPartitionHandler.afterPropertiesSet();
 
 		// execute
 		Collection<StepExecution> executions = messageChannelPartitionHandler.handle(stepExecutionSplitter,
@@ -153,12 +158,25 @@ class MessageChannelPartitionHandlerTests {
 		stepExecutions.add(stepExecution);
 		when(managerStepExecution.getJobExecution()).thenReturn(jobExecution);
 		when(stepExecutionSplitter.split(any(StepExecution.class), eq(1))).thenReturn(stepExecutions);
-		// set
+		// set: no reply is ever sent back, so the handler must time out
 		messageChannelPartitionHandler.setMessagingOperations(operations);
+		messageChannelPartitionHandler.setStepName("step1");
+		messageChannelPartitionHandler.afterPropertiesSet();
 
 		// execute
 		assertThrows(MessageTimeoutException.class,
 				() -> messageChannelPartitionHandler.handle(stepExecutionSplitter, managerStepExecution));
+	}
+
+	/**
+	 * Simulates a worker reply by sending a message with the same correlation id as the
+	 * given request onto the request's reply channel.
+	 */
+	private static Object replyWith(Message<?> request, Object payload) {
+		String correlationId = (String) request.getHeaders().get(IntegrationMessageHeaderAccessor.CORRELATION_ID);
+		MessageChannel replyChannel = (MessageChannel) request.getHeaders().getReplyChannel();
+		replyChannel.send(MessageBuilder.withPayload(payload).setCorrelationId(correlationId).build());
+		return null;
 	}
 
 	@Test

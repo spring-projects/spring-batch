@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2025 the original author or authors.
+ * Copyright 2016-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -95,8 +95,9 @@ public class JdbcCursorItemReaderBuilder<T> {
 	}
 
 	/**
-	 * The name used to calculate the key within the {@link ExecutionContext}. Required if
-	 * {@link #saveState(boolean)} is set to true.
+	 * The name used to calculate the key within the {@link ExecutionContext}. Defaults to
+	 * the bean name, or to the short class name if this instance is not a bean. Set it
+	 * explicitly to disambiguate several non-bean instances of the same type in a step.
 	 * @param name name of the reader instance
 	 * @return The current instance of the builder.
 	 * @see ItemStreamSupport#setName(String)
@@ -135,7 +136,6 @@ public class JdbcCursorItemReaderBuilder<T> {
 	 * The {@link DataSource} to read from
 	 * @param dataSource a relational data base
 	 * @return this instance for method chaining
-	 * @see JdbcCursorItemReader#setDataSource(DataSource)
 	 */
 	public JdbcCursorItemReaderBuilder<T> dataSource(DataSource dataSource) {
 		this.dataSource = dataSource;
@@ -286,7 +286,6 @@ public class JdbcCursorItemReaderBuilder<T> {
 	 * The query to be executed for this reader
 	 * @param sql query
 	 * @return this instance for method chaining
-	 * @see JdbcCursorItemReader#setSql(String)
 	 */
 	public JdbcCursorItemReaderBuilder<T> sql(String sql) {
 		this.sql = sql;
@@ -298,7 +297,6 @@ public class JdbcCursorItemReaderBuilder<T> {
 	 * The {@link RowMapper} used to map the results of the cursor to each item.
 	 * @param rowMapper {@link RowMapper}
 	 * @return this instance for method chaining
-	 * @see JdbcCursorItemReader#setRowMapper(RowMapper)
 	 */
 	public JdbcCursorItemReaderBuilder<T> rowMapper(RowMapper<T> rowMapper) {
 		this.rowMapper = rowMapper;
@@ -349,10 +347,6 @@ public class JdbcCursorItemReaderBuilder<T> {
 	 * @return a fully constructed {@link JdbcCursorItemReader}
 	 */
 	public JdbcCursorItemReader<T> build() {
-		if (this.saveState) {
-			Assert.hasText(this.name, "A name is required when saveState is set to true");
-		}
-
 		Assert.hasText(this.sql, "A query is required");
 		Assert.notNull(this.dataSource, "A datasource is required");
 		Assert.notNull(this.rowMapper, "A rowmapper is required");

@@ -187,7 +187,7 @@
 		<dependency>
 			<groupId>io.prometheus</groupId>
 			<artifactId>prometheus-metrics-exporter-pushgateway</artifactId>
-			<version>${prometheus-metrics-exporter-pushgateway}</version>
+			<version>${prometheus-metrics-exporter-pushgateway.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
@@ -273,13 +273,13 @@
 			<version>${hsqldb.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.codehaus.groovy</groupId>
+			<groupId>org.apache.groovy</groupId>
 			<artifactId>groovy</artifactId>
 			<version>${groovy.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.codehaus.groovy</groupId>
+			<groupId>org.apache.groovy</groupId>
 			<artifactId>groovy-ant</artifactId>
 			<version>${groovy.version}</version>
 			<scope>test</scope>

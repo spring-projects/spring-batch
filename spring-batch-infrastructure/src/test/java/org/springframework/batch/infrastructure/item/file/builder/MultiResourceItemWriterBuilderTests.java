@@ -208,13 +208,13 @@ class MultiResourceItemWriterBuilderTests {
 
 	@Test
 	void testSaveStateNoName() {
-		var builder = new MultiResourceItemWriterBuilder<String>().delegate(this.delegate)
+		MultiResourceItemWriter<String> writer = new MultiResourceItemWriterBuilder<String>().delegate(this.delegate)
 			.resource(new FileSystemResource(this.file))
 			.resourceSuffixCreator(this.suffixCreator)
 			.itemCountLimitPerResource(2)
-			.saveState(true);
-		Exception exception = assertThrows(IllegalArgumentException.class, builder::build);
-		assertEquals("A name is required when saveState is true.", exception.getMessage());
+			.saveState(true)
+			.build();
+		assertEquals("MultiResourceItemWriter", writer.getName());
 	}
 
 	@Test

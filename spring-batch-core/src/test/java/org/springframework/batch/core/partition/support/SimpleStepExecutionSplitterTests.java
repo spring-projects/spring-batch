@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.partition.support;
 
+import org.springframework.batch.infrastructure.support.DatabaseType;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collection;
@@ -57,8 +58,8 @@ class SimpleStepExecutionSplitterTests {
 	void setUp() throws Exception {
 		step = new TaskletStep("step");
 		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
-			.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-			.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
+			.addScript(DatabaseType.HSQL.getProductSchemaDrop())
+			.addScript(DatabaseType.HSQL.getProductSchema())
 			.generateUniqueName(true)
 			.build();
 		JdbcJobRepositoryFactoryBean factory = new JdbcJobRepositoryFactoryBean();

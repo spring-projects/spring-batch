@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.launch.support;
 
+import org.springframework.batch.infrastructure.support.DatabaseType;
 import java.time.LocalDateTime;
 
 import org.junit.jupiter.api.Assertions;
@@ -65,8 +66,8 @@ class TaskExecutorJobOperatorTests {
 	@BeforeEach
 	void setUp() throws Exception {
 		EmbeddedDatabase database = new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2)
-			.addScript("/org/springframework/batch/core/schema-drop-h2.sql")
-			.addScript("/org/springframework/batch/core/schema-h2.sql")
+			.addScript(DatabaseType.H2.getProductSchemaDrop())
+			.addScript(DatabaseType.H2.getProductSchema())
 			.build();
 		JdbcTransactionManager transactionManager = new JdbcTransactionManager(database);
 

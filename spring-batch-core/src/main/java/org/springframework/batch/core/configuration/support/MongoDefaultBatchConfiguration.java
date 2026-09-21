@@ -21,13 +21,14 @@ import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.JobKeyGenerator;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.repository.dao.AbstractMongoBatchMetadataDao;
 import org.springframework.batch.core.repository.dao.mongodb.MongoSequenceIncrementer;
 import org.springframework.batch.core.repository.support.MongoJobRepositoryFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.mongodb.MongoTransactionManager;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Isolation;
 
 /**
@@ -61,6 +62,7 @@ import org.springframework.transaction.annotation.Isolation;
  * </pre>
  *
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  * @since 6.0
  */
 @Configuration(proxyBeanMethods = false)
@@ -73,6 +75,7 @@ public class MongoDefaultBatchConfiguration extends DefaultBatchConfiguration {
 		try {
 			jobRepositoryFactoryBean.setMongoOperations(getMongoOperations());
 			jobRepositoryFactoryBean.setTransactionManager(getTransactionManager());
+			jobRepositoryFactoryBean.setCollectionPrefix(getCollectionPrefix());
 			jobRepositoryFactoryBean.setIsolationLevelForCreateEnum(getIsolationLevelForCreate());
 			jobRepositoryFactoryBean.setValidateTransactionState(getValidateTransactionState());
 			jobRepositoryFactoryBean.setJobKeyGenerator(getJobKeyGenerator());
@@ -108,20 +111,20 @@ public class MongoDefaultBatchConfiguration extends DefaultBatchConfiguration {
 	}
 
 	@Override
-	protected MongoTransactionManager getTransactionManager() {
-		String errorMessage = " To use the default configuration, a MongoTransactionManager bean named 'transactionManager'"
+	protected PlatformTransactionManager getTransactionManager() {
+		String errorMessage = " To use the default configuration, a PlatformTransactionManager bean named 'transactionManager'"
 				+ " should be defined in the application context but none was found. Override getTransactionManager()"
 				+ " to provide the transaction manager to use for the job repository.";
-		if (this.applicationContext.getBeansOfType(MongoTransactionManager.class).isEmpty()) {
+		if (this.applicationContext.getBeansOfType(PlatformTransactionManager.class).isEmpty()) {
 			throw new BatchConfigurationException(
-					"Unable to find a MongoTransactionManager bean in the application context." + errorMessage);
+					"Unable to find a PlatformTransactionManager bean in the application context." + errorMessage);
 		}
 		else {
 			if (!this.applicationContext.containsBean("transactionManager")) {
 				throw new BatchConfigurationException(errorMessage);
 			}
 		}
-		return this.applicationContext.getBean("transactionManager", MongoTransactionManager.class);
+		return this.applicationContext.getBean("transactionManager", PlatformTransactionManager.class);
 	}
 
 	/**
@@ -154,12 +157,22 @@ public class MongoDefaultBatchConfiguration extends DefaultBatchConfiguration {
 	}
 
 	/**
+	 * Return the prefix prepended to the batch metadata collections. Defaults to
+	 * {@link AbstractMongoBatchMetadataDao#DEFAULT_COLLECTION_PREFIX}.
+	 * @return the prefix prepended to the batch metadata collections
+	 * @since 6.1.0
+	 */
+	protected String getCollectionPrefix() {
+		return AbstractMongoBatchMetadataDao.DEFAULT_COLLECTION_PREFIX;
+	}
+
+	/**
 	 * Return the incrementer to be used to generate ids for new job instances.
 	 * @return the incrementer to be used to generate ids for new job instances
 	 * @since 6.0
 	 */
 	protected DataFieldMaxValueIncrementer getJobInstanceIncrementer() {
-		return new MongoSequenceIncrementer(getMongoOperations(), "BATCH_JOB_INSTANCE_SEQ", getTransactionManager());
+		return createSequenceIncrementer(AbstractMongoBatchMetadataDao.DEFAULT_JOB_INSTANCE_INCREMENTER_NAME);
 	}
 
 	/**
@@ -168,7 +181,7 @@ public class MongoDefaultBatchConfiguration extends DefaultBatchConfiguration {
 	 * @since 6.0
 	 */
 	protected DataFieldMaxValueIncrementer getJobExecutionIncrementer() {
-		return new MongoSequenceIncrementer(getMongoOperations(), "BATCH_JOB_EXECUTION_SEQ", getTransactionManager());
+		return createSequenceIncrementer(AbstractMongoBatchMetadataDao.DEFAULT_JOB_EXECUTION_INCREMENTER_NAME);
 	}
 
 	/**
@@ -177,7 +190,15 @@ public class MongoDefaultBatchConfiguration extends DefaultBatchConfiguration {
 	 * @since 6.0
 	 */
 	protected DataFieldMaxValueIncrementer getStepExecutionIncrementer() {
-		return new MongoSequenceIncrementer(getMongoOperations(), "BATCH_STEP_EXECUTION_SEQ", getTransactionManager());
+		return createSequenceIncrementer(AbstractMongoBatchMetadataDao.DEFAULT_STEP_EXECUTION_INCREMENTER_NAME);
+	}
+
+	private MongoSequenceIncrementer createSequenceIncrementer(String sequenceName) {
+		String collectionPrefix = getCollectionPrefix();
+		MongoSequenceIncrementer incrementer = new MongoSequenceIncrementer(getMongoOperations(),
+				collectionPrefix + sequenceName, getTransactionManager());
+		incrementer.setCollectionPrefix(collectionPrefix);
+		return incrementer;
 	}
 
 }

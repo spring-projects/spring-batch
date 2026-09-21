@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2026 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -81,9 +81,9 @@ public class RemoteStepExecutionAggregator implements StepExecutionAggregator {
 			long id = stepExecution.getId();
 			return id;
 		}).collect(Collectors.toSet());
-		JobExecution jobExecution = jobRepository.getJobExecution(result.getJobExecutionId());
+		JobExecution jobExecution = jobRepository.getJobExecution(result.getJobExecution().getId());
 		Assert.state(jobExecution != null,
-				"Could not load JobExecution from JobRepository for id " + result.getJobExecutionId());
+				"Could not load JobExecution from JobRepository for id " + result.getJobExecution().getId());
 		List<StepExecution> updates = jobExecution.getStepExecutions()
 			.stream()
 			.filter(stepExecution -> stepExecutionIds.contains(stepExecution.getId()))

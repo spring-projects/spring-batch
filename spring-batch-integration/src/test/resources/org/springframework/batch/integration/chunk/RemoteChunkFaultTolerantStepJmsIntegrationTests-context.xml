@@ -64,36 +64,12 @@
 
 	<bean id="headerExtractor" class="org.springframework.batch.integration.chunk.JmsRedeliveredExtractor" />
 
-	<bean class="org.springframework.beans.factory.config.CustomScopeConfigurer">
-		<property name="scopes">
-			<map>
-				<entry key="thread">
-					<bean class="org.springframework.context.support.SimpleThreadScope" />
-				</entry>
-			</map>
-		</property>
-	</bean>
+	<!-- The reply channel must be a SubscribableChannel: replies are pushed onto it by the
+	     message-driven adapter below as they arrive from the JMS "replies" destination. -->
+	<integration:channel id="replies" />
 
-	<!-- If we use a direct channel for requests then the replies can come in on a thread-local -->
-	<integration:channel id="replies" scope="thread">
-		<integration:queue />
-		<integration:interceptors>
-			<bean id="pollerInterceptor" class="org.springframework.batch.integration.chunk.MessageSourcePollerInterceptor">
-				<constructor-arg name="source">
-					<bean class="org.springframework.integration.jms.inbound.JmsDestinationPollingSource">
-						<constructor-arg>
-							<bean class="org.springframework.jms.core.JmsTemplate">
-								<property name="connectionFactory" ref="jmsConnectionFactory" />
-								<property name="defaultDestinationName" value="replies" />
-								<property name="receiveTimeout" value="100" />
-							</bean>
-						</constructor-arg>
-					</bean>
-				</constructor-arg>
-				<property name="channel" ref="incoming" />
-			</bean>
-		</integration:interceptors>
-	</integration:channel>
+	<int-jms:message-driven-channel-adapter connection-factory="jmsConnectionFactory"
+		destination-name="replies" channel="incoming" />
 
 	<jms:listener-container connection-factory="jmsConnectionFactory" transaction-manager="transactionManager"
 		acknowledge="transacted">

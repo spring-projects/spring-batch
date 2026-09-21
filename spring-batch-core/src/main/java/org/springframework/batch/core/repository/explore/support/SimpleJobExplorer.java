@@ -143,9 +143,21 @@ public class SimpleJobExplorer implements JobExplorer {
 		return jobInstanceDao.getJobInstances(jobName, start, count);
 	}
 
+	/**
+	 * @deprecated since 6.1 in favor of {@link #countJobInstances(String)}.
+	 */
+	@Deprecated(since = "6.1", forRemoval = true)
 	@Override
 	public long getJobInstanceCount(String jobName) throws NoSuchJobException {
 		return jobInstanceDao.getJobInstanceCount(jobName);
+	}
+
+	/**
+	 * @since 6.1
+	 */
+	@Override
+	public long countJobInstances(String jobName) {
+		return jobInstanceDao.countJobInstances(jobName);
 	}
 
 	/*
@@ -277,11 +289,20 @@ public class SimpleJobExplorer implements JobExplorer {
 
 	/**
 	 * @return number of executions of the step within given job instance
+	 * @deprecated since 6.1 in favor of
+	 * {@link #countStepExecutions(JobInstance, String)}.
 	 */
+	@Deprecated(since = "6.1", forRemoval = true)
 	@Override
 	public long getStepExecutionCount(JobInstance jobInstance, String stepName) throws NoSuchStepException {
-		// TODO verify that the step exists for the job instance and throw
-		// NoSuchStepException if not
+		return countStepExecutions(jobInstance, stepName);
+	}
+
+	/**
+	 * @since 6.1
+	 */
+	@Override
+	public long countStepExecutions(JobInstance jobInstance, String stepName) {
 		return stepExecutionDao.countStepExecutions(jobInstance, stepName);
 	}
 

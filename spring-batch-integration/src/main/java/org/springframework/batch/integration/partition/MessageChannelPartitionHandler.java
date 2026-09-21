@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2025 the original author or authors.
+ * Copyright 2009-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,12 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -37,16 +41,17 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.infrastructure.poller.DirectPoller;
 import org.springframework.batch.infrastructure.poller.Poller;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.integration.IntegrationMessageHeaderAccessor;
 import org.springframework.integration.MessageTimeoutException;
 import org.springframework.integration.annotation.Aggregator;
 import org.springframework.integration.annotation.MessageEndpoint;
 import org.springframework.integration.annotation.Payloads;
-import org.springframework.integration.channel.QueueChannel;
+import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.core.MessagingTemplate;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
-import org.springframework.messaging.PollableChannel;
+import org.springframework.messaging.SubscribableChannel;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
@@ -66,15 +71,13 @@ import org.springframework.util.CollectionUtils;
  * requests to the workers, the worker's responses can be obtained in one of two ways:
  * <ul>
  * <li>A reply channel - Workers will respond with messages that will be aggregated via
- * this component.</li>
+ * this component. Replies are demultiplexed by correlation id (the manager
+ * {@link JobExecution} id and step name), so that this component can be shared safely
+ * across concurrent job executions.</li>
  * <li>Polling the job repository - Since the state of each worker is maintained
  * independently within the job repository, we can poll the store to determine the state
  * without the need of the workers to formally respond.</li>
  * </ul>
- *
- * Note: The reply channel for this is instance based. Sharing this component across
- * multiple step instances may result in the crossing of messages. It's recommended that
- * this component be step or job scoped.
  *
  * @author Dave Syer
  * @author Will Schipp
@@ -101,9 +104,16 @@ public class MessageChannelPartitionHandler extends AbstractPartitionHandler imp
 	private long timeout = -1;
 
 	/**
-	 * pollable channel for the replies
+	 * subscribable channel for the replies
 	 */
-	private PollableChannel replyChannel;
+	private SubscribableChannel replyChannel;
+
+	/**
+	 * Pending replies, keyed by correlation id (manager job execution id : step name), so
+	 * that concurrent job executions sharing this handler and its reply channel never
+	 * consume each other's aggregated replies.
+	 */
+	private final ConcurrentMap<String, BlockingQueue<Message<?>>> pendingReplies = new ConcurrentHashMap<>();
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -118,11 +128,23 @@ public class MessageChannelPartitionHandler extends AbstractPartitionHandler imp
 		else {
 			logger.debug("MessageChannelPartitionHandler is configured to use a reply channel for worker results");
 			if (replyChannel == null) {
-				logger.info("No reply channel configured, using a QueueChannel as the default reply channel.");
-				replyChannel = new QueueChannel();
+				logger.info("No reply channel configured, using a DirectChannel as the default reply channel.");
+				replyChannel = new DirectChannel();
 			}
+			replyChannel.subscribe(this::onReply);
 		}
 
+	}
+
+	private void onReply(Message<?> message) {
+		String correlationId = (String) message.getHeaders().get(IntegrationMessageHeaderAccessor.CORRELATION_ID);
+		BlockingQueue<Message<?>> queue = correlationId != null ? this.pendingReplies.get(correlationId) : null;
+		if (queue != null) {
+			queue.offer(message);
+		}
+		else if (logger.isWarnEnabled()) {
+			logger.warn("Received a reply with no matching pending request for correlation id: " + correlationId);
+		}
 	}
 
 	/**
@@ -188,17 +210,27 @@ public class MessageChannelPartitionHandler extends AbstractPartitionHandler imp
 		return messages;
 	}
 
-	public void setReplyChannel(PollableChannel replyChannel) {
+	/**
+	 * The channel on which replies from workers are expected. Must be a
+	 * {@link SubscribableChannel} so that this component can demultiplex replies by
+	 * correlation id instead of blindly dequeuing from a shared, FIFO
+	 * {@link org.springframework.messaging.PollableChannel}, which can hand a reply
+	 * belonging to one job execution to the manager thread of a different, concurrently
+	 * running job execution sharing this handler.
+	 * @param replyChannel the reply channel to set
+	 */
+	public void setReplyChannel(SubscribableChannel replyChannel) {
 		this.replyChannel = replyChannel;
 	}
 
 	/**
 	 * Sends {@link StepExecutionRequest} objects to the request channel of the
 	 * {@link MessagingTemplate}, and then receives the result back as a list of
-	 * {@link StepExecution} on a reply channel. Use the {@link #aggregate(List)} method
-	 * as an aggregator of the individual remote replies. The receive timeout needs to be
-	 * set realistically in the {@link MessagingTemplate} <b>and</b> the aggregator, so
-	 * that there is a good chance of all work being done.
+	 * {@link StepExecution}, demultiplexed by correlation id from the reply channel. Use
+	 * the {@link #aggregate(List)} method as an aggregator of the individual remote
+	 * replies. The receive timeout needs to be set realistically in the
+	 * {@link MessagingTemplate} <b>and</b> the aggregator, so that there is a good chance
+	 * of all work being done.
 	 *
 	 * @see PartitionHandler#handle(StepExecutionSplitter, StepExecution)
 	 */
@@ -210,23 +242,33 @@ public class MessageChannelPartitionHandler extends AbstractPartitionHandler imp
 			return partitionStepExecutions;
 		}
 
-		int count = 0;
-
 		long jobExecutionId = managerStepExecution.getJobExecution().getId();
-		for (StepExecution stepExecution : partitionStepExecutions) {
-			Message<StepExecutionRequest> request = createMessage(count++, partitionStepExecutions.size(),
-					new StepExecutionRequest(stepName, stepExecution.getId()), jobExecutionId, replyChannel);
-			if (logger.isDebugEnabled()) {
-				logger.debug("Sending request: " + request);
-			}
-			messagingGateway.send(request);
-		}
+		String correlationId = jobExecutionId + ":" + stepName;
 
 		if (!pollRepositoryForResults) {
-			return receiveReplies(replyChannel);
+			this.pendingReplies.put(correlationId, new LinkedBlockingQueue<>(1));
 		}
-		else {
-			return pollReplies(managerStepExecution, partitionStepExecutions);
+
+		try {
+			int count = 0;
+			for (StepExecution stepExecution : partitionStepExecutions) {
+				Message<StepExecutionRequest> request = createMessage(count++, partitionStepExecutions.size(),
+						new StepExecutionRequest(stepName, stepExecution.getId()), correlationId);
+				if (logger.isDebugEnabled()) {
+					logger.debug("Sending request: " + request);
+				}
+				messagingGateway.send(request);
+			}
+
+			if (!pollRepositoryForResults) {
+				return receiveReplies(correlationId);
+			}
+			else {
+				return pollReplies(managerStepExecution, partitionStepExecutions);
+			}
+		}
+		finally {
+			this.pendingReplies.remove(correlationId);
 		}
 	}
 
@@ -235,7 +277,7 @@ public class MessageChannelPartitionHandler extends AbstractPartitionHandler imp
 		Set<Long> partitionStepExecutionIds = split.stream().map(StepExecution::getId).collect(Collectors.toSet());
 
 		Callable<Set<StepExecution>> callback = () -> {
-			JobExecution jobExecution = jobRepository.getJobExecution(managerStepExecution.getJobExecutionId());
+			JobExecution jobExecution = jobRepository.getJobExecution(managerStepExecution.getJobExecution().getId());
 			Set<StepExecution> finishedStepExecutions = jobExecution.getStepExecutions()
 				.stream()
 				.filter(stepExecution -> partitionStepExecutionIds.contains(stepExecution.getId()))
@@ -266,9 +308,10 @@ public class MessageChannelPartitionHandler extends AbstractPartitionHandler imp
 	}
 
 	@SuppressWarnings("unchecked")
-	private Set<StepExecution> receiveReplies(PollableChannel currentReplyChannel) {
-		Message<Collection<StepExecution>> message = (Message<Collection<StepExecution>>) messagingGateway
-			.receive(currentReplyChannel);
+	private Set<StepExecution> receiveReplies(String correlationId) throws InterruptedException {
+		BlockingQueue<Message<?>> queue = this.pendingReplies.get(correlationId);
+		long receiveTimeout = this.messagingGateway.getReceiveTimeout();
+		Message<?> message = receiveTimeout >= 0 ? queue.poll(receiveTimeout, TimeUnit.MILLISECONDS) : queue.take();
 
 		if (message == null) {
 			throw new MessageTimeoutException("Timeout occurred before all partitions returned");
@@ -277,16 +320,16 @@ public class MessageChannelPartitionHandler extends AbstractPartitionHandler imp
 			logger.debug("Received replies: " + message);
 		}
 
-		Collection<StepExecution> payload = message.getPayload();
-		return payload instanceof Set ? (Set<StepExecution>) payload : new HashSet<>(message.getPayload());
+		Collection<StepExecution> payload = (Collection<StepExecution>) message.getPayload();
+		return payload instanceof Set ? (Set<StepExecution>) payload : new HashSet<>(payload);
 	}
 
 	private Message<StepExecutionRequest> createMessage(int sequenceNumber, int sequenceSize,
-			StepExecutionRequest stepExecutionRequest, long jobExecutionId, PollableChannel replyChannel) {
+			StepExecutionRequest stepExecutionRequest, String correlationId) {
 		return MessageBuilder.withPayload(stepExecutionRequest)
 			.setSequenceNumber(sequenceNumber)
 			.setSequenceSize(sequenceSize)
-			.setCorrelationId(jobExecutionId + ":" + stepExecutionRequest.getStepName())
+			.setCorrelationId(correlationId)
 			.setReplyChannel(replyChannel)
 			.build();
 	}

@@ -144,6 +144,14 @@ output), a more unique name is needed. For this reason, many of the Spring Batch
 `ItemReader` and `ItemWriter` implementations have a `setName()` property that lets this
 key name be overridden.
 
+If no name is explicitly set, it defaults to the short name of the implementation class
+(for example, `FlatFileItemReader`) and, when the reader or writer is declared as a Spring
+bean, is further defaulted to the bean name. This is because these implementations extend
+`ItemStreamSupport`, which implements `BeanNameAware` and applies the bean name unless a
+name has already been set explicitly. So an explicit name only needs to be provided when
+that automatic default is not unique enough, such as the two-files-in-the-same-step case
+mentioned above.
+
 [[customWriter]]
 == Custom `ItemWriter` Example
 

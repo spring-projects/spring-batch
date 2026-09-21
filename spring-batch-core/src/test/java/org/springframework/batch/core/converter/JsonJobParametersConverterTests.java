@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 the original author or authors.
+ * Copyright 2022-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ class JsonJobParametersConverterTests {
 
 		// then
 		Assertions.assertEquals(
-				"{\"name\":\"name\",\"value\":\"foo\",\"type\":\"java.lang.String\",\"identifying\":\"false\"}",
+				"{\"name\":\"name\",\"value\":\"foo\",\"type\":\"java.lang.String\",\"identifying\":false}",
 				encodedJobParameter);
 	}
 
@@ -52,7 +52,7 @@ class JsonJobParametersConverterTests {
 
 		// then
 		Assertions.assertEquals(
-				"{\"name\":\"name\",\"value\":\"foo\",\"type\":\"java.lang.String\",\"identifying\":\"true\"}",
+				"{\"name\":\"name\",\"value\":\"foo\",\"type\":\"java.lang.String\",\"identifying\":true}",
 				encodedJobParameter);
 	}
 
@@ -85,6 +85,22 @@ class JsonJobParametersConverterTests {
 		Assertions.assertNotNull(jobParameter);
 		Assertions.assertEquals(long.class, jobParameter.type());
 		Assertions.assertEquals(1984L, jobParameter.value());
+	}
+
+	@Test
+	void testDecodeWithBooleanIdentifyingFlag() {
+		// given
+		JsonJobParametersConverter converter = new JsonJobParametersConverter();
+		String encodedJobParameter = "{\"name\":\"name\",\"value\":\"foo\",\"type\":\"java.lang.String\",\"identifying\":true}";
+
+		// when
+		JobParameter<String> jobParameter = converter.decode("name", encodedJobParameter);
+
+		// then
+		Assertions.assertNotNull(jobParameter);
+		Assertions.assertEquals("foo", jobParameter.value());
+		Assertions.assertEquals(String.class, jobParameter.type());
+		Assertions.assertTrue(jobParameter.identifying());
 	}
 
 	@Test

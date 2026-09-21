@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2023 the original author or authors.
+ * Copyright 2021-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,9 @@
  */
 package org.springframework.batch.integration.chunk;
 
+import org.springframework.batch.infrastructure.support.DatabaseType;
 import java.util.Arrays;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -46,9 +46,8 @@ import org.springframework.integration.core.MessagingTemplate;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
-import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
-import org.springframework.messaging.PollableChannel;
+import org.springframework.messaging.SubscribableChannel;
 import org.springframework.messaging.support.GenericMessage;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.util.StringUtils;
@@ -67,7 +66,7 @@ class ChunkMessageItemWriterIntegrationTests {
 
 	@Autowired
 	@Qualifier("replies")
-	private PollableChannel replies;
+	private SubscribableChannel replies;
 
 	private final SimpleStepFactoryBean<Object, Object> factory = new SimpleStepFactoryBean<>();
 
@@ -78,8 +77,8 @@ class ChunkMessageItemWriterIntegrationTests {
 	@BeforeEach
 	void setUp() throws Exception {
 		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder().generateUniqueName(true)
-			.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-			.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
+			.addScript(DatabaseType.HSQL.getProductSchemaDrop())
+			.addScript(DatabaseType.HSQL.getProductSchema())
 			.build();
 		JdbcTransactionManager transactionManager = new JdbcTransactionManager(embeddedDatabase);
 		JdbcJobRepositoryFactoryBean repositoryFactoryBean = new JdbcJobRepositoryFactoryBean();
@@ -101,19 +100,6 @@ class ChunkMessageItemWriterIntegrationTests {
 		gateway.setReceiveTimeout(100);
 
 		TestItemWriter.count = 0;
-
-		// Drain queues
-		Message<?> message = replies.receive(10);
-		while (message != null) {
-			message = replies.receive(10);
-		}
-
-	}
-
-	@AfterEach
-	void tearDown() {
-		while (replies.receive(10L) != null) {
-		}
 	}
 
 	@Test
@@ -162,8 +148,8 @@ class ChunkMessageItemWriterIntegrationTests {
 		stepExecution.getExecutionContext().putInt(ChunkMessageChannelItemWriter.EXPECTED, 6);
 		stepExecution.getExecutionContext().putInt(ChunkMessageChannelItemWriter.ACTUAL, 4);
 		// And make the back log real
-		requests.send(getSimpleMessage(stepExecution.getJobExecution().getJobInstanceId(), "foo"));
-		requests.send(getSimpleMessage(stepExecution.getJobExecution().getJobInstanceId(), "bar"));
+		requests.send(getSimpleMessage(stepExecution.getJobExecution().getJobInstance().getId(), "foo"));
+		requests.send(getSimpleMessage(stepExecution.getJobExecution().getJobInstance().getId(), "bar"));
 		step.execute(stepExecution);
 
 		waitForResults(8, 10);
@@ -174,7 +160,7 @@ class ChunkMessageItemWriterIntegrationTests {
 	}
 
 	@Test
-	void testSimulatedRestartWithBadMessagesFromAnotherJob() throws Exception {
+	void testSimulatedRestartWithMessagesFromAnotherJobAreIgnored() throws Exception {
 
 		factory.setItemReader(
 				new ListItemReader<>(Arrays.asList(StringUtils.commaDelimitedListToStringArray("1,2,3,4,5,6"))));
@@ -190,13 +176,14 @@ class ChunkMessageItemWriterIntegrationTests {
 		// Speed up the eventual failure
 		writer.setMaxWaitTimeouts(2);
 
-		// And make the back log real
+		// A reply for some other job instance must be ignored rather than stolen: the
+		// step below is still missing one reply of its own, so it should simply time out.
 		requests.send(getSimpleMessage(4321L, "foo"));
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
 		assertEquals(ExitStatus.FAILED.getExitCode(), stepExecution.getExitStatus().getExitCode());
 		String message = stepExecution.getExitStatus().getExitDescription();
-		assertTrue(message.contains("wrong job"), "Message does not contain 'wrong job': " + message);
+		assertTrue(message.toLowerCase().contains("timed out"), "Message did not contain 'timed out': " + message);
 
 		waitForResults(1, 10);
 

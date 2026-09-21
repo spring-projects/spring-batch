@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2026 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -185,10 +185,9 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 		Timestamp endTime = stepExecution.getEndTime() == null ? null : Timestamp.valueOf(stepExecution.getEndTime());
 		Timestamp lastUpdated = stepExecution.getLastUpdated() == null ? null
 				: Timestamp.valueOf(stepExecution.getLastUpdated());
-		Timestamp createTime = stepExecution.getCreateTime() == null ? null
-				: Timestamp.valueOf(stepExecution.getCreateTime());
+		Timestamp createTime = Timestamp.valueOf(stepExecution.getCreateTime());
 		Object[] parameterValues = new Object[] { stepExecution.getId(), stepExecution.getVersion(),
-				stepExecution.getStepName(), stepExecution.getJobExecutionId(), startTime, endTime,
+				stepExecution.getStepName(), stepExecution.getJobExecution().getId(), startTime, endTime,
 				stepExecution.getStatus().toString(), stepExecution.getCommitCount(), stepExecution.getReadCount(),
 				stepExecution.getFilterCount(), stepExecution.getWriteCount(),
 				stepExecution.getExitStatus().getExitCode(), exitDescription, stepExecution.getReadSkipCount(),
@@ -332,7 +331,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 		return getJdbcTemplate().execute(getQuery(GET_LAST_STEP_EXECUTION),
 				(PreparedStatementCallback<StepExecution>) statement -> {
 					statement.setMaxRows(1);
-					statement.setLong(1, jobInstance.getInstanceId());
+					statement.setLong(1, jobInstance.getId());
 					statement.setString(2, stepName);
 					try (ResultSet rs = statement.executeQuery()) {
 						if (rs.next()) {
@@ -373,8 +372,8 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 
 	@Override
 	public long countStepExecutions(JobInstance jobInstance, String stepName) {
-		return getJdbcTemplate().queryForObject(getQuery(COUNT_STEP_EXECUTIONS), Long.class,
-				jobInstance.getInstanceId(), stepName);
+		return getJdbcTemplate().queryForObject(getQuery(COUNT_STEP_EXECUTIONS), Long.class, jobInstance.getId(),
+				stepName);
 	}
 
 	/**

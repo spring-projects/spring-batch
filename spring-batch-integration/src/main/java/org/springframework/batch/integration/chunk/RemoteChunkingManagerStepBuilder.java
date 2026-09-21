@@ -37,7 +37,7 @@ import org.springframework.batch.infrastructure.repeat.RepeatOperations;
 import org.springframework.batch.infrastructure.repeat.exception.ExceptionHandler;
 import org.springframework.integration.core.MessagingTemplate;
 import org.springframework.messaging.MessageChannel;
-import org.springframework.messaging.PollableChannel;
+import org.springframework.messaging.SubscribableChannel;
 import org.springframework.retry.RetryPolicy;
 import org.springframework.retry.backoff.BackOffPolicy;
 import org.springframework.retry.policy.RetryContextCache;
@@ -73,7 +73,7 @@ public class RemoteChunkingManagerStepBuilder<I, O> extends FaultTolerantStepBui
 
 	private MessagingTemplate messagingTemplate;
 
-	private PollableChannel inputChannel;
+	private SubscribableChannel inputChannel;
 
 	private MessageChannel outputChannel;
 
@@ -104,7 +104,7 @@ public class RemoteChunkingManagerStepBuilder<I, O> extends FaultTolerantStepBui
 	 *
 	 * @see ChunkMessageChannelItemWriter#setReplyChannel
 	 */
-	public RemoteChunkingManagerStepBuilder<I, O> inputChannel(PollableChannel inputChannel) {
+	public RemoteChunkingManagerStepBuilder<I, O> inputChannel(SubscribableChannel inputChannel) {
 		Assert.notNull(inputChannel, "inputChannel must not be null");
 		this.inputChannel = inputChannel;
 		return this;

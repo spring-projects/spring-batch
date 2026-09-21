@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -76,7 +76,10 @@ public class MimeMessageItemWriter implements ItemWriter<MimeMessage> {
 	/**
 	 * A {@link JavaMailSender} to be used to send messages in {@link #write(Chunk)}.
 	 * @param mailSender service for doing the work of sending a MIME message
+	 * @deprecated since 6.1 in favor of passing the mail sender to the constructor.
+	 * Scheduled for removal in 7.0.
 	 */
+	@Deprecated(since = "6.1", forRemoval = true)
 	public void setJavaMailSender(JavaMailSender mailSender) {
 		this.mailSender = mailSender;
 	}

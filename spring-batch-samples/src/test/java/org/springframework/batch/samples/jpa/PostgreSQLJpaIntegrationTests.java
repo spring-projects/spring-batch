@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.samples.jpa;
 
+import org.springframework.batch.infrastructure.support.DatabaseType;
 import javax.sql.DataSource;
 import jakarta.persistence.EntityManagerFactory;
 
@@ -83,7 +84,7 @@ class PostgreSQLJpaIntegrationTests {
 	@BeforeEach
 	void setUp() {
 		ResourceDatabasePopulator databasePopulator = new ResourceDatabasePopulator();
-		databasePopulator.addScript(new ClassPathResource("/org/springframework/batch/core/schema-postgresql.sql"));
+		databasePopulator.addScript(new ClassPathResource(DatabaseType.POSTGRES.getProductSchema()));
 		databasePopulator.addScript(
 				new ClassPathResource("/org/springframework/batch/samples/common/business-schema-postgresql.sql"));
 		databasePopulator.execute(this.dataSource);
