@@ -135,7 +135,7 @@ public class StepExecution extends Entity {
 	 * Returns the time when this execution ended or {@code null} if the step is running.
 	 * @return the time when this execution ended or {@code null} if the step is running.
 	 */
-	@Nullable public LocalDateTime getEndTime() {
+	public @Nullable LocalDateTime getEndTime() {
 		return endTime;
 	}
 
@@ -231,7 +231,7 @@ public class StepExecution extends Entity {
 	 * Gets the time when this execution started.
 	 * @return the time when this execution started.
 	 */
-	@Nullable public LocalDateTime getStartTime() {
+	public @Nullable LocalDateTime getStartTime() {
 		return startTime;
 	}
 
@@ -420,7 +420,7 @@ public class StepExecution extends Entity {
 	/**
 	 * @return the Date representing the last time this execution was persisted.
 	 */
-	@Nullable public LocalDateTime getLastUpdated() {
+	public @Nullable LocalDateTime getLastUpdated() {
 		return lastUpdated;
 	}
 
