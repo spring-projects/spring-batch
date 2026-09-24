@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2023 the original author or authors.
+ * Copyright 2010-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 package org.springframework.batch.infrastructure.item.database;
 
 import org.hsqldb.types.Types;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.batch.infrastructure.item.ItemReader;
@@ -27,7 +26,6 @@ import org.springframework.jdbc.core.SqlParameter;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@Disabled("see FIXME in init-foo-schema.sql")
 class StoredProcedureItemReaderCommonTests extends AbstractDatabaseItemStreamItemReaderTests {
 
 	@Override
