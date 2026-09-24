@@ -634,16 +634,21 @@ Every scenario described so far has involved a `Job` that executes its steps one
 time in a linear fashion. In addition to this typical style, Spring Batch also allows
 for a job to be configured with parallel flows.
 
+A flow is a sequence of steps, together with the transitions between them, that can be
+executed as a job or as part of a job. A split lets several flows run in parallel.
+
 
 [tabs]
 ====
 Java::
 +
 Java-based configuration lets you configure splits through the provided builders. As the
-following example shows, the `split` element contains one or more `flow` elements, where
-entire separate flows can be defined. A `split` element can also contain any of the
-previously discussed transition elements, such as the `next` attribute or the `next`,
-`end`, or `fail` elements.
+following example shows, a `Flow` can be built on its own with a `FlowBuilder` by using
+the same `start` and `next` methods as when defining a job. In the job definition, `split`
+and `add` put `flow1` (the flow that the job starts with) and `flow2` into a split, which
+runs them with the `TaskExecutor` passed to `split`. `next` then defines what runs after
+the split. The job definition is itself a flow, which `end` completes before `build`
+creates the `Job`.
 +
 [source, java]
 ----
@@ -680,10 +685,11 @@ The XML namespace lets you use the `split` element. As the following example sho
 the `split` element contains one or more `flow` elements, where entire separate flows can
 be defined. A `split` element can also contain any of the previously discussed transition
 elements, such as the `next` attribute or the `next`, `end`, or `fail` elements.
+The `task-executor` attribute references the `TaskExecutor` that runs the flows.
 +
 [source, xml]
 ----
-<split id="split1" next="step4">
+<split id="split1" task-executor="taskExecutor" next="step4">
     <flow>
         <step id="step1" parent="s1" next="step2"/>
         <step id="step2" parent="s2"/>
@@ -696,6 +702,11 @@ elements, such as the `next` attribute or the `next`, `end`, or `fail` elements.
 ----
 
 ====
+
+In the preceding example, the two flows run in parallel: one runs `step1` and then `step2`,
+while the other runs `step3`. `step4` starts only after both flows have completed. Note
+that an asynchronous `TaskExecutor`, such as `SimpleAsyncTaskExecutor`, is required to run
+the flows in parallel.
 
 
 
