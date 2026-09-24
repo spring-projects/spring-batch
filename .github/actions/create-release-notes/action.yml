@@ -20,6 +20,7 @@ runs:
       with:
         milestone: ${{ inputs.milestone }}
         token: ${{ inputs.token }}
+        config-file: .github/actions/create-release-notes/application.yml
     - name: Print release notes
       shell: bash
       run: cat changelog.md
