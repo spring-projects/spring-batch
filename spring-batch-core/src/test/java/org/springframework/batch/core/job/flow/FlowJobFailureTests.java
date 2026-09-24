@@ -17,6 +17,7 @@ package org.springframework.batch.core.job.flow;
 
 import org.springframework.batch.infrastructure.support.DatabaseType;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -90,6 +91,35 @@ class FlowJobFailureTests {
 		job.afterPropertiesSet();
 		job.execute(execution);
 		assertEquals(BatchStatus.FAILED, execution.getStatus());
+	}
+
+	@Test // gh-3740
+	void testStepFailureExitDescriptionPropagatedToJobExecution() throws Exception {
+		final String failureDescription = "boom: simulated step failure";
+		SimpleFlow flow = new SimpleFlow("job");
+		List<StateTransition> transitions = new ArrayList<>();
+		StepState step = new StepState(new StepSupport("step") {
+			@Override
+			public void execute(StepExecution stepExecution)
+					throws JobInterruptedException, UnexpectedJobExecutionException {
+				stepExecution.setExitStatus(ExitStatus.FAILED.addExitDescription(failureDescription));
+				stepExecution.setStatus(BatchStatus.FAILED);
+			}
+		});
+		transitions.add(StateTransition.createStateTransition(step, ExitStatus.FAILED.getExitCode(), "end0"));
+		transitions.add(StateTransition.createStateTransition(step, ExitStatus.COMPLETED.getExitCode(), "end1"));
+		transitions.add(StateTransition.createEndStateTransition(new EndState(FlowExecutionStatus.FAILED, "end0")));
+		transitions.add(StateTransition.createEndStateTransition(new EndState(FlowExecutionStatus.COMPLETED, "end1")));
+		flow.setStateTransitions(transitions);
+		job.setFlow(flow);
+		job.afterPropertiesSet();
+		job.execute(execution);
+
+		assertEquals(BatchStatus.FAILED, execution.getStatus());
+		assertEquals(ExitStatus.FAILED.getExitCode(), execution.getExitStatus().getExitCode());
+		assertTrue(execution.getExitStatus().getExitDescription().contains(failureDescription),
+				"Expected JobExecution exit description to contain step failure description but was: '"
+						+ execution.getExitStatus().getExitDescription() + "'");
 	}
 
 	@Test
