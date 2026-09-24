@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2025 the original author or authors.
+ * Copyright 2017-present the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,7 +16,10 @@
 
 package org.springframework.batch.infrastructure.item.file.builder;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 
 import org.jspecify.annotations.Nullable;
 
@@ -25,6 +28,8 @@ import org.springframework.batch.infrastructure.item.ItemStreamSupport;
 import org.springframework.batch.infrastructure.item.file.MultiResourceItemReader;
 import org.springframework.batch.infrastructure.item.file.ResourceAwareItemReaderItemStream;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -34,6 +39,8 @@ import org.springframework.util.StringUtils;
  * @author Glenn Renfro
  * @author Drummond Dawson
  * @author Stefano Cordio
+ * @author Usman Ijaz
+ * @author Sanghyuk Jung
  * @since 4.0
  * @see MultiResourceItemReader
  */
@@ -64,8 +71,9 @@ public class MultiResourceItemReaderBuilder<T> {
 	}
 
 	/**
-	 * The name used to calculate the key within the {@link ExecutionContext}. Required if
-	 * {@link #saveState(boolean)} is set to true.
+	 * The name used to calculate the key within the {@link ExecutionContext}. Defaults to
+	 * the bean name, or to the short class name if this instance is not a bean. Set it
+	 * explicitly to disambiguate several non-bean instances of the same type in a step.
 	 * @param name name of the reader instance
 	 * @return The current instance of the builder.
 	 * @see ItemStreamSupport#setName(String)
@@ -91,6 +99,34 @@ public class MultiResourceItemReaderBuilder<T> {
 	}
 
 	/**
+	 * The location patterns of resources that the {@link MultiResourceItemReader} will
+	 * use to retrieve items. Each pattern is resolved through a
+	 * {@link PathMatchingResourcePatternResolver}, so it can use any resource prefix
+	 * supported by Spring (for example {@code file:}, {@code classpath:} or
+	 * {@code classpath*:}) combined with Ant-style wildcards like {@code *}, {@code **}
+	 * and {@code ?} (for example {@code file:/data/*.csv} or
+	 * {@code classpath*:data/**&#47;user?.txt}).
+	 * @param locationPatterns the location patterns of resources to use.
+	 * @return this instance for method chaining.
+	 * @since 6.1.0
+	 */
+	public MultiResourceItemReaderBuilder<T> resources(String... locationPatterns) {
+		ResourcePatternResolver patternResolver = new PathMatchingResourcePatternResolver();
+		List<Resource> resolvedResources = new ArrayList<>();
+		for (String locationPattern : locationPatterns) {
+			try {
+				resolvedResources.addAll(List.of(patternResolver.getResources(locationPattern)));
+			}
+			catch (IOException e) {
+				throw new IllegalArgumentException("Unable to resolve resources for pattern " + locationPattern, e);
+			}
+		}
+		this.resources = resolvedResources.toArray(new Resource[0]);
+
+		return this;
+	}
+
+	/**
 	 * Establishes the delegate to use for reading the resources provided.
 	 * @param delegate reads items from single {@link Resource}.
 	 * @return this instance for method chaining.
@@ -110,8 +146,25 @@ public class MultiResourceItemReaderBuilder<T> {
 	 * @param strict false by default.
 	 * @return this instance for method chaining.
 	 * @see MultiResourceItemReader#setStrict(boolean)
+	 * @deprecated as of 6.1.0 in favor of {@link #strict(boolean)}
 	 */
+	@Deprecated(since = "6.1.0", forRemoval = true)
 	public MultiResourceItemReaderBuilder<T> setStrict(boolean strict) {
+		this.strict = strict;
+
+		return this;
+	}
+
+	/**
+	 * In strict mode the reader will throw an exception on
+	 * {@link MultiResourceItemReader#open(ExecutionContext)} if there are no resources to
+	 * read.
+	 * @param strict false by default.
+	 * @return this instance for method chaining.
+	 * @see MultiResourceItemReader#setStrict(boolean)
+	 * @since 6.1.0
+	 */
+	public MultiResourceItemReaderBuilder<T> strict(boolean strict) {
 		this.strict = strict;
 
 		return this;
@@ -137,9 +190,6 @@ public class MultiResourceItemReaderBuilder<T> {
 	public MultiResourceItemReader<T> build() {
 		Assert.notNull(this.resources, "resources array is required.");
 		Assert.notNull(this.delegate, "delegate is required.");
-		if (this.saveState) {
-			Assert.state(StringUtils.hasText(this.name), "A name is required when saveState is set to true.");
-		}
 
 		MultiResourceItemReader<T> reader = new MultiResourceItemReader<>(this.delegate);
 		reader.setResources(this.resources);

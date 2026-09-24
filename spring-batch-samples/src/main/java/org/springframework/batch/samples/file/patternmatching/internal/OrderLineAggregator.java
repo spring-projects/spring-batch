@@ -27,10 +27,11 @@ import org.springframework.batch.samples.file.patternmatching.Order;
  *
  * @author Dave Syer
  * @author Dan Garrette
+ * @author Yanming Zhou
  */
 public class OrderLineAggregator implements LineAggregator<Order> {
 
-	private static final String LINE_SEPARATOR = System.getProperty("line.separator");
+	private static final String LINE_SEPARATOR = System.lineSeparator();
 
 	private Map<String, LineAggregator<Object>> aggregators;
 

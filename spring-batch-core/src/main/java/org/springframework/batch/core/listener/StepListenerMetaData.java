@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2025 the original author or authors.
+ * Copyright 2002-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@ import org.springframework.batch.core.annotation.BeforeProcess;
 import org.springframework.batch.core.annotation.BeforeRead;
 import org.springframework.batch.core.annotation.BeforeStep;
 import org.springframework.batch.core.annotation.BeforeWrite;
+import org.springframework.batch.core.annotation.OnChunkError;
 import org.springframework.batch.core.annotation.OnProcessError;
 import org.springframework.batch.core.annotation.OnReadError;
 import org.springframework.batch.core.annotation.OnSkipInProcess;
@@ -59,6 +60,8 @@ public enum StepListenerMetaData implements ListenerMetaData {
 	AFTER_CHUNK("afterChunk", "after-chunk-method", AfterChunk.class, ChunkListener.class, Chunk.class),
 	AFTER_CHUNK_ERROR("afterChunkError", "after-chunk-error-method", AfterChunkError.class, ChunkListener.class,
 			ChunkContext.class),
+	ON_CHUNK_ERROR("onChunkError", "on-chunk-error-method", OnChunkError.class, ChunkListener.class, Exception.class,
+			Chunk.class),
 	BEFORE_READ("beforeRead", "before-read-method", BeforeRead.class, ItemReadListener.class),
 	AFTER_READ("afterRead", "after-read-method", AfterRead.class, ItemReadListener.class, Object.class),
 	ON_READ_ERROR("onReadError", "on-read-error-method", OnReadError.class, ItemReadListener.class, Exception.class),

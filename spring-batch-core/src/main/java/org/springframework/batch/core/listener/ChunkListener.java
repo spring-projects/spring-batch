@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,6 +83,10 @@ public interface ChunkListener<I, O> extends StepListener {
 	/**
 	 * Callback after a chunk is read but before it is processed, inside the transaction.
 	 * <strong>This method is not called in concurrent steps.</strong>
+	 * <p>
+	 * When a chunk is scanned after a write failure, each item is re-attempted in its own
+	 * transaction and this method is called once per scanned item, with a chunk holding
+	 * that single input item.
 	 * @since 6.0
 	 */
 	default void beforeChunk(Chunk<I> chunk) {
@@ -91,6 +95,10 @@ public interface ChunkListener<I, O> extends StepListener {
 	/**
 	 * Callback after the chunk is written, inside the transaction. <strong>This method is
 	 * not called in concurrent steps.</strong>
+	 * <p>
+	 * When a chunk is scanned after a write failure, this method is called once per
+	 * scanned item that was successfully written, and is not called for a scanned item
+	 * that was skipped.
 	 * @since 6.0
 	 */
 	default void afterChunk(Chunk<O> chunk) {
@@ -101,8 +109,17 @@ public interface ChunkListener<I, O> extends StepListener {
 	 * transaction, which is about to be rolled back. <em>As a result, you should use
 	 * {@code PROPAGATION_REQUIRES_NEW} for any transactional operation that is called
 	 * here</em>. <strong>This method is not called in concurrent steps.</strong>
+	 * <p>
+	 * When a chunk is scanned after a write failure, this method is called once for the
+	 * whole chunk that failed to be written, and then once per scanned item that turns
+	 * out to be faulty, with a chunk holding that single item.
+	 * <p>
+	 * The given chunk is never empty. A failure that occurs before any item was
+	 * processed, such as a read failure, has no processed chunk to report and is
+	 * signalled by {@link ItemReadListener#onReadError(Exception)} or
+	 * {@link ItemProcessListener#onProcessError} instead.
 	 * @param exception the exception that caused the underlying rollback.
-	 * @param chunk the processed chunk
+	 * @param chunk the processed chunk, never empty
 	 * @since 6.0
 	 */
 	default void onChunkError(Exception exception, Chunk<O> chunk) {

@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.step.item;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -22,6 +23,11 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.ExitStatus;
+import org.springframework.batch.core.annotation.AfterStep;
+import org.springframework.batch.core.annotation.BeforeStep;
+import org.springframework.batch.core.annotation.OnSkipInProcess;
+import org.springframework.batch.core.annotation.OnSkipInRead;
+import org.springframework.batch.core.annotation.OnSkipInWrite;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
@@ -51,6 +57,7 @@ import static org.mockito.Mockito.when;
  * @author Mahmoud Ben Hassine
  * @author Andrey Litvitski
  * @author xeounxzxu
+ * @author Taeik Lim
  */
 public class ChunkOrientedStepTests {
 
@@ -68,6 +75,105 @@ public class ChunkOrientedStepTests {
 
 		Assertions.assertTrue(step.isAllowStartIfComplete());
 		Assertions.assertEquals(5, step.getStartLimit());
+	}
+
+	@Test
+	void testStepAnnotationBasedListenerRegisteredWithChunkOrientedStepBuilder() throws Exception {
+		AtomicInteger beforeStepCount = new AtomicInteger();
+		AtomicInteger afterStepCount = new AtomicInteger();
+		Object listener = new Object() {
+
+			@BeforeStep
+			public void beforeStep(StepExecution stepExecution) {
+				beforeStepCount.incrementAndGet();
+			}
+
+			@AfterStep
+			public void afterStep(StepExecution stepExecution) {
+				afterStepCount.incrementAndGet();
+			}
+
+		};
+		ChunkOrientedStep<String, String> step = new StepBuilder("step", new ResourcelessJobRepository())
+			.<String, String>chunk(1)
+			.reader(new ListItemReader<>(List.of("item")))
+			.writer(items -> {
+			})
+			.listener(listener)
+			.build();
+		JobExecution jobExecution = new JobExecution(1L, new JobInstance(1L, "job"), new JobParameters());
+		StepExecution stepExecution = new StepExecution(1L, "step", jobExecution);
+
+		step.execute(stepExecution);
+
+		assertEquals(1, beforeStepCount.get());
+		assertEquals(1, afterStepCount.get());
+	}
+
+	@Test
+	void testSkipAnnotationBasedListenerRegisteredWithChunkOrientedStepBuilder() throws Exception {
+		AtomicInteger skipInReadCount = new AtomicInteger();
+		AtomicInteger skipInProcessCount = new AtomicInteger();
+		AtomicInteger skipInWriteCount = new AtomicInteger();
+		Object listener = new Object() {
+
+			@OnSkipInRead
+			public void onSkipInRead(Throwable throwable) {
+				skipInReadCount.incrementAndGet();
+			}
+
+			@OnSkipInProcess
+			public void onSkipInProcess(String item, Throwable throwable) {
+				skipInProcessCount.incrementAndGet();
+			}
+
+			@OnSkipInWrite
+			public void onSkipInWrite(String item, Throwable throwable) {
+				skipInWriteCount.incrementAndGet();
+			}
+
+		};
+		Iterator<String> items = List.of("failOnRead", "failOnProcess", "failOnWrite").iterator();
+		ItemReader<String> reader = () -> {
+			if (!items.hasNext()) {
+				return null;
+			}
+			String item = items.next();
+			if (item.equals("failOnRead")) {
+				throw new IllegalStateException("read failure");
+			}
+			return item;
+		};
+		ItemProcessor<String, String> processor = item -> {
+			if (item.equals("failOnProcess")) {
+				throw new IllegalStateException("process failure");
+			}
+			return item;
+		};
+		ItemWriter<String> writer = chunk -> {
+			if (chunk.getItems().contains("failOnWrite")) {
+				throw new IllegalStateException("write failure");
+			}
+		};
+		ChunkOrientedStep<String, String> step = new StepBuilder("step", new ResourcelessJobRepository())
+			.<String, String>chunk(1)
+			.reader(reader)
+			.processor(processor)
+			.writer(writer)
+			.faultTolerant()
+			.skip(IllegalStateException.class)
+			.listener(listener)
+			.build();
+		JobExecution jobExecution = new JobExecution(1L, new JobInstance(1L, "job"), new JobParameters());
+		StepExecution stepExecution = new StepExecution(1L, "step", jobExecution);
+
+		step.execute(stepExecution);
+
+		assertEquals(ExitStatus.COMPLETED.getExitCode(), stepExecution.getExitStatus().getExitCode());
+		assertEquals(3, stepExecution.getSkipCount());
+		assertEquals(1, skipInReadCount.get());
+		assertEquals(1, skipInProcessCount.get());
+		assertEquals(1, skipInWriteCount.get());
 	}
 
 	@Test

@@ -48,9 +48,7 @@
 
 	<!-- A pub-sub channel with task executor is a decent approximation to a JMS outbound adapter -->
 	<integration:publish-subscribe-channel id="requests" task-executor="poolExecutor" />
-	<integration:channel id="replies">
-		<integration:queue />
-	</integration:channel>
+	<integration:channel id="replies" />
 	<integration:service-activator input-channel="requests" output-channel="replies" ref="chunkRequestHandler" />
 
 	<bean id="chunkRequestHandler" class="org.springframework.batch.integration.chunk.RemoteChunkHandlerFactoryBean">

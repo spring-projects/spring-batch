@@ -185,7 +185,10 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T>
 	/**
 	 * Set Object to XML marshaller.
 	 * @param marshaller the Object to XML marshaller
+	 * @deprecated since 6.1 in favor of passing the marshaller to the constructor.
+	 * Scheduled for removal in 7.0.
 	 */
+	@Deprecated(since = "6.1", forRemoval = true)
 	public void setMarshaller(Marshaller marshaller) {
 		this.marshaller = marshaller;
 	}
@@ -451,7 +454,8 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T>
 	 * @param writer the {@link Writer} to be used by the {@link XMLEventWriter} for
 	 * writing to character streams.
 	 * @return an xml writer
-	 * @throws XMLStreamException thrown if error occured creating {@link XMLEventWriter}.
+	 * @throws XMLStreamException thrown if error occurred creating
+	 * {@link XMLEventWriter}.
 	 */
 	protected XMLEventWriter createXmlEventWriter(XMLOutputFactory outputFactory, Writer writer)
 			throws XMLStreamException {

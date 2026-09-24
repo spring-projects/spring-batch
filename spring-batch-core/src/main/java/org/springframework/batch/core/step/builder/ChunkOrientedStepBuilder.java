@@ -27,14 +27,19 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.batch.core.annotation.AfterChunk;
 import org.springframework.batch.core.annotation.AfterProcess;
 import org.springframework.batch.core.annotation.AfterRead;
+import org.springframework.batch.core.annotation.AfterStep;
 import org.springframework.batch.core.annotation.AfterWrite;
 import org.springframework.batch.core.annotation.BeforeChunk;
 import org.springframework.batch.core.annotation.BeforeProcess;
 import org.springframework.batch.core.annotation.BeforeRead;
+import org.springframework.batch.core.annotation.BeforeStep;
 import org.springframework.batch.core.annotation.BeforeWrite;
 import org.springframework.batch.core.annotation.OnChunkError;
 import org.springframework.batch.core.annotation.OnProcessError;
 import org.springframework.batch.core.annotation.OnReadError;
+import org.springframework.batch.core.annotation.OnSkipInProcess;
+import org.springframework.batch.core.annotation.OnSkipInRead;
+import org.springframework.batch.core.annotation.OnSkipInWrite;
 import org.springframework.batch.core.annotation.OnWriteError;
 import org.springframework.batch.core.listener.ChunkListener;
 import org.springframework.batch.core.listener.ItemProcessListener;
@@ -96,6 +101,8 @@ public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrien
 	private StepInterruptionPolicy interruptionPolicy = new ThreadStepInterruptionPolicy();
 
 	private boolean faultTolerant;
+
+	private boolean processorTransactional = true;
 
 	private @Nullable RetryPolicy retryPolicy;
 
@@ -236,6 +243,8 @@ public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrien
 	 */
 	public ChunkOrientedStepBuilder<I, O> listener(Object listener) {
 		Set<Method> listenerMethods = new HashSet<>();
+		listenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), BeforeStep.class));
+		listenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), AfterStep.class));
 		listenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), BeforeChunk.class));
 		listenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), AfterChunk.class));
 		listenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), OnChunkError.class));
@@ -248,6 +257,9 @@ public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrien
 		listenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), BeforeWrite.class));
 		listenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), AfterWrite.class));
 		listenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), OnWriteError.class));
+		listenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), OnSkipInRead.class));
+		listenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), OnSkipInProcess.class));
+		listenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), OnSkipInWrite.class));
 
 		if (!listenerMethods.isEmpty()) {
 			StepListenerFactoryBean factory = new StepListenerFactoryBean();
@@ -283,9 +295,32 @@ public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrien
 	}
 
 	/**
+	 * Mark the item processor as non-transactional (the default is the opposite). By
+	 * default, the {@link ItemProcessor} is re-invoked for every item that is
+	 * re-attempted while scanning a chunk, ie after a write failure has rolled back the
+	 * chunk transaction. If this flag is set, the results of item processing are cached
+	 * and re-used during chunk scanning instead.
+	 * <p>
+	 * Set this flag only if the output of the processor is safe to write again after a
+	 * failed, rolled back write. This is typically not the case for items that the writer
+	 * mutates, like JPA entities: a failed flush can leave the entity in a state that
+	 * makes the next write attempt fail with an unrelated exception.
+	 * @return this for fluent chaining
+	 * @since 6.0.6
+	 */
+	public ChunkOrientedStepBuilder<I, O> processorNonTransactional() {
+		this.processorTransactional = false;
+		return self();
+	}
+
+	/**
 	 * Set the retry policy for the step. This policy determines how the step handles
 	 * retries in case of failures. It can be used to define the number of retry attempts
 	 * and the conditions under which retries should occur. Defaults to no retry policy.
+	 * <p>
+	 * Reserve retryable exceptions for genuinely transient conditions (for example, a
+	 * transient connection drop) and route deterministic failures (such as parsing
+	 * errors) to a {@link SkipPolicy} instead.
 	 * @param retryPolicy the retry policy to use
 	 * @return this for fluent chaining
 	 */
@@ -306,6 +341,14 @@ public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrien
 		return self();
 	}
 
+	/**
+	 * Register exception types that should be retried. Reserve retryable exceptions for
+	 * genuinely transient conditions (for example, a transient connection drop) and
+	 * register deterministic failures (such as parsing errors) as {@link #skip(Class[])}
+	 * skippable exceptions.
+	 * @param retryableExceptions the exception types to retry
+	 * @return this for fluent chaining
+	 */
 	@SafeVarargs
 	public final ChunkOrientedStepBuilder<I, O> retry(Class<? extends Throwable>... retryableExceptions) {
 		this.retryableExceptions.addAll(Arrays.stream(retryableExceptions).toList());
@@ -437,6 +480,7 @@ public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrien
 		}
 		chunkOrientedStep.setSkipPolicy(this.skipPolicy);
 		chunkOrientedStep.setFaultTolerant(this.faultTolerant);
+		chunkOrientedStep.setProcessorTransactional(this.processorTransactional);
 		if (this.asyncTaskExecutor != null) {
 			chunkOrientedStep.setTaskExecutor(this.asyncTaskExecutor);
 		}
@@ -485,13 +529,14 @@ public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrien
 		if (itemHandler instanceof ItemStream itemStream) {
 			this.streams.add(itemStream);
 		}
-		// Register as listener if implements the interface
-		if (itemHandler instanceof StepListener listener) {
-			this.stepListeners.add(listener);
-		}
-		// Register as listener if annotated methods are present
+		// Register as listener if it implements a listener interface or has annotated
+		// methods. The factory covers both cases, so the item handler is registered
+		// only once even if it mixes interfaces and annotations.
 		if (StepListenerFactoryBean.isListener(itemHandler)) {
 			StepListener listener = StepListenerFactoryBean.getListener(itemHandler);
+			this.stepListeners.add(listener);
+		}
+		else if (itemHandler instanceof StepListener listener) {
 			this.stepListeners.add(listener);
 		}
 	}

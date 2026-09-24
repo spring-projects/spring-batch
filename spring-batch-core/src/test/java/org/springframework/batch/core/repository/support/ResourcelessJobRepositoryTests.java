@@ -54,7 +54,7 @@ class ResourcelessJobRepositoryTests {
 		// then
 		assertNotNull(jobInstance);
 		assertEquals(jobName, jobInstance.getJobName());
-		assertEquals(1L, jobInstance.getInstanceId());
+		assertEquals(1L, jobInstance.getId());
 	}
 
 	@Test
@@ -72,7 +72,7 @@ class ResourcelessJobRepositoryTests {
 		assertNotNull(jobExecution);
 		assertEquals(1L, jobExecution.getId());
 		assertEquals(jobName, jobExecution.getJobInstance().getJobName());
-		assertEquals(1L, jobExecution.getJobInstance().getInstanceId());
+		assertEquals(1L, jobExecution.getJobInstance().getId());
 	}
 
 	@Test
@@ -90,7 +90,7 @@ class ResourcelessJobRepositoryTests {
 		assertNotNull(jobExecution);
 		assertEquals(1L, jobExecution.getId());
 		assertEquals(jobName, jobExecution.getJobInstance().getJobName());
-		assertEquals(1L, jobExecution.getJobInstance().getInstanceId());
+		assertEquals(1L, jobExecution.getJobInstance().getId());
 	}
 
 	@Test
@@ -194,7 +194,7 @@ class ResourcelessJobRepositoryTests {
 		// then
 		assertNotNull(jobInstance);
 		assertEquals(jobName, jobInstance.getJobName());
-		assertEquals(1L, jobInstance.getInstanceId());
+		assertEquals(1L, jobInstance.getId());
 	}
 
 	@Test
@@ -245,6 +245,34 @@ class ResourcelessJobRepositoryTests {
 
 		// when
 		long count = jobRepository.getJobInstanceCount(jobName);
+
+		// then
+		assertEquals(1L, count);
+	}
+
+	@Test
+	void countJobInstancesWithUnknownJobName() {
+		// given
+		String jobName = "job";
+		JobParameters jobParameters = new JobParameters();
+		jobRepository.createJobInstance(jobName, jobParameters);
+
+		// when
+		long count = jobRepository.countJobInstances("differentJob");
+
+		// then
+		assertEquals(0L, count);
+	}
+
+	@Test
+	void countJobInstancesWithCorrectJobName() {
+		// given
+		String jobName = "job";
+		JobParameters jobParameters = new JobParameters();
+		jobRepository.createJobInstance(jobName, jobParameters);
+
+		// when
+		long count = jobRepository.countJobInstances(jobName);
 
 		// then
 		assertEquals(1L, count);
@@ -445,6 +473,40 @@ class ResourcelessJobRepositoryTests {
 
 		// then
 		assertEquals(jobExecution, jobRepository.getJobExecution(jobExecution.getId()));
+	}
+
+	@Test
+	void countStepExecutionsForUnknownStepName() {
+		// given
+		String jobName = "job";
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = jobRepository.createJobInstance(jobName, jobParameters);
+		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
+				new ExecutionContext());
+		jobRepository.createStepExecution("step", jobExecution);
+
+		// when
+		long count = jobRepository.countStepExecutions(jobInstance, "unknownStep");
+
+		// then
+		assertEquals(0L, count);
+	}
+
+	@Test
+	void countStepExecutionsForKnownStepName() {
+		// given
+		String jobName = "job";
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = jobRepository.createJobInstance(jobName, jobParameters);
+		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
+				new ExecutionContext());
+		jobRepository.createStepExecution("step", jobExecution);
+
+		// when
+		long count = jobRepository.countStepExecutions(jobInstance, "step");
+
+		// then
+		assertEquals(1L, count);
 	}
 
 }

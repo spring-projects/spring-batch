@@ -45,6 +45,7 @@ import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.jspecify.annotations.Nullable;
 import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
 
 /**
  * JDBC implementation of {@link JobExecutionDao}. Uses sequences (via Spring's
@@ -197,8 +198,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		Timestamp startTime = jobExecution.getStartTime() == null ? null
 				: Timestamp.valueOf(jobExecution.getStartTime());
 		Timestamp endTime = jobExecution.getEndTime() == null ? null : Timestamp.valueOf(jobExecution.getEndTime());
-		Timestamp createTime = jobExecution.getCreateTime() == null ? null
-				: Timestamp.valueOf(jobExecution.getCreateTime());
+		Timestamp createTime = Timestamp.valueOf(jobExecution.getCreateTime());
 		Timestamp lastUpdated = jobExecution.getLastUpdated() == null ? null
 				: Timestamp.valueOf(jobExecution.getLastUpdated());
 		Object[] parameters = new Object[] { jobExecution.getId(), jobInstance.getId(), startTime, endTime,
@@ -267,8 +267,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 			Timestamp startTime = jobExecution.getStartTime() == null ? null
 					: Timestamp.valueOf(jobExecution.getStartTime());
 			Timestamp endTime = jobExecution.getEndTime() == null ? null : Timestamp.valueOf(jobExecution.getEndTime());
-			Timestamp createTime = jobExecution.getCreateTime() == null ? null
-					: Timestamp.valueOf(jobExecution.getCreateTime());
+			Timestamp createTime = Timestamp.valueOf(jobExecution.getCreateTime());
 			Timestamp lastUpdated = jobExecution.getLastUpdated() == null ? null
 					: Timestamp.valueOf(jobExecution.getLastUpdated());
 			Object[] parameters = new Object[] { startTime, endTime, jobExecution.getStatus().toString(),
@@ -432,7 +431,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 
 			Class<?> parameterType = null;
 			try {
-				parameterType = Class.forName(rs.getString("PARAMETER_TYPE"));
+				parameterType = ClassUtils.forName(rs.getString("PARAMETER_TYPE"), null);
 			}
 			catch (ClassNotFoundException e) {
 				throw new RuntimeException(e);

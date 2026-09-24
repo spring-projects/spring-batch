@@ -6,49 +6,16 @@ on:
       milestoneNumber:
         description: "Milestone title"
         required: true
-      generatorVersion:
-        description: "Changelog Generator version"
-        required: true
 
 jobs:
-  build:
+  generate-release-notes:
     name: Generate release notes
     runs-on: ubuntu-latest
     steps:
-      - name: Capture milestone number and generator version
-        run: |
-          echo MILESTONE_NUMBER=${{ github.event.inputs.milestoneNumber }} >> $GITHUB_ENV
-          echo GENERATOR_VERSION=${{ github.event.inputs.generatorVersion }} >> $GITHUB_ENV
-
-      - name: Download changelog generator
-        run: wget https://github.com/spring-io/github-changelog-generator/releases/download/v$GENERATOR_VERSION/github-changelog-generator.jar
-
-      - name: Set up JDK 25
-        uses: actions/setup-java@v5
-        with:
-          java-version: '25'
-          distribution: 'temurin'
-
-      - name: Prepare configuration file
-        run: |
-          cat << EOF > application.yml
-          changelog:
-            repository: spring-projects/spring-batch
-            sections:
-              - title: ":star: New features"
-                labels: [ "type: feature" ]
-              - title: ":rocket: Enhancements"
-                labels: [ "type: enhancement" ]
-              - title: ":lady_beetle: Bug fixes"
-                labels: [ "type: bug" ]
-              - title: ":notebook_with_decorative_cover: Documentation"
-                labels: [ "in: documentation" ]
-              - title: ":hammer: Tasks"
-                labels: [ "type: task" ]
-          EOF
-
+      - name: Check Out Code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Generate release notes
-        run: java -jar github-changelog-generator.jar $MILESTONE_NUMBER release-notes.md
-
-      - name: Print release notes
-        run: cat release-notes.md
+        uses: ./.github/actions/create-release-notes
+        with:
+          milestone: ${{ inputs.milestoneNumber }}
+          token: ${{ secrets.GH_ACTIONS_REPO_TOKEN }}

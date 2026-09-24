@@ -1,5 +1,5 @@
 /*
- * Copyright 2024-2025 the original author or authors.
+ * Copyright 2024-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -86,6 +86,51 @@ public class MongoDBJobRepositoryIntegrationTests extends AbstractJobRepositoryI
 		Assertions.assertEquals(1, jobInstancesCollection.countDocuments());
 		Assertions.assertEquals(1, jobExecutionsCollection.countDocuments());
 		Assertions.assertEquals(2, stepExecutionsCollection.countDocuments());
+
+		// dump results for inspection
+		dump(jobInstancesCollection, "job instance = ");
+		dump(jobExecutionsCollection, "job execution = ");
+		dump(stepExecutionsCollection, "step execution = ");
+	}
+
+	@Test
+	void testParallelJobExecution(@Autowired JobOperator jobOperator, @Autowired Job job) throws Exception {
+		int parallelJobs = 10;
+		Thread[] threads = new Thread[parallelJobs];
+		JobExecution[] executions = new JobExecution[parallelJobs];
+
+		for (int i = 0; i < parallelJobs; i++) {
+			final int idx = i;
+			threads[i] = new Thread(() -> {
+				JobParameters jobParameters = new JobParametersBuilder().addString("name", "foo" + idx)
+					.addLocalDateTime("runtime", LocalDateTime.now())
+					.toJobParameters();
+				try {
+					executions[idx] = jobOperator.start(job, jobParameters);
+				}
+				catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+			});
+			threads[i].start();
+		}
+
+		for (Thread t : threads) {
+			t.join();
+		}
+
+		for (JobExecution exec : executions) {
+			Assertions.assertNotNull(exec);
+			Assertions.assertEquals(ExitStatus.COMPLETED, exec.getExitStatus());
+		}
+
+		MongoCollection<Document> jobInstancesCollection = mongoTemplate.getCollection("BATCH_JOB_INSTANCE");
+		MongoCollection<Document> jobExecutionsCollection = mongoTemplate.getCollection("BATCH_JOB_EXECUTION");
+		MongoCollection<Document> stepExecutionsCollection = mongoTemplate.getCollection("BATCH_STEP_EXECUTION");
+
+		Assertions.assertEquals(parallelJobs, jobInstancesCollection.countDocuments());
+		Assertions.assertEquals(parallelJobs, jobExecutionsCollection.countDocuments());
+		Assertions.assertEquals(parallelJobs * 2, stepExecutionsCollection.countDocuments());
 
 		// dump results for inspection
 		dump(jobInstancesCollection, "job instance = ");

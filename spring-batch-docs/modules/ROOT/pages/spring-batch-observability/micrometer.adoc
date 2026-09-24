@@ -89,8 +89,9 @@ public class MyTimedTasklet implements Tasklet {
 == Tracing
 
 As of version 5, Spring Batch provides tracing through Micrometer's `Observation` API. By default, tracing is disabled.
-To enable it, you need to define an `ObservationRegistry` bean configured with an `ObservationHandler` that supports tracing,
-such as `TracingAwareMeterObservationHandler`:
+To enable it, you need to define an `ObservationRegistry` bean configured with a `TracingObservationHandler`,
+such as `DefaultTracingObservationHandler`. The following example registers it next to the metrics handler
+shown above, so that the same registry collects both metrics and traces:
 
 [source, java]
 ----
@@ -99,10 +100,15 @@ public ObservationRegistry observationRegistry(MeterRegistry meterRegistry, Trac
     DefaultMeterObservationHandler observationHandler = new DefaultMeterObservationHandler(meterRegistry);
     ObservationRegistry observationRegistry = ObservationRegistry.create();
     observationRegistry.observationConfig()
+            .observationHandler(new DefaultTracingObservationHandler(tracer))
             .observationHandler(new TracingAwareMeterObservationHandler<>(observationHandler, tracer));
     return observationRegistry;
 }
 ----
+
+NOTE: `TracingAwareMeterObservationHandler` does not create spans. It wraps a `MeterObservationHandler` to make
+tracing data available to it (for exemplars, for example), so it requires a `TracingObservationHandler` to be
+registered as well.
 
 With that in place, Spring Batch will create a trace for each job execution and a span for each step execution.
 

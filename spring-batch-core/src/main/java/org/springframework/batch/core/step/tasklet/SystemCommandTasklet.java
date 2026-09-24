@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -116,7 +116,7 @@ public class SystemCommandTasklet implements StepExecutionListener, StoppableTas
 
 			if (stoppable) {
 				JobExecution jobExecution = jobRepository
-					.getJobExecution(chunkContext.getStepContext().getStepExecution().getJobExecutionId());
+					.getJobExecution(chunkContext.getStepContext().getStepExecution().getJobExecution().getId());
 
 				if (jobExecution.isStopping()) {
 					stopped = true;

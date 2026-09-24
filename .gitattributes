@@ -1,0 +1,21 @@
+# Normalize line endings for text files so checkouts are consistent
+# across platforms, regardless of the user's core.autocrlf setting.
+* text=auto eol=lf
+
+# Windows scripts must keep their native CRLF endings.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Never modify binary files.
+*.jar binary
+*.zip binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.bmp binary
+*.tiff binary
+*.ico binary
+*.doc binary
+*.ppt binary
+*.vsd binary

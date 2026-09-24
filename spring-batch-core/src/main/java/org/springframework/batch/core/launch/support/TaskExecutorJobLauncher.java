@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2025 the original author or authors.
+ * Copyright 2022-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -134,7 +134,7 @@ public class TaskExecutorJobLauncher implements JobLauncher, InitializingBean {
 				for (JobExecution execution : executions) {
 					if (execution.isRunning()) {
 						throw new JobExecutionAlreadyRunningException(
-								"A job execution for this job is already running: " + jobInstance);
+								"A job execution for this job is already running: " + execution);
 					}
 					BatchStatus status = execution.getStatus();
 					if (status == BatchStatus.UNKNOWN) {

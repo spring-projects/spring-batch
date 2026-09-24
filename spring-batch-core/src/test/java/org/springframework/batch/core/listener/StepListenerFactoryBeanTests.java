@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2025 the original author or authors.
+ * Copyright 2002-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,6 +41,7 @@ import org.springframework.batch.core.annotation.BeforeProcess;
 import org.springframework.batch.core.annotation.BeforeRead;
 import org.springframework.batch.core.annotation.BeforeStep;
 import org.springframework.batch.core.annotation.BeforeWrite;
+import org.springframework.batch.core.annotation.OnChunkError;
 import org.springframework.batch.core.annotation.OnProcessError;
 import org.springframework.batch.core.annotation.OnReadError;
 import org.springframework.batch.core.annotation.OnWriteError;
@@ -87,6 +88,7 @@ class StepListenerFactoryBeanTests {
 		((ChunkListener) listener).beforeChunk((ChunkContext) null);
 		((ChunkListener) listener).afterChunk((ChunkContext) null);
 		((ChunkListener) listener).afterChunkError(new ChunkContext(null));
+		((ChunkListener<String, Integer>) listener).onChunkError(new Exception(), writeItems);
 		((ItemReadListener<String>) listener).beforeRead();
 		((ItemReadListener<String>) listener).afterRead(readItem);
 		((ItemReadListener<String>) listener).onReadError(new Exception());
@@ -103,6 +105,7 @@ class StepListenerFactoryBeanTests {
 		assertTrue(testListener.beforeChunkCalled);
 		assertTrue(testListener.afterChunkCalled);
 		assertTrue(testListener.afterChunkErrorCalled);
+		assertTrue(testListener.onChunkErrorCalled);
 		assertTrue(testListener.beforeReadCalled);
 		assertTrue(testListener.afterReadCalled);
 		assertTrue(testListener.onReadErrorCalled);
@@ -320,6 +323,8 @@ class StepListenerFactoryBeanTests {
 
 		boolean afterChunkErrorCalled = false;
 
+		boolean onChunkErrorCalled = false;
+
 		boolean beforeReadCalled = false;
 
 		boolean afterReadCalled = false;
@@ -367,6 +372,11 @@ class StepListenerFactoryBeanTests {
 		@AfterChunkError
 		public void afterChunkError(ChunkContext context) {
 			afterChunkErrorCalled = true;
+		}
+
+		@OnChunkError
+		public void onChunkError(Exception exception, Chunk<Integer> chunk) {
+			onChunkErrorCalled = true;
 		}
 
 		@BeforeRead

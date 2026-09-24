@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2024 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,12 @@ package org.springframework.batch.core.job.flow;
 
 import org.jspecify.annotations.Nullable;
 
+import org.springframework.batch.core.BatchConstants;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInterruptedException;
 import org.springframework.batch.core.job.StartLimitExceededException;
-import org.springframework.batch.core.step.NoSuchStepException;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.job.StepHandler;
@@ -79,7 +79,7 @@ public class JobFlowExecutor implements FlowExecutor {
 		}
 
 		if (isRerun) {
-			stepExecution.getExecutionContext().put("batch.restart", true);
+			stepExecution.getExecutionContext().put(BatchConstants.BATCH_RESTART, true);
 		}
 
 		// Preserve the step's exit description (e.g., the stack trace recorded by
@@ -92,14 +92,7 @@ public class JobFlowExecutor implements FlowExecutor {
 	}
 
 	private boolean isStepRestart(Step step) {
-		long count = 0;
-		try {
-			count = jobRepository.getStepExecutionCount(execution.getJobInstance(), step.getName());
-		}
-		catch (NoSuchStepException e) {
-			return false;
-		}
-		return count > 0;
+		return jobRepository.countStepExecutions(execution.getJobInstance(), step.getName()) > 0;
 	}
 
 	@Override

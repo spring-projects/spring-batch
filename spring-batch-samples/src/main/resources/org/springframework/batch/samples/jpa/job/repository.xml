@@ -42,8 +42,8 @@
 
 	<bean id="itemWriter"
 		class="org.springframework.batch.infrastructure.item.data.RepositoryItemWriter">
+		<constructor-arg name="repository" ref="customerCreditCrudRepository"/>
 		<property name="methodName" value="save"/>
-		<property name="repository" ref="customerCreditCrudRepository"/>
 	</bean>
 	
 	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">

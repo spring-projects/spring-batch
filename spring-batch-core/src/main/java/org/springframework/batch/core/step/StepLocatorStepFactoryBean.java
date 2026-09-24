@@ -69,14 +69,4 @@ public class StepLocatorStepFactoryBean implements FactoryBean<Step> {
 		return Step.class;
 	}
 
-	/**
-	 * Always return true as optimization for bean factory.
-	 *
-	 * @see FactoryBean#isSingleton()
-	 */
-	@Override
-	public boolean isSingleton() {
-		return true;
-	}
-
 }

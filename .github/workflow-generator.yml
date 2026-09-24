@@ -1,0 +1,16 @@
+workflow:
+  generator:
+    project:
+      java:
+        versions:
+          primary: 25
+    workflows:
+      release-train:
+        build:
+          env:
+            ARTIFACTORY_USERNAME: secrets.COMMERCIAL_ARTIFACTORY_USERNAME
+            ARTIFACTORY_PASSWORD: secrets.COMMERCIAL_ARTIFACTORY_PASSWORD
+        test:
+          env:
+            ARTIFACTORY_USERNAME: secrets.COMMERCIAL_ARTIFACTORY_USERNAME
+            ARTIFACTORY_PASSWORD: secrets.COMMERCIAL_ARTIFACTORY_PASSWORD

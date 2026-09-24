@@ -111,7 +111,7 @@ public interface ChunkListener<I, O> extends StepListener {
 
     void beforeChunk(Chunk<I> chunk);
     void afterChunk(Chunk<O> chunk);
-    void afterChunkError(Exception exception, Chunk<O> chunk);
+    void onChunkError(Exception exception, Chunk<O> chunk);
 
 }
 ----
@@ -120,13 +120,52 @@ The `beforeChunk` method is called after the transaction is started after readin
 of items but before processing start. Conversely, `afterChunk` is called after the chunk
 is written but before the transaction is committed or rolled back.
 
+`onChunkError` is never called with an empty chunk: a failure that happens before any item
+was processed, such as a read failure, has no processed chunk to report and is signalled by
+`ItemReadListener#onReadError` or `ItemProcessListener#onProcessError` instead. This means
+an implementation does not need to guard against an empty chunk.
+
 NOTE: The `ChunkListener` listener interface is not called in concurrent steps
+
+When a fault-tolerant step scans a chunk after a write failure (see
+xref:step/chunk-oriented-processing/configuring-skip.adoc#skippingWriteFailures[Skipping Write Failures and Chunk Scanning]),
+each item is re-attempted in its own transaction, and the callbacks are invoked for the
+whole chunk as well as for each scanned item:
+
+* `beforeChunk` is called once for the chunk that was read, then once per scanned item,
+  with a chunk holding that single input item.
+* `afterChunk` is called only for the scanned items that were successfully written.
+* `onChunkError` is called once for the whole chunk that failed to be written, then once
+  per scanned item that turns out to be faulty, whether that item is skipped or fails the
+  step.
+
+For example, for a chunk of three items whose write fails because the second and third
+items are invalid, a listener is called as follows:
+
+[source]
+----
+beforeChunk([1, 2, 3])   onChunkError(ex, [1, 2, 3])   <1>
+beforeChunk([1])         afterChunk([1])               <2>
+beforeChunk([2])         onChunkError(ex, [2])         <3>
+beforeChunk([3])         onChunkError(ex, [3])
+----
+<1> The initial chunk transaction, which is rolled back.
+<2> The first scan transaction, which commits.
+<3> A scan transaction for a faulty item, which is rolled back after the item is skipped.
+
+[WARNING]
+====
+As stated above, a `ChunkListener` must handle its own errors. An exception thrown from a
+listener callback terminates the step, including during a chunk scan: at that point the
+item being scanned can no longer be written or skipped, so the step is failed rather than
+completed with the item unaccounted for. The job can then be restarted.
+====
 
 The annotations corresponding to this interface are:
 
 * `@BeforeChunk`
 * `@AfterChunk`
-* `@AfterChunkError`
+* `@OnChunkError`
 
 A `ChunkListener` is not designed to throw checked exceptions. Errors must be handled in the
 implementation or the step will terminate.
@@ -257,12 +296,27 @@ The annotations corresponding to this interface are:
 
 One of the most common use cases for a `SkipListener` is to log out a skipped item, so
 that another batch process or even human process can be used to evaluate and fix the
-issue that leads to the skip. Because there are many cases in which the original transaction
-may be rolled back, Spring Batch makes two guarantees:
+issue that leads to the skip.
 
-* The appropriate skip method (depending on when the error happened) is called only once
-per item.
-* The `SkipListener` is always called just before the transaction is committed. This is
-to ensure that any transactional resources call by the listener are not rolled back by a
-failure within the `ItemWriter`.
+`onSkipInWrite` is called during a
+xref:step/chunk-oriented-processing/configuring-skip.adoc#skippingWriteFailures[chunk scan],
+inside the single-item transaction used to re-attempt the faulty item. That transaction
+is always rolled back right after the callback returns, since the item is being skipped
+rather than committed. `onSkipInRead` and `onSkipInProcess`, on the other hand, are
+called inside the chunk's own ongoing transaction, before the rest of the chunk has been
+read, processed, and written. Whether that transaction is ultimately committed or rolled
+back depends on the outcome of the remaining items in the chunk.
+
+[WARNING]
+====
+Because a `SkipListener` callback can run in a transaction that ends up rolled back, any
+transactional resource used by the listener (for example, to log the skipped item to a
+database) is not guaranteed to be committed. As a result, you should use
+`PROPAGATION_REQUIRES_NEW` for any transactional operation called from a `SkipListener`
+method, the same guidance given for `ChunkListener#onChunkError` and
+`ItemWriteListener#onWriteError`.
+====
+
+Regardless of the fate of the transaction, Spring Batch guarantees that the appropriate
+skip method (depending on when the error happened) is called only once per item.
 

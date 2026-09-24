@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2025 the original author or authors.
+ * Copyright 2018-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.integration.chunk;
 
+import org.springframework.batch.infrastructure.support.DatabaseType;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -53,11 +54,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.channel.DirectChannel;
-import org.springframework.integration.channel.QueueChannel;
 import org.springframework.integration.core.MessagingTemplate;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
-import org.springframework.messaging.PollableChannel;
+import org.springframework.messaging.SubscribableChannel;
 import org.springframework.retry.RetryListener;
 import org.springframework.retry.backoff.NoBackOffPolicy;
 import org.springframework.retry.policy.MapRetryContextCache;
@@ -90,7 +90,7 @@ class RemoteChunkingManagerStepBuilderTests {
 	@Autowired
 	private PlatformTransactionManager transactionManager;
 
-	private final PollableChannel inputChannel = new QueueChannel();
+	private final SubscribableChannel inputChannel = new DirectChannel();
 
 	private final DirectChannel outputChannel = new DirectChannel();
 
@@ -365,8 +365,8 @@ class RemoteChunkingManagerStepBuilderTests {
 
 		@Bean
 		DataSource dataSource() {
-			return new EmbeddedDatabaseBuilder().addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-				.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
+			return new EmbeddedDatabaseBuilder().addScript(DatabaseType.HSQL.getProductSchemaDrop())
+				.addScript(DatabaseType.HSQL.getProductSchema())
 				.generateUniqueName(true)
 				.build();
 		}

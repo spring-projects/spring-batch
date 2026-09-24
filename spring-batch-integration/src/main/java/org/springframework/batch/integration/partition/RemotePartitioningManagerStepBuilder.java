@@ -27,13 +27,13 @@ import org.springframework.batch.core.step.builder.PartitionStepBuilder;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.BeanFactory;
-import org.springframework.integration.channel.QueueChannel;
+import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.core.MessagingTemplate;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.StandardIntegrationFlow;
 import org.springframework.integration.dsl.context.IntegrationFlowContext;
 import org.springframework.messaging.MessageChannel;
-import org.springframework.messaging.PollableChannel;
+import org.springframework.messaging.SubscribableChannel;
 import org.springframework.util.Assert;
 
 /**
@@ -193,7 +193,7 @@ public class RemotePartitioningManagerStepBuilder extends PartitionStepBuilder {
 			partitionHandler.setTimeout(this.timeout);
 		}
 		else {
-			PollableChannel replies = new QueueChannel();
+			SubscribableChannel replies = new DirectChannel();
 			partitionHandler.setReplyChannel(replies);
 			if (this.beanFactory != null) {
 				StandardIntegrationFlow standardIntegrationFlow = IntegrationFlow.from(this.inputChannel)

@@ -37,9 +37,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.integration.channel.DirectChannel;
-import org.springframework.integration.channel.QueueChannel;
 import org.springframework.integration.config.EnableIntegration;
 import org.springframework.integration.dsl.IntegrationFlow;
+import org.springframework.integration.jms.DefaultJmsHeaderMapper;
 import org.springframework.integration.jms.dsl.Jms;
 
 /**
@@ -90,13 +90,16 @@ public class ManagerConfiguration {
 	 * Configure inbound flow (replies coming from workers)
 	 */
 	@Bean
-	public QueueChannel replies() {
-		return new QueueChannel();
+	public DirectChannel replies() {
+		return new DirectChannel();
 	}
 
 	@Bean
 	public IntegrationFlow inboundFlow(ActiveMQConnectionFactory connectionFactory) {
-		return IntegrationFlow.from(Jms.messageDrivenChannelAdapter(connectionFactory).destination("replies"))
+		return IntegrationFlow
+			.from(Jms.messageDrivenChannelAdapter(connectionFactory)
+				.headerMapper(new DefaultJmsHeaderMapper("*"))
+				.destination("replies"))
 			.channel(replies())
 			.get();
 	}

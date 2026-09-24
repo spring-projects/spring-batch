@@ -130,7 +130,7 @@ abstract class AbstractJobRepositoryIntegrationTests {
 		JobExecution firstJobExec = jobRepository.createJobExecution(jobInstance, jobParameters, executionContext);
 		StepExecution firstStepExec = jobRepository.createStepExecution(step.getName(), firstJobExec);
 
-		assertEquals(1, jobRepository.getStepExecutionCount(firstJobExec.getJobInstance(), step.getName()));
+		assertEquals(1, jobRepository.countStepExecutions(firstJobExec.getJobInstance(), step.getName()));
 		assertEquals(firstStepExec, jobRepository.getLastStepExecution(firstJobExec.getJobInstance(), step.getName()));
 
 		// first execution failed
@@ -148,7 +148,7 @@ abstract class AbstractJobRepositoryIntegrationTests {
 		JobExecution secondJobExec = jobRepository.createJobExecution(jobInstance, jobParameters, executionContext);
 		StepExecution secondStepExec = jobRepository.createStepExecution(step.getName(), firstJobExec);
 
-		assertEquals(2, jobRepository.getStepExecutionCount(secondJobExec.getJobInstance(), step.getName()));
+		assertEquals(2, jobRepository.countStepExecutions(secondJobExec.getJobInstance(), step.getName()));
 		assertEquals(secondStepExec,
 				jobRepository.getLastStepExecution(secondJobExec.getJobInstance(), step.getName()));
 	}

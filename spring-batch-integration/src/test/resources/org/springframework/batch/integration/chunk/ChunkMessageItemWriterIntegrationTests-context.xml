@@ -13,9 +13,7 @@
                                  https://www.springframework.org/schema/tx/spring-tx.xsd">
 	<annotation-config/>
 	<channel id="requests" />
-	<channel id="replies">
-		<queue/>
-	</channel>
+	<channel id="replies" />
 	<beans:bean id="transactionManager" class="org.springframework.batch.infrastructure.support.transaction.ResourcelessTransactionManager" />
 	<tx:annotation-driven />
 	<beans:bean id="chunkRequestHandler" class="org.springframework.batch.integration.chunk.ChunkProcessorChunkRequestHandler">

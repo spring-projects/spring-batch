@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2025 the original author or authors.
+ * Copyright 2023-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -87,8 +87,9 @@ public class MongoCursorItemReaderBuilder<T> {
 	}
 
 	/**
-	 * The name used to calculate the key within the {@link ExecutionContext}. Required if
-	 * {@link #saveState(boolean)} is set to true.
+	 * The name used to calculate the key within the {@link ExecutionContext}. Defaults to
+	 * the bean name, or to the short class name if this instance is not a bean. Set it
+	 * explicitly to disambiguate several non-bean instances of the same type in a step.
 	 * @param name name of the reader instance
 	 * @return The current instance of the builder.
 	 * @see ItemStreamSupport#setName(String)
@@ -129,7 +130,6 @@ public class MongoCursorItemReaderBuilder<T> {
 	 * @param template the MongoOperations instance to use
 	 * @see MongoOperations
 	 * @return The current instance of the builder
-	 * @see MongoCursorItemReader#setTemplate(MongoOperations)
 	 */
 	public MongoCursorItemReaderBuilder<T> template(MongoOperations template) {
 		this.template = template;
@@ -142,7 +142,6 @@ public class MongoCursorItemReaderBuilder<T> {
 	 * {@link MongoCursorItemReader#read()} call.
 	 * @param targetType the targetType of object to return
 	 * @return The current instance of the builder
-	 * @see MongoCursorItemReader#setTargetType(Class)
 	 */
 	public MongoCursorItemReaderBuilder<T> targetType(Class<? extends T> targetType) {
 		this.targetType = targetType;
@@ -278,12 +277,12 @@ public class MongoCursorItemReaderBuilder<T> {
 
 	public MongoCursorItemReader<T> build() {
 		Assert.notNull(this.template, "template is required.");
-		if (this.saveState) {
-			Assert.hasText(this.name, "A name is required when saveState is set to true");
-		}
 		Assert.notNull(this.targetType, "targetType is required.");
 		Assert.state(StringUtils.hasText(this.jsonQuery) || this.query != null, "A query is required");
-		Assert.notNull(this.sorts, "sorts map is required.");
+
+		if (StringUtils.hasText(this.jsonQuery) && this.query == null) {
+			Assert.notNull(this.sorts, "sorts map is required.");
+		}
 
 		MongoCursorItemReader<T> reader = new MongoCursorItemReader<>(this.template, this.targetType);
 		reader.setSaveState(this.saveState);
@@ -293,8 +292,6 @@ public class MongoCursorItemReaderBuilder<T> {
 		reader.setCurrentItemCount(this.currentItemCount);
 		reader.setMaxItemCount(this.maxItemCount);
 
-		reader.setTemplate(this.template);
-		reader.setTargetType(this.targetType);
 		if (this.collection != null) {
 			reader.setCollection(this.collection);
 		}
@@ -308,7 +305,9 @@ public class MongoCursorItemReaderBuilder<T> {
 		if (this.fields != null) {
 			reader.setFields(this.fields);
 		}
-		reader.setSort(this.sorts);
+		if (this.sorts != null) {
+			reader.setSort(this.sorts);
+		}
 		if (this.hint != null) {
 			reader.setHint(this.hint);
 		}

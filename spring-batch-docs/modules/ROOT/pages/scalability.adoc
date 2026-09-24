@@ -602,7 +602,10 @@ public IntegrationFlow inboundFlow(ActiveMQConnectionFactory connectionFactory, 
     StepExecutionRequestHandler stepExecutionRequestHandler = new StepExecutionRequestHandler();
     stepExecutionRequestHandler.setJobRepository(jobRepository);
     stepExecutionRequestHandler.setStepLocator(stepLocator);
-    return IntegrationFlow.from(Jms.messageDrivenChannelAdapter(connectionFactory).destination("requests"))
+    return IntegrationFlow
+        .from(Jms.messageDrivenChannelAdapter(connectionFactory)
+            .headerMapper(new DefaultJmsHeaderMapper("*"))
+            .destination("requests"))
         .channel(requests())
         .handle(stepExecutionRequestHandler, "handle")
         .get();

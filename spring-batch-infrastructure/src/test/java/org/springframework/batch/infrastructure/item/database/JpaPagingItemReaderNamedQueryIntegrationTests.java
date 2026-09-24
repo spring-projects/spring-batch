@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 the original author or authors.
+ * Copyright 2020-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,6 @@ public class JpaPagingItemReaderNamedQueryIntegrationTests extends AbstractPagin
 		jpaNamedQueryProvider.setEntityClass(Foo.class);
 		jpaNamedQueryProvider.afterPropertiesSet();
 
-		reader.setEntityManagerFactory(entityManagerFactory);
 		reader.setQueryProvider(jpaNamedQueryProvider);
 		reader.afterPropertiesSet();
 		reader.setSaveState(true);

@@ -80,8 +80,9 @@ public interface JobOperator extends JobLauncher {
 	 * @param jobParameters the {@link JobParameters} to start the job with
 	 * @return the {@link JobExecution} that was started
 	 * @throws InvalidJobParametersException thrown if any of the job parameters are
+	 * invalid.
 	 * @throws JobExecutionAlreadyRunningException if the JobInstance identified by the
-	 * properties already has an execution running. invalid.
+	 * properties already has an execution running.
 	 * @throws JobRestartException if the execution would be a re-start, but a re-start is
 	 * either not allowed or not needed.
 	 * @throws JobInstanceAlreadyCompleteException if the job has been run before with the
