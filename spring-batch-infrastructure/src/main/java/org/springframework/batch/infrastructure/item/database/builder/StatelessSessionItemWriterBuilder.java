@@ -1,0 +1,58 @@
+/*
+ * Copyright 2026 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.springframework.batch.infrastructure.item.database.builder;
+
+import org.hibernate.SessionFactory;
+import org.jspecify.annotations.Nullable;
+import org.springframework.batch.infrastructure.item.database.StatelessSessionItemWriter;
+import org.springframework.util.Assert;
+
+/**
+ * A builder for the {@link StatelessSessionItemWriter}.
+ *
+ * @author Philippe Marschall
+ * @since 6.1
+ * @see StatelessSessionItemWriter
+ */
+public class StatelessSessionItemWriterBuilder<T> {
+
+	private @Nullable SessionFactory sessionFactory;
+
+	/**
+	 * The Hibnerate {@link SessionFactory} to obtain an entity manager from. Required.
+	 * @param sessionFactory the {@link SessionFactory}
+	 * @return this instance for method chaining
+	 * @see StatelessSessionItemWriter#StatelessSessionItemWriter(SessionFactory)
+	 */
+	public StatelessSessionItemWriterBuilder<T> sessionFactory(SessionFactory sessionFactory) {
+		this.sessionFactory = sessionFactory;
+
+		return this;
+	}
+
+	/**
+	 * Returns a fully built {@link StatelessSessionItemWriter}.
+	 * @return the writer
+	 */
+	public StatelessSessionItemWriter<T> build() {
+		Assert.state(this.sessionFactory != null, "SessionFactory must be provided");
+
+		StatelessSessionItemWriter<T> writer = new StatelessSessionItemWriter<>(this.sessionFactory);
+
+		return writer;
+	}
+
+}

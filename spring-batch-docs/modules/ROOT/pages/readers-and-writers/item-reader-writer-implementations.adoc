@@ -255,6 +255,12 @@ The `JpaItemWriter` is an `ItemWriter` that uses a JPA `EntityManagerFactory` to
 any entities that are not part of the persistence context. Spring Batch provides a
 `JpaItemWriterBuilder` to construct an instance of the `JpaItemWriter`.
 
+[[statelessSessionItemWriter]]
+=== `StatelessSessionItemWriter`
+The `StatelessSessionItemWriter` is an `ItemWriter` that uses a Hibernate `StatelessSession`
+to insert of all items provided. Spring Batch provides a `StatelessSessionItemWriterBuilder`
+to construct an instance of the `StatelessSessionItemWriter`.
+
 [[specializedReaders]]
 == Specialized Readers
 Spring Batch offers the following specialized readers:
