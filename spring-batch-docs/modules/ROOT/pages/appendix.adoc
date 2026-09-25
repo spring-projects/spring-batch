@@ -115,6 +115,8 @@ This reader stores message offsets in the execution context to support restart c
 |`StaxEventItemWriter`|Uses a `Marshaller` implementation to
             convert each item to XML and then writes it to an XML file by using
             StAX.|No
+|`StatelessSessionItemWriter`|Uses batching features from a
+            `StatelessSession`|Yes
 |`JsonFileItemWriter`|Uses a `JsonObjectMarshaller` implementation to
             convert each item to Json and then writes it to a Json file.|No
 |`AvroItemWriter`|Serializes data to an `WritableResource` using Avro|No
