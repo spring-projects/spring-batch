@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,22 +24,23 @@ import org.springframework.batch.infrastructure.item.database.PagingQueryProvide
  *
  * @author Thomas Risberg
  * @author Michael Minella
+ * @author Philippe Marschall
  * @since 2.0
  */
 public class OraclePagingQueryProvider extends AbstractSqlPagingQueryProvider {
 
 	@Override
 	public String generateFirstPageQuery(int pageSize) {
-		return SqlPagingQueryUtils.generateRowNumSqlQuery(this, false, buildRowNumClause(pageSize));
+		return SqlPagingQueryUtils.generateLimitSqlQuery(this, false, buildLimitClause(pageSize));
 	}
 
 	@Override
 	public String generateRemainingPagesQuery(int pageSize) {
-		return SqlPagingQueryUtils.generateRowNumSqlQuery(this, true, buildRowNumClause(pageSize));
+		return SqlPagingQueryUtils.generateLimitSqlQuery(this, true, buildLimitClause(pageSize));
 	}
 
-	private String buildRowNumClause(int pageSize) {
-		return "ROWNUM <= " + pageSize;
+	private String buildLimitClause(int pageSize) {
+		return "FETCH FIRST " + pageSize + " ROWS ONLY";
 	}
 
 }
