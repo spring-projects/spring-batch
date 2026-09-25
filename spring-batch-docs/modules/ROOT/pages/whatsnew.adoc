@@ -6,6 +6,7 @@ This section highlights the major changes in Spring Batch 6.1. For the complete 
 Spring Batch 6.1 includes the following features and improvements:
 
 * xref:whatsnew.adoc#dependencies-upgrade[Dependencies upgrade]
+* xref:whatsnew.adoc#statelesssession-item-writer[StatelessSession based ItemWriter]
 * xref:whatsnew.adoc#collection-prefix-for-the-mongodb-job-repository[Collection prefix for the MongoDB job repository]
 * xref:whatsnew.adoc#default-conversion-service-based-on-defaultformattingconversionservice[Default conversion service based on `DefaultFormattingConversionService`]
 * xref:whatsnew.adoc#async-processing-apis-and-local-chunking-moved-to-core[Async processing APIs and local chunking moved to `spring-batch-core`]
@@ -31,6 +32,11 @@ In this release, Spring dependencies are upgraded to the following versions:
 * Spring AMQP 4.2
 * Spring Kafka 4.2
 * Micrometer 1.18
+
+[[statelesssession-item-writer]]
+== StatelessSession based ItemWriter
+The `StatelessSessionItemWriter` uses Hibernate `StatelessSession` to insert, update
+or delete detached entities.
 
 [[collection-prefix-for-the-mongodb-job-repository]]
 == Collection prefix for the MongoDB job repository
