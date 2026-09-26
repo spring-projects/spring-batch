@@ -19,12 +19,20 @@ import java.io.StringWriter;
 
 import javax.sql.DataSource;
 
+import org.apache.commons.logging.Log;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.appender.WriterAppender;
+import org.h2.jdbcx.JdbcDataSource;
 import org.junit.jupiter.api.Test;
 
+import org.springframework.aop.scope.ScopedProxyUtils;
+import org.springframework.beans.factory.ObjectFactory;
+import org.springframework.beans.factory.config.BeanDefinitionHolder;
+import org.springframework.beans.factory.config.Scope;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -76,6 +84,40 @@ class JdbcJobRepositoryFactoryBeanTests {
 		}
 	}
 
+	@Test
+	void inheritedLoggerRemainsAvailableToSubclasses() {
+		assertThat(new InheritedLoggerRepositoryBean().inheritedLogger()).isNotNull();
+	}
+
+	@Test
+	void doesNotFailOrWarnWhenScopedDataSourcesCannotBeResolved() throws Exception {
+
+		String warning = "The DataSource configured for the JobRepository does not appear to match";
+		StringWriter output = new StringWriter();
+		WriterAppender appender = WriterAppender.newBuilder().setName("test").setTarget(output).build();
+		Logger logger = (Logger) LogManager.getLogger(JdbcJobRepositoryFactoryBean.class);
+		Level originalLevel = logger.getLevel();
+		appender.start();
+		logger.addAppender(appender);
+		logger.setLevel(Level.WARN);
+
+		try {
+			DataSource scopedDataSource = createScopedDataSourceProxy();
+			createFactoryBean(scopedDataSource, new JdbcTransactionManager(scopedDataSource)).afterPropertiesSet();
+			assertThat(output.toString()).doesNotContain(warning);
+
+			output.getBuffer().setLength(0);
+			createFactoryBean(createScopedDataSourceProxy(), new JdbcTransactionManager(createScopedDataSourceProxy()))
+				.afterPropertiesSet();
+			assertThat(output.toString()).doesNotContain(warning);
+		}
+		finally {
+			logger.removeAppender(appender);
+			logger.setLevel(originalLevel);
+			appender.stop();
+		}
+	}
+
 	private JdbcJobRepositoryFactoryBean createFactoryBean(DataSource dataSource,
 			PlatformTransactionManager transactionManager) {
 		JdbcJobRepositoryFactoryBean factoryBean = new JdbcJobRepositoryFactoryBean();
@@ -83,6 +125,50 @@ class JdbcJobRepositoryFactoryBeanTests {
 		factoryBean.setTransactionManager(transactionManager);
 		factoryBean.setDatabaseType("H2");
 		return factoryBean;
+	}
+
+	private DataSource createScopedDataSourceProxy() {
+		DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
+		beanFactory.registerScope("inactive", new Scope() {
+
+			@Override
+			public Object get(String name, ObjectFactory<?> objectFactory) {
+				throw new IllegalStateException("Scope 'inactive' is not active");
+			}
+
+			@Override
+			public Object remove(String name) {
+				return null;
+			}
+
+			@Override
+			public void registerDestructionCallback(String name, Runnable callback) {
+			}
+
+			@Override
+			public Object resolveContextualObject(String key) {
+				return null;
+			}
+
+			@Override
+			public String getConversationId() {
+				return null;
+			}
+		});
+		RootBeanDefinition targetDefinition = new RootBeanDefinition(JdbcDataSource.class);
+		targetDefinition.setScope("inactive");
+		BeanDefinitionHolder targetHolder = new BeanDefinitionHolder(targetDefinition, "dataSource");
+		BeanDefinitionHolder proxyHolder = ScopedProxyUtils.createScopedProxy(targetHolder, beanFactory, false);
+		beanFactory.registerBeanDefinition(proxyHolder.getBeanName(), proxyHolder.getBeanDefinition());
+		return (DataSource) beanFactory.getBean(proxyHolder.getBeanName());
+	}
+
+	private static class InheritedLoggerRepositoryBean extends JdbcJobRepositoryFactoryBean {
+
+		Log inheritedLogger() {
+			return logger;
+		}
+
 	}
 
 }

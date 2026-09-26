@@ -54,7 +54,7 @@ import java.nio.charset.Charset;
 @SuppressWarnings("removal")
 public class JdbcJobRepositoryFactoryBean extends JobRepositoryFactoryBean {
 
-	private static final Log logger = LogFactory.getLog(JdbcJobRepositoryFactoryBean.class);
+	private static final Log jdbcLogger = LogFactory.getLog(JdbcJobRepositoryFactoryBean.class);
 
 	/**
 	 * @param type a value from the {@link java.sql.Types} class to indicate the type to
@@ -227,12 +227,26 @@ public class JdbcJobRepositoryFactoryBean extends JobRepositoryFactoryBean {
 			dataSource = proxy.getTargetDataSource();
 		}
 		if (getTransactionManager() instanceof ResourceTransactionManager transactionManager
-				&& transactionManager.getResourceFactory() instanceof DataSource
-				&& !TransactionSynchronizationUtils.sameResourceFactory(transactionManager, dataSource)) {
-			logger
-				.warn("The DataSource configured for the JobRepository does not appear to match the DataSource managed "
-						+ "by the configured transaction manager. Spring Batch metadata updates may not participate in "
-						+ "the same transaction.");
+				&& transactionManager.getResourceFactory() instanceof DataSource transactionManagerDataSource) {
+			if (transactionManagerDataSource == dataSource) {
+				return;
+			}
+			boolean sameDataSource;
+			try {
+				sameDataSource = TransactionSynchronizationUtils.sameResourceFactory(transactionManager, dataSource);
+			}
+			catch (RuntimeException ex) {
+				// The resource factory could not be unwrapped (for example a scoped
+				// proxy whose scope is inactive), so this best-effort check cannot tell
+				// whether the DataSources match and stays silent.
+				return;
+			}
+			if (!sameDataSource) {
+				jdbcLogger
+					.warn("The DataSource configured for the JobRepository does not appear to match the DataSource managed "
+							+ "by the configured transaction manager. Spring Batch metadata updates may not participate in "
+							+ "the same transaction.");
+			}
 		}
 	}
 
