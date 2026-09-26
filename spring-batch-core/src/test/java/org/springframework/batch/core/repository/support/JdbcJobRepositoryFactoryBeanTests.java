@@ -110,6 +110,12 @@ class JdbcJobRepositoryFactoryBeanTests {
 			createFactoryBean(createScopedDataSourceProxy(), new JdbcTransactionManager(createScopedDataSourceProxy()))
 				.afterPropertiesSet();
 			assertThat(output.toString()).doesNotContain(warning);
+
+			output.getBuffer().setLength(0);
+			DataSource plainTarget = mock();
+			createFactoryBean(createClassBasedScopedDataSourceProxy(), new JdbcTransactionManager(plainTarget))
+				.afterPropertiesSet();
+			assertThat(output.toString()).doesNotContain(warning);
 		}
 		finally {
 			logger.removeAppender(appender);
@@ -128,8 +134,27 @@ class JdbcJobRepositoryFactoryBeanTests {
 	}
 
 	private DataSource createScopedDataSourceProxy() {
+		return createScopedDataSourceProxy(JdbcDataSource.class, false);
+	}
+
+	private DataSource createClassBasedScopedDataSourceProxy() {
+		return createScopedDataSourceProxy(TransactionAwareDataSourceProxy.class, true);
+	}
+
+	private DataSource createScopedDataSourceProxy(Class<?> targetType, boolean proxyTargetClass) {
 		DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
-		beanFactory.registerScope("inactive", new Scope() {
+		beanFactory.registerScope("inactive", inactiveScope());
+		RootBeanDefinition targetDefinition = new RootBeanDefinition(targetType);
+		targetDefinition.setScope("inactive");
+		BeanDefinitionHolder targetHolder = new BeanDefinitionHolder(targetDefinition, "dataSource");
+		BeanDefinitionHolder proxyHolder = ScopedProxyUtils.createScopedProxy(targetHolder, beanFactory,
+				proxyTargetClass);
+		beanFactory.registerBeanDefinition(proxyHolder.getBeanName(), proxyHolder.getBeanDefinition());
+		return (DataSource) beanFactory.getBean(proxyHolder.getBeanName());
+	}
+
+	private Scope inactiveScope() {
+		return new Scope() {
 
 			@Override
 			public Object get(String name, ObjectFactory<?> objectFactory) {
@@ -154,13 +179,7 @@ class JdbcJobRepositoryFactoryBeanTests {
 			public String getConversationId() {
 				return null;
 			}
-		});
-		RootBeanDefinition targetDefinition = new RootBeanDefinition(JdbcDataSource.class);
-		targetDefinition.setScope("inactive");
-		BeanDefinitionHolder targetHolder = new BeanDefinitionHolder(targetDefinition, "dataSource");
-		BeanDefinitionHolder proxyHolder = ScopedProxyUtils.createScopedProxy(targetHolder, beanFactory, false);
-		beanFactory.registerBeanDefinition(proxyHolder.getBeanName(), proxyHolder.getBeanDefinition());
-		return (DataSource) beanFactory.getBean(proxyHolder.getBeanName());
+		};
 	}
 
 	private static class InheritedLoggerRepositoryBean extends JdbcJobRepositoryFactoryBean {

@@ -222,23 +222,24 @@ public class JdbcJobRepositoryFactoryBean extends JobRepositoryFactoryBean {
 	}
 
 	private void validateTransactionManagerDataSource() {
-		DataSource dataSource = this.dataSource;
-		if (dataSource instanceof TransactionAwareDataSourceProxy proxy && proxy.getTargetDataSource() != null) {
-			dataSource = proxy.getTargetDataSource();
-		}
 		if (getTransactionManager() instanceof ResourceTransactionManager transactionManager
 				&& transactionManager.getResourceFactory() instanceof DataSource transactionManagerDataSource) {
+			DataSource dataSource = this.dataSource;
 			if (transactionManagerDataSource == dataSource) {
 				return;
 			}
 			boolean sameDataSource;
 			try {
+				if (dataSource instanceof TransactionAwareDataSourceProxy proxy
+						&& proxy.getTargetDataSource() != null) {
+					dataSource = proxy.getTargetDataSource();
+				}
 				sameDataSource = TransactionSynchronizationUtils.sameResourceFactory(transactionManager, dataSource);
 			}
 			catch (RuntimeException ex) {
-				// The resource factory could not be unwrapped (for example a scoped
-				// proxy whose scope is inactive), so this best-effort check cannot tell
-				// whether the DataSources match and stays silent.
+				// The DataSource could not be resolved (for example a scoped proxy whose
+				// scope is inactive), so this best-effort check cannot tell whether the
+				// DataSources match and stays silent.
 				return;
 			}
 			if (!sameDataSource) {
