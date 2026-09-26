@@ -61,6 +61,7 @@ import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.batch.infrastructure.item.ItemProcessor;
 import org.springframework.batch.infrastructure.item.ItemReader;
 import org.springframework.batch.infrastructure.item.ItemStream;
+import org.springframework.batch.infrastructure.item.ItemStreamException;
 import org.springframework.batch.infrastructure.item.ItemWriter;
 import org.springframework.batch.infrastructure.item.support.CompositeItemStream;
 import org.springframework.batch.infrastructure.support.transaction.ResourcelessTransactionManager;
@@ -94,11 +95,19 @@ import static org.springframework.batch.core.observability.BatchMetrics.METRICS_
  * @author Minchul Son
  * @author Yanming Zhou
  * @author Taeik Lim
+ * @author Kim ByeongChang
  * @since 6.0
  */
 public class ChunkOrientedStep<I, O> extends AbstractStep {
 
 	private static final Log logger = LogFactory.getLog(ChunkOrientedStep.class.getName());
+
+	/*
+	 * Execution context key holding the number of reads, since the reader checkpoint
+	 * saved in the execution context, whose outcome has already been committed while a
+	 * chunk was being scanned, see #doExecute.
+	 */
+	private static final String CHUNK_SCAN_OFFSET = "batch.chunkScanOffset";
 
 	/*
 	 * Step Input / Output parameters
@@ -120,6 +129,15 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 	 * Step state / interruption parameters
 	 */
 	private final CompositeItemStream compositeItemStream = new CompositeItemStream();
+
+	/*
+	 * The registered streams, split into item readers and other streams. During scanning,
+	 * reader checkpoints are preserved while updates from non-reader streams are
+	 * persisted, see #updateStreamsWhileScanning.
+	 */
+	private final CompositeItemStream readerItemStream = new CompositeItemStream();
+
+	private final CompositeItemStream nonReaderItemStream = new CompositeItemStream();
 
 	private StepInterruptionPolicy interruptionPolicy = new ThreadStepInterruptionPolicy();
 
@@ -209,6 +227,12 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 	public void registerItemStream(ItemStream stream) {
 		Assert.notNull(stream, "Item stream must not be null");
 		this.compositeItemStream.register(stream);
+		if (stream instanceof ItemReader<?>) {
+			this.readerItemStream.register(stream);
+		}
+		else {
+			this.nonReaderItemStream.register(stream);
+		}
 	}
 
 	/**
@@ -359,13 +383,13 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 		Assert.notNull(this.itemReader, "Item reader must not be null");
 		Assert.notNull(this.itemWriter, "Item writer must not be null");
 		if (this.itemReader instanceof ItemStream itemStream) {
-			this.compositeItemStream.register(itemStream);
+			registerItemStream(itemStream);
 		}
 		if (this.itemWriter instanceof ItemStream itemStream) {
-			this.compositeItemStream.register(itemStream);
+			registerItemStream(itemStream);
 		}
 		if (this.itemProcessor instanceof ItemStream itemStream) {
-			this.compositeItemStream.register(itemStream);
+			registerItemStream(itemStream);
 		}
 		this.transactionTemplate = new TransactionTemplate(this.transactionManager, this.transactionAttribute);
 		if (this.faultTolerant) {
@@ -378,6 +402,45 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 	protected void open(ExecutionContext executionContext) throws Exception {
 		this.compositeItemStream.open(executionContext);
 		this.chunkTracker.get().init();
+		positionReaderAfterScannedItems(executionContext);
+	}
+
+	/*
+	 * If the previous execution failed while scanning a chunk, the reader checkpoint
+	 * saved in the execution context precedes that chunk, and the scan offset is the
+	 * number of reads since that checkpoint whose outcome (item written or skipped, read
+	 * skipped) was committed before the failure. Those reads are replayed and their items
+	 * discarded, so that the restart resumes with the first item that was not processed.
+	 * The checkpoint itself does not move until the next commit that persists the reader
+	 * state, so the replayed reads remain counted from it. Replayed reads go through the
+	 * same retry and skip policies as in the previous execution: a read that is skipped
+	 * again consumes one read of the offset, as it did then, while a failure that cannot
+	 * be skipped fails the restart.
+	 */
+	private void positionReaderAfterScannedItems(ExecutionContext executionContext) throws Exception {
+		if (!executionContext.containsKey(CHUNK_SCAN_OFFSET)) {
+			return;
+		}
+		int offset = executionContext.getInt(CHUNK_SCAN_OFFSET);
+		if (logger.isDebugEnabled()) {
+			logger.debug("Positioning reader after " + offset + " already scanned reads of the chunk being scanned");
+		}
+		ChunkTracker<I, O> tracker = this.chunkTracker.get();
+		for (int i = 0; i < offset; i++) {
+			try {
+				if (doRead() == null) {
+					return;
+				}
+			}
+			catch (RetryException exception) {
+				Throwable cause = exception.getCause();
+				if (!(this.faultTolerant && this.skipPolicy.shouldSkip(cause, -1))) {
+					throw new ItemStreamException(
+							"Unable to position the reader after the " + offset + " already scanned reads", cause);
+				}
+			}
+			tracker.incrementReadCount();
+		}
 	}
 
 	@Override
@@ -396,6 +459,8 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 						stepExecution.getId());
 				chunkTransactionEvent.begin();
 				StepContribution contribution = stepExecution.createStepContribution();
+				ChunkTracker<I, O> tracker = this.chunkTracker.get();
+				boolean scanning = tracker.isScanMode();
 				processNextChunk(transactionStatus, contribution, stepExecution);
 
 				// Skip update during rollback to avoid OptimisticLockingFailureException
@@ -410,12 +475,44 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 					return;
 				}
 
-				this.compositeItemStream.update(stepExecution.getExecutionContext());
+				ExecutionContext executionContext = stepExecution.getExecutionContext();
+				if (scanning && tracker.isScanMode()) {
+					updateStreamsWhileScanning(executionContext, tracker);
+				}
+				else {
+					this.compositeItemStream.update(executionContext);
+					executionContext.remove(CHUNK_SCAN_OFFSET);
+					tracker.readerCheckpointSaved();
+				}
 				getJobRepository().updateExecutionContext(stepExecution);
 				getJobRepository().update(stepExecution);
 				chunkTransactionEvent.transactionStatus = BatchMetrics.STATUS_COMMITTED;
 				chunkTransactionEvent.commit();
 			});
+		}
+	}
+
+	/*
+	 * Update the streams for a commit made while a chunk is being scanned. The reader has
+	 * already read the whole chunk, but only part of it is committed, so the advanced
+	 * reader state must not be persisted. The reader streams are updated with an empty
+	 * execution context that is discarded, which tells whether the reader keeps restart
+	 * state at all: - if it does, the checkpoint in the execution context is left as is,
+	 * and the number of reads since that checkpoint whose outcome is committed is saved
+	 * as the scan offset, so that a restart resumes right after them; - if it does not
+	 * (typically a reader with saveState(false) relying on a process indicator), the
+	 * reader is restarted from its own state and must not be offset. Either way, the
+	 * reader streams are updated once, as in any other commit.
+	 */
+	private void updateStreamsWhileScanning(ExecutionContext executionContext, ChunkTracker<I, O> tracker) {
+		ExecutionContext readerState = new ExecutionContext();
+		this.readerItemStream.update(readerState);
+		this.nonReaderItemStream.update(executionContext);
+		if (readerState.isEmpty()) {
+			executionContext.remove(CHUNK_SCAN_OFFSET);
+		}
+		else {
+			executionContext.putInt(CHUNK_SCAN_OFFSET, tracker.getLastScannedReadPosition());
 		}
 	}
 
@@ -463,10 +560,12 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			}
 
 			// read items and submit concurrent item processing tasks
+			List<Integer> readPositions = new ArrayList<>();
 			for (int i = 0; i < this.chunkSize && this.chunkTracker.get().moreItems(); i++) {
 				I item = readItem(contribution);
 				if (item != null) {
 					inputItems.add(item);
+					readPositions.add(tracker.getReadCount());
 					Future<O> itemProcessingFuture = this.taskExecutor.submit(() -> {
 						try {
 							StepSynchronizationManager.register(stepExecution);
@@ -490,7 +589,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 				O processedItem = itemProcessingTasks.get(i).get();
 				if (processedItem != null) {
 					processedChunk.add(processedItem);
-					scanItems.add(new ScanItem<>(inputItems.get(i), processedItem));
+					scanItems.add(new ScanItem<>(inputItems.get(i), processedItem, readPositions.get(i)));
 				}
 			}
 
@@ -560,12 +659,13 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 				return;
 			}
 
-			inputChunk = readChunk(contribution);
+			List<Integer> readPositions = new ArrayList<>();
+			inputChunk = readChunk(contribution, readPositions);
 			if (inputChunk.isEmpty()) {
 				return;
 			}
 			compositeChunkListener.beforeChunk(inputChunk);
-			processedChunk = processChunk(inputChunk, contribution, scanItems);
+			processedChunk = processChunk(inputChunk, readPositions, contribution, scanItems);
 			writeChunk(processedChunk, scanItems, contribution, status);
 			compositeChunkListener.afterChunk(processedChunk);
 			stepExecution.incrementCommitCount();
@@ -632,12 +732,21 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 		return false;
 	}
 
-	private Chunk<I> readChunk(StepContribution contribution) throws Exception {
+	/*
+	 * Read the next chunk. The position of each item, in terms of reads that returned an
+	 * item or were skipped (a read that succeeds after being retried counts once) since
+	 * the reader checkpoint saved in the execution context, is added to readPositions so
+	 * that a restart after a failure during a scan of this chunk can resume right after
+	 * the items whose outcome was committed.
+	 */
+	private Chunk<I> readChunk(StepContribution contribution, List<Integer> readPositions) throws Exception {
 		Chunk<I> chunk = new Chunk<>();
-		for (int i = 0; i < chunkSize && this.chunkTracker.get().moreItems(); i++) {
+		ChunkTracker<I, O> tracker = this.chunkTracker.get();
+		for (int i = 0; i < chunkSize && tracker.moreItems(); i++) {
 			I item = readItem(contribution);
 			if (item != null) {
 				chunk.add(item);
+				readPositions.add(tracker.getReadCount());
 			}
 		}
 		return chunk;
@@ -663,6 +772,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			}
 			else {
 				contribution.incrementReadCount();
+				this.chunkTracker.get().incrementReadCount();
 				this.compositeItemReadListener.afterRead(item);
 			}
 			itemReadEvent.itemReadStatus = BatchMetrics.STATUS_SUCCESS;
@@ -672,6 +782,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			this.compositeItemReadListener.onReadError(exception);
 			if (this.faultTolerant && exception instanceof RetryException retryException) {
 				doSkipInRead(retryException, contribution);
+				this.chunkTracker.get().incrementReadCount();
 			}
 			else {
 				throw exception;
@@ -719,16 +830,18 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 		}
 	}
 
-	private Chunk<O> processChunk(Chunk<I> chunk, StepContribution contribution, List<ScanItem<I, O>> scanItems)
-			throws Exception {
+	private Chunk<O> processChunk(Chunk<I> chunk, List<Integer> readPositions, StepContribution contribution,
+			List<ScanItem<I, O>> scanItems) throws Exception {
 		Chunk<O> processedChunk = new Chunk<>();
-		for (I item : chunk) {
+		List<I> items = chunk.getItems();
+		for (int i = 0; i < items.size(); i++) {
+			I item = items.get(i);
 			O processedItem = processItem(item, contribution);
 			if (processedItem != null) {
 				processedChunk.add(processedItem);
 				// keep track of the input item each output item was produced from, so
 				// that it can be re-processed during a chunk scan
-				scanItems.add(new ScanItem<>(item, processedItem));
+				scanItems.add(new ScanItem<>(item, processedItem, readPositions.get(i)));
 			}
 		}
 		return processedChunk;
@@ -976,8 +1089,11 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 	 *
 	 * @param input the item as read by the item reader
 	 * @param output the item as produced by the item processor
+	 * @param readPosition the number of reads, since the reader checkpoint saved in the
+	 * execution context, that returned an item or were skipped, up to and including the
+	 * one that returned the input item
 	 */
-	private record ScanItem<I, O>(I input, O output) {
+	private record ScanItem<I, O>(I input, O output, int readPosition) {
 	}
 
 	private static class ChunkTracker<I, O> {
@@ -992,10 +1108,35 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 
 		@Nullable private LinkedList<ScanItem<I, O>> pendingScanItems;
 
+		private int readCount;
+
+		private int lastScannedReadPosition;
+
 		void init() {
 			this.moreItems = true;
 			this.scanMode = false;
 			this.pendingScanItems = null;
+			this.readCount = 0;
+			this.lastScannedReadPosition = 0;
+		}
+
+		/*
+		 * The reader state has just been persisted: reads are now counted from there.
+		 */
+		void readerCheckpointSaved() {
+			this.readCount = 0;
+		}
+
+		void incrementReadCount() {
+			this.readCount++;
+		}
+
+		int getReadCount() {
+			return this.readCount;
+		}
+
+		int getLastScannedReadPosition() {
+			return this.lastScannedReadPosition;
 		}
 
 		void reset() {
@@ -1016,7 +1157,11 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 		}
 
 		@Nullable ScanItem<I, O> pollNextScanItem() {
-			return (this.pendingScanItems != null) ? this.pendingScanItems.poll() : null;
+			ScanItem<I, O> scanItem = (this.pendingScanItems != null) ? this.pendingScanItems.poll() : null;
+			if (scanItem != null) {
+				this.lastScannedReadPosition = scanItem.readPosition();
+			}
+			return scanItem;
 		}
 
 		boolean hasPendingScanItems() {
