@@ -116,6 +116,12 @@ class JdbcJobRepositoryFactoryBeanTests {
 			createFactoryBean(createClassBasedScopedDataSourceProxy(), new JdbcTransactionManager(plainTarget))
 				.afterPropertiesSet();
 			assertThat(output.toString()).doesNotContain(warning);
+
+			output.getBuffer().setLength(0);
+			DataSource repositoryDataSource = mock();
+			createFactoryBean(repositoryDataSource, createScopedTransactionManager(repositoryDataSource))
+				.afterPropertiesSet();
+			assertThat(output.toString()).doesNotContain(warning);
 		}
 		finally {
 			logger.removeAppender(appender);
@@ -139,6 +145,18 @@ class JdbcJobRepositoryFactoryBeanTests {
 
 	private DataSource createClassBasedScopedDataSourceProxy() {
 		return createScopedDataSourceProxy(TransactionAwareDataSourceProxy.class, true);
+	}
+
+	private PlatformTransactionManager createScopedTransactionManager(DataSource dataSource) {
+		DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
+		beanFactory.registerScope("inactive", inactiveScope());
+		RootBeanDefinition targetDefinition = new RootBeanDefinition(JdbcTransactionManager.class);
+		targetDefinition.setScope("inactive");
+		targetDefinition.setInstanceSupplier(() -> new JdbcTransactionManager(dataSource));
+		BeanDefinitionHolder targetHolder = new BeanDefinitionHolder(targetDefinition, "transactionManager");
+		BeanDefinitionHolder proxyHolder = ScopedProxyUtils.createScopedProxy(targetHolder, beanFactory, false);
+		beanFactory.registerBeanDefinition(proxyHolder.getBeanName(), proxyHolder.getBeanDefinition());
+		return (PlatformTransactionManager) beanFactory.getBean(proxyHolder.getBeanName());
 	}
 
 	private DataSource createScopedDataSourceProxy(Class<?> targetType, boolean proxyTargetClass) {

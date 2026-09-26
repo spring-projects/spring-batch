@@ -222,32 +222,32 @@ public class JdbcJobRepositoryFactoryBean extends JobRepositoryFactoryBean {
 	}
 
 	private void validateTransactionManagerDataSource() {
-		if (getTransactionManager() instanceof ResourceTransactionManager transactionManager
-				&& transactionManager.getResourceFactory() instanceof DataSource transactionManagerDataSource) {
-			DataSource dataSource = this.dataSource;
+		DataSource dataSource = this.dataSource;
+		boolean sameDataSource;
+		try {
+			if (!(getTransactionManager() instanceof ResourceTransactionManager transactionManager)
+					|| !(transactionManager.getResourceFactory() instanceof DataSource transactionManagerDataSource)) {
+				return;
+			}
 			if (transactionManagerDataSource == dataSource) {
 				return;
 			}
-			boolean sameDataSource;
-			try {
-				if (dataSource instanceof TransactionAwareDataSourceProxy proxy
-						&& proxy.getTargetDataSource() != null) {
-					dataSource = proxy.getTargetDataSource();
-				}
-				sameDataSource = TransactionSynchronizationUtils.sameResourceFactory(transactionManager, dataSource);
+			if (dataSource instanceof TransactionAwareDataSourceProxy proxy && proxy.getTargetDataSource() != null) {
+				dataSource = proxy.getTargetDataSource();
 			}
-			catch (RuntimeException ex) {
-				// The DataSource could not be resolved (for example a scoped proxy whose
-				// scope is inactive), so this best-effort check cannot tell whether the
-				// DataSources match and stays silent.
-				return;
-			}
-			if (!sameDataSource) {
-				jdbcLogger
-					.warn("The DataSource configured for the JobRepository does not appear to match the DataSource managed "
-							+ "by the configured transaction manager. Spring Batch metadata updates may not participate in "
-							+ "the same transaction.");
-			}
+			sameDataSource = TransactionSynchronizationUtils.sameResourceFactory(transactionManager, dataSource);
+		}
+		catch (RuntimeException ex) {
+			// The transaction manager or the DataSource could not be resolved (for
+			// example a scoped proxy with an inactive scope), so this best-effort check
+			// cannot tell whether the DataSources match.
+			return;
+		}
+		if (!sameDataSource) {
+			jdbcLogger
+				.warn("The DataSource configured for the JobRepository does not appear to match the DataSource managed "
+						+ "by the configured transaction manager. Spring Batch metadata updates may not participate in "
+						+ "the same transaction.");
 		}
 	}
 
