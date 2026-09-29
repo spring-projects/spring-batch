@@ -142,6 +142,7 @@ import java.lang.annotation.Target;
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  * @author Taeik Lim
+ * @author Yanming Zhou
  * @see EnableJdbcJobRepository
  * @see EnableMongoJobRepository
  */
@@ -149,7 +150,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Import({ BatchRegistrar.class, ScopeConfiguration.class, AutomaticJobRegistrarBeanPostProcessor.class,
-		BatchObservabilityBeanPostProcessor.class })
+		BatchObservabilityBeanPostProcessor.class, JobParameterBeanFactoryPostProcessor.class })
 public @interface EnableBatchProcessing {
 
 	/**
