@@ -112,7 +112,7 @@ The following example shows how to parameterize a file name in Java:
 ----
 @StepScope
 @Bean
-public FlatFileItemReader flatFileItemReader(@Value("#{jobParameters['input.file.name']}") String name) {
+public FlatFileItemReader flatFileItemReader(@JobParameter("input.file.name") String name) {
 	return new FlatFileItemReaderBuilder<Foo>()
 			.name("flatFileItemReader")
 			.resource(new FileSystemResource(name))
@@ -238,7 +238,7 @@ The following example shows an example of binding to step scope in Java:
 ----
 @StepScope
 @Bean
-public FlatFileItemReader flatFileItemReader(@Value("#{jobParameters[input.file.name]}") String name) {
+public FlatFileItemReader flatFileItemReader(@JobParameter("input.file.name") String name) {
 	return new FlatFileItemReaderBuilder<Foo>()
 			.name("flatFileItemReader")
 			.resource(new FileSystemResource(name))
@@ -310,7 +310,7 @@ chunk-oriented step by using the job scope in Java:
 ----
 @Bean
 @JobScope
-public Step step(JobRepository jobRepository, @Value("#{jobParameters['chunkSize']}") int chunkSize) {
+public Step step(JobRepository jobRepository, @JobParameter int chunkSize) {
     return new StepBuilder(jobRepository)
             .<Integer, Integer>chunk(chunkSize)
             .reader(...)
@@ -402,7 +402,7 @@ known implementation, as shown in the following example:
 ----
 @Bean
 @StepScope
-public FlatFileItemReader flatFileItemReader(@Value("#{jobParameters['input.file.name']}") String name) {
+public FlatFileItemReader flatFileItemReader(@JobParameter("input.file.name") String name) {
 	return new FlatFileItemReaderBuilder<Foo>()
 			.resource(new FileSystemResource(name))
 			// set other properties of the item reader
