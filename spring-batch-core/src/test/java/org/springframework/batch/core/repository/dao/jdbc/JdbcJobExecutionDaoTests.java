@@ -28,6 +28,7 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
+import org.springframework.batch.core.job.parameters.JobParameter;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -170,6 +171,139 @@ public class JdbcJobExecutionDaoTests {
 		Assertions.assertEquals(2, jobExecutions.size());
 		Assertions.assertEquals(jobExecution2.getId(), jobExecutions.get(0).getId());
 		Assertions.assertEquals(jobExecution1.getId(), jobExecutions.get(1).getId());
+	}
+
+	@Test
+	void testGetJobParametersReconstructsEmptyListWhenPersistedValueIsNull() {
+		// given
+		JobParameters jobParameters = new JobParametersBuilder().addJobParameter("providers", List.of(), List.class)
+			.toJobParameters();
+		JobInstance jobInstance = jdbcJobInstanceDao.createJobInstance("job", jobParameters);
+		JobExecution jobExecution = jdbcJobExecutionDao.createJobExecution(jobInstance, jobParameters);
+		setPersistedParameterValueToNull(jobExecution.getId(), "providers");
+
+		// when
+		JobParameters retrieved = jdbcJobExecutionDao.getJobParameters(jobExecution.getId());
+
+		// then
+		JobParameter<?> providers = retrieved.getParameter("providers");
+		Assertions.assertNotNull(providers);
+		Assertions.assertEquals("providers", providers.name());
+		Assertions.assertEquals(List.class, providers.type());
+		Assertions.assertTrue(providers.identifying());
+		Assertions.assertNotNull(providers.value());
+		Assertions.assertEquals(List.of(), providers.value());
+	}
+
+	@Test
+	void testGetJobParametersReconstructsEmptyStringWhenPersistedValueIsNull() {
+		// given
+		JobParameters jobParameters = new JobParametersBuilder().addString("identifyingEmpty", "", true)
+			.addString("nonIdentifyingEmpty", "", false)
+			.toJobParameters();
+		JobInstance jobInstance = jdbcJobInstanceDao.createJobInstance("job", jobParameters);
+		JobExecution jobExecution = jdbcJobExecutionDao.createJobExecution(jobInstance, jobParameters);
+		setPersistedParameterValueToNull(jobExecution.getId(), "identifyingEmpty");
+		setPersistedParameterValueToNull(jobExecution.getId(), "nonIdentifyingEmpty");
+
+		// when
+		JobParameters retrieved = jdbcJobExecutionDao.getJobParameters(jobExecution.getId());
+
+		// then
+		JobParameter<?> identifyingEmpty = retrieved.getParameter("identifyingEmpty");
+		Assertions.assertNotNull(identifyingEmpty);
+		Assertions.assertEquals("identifyingEmpty", identifyingEmpty.name());
+		Assertions.assertEquals(String.class, identifyingEmpty.type());
+		Assertions.assertEquals("", identifyingEmpty.value());
+		Assertions.assertTrue(identifyingEmpty.identifying());
+
+		JobParameter<?> nonIdentifyingEmpty = retrieved.getParameter("nonIdentifyingEmpty");
+		Assertions.assertNotNull(nonIdentifyingEmpty);
+		Assertions.assertEquals("nonIdentifyingEmpty", nonIdentifyingEmpty.name());
+		Assertions.assertEquals(String.class, nonIdentifyingEmpty.type());
+		Assertions.assertEquals("", nonIdentifyingEmpty.value());
+		Assertions.assertFalse(nonIdentifyingEmpty.identifying());
+	}
+
+	@Test
+	void testLastJobExecutionLookupSucceedsAfterReadingNullEmptyParameters() {
+		// given
+		JobParameters jobParameters = new JobParametersBuilder().addJobParameter("providers", List.of(), List.class)
+			.addString("emptyString", "")
+			.toJobParameters();
+		JobInstance jobInstance = jdbcJobInstanceDao.createJobInstance("job", jobParameters);
+		JobExecution firstExecution = jdbcJobExecutionDao.createJobExecution(jobInstance, jobParameters);
+		setPersistedParameterValueToNull(firstExecution.getId(), "providers");
+		setPersistedParameterValueToNull(firstExecution.getId(), "emptyString");
+
+		// when
+		JobExecution retrievedById = jdbcJobExecutionDao.getJobExecution(firstExecution.getId());
+		JobExecution lastBeforeSecond = jdbcJobExecutionDao.getLastJobExecution(jobInstance);
+		JobExecution secondExecution = jdbcJobExecutionDao.createJobExecution(jobInstance, jobParameters);
+		JobExecution lastAfterSecond = jdbcJobExecutionDao.getLastJobExecution(jobInstance);
+
+		// then
+		Assertions.assertNotNull(retrievedById);
+		Assertions.assertEquals(firstExecution.getId(), retrievedById.getId());
+		Assertions.assertNotNull(lastBeforeSecond);
+		Assertions.assertEquals(firstExecution.getId(), lastBeforeSecond.getId());
+		Assertions.assertNotNull(lastAfterSecond);
+		Assertions.assertEquals(secondExecution.getId(), lastAfterSecond.getId());
+	}
+
+	@Test
+	void testEmptyAndPopulatedListAndStringRoundTripPreservesWhitespace() {
+		// given
+		List<String> populatedList = List.of("a", "b");
+		JobParameters jobParameters = new JobParametersBuilder().addJobParameter("emptyList", List.of(), List.class)
+			.addJobParameter("populatedList", populatedList, List.class)
+			.addString("emptyString", "")
+			.addString("populatedString", "foo")
+			.addString("singleSpace", " ")
+			.toJobParameters();
+		JobInstance jobInstance = jdbcJobInstanceDao.createJobInstance("job", jobParameters);
+		JobExecution jobExecution = jdbcJobExecutionDao.createJobExecution(jobInstance, jobParameters);
+
+		// when
+		JobParameters retrieved = jdbcJobExecutionDao.getJobParameters(jobExecution.getId());
+
+		// then
+		JobParameter<?> emptyList = retrieved.getParameter("emptyList");
+		Assertions.assertNotNull(emptyList);
+		Assertions.assertEquals("emptyList", emptyList.name());
+		Assertions.assertEquals(List.class, emptyList.type());
+		Assertions.assertEquals(List.of(), emptyList.value());
+		Assertions.assertTrue(emptyList.identifying());
+
+		JobParameter<?> populated = retrieved.getParameter("populatedList");
+		Assertions.assertNotNull(populated);
+		Assertions.assertEquals("populatedList", populated.name());
+		Assertions.assertEquals(List.class, populated.type());
+		Assertions.assertEquals(populatedList, populated.value());
+		Assertions.assertTrue(populated.identifying());
+
+		Assertions.assertEquals("", retrieved.getString("emptyString"));
+		Assertions.assertEquals("foo", retrieved.getString("populatedString"));
+		Assertions.assertEquals(" ", retrieved.getString("singleSpace"));
+	}
+
+	@Test
+	void testNullNumericParameterValueFailsConversion() {
+		// given
+		JobParameters jobParameters = new JobParametersBuilder().addLong("count", 1L).toJobParameters();
+		JobInstance jobInstance = jdbcJobInstanceDao.createJobInstance("job", jobParameters);
+		JobExecution jobExecution = jdbcJobExecutionDao.createJobExecution(jobInstance, jobParameters);
+		setPersistedParameterValueToNull(jobExecution.getId(), "count");
+
+		// when / then
+		Assertions.assertThrows(IllegalArgumentException.class,
+				() -> jdbcJobExecutionDao.getJobParameters(jobExecution.getId()));
+	}
+
+	private void setPersistedParameterValueToNull(long jobExecutionId, String parameterName) {
+		jdbcTemplate.update(
+				"UPDATE BATCH_JOB_EXECUTION_PARAMS SET PARAMETER_VALUE = NULL WHERE JOB_EXECUTION_ID = ? AND PARAMETER_NAME = ?",
+				jobExecutionId, parameterName);
 	}
 
 }
