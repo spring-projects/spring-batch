@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,6 +57,7 @@ import org.springframework.util.StringUtils;
  * @author Mahmoud Ben Hassine
  * @author Parikshit Dutta
  * @author Yanming Zhou
+ * @author Taeik Lim
  */
 public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements JobInstanceDao, InitializingBean {
 
@@ -175,7 +176,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 	 * @throws IllegalArgumentException if any {@link JobParameters} fields are null.
 	 */
 	@Override
-	@Nullable public JobInstance getJobInstance(final String jobName, final JobParameters jobParameters) {
+	public @Nullable JobInstance getJobInstance(final String jobName, final JobParameters jobParameters) {
 
 		Assert.notNull(jobName, "Job name must not be null.");
 		Assert.notNull(jobParameters, "JobParameters must not be null.");
@@ -202,7 +203,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 	}
 
 	@Override
-	@Nullable public JobInstance getJobInstance(long instanceId) {
+	public @Nullable JobInstance getJobInstance(long instanceId) {
 
 		try {
 			return getJdbcTemplate().queryForObject(getQuery(GET_JOB_FROM_ID), new JobInstanceRowMapper(), instanceId);
@@ -265,7 +266,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 	}
 
 	@Override
-	@Nullable public JobInstance getLastJobInstance(String jobName) {
+	public @Nullable JobInstance getLastJobInstance(String jobName) {
 		try {
 			return getJdbcTemplate().queryForObject(getQuery(FIND_LAST_JOB_INSTANCE_BY_JOB_NAME),
 					new JobInstanceRowMapper(), jobName, jobName);
@@ -276,11 +277,10 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 	}
 
 	@Override
-	@Nullable
 	// TODO what is the added value of this method?
 	// TODO clients should use
 	// JobExecutionDao.getJobExecution(jobExecutionId).getJobInstance() instead
-	public JobInstance getJobInstance(JobExecution jobExecution) {
+	public @Nullable JobInstance getJobInstance(JobExecution jobExecution) {
 
 		try {
 			return getJdbcTemplate().queryForObject(getQuery(GET_JOB_FROM_EXECUTION_ID), new JobInstanceRowMapper(),
