@@ -133,6 +133,15 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 	private final Lock lock = new ReentrantLock();
 
 	/**
+	 * Create a new {@link JdbcStepExecutionDao}.
+	 * @param jdbcClient the client to use to interact with the batch metadata tables
+	 * @since 6.1
+	 */
+	public JdbcStepExecutionDao(JdbcClient jdbcClient) {
+		super(jdbcClient);
+	}
+
+	/**
 	 * Public setter for the exit message length in database. Do not set this if you
 	 * haven't modified the schema.
 	 * @param exitMessageLength the exitMessageLength to set

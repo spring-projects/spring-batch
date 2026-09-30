@@ -37,6 +37,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.convert.support.ConfigurableConversionService;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -306,7 +307,7 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 
 	@Override
 	protected JdbcJobInstanceDao createJobInstanceDao() {
-		JdbcJobInstanceDao dao = new JdbcJobInstanceDao();
+		JdbcJobInstanceDao dao = new JdbcJobInstanceDao(JdbcClient.create(jdbcOperations));
 		String legacySchema = "false";
 		if (System.getenv(SPRING_BATCH_JDBC_SCHEMA_LEGACY) != null) {
 			legacySchema = System.getenv(SPRING_BATCH_JDBC_SCHEMA_LEGACY);
@@ -318,7 +319,6 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 			jobInstanceIncrementerName = LEGACY_JOB_INSTANCE_INCREMENTER_NAME;
 			logger.info("Using legacy name for job instance incrementer: " + jobInstanceIncrementerName);
 		}
-		dao.setJdbcTemplate(jdbcOperations);
 		dao.setJobInstanceIncrementer(
 				incrementerFactory.getIncrementer(databaseType, tablePrefix + jobInstanceIncrementerName));
 		dao.setJobKeyGenerator(jobKeyGenerator);
@@ -328,8 +328,7 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 
 	@Override
 	protected JdbcJobExecutionDao createJobExecutionDao() {
-		JdbcJobExecutionDao dao = new JdbcJobExecutionDao();
-		dao.setJdbcTemplate(jdbcOperations);
+		JdbcJobExecutionDao dao = new JdbcJobExecutionDao(JdbcClient.create(jdbcOperations));
 		dao.setJobExecutionIncrementer(
 				incrementerFactory.getIncrementer(databaseType, tablePrefix + jobExecutionIncrementerName));
 		dao.setTablePrefix(tablePrefix);
@@ -341,8 +340,7 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 
 	@Override
 	protected JdbcStepExecutionDao createStepExecutionDao() {
-		JdbcStepExecutionDao dao = new JdbcStepExecutionDao();
-		dao.setJdbcTemplate(jdbcOperations);
+		JdbcStepExecutionDao dao = new JdbcStepExecutionDao(JdbcClient.create(jdbcOperations));
 		dao.setStepExecutionIncrementer(
 				incrementerFactory.getIncrementer(databaseType, tablePrefix + stepExecutionIncrementerName));
 		dao.setTablePrefix(tablePrefix);
@@ -353,8 +351,7 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 
 	@Override
 	protected JdbcExecutionContextDao createExecutionContextDao() {
-		JdbcExecutionContextDao dao = new JdbcExecutionContextDao();
-		dao.setJdbcTemplate(jdbcOperations);
+		JdbcExecutionContextDao dao = new JdbcExecutionContextDao(JdbcClient.create(jdbcOperations));
 		dao.setTablePrefix(tablePrefix);
 		dao.setClobTypeToUse(determineClobTypeToUse(this.databaseType));
 		dao.setSerializer(serializer);

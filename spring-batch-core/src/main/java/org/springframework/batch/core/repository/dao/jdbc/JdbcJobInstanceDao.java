@@ -35,6 +35,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.jspecify.annotations.Nullable;
 import org.springframework.util.Assert;
@@ -327,6 +328,15 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 			throw new OptimisticLockingFailureException("Attempt to delete job instance id=" + jobInstance.getId()
 					+ " with wrong version (" + jobInstance.getVersion() + ")");
 		}
+	}
+
+	/**
+	 * Create a new {@link JdbcJobInstanceDao}.
+	 * @param jdbcClient the client to use to interact with the batch metadata tables
+	 * @since 6.1
+	 */
+	public JdbcJobInstanceDao(JdbcClient jdbcClient) {
+		super(jdbcClient);
 	}
 
 	/**

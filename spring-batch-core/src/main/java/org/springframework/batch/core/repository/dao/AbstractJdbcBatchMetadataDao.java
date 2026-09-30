@@ -68,9 +68,19 @@ public abstract class AbstractJdbcBatchMetadataDao implements InitializingBean {
 
 	private @Nullable JdbcOperations jdbcTemplate;
 
-	private @Nullable JdbcClient jdbcClient;
+	private JdbcClient jdbcClient;
 
 	private ConfigurableConversionService conversionService = ConversionServiceFactory.createConversionService();
+
+	/**
+	 * Create a new {@link AbstractJdbcBatchMetadataDao}.
+	 * @param jdbcClient the client to use to interact with the batch metadata tables
+	 * @since 6.1
+	 */
+	protected AbstractJdbcBatchMetadataDao(JdbcClient jdbcClient) {
+		Assert.notNull(jdbcClient, "jdbcClient must not be null");
+		this.jdbcClient = jdbcClient;
+	}
 
 	protected String getQuery(String base) {
 		return StringUtils.replace(base, "%PREFIX%", tablePrefix);
@@ -93,7 +103,9 @@ public abstract class AbstractJdbcBatchMetadataDao implements InitializingBean {
 	 * Set the {@link JdbcOperations} to use to interact with the batch metadata tables.
 	 * This also sets the {@link JdbcClient} to a client backed by the given operations.
 	 * @param jdbcTemplate the operations to use
+	 * @deprecated since 6.1 in favor of {@link #AbstractJdbcBatchMetadataDao(JdbcClient)}
 	 */
+	@Deprecated(since = "6.1", forRemoval = true)
 	public void setJdbcTemplate(JdbcOperations jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
 		this.jdbcClient = JdbcClient.create(jdbcTemplate);
@@ -110,20 +122,11 @@ public abstract class AbstractJdbcBatchMetadataDao implements InitializingBean {
 	}
 
 	/**
-	 * Set the {@link JdbcClient} to use to interact with the batch metadata tables.
-	 * @param jdbcClient the client to use
-	 * @since 6.1
-	 */
-	public void setJdbcClient(JdbcClient jdbcClient) {
-		this.jdbcClient = jdbcClient;
-	}
-
-	/**
 	 * Get the {@link JdbcClient} to use to interact with the batch metadata tables.
-	 * @return the client to use, or {@code null} if none was set
+	 * @return the client to use
 	 * @since 6.1
 	 */
-	protected @Nullable JdbcClient getJdbcClient() {
+	protected JdbcClient getJdbcClient() {
 		return jdbcClient;
 	}
 
@@ -150,7 +153,6 @@ public abstract class AbstractJdbcBatchMetadataDao implements InitializingBean {
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.state(jdbcClient != null, "JdbcClient is required");
 	}
 
 }

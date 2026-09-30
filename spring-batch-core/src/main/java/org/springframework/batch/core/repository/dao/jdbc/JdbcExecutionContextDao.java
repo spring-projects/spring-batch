@@ -115,6 +115,15 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 	private final Lock lock = new ReentrantLock();
 
 	/**
+	 * Create a new {@link JdbcExecutionContextDao}.
+	 * @param jdbcClient the client to use to interact with the batch metadata tables
+	 * @since 6.1
+	 */
+	public JdbcExecutionContextDao(JdbcClient jdbcClient) {
+		super(jdbcClient);
+	}
+
+	/**
 	 * Setter for {@link Serializer} implementation
 	 * @param serializer {@link ExecutionContextSerializer} instance to use.
 	 */
