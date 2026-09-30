@@ -18,6 +18,7 @@ package org.springframework.batch.core.repository.dao.jdbc;
 
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -69,13 +70,13 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 
 	private static final String SAVE_STEP_EXECUTION = """
 			INSERT INTO %PREFIX%STEP_EXECUTION(STEP_EXECUTION_ID, VERSION, STEP_NAME, JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, COMMIT_COUNT, READ_COUNT, FILTER_COUNT, WRITE_COUNT, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, PROCESS_SKIP_COUNT, ROLLBACK_COUNT, LAST_UPDATED, CREATE_TIME)
-				VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+				VALUES (:stepExecutionId, :version, :stepName, :jobExecutionId, :startTime, :endTime, :status, :commitCount, :readCount, :filterCount, :writeCount, :exitCode, :exitMessage, :readSkipCount, :writeSkipCount, :processSkipCount, :rollbackCount, :lastUpdated, :createTime)
 			""";
 
 	private static final String UPDATE_STEP_EXECUTION = """
 			UPDATE %PREFIX%STEP_EXECUTION
-			SET START_TIME = ?, END_TIME = ?, STATUS = ?, COMMIT_COUNT = ?, READ_COUNT = ?, FILTER_COUNT = ?, WRITE_COUNT = ?, EXIT_CODE = ?, EXIT_MESSAGE = ?, VERSION = VERSION + 1, READ_SKIP_COUNT = ?, PROCESS_SKIP_COUNT = ?, WRITE_SKIP_COUNT = ?, ROLLBACK_COUNT = ?, LAST_UPDATED = ?
-			WHERE STEP_EXECUTION_ID = ? AND VERSION = ?
+			SET START_TIME = :startTime, END_TIME = :endTime, STATUS = :status, COMMIT_COUNT = :commitCount, READ_COUNT = :readCount, FILTER_COUNT = :filterCount, WRITE_COUNT = :writeCount, EXIT_CODE = :exitCode, EXIT_MESSAGE = :exitMessage, VERSION = VERSION + 1, READ_SKIP_COUNT = :readSkipCount, PROCESS_SKIP_COUNT = :processSkipCount, WRITE_SKIP_COUNT = :writeSkipCount, ROLLBACK_COUNT = :rollbackCount, LAST_UPDATED = :lastUpdated
+			WHERE STEP_EXECUTION_ID = :stepExecutionId AND VERSION = :version
 			""";
 
 	private static final String GET_RAW_STEP_EXECUTIONS = """
@@ -170,48 +171,36 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 		StepExecution stepExecution = new StepExecution(id, stepName, jobExecution);
 		stepExecution.incrementVersion();
 
-		List<Object[]> parameters = buildStepExecutionParameters(stepExecution);
-		Object[] parameterValues = parameters.get(0);
+		validateStepExecution(stepExecution);
 
-		// Template expects an int array fails with Integer
-		int[] parameterTypes = new int[parameters.get(1).length];
-		for (int i = 0; i < parameterTypes.length; i++) {
-			parameterTypes[i] = (Integer) parameters.get(1)[i];
-		}
-
-		JdbcClient.StatementSpec statement = getJdbcClient().sql(getQuery(SAVE_STEP_EXECUTION));
-		for (int i = 0; i < parameterTypes.length; i++) {
-			statement = statement.param(i + 1, parameterValues[i], parameterTypes[i]);
-		}
-		statement.update();
+		getJdbcClient().sql(getQuery(SAVE_STEP_EXECUTION))
+			.param("stepExecutionId", stepExecution.getId(), Types.BIGINT)
+			.param("version", stepExecution.getVersion(), Types.INTEGER)
+			.param("stepName", stepExecution.getStepName(), Types.VARCHAR)
+			.param("jobExecutionId", stepExecution.getJobExecution().getId(), Types.BIGINT)
+			.param("startTime", toTimestamp(stepExecution.getStartTime()), Types.TIMESTAMP)
+			.param("endTime", toTimestamp(stepExecution.getEndTime()), Types.TIMESTAMP)
+			.param("status", stepExecution.getStatus().toString(), Types.VARCHAR)
+			.param("commitCount", stepExecution.getCommitCount(), Types.BIGINT)
+			.param("readCount", stepExecution.getReadCount(), Types.BIGINT)
+			.param("filterCount", stepExecution.getFilterCount(), Types.BIGINT)
+			.param("writeCount", stepExecution.getWriteCount(), Types.BIGINT)
+			.param("exitCode", stepExecution.getExitStatus().getExitCode(), Types.VARCHAR)
+			.param("exitMessage", truncateExitDescription(stepExecution.getExitStatus().getExitDescription()),
+					Types.VARCHAR)
+			.param("readSkipCount", stepExecution.getReadSkipCount(), Types.BIGINT)
+			.param("writeSkipCount", stepExecution.getWriteSkipCount(), Types.BIGINT)
+			.param("processSkipCount", stepExecution.getProcessSkipCount(), Types.BIGINT)
+			.param("rollbackCount", stepExecution.getRollbackCount(), Types.BIGINT)
+			.param("lastUpdated", toTimestamp(stepExecution.getLastUpdated()), Types.TIMESTAMP)
+			.param("createTime", toTimestamp(stepExecution.getCreateTime()), Types.TIMESTAMP)
+			.update();
 
 		return stepExecution;
 	}
 
-	private List<Object[]> buildStepExecutionParameters(StepExecution stepExecution) {
-		validateStepExecution(stepExecution);
-		List<Object[]> parameters = new ArrayList<>();
-		String exitDescription = truncateExitDescription(stepExecution.getExitStatus().getExitDescription());
-		Timestamp startTime = stepExecution.getStartTime() == null ? null
-				: Timestamp.valueOf(stepExecution.getStartTime());
-		Timestamp endTime = stepExecution.getEndTime() == null ? null : Timestamp.valueOf(stepExecution.getEndTime());
-		Timestamp lastUpdated = stepExecution.getLastUpdated() == null ? null
-				: Timestamp.valueOf(stepExecution.getLastUpdated());
-		Timestamp createTime = Timestamp.valueOf(stepExecution.getCreateTime());
-		Object[] parameterValues = new Object[] { stepExecution.getId(), stepExecution.getVersion(),
-				stepExecution.getStepName(), stepExecution.getJobExecution().getId(), startTime, endTime,
-				stepExecution.getStatus().toString(), stepExecution.getCommitCount(), stepExecution.getReadCount(),
-				stepExecution.getFilterCount(), stepExecution.getWriteCount(),
-				stepExecution.getExitStatus().getExitCode(), exitDescription, stepExecution.getReadSkipCount(),
-				stepExecution.getWriteSkipCount(), stepExecution.getProcessSkipCount(),
-				stepExecution.getRollbackCount(), lastUpdated, createTime };
-		Integer[] parameterTypes = new Integer[] { Types.BIGINT, Types.INTEGER, Types.VARCHAR, Types.BIGINT,
-				Types.TIMESTAMP, Types.TIMESTAMP, Types.VARCHAR, Types.BIGINT, Types.BIGINT, Types.BIGINT, Types.BIGINT,
-				Types.VARCHAR, Types.VARCHAR, Types.BIGINT, Types.BIGINT, Types.BIGINT, Types.BIGINT, Types.TIMESTAMP,
-				Types.TIMESTAMP };
-		parameters.add(0, Arrays.copyOf(parameterValues, parameterValues.length));
-		parameters.add(1, Arrays.copyOf(parameterTypes, parameterTypes.length));
-		return parameters;
+	private static @Nullable Timestamp toTimestamp(@Nullable LocalDateTime dateTime) {
+		return dateTime == null ? null : Timestamp.valueOf(dateTime);
 	}
 
 	/**
@@ -241,32 +230,23 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 		this.lock.lock();
 		try {
 
-			Timestamp startTime = stepExecution.getStartTime() == null ? null
-					: Timestamp.valueOf(stepExecution.getStartTime());
-			Timestamp endTime = stepExecution.getEndTime() == null ? null
-					: Timestamp.valueOf(stepExecution.getEndTime());
-			Timestamp lastUpdated = stepExecution.getLastUpdated() == null ? null
-					: Timestamp.valueOf(stepExecution.getLastUpdated());
-
 			int count = getJdbcClient().sql(getQuery(UPDATE_STEP_EXECUTION))
-			// @formatter:off
-					.param(1, startTime, Types.TIMESTAMP)
-					.param(2, endTime, Types.TIMESTAMP)
-					.param(3, stepExecution.getStatus().toString(), Types.VARCHAR)
-					.param(4, stepExecution.getCommitCount(), Types.BIGINT)
-					.param(5, stepExecution.getReadCount(), Types.BIGINT)
-					.param(6, stepExecution.getFilterCount(), Types.BIGINT)
-					.param(7, stepExecution.getWriteCount(), Types.BIGINT)
-					.param(8, stepExecution.getExitStatus().getExitCode(), Types.VARCHAR)
-					.param(9, exitDescription, Types.VARCHAR)
-					.param(10, stepExecution.getReadSkipCount(), Types.BIGINT)
-					.param(11, stepExecution.getProcessSkipCount(), Types.BIGINT)
-					.param(12, stepExecution.getWriteSkipCount(), Types.BIGINT)
-					.param(13, stepExecution.getRollbackCount(), Types.BIGINT)
-					.param(14, lastUpdated, Types.TIMESTAMP)
-					.param(15, stepExecution.getId(), Types.BIGINT)
-					.param(16, stepExecution.getVersion(), Types.INTEGER)
-			// @formatter:on
+				.param("startTime", toTimestamp(stepExecution.getStartTime()), Types.TIMESTAMP)
+				.param("endTime", toTimestamp(stepExecution.getEndTime()), Types.TIMESTAMP)
+				.param("status", stepExecution.getStatus().toString(), Types.VARCHAR)
+				.param("commitCount", stepExecution.getCommitCount(), Types.BIGINT)
+				.param("readCount", stepExecution.getReadCount(), Types.BIGINT)
+				.param("filterCount", stepExecution.getFilterCount(), Types.BIGINT)
+				.param("writeCount", stepExecution.getWriteCount(), Types.BIGINT)
+				.param("exitCode", stepExecution.getExitStatus().getExitCode(), Types.VARCHAR)
+				.param("exitMessage", exitDescription, Types.VARCHAR)
+				.param("readSkipCount", stepExecution.getReadSkipCount(), Types.BIGINT)
+				.param("processSkipCount", stepExecution.getProcessSkipCount(), Types.BIGINT)
+				.param("writeSkipCount", stepExecution.getWriteSkipCount(), Types.BIGINT)
+				.param("rollbackCount", stepExecution.getRollbackCount(), Types.BIGINT)
+				.param("lastUpdated", toTimestamp(stepExecution.getLastUpdated()), Types.TIMESTAMP)
+				.param("stepExecutionId", stepExecution.getId(), Types.BIGINT)
+				.param("version", stepExecution.getVersion(), Types.INTEGER)
 				.update();
 
 			// Avoid concurrent modifications...

@@ -74,7 +74,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 
 	private static final String SAVE_JOB_EXECUTION = """
 			INSERT INTO %PREFIX%JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-				VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+				VALUES (:jobExecutionId, :jobInstanceId, :startTime, :endTime, :status, :exitCode, :exitMessage, :version, :createTime, :lastUpdated)
 			""";
 
 	private static final String GET_VERSION_AND_STATUS = """
@@ -85,8 +85,8 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 
 	private static final String UPDATE_JOB_EXECUTION = """
 			UPDATE %PREFIX%JOB_EXECUTION
-			SET START_TIME = ?, END_TIME = ?,  STATUS = ?, EXIT_CODE = ?, EXIT_MESSAGE = ?, VERSION = VERSION + 1, CREATE_TIME = ?, LAST_UPDATED = ?
-			WHERE JOB_EXECUTION_ID = ? AND VERSION = ?
+			SET START_TIME = :startTime, END_TIME = :endTime, STATUS = :status, EXIT_CODE = :exitCode, EXIT_MESSAGE = :exitMessage, VERSION = VERSION + 1, CREATE_TIME = :createTime, LAST_UPDATED = :lastUpdated
+			WHERE JOB_EXECUTION_ID = :jobExecutionId AND VERSION = :version
 			""";
 
 	private static final String GET_LAST_JOB_EXECUTION = """
@@ -121,7 +121,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 
 	private static final String CREATE_JOB_PARAMETERS = """
 			INSERT INTO %PREFIX%JOB_EXECUTION_PARAMS(JOB_EXECUTION_ID, PARAMETER_NAME, PARAMETER_TYPE, PARAMETER_VALUE, IDENTIFYING)
-				VALUES (?, ?, ?, ?, ?)
+				VALUES (:jobExecutionId, :parameterName, :parameterType, :parameterValue, :identifying)
 			""";
 
 	private static final String DELETE_JOB_EXECUTION = """
@@ -206,18 +206,16 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 				jobExecution.getStatus().toString(), jobExecution.getExitStatus().getExitCode(),
 				jobExecution.getExitStatus().getExitDescription(), jobExecution.getVersion(), createTime, lastUpdated };
 		getJdbcClient().sql(getQuery(SAVE_JOB_EXECUTION))
-		// @formatter:off
-                .param(1, jobExecution.getId(), Types.BIGINT)
-                .param(2, jobExecution.getJobInstance().getId(), Types.BIGINT)
-                .param(3, startTime, Types.TIMESTAMP)
-                .param(4, endTime, Types.TIMESTAMP)
-                .param(5, jobExecution.getStatus().toString(), Types.VARCHAR)
-                .param(6, jobExecution.getExitStatus().getExitCode(), Types.VARCHAR)
-                .param(7, jobExecution.getExitStatus().getExitDescription(), Types.VARCHAR)
-                .param(8, jobExecution.getVersion(), Types.INTEGER)
-                .param(9, createTime, Types.TIMESTAMP)
-                .param(10, lastUpdated, Types.TIMESTAMP)
-                // @formatter:on
+			.param("jobExecutionId", jobExecution.getId(), Types.BIGINT)
+			.param("jobInstanceId", jobExecution.getJobInstance().getId(), Types.BIGINT)
+			.param("startTime", startTime, Types.TIMESTAMP)
+			.param("endTime", endTime, Types.TIMESTAMP)
+			.param("status", jobExecution.getStatus().toString(), Types.VARCHAR)
+			.param("exitCode", jobExecution.getExitStatus().getExitCode(), Types.VARCHAR)
+			.param("exitMessage", jobExecution.getExitStatus().getExitDescription(), Types.VARCHAR)
+			.param("version", jobExecution.getVersion(), Types.INTEGER)
+			.param("createTime", createTime, Types.TIMESTAMP)
+			.param("lastUpdated", lastUpdated, Types.TIMESTAMP)
 			.update();
 
 		insertJobParameters(jobExecution.getId(), jobExecution.getJobParameters());
@@ -285,17 +283,15 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 					: Timestamp.valueOf(jobExecution.getLastUpdated());
 
 			int count = getJdbcClient().sql(getQuery(UPDATE_JOB_EXECUTION))
-			// @formatter:off
-					.param(1, startTime, Types.TIMESTAMP)
-					.param(2, endTime, Types.TIMESTAMP)
-					.param(3, jobExecution.getStatus().toString(), Types.VARCHAR)
-					.param(4, jobExecution.getExitStatus().getExitCode(), Types.VARCHAR)
-					.param(5, exitDescription, Types.VARCHAR)
-					.param(6, createTime, Types.TIMESTAMP)
-					.param(7, lastUpdated, Types.TIMESTAMP)
-					.param(8, jobExecution.getId(), Types.BIGINT)
-					.param(9, jobExecution.getVersion(), Types.INTEGER)
-			// @formatter:on
+				.param("startTime", startTime, Types.TIMESTAMP)
+				.param("endTime", endTime, Types.TIMESTAMP)
+				.param("status", jobExecution.getStatus().toString(), Types.VARCHAR)
+				.param("exitCode", jobExecution.getExitStatus().getExitCode(), Types.VARCHAR)
+				.param("exitMessage", exitDescription, Types.VARCHAR)
+				.param("createTime", createTime, Types.TIMESTAMP)
+				.param("lastUpdated", lastUpdated, Types.TIMESTAMP)
+				.param("jobExecutionId", jobExecution.getId(), Types.BIGINT)
+				.param("version", jobExecution.getVersion(), Types.INTEGER)
 				.update();
 
 			// Avoid concurrent modifications...
@@ -409,11 +405,11 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		JdbcClient.BatchSpec batch = getJdbcClient().sql(getQuery(CREATE_JOB_PARAMETERS)).batch();
 		for (JobParameter<?> jobParameter : jobParameters) {
 			batch.entry(entry -> {
-				entry.param(1, executionId);
-				entry.param(2, jobParameter.name());
-				entry.param(3, jobParameter.type().getName());
-				entry.param(4, getConversionService().convert(jobParameter.value(), String.class));
-				entry.param(5, jobParameter.identifying() ? "Y" : "N");
+				entry.param("jobExecutionId", executionId);
+				entry.param("parameterName", jobParameter.name());
+				entry.param("parameterType", jobParameter.type().getName());
+				entry.param("parameterValue", getConversionService().convert(jobParameter.value(), String.class));
+				entry.param("identifying", jobParameter.identifying() ? "Y" : "N");
 			});
 		}
 		batch.update();

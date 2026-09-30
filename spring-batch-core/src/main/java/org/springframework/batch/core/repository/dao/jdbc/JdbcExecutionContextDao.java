@@ -68,13 +68,13 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 
 	private static final String INSERT_JOB_EXECUTION_CONTEXT = """
 			INSERT INTO %PREFIX%JOB_EXECUTION_CONTEXT (SHORT_CONTEXT, SERIALIZED_CONTEXT, JOB_EXECUTION_ID)
-				VALUES(?, ?, ?)
+				VALUES(:shortContext, :serializedContext, :executionId)
 			""";
 
 	private static final String UPDATE_JOB_EXECUTION_CONTEXT = """
 			UPDATE %PREFIX%JOB_EXECUTION_CONTEXT
-			SET SHORT_CONTEXT = ?, SERIALIZED_CONTEXT = ?
-			WHERE JOB_EXECUTION_ID = ?
+			SET SHORT_CONTEXT = :shortContext, SERIALIZED_CONTEXT = :serializedContext
+			WHERE JOB_EXECUTION_ID = :executionId
 			""";
 
 	private static final String FIND_STEP_EXECUTION_CONTEXT = """
@@ -85,13 +85,13 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 
 	private static final String INSERT_STEP_EXECUTION_CONTEXT = """
 			INSERT INTO %PREFIX%STEP_EXECUTION_CONTEXT (SHORT_CONTEXT, SERIALIZED_CONTEXT, STEP_EXECUTION_ID)
-				VALUES(?, ?, ?)
+				VALUES(:shortContext, :serializedContext, :executionId)
 			""";
 
 	private static final String UPDATE_STEP_EXECUTION_CONTEXT = """
 			UPDATE %PREFIX%STEP_EXECUTION_CONTEXT
-			SET SHORT_CONTEXT = ?, SERIALIZED_CONTEXT = ?
-			WHERE STEP_EXECUTION_ID = ?
+			SET SHORT_CONTEXT = :shortContext, SERIALIZED_CONTEXT = :serializedContext
+			WHERE STEP_EXECUTION_ID = :executionId
 			""";
 
 	private static final String DELETE_STEP_EXECUTION_CONTEXT = """
@@ -294,10 +294,10 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 		}
 
 		JdbcClient.StatementSpec statement = getJdbcClient().sql(getQuery(sql))
-			.param(1, shortContext)
-			.param(3, executionId);
-		statement = (longContext != null) ? statement.param(2, longContext)
-				: statement.param(2, null, getClobTypeToUse());
+			.param("shortContext", shortContext)
+			.param("executionId", executionId);
+		statement = (longContext != null) ? statement.param("serializedContext", longContext)
+				: statement.param("serializedContext", null, getClobTypeToUse());
 		statement.update();
 	}
 
@@ -322,14 +322,14 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 					longContext = null;
 				}
 				batch.entry(entry -> {
-					entry.param(1, shortContext);
+					entry.param("shortContext", shortContext);
 					if (longContext != null) {
-						entry.param(2, longContext);
+						entry.param("serializedContext", longContext);
 					}
 					else {
-						entry.param(2, null, getClobTypeToUse());
+						entry.param("serializedContext", null, getClobTypeToUse());
 					}
-					entry.param(3, sc.getKey());
+					entry.param("executionId", sc.getKey());
 				});
 			}
 			batch.update();

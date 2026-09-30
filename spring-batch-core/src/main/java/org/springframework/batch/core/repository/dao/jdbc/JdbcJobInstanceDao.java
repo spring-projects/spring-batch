@@ -68,7 +68,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 
 	private static final String CREATE_JOB_INSTANCE = """
 			INSERT INTO %PREFIX%JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-				VALUES (?, ?, ?, ?)
+				VALUES (:jobInstanceId, :jobName, :jobKey, :version)
 			""";
 
 	private static final String FIND_JOBS_WITH_NAME = """
@@ -160,12 +160,10 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 		jobInstance.incrementVersion();
 
 		getJdbcClient().sql(getQuery(CREATE_JOB_INSTANCE))
-		// @formatter:off
-				.param(1, jobInstanceId, Types.BIGINT)
-				.param(2, jobName, Types.VARCHAR)
-				.param(3, jobKeyGenerator.generateKey(jobParameters), Types.VARCHAR)
-				.param(4, jobInstance.getVersion(), Types.INTEGER)
-		// @formatter:on
+			.param("jobInstanceId", jobInstanceId, Types.BIGINT)
+			.param("jobName", jobName, Types.VARCHAR)
+			.param("jobKey", jobKeyGenerator.generateKey(jobParameters), Types.VARCHAR)
+			.param("version", jobInstance.getVersion(), Types.INTEGER)
 			.update();
 
 		return jobInstance;
