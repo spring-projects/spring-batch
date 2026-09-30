@@ -89,26 +89,41 @@ public abstract class AbstractJdbcBatchMetadataDao implements InitializingBean {
 		this.tablePrefix = tablePrefix;
 	}
 
+	/**
+	 * Set the {@link JdbcOperations} to use to interact with the batch metadata tables.
+	 * This also sets the {@link JdbcClient} to a client backed by the given operations.
+	 * @param jdbcTemplate the operations to use
+	 */
 	public void setJdbcTemplate(JdbcOperations jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
 		this.jdbcClient = JdbcClient.create(jdbcTemplate);
 	}
 
 	/**
-	 * @deprecated use {{@link #getJdbcClient()}} instead.
+	 * Get the {@link JdbcOperations} to use to interact with the batch metadata tables.
+	 * @return the operations to use, or {@code null} if none was set
+	 * @deprecated since 6.1 in favor of {@link #getJdbcClient()}
 	 */
-	@Deprecated(forRemoval = true)
-	protected JdbcOperations getJdbcTemplate() {
-		Assert.state(jdbcTemplate != null, "JdbcOperations is required");
+	@Deprecated(since = "6.1", forRemoval = true)
+	protected @Nullable JdbcOperations getJdbcTemplate() {
 		return jdbcTemplate;
 	}
 
+	/**
+	 * Set the {@link JdbcClient} to use to interact with the batch metadata tables.
+	 * @param jdbcClient the client to use
+	 * @since 6.1
+	 */
 	public void setJdbcClient(JdbcClient jdbcClient) {
 		this.jdbcClient = jdbcClient;
 	}
 
-	protected JdbcClient getJdbcClient() {
-		Assert.state(jdbcClient != null, "JdbcClient is required");
+	/**
+	 * Get the {@link JdbcClient} to use to interact with the batch metadata tables.
+	 * @return the client to use, or {@code null} if none was set
+	 * @since 6.1
+	 */
+	protected @Nullable JdbcClient getJdbcClient() {
 		return jdbcClient;
 	}
 
@@ -135,7 +150,6 @@ public abstract class AbstractJdbcBatchMetadataDao implements InitializingBean {
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.state(jdbcTemplate != null, "JdbcOperations is required");
 		Assert.state(jdbcClient != null, "JdbcClient is required");
 	}
 

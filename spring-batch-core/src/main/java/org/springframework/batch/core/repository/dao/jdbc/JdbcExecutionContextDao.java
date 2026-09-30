@@ -287,12 +287,8 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 		JdbcClient.StatementSpec statement = getJdbcClient().sql(getQuery(sql))
 			.param(1, shortContext)
 			.param(3, executionId);
-		if (longContext != null) {
-			statement.param(2, longContext);
-		}
-		else {
-			statement.param(2, null, getClobTypeToUse());
-		}
+		statement = (longContext != null) ? statement.param(2, longContext)
+				: statement.param(2, null, getClobTypeToUse());
 		statement.update();
 	}
 

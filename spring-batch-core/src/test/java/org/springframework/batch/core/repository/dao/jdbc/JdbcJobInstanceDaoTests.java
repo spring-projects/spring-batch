@@ -192,4 +192,22 @@ public class JdbcJobInstanceDaoTests {
 		assertThrows(IllegalStateException.class, () -> jdbcJobInstanceDao.createJobInstance("job", jobParameters));
 	}
 
+	@Test
+	void testGetJobInstanceIds() {
+		// given
+		JobParameters jobParameters = new JobParametersBuilder().addString("name", "foo").toJobParameters();
+		JobInstance first = jdbcJobInstanceDao.createJobInstance("job", jobParameters);
+		JobInstance second = jdbcJobInstanceDao.createJobInstance("job",
+				new JobParametersBuilder().addString("name", "bar").toJobParameters());
+		jdbcJobInstanceDao.createJobInstance("otherJob", jobParameters);
+
+		// when
+		List<Long> jobInstanceIds = jdbcJobInstanceDao.getJobInstanceIds("job");
+
+		// then
+		assertEquals(2, jobInstanceIds.size());
+		assertTrue(jobInstanceIds.contains(first.getId()));
+		assertTrue(jobInstanceIds.contains(second.getId()));
+	}
+
 }

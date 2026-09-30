@@ -344,6 +344,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		return getJdbcClient().sql(getQuery(GET_RUNNING_EXECUTION_FOR_INSTANCE))
 			.param("jobName", jobName)
 			.query(Long.class)
+			.list()
 			.stream()
 			.map(this::getJobExecution)
 			.collect(Collectors.toSet());

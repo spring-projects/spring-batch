@@ -263,7 +263,10 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 
 	@Override
 	public List<Long> getJobInstanceIds(String jobName) {
-		return getJdbcClient().sql(GET_JOB_INSTANCE_IDS_BY_JOB_NAME).param("jobName", jobName).query(Long.class).list();
+		return getJdbcClient().sql(getQuery(GET_JOB_INSTANCE_IDS_BY_JOB_NAME))
+			.param("jobName", jobName)
+			.query(Long.class)
+			.list();
 	}
 
 	@Override

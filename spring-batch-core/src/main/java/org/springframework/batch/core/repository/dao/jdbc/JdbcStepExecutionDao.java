@@ -172,7 +172,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 
 		JdbcClient.StatementSpec statement = getJdbcClient().sql(getQuery(SAVE_STEP_EXECUTION));
 		for (int i = 0; i < parameterTypes.length; i++) {
-			statement.param(i + 1, parameterValues[i], parameterTypes[i]);
+			statement = statement.param(i + 1, parameterValues[i], parameterTypes[i]);
 		}
 		statement.update();
 
