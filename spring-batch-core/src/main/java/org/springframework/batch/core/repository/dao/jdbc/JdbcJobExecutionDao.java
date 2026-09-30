@@ -74,12 +74,6 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 				VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 			""";
 
-	private static final String CHECK_JOB_EXECUTION_EXISTS = """
-			SELECT COUNT(*)
-			FROM %PREFIX%JOB_EXECUTION
-			WHERE JOB_EXECUTION_ID = :jobExecutionId
-			""";
-
 	private static final String GET_VERSION_AND_STATUS = """
 			SELECT VERSION, STATUS
 			FROM %PREFIX%JOB_EXECUTION
@@ -280,19 +274,6 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 			Timestamp createTime = Timestamp.valueOf(jobExecution.getCreateTime());
 			Timestamp lastUpdated = jobExecution.getLastUpdated() == null ? null
 					: Timestamp.valueOf(jobExecution.getLastUpdated());
-
-			// TODO review this check, it's too late to check for the existence of the job
-			// execution here
-			// Check if given JobExecution's Id already exists, if none is found
-			// it
-			// is invalid and
-			// an exception should be thrown.
-			if (getJdbcClient().sql(getQuery(CHECK_JOB_EXECUTION_EXISTS))
-				.param("jobExecutionId", jobExecution.getId())
-				.query(Integer.class)
-				.single() != 1) {
-				throw new RuntimeException("Invalid JobExecution, ID " + jobExecution.getId() + " not found.");
-			}
 
 			int count = getJdbcClient().sql(getQuery(UPDATE_JOB_EXECUTION))
 			// @formatter:off

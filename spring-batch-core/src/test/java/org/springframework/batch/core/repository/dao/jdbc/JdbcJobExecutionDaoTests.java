@@ -30,6 +30,7 @@ import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersBuilder;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
@@ -201,6 +202,19 @@ public class JdbcJobExecutionDaoTests {
 		JobExecution lastJobExecution = jdbcJobExecutionDao.getLastJobExecution(jobInstance);
 
 		Assertions.assertNull(lastJobExecution);
+	}
+
+	@Test
+	void testUpdateJobExecutionWhenRowNoLongerExists() {
+		// given
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = jdbcJobInstanceDao.createJobInstance("job", jobParameters);
+		JobExecution jobExecution = jdbcJobExecutionDao.createJobExecution(jobInstance, jobParameters);
+		jdbcTemplate.update("DELETE FROM BATCH_JOB_EXECUTION WHERE JOB_EXECUTION_ID = ?", jobExecution.getId());
+
+		// when & then
+		Assertions.assertThrows(OptimisticLockingFailureException.class,
+				() -> jdbcJobExecutionDao.updateJobExecution(jobExecution));
 	}
 
 }
