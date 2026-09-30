@@ -217,4 +217,36 @@ public class JdbcJobExecutionDaoTests {
 				() -> jdbcJobExecutionDao.updateJobExecution(jobExecution));
 	}
 
+	@Test
+	void testFindJobExecutionsLoadsTheParametersOfEachExecution() {
+		// given
+		JobInstance jobInstance = jdbcJobInstanceDao.createJobInstance("job",
+				new JobParametersBuilder().addString("name", "foo").toJobParameters());
+		JobExecution first = jdbcJobExecutionDao.createJobExecution(jobInstance,
+				new JobParametersBuilder().addString("name", "foo").toJobParameters());
+		JobExecution second = jdbcJobExecutionDao.createJobExecution(jobInstance,
+				new JobParametersBuilder().addString("name", "bar").addLong("run", 2L).toJobParameters());
+		JobExecution third = jdbcJobExecutionDao.createJobExecution(jobInstance, new JobParameters());
+
+		// when
+		List<JobExecution> jobExecutions = jdbcJobExecutionDao.findJobExecutions(jobInstance);
+
+		// then, newest first, each with its own parameters
+		Assertions.assertEquals(3, jobExecutions.size());
+
+		Assertions.assertEquals(third.getId(), jobExecutions.get(0).getId());
+		Assertions.assertTrue(jobExecutions.get(0).getJobParameters().isEmpty());
+
+		Assertions.assertEquals(second.getId(), jobExecutions.get(1).getId());
+		Assertions.assertEquals("bar", jobExecutions.get(1).getJobParameters().getString("name"));
+		Assertions.assertEquals(2L, jobExecutions.get(1).getJobParameters().getLong("run"));
+
+		Assertions.assertEquals(first.getId(), jobExecutions.get(2).getId());
+		Assertions.assertEquals("foo", jobExecutions.get(2).getJobParameters().getString("name"));
+		Assertions.assertEquals(1, jobExecutions.get(2).getJobParameters().parameters().size());
+
+		// the given job instance is reused rather than loaded again
+		Assertions.assertSame(jobInstance, jobExecutions.get(0).getJobInstance());
+	}
+
 }
