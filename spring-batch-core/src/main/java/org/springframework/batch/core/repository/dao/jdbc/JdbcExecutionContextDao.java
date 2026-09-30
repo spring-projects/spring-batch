@@ -27,8 +27,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.springframework.batch.core.job.JobExecution;
 
@@ -112,7 +110,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 
 	private ExecutionContextSerializer serializer = new DefaultExecutionContextSerializer();
 
-	private final Lock lock = new ReentrantLock();
+	private final FineGrainedLock<Long> lock = new FineGrainedLock<>();
 
 	/**
 	 * Create a new {@link JdbcExecutionContextDao}.
@@ -194,9 +192,9 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 	public void updateExecutionContext(StepExecution stepExecution) {
 		// Attempt to prevent concurrent modification errors by blocking here if
 		// someone is already trying to do it.
-		this.lock.lock();
+		Long executionId = stepExecution.getId();
+		this.lock.lock(executionId);
 		try {
-			long executionId = stepExecution.getId();
 			ExecutionContext executionContext = stepExecution.getExecutionContext();
 			Assert.notNull(executionContext, "The ExecutionContext must not be null.");
 
@@ -205,7 +203,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 			persistSerializedContext(executionId, serializedContext, UPDATE_STEP_EXECUTION_CONTEXT);
 		}
 		finally {
-			this.lock.unlock();
+			this.lock.unlock(executionId);
 		}
 	}
 
