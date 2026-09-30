@@ -22,6 +22,7 @@ import java.util.concurrent.Future;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.Nullable;
 
 import org.springframework.batch.infrastructure.item.Chunk;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
@@ -44,7 +45,7 @@ import org.springframework.util.Assert;
  * @see AsyncItemProcessor
  * @since 6.1.0
  */
-public class AsyncItemWriter<T> implements ItemStreamWriter<Future<T>> {
+public class AsyncItemWriter<T> implements ItemStreamWriter<Future<@Nullable T>> {
 
 	private static final Log logger = LogFactory.getLog(AsyncItemWriter.class);
 
@@ -77,9 +78,9 @@ public class AsyncItemWriter<T> implements ItemStreamWriter<Future<T>> {
 	 * @throws Exception The exception returned by the Future if one was thrown
 	 */
 	@Override
-	public void write(Chunk<? extends Future<T>> items) throws Exception {
+	public void write(Chunk<? extends Future<@Nullable T>> items) throws Exception {
 		List<T> list = new ArrayList<>();
-		for (Future<T> future : items) {
+		for (Future<@Nullable T> future : items) {
 			try {
 				T item = future.get();
 
