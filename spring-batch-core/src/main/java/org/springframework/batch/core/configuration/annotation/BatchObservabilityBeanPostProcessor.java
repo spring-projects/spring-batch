@@ -36,6 +36,7 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
  *
  * @author Mahmoud Ben Hassine
  * @author Sanghyuk Jung
+ * @author Yanming Zhou
  * @since 5.0
  */
 public class BatchObservabilityBeanPostProcessor implements BeanFactoryPostProcessor, BeanPostProcessor {
@@ -64,13 +65,22 @@ public class BatchObservabilityBeanPostProcessor implements BeanFactoryPostProce
 					|| target instanceof TaskExecutorJobOperator) {
 				ObservationRegistry observationRegistry = this.beanFactory.getBean(ObservationRegistry.class);
 				if (target instanceof AbstractJob job) {
-					job.setObservationRegistry(observationRegistry);
+					if (job.getObservationRegistry() == null
+							|| job.getObservationRegistry() == ObservationRegistry.NOOP) {
+						job.setObservationRegistry(observationRegistry);
+					}
 				}
 				if (target instanceof AbstractStep step) {
-					step.setObservationRegistry(observationRegistry);
+					if (step.getObservationRegistry() == null
+							|| step.getObservationRegistry() == ObservationRegistry.NOOP) {
+						step.setObservationRegistry(observationRegistry);
+					}
 				}
 				if (target instanceof TaskExecutorJobOperator operator) {
-					operator.setObservationRegistry(observationRegistry);
+					if (operator.getObservationRegistry() == null
+							|| operator.getObservationRegistry() == ObservationRegistry.NOOP) {
+						operator.setObservationRegistry(observationRegistry);
+					}
 				}
 			}
 		}
