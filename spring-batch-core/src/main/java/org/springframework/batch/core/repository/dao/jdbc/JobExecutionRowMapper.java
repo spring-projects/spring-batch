@@ -39,6 +39,20 @@ import org.springframework.jdbc.core.RowMapper;
  */
 class JobExecutionRowMapper implements RowMapper<JobExecutionRowMapper.JobExecutionRow> {
 
+	private final String columnPrefix;
+
+	JobExecutionRowMapper() {
+		this("");
+	}
+
+	/**
+	 * @param columnPrefix prefix of the aliases the job execution columns are selected
+	 * under, for queries that also select columns of the same name from another table
+	 */
+	JobExecutionRowMapper(String columnPrefix) {
+		this.columnPrefix = columnPrefix;
+	}
+
 	/**
 	 * A single row of the job execution table, including the id of the job instance it
 	 * belongs to.
@@ -69,12 +83,17 @@ class JobExecutionRowMapper implements RowMapper<JobExecutionRowMapper.JobExecut
 
 	@Override
 	public JobExecutionRow mapRow(ResultSet rs, int rowNum) throws SQLException {
-		return new JobExecutionRow(rs.getLong("JOB_EXECUTION_ID"), rs.getLong("JOB_INSTANCE_ID"),
-				toLocalDateTime(rs.getTimestamp("START_TIME")), toLocalDateTime(rs.getTimestamp("END_TIME")),
-				BatchStatus.valueOf(rs.getString("STATUS")),
-				new ExitStatus(rs.getString("EXIT_CODE"), rs.getString("EXIT_MESSAGE")),
-				toLocalDateTime(rs.getTimestamp("CREATE_TIME")), toLocalDateTime(rs.getTimestamp("LAST_UPDATED")),
-				rs.getInt("VERSION"));
+		return new JobExecutionRow(rs.getLong(column("JOB_EXECUTION_ID")), rs.getLong(column("JOB_INSTANCE_ID")),
+				toLocalDateTime(rs.getTimestamp(column("START_TIME"))),
+				toLocalDateTime(rs.getTimestamp(column("END_TIME"))),
+				BatchStatus.valueOf(rs.getString(column("STATUS"))),
+				new ExitStatus(rs.getString(column("EXIT_CODE")), rs.getString(column("EXIT_MESSAGE"))),
+				toLocalDateTime(rs.getTimestamp(column("CREATE_TIME"))),
+				toLocalDateTime(rs.getTimestamp(column("LAST_UPDATED"))), rs.getInt(column("VERSION")));
+	}
+
+	private String column(String name) {
+		return this.columnPrefix + name;
 	}
 
 	private static LocalDateTime toLocalDateTime(Timestamp timestamp) {

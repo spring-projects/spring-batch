@@ -20,10 +20,12 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
@@ -157,6 +159,47 @@ class JdbcStepExecutionDaoTests {
 
 		// Then
 		Assertions.assertEquals(0, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_STEP_EXECUTION"));
+	}
+
+	@Test
+	void testGetLastStepExecution() {
+		// given
+		JobParameters jobParameters = new JobParametersBuilder().addString("name", "foo").toJobParameters();
+		JobInstance jobInstance = jdbcJobInstanceDao.createJobInstance("job", jobParameters);
+		JobExecution jobExecution = jdbcJobExecutionDao.createJobExecution(jobInstance, jobParameters);
+		jdbcStepExecutionDao.createStepExecution("step", jobExecution);
+		StepExecution lastStepExecution = jdbcStepExecutionDao.createStepExecution("step", jobExecution);
+
+		// distinct values on either side of the join, so that mixing up the step
+		// execution and job execution columns of the same name would be caught
+		lastStepExecution.setStatus(BatchStatus.COMPLETED);
+		lastStepExecution.setExitStatus(new ExitStatus("STEP_EXIT_CODE", "step exit description"));
+		lastStepExecution.setReadCount(7);
+		jdbcStepExecutionDao.updateStepExecution(lastStepExecution);
+		jobExecution.setStatus(BatchStatus.STARTED);
+		jobExecution.setExitStatus(new ExitStatus("JOB_EXIT_CODE", "job exit description"));
+		jdbcJobExecutionDao.updateJobExecution(jobExecution);
+
+		// when
+		StepExecution retrieved = jdbcStepExecutionDao.getLastStepExecution(jobInstance, "step");
+
+		// then
+		Assertions.assertNotNull(retrieved);
+		assertEquals(lastStepExecution.getId(), retrieved.getId());
+		assertEquals("step", retrieved.getStepName());
+		assertEquals(BatchStatus.COMPLETED, retrieved.getStatus());
+		assertEquals("STEP_EXIT_CODE", retrieved.getExitStatus().getExitCode());
+		assertEquals("step exit description", retrieved.getExitStatus().getExitDescription());
+		assertEquals(7, retrieved.getReadCount());
+		assertEquals(lastStepExecution.getVersion(), retrieved.getVersion());
+
+		JobExecution retrievedJobExecution = retrieved.getJobExecution();
+		assertEquals(jobExecution.getId(), retrievedJobExecution.getId());
+		assertEquals(jobInstance.getId(), retrievedJobExecution.getJobInstance().getId());
+		assertEquals(BatchStatus.STARTED, retrievedJobExecution.getStatus());
+		assertEquals("JOB_EXIT_CODE", retrievedJobExecution.getExitStatus().getExitCode());
+		assertEquals(jobExecution.getVersion(), retrievedJobExecution.getVersion());
+		assertEquals("foo", retrievedJobExecution.getJobParameters().getString("name"));
 	}
 
 }
