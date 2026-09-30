@@ -48,7 +48,7 @@ import org.springframework.util.Assert;
  * @see AsyncItemWriter
  * @since 6.1.0
  */
-public class AsyncItemProcessor<I, O> implements ItemProcessor<I, Future<O>> {
+public class AsyncItemProcessor<I, O> implements ItemProcessor<I, Future<@Nullable O>> {
 
 	private ItemProcessor<I, O> delegate;
 
@@ -87,11 +87,10 @@ public class AsyncItemProcessor<I, O> implements ItemProcessor<I, Future<O>> {
 	 *
 	 * @see ItemProcessor#process(Object)
 	 */
-	@SuppressWarnings("DataFlowIssue")
 	@Override
-	public @Nullable Future<O> process(I item) throws Exception {
+	public @Nullable Future<@Nullable O> process(I item) throws Exception {
 		final StepExecution stepExecution = getStepExecution();
-		FutureTask<O> task = new FutureTask<>(() -> {
+		FutureTask<@Nullable O> task = new FutureTask<>(() -> {
 			if (stepExecution != null) {
 				StepSynchronizationManager.register(stepExecution);
 			}
