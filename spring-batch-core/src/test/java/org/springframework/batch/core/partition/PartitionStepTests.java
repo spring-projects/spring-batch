@@ -17,9 +17,11 @@ package org.springframework.batch.core.partition;
 
 import org.springframework.batch.infrastructure.support.DatabaseType;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -220,6 +222,118 @@ class PartitionStepTests {
 		// one manager and two workers
 		assertEquals(3, stepExecution.getJobExecution().getStepExecutions().size());
 		assertEquals(BatchStatus.STOPPED, stepExecution.getStatus());
+	}
+
+	/**
+	 * The partitions that already completed before a restart are not re-executed, but
+	 * they must still be part of the aggregated result of the restarted manager step.
+	 */
+	@Test
+	void testRestartWhenAllPartitionsAlreadyCompleted() throws Exception {
+		List<Collection<StepExecution>> aggregated = new ArrayList<>();
+		step.setStepExecutionAggregator(new DefaultStepExecutionAggregator() {
+			@Override
+			public void aggregate(StepExecution result, Collection<StepExecution> executions) {
+				aggregated.add(new ArrayList<>(executions));
+				super.aggregate(result, executions);
+			}
+		});
+		SimpleStepExecutionSplitter stepExecutionSplitter = new SimpleStepExecutionSplitter(jobRepository,
+				step.getName(), new SimplePartitioner());
+		step.setStepExecutionSplitter(stepExecutionSplitter);
+		AtomicBoolean managerCrashes = new AtomicBoolean(true);
+		step.setPartitionHandler((stepSplitter, managerStepExecution) -> {
+			Set<StepExecution> executions = stepSplitter.split(managerStepExecution, 2);
+			for (StepExecution execution : executions) {
+				execution.setStatus(BatchStatus.COMPLETED);
+				execution.setExitStatus(ExitStatus.COMPLETED);
+				execution.setWriteCount(3);
+				jobRepository.update(execution);
+			}
+			if (managerCrashes.get()) {
+				// the manager dies after the workers completed
+				throw new IllegalStateException("manager crashed");
+			}
+			return executions;
+		});
+		step.afterPropertiesSet();
+
+		JobParameters jobParameters = new JobParameters();
+		ExecutionContext executionContext = new ExecutionContext();
+		JobInstance jobInstance = jobRepository.createJobInstance("restartJob", jobParameters);
+		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters, executionContext);
+		StepExecution stepExecution = jobRepository.createStepExecution("foo", jobExecution);
+		step.execute(stepExecution);
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
+		jobExecution.setStatus(BatchStatus.FAILED);
+		jobExecution.setEndTime(LocalDateTime.now());
+		jobRepository.update(jobExecution);
+
+		// Now restart: both partitions already completed, so none is re-executed
+		managerCrashes.set(false);
+		JobExecution jobExecution2 = jobRepository.createJobExecution(jobInstance, jobParameters, executionContext);
+		StepExecution stepExecution2 = jobRepository.createStepExecution("foo", jobExecution2);
+		step.execute(stepExecution2);
+
+		assertEquals(1, aggregated.size());
+		assertEquals(2, aggregated.get(0).size());
+		assertEquals(6, stepExecution2.getWriteCount());
+		assertEquals(BatchStatus.COMPLETED, stepExecution2.getStatus());
+	}
+
+	/**
+	 * Only the partitions that did not complete are re-executed on a restart, but the
+	 * aggregated result must cover all partitions.
+	 */
+	@Test
+	void testRestartWhenSomePartitionsAlreadyCompleted() throws Exception {
+		List<Collection<StepExecution>> aggregated = new ArrayList<>();
+		step.setStepExecutionAggregator(new DefaultStepExecutionAggregator() {
+			@Override
+			public void aggregate(StepExecution result, Collection<StepExecution> executions) {
+				aggregated.add(new ArrayList<>(executions));
+				super.aggregate(result, executions);
+			}
+		});
+		SimpleStepExecutionSplitter stepExecutionSplitter = new SimpleStepExecutionSplitter(jobRepository,
+				step.getName(), new SimplePartitioner());
+		step.setStepExecutionSplitter(stepExecutionSplitter);
+		AtomicBoolean firstRun = new AtomicBoolean(true);
+		step.setPartitionHandler((stepSplitter, managerStepExecution) -> {
+			Set<StepExecution> executions = stepSplitter.split(managerStepExecution, 2);
+			for (StepExecution execution : executions) {
+				boolean failing = firstRun.get() && execution.getStepName().endsWith("partition1");
+				execution.setStatus(failing ? BatchStatus.FAILED : BatchStatus.COMPLETED);
+				execution.setExitStatus(failing ? ExitStatus.FAILED : ExitStatus.COMPLETED);
+				execution.setWriteCount(3);
+				jobRepository.update(execution);
+			}
+			firstRun.set(false);
+			return executions;
+		});
+		step.afterPropertiesSet();
+
+		JobParameters jobParameters = new JobParameters();
+		ExecutionContext executionContext = new ExecutionContext();
+		JobInstance jobInstance = jobRepository.createJobInstance("restartJob", jobParameters);
+		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters, executionContext);
+		StepExecution stepExecution = jobRepository.createStepExecution("foo", jobExecution);
+		step.execute(stepExecution);
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
+		assertEquals(2, aggregated.get(0).size());
+		jobExecution.setStatus(BatchStatus.FAILED);
+		jobExecution.setEndTime(LocalDateTime.now());
+		jobRepository.update(jobExecution);
+
+		// Now restart: only the failed partition is re-executed
+		JobExecution jobExecution2 = jobRepository.createJobExecution(jobInstance, jobParameters, executionContext);
+		StepExecution stepExecution2 = jobRepository.createStepExecution("foo", jobExecution2);
+		step.execute(stepExecution2);
+
+		assertEquals(1, jobExecution2.getStepExecutions().size() - 1);
+		assertEquals(2, aggregated.get(1).size());
+		assertEquals(6, stepExecution2.getWriteCount());
+		assertEquals(BatchStatus.COMPLETED, stepExecution2.getStatus());
 	}
 
 	@Test
