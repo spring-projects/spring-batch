@@ -542,7 +542,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 
 		try {
 			if (scanning) {
-				logger.info("Executing scan in new transaction after rollback");
+				logger.debug("Executing scan in new transaction after rollback");
 				ScanItem<I, O> scanItem = tracker.pollNextScanItem();
 				if (scanItem != null) {
 					ChunkScanEvent chunkScanEvent = new ChunkScanEvent(stepExecution.getStepName(),
@@ -555,7 +555,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 					chunkScanEvent.commit();
 				}
 				if (!tracker.hasPendingScanItems()) {
-					logger.info("Chunk scan completed");
+					logger.debug("Chunk scan completed");
 					tracker.exitScanMode();
 					if (!status.isRollbackOnly()) {
 						stepExecution.incrementCommitCount();
@@ -603,17 +603,19 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			stepExecution.incrementCommitCount();
 		}
 		catch (Exception e) {
-			logger.error("Rolling back chunk transaction", e);
 			status.setRollbackOnly();
 			stepExecution.incrementRollbackCount();
 
 			// the write of this chunk has just failed with a skippable exception and the
 			// chunk has been queued for scanning: roll back and start the scan in the
-			// next transaction
+			// next transaction. This rollback is an expected part of the skip algorithm
+			// and not a step failure, so it is only reported at debug level.
 			if (!scanning && tracker.isScanMode()) {
-				logger.info("Rollback complete, scan will execute in next transaction");
+				logger.debug("Chunk transaction rolled back, scan will execute in next transaction");
 				return;
 			}
+
+			logger.error("Rolling back chunk transaction", e);
 
 			// a scan attempt itself failed: the pending item has already been polled off
 			// the scan queue, so carrying on would silently lose it. Fail the step
@@ -640,7 +642,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 
 		try {
 			if (scanning) {
-				logger.info("Executing scan in new transaction after rollback");
+				logger.debug("Executing scan in new transaction after rollback");
 				ScanItem<I, O> scanItem = tracker.pollNextScanItem();
 				if (scanItem != null) {
 					ChunkScanEvent chunkScanEvent = new ChunkScanEvent(stepExecution.getStepName(),
@@ -655,7 +657,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 					chunkScanEvent.commit();
 				}
 				if (!tracker.hasPendingScanItems()) {
-					logger.info("Chunk scan completed");
+					logger.debug("Chunk scan completed");
 					tracker.exitScanMode();
 					if (!status.isRollbackOnly()) {
 						stepExecution.incrementCommitCount();
@@ -676,18 +678,20 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			stepExecution.incrementCommitCount();
 		}
 		catch (Exception e) {
-			logger.error("Rolling back chunk transaction", e);
 			status.setRollbackOnly();
 			stepExecution.incrementRollbackCount();
 
 			// the write of this chunk has just failed with a skippable exception and the
 			// chunk has been queued for scanning: roll back and start the scan in the
-			// next transaction
+			// next transaction. This rollback is an expected part of the skip algorithm
+			// and not a step failure, so it is only reported at debug level.
 			if (!scanning && tracker.isScanMode()) {
 				notifyChunkError(e, processedChunk);
-				logger.info("Rollback complete, scan will execute in next transaction");
+				logger.debug("Chunk transaction rolled back, scan will execute in next transaction");
 				return;
 			}
+
+			logger.error("Rolling back chunk transaction", e);
 
 			// a scan attempt itself failed: the pending item has already been polled off
 			// the scan queue, so carrying on would silently lose it. Fail the step
@@ -981,11 +985,20 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			}
 			else if (this.faultTolerant && exception instanceof RetryException retryException
 					&& this.skipPolicy.shouldSkip(retryException.getCause(), -1)) {
-				logger.info("Retry exhausted, entering scan mode for next transaction", retryException);
+				// the write failed (after exhausting the retry policy, which may allow
+				// no retry at all) with an exception the skip policy accepts: queue the
+				// chunk for scanning so that the offending item can be identified and
+				// skipped. This is an expected part of the skip algorithm and not a step
+				// failure, so it is only reported at debug level, and with the exception
+				// raised by the writer rather than the RetryException wrapping it.
+				if (logger.isDebugEnabled()) {
+					logger.debug("Chunk write failed with a skippable exception, entering scan mode "
+							+ "for next transaction", retryException.getCause());
+				}
 				this.chunkTracker.get().enterScanMode(scanItems);
 			}
 			else {
-				logger.error("Retry exhausted after last attempt in recovery path, but exception is not skippable");
+				logger.error("Chunk write failed with an exception that cannot be skipped");
 			}
 			throw exception;
 		}
