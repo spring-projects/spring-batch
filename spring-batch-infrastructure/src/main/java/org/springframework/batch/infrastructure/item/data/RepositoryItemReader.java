@@ -80,7 +80,10 @@ import org.springframework.util.StringUtils;
  * @author Mahmoud Ben Hassine
  * @author Jimmy Praet
  * @since 2.2
+ * @deprecated since 6.1 in favor of {@link PageableItemReader}. Scheduled for removal in
+ * 7.0.
  */
+@Deprecated(since = "6.1", forRemoval = true)
 public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> implements InitializingBean {
 
 	protected Log logger = LogFactory.getLog(getClass());

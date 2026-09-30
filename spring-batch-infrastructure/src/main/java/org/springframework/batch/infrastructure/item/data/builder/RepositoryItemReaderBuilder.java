@@ -38,7 +38,10 @@ import org.springframework.util.Assert;
  * @author Drummond Dawson
  * @since 4.0
  * @see RepositoryItemReader
+ * @deprecated since 6.1 in favor of {@link PageableItemReaderBuilder}. Scheduled for
+ * removal in 7.0.
  */
+@Deprecated(since = "6.1", forRemoval = true)
 public class RepositoryItemReaderBuilder<T> {
 
 	private @Nullable PagingAndSortingRepository<?, ?> repository;

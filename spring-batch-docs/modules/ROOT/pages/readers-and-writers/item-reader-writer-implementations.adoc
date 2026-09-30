@@ -174,6 +174,7 @@ Spring Batch offers the following database readers:
 
 * xref:readers-and-writers/item-reader-writer-implementations.adoc#mongoPagingItemReader[`MongoPagingItemReader`]
 * xref:readers-and-writers/item-reader-writer-implementations.adoc#mongoCursorItemReader[`MongoCursorItemReader`]
+* xref:readers-and-writers/item-reader-writer-implementations.adoc#pageableItemReader[`PageableItemReader`]
 * xref:readers-and-writers/item-reader-writer-implementations.adoc#repositoryItemReader[`RepositoryItemReader`]
 
 [[mongoPagingItemReader]]
@@ -188,11 +189,34 @@ The `MongoCursorItemReader` is an `ItemReader` that reads documents from MongoDB
 streaming technique. Spring Batch provides a `MongoCursorItemReaderBuilder` to construct an
 instance of the `MongoCursorItemReader`.
 
+[[pageableItemReader]]
+=== `PageableItemReader`
+The `PageableItemReader` reads records by applying a query function to a Spring Data
+`Pageable`. The function can be a repository method reference or a lambda that invokes a
+custom repository query returning a `Slice`. Unlike `RepositoryItemReader`, it does not
+use reflection to select a repository method.
+
+The page size and a non-empty sort map are required constructor arguments. Use a
+`LinkedHashMap` when the order of multiple sort fields matters. Spring Batch provides a
+`PageableItemReaderBuilder` to construct an instance of the `PageableItemReader`. For
+example, a repository that extends `PagingAndSortingRepository` can be used as follows:
+
+[source, java]
+----
+PageableItemReader<Customer> reader = new PageableItemReaderBuilder<Customer>()
+		.pageSize(100)
+		.query(customerRepository::findAll)
+		.sorts(Map.of("id", Sort.Direction.ASC))
+		.build();
+----
+
 [[repositoryItemReader]]
 === `RepositoryItemReader`
 The `RepositoryItemReader` is an `ItemReader` that reads records by using a
-`PagingAndSortingRepository`. Spring Batch provides a `RepositoryItemReaderBuilder` to
-construct an instance of the `RepositoryItemReader`.
+`PagingAndSortingRepository`. It and its `RepositoryItemReaderBuilder` are deprecated
+since 6.1 and scheduled for removal in 7.0. Use `PageableItemReader` instead, passing a
+repository method reference or query lambda rather than configuring a method name and
+arguments for reflective invocation.
 
 [[databaseWriters]]
 == Database Writers
