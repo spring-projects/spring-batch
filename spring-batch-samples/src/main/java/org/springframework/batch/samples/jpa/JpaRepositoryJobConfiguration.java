@@ -28,9 +28,9 @@ import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
-import org.springframework.batch.infrastructure.item.data.RepositoryItemReader;
+import org.springframework.batch.infrastructure.item.data.PageableItemReader;
 import org.springframework.batch.infrastructure.item.data.RepositoryItemWriter;
-import org.springframework.batch.infrastructure.item.data.builder.RepositoryItemReaderBuilder;
+import org.springframework.batch.infrastructure.item.data.builder.PageableItemReaderBuilder;
 import org.springframework.batch.infrastructure.item.data.builder.RepositoryItemWriterBuilder;
 import org.springframework.batch.samples.common.DataSourceConfiguration;
 import org.springframework.batch.samples.domain.trade.CustomerCredit;
@@ -63,13 +63,11 @@ public class JpaRepositoryJobConfiguration {
 
 	@Bean
 	@StepScope
-	public RepositoryItemReader<CustomerCredit> itemReader(@Value("#{jobParameters['credit']}") Double credit,
+	public PageableItemReader<CustomerCredit> itemReader(@Value("#{jobParameters['credit']}") Double credit,
 			CustomerCreditPagingAndSortingRepository repository) {
-		return new RepositoryItemReaderBuilder<CustomerCredit>().name("itemReader")
+		return new PageableItemReaderBuilder<CustomerCredit>().name("itemReader")
 			.pageSize(2)
-			.methodName("findByCreditGreaterThan")
-			.repository(repository)
-			.arguments(BigDecimal.valueOf(credit))
+			.query(pageable -> repository.findByCreditGreaterThan(BigDecimal.valueOf(credit), pageable))
 			.sorts(Map.of("id", Sort.Direction.ASC))
 			.build();
 	}
@@ -81,7 +79,7 @@ public class JpaRepositoryJobConfiguration {
 
 	@Bean
 	public Job job(JobRepository jobRepository, JpaTransactionManager jpaTransactionManager,
-			RepositoryItemReader<CustomerCredit> itemReader, RepositoryItemWriter<CustomerCredit> itemWriter) {
+			PageableItemReader<CustomerCredit> itemReader, RepositoryItemWriter<CustomerCredit> itemWriter) {
 		return new JobBuilder("ioSampleJob", jobRepository)
 			.start(new StepBuilder("step1", jobRepository).<CustomerCredit, CustomerCredit>chunk(2)
 				.transactionManager(jpaTransactionManager)
