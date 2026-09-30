@@ -143,12 +143,11 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 	/*
 	 * Transaction related parameters
 	 */
-	private @Nullable PlatformTransactionManager transactionManager;
+	private PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
 
-	@SuppressWarnings("NullAway.Init")
-	private TransactionTemplate transactionTemplate;
+	private TransactionAttribute transactionAttribute = new DefaultTransactionAttribute();
 
-	private @Nullable TransactionAttribute transactionAttribute;
+	private TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager, transactionAttribute);
 
 	/*
 	 * Chunk related parameters
@@ -179,8 +178,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 	/*
 	 * Concurrency parameters
 	 */
-	@SuppressWarnings("NullAway.Init")
-	private AsyncTaskExecutor taskExecutor;
+	private @Nullable AsyncTaskExecutor taskExecutor;
 
 	/**
 	 * Create a new {@link ChunkOrientedStep}.
@@ -370,17 +368,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
-		if (this.transactionManager == null) {
-			logger.debug("No transaction manager has been set. Defaulting to ResourcelessTransactionManager.");
-			this.transactionManager = new ResourcelessTransactionManager();
-		}
-		if (this.transactionAttribute == null) {
-			logger.debug("No transaction attribute has been set. Defaulting to DefaultTransactionAttribute.");
-			this.transactionAttribute = new DefaultTransactionAttribute();
-		}
 		Assert.isTrue(this.chunkSize > 0, "Chunk size must be greater than 0");
-		Assert.notNull(this.itemReader, "Item reader must not be null");
-		Assert.notNull(this.itemWriter, "Item writer must not be null");
 		if (this.itemReader instanceof ItemStream itemStream) {
 			registerItemStream(itemStream);
 		}
@@ -533,7 +521,8 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 
 	private void processChunkConcurrently(TransactionStatus status, StepContribution contribution,
 			StepExecution stepExecution) {
-		List<Future<O>> itemProcessingTasks = new ArrayList<>();
+		Assert.state(this.taskExecutor != null, "TaskExecutor must not be null");
+		List<Future<@Nullable O>> itemProcessingTasks = new ArrayList<>();
 		List<I> inputItems = new ArrayList<>();
 		List<ScanItem<I, O>> scanItems = new ArrayList<>();
 		Chunk<O> processedChunk = new Chunk<>();
@@ -571,7 +560,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 				if (item != null) {
 					inputItems.add(item);
 					readPositions.add(tracker.getReadsSinceCheckpoint());
-					Future<O> itemProcessingFuture = this.taskExecutor.submit(() -> {
+					Future<@Nullable O> itemProcessingFuture = this.taskExecutor.submit(() -> {
 						try {
 							StepSynchronizationManager.register(stepExecution);
 							return processItem(item, contribution);
@@ -634,7 +623,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 
 	private void processChunkSequentially(TransactionStatus status, StepContribution contribution,
 			StepExecution stepExecution) {
-		Chunk<I> inputChunk = new Chunk<>();
+		Chunk<I> inputChunk;
 		Chunk<O> processedChunk = new Chunk<>();
 		List<ScanItem<I, O>> scanItems = new ArrayList<>();
 		ChunkTracker<I, O> tracker = this.chunkTracker.get();
@@ -735,10 +724,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			return true;
 		}
 		// check external interruption via job operator
-		if (stepExecution.isTerminateOnly()) {
-			return true;
-		}
-		return false;
+		return stepExecution.isTerminateOnly();
 	}
 
 	/*
@@ -810,12 +796,11 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 		return item;
 	}
 
-	@SuppressWarnings("NullAway")
 	private @Nullable I doRead() throws Exception {
 		if (this.faultTolerant) {
-			Retryable<I> retryableRead = new Retryable<>() {
+			Retryable<@Nullable I> retryableRead = new Retryable<@Nullable I>() {
 				@Override
-				public I execute() throws Throwable {
+				public @Nullable I execute() throws Throwable {
 					return itemReader.read();
 				}
 
@@ -900,12 +885,11 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 		return processedItem;
 	}
 
-	@SuppressWarnings("NullAway")
 	private @Nullable O doProcess(I item) throws Exception {
 		if (this.faultTolerant) {
-			Retryable<O> retryableProcess = new Retryable<>() {
+			Retryable<@Nullable O> retryableProcess = new Retryable<@Nullable O>() {
 				@Override
-				public O execute() throws Throwable {
+				public @Nullable O execute() throws Throwable {
 					StepContext context = StepSynchronizationManager.getContext();
 					final StepExecution stepExecution = context == null ? null : context.getStepExecution();
 					if (isConcurrent() && stepExecution != null) {
