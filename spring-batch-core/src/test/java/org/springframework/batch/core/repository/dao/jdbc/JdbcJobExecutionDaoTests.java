@@ -172,4 +172,36 @@ public class JdbcJobExecutionDaoTests {
 		Assertions.assertEquals(jobExecution1.getId(), jobExecutions.get(1).getId());
 	}
 
+	@Test
+	void testGetMissingById() {
+		JobExecution retrievedJobExecution = jdbcJobExecutionDao.getJobExecution(1111111L);
+		Assertions.assertNull(retrievedJobExecution);
+	}
+
+	@Test
+	void testGetLastJobExecution() {
+		// given
+		JobParameters jobParameters = new JobParametersBuilder().addString("name", "foo").toJobParameters();
+		JobInstance jobInstance = jdbcJobInstanceDao.createJobInstance("job", jobParameters);
+		jdbcJobExecutionDao.createJobExecution(jobInstance, jobParameters);
+		JobExecution lastJobExecution = jdbcJobExecutionDao.createJobExecution(jobInstance, jobParameters);
+
+		// when
+		JobExecution retrievedJobExecution = jdbcJobExecutionDao.getLastJobExecution(jobInstance);
+
+		// then
+		Assertions.assertNotNull(retrievedJobExecution);
+		Assertions.assertEquals(lastJobExecution.getId(), retrievedJobExecution.getId());
+	}
+
+	@Test
+	void testGetLastJobExecutionWhenNoJobExecution() {
+		JobParameters jobParameters = new JobParametersBuilder().addString("name", "foo").toJobParameters();
+		JobInstance jobInstance = jdbcJobInstanceDao.createJobInstance("job", jobParameters);
+
+		JobExecution lastJobExecution = jdbcJobExecutionDao.getLastJobExecution(jobInstance);
+
+		Assertions.assertNull(lastJobExecution);
+	}
+
 }
