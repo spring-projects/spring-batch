@@ -16,7 +16,6 @@
 
 package org.springframework.batch.core.repository.dao.jdbc;
 
-import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.*;
@@ -36,7 +35,7 @@ import org.springframework.batch.core.repository.dao.jdbc.JobExecutionRowMapper.
 import org.springframework.batch.core.repository.dao.jdbc.StepExecutionRowMapper.StepExecutionRow;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.OptimisticLockingFailureException;
-import org.springframework.jdbc.core.PreparedStatementCallback;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.jspecify.annotations.Nullable;
 import org.springframework.util.Assert;
@@ -85,14 +84,15 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 			""";
 
 	private static final String GET_STEP_EXECUTIONS = GET_RAW_STEP_EXECUTIONS
-			+ " WHERE JOB_EXECUTION_ID = ? ORDER BY STEP_EXECUTION_ID";
+			+ " WHERE JOB_EXECUTION_ID = :jobExecutionId ORDER BY STEP_EXECUTION_ID";
 
-	private static final String GET_STEP_EXECUTION = GET_RAW_STEP_EXECUTIONS + " WHERE STEP_EXECUTION_ID = ?";
+	private static final String GET_STEP_EXECUTION = GET_RAW_STEP_EXECUTIONS
+			+ " WHERE STEP_EXECUTION_ID = :stepExecutionId";
 
 	private static final String GET_VERSION_AND_STATUS = """
 			SELECT VERSION, STATUS
 			FROM %PREFIX%STEP_EXECUTION
-			WHERE STEP_EXECUTION_ID = ?
+			WHERE STEP_EXECUTION_ID = :stepExecutionId
 			""";
 
 	// The job execution columns are selected under a JE_ prefix, to disambiguate them
@@ -102,7 +102,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 			SELECT SE.STEP_EXECUTION_ID, SE.STEP_NAME, SE.START_TIME, SE.END_TIME, SE.STATUS, SE.COMMIT_COUNT, SE.READ_COUNT, SE.FILTER_COUNT, SE.WRITE_COUNT, SE.EXIT_CODE, SE.EXIT_MESSAGE, SE.READ_SKIP_COUNT, SE.WRITE_SKIP_COUNT, SE.PROCESS_SKIP_COUNT, SE.ROLLBACK_COUNT, SE.LAST_UPDATED, SE.VERSION, SE.CREATE_TIME, JE.JOB_EXECUTION_ID AS JE_JOB_EXECUTION_ID, JE.JOB_INSTANCE_ID AS JE_JOB_INSTANCE_ID, JE.START_TIME AS JE_START_TIME, JE.END_TIME AS JE_END_TIME, JE.STATUS AS JE_STATUS, JE.EXIT_CODE AS JE_EXIT_CODE, JE.EXIT_MESSAGE AS JE_EXIT_MESSAGE, JE.CREATE_TIME AS JE_CREATE_TIME, JE.LAST_UPDATED AS JE_LAST_UPDATED, JE.VERSION AS JE_VERSION
 			FROM %PREFIX%JOB_EXECUTION JE
 				JOIN %PREFIX%STEP_EXECUTION SE ON SE.JOB_EXECUTION_ID = JE.JOB_EXECUTION_ID
-			WHERE JE.JOB_INSTANCE_ID = ? AND SE.STEP_NAME = ?
+			WHERE JE.JOB_INSTANCE_ID = :jobInstanceId AND SE.STEP_NAME = :stepName
 			ORDER BY SE.CREATE_TIME DESC, SE.STEP_EXECUTION_ID DESC
 			""";
 
@@ -110,18 +110,18 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 			SELECT COUNT(*)
 			FROM %PREFIX%JOB_EXECUTION JE
 				JOIN %PREFIX%STEP_EXECUTION SE ON SE.JOB_EXECUTION_ID = JE.JOB_EXECUTION_ID
-			WHERE JE.JOB_INSTANCE_ID = ? AND SE.STEP_NAME = ?
+			WHERE JE.JOB_INSTANCE_ID = :jobInstanceId AND SE.STEP_NAME = :stepName
 			""";
 
 	private static final String DELETE_STEP_EXECUTION = """
 			DELETE FROM %PREFIX%STEP_EXECUTION
-			WHERE STEP_EXECUTION_ID = ? and VERSION = ?
+			WHERE STEP_EXECUTION_ID = :stepExecutionId and VERSION = :version
 			""";
 
 	private static final String GET_JOB_EXECUTION_ID_FROM_STEP_EXECUTION_ID = """
 			SELECT JE.JOB_EXECUTION_ID
 			FROM %PREFIX%JOB_EXECUTION JE, %PREFIX%STEP_EXECUTION SE
-			WHERE SE.STEP_EXECUTION_ID = ? AND JE.JOB_EXECUTION_ID = SE.JOB_EXECUTION_ID
+			WHERE SE.STEP_EXECUTION_ID = :stepExecutionId AND JE.JOB_EXECUTION_ID = SE.JOB_EXECUTION_ID
 			""";
 
 	private int exitMessageLength = DEFAULT_EXIT_MESSAGE_LENGTH;
@@ -170,7 +170,11 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 			parameterTypes[i] = (Integer) parameters.get(1)[i];
 		}
 
-		getJdbcTemplate().update(getQuery(SAVE_STEP_EXECUTION), parameterValues, parameterTypes);
+		JdbcClient.StatementSpec statement = getJdbcClient().sql(getQuery(SAVE_STEP_EXECUTION));
+		for (int i = 0; i < parameterTypes.length; i++) {
+			statement.param(i + 1, parameterValues[i], parameterTypes[i]);
+		}
+		statement.update();
 
 		return stepExecution;
 	}
@@ -234,16 +238,27 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 					: Timestamp.valueOf(stepExecution.getEndTime());
 			Timestamp lastUpdated = stepExecution.getLastUpdated() == null ? null
 					: Timestamp.valueOf(stepExecution.getLastUpdated());
-			Object[] parameters = new Object[] { startTime, endTime, stepExecution.getStatus().toString(),
-					stepExecution.getCommitCount(), stepExecution.getReadCount(), stepExecution.getFilterCount(),
-					stepExecution.getWriteCount(), stepExecution.getExitStatus().getExitCode(), exitDescription,
-					stepExecution.getReadSkipCount(), stepExecution.getProcessSkipCount(),
-					stepExecution.getWriteSkipCount(), stepExecution.getRollbackCount(), lastUpdated,
-					stepExecution.getId(), stepExecution.getVersion() };
-			int count = getJdbcTemplate().update(getQuery(UPDATE_STEP_EXECUTION), parameters,
-					new int[] { Types.TIMESTAMP, Types.TIMESTAMP, Types.VARCHAR, Types.BIGINT, Types.BIGINT,
-							Types.BIGINT, Types.BIGINT, Types.VARCHAR, Types.VARCHAR, Types.BIGINT, Types.BIGINT,
-							Types.BIGINT, Types.BIGINT, Types.TIMESTAMP, Types.BIGINT, Types.INTEGER });
+
+			int count = getJdbcClient().sql(getQuery(UPDATE_STEP_EXECUTION))
+			// @formatter:off
+					.param(1, startTime, Types.TIMESTAMP)
+					.param(2, endTime, Types.TIMESTAMP)
+					.param(3, stepExecution.getStatus().toString(), Types.VARCHAR)
+					.param(4, stepExecution.getCommitCount(), Types.BIGINT)
+					.param(5, stepExecution.getReadCount(), Types.BIGINT)
+					.param(6, stepExecution.getFilterCount(), Types.BIGINT)
+					.param(7, stepExecution.getWriteCount(), Types.BIGINT)
+					.param(8, stepExecution.getExitStatus().getExitCode(), Types.VARCHAR)
+					.param(9, exitDescription, Types.VARCHAR)
+					.param(10, stepExecution.getReadSkipCount(), Types.BIGINT)
+					.param(11, stepExecution.getProcessSkipCount(), Types.BIGINT)
+					.param(12, stepExecution.getWriteSkipCount(), Types.BIGINT)
+					.param(13, stepExecution.getRollbackCount(), Types.BIGINT)
+					.param(14, lastUpdated, Types.TIMESTAMP)
+					.param(15, stepExecution.getId(), Types.BIGINT)
+					.param(16, stepExecution.getVersion(), Types.INTEGER)
+			// @formatter:on
+				.update();
 
 			// Avoid concurrent modifications...
 			if (count == 0) {
@@ -286,16 +301,20 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 	}
 
 	private long getJobExecutionId(long stepExecutionId) {
-		return getJdbcTemplate().queryForObject(getQuery(GET_JOB_EXECUTION_ID_FROM_STEP_EXECUTION_ID), Long.class,
-				stepExecutionId);
+		return getJdbcClient().sql(getQuery(GET_JOB_EXECUTION_ID_FROM_STEP_EXECUTION_ID))
+			.param("stepExecutionId", stepExecutionId)
+			.query(Long.class)
+			.single();
 	}
 
 	@Override
 	@Nullable
 	@Deprecated(since = "6.0", forRemoval = true)
 	public StepExecution getStepExecution(JobExecution jobExecution, long stepExecutionId) {
-		List<StepExecution> executions = getJdbcTemplate()
-			.query(getQuery(GET_STEP_EXECUTION), new StepExecutionRowMapper(), stepExecutionId)
+		List<StepExecution> executions = getJdbcClient().sql(getQuery(GET_STEP_EXECUTION))
+			.param("stepExecutionId", stepExecutionId)
+			.query(new StepExecutionRowMapper())
+			.list()
 			.stream()
 			.map(row -> row.toStepExecution(jobExecution))
 			.toList();
@@ -312,16 +331,18 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 
 	@Override
 	public void synchronizeStatus(StepExecution stepExecution) {
-		getJdbcTemplate().query(getQuery(GET_VERSION_AND_STATUS), rs -> {
-			Integer currentVersion = rs.getInt("VERSION");
-			if (!Objects.equals(currentVersion, stepExecution.getVersion())) {
-				BatchStatus currentStatus = BatchStatus.valueOf(rs.getString("STATUS"));
-				if (currentStatus.isGreaterThan(stepExecution.getStatus())) {
-					stepExecution.upgradeStatus(currentStatus);
+		getJdbcClient().sql(getQuery(GET_VERSION_AND_STATUS))
+			.param("stepExecutionId", stepExecution.getId())
+			.query(rs -> {
+				Integer currentVersion = rs.getInt("VERSION");
+				if (!Objects.equals(currentVersion, stepExecution.getVersion())) {
+					BatchStatus currentStatus = BatchStatus.valueOf(rs.getString("STATUS"));
+					if (currentStatus.isGreaterThan(stepExecution.getStatus())) {
+						stepExecution.upgradeStatus(currentStatus);
+					}
+					stepExecution.setVersion(currentVersion);
 				}
-				stepExecution.setVersion(currentVersion);
-			}
-		}, stepExecution.getId());
+			});
 	}
 
 	@Nullable
@@ -332,19 +353,14 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 		record JoinedRow(StepExecutionRow stepExecutionRow, JobExecutionRow jobExecutionRow) {
 		}
 
-		JoinedRow row = getJdbcTemplate().execute(getQuery(GET_LAST_STEP_EXECUTION),
-				(PreparedStatementCallback<JoinedRow>) statement -> {
-					statement.setMaxRows(1);
-					statement.setLong(1, jobInstance.getId());
-					statement.setString(2, stepName);
-					try (ResultSet rs = statement.executeQuery()) {
-						if (rs.next()) {
-							return new JoinedRow(new StepExecutionRowMapper().mapRow(rs, 0),
-									new JobExecutionRowMapper("JE_").mapRow(rs, 0));
-						}
-						return null;
-					}
-				});
+		JoinedRow row = getJdbcClient().sql(getQuery(GET_LAST_STEP_EXECUTION))
+			.param("jobInstanceId", jobInstance.getId())
+			.param("stepName", stepName)
+			.withMaxRows(1)
+			.query((rs, rowNum) -> new JoinedRow(new StepExecutionRowMapper().mapRow(rs, rowNum),
+					new JobExecutionRowMapper("JE_").mapRow(rs, rowNum)))
+			.optional()
+			.orElse(null);
 		if (row == null) {
 			return null;
 		}
@@ -364,8 +380,10 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 	 */
 	@Override
 	public List<StepExecution> getStepExecutions(JobExecution jobExecution) {
-		return getJdbcTemplate()
-			.query(getQuery(GET_STEP_EXECUTIONS), new StepExecutionRowMapper(), jobExecution.getId())
+		return getJdbcClient().sql(getQuery(GET_STEP_EXECUTIONS))
+			.param("jobExecutionId", jobExecution.getId())
+			.query(new StepExecutionRowMapper())
+			.list()
 			.stream()
 			.map(row -> row.toStepExecution(jobExecution))
 			.toList();
@@ -373,8 +391,11 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 
 	@Override
 	public long countStepExecutions(JobInstance jobInstance, String stepName) {
-		return getJdbcTemplate().queryForObject(getQuery(COUNT_STEP_EXECUTIONS), Long.class, jobInstance.getId(),
-				stepName);
+		return getJdbcClient().sql(getQuery(COUNT_STEP_EXECUTIONS))
+			.param("jobInstanceId", jobInstance.getId())
+			.param("stepName", stepName)
+			.query(Long.class)
+			.single();
 	}
 
 	/**
@@ -383,8 +404,10 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 	 */
 	@Override
 	public void deleteStepExecution(StepExecution stepExecution) {
-		int count = getJdbcTemplate().update(getQuery(DELETE_STEP_EXECUTION), stepExecution.getId(),
-				stepExecution.getVersion());
+		int count = getJdbcClient().sql(getQuery(DELETE_STEP_EXECUTION))
+			.param("stepExecutionId", stepExecution.getId())
+			.param("version", stepExecution.getVersion())
+			.update();
 
 		if (count == 0) {
 			throw new OptimisticLockingFailureException("Attempt to delete step execution id=" + stepExecution.getId()

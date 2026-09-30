@@ -21,13 +21,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.locks.Lock;
@@ -42,8 +39,8 @@ import org.springframework.batch.core.repository.dao.DefaultExecutionContextSeri
 import org.springframework.batch.core.repository.dao.ExecutionContextDao;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.core.serializer.Serializer;
-import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
@@ -59,13 +56,14 @@ import org.springframework.util.CollectionUtils;
  * @author Michael Minella
  * @author David Turanski
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  */
 public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implements ExecutionContextDao {
 
 	private static final String FIND_JOB_EXECUTION_CONTEXT = """
 			SELECT SHORT_CONTEXT, SERIALIZED_CONTEXT
 			FROM %PREFIX%JOB_EXECUTION_CONTEXT
-			WHERE JOB_EXECUTION_ID = ?
+			WHERE JOB_EXECUTION_ID = :jobExecutionId
 			""";
 
 	private static final String INSERT_JOB_EXECUTION_CONTEXT = """
@@ -82,7 +80,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 	private static final String FIND_STEP_EXECUTION_CONTEXT = """
 			SELECT SHORT_CONTEXT, SERIALIZED_CONTEXT
 			FROM %PREFIX%STEP_EXECUTION_CONTEXT
-			WHERE STEP_EXECUTION_ID = ?
+			WHERE STEP_EXECUTION_ID = :stepExecutionId
 			""";
 
 	private static final String INSERT_STEP_EXECUTION_CONTEXT = """
@@ -98,12 +96,12 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 
 	private static final String DELETE_STEP_EXECUTION_CONTEXT = """
 			DELETE FROM %PREFIX%STEP_EXECUTION_CONTEXT
-			WHERE STEP_EXECUTION_ID = ?
+			WHERE STEP_EXECUTION_ID = :stepExecutionId
 			""";
 
 	private static final String DELETE_JOB_EXECUTION_CONTEXT = """
 			DELETE FROM %PREFIX%JOB_EXECUTION_CONTEXT
-			WHERE JOB_EXECUTION_ID = ?
+			WHERE JOB_EXECUTION_ID = :jobExecutionId
 			""";
 
 	private Charset charset = StandardCharsets.UTF_8;
@@ -153,28 +151,23 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 	public ExecutionContext getExecutionContext(JobExecution jobExecution) {
 		long executionId = jobExecution.getId();
 
-		List<ExecutionContext> results = getJdbcTemplate().query(getQuery(FIND_JOB_EXECUTION_CONTEXT),
-				new ExecutionContextRowMapper(), executionId);
-		if (!results.isEmpty()) {
-			return results.get(0);
-		}
-		else {
-			return new ExecutionContext();
-		}
+		return getJdbcClient().sql(getQuery(FIND_JOB_EXECUTION_CONTEXT))
+			.param("jobExecutionId", executionId)
+			.query(new ExecutionContextRowMapper())
+			.optional()
+			.orElseGet(ExecutionContext::new);
+
 	}
 
 	@Override
 	public ExecutionContext getExecutionContext(StepExecution stepExecution) {
 		long executionId = stepExecution.getId();
 
-		List<ExecutionContext> results = getJdbcTemplate().query(getQuery(FIND_STEP_EXECUTION_CONTEXT),
-				new ExecutionContextRowMapper(), executionId);
-		if (results.size() > 0) {
-			return results.get(0);
-		}
-		else {
-			return new ExecutionContext();
-		}
+		return getJdbcClient().sql(getQuery(FIND_STEP_EXECUTION_CONTEXT))
+			.param("stepExecutionId", executionId)
+			.query(new ExecutionContextRowMapper())
+			.optional()
+			.orElseGet(ExecutionContext::new);
 	}
 
 	@Override
@@ -240,7 +233,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 			Assert.notNull(executionContext, "The ExecutionContext must not be null.");
 			serializedContexts.put(executionId, serializeContext(executionContext));
 		}
-		persistSerializedContexts(serializedContexts, INSERT_STEP_EXECUTION_CONTEXT);
+		persistSerializedContexts(serializedContexts);
 	}
 
 	/**
@@ -249,7 +242,9 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 	 */
 	@Override
 	public void deleteExecutionContext(JobExecution jobExecution) {
-		getJdbcTemplate().update(getQuery(DELETE_JOB_EXECUTION_CONTEXT), jobExecution.getId());
+		getJdbcClient().sql(getQuery(DELETE_JOB_EXECUTION_CONTEXT))
+			.param("jobExecutionId", jobExecution.getId())
+			.update();
 	}
 
 	/**
@@ -258,7 +253,9 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 	 */
 	@Override
 	public void deleteExecutionContext(StepExecution stepExecution) {
-		getJdbcTemplate().update(getQuery(DELETE_STEP_EXECUTION_CONTEXT), stepExecution.getId());
+		getJdbcClient().sql(getQuery(DELETE_STEP_EXECUTION_CONTEXT))
+			.param("stepExecutionId", stepExecution.getId())
+			.update();
 	}
 
 	@Override
@@ -287,58 +284,50 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 			longContext = null;
 		}
 
-		getJdbcTemplate().update(getQuery(sql), ps -> {
-			ps.setString(1, shortContext);
-			if (longContext != null) {
-				ps.setString(2, longContext);
-			}
-			else {
-				ps.setNull(2, getClobTypeToUse());
-			}
-			ps.setLong(3, executionId);
-		});
+		JdbcClient.StatementSpec statement = getJdbcClient().sql(getQuery(sql))
+			.param(1, shortContext)
+			.param(3, executionId);
+		if (longContext != null) {
+			statement.param(2, longContext);
+		}
+		else {
+			statement.param(2, null, getClobTypeToUse());
+		}
+		statement.update();
 	}
 
 	/**
 	 * @param serializedContexts the execution contexts to serialize
-	 * @param sql with parameters (shortContext, longContext, executionId)
 	 */
-	private void persistSerializedContexts(Map<Long, String> serializedContexts, String sql) {
+	private void persistSerializedContexts(Map<Long, String> serializedContexts) {
 		if (!serializedContexts.isEmpty()) {
-			final Iterator<Long> executionIdIterator = serializedContexts.keySet().iterator();
-
-			getJdbcTemplate().batchUpdate(getQuery(sql), new BatchPreparedStatementSetter() {
-				@Override
-				public void setValues(PreparedStatement ps, int i) throws SQLException {
-					Long executionId = executionIdIterator.next();
-					String serializedContext = serializedContexts.get(executionId);
-					String shortContext;
-					String longContext;
-					if (serializedContext.length() > shortContextLength) {
-						// Overestimate length of ellipsis to be on the safe side with
-						// 2-byte chars
-						shortContext = serializedContext.substring(0, shortContextLength - 8) + " ...";
-						longContext = serializedContext;
-					}
-					else {
-						shortContext = serializedContext;
-						longContext = null;
-					}
-					ps.setString(1, shortContext);
+			JdbcClient.BatchSpec batch = getJdbcClient().sql(getQuery(INSERT_STEP_EXECUTION_CONTEXT)).batch();
+			for (Map.Entry<Long, String> sc : serializedContexts.entrySet()) {
+				String serializedContext = sc.getValue();
+				String shortContext;
+				String longContext;
+				if (serializedContext.length() > shortContextLength) {
+					// Overestimate length of ellipsis to be on the safe side with
+					// 2-byte chars
+					shortContext = serializedContext.substring(0, shortContextLength - 8) + " ...";
+					longContext = serializedContext;
+				}
+				else {
+					shortContext = serializedContext;
+					longContext = null;
+				}
+				batch.entry(entry -> {
+					entry.param(1, shortContext);
 					if (longContext != null) {
-						ps.setString(2, longContext);
+						entry.param(2, longContext);
 					}
 					else {
-						ps.setNull(2, getClobTypeToUse());
+						entry.param(2, null, getClobTypeToUse());
 					}
-					ps.setLong(3, executionId);
-				}
-
-				@Override
-				public int getBatchSize() {
-					return serializedContexts.size();
-				}
-			});
+					entry.param(3, sc.getKey());
+				});
+			}
+			batch.update();
 		}
 	}
 
