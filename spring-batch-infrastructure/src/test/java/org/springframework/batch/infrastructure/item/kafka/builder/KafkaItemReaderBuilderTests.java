@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2022 the original author or authors.
+ * Copyright 2019-2026 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -29,19 +29,17 @@ import org.apache.kafka.common.serialization.StringDeserializer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import org.springframework.batch.infrastructure.item.kafka.KafkaConsumerRecordItemReader;
 import org.springframework.batch.infrastructure.item.kafka.KafkaItemReader;
-import org.springframework.batch.infrastructure.item.kafka.builder.KafkaItemReaderBuilder;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Mathieu Ouellet
  * @author Mahmoud Ben Hassine
+ * @author djechelon@github.com
  */
 class KafkaItemReaderBuilderTests {
 
@@ -94,11 +92,13 @@ class KafkaItemReaderBuilderTests {
 		assertEquals("value.deserializer property must be provided", exception.getMessage());
 
 		consumerProperties.put("value.deserializer", StringDeserializer.class.getName());
-		new KafkaItemReaderBuilder<>().name("kafkaItemReader")
+		builder = new KafkaItemReaderBuilder<>().name("kafkaItemReader")
 			.consumerProperties(consumerProperties)
 			.topic("test")
-			.partitions(0, 1)
-			.build();
+			.partitions(0, 1);
+		assertDoesNotThrow(builder::build);
+		assertDoesNotThrow(builder::buildWithConsumerRecord);
+
 	}
 
 	@Test
@@ -210,6 +210,47 @@ class KafkaItemReaderBuilderTests {
 			.pollTimeout(pollTimeout)
 			.saveState(saveState)
 			.build();
+
+		// then
+		assertNotNull(reader);
+		assertFalse((Boolean) ReflectionTestUtils.getField(reader, "saveState"));
+		assertEquals(pollTimeout, ReflectionTestUtils.getField(reader, "pollTimeout"));
+		List<TopicPartition> topicPartitions = (List<TopicPartition>) ReflectionTestUtils.getField(reader,
+				"topicPartitions");
+		assertEquals(2, topicPartitions.size());
+		assertEquals(topic, topicPartitions.get(0).topic());
+		assertEquals(partitions.get(0).intValue(), topicPartitions.get(0).partition());
+		assertEquals(topic, topicPartitions.get(1).topic());
+		assertEquals(partitions.get(1).intValue(), topicPartitions.get(1).partition());
+		Map<TopicPartition, Long> partitionOffsetsMap = (Map<TopicPartition, Long>) ReflectionTestUtils.getField(reader,
+				"partitionOffsets");
+		assertEquals(2, partitionOffsetsMap.size());
+		assertEquals(Long.valueOf(10L), partitionOffsetsMap.get(new TopicPartition(topic, partitions.get(0))));
+		assertEquals(Long.valueOf(15L), partitionOffsetsMap.get(new TopicPartition(topic, partitions.get(1))));
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
+	void testKafkaConsumerRecordItemReaderCreation() {
+		// given
+		boolean saveState = false;
+		Duration pollTimeout = Duration.ofSeconds(100);
+		String topic = "test";
+		List<Integer> partitions = Arrays.asList(0, 1);
+		Map<TopicPartition, Long> partitionOffsets = new HashMap<>();
+		partitionOffsets.put(new TopicPartition(topic, partitions.get(0)), 10L);
+		partitionOffsets.put(new TopicPartition(topic, partitions.get(1)), 15L);
+
+		// when
+		KafkaConsumerRecordItemReader<String, String> reader = new KafkaItemReaderBuilder<String, String>()
+			.name("kafkaItemReader")
+			.consumerProperties(this.consumerProperties)
+			.topic(topic)
+			.partitions(partitions)
+			.partitionOffsets(partitionOffsets)
+			.pollTimeout(pollTimeout)
+			.saveState(saveState)
+			.buildWithConsumerRecord();
 
 		// then
 		assertNotNull(reader);
