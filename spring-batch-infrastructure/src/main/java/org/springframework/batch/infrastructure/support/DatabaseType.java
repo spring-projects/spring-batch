@@ -25,6 +25,7 @@ import javax.sql.DataSource;
 import java.sql.DatabaseMetaData;
 
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -37,6 +38,7 @@ import java.util.stream.Collectors;
  * @author Lucas Ward
  * @author Mahmoud Ben Hassine
  * @author Stefano Cordio
+ * @author Yanming Zhou
  * @since 2.0
  */
 public enum DatabaseType {
@@ -46,20 +48,14 @@ public enum DatabaseType {
 	 * @deprecated since 6.1.0 with no replacement. Scheduled for removal in 7.0.0.
 	 */
 	@Deprecated(since = "6.1.0", forRemoval = true)
-	DERBY("Apache Derby", "schema-derby.sql", "schema-drop-derby.sql"),
+	DERBY("Apache Derby"),
 
-	DB2("DB2", "schema-db2.sql", "schema-drop-db2.sql"), DB2VSE("DB2VSE", "schema-db2.sql", "schema-drop-db2.sql"),
+	DB2("DB2"), DB2VSE("DB2VSE", "schema-db2.sql", "schema-drop-db2.sql"),
 	DB2ZOS("DB2ZOS", "schema-db2.sql", "schema-drop-db2.sql"),
 	DB2AS400("DB2AS400", "schema-db2.sql", "schema-drop-db2.sql"),
-	HSQL("HSQL Database Engine", "schema-hsqldb.sql", "schema-drop-hsqldb.sql"),
-	SQLSERVER("Microsoft SQL Server", "schema-sqlserver.sql", "schema-drop-sqlserver.sql"),
-	MYSQL("MySQL", "schema-mysql.sql", "schema-drop-mysql.sql"),
-	ORACLE("Oracle", "schema-oracle.sql", "schema-drop-oracle.sql"),
-	POSTGRES("PostgreSQL", "schema-postgresql.sql", "schema-drop-postgresql.sql"),
-	SYBASE("Sybase", "schema-sybase.sql", "schema-drop-sybase.sql"), H2("H2", "schema-h2.sql", "schema-drop-h2.sql"),
-	SQLITE("SQLite", "schema-sqlite.sql", "schema-drop-sqlite.sql"),
-	HANA("HDB", "schema-hana.sql", "schema-drop-hana.sql"),
-	MARIADB("MariaDB", "schema-mariadb.sql", "schema-drop-mariadb.sql");
+	HSQL("HSQL Database Engine", "schema-hsqldb.sql", "schema-drop-hsqldb.sql"), SQLSERVER("Microsoft SQL Server"),
+	MYSQL("MySQL"), ORACLE("Oracle"), POSTGRES("PostgreSQL", "schema-postgresql.sql", "schema-drop-postgresql.sql"),
+	SYBASE("Sybase"), H2("H2"), SQLITE("SQLite"), HANA("HDB"), MARIADB("MariaDB");
 
 	/**
 	 * The package in which the schema scripts for supported databases are located.
@@ -76,6 +72,13 @@ public enum DatabaseType {
 	private final String productSchema;
 
 	private final String productSchemaDrop;
+
+	DatabaseType(String productName) {
+		String name = name().toLowerCase(Locale.ROOT);
+		this.productName = productName;
+		this.productSchema = SCHEMA_LOCATION + "schema-%s.sql".formatted(name);
+		this.productSchemaDrop = SCHEMA_LOCATION + "schema-drop-%s.sql".formatted(name);
+	}
 
 	DatabaseType(String productName, String productSchema, String productSchemaDrop) {
 		this.productName = productName;
