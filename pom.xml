@@ -68,7 +68,6 @@
 		<jackson3.version>3.2.2</jackson3.version>
 		<avro.version>1.12.2</avro.version>
 		<gson.version>2.14.0</gson.version>
-		<hibernate-core.version>7.4.8.Final</hibernate-core.version>
 		<jakarta.annotation-api.version>3.0.0</jakarta.annotation-api.version>
 		<jakarta.mail-api.version>2.1.5</jakarta.mail-api.version>
 		<jakarta.jms-api.version>3.1.0</jakarta.jms-api.version>
@@ -98,6 +97,7 @@
 		<artemis.version>2.57.0</artemis.version>
 		<jaxb-core.version>4.0.9</jaxb-core.version>
 		<log4j.version>2.26.1</log4j.version>
+		<hibernate-core.version>7.4.8.Final</hibernate-core.version>
 		<hibernate-validator.version>9.1.3.Final</hibernate-validator.version>
 		<jakarta.el-api.version>6.0.1</jakarta.el-api.version>
 		<jakarta.el.version>4.0.2</jakarta.el.version>
