@@ -164,12 +164,6 @@
 			<optional>true</optional>
 		</dependency>
 		<dependency>
-			<groupId>org.mongodb</groupId>
-			<artifactId>mongodb-driver-sync</artifactId>
-			<version>${mongodb-driver.version}</version>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
 			<groupId>org.springframework.ldap</groupId>
 			<artifactId>spring-ldap-core</artifactId>
 			<version>${spring-ldap.version}</version>
@@ -253,6 +247,12 @@
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-core</artifactId>
 			<version>${log4j.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mongodb</groupId>
+			<artifactId>mongodb-driver-sync</artifactId>
+			<version>${mongodb-driver.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
