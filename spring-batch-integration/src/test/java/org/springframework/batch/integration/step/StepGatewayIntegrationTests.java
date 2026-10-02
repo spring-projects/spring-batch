@@ -65,7 +65,7 @@ class StepGatewayIntegrationTests {
 		JobExecution jobExecution = jobOperator.start(job,
 				new JobParametersBuilder().addLong("run.id", 2L).toJobParameters());
 		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
-		assertEquals(ExitStatus.FAILED, jobExecution.getExitStatus());
+		assertEquals(ExitStatus.FAILED.getExitCode(), jobExecution.getExitStatus().getExitCode());
 	}
 
 }
