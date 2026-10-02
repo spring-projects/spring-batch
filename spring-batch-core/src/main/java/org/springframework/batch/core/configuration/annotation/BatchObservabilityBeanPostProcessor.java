@@ -25,10 +25,10 @@ import org.springframework.batch.core.job.AbstractJob;
 import org.springframework.batch.core.launch.support.TaskExecutorJobOperator;
 import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
-import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.BeanPostProcessor;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 
 /**
  * Bean post processor that configures observable batch artifacts (typically jobs and
@@ -36,16 +36,17 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
  *
  * @author Mahmoud Ben Hassine
  * @author Sanghyuk Jung
+ * @author Yanming Zhou
  * @since 5.0
  */
-public class BatchObservabilityBeanPostProcessor implements BeanFactoryPostProcessor, BeanPostProcessor {
+public class BatchObservabilityBeanPostProcessor implements BeanFactoryAware, BeanPostProcessor {
 
 	private static final Log LOGGER = LogFactory.getLog(BatchObservabilityBeanPostProcessor.class);
 
-	private @Nullable ConfigurableListableBeanFactory beanFactory;
+	private @Nullable BeanFactory beanFactory;
 
 	@Override
-	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
 		this.beanFactory = beanFactory;
 	}
 
