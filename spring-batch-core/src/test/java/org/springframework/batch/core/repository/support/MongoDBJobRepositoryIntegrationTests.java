@@ -18,9 +18,12 @@ package org.springframework.batch.core.repository.support;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.time.LocalDateTime;
+import java.time.Year;
+import java.util.Set;
 
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
+import org.bson.codecs.configuration.CodecConfigurationException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,12 +32,19 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.job.parameters.InvalidJobParametersException;
+import org.springframework.batch.core.job.parameters.JobParameter;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobOperator;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
+import org.springframework.batch.infrastructure.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.data.mongodb.MongoTransactionManager;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
@@ -91,6 +101,59 @@ public class MongoDBJobRepositoryIntegrationTests extends AbstractJobRepositoryI
 		dump(jobInstancesCollection, "job instance = ");
 		dump(jobExecutionsCollection, "job execution = ");
 		dump(stepExecutionsCollection, "step execution = ");
+	}
+
+	@Test
+	void testJobInstanceShouldNotBeCreatedWhenJobParametersAreInvalid(@Autowired JobOperator jobOperator,
+			@Autowired JobRepository jobRepository, @Autowired MongoTransactionManager transactionManager) {
+		// given
+		Job job = new JobBuilder("jobWithRejectingValidator", jobRepository)
+			.start(new StepBuilder("step", jobRepository)
+				.tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED, transactionManager)
+				.build())
+			.validator(parameters -> {
+				throw new InvalidJobParametersException("Job parameters are not valid");
+			})
+			.build();
+		JobParameters jobParameters = new JobParametersBuilder().addString("name", "foo").toJobParameters();
+
+		// when
+		Assertions.assertThrows(InvalidJobParametersException.class, () -> jobOperator.start(job, jobParameters));
+
+		// then
+		assertNothingPersisted();
+	}
+
+	@Test
+	void testJobInstanceShouldNotBeCreatedWhenJobParametersCannotBePersisted(@Autowired JobOperator jobOperator,
+			@Autowired Job job) {
+		// given: java.time.Year has no MongoDB codec
+		JobParameters jobParameters = new JobParameters(Set.of(new JobParameter<>("year", Year.of(2026), Year.class)));
+
+		// when
+		Assertions.assertThrows(CodecConfigurationException.class, () -> jobOperator.start(job, jobParameters));
+
+		// then
+		assertNothingPersisted();
+	}
+
+	@Test
+	void testCreateJobInstanceAndExecutionShouldBeAtomic(@Autowired JobRepository jobRepository) {
+		// given: java.time.Year has no MongoDB codec
+		JobParameters jobParameters = new JobParameters(Set.of(new JobParameter<>("year", Year.of(2026), Year.class)));
+
+		// when
+		Assertions.assertThrows(CodecConfigurationException.class,
+				() -> jobRepository.createJobExecution("job", jobParameters));
+
+		// then
+		Assertions.assertNull(jobRepository.getJobInstance("job", jobParameters));
+		assertNothingPersisted();
+	}
+
+	private void assertNothingPersisted() {
+		Assertions.assertEquals(0, mongoTemplate.getCollection("BATCH_JOB_INSTANCE").countDocuments());
+		Assertions.assertEquals(0, mongoTemplate.getCollection("BATCH_JOB_EXECUTION").countDocuments());
 	}
 
 	@Test

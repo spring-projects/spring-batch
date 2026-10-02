@@ -114,12 +114,16 @@ public class TaskExecutorJobLauncher implements JobLauncher, InitializingBean {
 			throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException,
 			InvalidJobParametersException {
 		JobInstance jobInstance = jobRepository.getJobInstance(job.getName(), jobParameters);
-		ExecutionContext executionContext;
 		if (jobInstance == null) { // fresh start
 			logger.debug(
 					"Creating a new job instance for job = " + job.getName() + " with parameters = " + jobParameters);
-			jobInstance = jobRepository.createJobInstance(job.getName(), jobParameters);
-			executionContext = new ExecutionContext();
+			// Check the validity of the parameters before creating anything
+			// in the repository...
+			job.getJobParametersValidator().validate(jobParameters);
+
+			// the job instance and its first execution are created in a single
+			// transaction: if this fails, no job instance should be left behind
+			return jobRepository.createJobExecution(job.getName(), jobParameters);
 		}
 		else { // restart
 			logger.debug(
@@ -170,20 +174,19 @@ public class TaskExecutorJobLauncher implements JobLauncher, InitializingBean {
 				}
 			}
 
-			executionContext = lastJobExecution.getExecutionContext();
+			// Check the validity of the parameters before creating anything
+			// in the repository...
+			job.getJobParametersValidator().validate(jobParameters);
+
+			/*
+			 * There is a very small probability that a non-restartable job can be
+			 * restarted, but only if another process or thread manages to launch
+			 * <i>and</i> fail a job execution for this instance between the last
+			 * assertion and the next method returning successfully.
+			 */
+			ExecutionContext executionContext = lastJobExecution.getExecutionContext();
+			return jobRepository.createJobExecution(jobInstance, jobParameters, executionContext);
 		}
-
-		// Check the validity of the parameters before creating anything
-		// in the repository...
-		job.getJobParametersValidator().validate(jobParameters);
-
-		/*
-		 * There is a very small probability that a non-restartable job can be restarted,
-		 * but only if another process or thread manages to launch <i>and</i> fail a job
-		 * execution for this instance between the last assertion and the next method
-		 * returning successfully.
-		 */
-		return jobRepository.createJobExecution(jobInstance, jobParameters, executionContext);
 	}
 
 	/**
