@@ -60,6 +60,7 @@ import org.springframework.util.ClassUtils;
  * @author Chris Schaefer
  * @author Mahmoud Ben Hassine
  * @author Jinwoo Bae
+ * @author Yanming Zhou
  */
 // FIXME remove once default constructors (required by the XML namespace) are removed
 @NullUnmarked
@@ -463,6 +464,10 @@ public abstract class AbstractStep implements StoppableStep, InitializingBean, B
 		}
 
 		return exitStatus;
+	}
+
+	public ObservationRegistry getObservationRegistry() {
+		return this.observationRegistry;
 	}
 
 	public void setObservationRegistry(ObservationRegistry observationRegistry) {

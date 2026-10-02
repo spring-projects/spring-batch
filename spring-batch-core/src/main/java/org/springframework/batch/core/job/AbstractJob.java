@@ -59,6 +59,7 @@ import org.springframework.util.ClassUtils;
  * @author Lucas Ward
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  */
 @NullUnmarked // FIXME to remove once default constructors (required by the batch XML
 				// namespace) are removed
@@ -419,6 +420,10 @@ public abstract class AbstractJob implements Job, ListableStepLocator, BeanNameA
 	private void updateStatus(JobExecution jobExecution, BatchStatus status) {
 		jobExecution.setStatus(status);
 		jobRepository.update(jobExecution);
+	}
+
+	public ObservationRegistry getObservationRegistry() {
+		return this.observationRegistry;
 	}
 
 	public void setObservationRegistry(ObservationRegistry observationRegistry) {

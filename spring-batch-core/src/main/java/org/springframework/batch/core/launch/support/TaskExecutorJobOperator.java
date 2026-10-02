@@ -57,6 +57,7 @@ import static org.springframework.batch.core.observability.BatchMetrics.METRICS_
  * @author Will Schipp
  * @author Mahmoud Ben Hassine
  * @author Yejeong Ham
+ * @author Yanming Zhou
  * @since 6.0
  */
 @SuppressWarnings("removal")
@@ -91,6 +92,10 @@ public class TaskExecutorJobOperator extends SimpleJobOperator {
 	public void setTaskExecutor(TaskExecutor taskExecutor) {
 		Assert.notNull(taskExecutor, "TaskExecutor must not be null");
 		this.taskExecutor = taskExecutor;
+	}
+
+	public @Nullable ObservationRegistry getObservationRegistry() {
+		return this.observationRegistry;
 	}
 
 	/**
