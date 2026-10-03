@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2022 the original author or authors.
+ * Copyright 2017-2026 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import org.mockito.ArgumentCaptor;
 
 import org.springframework.batch.infrastructure.item.Chunk;
 import org.springframework.batch.infrastructure.item.jms.JmsItemWriter;
-import org.springframework.batch.infrastructure.item.jms.builder.JmsItemWriterBuilder;
 import org.springframework.jms.core.JmsOperations;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

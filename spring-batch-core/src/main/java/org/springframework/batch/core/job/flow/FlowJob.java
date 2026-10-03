@@ -33,7 +33,6 @@ import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.job.AbstractJob;
 import org.springframework.batch.core.job.SimpleStepHandler;
 import org.springframework.batch.core.step.StepHolder;
-import org.springframework.batch.core.step.StepLocator;
 
 /**
  * Implementation of the {@link Job} interface that allows for complex flows of steps,

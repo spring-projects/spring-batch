@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.batch.infrastructure.repeat.RepeatContext;
 import org.springframework.batch.infrastructure.repeat.RepeatListener;
 import org.springframework.batch.infrastructure.repeat.context.RepeatContextSupport;
-import org.springframework.batch.infrastructure.repeat.listener.CompositeRepeatListener;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

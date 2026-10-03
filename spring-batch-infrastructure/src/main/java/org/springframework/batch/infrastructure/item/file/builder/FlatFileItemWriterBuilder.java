@@ -37,7 +37,6 @@ import org.springframework.batch.infrastructure.item.file.transform.FieldExtract
 import org.springframework.batch.infrastructure.item.file.transform.FormatterLineAggregator;
 import org.springframework.batch.infrastructure.item.file.transform.LineAggregator;
 import org.springframework.batch.infrastructure.item.file.transform.RecordFieldExtractor;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.WritableResource;
 import org.springframework.util.Assert;

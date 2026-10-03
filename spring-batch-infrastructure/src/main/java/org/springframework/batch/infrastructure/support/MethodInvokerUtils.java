@@ -21,7 +21,6 @@ import java.lang.annotation.Target;
 import java.lang.reflect.Method;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.jspecify.annotations.NonNull;
 import org.springframework.aop.framework.Advised;
 
 import org.jspecify.annotations.Nullable;

@@ -35,7 +35,6 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.util.json.ParameterBindingDocumentCodec;
 import org.springframework.data.mongodb.util.json.ParameterBindingJsonReader;
 import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
 /**
