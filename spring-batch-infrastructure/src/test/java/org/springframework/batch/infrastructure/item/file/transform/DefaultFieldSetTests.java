@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -522,6 +523,76 @@ class DefaultFieldSetTests {
 
 		assertEquals(value, fs.readRawString(0));
 		assertEquals(value, fs.readRawString(name));
+	}
+
+	@Test
+	void numericReadsCallValidateHooks() {
+		String[] values = new String[] { "10", "-472", "354224", "543", "124.3", "424.3", "" };
+		String[] fieldNames = new String[] { "Byte", "Short", "Integer", "Long", "Float", "Double", "Blank" };
+		RecordingFieldSet recording = new RecordingFieldSet(values, fieldNames);
+
+		assertEquals(10, recording.readByte(0));
+		assertEquals(10, recording.readByte("Byte"));
+		assertEquals(-472, recording.readShort(1));
+		assertEquals(-472, recording.readShort("Short"));
+		assertEquals(354224, recording.readInt(2));
+		assertEquals(354224, recording.readInt("Integer"));
+		assertEquals(5, recording.readInt(6, 5));
+		assertEquals(5, recording.readInt("Blank", 5));
+		assertEquals(543, recording.readLong(3));
+		assertEquals(543, recording.readLong("Long"));
+		assertEquals(9L, recording.readLong(6, 9L));
+		assertEquals(9L, recording.readLong("Blank", 9L));
+		assertEquals(124.3F, recording.readFloat(4));
+		assertEquals(124.3F, recording.readFloat("Float"));
+		assertEquals(424.3, recording.readDouble(5));
+		assertEquals(424.3, recording.readDouble("Double"));
+		assertEquals(new BigDecimal("424.3"), recording.readBigDecimal(5));
+		assertEquals(new BigDecimal("424.3"), recording.readBigDecimal("Double"));
+		assertNull(recording.readBigDecimal(6));
+
+		assertEquals(8, recording.integralCount);
+		assertEquals(6, recording.decimalCount);
+		assertEquals(".", String.valueOf(recording.getDecimalFormatSymbols().getDecimalSeparator()));
+	}
+
+	@Test
+	void validateHooksCanReject() {
+		RecordingFieldSet recording = new RecordingFieldSet(new String[] { "1.5", "1.5" },
+				new String[] { "Int", "Dec" });
+		recording.reject = true;
+		assertThrows(NumberFormatException.class, () -> recording.readInt(0));
+		assertThrows(NumberFormatException.class, () -> recording.readBigDecimal(1));
+	}
+
+	private static class RecordingFieldSet extends DefaultFieldSet {
+
+		private int integralCount;
+
+		private int decimalCount;
+
+		private boolean reject;
+
+		RecordingFieldSet(String[] tokens, String[] names) {
+			super(tokens, names);
+		}
+
+		@Override
+		protected void validateIntegral(String input) {
+			integralCount++;
+			if (reject) {
+				throw new NumberFormatException("rejected");
+			}
+		}
+
+		@Override
+		protected void validateDecimal(String input) {
+			decimalCount++;
+			if (reject) {
+				throw new NumberFormatException("rejected");
+			}
+		}
+
 	}
 
 }
