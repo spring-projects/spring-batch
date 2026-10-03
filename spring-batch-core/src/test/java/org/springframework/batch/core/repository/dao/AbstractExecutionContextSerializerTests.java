@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2023 the original author or authors.
+ * Copyright 2012-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@ package org.springframework.batch.core.repository.dao;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.junit.jupiter.api.Test;
-import org.springframework.batch.core.job.parameters.JobParameter;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
 

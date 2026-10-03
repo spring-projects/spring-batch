@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2017 the original author or authors.
+ * Copyright 2006-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,6 @@ import java.sql.DatabaseMetaData;
 import javax.sql.DataSource;
 
 import org.apache.commons.dbcp2.BasicDataSource;
-
-import org.springframework.batch.infrastructure.support.DatabaseType;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;

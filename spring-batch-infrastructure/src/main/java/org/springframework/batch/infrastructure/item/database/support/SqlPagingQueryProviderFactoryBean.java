@@ -32,7 +32,6 @@ import static org.springframework.batch.infrastructure.support.DatabaseType.SQLS
 import static org.springframework.batch.infrastructure.support.DatabaseType.SYBASE;
 
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.sql.DataSource;

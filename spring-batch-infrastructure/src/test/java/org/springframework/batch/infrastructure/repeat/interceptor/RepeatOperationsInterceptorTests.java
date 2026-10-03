@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,6 @@ import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.batch.infrastructure.repeat.RepeatStatus;
 import org.springframework.batch.infrastructure.repeat.RepeatException;
 import org.springframework.batch.infrastructure.repeat.RepeatOperations;
-import org.springframework.batch.infrastructure.repeat.interceptor.RepeatOperationsInterceptor;
 import org.springframework.batch.infrastructure.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.infrastructure.repeat.support.RepeatTemplate;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,6 @@ import static org.mockito.Mockito.mock;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import org.springframework.batch.infrastructure.item.database.support.DefaultDataFieldMaxValueIncrementerFactory;
-import org.springframework.batch.infrastructure.item.database.support.SqliteMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.Db2LuwMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.Db2MainframeMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.DerbyMaxValueIncrementer;

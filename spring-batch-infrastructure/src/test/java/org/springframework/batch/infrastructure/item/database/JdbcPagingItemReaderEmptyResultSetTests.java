@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 the original author or authors.
+ * Copyright 2021-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,6 @@ import javax.sql.DataSource;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.infrastructure.item.ItemReader;
-import org.springframework.batch.infrastructure.item.database.JdbcPagingItemReader;
-import org.springframework.batch.infrastructure.item.database.Order;
 import org.springframework.batch.infrastructure.item.database.support.HsqlPagingQueryProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.SingleColumnRowMapper;
