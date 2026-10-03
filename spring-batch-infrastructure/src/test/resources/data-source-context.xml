@@ -6,6 +6,7 @@
 
 	<jdbc:embedded-database id="dataSource" generate-name="true">
 		<jdbc:script location="org/springframework/batch/infrastructure/item/database/init-foo-schema.sql"/>
+		<jdbc:script location="org/springframework/batch/infrastructure/item/database/init-foo-procedure.sql" separator="/"/>
 	</jdbc:embedded-database>
 
 	<bean id="transactionManager" class="org.springframework.jdbc.support.JdbcTransactionManager">
