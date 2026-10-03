@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package org.springframework.batch.infrastructure.item.file.transform;
 import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -48,6 +49,7 @@ import org.springframework.util.StringUtils;
  * @author Mahmoud Ben Hassine
  * @author Stefano Cordio
  * @author Choi Wang Gyu
+ * @author Çağatay Kalan
  */
 @NullUnmarked // FIXME
 public class DefaultFieldSet implements FieldSet {
@@ -169,9 +171,29 @@ public class DefaultFieldSet implements FieldSet {
 	public final void setNumberFormat(NumberFormat numberFormat) {
 		this.numberFormat = numberFormat;
 		if (numberFormat instanceof DecimalFormat decimalFormat) {
-			this.grouping = String.valueOf(decimalFormat.getDecimalFormatSymbols().getGroupingSeparator());
-			this.decimal = String.valueOf(decimalFormat.getDecimalFormatSymbols().getDecimalSeparator());
+			DecimalFormatSymbols symbols = decimalFormat.getDecimalFormatSymbols();
+			this.grouping = String.valueOf(symbols.getGroupingSeparator());
+			this.decimal = String.valueOf(symbols.getDecimalSeparator());
 		}
+	}
+
+	/**
+	 * Return a copy of the decimal-format symbols for the configured
+	 * {@link NumberFormat}.
+	 * <p>
+	 * Null when the format is not a {@link DecimalFormat}. The returned object is the
+	 * copy from {@link DecimalFormat#getDecimalFormatSymbols()}; mutating it does not
+	 * change later parsing. Call this from a validate hook rather than caching it in a
+	 * constructor, because {@link #setNumberFormat(NumberFormat)} can replace the format
+	 * later and is also invoked while this object is still being constructed.
+	 * @return the current symbol snapshot, or null
+	 * @since 6.1
+	 */
+	protected @Nullable DecimalFormatSymbols getDecimalFormatSymbols() {
+		if (this.numberFormat instanceof DecimalFormat decimalFormat) {
+			return decimalFormat.getDecimalFormatSymbols();
+		}
+		return null;
 	}
 
 	@Override
@@ -247,7 +269,9 @@ public class DefaultFieldSet implements FieldSet {
 
 	@Override
 	public byte readByte(int index) {
-		return Byte.parseByte(Objects.requireNonNull(readAndTrim(index)));
+		String value = Objects.requireNonNull(readAndTrim(index));
+		validateIntegral(value);
+		return Byte.parseByte(value);
 	}
 
 	@Override
@@ -257,7 +281,9 @@ public class DefaultFieldSet implements FieldSet {
 
 	@Override
 	public short readShort(int index) {
-		return Short.parseShort(Objects.requireNonNull(readAndTrim(index)));
+		String value = Objects.requireNonNull(readAndTrim(index));
+		validateIntegral(value);
+		return Short.parseShort(value);
 	}
 
 	@Override
@@ -267,7 +293,9 @@ public class DefaultFieldSet implements FieldSet {
 
 	@Override
 	public int readInt(int index) {
-		return parseNumber(Objects.requireNonNull(readAndTrim(index))).intValue();
+		String value = Objects.requireNonNull(readAndTrim(index));
+		validateIntegral(value);
+		return parseNumber(value).intValue();
 	}
 
 	@Override
@@ -278,8 +306,11 @@ public class DefaultFieldSet implements FieldSet {
 	@Override
 	public int readInt(int index, int defaultValue) {
 		String value = readAndTrim(index);
-
-		return StringUtils.hasLength(value) ? Integer.parseInt(value) : defaultValue;
+		if (!StringUtils.hasLength(value)) {
+			return defaultValue;
+		}
+		validateIntegral(value);
+		return Integer.parseInt(value);
 	}
 
 	@Override
@@ -289,7 +320,9 @@ public class DefaultFieldSet implements FieldSet {
 
 	@Override
 	public long readLong(int index) {
-		return parseNumber(Objects.requireNonNull(readAndTrim(index))).longValue();
+		String value = Objects.requireNonNull(readAndTrim(index));
+		validateIntegral(value);
+		return parseNumber(value).longValue();
 	}
 
 	@Override
@@ -300,7 +333,11 @@ public class DefaultFieldSet implements FieldSet {
 	@Override
 	public long readLong(int index, long defaultValue) {
 		String value = readAndTrim(index);
-		return StringUtils.hasLength(value) ? Long.parseLong(value) : defaultValue;
+		if (!StringUtils.hasLength(value)) {
+			return defaultValue;
+		}
+		validateIntegral(value);
+		return Long.parseLong(value);
 	}
 
 	@Override
@@ -310,7 +347,9 @@ public class DefaultFieldSet implements FieldSet {
 
 	@Override
 	public float readFloat(int index) {
-		return parseNumber(Objects.requireNonNull(readAndTrim(index))).floatValue();
+		String value = Objects.requireNonNull(readAndTrim(index));
+		validateDecimal(value);
+		return parseNumber(value).floatValue();
 	}
 
 	@Override
@@ -320,7 +359,9 @@ public class DefaultFieldSet implements FieldSet {
 
 	@Override
 	public double readDouble(int index) {
-		return parseNumber(Objects.requireNonNull(readAndTrim(index))).doubleValue();
+		String value = Objects.requireNonNull(readAndTrim(index));
+		validateDecimal(value);
+		return parseNumber(value).doubleValue();
 	}
 
 	@Override
@@ -345,6 +386,7 @@ public class DefaultFieldSet implements FieldSet {
 		if (!StringUtils.hasText(candidate)) {
 			return defaultValue;
 		}
+		validateDecimal(candidate);
 
 		try {
 			return new BigDecimal(removeSeparators(candidate));
@@ -518,6 +560,28 @@ public class DefaultFieldSet implements FieldSet {
 			}
 		}
 		return props;
+	}
+
+	/**
+	 * Veto an integral token before it is parsed.
+	 * <p>
+	 * Called for byte, short, int and long reads, including default-value overloads when
+	 * the token is not blank. The default implementation does nothing.
+	 * @param input the trimmed token
+	 * @since 6.1
+	 */
+	protected void validateIntegral(String input) {
+	}
+
+	/**
+	 * Veto a decimal token before it is parsed.
+	 * <p>
+	 * Called for float, double and {@link BigDecimal} reads when the token is not blank.
+	 * The default implementation does nothing.
+	 * @param input the trimmed token
+	 * @since 6.1
+	 */
+	protected void validateDecimal(String input) {
 	}
 
 	private Number parseNumber(String input) {
