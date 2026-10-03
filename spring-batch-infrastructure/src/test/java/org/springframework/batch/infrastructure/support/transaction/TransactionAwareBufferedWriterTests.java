@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,9 +24,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
-import org.springframework.batch.infrastructure.support.transaction.FlushFailedException;
-import org.springframework.batch.infrastructure.support.transaction.ResourcelessTransactionManager;
-import org.springframework.batch.infrastructure.support.transaction.TransactionAwareBufferedWriter;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;

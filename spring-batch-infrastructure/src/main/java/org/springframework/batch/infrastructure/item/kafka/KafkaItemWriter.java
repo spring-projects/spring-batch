@@ -16,7 +16,6 @@
 
 package org.springframework.batch.infrastructure.item.kafka;
 
-import org.jspecify.annotations.Nullable;
 import org.springframework.batch.infrastructure.item.ItemWriter;
 import org.springframework.batch.infrastructure.item.KeyValueItemWriter;
 import org.springframework.core.convert.converter.Converter;

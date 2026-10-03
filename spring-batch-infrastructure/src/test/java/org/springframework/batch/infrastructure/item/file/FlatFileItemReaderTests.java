@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2023 the original author or authors.
+ * Copyright 2008-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,9 +34,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.batch.infrastructure.item.ItemCountAware;
 import org.springframework.batch.infrastructure.item.ItemStreamException;
-import org.springframework.batch.infrastructure.item.file.FlatFileItemReader;
-import org.springframework.batch.infrastructure.item.file.FlatFileParseException;
-import org.springframework.batch.infrastructure.item.file.LineMapper;
 import org.springframework.batch.infrastructure.item.file.mapping.PassThroughLineMapper;
 import org.springframework.batch.infrastructure.item.file.separator.RecordSeparatorPolicy;
 import org.springframework.core.io.AbstractResource;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2022 the original author or authors.
+ * Copyright 2012-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.batch.infrastructure.item.Chunk;
-import org.springframework.batch.infrastructure.item.amqp.AmqpItemWriter;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;

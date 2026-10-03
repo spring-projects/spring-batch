@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 the original author or authors.
+ * Copyright 2022-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
 import org.springframework.batch.infrastructure.item.database.Order;
-import org.springframework.batch.infrastructure.item.database.support.H2PagingQueryProvider;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;

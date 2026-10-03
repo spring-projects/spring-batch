@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 the original author or authors.
+ * Copyright 2023-2026 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package org.springframework.batch.infrastructure.item.redis.builder;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.infrastructure.item.redis.RedisItemReader;
-import org.springframework.batch.infrastructure.item.redis.builder.RedisItemReaderBuilder;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.test.util.ReflectionTestUtils;
