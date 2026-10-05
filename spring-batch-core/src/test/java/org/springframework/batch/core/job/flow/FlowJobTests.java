@@ -46,6 +46,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -101,6 +102,58 @@ public class FlowJobTests {
 		job.setFlow(flow);
 		job.afterPropertiesSet();
 		assertEquals(2, job.getStepNames().size());
+	}
+
+	@Test
+	void testDuplicateStepNamesAreDetected() throws Exception {
+		SimpleFlow flow = new SimpleFlow("job");
+		List<StateTransition> transitions = new ArrayList<>();
+		transitions.add(StateTransition.createStateTransition(new StepState("step0", new StubStep("step1")), "step1"));
+		transitions.add(StateTransition.createStateTransition(new StepState("step1", new StubStep("step1")), "step2"));
+		transitions.add(StateTransition.createStateTransition(new StepState("step2", new StubStep("step2")), "end0"));
+		transitions.add(StateTransition.createEndStateTransition(new EndState(FlowExecutionStatus.COMPLETED, "end0")));
+		flow.setStateTransitions(transitions);
+		flow.afterPropertiesSet();
+		job.setFlow(flow);
+		job.afterPropertiesSet();
+		assertEquals(Set.of("step1"), job.findDuplicateStepNames());
+	}
+
+	@Test
+	void testDuplicateStepNamesAreDetectedInNestedFlows() throws Exception {
+		SimpleFlow subflow = new SimpleFlow("subflow");
+		List<StateTransition> subTransitions = new ArrayList<>();
+		subTransitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1")), "end0"));
+		subTransitions
+			.add(StateTransition.createEndStateTransition(new EndState(FlowExecutionStatus.COMPLETED, "end0")));
+		subflow.setStateTransitions(subTransitions);
+		subflow.afterPropertiesSet();
+
+		SimpleFlow flow = new SimpleFlow("job");
+		List<StateTransition> transitions = new ArrayList<>();
+		transitions.add(StateTransition.createStateTransition(new StepState("step0", new StubStep("step1")), "flow"));
+		transitions.add(StateTransition.createStateTransition(new FlowState(subflow, "flow"), "end0"));
+		transitions.add(StateTransition.createEndStateTransition(new EndState(FlowExecutionStatus.COMPLETED, "end0")));
+		flow.setStateTransitions(transitions);
+		flow.afterPropertiesSet();
+		job.setFlow(flow);
+		job.afterPropertiesSet();
+		assertEquals(Set.of("step1"), job.findDuplicateStepNames());
+	}
+
+	@Test
+	void testSameStepInstanceUsedSeveralTimesIsNotADuplicate() throws Exception {
+		Step step = new StubStep("step1");
+		SimpleFlow flow = new SimpleFlow("job");
+		List<StateTransition> transitions = new ArrayList<>();
+		transitions.add(StateTransition.createStateTransition(new StepState("step0", step), "step1"));
+		transitions.add(StateTransition.createStateTransition(new StepState("step1", step), "end0"));
+		transitions.add(StateTransition.createEndStateTransition(new EndState(FlowExecutionStatus.COMPLETED, "end0")));
+		flow.setStateTransitions(transitions);
+		flow.afterPropertiesSet();
+		job.setFlow(flow);
+		job.afterPropertiesSet();
+		assertEquals(Set.of(), job.findDuplicateStepNames());
 	}
 
 	@Test
