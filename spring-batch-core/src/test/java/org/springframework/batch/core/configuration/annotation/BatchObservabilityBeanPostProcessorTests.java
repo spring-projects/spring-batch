@@ -43,7 +43,7 @@ class BatchObservabilityBeanPostProcessorTests {
 	void observationRegistryShouldBeSetOnJobOperator() {
 		// given
 		this.beanFactory.registerSingleton("observationRegistry", this.observationRegistry);
-		this.postProcessor.postProcessBeanFactory(this.beanFactory);
+		this.postProcessor.setBeanFactory(this.beanFactory);
 		TaskExecutorJobOperator jobOperator = new TaskExecutorJobOperator();
 
 		// when
@@ -57,7 +57,7 @@ class BatchObservabilityBeanPostProcessorTests {
 	void observationRegistryShouldBeSetOnProxiedJobOperator() {
 		// given
 		this.beanFactory.registerSingleton("observationRegistry", this.observationRegistry);
-		this.postProcessor.postProcessBeanFactory(this.beanFactory);
+		this.postProcessor.setBeanFactory(this.beanFactory);
 		TaskExecutorJobOperator target = new TaskExecutorJobOperator();
 		ProxyFactory proxyFactory = new ProxyFactory();
 		proxyFactory.setTarget(target);
