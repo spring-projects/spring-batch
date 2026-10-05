@@ -114,6 +114,12 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 			WHERE JE.JOB_INSTANCE_ID = :jobInstanceId AND SE.STEP_NAME = :stepName
 			""";
 
+	private static final String COUNT_STEP_EXECUTIONS_BY_IDS_AND_STATUSES = """
+			SELECT COUNT(*)
+			FROM %PREFIX%STEP_EXECUTION
+			WHERE STEP_EXECUTION_ID IN (:stepExecutionIds) AND STATUS IN (:statuses)
+			""";
+
 	private static final String DELETE_STEP_EXECUTION = """
 			DELETE FROM %PREFIX%STEP_EXECUTION
 			WHERE STEP_EXECUTION_ID = :stepExecutionId and VERSION = :version
@@ -124,6 +130,13 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 			FROM %PREFIX%JOB_EXECUTION JE, %PREFIX%STEP_EXECUTION SE
 			WHERE SE.STEP_EXECUTION_ID = :stepExecutionId AND JE.JOB_EXECUTION_ID = SE.JOB_EXECUTION_ID
 			""";
+
+	/**
+	 * Maximum number of ids bound to a single {@code IN} clause. Some databases limit the
+	 * number of expressions in such a list (for example, 1000 for Oracle) or the number
+	 * of bind parameters in a statement.
+	 */
+	private static final int MAX_IN_CLAUSE_SIZE = 500;
 
 	private int exitMessageLength = DEFAULT_EXIT_MESSAGE_LENGTH;
 
@@ -376,6 +389,28 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 			.stream()
 			.map(row -> row.toStepExecution(jobExecution))
 			.toList();
+	}
+
+	@Override
+	public long countRunningStepExecutions(Collection<Long> stepExecutionIds) {
+		List<String> runningStatuses = Arrays.stream(BatchStatus.values())
+			.filter(BatchStatus::isRunning)
+			.map(BatchStatus::name)
+			.toList();
+		long count = 0;
+		Iterator<Long> ids = stepExecutionIds.iterator();
+		while (ids.hasNext()) {
+			List<Long> chunk = new ArrayList<>(MAX_IN_CLAUSE_SIZE);
+			while (ids.hasNext() && chunk.size() < MAX_IN_CLAUSE_SIZE) {
+				chunk.add(ids.next());
+			}
+			count += getJdbcClient().sql(getQuery(COUNT_STEP_EXECUTIONS_BY_IDS_AND_STATUSES))
+				.param("stepExecutionIds", chunk)
+				.param("statuses", runningStatuses)
+				.query(Long.class)
+				.single();
+		}
+		return count;
 	}
 
 	@Override

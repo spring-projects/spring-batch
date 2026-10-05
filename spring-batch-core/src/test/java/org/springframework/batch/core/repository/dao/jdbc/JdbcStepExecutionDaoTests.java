@@ -15,6 +15,9 @@
  */
 package org.springframework.batch.core.repository.dao.jdbc;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.batch.infrastructure.support.DatabaseType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -142,6 +145,60 @@ class JdbcStepExecutionDaoTests {
 
 		// Then
 		assertEquals(2, result);
+	}
+
+	@Test
+	void testCountRunningStepExecutions() {
+		// given
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = jdbcJobInstanceDao.createJobInstance("job", jobParameters);
+		JobExecution jobExecution = jdbcJobExecutionDao.createJobExecution(jobInstance, jobParameters);
+		List<Long> ids = new ArrayList<>();
+		for (BatchStatus status : BatchStatus.values()) {
+			StepExecution stepExecution = jdbcStepExecutionDao.createStepExecution("step-" + status, jobExecution);
+			stepExecution.setStatus(status);
+			jdbcStepExecutionDao.updateStepExecution(stepExecution);
+			ids.add(stepExecution.getId());
+		}
+		StepExecution notRequested = jdbcStepExecutionDao.createStepExecution("not-requested", jobExecution);
+
+		// when
+		long running = jdbcStepExecutionDao.countRunningStepExecutions(ids);
+		long runningNotRequested = jdbcStepExecutionDao.countRunningStepExecutions(List.of(notRequested.getId()));
+
+		// then: STARTING, STARTED and STOPPING
+		assertEquals(3, running);
+		assertEquals(1, runningNotRequested);
+	}
+
+	@Test
+	void testCountRunningStepExecutionsWithoutIds() {
+		assertEquals(0, jdbcStepExecutionDao.countRunningStepExecutions(List.of()));
+	}
+
+	@Test
+	void testCountRunningStepExecutionsWithMoreIdsThanTheInClauseLimit() {
+		// given
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = jdbcJobInstanceDao.createJobInstance("job", jobParameters);
+		JobExecution jobExecution = jdbcJobExecutionDao.createJobExecution(jobInstance, jobParameters);
+		int total = 1200;
+		int completed = 150;
+		List<Long> ids = new ArrayList<>();
+		for (int i = 0; i < total; i++) {
+			StepExecution stepExecution = jdbcStepExecutionDao.createStepExecution("partition" + i, jobExecution);
+			if (i % 8 == 0 && i / 8 < completed) {
+				stepExecution.setStatus(BatchStatus.COMPLETED);
+				jdbcStepExecutionDao.updateStepExecution(stepExecution);
+			}
+			ids.add(stepExecution.getId());
+		}
+
+		// when
+		long running = jdbcStepExecutionDao.countRunningStepExecutions(ids);
+
+		// then
+		assertEquals(total - completed, running);
 	}
 
 	@Test

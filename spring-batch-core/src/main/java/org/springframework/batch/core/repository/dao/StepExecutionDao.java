@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package org.springframework.batch.core.repository.dao;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -109,6 +110,18 @@ public interface StepExecutionDao {
 	 * @return the count of {@link StepExecution}s for a given step
 	 */
 	default long countStepExecutions(JobInstance jobInstance, String stepName) {
+		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 * Count, among the step executions with the given ids, those that are running (see
+	 * {@link org.springframework.batch.core.BatchStatus#isRunning()}), without loading
+	 * them in memory.
+	 * @param stepExecutionIds the ids of the step executions to check
+	 * @return the number of running step executions among the given ones
+	 * @since 6.1
+	 */
+	default long countRunningStepExecutions(Collection<Long> stepExecutionIds) {
 		throw new UnsupportedOperationException();
 	}
 

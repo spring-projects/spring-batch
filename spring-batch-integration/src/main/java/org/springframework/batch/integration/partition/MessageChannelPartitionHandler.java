@@ -26,6 +26,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import org.apache.commons.logging.Log;
@@ -275,8 +276,30 @@ public class MessageChannelPartitionHandler extends AbstractPartitionHandler imp
 	private Set<StepExecution> pollReplies(StepExecution managerStepExecution, final Set<StepExecution> split)
 			throws Exception {
 		Set<Long> partitionStepExecutionIds = split.stream().map(StepExecution::getId).collect(Collectors.toSet());
+		AtomicBoolean countRunningSupported = new AtomicBoolean(true);
 
 		Callable<Set<StepExecution>> callback = () -> {
+			// While workers are running, only count them: this avoids loading the whole
+			// object graph of the job execution (including the execution context of every
+			// step execution) at each poll.
+			if (countRunningSupported.get()) {
+				try {
+					long running = jobRepository.countRunningStepExecutions(partitionStepExecutionIds);
+					if (running > 0) {
+						if (logger.isDebugEnabled()) {
+							logger.debug(String.format("Currently waiting on %s out of %s partitions to finish",
+									running, split.size()));
+						}
+						return null;
+					}
+				}
+				catch (UnsupportedOperationException e) {
+					logger.debug("The job repository cannot count running step executions, "
+							+ "falling back to loading the job execution at each poll");
+					countRunningSupported.set(false);
+				}
+			}
+
 			JobExecution jobExecution = jobRepository.getJobExecution(managerStepExecution.getJobExecution().getId());
 			Set<StepExecution> finishedStepExecutions = jobExecution.getStepExecutions()
 				.stream()
@@ -284,16 +307,14 @@ public class MessageChannelPartitionHandler extends AbstractPartitionHandler imp
 				.filter(stepExecution -> !stepExecution.getStatus().isRunning())
 				.collect(Collectors.toSet());
 
-			if (logger.isDebugEnabled()) {
-				logger.debug(String.format("Currently waiting on %s partitions to finish", split.size()));
-			}
-
 			if (finishedStepExecutions.size() == split.size()) {
 				return finishedStepExecutions;
 			}
-			else {
-				return null;
+			if (logger.isDebugEnabled()) {
+				logger.debug(String.format("Currently waiting on %s out of %s partitions to finish",
+						split.size() - finishedStepExecutions.size(), split.size()));
 			}
+			return null;
 		};
 
 		Poller<Set<StepExecution>> poller = new DirectPoller<>(pollInterval);

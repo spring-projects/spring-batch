@@ -16,6 +16,7 @@
 
 package org.springframework.batch.core.repository;
 
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
@@ -26,6 +27,7 @@ import org.springframework.batch.core.repository.explore.JobExplorer;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.jspecify.annotations.Nullable;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -291,6 +293,21 @@ public interface JobRepository extends JobExplorer {
 	 * @since 6.1
 	 */
 	default long countStepExecutions(JobInstance jobInstance, String stepName) {
+		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 * Count, among the step executions with the given ids, those that are still running
+	 * (see {@link BatchStatus#isRunning()}). Unlike {@link #getJobExecution(long)}, this
+	 * does not load any step execution (nor its execution context) in memory, which makes
+	 * it suitable for polling the progress of a large number of step executions, such as
+	 * the workers of a partitioned step.
+	 * @param stepExecutionIds the ids of the step executions to check
+	 * @return the number of step executions with one of the given ids that are running,
+	 * or {@code 0} if none is found.
+	 * @since 6.1
+	 */
+	default long countRunningStepExecutions(Collection<Long> stepExecutionIds) {
 		throw new UnsupportedOperationException();
 	}
 

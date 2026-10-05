@@ -16,6 +16,7 @@
 package org.springframework.batch.core.repository.support;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -352,6 +353,21 @@ public class ResourcelessJobRepository implements JobRepository {
 		return this.jobExecution.getStepExecutions()
 			.stream()
 			.filter(stepExecution -> stepExecution.getStepName().equals(stepName))
+			.count();
+	}
+
+	/**
+	 * @since 6.1
+	 */
+	@Override
+	public long countRunningStepExecutions(Collection<Long> stepExecutionIds) {
+		if (this.jobExecution == null) {
+			return 0;
+		}
+		return this.jobExecution.getStepExecutions()
+			.stream()
+			.filter(stepExecution -> stepExecutionIds.contains(stepExecution.getId()))
+			.filter(stepExecution -> stepExecution.getStatus().isRunning())
 			.count();
 	}
 
