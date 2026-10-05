@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,6 @@ import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.job.AbstractJob;
 import org.springframework.batch.core.job.SimpleStepHandler;
 import org.springframework.batch.core.step.StepHolder;
-import org.springframework.batch.core.step.StepLocator;
 
 /**
  * Implementation of the {@link Job} interface that allows for complex flows of steps,

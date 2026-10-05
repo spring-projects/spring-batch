@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2025 the original author or authors.
+ * Copyright 2008-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,8 +26,6 @@ import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.batch.infrastructure.item.ItemStreamException;
 import org.springframework.batch.infrastructure.item.ItemStreamWriter;
 import org.springframework.batch.infrastructure.item.ItemWriter;
-import org.springframework.batch.infrastructure.item.support.AbstractFileItemWriter;
-import org.springframework.batch.infrastructure.item.support.CompositeItemWriter;
 
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package org.springframework.batch.core.partition.support;
 
-import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
