@@ -431,7 +431,11 @@ public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrien
 	/**
 	 * Set the observation registry to be used for collecting metrics during step
 	 * execution. This allows for monitoring and analyzing the performance of the step. If
-	 * not set, it will default to {@link ObservationRegistry#NOOP}.
+	 * not set, the {@link ObservationRegistry} bean of the application context is used if
+	 * there is one (see
+	 * {@link org.springframework.batch.core.configuration.annotation.BatchObservabilityBeanPostProcessor}),
+	 * and {@link ObservationRegistry#NOOP} otherwise. Use
+	 * {@link ObservationRegistry#NOOP} to explicitly disable observations for this step.
 	 * @param observationRegistry the observation registry to use
 	 * @return this for fluent chaining
 	 */

@@ -26,6 +26,7 @@ import io.micrometer.observation.ObservationRegistry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jspecify.annotations.NullUnmarked;
+import org.jspecify.annotations.Nullable;
 
 import org.springframework.batch.core.BatchConstants;
 import org.springframework.batch.core.BatchStatus;
@@ -80,7 +81,7 @@ public abstract class AbstractJob implements Job, ListableStepLocator, BeanNameA
 
 	private StepHandler stepHandler;
 
-	private ObservationRegistry observationRegistry;
+	private @Nullable ObservationRegistry observationRegistry;
 
 	/**
 	 * Default constructor.
@@ -115,10 +116,6 @@ public abstract class AbstractJob implements Job, ListableStepLocator, BeanNameA
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(jobRepository != null, "JobRepository must be set");
-		if (this.observationRegistry == null) {
-			logger.debug("No ObservationRegistry has been set, defaulting to ObservationRegistry NOOP");
-			this.observationRegistry = ObservationRegistry.NOOP;
-		}
 	}
 
 	/**
@@ -421,7 +418,28 @@ public abstract class AbstractJob implements Job, ListableStepLocator, BeanNameA
 		jobRepository.update(jobExecution);
 	}
 
+	/**
+	 * Return the observation registry configured on this job, or {@code null} if none has
+	 * been set, in which case no observations are created unless a registry is provided
+	 * by the application context (see
+	 * {@link org.springframework.batch.core.configuration.annotation.BatchObservabilityBeanPostProcessor}).
+	 * @return the observation registry, or {@code null} if none has been set
+	 * @since 6.1
+	 */
+	public @Nullable ObservationRegistry getObservationRegistry() {
+		return this.observationRegistry;
+	}
+
+	/**
+	 * Set the observation registry to use for observations. If not set, no observations
+	 * are created unless a registry is provided by the application context (see
+	 * {@link org.springframework.batch.core.configuration.annotation.BatchObservabilityBeanPostProcessor}).
+	 * Use {@link ObservationRegistry#NOOP} to explicitly disable observations for this
+	 * job.
+	 * @param observationRegistry the observation registry, must not be {@code null}
+	 */
 	public void setObservationRegistry(ObservationRegistry observationRegistry) {
+		Assert.notNull(observationRegistry, "ObservationRegistry must not be null");
 		this.observationRegistry = observationRegistry;
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2025 the original author or authors.
+ * Copyright 2022-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -158,8 +158,11 @@ public class JobOperatorFactoryBean implements FactoryBean<JobOperator>, Applica
 	}
 
 	/**
-	 * Set the observation registry to use for metrics. Defaults to
-	 * {@link ObservationRegistry#NOOP}.
+	 * Set the observation registry to use for metrics. If not set, the
+	 * {@link ObservationRegistry} bean of the application context is used if there is one
+	 * (see
+	 * {@link org.springframework.batch.core.configuration.annotation.BatchObservabilityBeanPostProcessor}),
+	 * and {@link ObservationRegistry#NOOP} otherwise.
 	 * @param observationRegistry the observation registry to use
 	 * @since 6.0
 	 */

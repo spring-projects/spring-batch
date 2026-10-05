@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2026 the original author or authors.
+ * Copyright 2012-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -180,7 +180,11 @@ public @interface EnableBatchProcessing {
 	String jobRegistryRef() default "jobRegistry";
 
 	/**
-	 * Set the observation registry to use in batch artifacts.
+	 * Set the observation registry to use in the job operator. If there is no bean with
+	 * this name, the {@link io.micrometer.observation.ObservationRegistry} bean of the
+	 * application context is used if there is a unique (or primary) one. Jobs and steps
+	 * that have no observation registry configured explicitly use that bean too (see
+	 * {@link BatchObservabilityBeanPostProcessor}).
 	 * @return the bean name of the observation registry to use. Defaults to
 	 * {@literal observationRegistry}
 	 */
