@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 the original author or authors.
+ * Copyright 2026-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,6 @@
 package org.springframework.batch.infrastructure.item.data;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
@@ -33,8 +31,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
-import org.springframework.data.domain.Sort.Order;
 import org.springframework.util.Assert;
 
 /**
@@ -46,11 +42,11 @@ import org.springframework.util.Assert;
  * performance.
  * <p>
  * The reader must be configured with a query function, {@linkplain Sort sort parameters},
- * and a pageSize greater than 0.
+ * and a page size greater than 0.
  * <p>
  * This implementation is thread-safe between calls to {@link #open(ExecutionContext)},
- * but remember to use {@code saveState=false} if used in a multi-threaded client (no
- * restart available).
+ * but remember to set {@link #setSaveState(boolean) saveState} to {@code false} if used
+ * in a multi-threaded client (no restart available).
  * <p>
  * It is important to note that this is a paging item reader and exceptions that are
  * thrown while reading the page itself (e.g., mapping results to objects in the
@@ -67,11 +63,11 @@ public class PageableItemReader<T> extends AbstractItemCountingItemStreamItemRea
 
 	protected Log logger = LogFactory.getLog(getClass());
 
-	private final int pageSize;
-
 	private final Function<Pageable, ? extends Slice<? extends T>> query;
 
 	private final Sort sort;
+
+	private final int pageSize;
 
 	private int page = 0;
 
@@ -83,26 +79,20 @@ public class PageableItemReader<T> extends AbstractItemCountingItemStreamItemRea
 
 	/**
 	 * Create a new {@link PageableItemReader}.
-	 * @param pageSize the number of items to retrieve per page. Must be greater than 0.
 	 * @param query a function that accepts a {@link Pageable} and returns a {@link Slice}
 	 * of items
-	 * @param sorts the sort parameters to use when building the {@link PageRequest}. Must
-	 * not be empty. Use a {@link java.util.LinkedHashMap} for multiple entries to
-	 * preserve sort order.
+	 * @param pageSize the number of items to retrieve per page. Must be greater than 0.
+	 * @param sort the sort parameters to use when building the {@link PageRequest}. Must
+	 * not be null, use {@link Sort#unsorted()} instead.
 	 * @since 6.1
 	 */
-	public PageableItemReader(int pageSize, Function<Pageable, ? extends Slice<? extends T>> query,
-			Map<String, Direction> sorts) {
-		Assert.isTrue(pageSize > 0, "'pageSize' must be greater than 0");
+	public PageableItemReader(Function<Pageable, ? extends Slice<? extends T>> query, int pageSize, Sort sort) {
 		Assert.notNull(query, "'query' cannot be null");
-		Assert.notEmpty(sorts, "'sorts' must not be empty");
-		this.pageSize = pageSize;
+		Assert.isTrue(pageSize > 0, "'pageSize' must be greater than 0");
+		Assert.notNull(sort, "'sort' must not be null");
 		this.query = query;
-		this.sort = Sort.by(sorts.entrySet().stream().map(PageableItemReader::createOrder).toList());
-	}
-
-	private static Order createOrder(Entry<String, Direction> entry) {
-		return new Order(entry.getValue(), entry.getKey());
+		this.pageSize = pageSize;
+		this.sort = sort;
 	}
 
 	@Override

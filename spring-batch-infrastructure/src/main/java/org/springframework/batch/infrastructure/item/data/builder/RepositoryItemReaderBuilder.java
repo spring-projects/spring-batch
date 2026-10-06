@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2026 the original author or authors.
+ * Copyright 2017-present the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -38,10 +38,8 @@ import org.springframework.util.Assert;
  * @author Drummond Dawson
  * @since 4.0
  * @see RepositoryItemReader
- * @deprecated since 6.1 in favor of {@link PageableItemReaderBuilder}. Scheduled for
- * removal in 7.0.
+ * @see PageableItemReaderBuilder
  */
-@Deprecated(since = "6.1", forRemoval = true)
 public class RepositoryItemReaderBuilder<T> {
 
 	private @Nullable PagingAndSortingRepository<?, ?> repository;

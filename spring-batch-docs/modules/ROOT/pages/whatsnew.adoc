@@ -12,6 +12,7 @@ Spring Batch 6.1 includes the following features and improvements:
 * xref:whatsnew.adoc#flushing-support-in-repositoryitemwriter[Flushing support in `RepositoryItemWriter`]
 * xref:whatsnew.adoc#location-patterns-in-multiresourceitemreaderbuilder[Location patterns in `MultiResourceItemReaderBuilder`]
 * xref:whatsnew.adoc#new-resourcesitemreaderbuilder[New `ResourcesItemReaderBuilder`]
+* xref:whatsnew.adoc#new-pageableitemreader[New `PageableItemReader`]
 * xref:whatsnew.adoc#schema-locations-in-databasetype[Schema locations in `DatabaseType`]
 * xref:whatsnew.adoc#default-name-for-item-readers-and-writers[Default name for item readers and writers]
 * xref:whatsnew.adoc#compile-time-safety-for-mutually-exclusive-builder-methods[Compile-time safety for mutually exclusive builder methods]
@@ -218,6 +219,52 @@ For more details, please refer to the
 xref:readers-and-writers/item-reader-writer-implementations.adoc#resourcesItemReader[`ResourcesItemReader`]
 section.
 
+[[new-pageableitemreader]]
+== New `PageableItemReader`
+
+This release introduces `PageableItemReader`, a type-safe alternative to
+`RepositoryItemReader`. Instead of invoking a repository method reflectively by name,
+it takes a function from a Spring Data `Pageable` to a `Slice`, which is checked at
+compile time:
+
+[source, java]
+----
+// before
+RepositoryItemReader<Customer> reader = new RepositoryItemReaderBuilder<Customer>()
+				.repository(customerRepository)
+				.methodName("findAll")
+				.sorts(Map.of("id", Sort.Direction.ASC))
+				.pageSize(100)
+				.name("customerReader")
+				.build();
+
+// after
+PageableItemReader<Customer> reader = new PageableItemReaderBuilder<Customer>()
+				.query(customerRepository::findAll)
+				.sort(Sort.by(Sort.Direction.ASC, "id"))
+				.pageSize(100)
+				.name("customerReader")
+				.build();
+----
+
+The sort can also be expressed with
+https://docs.spring.io/spring-data/commons/reference/property-paths.html#type-safe-property-references[type-safe property references],
+which eliminates string-based property names:
+
+[source, java]
+----
+PageableItemReader<Customer> reader = new PageableItemReaderBuilder<Customer>()
+				.query(customerRepository::findAll)
+				.sort(Sort.by(Sort.Direction.ASC, Customer::getId))
+				.pageSize(100)
+				.name("customerReader")
+				.build();
+----
+
+For more details, please refer to the
+xref:readers-and-writers/item-reader-writer-implementations.adoc#pageableItemReader[`PageableItemReader`]
+section.
+
 [[schema-locations-in-databasetype]]
 == Schema locations in `DatabaseType`
 
@@ -404,7 +451,7 @@ The following features have been deprecated in Spring Batch 6.1:
 * Deprecate the legacy date/time converters (`DateToStringConverter`, `StringToDateConverter`, `LocalDateToStringConverter`, `StringToLocalDateConverter`, `LocalTimeToStringConverter`, `StringToLocalTimeConverter`, `LocalDateTimeToStringConverter` and `StringToLocalDateTimeConverter`) in favor of `ConversionServiceFactory#createConversionService()`, scheduled for removal in version 7.0.0
 * Deprecate `StepExecution#getJobExecutionId()` and `StepExecution#getJobParameters()` in favor of `StepExecution#getJobExecution()`, scheduled for removal in version 7.0
 * Deprecate `JobExecution#getJobInstanceId()` in favor of `JobExecution#getJobInstance()`, scheduled for removal in version 7.0
-* Deprecate `RepositoryItemReader` and `RepositoryItemReaderBuilder` in favor of `PageableItemReader` and `PageableItemReaderBuilder`, which accepts a query function instead of invoking repository methods reflectively. Scheduled for removal in version 7.0
+* Deprecate `RepositoryItemReader#setSorts(Map)` and `RepositoryItemReader#setRepository(PagingAndSortingRepository)` in favor of passing the sorts and the repository to the constructor, scheduled for removal in version 7.0
 * Deprecate `RepositoryItemWriter#setRepository(CrudRepository)` in favor of passing the repository to the constructor, scheduled for removal in version 7.0
 * Deprecate `org.springframework.batch.integration.async.AsyncItemProcessor`, `org.springframework.batch.integration.async.AsyncItemWriter`, and `org.springframework.batch.integration.chunk.ChunkTaskExecutorItemWriter` in favor of their counterparts in `org.springframework.batch.core.step.item`, see the xref:whatsnew.adoc#async-processing-apis-and-local-chunking-moved-to-core[Async processing APIs and local chunking moved to `spring-batch-core`] section for more details
 * Deprecate `AbstractJdbcBatchMetadataDao#setJdbcTemplate(JdbcOperations)` in favor of passing a `JdbcClient` to the constructor of the JDBC DAOs, and `AbstractJdbcBatchMetadataDao#getJdbcTemplate()` in favor of `AbstractJdbcBatchMetadataDao#getJdbcClient()`, see the xref:whatsnew.adoc#jdbc-daos-migrated-to-jdbcclient[JDBC DAOs migrated to `JdbcClient`] section for more details. Scheduled for removal in version 7.0

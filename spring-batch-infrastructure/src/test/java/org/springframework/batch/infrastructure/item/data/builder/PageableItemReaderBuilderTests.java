@@ -16,7 +16,6 @@
 package org.springframework.batch.infrastructure.item.data.builder;
 
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 
 import org.junit.jupiter.api.Test;
@@ -41,7 +40,7 @@ import static org.mockito.Mockito.when;
 
 class PageableItemReaderBuilderTests {
 
-	private final Map<String, Direction> sorts = Map.of("id", Direction.ASC);
+	private final Sort sort = Sort.by(Direction.ASC, "id");
 
 	@Test
 	void testBasicRead() throws Exception {
@@ -51,14 +50,14 @@ class PageableItemReaderBuilderTests {
 
 		PageableItemReader<Object> reader = new PageableItemReaderBuilder<>().pageSize(5)
 			.query(query)
-			.sorts(this.sorts)
+			.sort(sort)
 			.name("bar")
 			.build();
 
 		Object result = reader.read();
 
 		assertEquals("result", result);
-		assertThat(captor.getValue()).isEqualTo(PageRequest.of(0, 5, Sort.by(Direction.ASC, "id")));
+		assertThat(captor.getValue()).isEqualTo(PageRequest.of(0, 5, sort));
 	}
 
 	@Test
@@ -68,7 +67,7 @@ class PageableItemReaderBuilderTests {
 
 		PageableItemReader<Object> reader = new PageableItemReaderBuilder<>().pageSize(5)
 			.query(query)
-			.sorts(this.sorts)
+			.sort(sort)
 			.currentItemCount(6)
 			.maxItemCount(5)
 			.name("bar")
@@ -83,33 +82,37 @@ class PageableItemReaderBuilderTests {
 
 		PageableItemReader<Object> reader = new PageableItemReaderBuilder<>().pageSize(5)
 			.query(query)
-			.sorts(this.sorts)
+			.sort(sort)
 			.build();
 
 		assertEquals("PageableItemReader", reader.getName());
 	}
 
 	@Test
+	void testDefaultPageSize() throws Exception {
+		Function<Pageable, Slice<Object>> query = mock();
+		ArgumentCaptor<Pageable> captor = captor();
+		when(query.apply(captor.capture())).thenReturn(new PageImpl<>(List.of("result")));
+
+		PageableItemReader<Object> reader = new PageableItemReaderBuilder<Object>().query(query).build();
+
+		assertEquals("result", reader.read());
+		assertThat(captor.getValue()).isEqualTo(PageRequest.of(0, 10, Sort.unsorted()));
+	}
+
+	@Test
 	void testNoQuery() {
-		var builder = new PageableItemReaderBuilder<>().pageSize(5).sorts(this.sorts);
+		var builder = new PageableItemReaderBuilder<>().pageSize(5).sort(sort);
 		Exception exception = assertThrows(IllegalArgumentException.class, builder::build);
 		assertEquals("query is required.", exception.getMessage());
 	}
 
 	@Test
-	void testNoSorts() {
-		Function<Pageable, Slice<Object>> query = mock();
-		var builder = new PageableItemReaderBuilder<>().pageSize(5).query(query);
-		Exception exception = assertThrows(IllegalArgumentException.class, builder::build);
-		assertEquals("sorts map is required.", exception.getMessage());
-	}
-
-	@Test
 	void testInvalidPageSize() {
 		Function<Pageable, Slice<Object>> query = mock();
-		var builder = new PageableItemReaderBuilder<>().query(query).sorts(this.sorts);
+		var builder = new PageableItemReaderBuilder<>().query(query).pageSize(0);
 		Exception exception = assertThrows(IllegalArgumentException.class, builder::build);
-		assertEquals("'pageSize' must be greater than 0", exception.getMessage());
+		assertEquals("Page size must be greater than 0", exception.getMessage());
 	}
 
 }
