@@ -42,6 +42,7 @@ import org.springframework.batch.core.observability.jfr.events.step.chunk.ChunkT
 import org.springframework.batch.core.observability.jfr.events.step.chunk.ChunkWriteEvent;
 import org.springframework.batch.core.observability.jfr.events.step.chunk.ItemProcessEvent;
 import org.springframework.batch.core.observability.jfr.events.step.chunk.ItemReadEvent;
+import org.springframework.batch.core.scope.context.JobSynchronizationManager;
 import org.springframework.batch.core.scope.context.StepContext;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.batch.core.step.StepContribution;
@@ -563,9 +564,11 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 					Future<@Nullable O> itemProcessingFuture = this.taskExecutor.submit(() -> {
 						try {
 							StepSynchronizationManager.register(stepExecution);
+							JobSynchronizationManager.register(stepExecution.getJobExecution());
 							return processItem(item, contribution);
 						}
 						finally {
+							JobSynchronizationManager.close();
 							StepSynchronizationManager.close();
 						}
 					});

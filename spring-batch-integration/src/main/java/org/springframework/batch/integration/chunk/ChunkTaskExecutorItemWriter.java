@@ -17,6 +17,7 @@ package org.springframework.batch.integration.chunk;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
+import org.springframework.batch.core.scope.context.JobSynchronizationManager;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.batch.core.step.StepContribution;
 import org.springframework.batch.core.step.StepExecution;
@@ -98,9 +99,11 @@ public class ChunkTaskExecutorItemWriter<T> implements ItemWriter<T>, StepExecut
 		FutureTask<ChunkResponse> chunkResponseFutureTask = new FutureTask<>(() -> {
 			try {
 				StepSynchronizationManager.register(this.stepExecution);
+				JobSynchronizationManager.register(this.stepExecution.getJobExecution());
 				return this.chunkProcessorChunkHandler.handle(request);
 			}
 			finally {
+				JobSynchronizationManager.close();
 				StepSynchronizationManager.close();
 			}
 		});

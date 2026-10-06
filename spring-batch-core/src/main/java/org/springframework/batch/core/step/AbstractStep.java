@@ -40,6 +40,7 @@ import org.springframework.batch.core.observability.BatchMetrics;
 import org.springframework.batch.core.observability.jfr.events.step.StepExecutionEvent;
 import org.springframework.batch.core.observability.micrometer.MicrometerMetrics;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.scope.context.JobSynchronizationManager;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.batch.infrastructure.repeat.RepeatException;
@@ -242,6 +243,8 @@ public abstract class AbstractStep implements StoppableStep, InitializingBean, B
 		ExitStatus exitStatus = ExitStatus.EXECUTING;
 
 		doExecutionRegistration(stepExecution);
+		// the step might be executed in a different thread than the job (partitioning)
+		JobSynchronizationManager.register(stepExecution.getJobExecution());
 
 		try (Observation.Scope scope = observation.openScope()) {
 			getCompositeListener().beforeStep(stepExecution);
@@ -351,6 +354,7 @@ public abstract class AbstractStep implements StoppableStep, InitializingBean, B
 			}
 
 			doExecutionRelease();
+			JobSynchronizationManager.close();
 
 			if (logger.isDebugEnabled()) {
 				logger.debug("Step execution complete: " + stepExecution.getSummary());

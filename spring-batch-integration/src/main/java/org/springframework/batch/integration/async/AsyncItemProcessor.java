@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import org.springframework.batch.core.step.StepExecution;
 
 import org.jspecify.annotations.Nullable;
 import org.springframework.batch.core.listener.ItemProcessListener;
+import org.springframework.batch.core.scope.context.JobSynchronizationManager;
 import org.springframework.batch.core.scope.context.StepContext;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.batch.infrastructure.item.ItemProcessor;
@@ -94,12 +95,14 @@ public class AsyncItemProcessor<I, O> implements ItemProcessor<I, Future<O>> {
 		FutureTask<O> task = new FutureTask<>(() -> {
 			if (stepExecution != null) {
 				StepSynchronizationManager.register(stepExecution);
+				JobSynchronizationManager.register(stepExecution.getJobExecution());
 			}
 			try {
 				return delegate.process(item);
 			}
 			finally {
 				if (stepExecution != null) {
+					JobSynchronizationManager.close();
 					StepSynchronizationManager.close();
 				}
 			}
