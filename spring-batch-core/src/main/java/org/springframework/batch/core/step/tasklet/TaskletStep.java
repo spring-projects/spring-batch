@@ -427,8 +427,8 @@ public class TaskletStep extends AbstractStep {
 					catch (Exception e) {
 						if (transactionAttribute.rollbackOn(e)) {
 							chunkContext.setAttribute(ChunkListener.ROLLBACK_EXCEPTION_KEY, e);
-							throw e;
 						}
+						throw e;
 					}
 				}
 				finally {
