@@ -15,11 +15,19 @@
  */
 package org.springframework.batch.core.job.flow;
 
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.JobExecutionException;
+import org.springframework.batch.core.step.ListableStepLocator;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
+import org.springframework.batch.core.step.StepHolder;
 import org.springframework.batch.core.job.SimpleStepHandler;
 import org.springframework.batch.core.job.StepHandler;
 import org.springframework.batch.core.repository.JobRepository;
@@ -37,9 +45,10 @@ import static org.springframework.batch.core.BatchConstants.BATCH_STEP_TYPE;
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
+ * @author Seonghun Lee
  *
  */
-public class FlowStep extends AbstractStep {
+public class FlowStep extends AbstractStep implements ListableStepLocator {
 
 	private Flow flow;
 
@@ -79,6 +88,54 @@ public class FlowStep extends AbstractStep {
 			setName(flow.getName());
 		}
 		super.afterPropertiesSet();
+	}
+
+	/**
+	 * Retrieve the step with the given name from the flow, looking into any nested flows
+	 * and flow steps.
+	 * @param stepName the name of the step to retrieve
+	 * @return the step with the given name, or {@code null} if no such step exists
+	 * @since 6.1
+	 */
+	@Override
+	public @Nullable Step getStep(String stepName) {
+		return findSteps().get(stepName);
+	}
+
+	/**
+	 * Retrieve the names of the steps defined in the flow, including the ones defined in
+	 * nested flows and flow steps.
+	 * @return the names of the steps in the flow
+	 * @since 6.1
+	 */
+	@Override
+	public Collection<String> getStepNames() {
+		return findSteps().keySet();
+	}
+
+	private Map<String, Step> findSteps() {
+		Map<String, Step> steps = new LinkedHashMap<>();
+		findSteps(this.flow, steps);
+		return steps;
+	}
+
+	private static void findSteps(Flow flow, Map<String, Step> map) {
+		for (State state : flow.getStates()) {
+			if (state instanceof ListableStepLocator locator) {
+				for (String name : locator.getStepNames()) {
+					map.put(name, locator.getStep(name));
+				}
+			}
+			else if (state instanceof StepHolder stepHolder) {
+				Step step = stepHolder.getStep();
+				map.put(step.getName(), step);
+			}
+			else if (state instanceof FlowHolder flowHolder) {
+				for (Flow subflow : flowHolder.getFlows()) {
+					findSteps(subflow, map);
+				}
+			}
+		}
 	}
 
 	/**
