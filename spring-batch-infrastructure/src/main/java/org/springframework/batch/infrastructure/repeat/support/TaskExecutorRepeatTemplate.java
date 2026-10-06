@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,6 +48,7 @@ import java.util.Objects;
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  * @author Stefano Cordio
+ * @author Sharang Gupta
  * @deprecated since 6.0 with no replacement, scheduled for removal in 7.0.
  */
 @Deprecated(since = "6.0", forRemoval = true)
@@ -107,9 +108,17 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 			runnable.expect();
 
 			/*
-			 * Start the task possibly concurrently / in the future.
+			 * Start the task possibly concurrently / in the future. If the executor fails
+			 * to run the task, the task will never put its result on the queue, so the
+			 * failure is handed to the queue in its place. Otherwise the queue would keep
+			 * expecting a result that never comes and waitForResults would block forever.
 			 */
-			taskExecutor.execute(runnable);
+			try {
+				taskExecutor.execute(runnable);
+			}
+			catch (Throwable e) {
+				runnable.fail(e);
+			}
 
 			/*
 			 * Allow termination policy to update its state. This must happen immediately
@@ -222,6 +231,17 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 				Thread.currentThread().interrupt();
 				throw new RepeatException("InterruptedException waiting for to acquire lock on input.");
 			}
+		}
+
+		/**
+		 * Hand the given failure to the queue as the result of this task, for a task that
+		 * could not be run. The queue was told to expect a result, so it must receive one
+		 * or it will wait for it forever.
+		 * @param cause the reason the task could not be run
+		 */
+		public void fail(Throwable cause) {
+			error = cause;
+			queue.put(this);
 		}
 
 		/**
