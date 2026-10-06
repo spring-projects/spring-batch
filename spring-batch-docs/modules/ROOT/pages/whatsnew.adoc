@@ -12,6 +12,7 @@ Spring Batch 6.1 includes the following features and improvements:
 * xref:whatsnew.adoc#flushing-support-in-repositoryitemwriter[Flushing support in `RepositoryItemWriter`]
 * xref:whatsnew.adoc#location-patterns-in-multiresourceitemreaderbuilder[Location patterns in `MultiResourceItemReaderBuilder`]
 * xref:whatsnew.adoc#new-resourcesitemreaderbuilder[New `ResourcesItemReaderBuilder`]
+* xref:whatsnew.adoc#new-pageableitemreader[New `PageableItemReader`]
 * xref:whatsnew.adoc#schema-locations-in-databasetype[Schema locations in `DatabaseType`]
 * xref:whatsnew.adoc#default-name-for-item-readers-and-writers[Default name for item readers and writers]
 * xref:whatsnew.adoc#compile-time-safety-for-mutually-exclusive-builder-methods[Compile-time safety for mutually exclusive builder methods]
@@ -216,6 +217,52 @@ ResourcesItemReader reader = new ResourcesItemReaderBuilder()
 
 For more details, please refer to the
 xref:readers-and-writers/item-reader-writer-implementations.adoc#resourcesItemReader[`ResourcesItemReader`]
+section.
+
+[[new-pageableitemreader]]
+== New `PageableItemReader`
+
+This release introduces `PageableItemReader`, a type-safe alternative to
+`RepositoryItemReader`. Instead of invoking a repository method reflectively by name,
+it takes a function from a Spring Data `Pageable` to a `Slice`, which is checked at
+compile time:
+
+[source, java]
+----
+// before
+RepositoryItemReader<Customer> reader = new RepositoryItemReaderBuilder<Customer>()
+				.repository(customerRepository)
+				.methodName("findAll")
+				.sorts(Map.of("id", Sort.Direction.ASC))
+				.pageSize(100)
+				.name("customerReader")
+				.build();
+
+// after
+PageableItemReader<Customer> reader = new PageableItemReaderBuilder<Customer>()
+				.query(customerRepository::findAll)
+				.sort(Sort.by(Sort.Direction.ASC, "id"))
+				.pageSize(100)
+				.name("customerReader")
+				.build();
+----
+
+The sort can also be expressed with
+https://docs.spring.io/spring-data/commons/reference/property-paths.html#type-safe-property-references[type-safe property references],
+which eliminates string-based property names:
+
+[source, java]
+----
+PageableItemReader<Customer> reader = new PageableItemReaderBuilder<Customer>()
+				.query(customerRepository::findAll)
+				.sort(Sort.by(Sort.Direction.ASC, Customer::getId))
+				.pageSize(100)
+				.name("customerReader")
+				.build();
+----
+
+For more details, please refer to the
+xref:readers-and-writers/item-reader-writer-implementations.adoc#pageableItemReader[`PageableItemReader`]
 section.
 
 [[schema-locations-in-databasetype]]

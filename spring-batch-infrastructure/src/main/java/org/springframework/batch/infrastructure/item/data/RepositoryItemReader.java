@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2026 the original author or authors.
+ * Copyright 2012-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,44 +42,33 @@ import org.springframework.util.MethodInvoker;
 import org.springframework.util.StringUtils;
 
 /**
- * <p>
  * A {@link ItemReader} that reads records utilizing a {@link PagingAndSortingRepository}.
- * </p>
- *
  * <p>
  * Performance of the reader is dependent on the repository implementation, however
  * setting a reasonably large page size and matching that to the commit interval should
  * yield better performance.
- * </p>
- *
  * <p>
- * The reader must be configured with a {@link PagingAndSortingRepository}, a
- * {@link Sort}, and a pageSize greater than 0.
- * </p>
- *
+ * The reader must be configured with a {@link PagingAndSortingRepository},
+ * {@linkplain Sort sort parameters}, and a page size greater than 0.
  * <p>
  * This implementation is thread-safe between calls to {@link #open(ExecutionContext)},
  * but remember to use <code>saveState=false</code> if used in a multi-threaded client (no
  * restart available).
- * </p>
- *
  * <p>
  * It is important to note that this is a paging item reader and exceptions that are
  * thrown while reading the page itself (mapping results to objects, etc in the
  * {@link RepositoryItemReader#doPageRead()}) will not be skippable since this reader has
  * no way of knowing if an exception should be skipped and therefore will continue to read
  * the same page until the skip limit is exceeded.
- * </p>
- *
  * <p>
  * NOTE: The {@code RepositoryItemReader} only reads Java Objects i.e. non primitives.
- * </p>
  *
  * @author Michael Minella
  * @author Antoine Kapps
  * @author Mahmoud Ben Hassine
  * @author Jimmy Praet
  * @since 2.2
+ * @see PageableItemReader
  */
 public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> implements InitializingBean {
 

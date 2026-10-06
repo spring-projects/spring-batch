@@ -46,9 +46,24 @@ class RepositoryFunctionalTests {
 	}
 
 	@Test
-	public void testLaunchJobWithJavaConfig() throws Exception {
+	void testLaunchJobWithJavaConfig() throws Exception {
 		// given
 		ApplicationContext context = new AnnotationConfigApplicationContext(JpaRepositoryJobConfiguration.class);
+		JobOperator jobOperator = context.getBean(JobOperator.class);
+		Job job = context.getBean(Job.class);
+		JobParameters jobParameters = new JobParametersBuilder().addDouble("credit", 10000D).toJobParameters();
+
+		// when
+		JobExecution jobExecution = jobOperator.start(job, jobParameters);
+
+		// then
+		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
+	}
+
+	@Test
+	void testLaunchJobWithPageableReaderJavaConfig() throws Exception {
+		// given
+		ApplicationContext context = new AnnotationConfigApplicationContext(JpaPageableJobConfiguration.class);
 		JobOperator jobOperator = context.getBean(JobOperator.class);
 		Job job = context.getBean(Job.class);
 		JobParameters jobParameters = new JobParametersBuilder().addDouble("credit", 10000D).toJobParameters();
