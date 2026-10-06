@@ -259,7 +259,7 @@ public ChunkProcessor<Vet> chunkProcessor(DataSource dataSource, TransactionTemp
 
 [IMPORTANT]
 ====
-It should be noted that transaction management of the chunk as well as fault tolerance features (like retry, skip, chunk scanning, etc)
+It should be noted that transaction management of the chunk as well as fault tolerance features (like retry, skip, xref:retry.adoc#chunk-scanning[chunk scanning], etc)
 are not handled by the `ChunkTaskExecutorItemWriter` nor the driving step, and are the responsibility of the delegate chunk processor.
 Moreover, the lifecycle of the task executor is not handled by the `ChunkTaskExecutorItemWriter`.
 ====

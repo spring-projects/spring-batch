@@ -3,7 +3,6 @@
 
 [[retry]]
 = Retry
-:page-section-summary-toc: 1
 
 
 To make processing more robust and less prone to failure, it sometimes helps to
@@ -17,3 +16,43 @@ Examples include remote calls to a web service that fails because of a network g
 As of v6.0, Spring Batch does *not* use https://github.com/spring-projects/spring-retry[Spring Retry] to automate retry operations within the framework,
 and is now based on the https://docs.spring.io/spring-framework/reference/7.0/core/resilience.html[core retry feature] provided by Spring Framework 7.0.
 ====
+
+[[chunk-scanning]]
+== Chunk Scanning
+
+In a fault-tolerant chunk-oriented step, when an exception thrown by the
+`ItemWriter` is classified as skippable, Spring Batch does not skip the whole
+chunk. Instead, after the configured retries are exhausted, the step enters
+_chunk scanning_ mode and replays the chunk one item at a time in order to
+isolate the failing item. Each replayed item is written in its own transaction,
+so the items that succeed are committed and the failing item is reported as a
+write-skip (and to any registered `SkipListener`), while the rest of the chunk
+is preserved.
+
+This is also why the `ItemWriter` can be invoked again after a failure even when
+no retry policy is configured. With a "never retry" policy (for example,
+`throwable -> false`), retries are simply considered exhausted on the first
+attempt, so scanning starts immediately if the exception is classified as
+skippable. If the exception is not skippable, the step fails with a
+`NonSkippableWriteException` without scanning.
+
+Concretely, for a chunk of size `N` where the writer fails on one of the items:
+
+. The initial transaction wrapping the chunk is rolled back.
+. The following `N` transactions each invoke the `ItemWriter` with a single item
+  from the buffered output of that chunk.
+. A successful single-item write is committed; a failure that the `SkipPolicy`
+  accepts increments the write-skip count and is rolled back; a failure that the
+  `SkipPolicy` rejects fails the step with a `NonSkippableWriteException`.
+
+When this behavior is undesirable, the two practical options are to size the
+chunk to one (so there is nothing to scan) or to move the failing condition into
+the `ItemProcessor`, which is called per item, so failures raised there are
+handled directly without scanning. Some failures, however, can only be detected
+on the writer side (for example, constraint violations surfaced by a JDBC batch
+insert or errors returned by a remote service) and therefore cannot be moved to
+the processor.
+
+The behavior is exercised by `ChunkOrientedStepFaultToleranceIntegrationTests`
+in `spring-batch-core`, in particular
+`testNoDuplicateWritesAfterScanModeInSequentialMode`.
