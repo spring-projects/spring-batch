@@ -17,7 +17,6 @@ package org.springframework.batch.infrastructure.item.data;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 
 import org.junit.jupiter.api.Test;
@@ -38,7 +37,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentCaptor.captor;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -48,12 +46,12 @@ import static org.mockito.Mockito.when;
 
 class PageableItemReaderTests {
 
-	private final Map<String, Direction> sorts = Map.of("id", Direction.ASC);
+	private final Sort sort = Sort.by(Direction.ASC, "id");
 
 	@Test
 	void testDoReadFirstReadNoResults() throws Exception {
 		Function<Pageable, Slice<Object>> query = mock();
-		PageableItemReader<Object> reader = new PageableItemReader<>(1, query, this.sorts);
+		PageableItemReader<Object> reader = new PageableItemReader<>(query, 1, this.sort);
 		ArgumentCaptor<Pageable> captor = captor();
 
 		when(query.apply(captor.capture())).thenReturn(new PageImpl<>(new ArrayList<>()));
@@ -66,7 +64,7 @@ class PageableItemReaderTests {
 	@Test
 	void testDoReadFirstReadResults() throws Exception {
 		Function<Pageable, Slice<Object>> query = mock();
-		PageableItemReader<Object> reader = new PageableItemReader<>(1, query, this.sorts);
+		PageableItemReader<Object> reader = new PageableItemReader<>(query, 1, this.sort);
 		ArgumentCaptor<Pageable> captor = captor();
 		Object result = new Object();
 
@@ -80,7 +78,7 @@ class PageableItemReaderTests {
 	@Test
 	void testDoReadFirstReadSecondPage() throws Exception {
 		Function<Pageable, Slice<Object>> query = mock();
-		PageableItemReader<Object> reader = new PageableItemReader<>(1, query, this.sorts);
+		PageableItemReader<Object> reader = new PageableItemReader<>(query, 1, this.sort);
 		ArgumentCaptor<Pageable> captor = captor();
 		Object result = new Object();
 
@@ -97,7 +95,7 @@ class PageableItemReaderTests {
 	@Test
 	void testDoReadFirstReadExhausted() throws Exception {
 		Function<Pageable, Slice<Object>> query = mock();
-		PageableItemReader<Object> reader = new PageableItemReader<>(1, query, this.sorts);
+		PageableItemReader<Object> reader = new PageableItemReader<>(query, 1, this.sort);
 		ArgumentCaptor<Pageable> captor = captor();
 		Object result = new Object();
 
@@ -116,7 +114,7 @@ class PageableItemReaderTests {
 	@Test
 	void testJumpToItem() throws Exception {
 		Function<Pageable, Slice<Object>> query = mock();
-		PageableItemReader<Object> reader = new PageableItemReader<>(100, query, this.sorts);
+		PageableItemReader<Object> reader = new PageableItemReader<>(query, 100, this.sort);
 		List<Object> objectList = fillWithNewObjects(100);
 		ArgumentCaptor<Pageable> captor = captor();
 
@@ -134,7 +132,7 @@ class PageableItemReaderTests {
 	@Test
 	void testJumpToItemFirstItemOnPage() throws Exception {
 		Function<Pageable, Slice<Object>> query = mock();
-		PageableItemReader<Object> reader = new PageableItemReader<>(50, query, this.sorts);
+		PageableItemReader<Object> reader = new PageableItemReader<>(query, 50, this.sort);
 		List<Object> objectList = fillWithNewObjects(50);
 		ArgumentCaptor<Pageable> captor = captor();
 
@@ -150,7 +148,7 @@ class PageableItemReaderTests {
 	@Test
 	void testPageSizeFromConstructor() throws Exception {
 		Function<Pageable, Slice<Object>> query = mock();
-		PageableItemReader<Object> reader = new PageableItemReader<>(5, query, this.sorts);
+		PageableItemReader<Object> reader = new PageableItemReader<>(query, 5, this.sort);
 		ArgumentCaptor<Pageable> captor = captor();
 
 		when(query.apply(captor.capture())).thenReturn(new PageImpl<>(List.of(new Object())));
@@ -161,14 +159,21 @@ class PageableItemReaderTests {
 	}
 
 	@Test
-	void testEmptySortsNotAllowed() {
-		assertThrows(IllegalArgumentException.class, () -> new PageableItemReader<>(1, mock(), Map.of()));
+	void testUnsortedAllowed() throws Exception {
+		Function<Pageable, Slice<Object>> query = mock();
+		ArgumentCaptor<Pageable> captor = captor();
+		when(query.apply(captor.capture())).thenReturn(new PageImpl<>(emptyList()));
+		PageableItemReader<Object> reader = new PageableItemReader<>(query, 1, Sort.unsorted());
+
+		assertNull(reader.doRead());
+
+		assertThat(captor.getValue()).isEqualTo(PageRequest.of(0, 1, Sort.unsorted()));
 	}
 
 	@Test
 	void testWithQueryProducingSliceItemSubclass() throws Exception {
 		Function<Pageable, Slice<String>> query = pageable -> new SliceImpl<>(List.of("result"));
-		PageableItemReader<CharSequence> reader = new PageableItemReader<>(1, query, this.sorts);
+		PageableItemReader<CharSequence> reader = new PageableItemReader<>(query, 1, this.sort);
 
 		assertEquals("result", reader.doRead());
 	}
@@ -176,7 +181,7 @@ class PageableItemReaderTests {
 	@Test
 	void testSettingCurrentItemCountExplicitly() throws Exception {
 		Function<Pageable, Slice<Object>> query = mock();
-		PageableItemReader<Object> reader = new PageableItemReader<>(2, query, this.sorts);
+		PageableItemReader<Object> reader = new PageableItemReader<>(query, 2, this.sort);
 
 		when(query.apply(PageRequest.of(1, 2, Sort.by(Direction.ASC, "id"))))
 			.thenReturn(new PageImpl<>(List.of("3", "4")));
@@ -196,7 +201,7 @@ class PageableItemReaderTests {
 	@Test
 	void testSettingCurrentItemCountRestart() throws Exception {
 		Function<Pageable, Slice<Object>> query = mock();
-		PageableItemReader<Object> reader = new PageableItemReader<>(2, query, this.sorts);
+		PageableItemReader<Object> reader = new PageableItemReader<>(query, 2, this.sort);
 
 		when(query.apply(PageRequest.of(1, 2, Sort.by(Direction.ASC, "id"))))
 			.thenReturn(new PageImpl<>(List.of("3", "4")));
@@ -221,7 +226,7 @@ class PageableItemReaderTests {
 	@Test
 	void testResetOfPage() throws Exception {
 		Function<Pageable, Slice<Object>> query = mock();
-		PageableItemReader<Object> reader = new PageableItemReader<>(2, query, this.sorts);
+		PageableItemReader<Object> reader = new PageableItemReader<>(query, 2, this.sort);
 
 		when(query.apply(PageRequest.of(0, 2, Sort.by(Direction.ASC, "id"))))
 			.thenReturn(new PageImpl<>(List.of("1", "2")));

@@ -42,7 +42,7 @@ class JpaFunctionalTests {
 	}
 
 	@Test
-	public void testLaunchJobWithJavaConfig() throws Exception {
+	void testLaunchJobWithJavaConfig() throws Exception {
 		// given
 		ApplicationContext context = new AnnotationConfigApplicationContext(JpaJobConfiguration.class);
 		JobOperator jobOperator = context.getBean(JobOperator.class);

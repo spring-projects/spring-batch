@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 the original author or authors.
+ * Copyright 2026-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
  */
 package org.springframework.batch.infrastructure.item.data.builder;
 
-import java.util.Map;
 import java.util.function.Function;
 
 import org.jspecify.annotations.Nullable;
@@ -26,7 +25,7 @@ import org.springframework.batch.infrastructure.item.data.PageableItemReader;
 import org.springframework.batch.infrastructure.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.domain.Sort;
 import org.springframework.util.Assert;
 
 /**
@@ -38,11 +37,11 @@ import org.springframework.util.Assert;
  */
 public class PageableItemReaderBuilder<T> {
 
-	private int pageSize;
-
 	private @Nullable Function<Pageable, ? extends Slice<? extends T>> query;
 
-	private @Nullable Map<String, Direction> sorts;
+	private Sort sort = Sort.unsorted();
+
+	private int pageSize = 10;
 
 	private boolean saveState = true;
 
@@ -53,22 +52,10 @@ public class PageableItemReaderBuilder<T> {
 	private int currentItemCount;
 
 	/**
-	 * The number of items to be read with each page.
-	 * @param pageSize the number of items per page. Must be greater than 0.
-	 * @return this instance for method chaining
-	 * @see PageableItemReader#PageableItemReader(int, Function, Map)
-	 */
-	public PageableItemReaderBuilder<T> pageSize(int pageSize) {
-		this.pageSize = pageSize;
-
-		return this;
-	}
-
-	/**
 	 * A function that accepts a {@link Pageable} and returns a {@link Slice} of items.
 	 * @param query the query function to apply for each page
 	 * @return this instance for method chaining
-	 * @see PageableItemReader#PageableItemReader(int, Function, Map)
+	 * @see PageableItemReader#PageableItemReader(Function, int, Sort)
 	 */
 	public PageableItemReaderBuilder<T> query(Function<Pageable, ? extends Slice<? extends T>> query) {
 		this.query = query;
@@ -77,15 +64,26 @@ public class PageableItemReaderBuilder<T> {
 	}
 
 	/**
-	 * Provides ordering of the results so that order is maintained between paged queries.
-	 * Use a {@link java.util.LinkedHashMap} in case of multiple sort entries to keep the
-	 * order.
-	 * @param sorts the fields to sort by and the directions
+	 * The number of items to read with each page.
+	 * @param pageSize the number of items per page. Defaults to 10 and must be greater
+	 * than 0.
 	 * @return this instance for method chaining
-	 * @see PageableItemReader#PageableItemReader(int, Function, Map)
+	 * @see PageableItemReader#PageableItemReader(Function, int, Sort)
 	 */
-	public PageableItemReaderBuilder<T> sorts(Map<String, Direction> sorts) {
-		this.sorts = sorts;
+	public PageableItemReaderBuilder<T> pageSize(int pageSize) {
+		this.pageSize = pageSize;
+
+		return this;
+	}
+
+	/**
+	 * Configures the sort parameters for the query.
+	 * @param sort the sort to apply to the query
+	 * @return this instance for method chaining
+	 * @see PageableItemReader#PageableItemReader(Function, int, Sort)
+	 */
+	public PageableItemReaderBuilder<T> sort(Sort sort) {
+		this.sort = sort;
 
 		return this;
 	}
@@ -146,9 +144,10 @@ public class PageableItemReaderBuilder<T> {
 	 */
 	public PageableItemReader<T> build() {
 		Assert.notNull(this.query, "query is required.");
-		Assert.notNull(this.sorts, "sorts map is required.");
+		Assert.isTrue(this.pageSize > 0, "Page size must be greater than 0");
+		Assert.notNull(this.sort, "sort is required.");
 
-		PageableItemReader<T> reader = new PageableItemReader<>(this.pageSize, this.query, this.sorts);
+		PageableItemReader<T> reader = new PageableItemReader<>(this.query, this.pageSize, this.sort);
 		reader.setCurrentItemCount(this.currentItemCount);
 		reader.setMaxItemCount(this.maxItemCount);
 		reader.setSaveState(this.saveState);
