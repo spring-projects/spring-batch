@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 the original author or authors.
+ * Copyright 2025-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,12 +29,14 @@ import org.springframework.batch.infrastructure.item.database.JdbcPagingItemRead
 import org.springframework.batch.infrastructure.item.database.JpaCursorItemReader;
 import org.springframework.batch.infrastructure.item.database.JpaItemWriter;
 import org.springframework.batch.infrastructure.item.database.JpaPagingItemReader;
+import org.springframework.batch.infrastructure.item.database.StatelessSessionItemWriter;
 import org.springframework.batch.infrastructure.item.database.builder.JdbcBatchItemWriterBuilder;
 import org.springframework.batch.infrastructure.item.database.builder.JdbcCursorItemReaderBuilder;
 import org.springframework.batch.infrastructure.item.database.builder.JdbcPagingItemReaderBuilder;
 import org.springframework.batch.infrastructure.item.database.builder.JpaCursorItemReaderBuilder;
 import org.springframework.batch.infrastructure.item.database.builder.JpaItemWriterBuilder;
 import org.springframework.batch.infrastructure.item.database.builder.JpaPagingItemReaderBuilder;
+import org.springframework.batch.infrastructure.item.database.builder.StatelessSessionItemWriterBuilder;
 import org.springframework.batch.infrastructure.item.file.FlatFileItemReader;
 import org.springframework.batch.infrastructure.item.file.FlatFileItemWriter;
 import org.springframework.batch.infrastructure.item.file.builder.FlatFileItemReaderBuilder;
@@ -85,6 +87,7 @@ public class InfrastructureRuntimeHints implements RuntimeHintsRegistrar {
 				JdbcPagingItemReaderBuilder.class, JdbcBatchItemWriter.class, JdbcBatchItemWriterBuilder.class,
 				JpaCursorItemReader.class, JpaCursorItemReaderBuilder.class, JpaPagingItemReader.class,
 				JpaPagingItemReaderBuilder.class, JpaItemWriter.class, JpaItemWriterBuilder.class,
+				StatelessSessionItemWriter.class, StatelessSessionItemWriterBuilder.class,
 
 				// Queue IO APIs
 				BlockingQueueItemReader.class, BlockingQueueItemReaderBuilder.class, BlockingQueueItemWriter.class,
