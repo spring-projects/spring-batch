@@ -97,13 +97,38 @@ public class JacksonJsonObjectReader<T> implements JsonObjectReader<T> {
 	public @Nullable T read() throws Exception {
 		try {
 			if (this.jsonParser.nextToken() == JsonToken.START_OBJECT) {
-				return this.mapper.readValue(this.jsonParser, this.itemType);
+				return readObject();
 			}
 		}
 		catch (JacksonException e) {
 			throw new ParseException("Unable to read next JSON object", e);
 		}
 		return null;
+	}
+
+	@SuppressWarnings("DataFlowIssue")
+	private T readObject() {
+		int objectDepth = this.jsonParser.streamReadContext().getNestingDepth();
+		try {
+			return this.mapper.readValue(this.jsonParser, this.itemType);
+		}
+		catch (JacksonException e) {
+			// A failed mapping leaves the cursor inside the malformed object, where the
+			// next read would find a token other than START_OBJECT and report the end of
+			// the input. Skipping to the end of the object keeps the remaining items
+			// readable, so a fault-tolerant step can skip this one and carry on.
+			skipToEndOfObject(objectDepth);
+			throw e;
+		}
+	}
+
+	@SuppressWarnings("DataFlowIssue")
+	private void skipToEndOfObject(int objectDepth) {
+		while (this.jsonParser.streamReadContext().getNestingDepth() >= objectDepth) {
+			if (this.jsonParser.nextToken() == null) {
+				return;
+			}
+		}
 	}
 
 	@Override
