@@ -65,9 +65,8 @@ public interface StepExecutionDao {
 	 * @return a {@link StepExecution}
 	 * @deprecated since 6.0 in favor of {@link #getStepExecution(long)}
 	 */
-	@Nullable
 	@Deprecated(since = "6.0", forRemoval = true)
-	StepExecution getStepExecution(JobExecution jobExecution, long stepExecutionId);
+	@Nullable StepExecution getStepExecution(JobExecution jobExecution, long stepExecutionId);
 
 	/**
 	 * Because it may be possible that the status of a StepExecution is updated while
@@ -86,7 +85,7 @@ public interface StepExecutionDao {
 	 * @param stepName the name of the step
 	 * @return a {@link StepExecution}
 	 */
-	@Nullable default StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
+	default @Nullable StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
 		throw new UnsupportedOperationException();
 	}
 
