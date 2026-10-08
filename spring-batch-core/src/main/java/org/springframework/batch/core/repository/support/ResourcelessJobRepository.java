@@ -288,6 +288,21 @@ public class ResourcelessJobRepository implements JobRepository {
 		return stepExecution;
 	}
 
+	@Override
+	public StepExecution createStepExecution(String stepName, JobExecution jobExecution,
+			@Nullable ExecutionContext stepExecutionContext) {
+		StepExecution stepExecution = new StepExecution(++stepExecutionIdIncrementer, stepName, jobExecution);
+		stepExecution.setStartTime(LocalDateTime.now());
+		stepExecution.setStatus(BatchStatus.STARTING);
+		stepExecution.setLastUpdated(LocalDateTime.now());
+		stepExecution.incrementVersion();
+		if (stepExecutionContext != null && !stepExecutionContext.isEmpty()) {
+			stepExecution.setExecutionContext(new ExecutionContext(stepExecutionContext));
+		}
+		jobExecution.addStepExecution(stepExecution);
+		return stepExecution;
+	}
+
 	@Deprecated(since = "6.0", forRemoval = true)
 	@Override
 	@Nullable public StepExecution getStepExecution(long jobExecutionId, long stepExecutionId) {
