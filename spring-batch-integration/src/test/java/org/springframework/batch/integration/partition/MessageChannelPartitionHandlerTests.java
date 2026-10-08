@@ -57,6 +57,7 @@ import static org.mockito.Mockito.when;
  * @author Will Schipp
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  *
  */
 class MessageChannelPartitionHandlerTests {
@@ -306,6 +307,14 @@ class MessageChannelPartitionHandlerTests {
 		assertEquals(Set.of(partition1, partition2), new HashSet<>(executions));
 		verify(jobRepository, times(1)).countRunningStepExecutions(any());
 		verify(jobRepository, times(2)).getJobExecution(5L);
+
+		// when
+		executions = messageChannelPartitionHandler.handle(stepExecutionSplitter, managerStepExecution);
+
+		assertEquals(Set.of(partition1, partition2), new HashSet<>(executions));
+		// then: counting is attempted only once
+		verify(jobRepository, times(1)).countRunningStepExecutions(any());
+		verify(jobRepository, times(3)).getJobExecution(5L);
 	}
 
 	@Test
