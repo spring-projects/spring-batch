@@ -19,31 +19,51 @@ import java.util.Map;
 
 import tools.jackson.core.exc.UnexpectedEndOfInputException;
 import org.junit.jupiter.api.Test;
+import tools.jackson.core.type.TypeReference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class JsonLineMapperTests {
 
-	private final JsonLineMapper mapper = new JsonLineMapper();
+	private final JsonLineMapper<Map<String, Object>> mapJsonLineMapper = new JsonLineMapper<>(new TypeReference<>() {
+	});
+
+	private final JsonLineMapper<User> userJsonLineMapper = new JsonLineMapper<>(User.class);
 
 	@Test
 	void testMapLine() throws Exception {
-		Map<String, Object> map = mapper.mapLine("{\"foo\": 1}", 1);
+		Map<String, Object> map = mapJsonLineMapper.mapLine("{\"foo\": 1}", 1);
 		assertEquals(1, map.get("foo"));
 	}
 
 	@SuppressWarnings("unchecked")
 	@Test
 	void testMapNested() throws Exception {
-		Map<String, Object> map = mapper.mapLine("{\"foo\": 1, \"bar\" : {\"foo\": 2}}", 1);
+		Map<String, Object> map = mapJsonLineMapper.mapLine("{\"foo\": 1, \"bar\" : {\"foo\": 2}}", 1);
 		assertEquals(1, map.get("foo"));
 		assertEquals(2, ((Map<String, Object>) map.get("bar")).get("foo"));
 	}
 
 	@Test
 	void testMappingError() {
-		assertThrows(UnexpectedEndOfInputException.class, () -> mapper.mapLine("{\"foo\": 1", 1));
+		assertThrows(UnexpectedEndOfInputException.class, () -> mapJsonLineMapper.mapLine("{\"foo\": 1", 1));
+	}
+
+	@Test
+	void testMapLineToDomainType() throws Exception {
+		User user = userJsonLineMapper.mapLine("""
+				{"name":"foo","email":"bar@example.com","introduction":"I'm\\npowerful\\nman"}""", 1);
+		assertEquals("foo", user.name());
+		assertEquals("bar@example.com", user.email());
+		assertEquals("""
+				I'm
+				powerful
+				man""", user.introduction());
+	}
+
+	record User(String name, String email, String introduction) {
+
 	}
 
 }
