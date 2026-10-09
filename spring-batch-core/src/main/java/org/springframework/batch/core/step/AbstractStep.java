@@ -25,6 +25,7 @@ import io.micrometer.observation.ObservationRegistry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jspecify.annotations.NullUnmarked;
+import org.jspecify.annotations.Nullable;
 
 import org.springframework.batch.core.BatchConstants;
 import org.springframework.batch.core.BatchStatus;
@@ -41,6 +42,7 @@ import org.springframework.batch.core.observability.BatchMetrics;
 import org.springframework.batch.core.observability.jfr.events.step.StepExecutionEvent;
 import org.springframework.batch.core.observability.micrometer.MicrometerMetrics;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.scope.context.JobSynchronizationManager;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.batch.infrastructure.repeat.RepeatException;
@@ -77,7 +79,7 @@ public abstract class AbstractStep implements StoppableStep, InitializingBean, B
 
 	private JobRepository jobRepository;
 
-	protected ObservationRegistry observationRegistry;
+	protected @Nullable ObservationRegistry observationRegistry;
 
 	/**
 	 * Create a new {@link AbstractStep}.
@@ -111,10 +113,6 @@ public abstract class AbstractStep implements StoppableStep, InitializingBean, B
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(jobRepository != null, "JobRepository is mandatory");
-		if (this.observationRegistry == null) {
-			logger.debug("No ObservationRegistry has been set, defaulting to ObservationRegistry NOOP");
-			this.observationRegistry = ObservationRegistry.NOOP;
-		}
 	}
 
 	@Override
@@ -243,6 +241,8 @@ public abstract class AbstractStep implements StoppableStep, InitializingBean, B
 		ExitStatus exitStatus = ExitStatus.EXECUTING;
 
 		doExecutionRegistration(stepExecution);
+		// the step might be executed in a different thread than the job (partitioning)
+		JobSynchronizationManager.register(stepExecution.getJobExecution());
 
 		try (Observation.Scope scope = observation.openScope()) {
 			getCompositeListener().beforeStep(stepExecution);
@@ -352,6 +352,7 @@ public abstract class AbstractStep implements StoppableStep, InitializingBean, B
 			}
 
 			doExecutionRelease();
+			JobSynchronizationManager.close();
 
 			if (logger.isDebugEnabled()) {
 				logger.debug("Step execution complete: " + stepExecution.getSummary());
@@ -465,7 +466,28 @@ public abstract class AbstractStep implements StoppableStep, InitializingBean, B
 		return exitStatus;
 	}
 
+	/**
+	 * Return the observation registry configured on this step, or {@code null} if none
+	 * has been set, in which case no observations are created unless a registry is
+	 * provided by the application context (see
+	 * {@link org.springframework.batch.core.configuration.annotation.BatchObservabilityBeanPostProcessor}).
+	 * @return the observation registry, or {@code null} if none has been set
+	 * @since 6.1
+	 */
+	public @Nullable ObservationRegistry getObservationRegistry() {
+		return this.observationRegistry;
+	}
+
+	/**
+	 * Set the observation registry to use for observations. If not set, no observations
+	 * are created unless a registry is provided by the application context (see
+	 * {@link org.springframework.batch.core.configuration.annotation.BatchObservabilityBeanPostProcessor}).
+	 * Use {@link ObservationRegistry#NOOP} to explicitly disable observations for this
+	 * step.
+	 * @param observationRegistry the observation registry, must not be {@code null}
+	 */
 	public void setObservationRegistry(ObservationRegistry observationRegistry) {
+		Assert.notNull(observationRegistry, "ObservationRegistry must not be null");
 		this.observationRegistry = observationRegistry;
 	}
 

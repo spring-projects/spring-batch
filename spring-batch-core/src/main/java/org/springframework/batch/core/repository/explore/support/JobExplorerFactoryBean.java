@@ -43,6 +43,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.convert.support.ConfigurableConversionService;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.jdbc.support.incrementer.AbstractDataFieldMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.springframework.util.Assert;
@@ -176,8 +177,7 @@ public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean imple
 
 	@Override
 	protected ExecutionContextDao createExecutionContextDao() {
-		JdbcExecutionContextDao dao = new JdbcExecutionContextDao();
-		dao.setJdbcTemplate(jdbcOperations);
+		JdbcExecutionContextDao dao = new JdbcExecutionContextDao(JdbcClient.create(jdbcOperations));
 		dao.setTablePrefix(tablePrefix);
 		dao.setSerializer(serializer);
 		dao.setCharset(charset);
@@ -186,8 +186,7 @@ public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean imple
 
 	@Override
 	protected JobInstanceDao createJobInstanceDao() {
-		JdbcJobInstanceDao dao = new JdbcJobInstanceDao();
-		dao.setJdbcTemplate(jdbcOperations);
+		JdbcJobInstanceDao dao = new JdbcJobInstanceDao(JdbcClient.create(jdbcOperations));
 		dao.setJobInstanceIncrementer(incrementer);
 		dao.setJobKeyGenerator(jobKeyGenerator);
 		dao.setTablePrefix(tablePrefix);
@@ -196,8 +195,7 @@ public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean imple
 
 	@Override
 	protected JobExecutionDao createJobExecutionDao() {
-		JdbcJobExecutionDao dao = new JdbcJobExecutionDao();
-		dao.setJdbcTemplate(jdbcOperations);
+		JdbcJobExecutionDao dao = new JdbcJobExecutionDao(JdbcClient.create(jdbcOperations));
 		dao.setJobExecutionIncrementer(incrementer);
 		dao.setTablePrefix(tablePrefix);
 		dao.setConversionService(this.conversionService);
@@ -206,8 +204,7 @@ public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean imple
 
 	@Override
 	protected StepExecutionDao createStepExecutionDao() {
-		JdbcStepExecutionDao dao = new JdbcStepExecutionDao();
-		dao.setJdbcTemplate(jdbcOperations);
+		JdbcStepExecutionDao dao = new JdbcStepExecutionDao(JdbcClient.create(jdbcOperations));
 		dao.setStepExecutionIncrementer(incrementer);
 		dao.setTablePrefix(tablePrefix);
 		return dao;

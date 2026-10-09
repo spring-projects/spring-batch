@@ -248,6 +248,28 @@ class MongoStepExecutionDaoIntegrationTests extends AbstractMongoDBDaoIntegratio
 	}
 
 	@Test
+	void testCountRunningStepExecutions() {
+		// given
+		StepExecution running = dao.createStepExecution("running", jobExecution);
+		StepExecution stopping = dao.createStepExecution("stopping", jobExecution);
+		stopping.setStatus(BatchStatus.STOPPING);
+		dao.updateStepExecution(stopping);
+		StepExecution completed = dao.createStepExecution("completed", jobExecution);
+		completed.setStatus(BatchStatus.COMPLETED);
+		dao.updateStepExecution(completed);
+		StepExecution notRequested = dao.createStepExecution("notRequested", jobExecution);
+
+		// when
+		long count = dao
+			.countRunningStepExecutions(java.util.List.of(running.getId(), stopping.getId(), completed.getId()));
+
+		// then
+		assertEquals(2, count);
+		assertEquals(1, dao.countRunningStepExecutions(java.util.List.of(notRequested.getId())));
+		assertEquals(0, dao.countRunningStepExecutions(java.util.List.of()));
+	}
+
+	@Test
 	void testCountStepExecutionsFiltersByStepName() {
 		// given
 		dao.createStepExecution("stepA", jobExecution);

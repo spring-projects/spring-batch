@@ -35,6 +35,7 @@ import org.springframework.batch.core.converter.JsonJobParametersConverter;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDao;
 import org.springframework.batch.core.repository.dao.jdbc.JdbcExecutionContextDao;
 import org.springframework.batch.core.repository.dao.jdbc.JdbcJobExecutionDao;
 import org.springframework.batch.core.repository.dao.jdbc.JdbcJobInstanceDao;
@@ -46,6 +47,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.MongoTransactionManager;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.jdbc.support.JdbcTransactionManager;
@@ -79,26 +82,22 @@ class BatchRegistrarTests {
 		JobRepository jobRepository = context.getBean(JobRepository.class);
 		JdbcJobInstanceDao jobInstanceDao = (JdbcJobInstanceDao) ReflectionTestUtils.getField(jobRepository,
 				"jobInstanceDao");
-		JdbcTemplate jdbcTemplate = (JdbcTemplate) ReflectionTestUtils.getField(jobInstanceDao, "jdbcTemplate");
-		DataSource dataSource = (DataSource) ReflectionTestUtils.getField(jdbcTemplate, "dataSource");
+		DataSource dataSource = getDataSource(jobInstanceDao);
 		Assertions.assertEquals(context.getBean(DataSource.class), dataSource);
 
 		JdbcJobExecutionDao jobExecutionDao = (JdbcJobExecutionDao) ReflectionTestUtils.getField(jobRepository,
 				"jobExecutionDao");
-		jdbcTemplate = (JdbcTemplate) ReflectionTestUtils.getField(jobExecutionDao, "jdbcTemplate");
-		dataSource = (DataSource) ReflectionTestUtils.getField(jdbcTemplate, "dataSource");
+		dataSource = getDataSource(jobExecutionDao);
 		Assertions.assertEquals(context.getBean(DataSource.class), dataSource);
 
 		JdbcStepExecutionDao stepExecutionDao = (JdbcStepExecutionDao) ReflectionTestUtils.getField(jobRepository,
 				"stepExecutionDao");
-		jdbcTemplate = (JdbcTemplate) ReflectionTestUtils.getField(stepExecutionDao, "jdbcTemplate");
-		dataSource = (DataSource) ReflectionTestUtils.getField(jdbcTemplate, "dataSource");
+		dataSource = getDataSource(stepExecutionDao);
 		Assertions.assertEquals(context.getBean(DataSource.class), dataSource);
 
 		JdbcExecutionContextDao executionContextDao = (JdbcExecutionContextDao) ReflectionTestUtils
 			.getField(jobRepository, "ecDao");
-		jdbcTemplate = (JdbcTemplate) ReflectionTestUtils.getField(executionContextDao, "jdbcTemplate");
-		dataSource = (DataSource) ReflectionTestUtils.getField(jdbcTemplate, "dataSource");
+		dataSource = getDataSource(executionContextDao);
 		Assertions.assertEquals(context.getBean(DataSource.class), dataSource);
 
 		PlatformTransactionManager transactionManager = getTransactionManagerSetOnJobRepository(jobRepository);
@@ -114,26 +113,22 @@ class BatchRegistrarTests {
 		JobRepository jobRepository = context.getBean(JobRepository.class);
 		JdbcJobInstanceDao jobInstanceDao = (JdbcJobInstanceDao) ReflectionTestUtils.getField(jobRepository,
 				"jobInstanceDao");
-		JdbcTemplate jdbcTemplate = (JdbcTemplate) ReflectionTestUtils.getField(jobInstanceDao, "jdbcTemplate");
-		DataSource dataSource = (DataSource) ReflectionTestUtils.getField(jdbcTemplate, "dataSource");
+		DataSource dataSource = getDataSource(jobInstanceDao);
 		Assertions.assertEquals(context.getBean(DataSource.class), dataSource);
 
 		JdbcJobExecutionDao jobExecutionDao = (JdbcJobExecutionDao) ReflectionTestUtils.getField(jobRepository,
 				"jobExecutionDao");
-		jdbcTemplate = (JdbcTemplate) ReflectionTestUtils.getField(jobExecutionDao, "jdbcTemplate");
-		dataSource = (DataSource) ReflectionTestUtils.getField(jdbcTemplate, "dataSource");
+		dataSource = getDataSource(jobExecutionDao);
 		Assertions.assertEquals(context.getBean(DataSource.class), dataSource);
 
 		JdbcStepExecutionDao stepExecutionDao = (JdbcStepExecutionDao) ReflectionTestUtils.getField(jobRepository,
 				"stepExecutionDao");
-		jdbcTemplate = (JdbcTemplate) ReflectionTestUtils.getField(stepExecutionDao, "jdbcTemplate");
-		dataSource = (DataSource) ReflectionTestUtils.getField(jdbcTemplate, "dataSource");
+		dataSource = getDataSource(stepExecutionDao);
 		Assertions.assertEquals(context.getBean(DataSource.class), dataSource);
 
 		JdbcExecutionContextDao executionContextDao = (JdbcExecutionContextDao) ReflectionTestUtils
 			.getField(jobRepository, "ecDao");
-		jdbcTemplate = (JdbcTemplate) ReflectionTestUtils.getField(executionContextDao, "jdbcTemplate");
-		dataSource = (DataSource) ReflectionTestUtils.getField(jdbcTemplate, "dataSource");
+		dataSource = getDataSource(executionContextDao);
 		Assertions.assertEquals(context.getBean(DataSource.class), dataSource);
 
 		PlatformTransactionManager transactionManager = getTransactionManagerSetOnJobRepository(jobRepository);
@@ -452,6 +447,13 @@ class BatchRegistrarTests {
 			}
 		}
 		return null;
+	}
+
+	private static DataSource getDataSource(AbstractJdbcBatchMetadataDao dao) {
+		JdbcClient jdbcClient = (JdbcClient) ReflectionTestUtils.getField(dao, "jdbcClient");
+		NamedParameterJdbcOperations namedParameterJdbcOperations = (NamedParameterJdbcOperations) ReflectionTestUtils
+			.getField(jdbcClient, "namedParamOps");
+		return ((JdbcTemplate) namedParameterJdbcOperations.getJdbcOperations()).getDataSource();
 	}
 
 }

@@ -15,17 +15,23 @@
  */
 package org.springframework.batch.core.repository.dao.jdbc;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.batch.infrastructure.support.DatabaseType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
@@ -53,26 +59,23 @@ class JdbcStepExecutionDaoTests {
 			.build();
 		jdbcTemplate = new JdbcTemplate(database);
 
-		jdbcJobInstanceDao = new JdbcJobInstanceDao();
-		jdbcJobInstanceDao.setJdbcTemplate(jdbcTemplate);
+		jdbcJobInstanceDao = new JdbcJobInstanceDao(JdbcClient.create(jdbcTemplate));
 		H2SequenceMaxValueIncrementer jobInstanceIncrementer = new H2SequenceMaxValueIncrementer(database,
 				"BATCH_JOB_INSTANCE_SEQ");
 		jdbcJobInstanceDao.setJobInstanceIncrementer(jobInstanceIncrementer);
 		jdbcJobInstanceDao.afterPropertiesSet();
 
-		jdbcJobExecutionDao = new JdbcJobExecutionDao();
-		jdbcJobExecutionDao.setJdbcTemplate(jdbcTemplate);
+		jdbcJobExecutionDao = new JdbcJobExecutionDao(JdbcClient.create(jdbcTemplate));
 		H2SequenceMaxValueIncrementer jobExecutionIncrementer = new H2SequenceMaxValueIncrementer(database,
 				"BATCH_JOB_EXECUTION_SEQ");
 		jdbcJobExecutionDao.setJobExecutionIncrementer(jobExecutionIncrementer);
 		jdbcJobExecutionDao.setJobInstanceDao(jdbcJobInstanceDao);
 		jdbcJobExecutionDao.afterPropertiesSet();
 
-		jdbcStepExecutionDao = new JdbcStepExecutionDao();
+		jdbcStepExecutionDao = new JdbcStepExecutionDao(JdbcClient.create(jdbcTemplate));
 		H2SequenceMaxValueIncrementer stepExecutionIncrementer = new H2SequenceMaxValueIncrementer(database,
 				"BATCH_STEP_EXECUTION_SEQ");
 		jdbcStepExecutionDao.setStepExecutionIncrementer(stepExecutionIncrementer);
-		jdbcStepExecutionDao.setJdbcTemplate(jdbcTemplate);
 		jdbcStepExecutionDao.setJobExecutionDao(jdbcJobExecutionDao);
 		jdbcStepExecutionDao.afterPropertiesSet();
 	}
@@ -145,6 +148,60 @@ class JdbcStepExecutionDaoTests {
 	}
 
 	@Test
+	void testCountRunningStepExecutions() {
+		// given
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = jdbcJobInstanceDao.createJobInstance("job", jobParameters);
+		JobExecution jobExecution = jdbcJobExecutionDao.createJobExecution(jobInstance, jobParameters);
+		List<Long> ids = new ArrayList<>();
+		for (BatchStatus status : BatchStatus.values()) {
+			StepExecution stepExecution = jdbcStepExecutionDao.createStepExecution("step-" + status, jobExecution);
+			stepExecution.setStatus(status);
+			jdbcStepExecutionDao.updateStepExecution(stepExecution);
+			ids.add(stepExecution.getId());
+		}
+		StepExecution notRequested = jdbcStepExecutionDao.createStepExecution("not-requested", jobExecution);
+
+		// when
+		long running = jdbcStepExecutionDao.countRunningStepExecutions(ids);
+		long runningNotRequested = jdbcStepExecutionDao.countRunningStepExecutions(List.of(notRequested.getId()));
+
+		// then: STARTING, STARTED and STOPPING
+		assertEquals(3, running);
+		assertEquals(1, runningNotRequested);
+	}
+
+	@Test
+	void testCountRunningStepExecutionsWithoutIds() {
+		assertEquals(0, jdbcStepExecutionDao.countRunningStepExecutions(List.of()));
+	}
+
+	@Test
+	void testCountRunningStepExecutionsWithMoreIdsThanTheInClauseLimit() {
+		// given
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = jdbcJobInstanceDao.createJobInstance("job", jobParameters);
+		JobExecution jobExecution = jdbcJobExecutionDao.createJobExecution(jobInstance, jobParameters);
+		int total = 1200;
+		int completed = 150;
+		List<Long> ids = new ArrayList<>();
+		for (int i = 0; i < total; i++) {
+			StepExecution stepExecution = jdbcStepExecutionDao.createStepExecution("partition" + i, jobExecution);
+			if (i % 8 == 0 && i / 8 < completed) {
+				stepExecution.setStatus(BatchStatus.COMPLETED);
+				jdbcStepExecutionDao.updateStepExecution(stepExecution);
+			}
+			ids.add(stepExecution.getId());
+		}
+
+		// when
+		long running = jdbcStepExecutionDao.countRunningStepExecutions(ids);
+
+		// then
+		assertEquals(total - completed, running);
+	}
+
+	@Test
 	void testDeleteStepExecution() {
 		// Given
 		JobParameters jobParameters = new JobParameters();
@@ -157,6 +214,47 @@ class JdbcStepExecutionDaoTests {
 
 		// Then
 		Assertions.assertEquals(0, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_STEP_EXECUTION"));
+	}
+
+	@Test
+	void testGetLastStepExecution() {
+		// given
+		JobParameters jobParameters = new JobParametersBuilder().addString("name", "foo").toJobParameters();
+		JobInstance jobInstance = jdbcJobInstanceDao.createJobInstance("job", jobParameters);
+		JobExecution jobExecution = jdbcJobExecutionDao.createJobExecution(jobInstance, jobParameters);
+		jdbcStepExecutionDao.createStepExecution("step", jobExecution);
+		StepExecution lastStepExecution = jdbcStepExecutionDao.createStepExecution("step", jobExecution);
+
+		// distinct values on either side of the join, so that mixing up the step
+		// execution and job execution columns of the same name would be caught
+		lastStepExecution.setStatus(BatchStatus.COMPLETED);
+		lastStepExecution.setExitStatus(new ExitStatus("STEP_EXIT_CODE", "step exit description"));
+		lastStepExecution.setReadCount(7);
+		jdbcStepExecutionDao.updateStepExecution(lastStepExecution);
+		jobExecution.setStatus(BatchStatus.STARTED);
+		jobExecution.setExitStatus(new ExitStatus("JOB_EXIT_CODE", "job exit description"));
+		jdbcJobExecutionDao.updateJobExecution(jobExecution);
+
+		// when
+		StepExecution retrieved = jdbcStepExecutionDao.getLastStepExecution(jobInstance, "step");
+
+		// then
+		Assertions.assertNotNull(retrieved);
+		assertEquals(lastStepExecution.getId(), retrieved.getId());
+		assertEquals("step", retrieved.getStepName());
+		assertEquals(BatchStatus.COMPLETED, retrieved.getStatus());
+		assertEquals("STEP_EXIT_CODE", retrieved.getExitStatus().getExitCode());
+		assertEquals("step exit description", retrieved.getExitStatus().getExitDescription());
+		assertEquals(7, retrieved.getReadCount());
+		assertEquals(lastStepExecution.getVersion(), retrieved.getVersion());
+
+		JobExecution retrievedJobExecution = retrieved.getJobExecution();
+		assertEquals(jobExecution.getId(), retrievedJobExecution.getId());
+		assertEquals(jobInstance.getId(), retrievedJobExecution.getJobInstance().getId());
+		assertEquals(BatchStatus.STARTED, retrievedJobExecution.getStatus());
+		assertEquals("JOB_EXIT_CODE", retrievedJobExecution.getExitStatus().getExitCode());
+		assertEquals(jobExecution.getVersion(), retrievedJobExecution.getVersion());
+		assertEquals("foo", retrievedJobExecution.getJobParameters().getString("name"));
 	}
 
 }

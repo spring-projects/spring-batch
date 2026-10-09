@@ -50,8 +50,6 @@ import org.springframework.util.CollectionUtils;
  */
 public class SimpleStepExecutionSplitter implements StepExecutionSplitter {
 
-	private static final String STEP_NAME_SEPARATOR = ":";
-
 	private String stepName;
 
 	private Partitioner partitioner;

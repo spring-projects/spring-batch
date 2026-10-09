@@ -15,13 +15,17 @@
  */
 package org.springframework.batch.core.repository.support;
 
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
+import org.springframework.batch.core.BatchStatus;
 
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.batch.core.launch.NoSuchJobException;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -490,6 +494,27 @@ class ResourcelessJobRepositoryTests {
 
 		// then
 		assertEquals(0L, count);
+	}
+
+	@Test
+	void countRunningStepExecutions() {
+		// given
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = jobRepository.createJobInstance("job", jobParameters);
+		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
+				new ExecutionContext());
+		StepExecution running = jobRepository.createStepExecution("running", jobExecution);
+		StepExecution completed = jobRepository.createStepExecution("completed", jobExecution);
+		completed.setStatus(BatchStatus.COMPLETED);
+		StepExecution other = jobRepository.createStepExecution("other", jobExecution);
+
+		// when
+		long count = jobRepository.countRunningStepExecutions(List.of(running.getId(), completed.getId()));
+
+		// then
+		assertEquals(1L, count);
+		assertEquals(0L, jobRepository.countRunningStepExecutions(List.of(completed.getId())));
+		assertEquals(1L, jobRepository.countRunningStepExecutions(List.of(other.getId())));
 	}
 
 	@Test

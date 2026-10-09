@@ -116,6 +116,27 @@ abstract class AbstractJobRepositoryIntegrationTests {
 	}
 
 	/*
+	 * Create a job instance and its first job execution in a single call. Check both are
+	 * persisted and linked.
+	 */
+	@Test
+	void testCreateJobInstanceAndExecution() {
+		JobParameters parameters = new JobParametersBuilder().addString("stringKey", "stringValue").toJobParameters();
+
+		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), parameters);
+
+		assertNotNull(jobExecution.getId());
+		assertEquals(job.getName(), jobExecution.getJobInstance().getJobName());
+		assertEquals(parameters, jobExecution.getJobParameters());
+		JobInstance jobInstance = jobRepository.getJobInstance(job.getName(), parameters);
+		assertNotNull(jobInstance);
+		assertEquals(jobExecution.getJobInstance().getId(), jobInstance.getId());
+		JobExecution lastJobExecution = jobRepository.getLastJobExecution(jobInstance);
+		assertNotNull(lastJobExecution);
+		assertEquals(jobExecution.getId(), lastJobExecution.getId());
+	}
+
+	/*
 	 * Save multiple StepExecutions for the same step and check the returned count and
 	 * last execution are correct.
 	 */

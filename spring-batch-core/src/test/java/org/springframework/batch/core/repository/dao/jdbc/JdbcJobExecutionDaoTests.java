@@ -30,7 +30,9 @@ import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersBuilder;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
@@ -57,15 +59,13 @@ public class JdbcJobExecutionDaoTests {
 			.build();
 		jdbcTemplate = new JdbcTemplate(database);
 
-		jdbcJobInstanceDao = new JdbcJobInstanceDao();
-		jdbcJobInstanceDao.setJdbcTemplate(jdbcTemplate);
+		jdbcJobInstanceDao = new JdbcJobInstanceDao(JdbcClient.create(jdbcTemplate));
 		H2SequenceMaxValueIncrementer jobInstanceIncrementer = new H2SequenceMaxValueIncrementer(database,
 				"BATCH_JOB_INSTANCE_SEQ");
 		jdbcJobInstanceDao.setJobInstanceIncrementer(jobInstanceIncrementer);
 		jdbcJobInstanceDao.afterPropertiesSet();
 
-		jdbcJobExecutionDao = new JdbcJobExecutionDao();
-		jdbcJobExecutionDao.setJdbcTemplate(jdbcTemplate);
+		jdbcJobExecutionDao = new JdbcJobExecutionDao(JdbcClient.create(jdbcTemplate));
 		H2SequenceMaxValueIncrementer jobExecutionIncrementer = new H2SequenceMaxValueIncrementer(database,
 				"BATCH_JOB_EXECUTION_SEQ");
 		jdbcJobExecutionDao.setJobExecutionIncrementer(jobExecutionIncrementer);
@@ -170,6 +170,83 @@ public class JdbcJobExecutionDaoTests {
 		Assertions.assertEquals(2, jobExecutions.size());
 		Assertions.assertEquals(jobExecution2.getId(), jobExecutions.get(0).getId());
 		Assertions.assertEquals(jobExecution1.getId(), jobExecutions.get(1).getId());
+	}
+
+	@Test
+	void testGetMissingById() {
+		JobExecution retrievedJobExecution = jdbcJobExecutionDao.getJobExecution(1111111L);
+		Assertions.assertNull(retrievedJobExecution);
+	}
+
+	@Test
+	void testGetLastJobExecution() {
+		// given
+		JobParameters jobParameters = new JobParametersBuilder().addString("name", "foo").toJobParameters();
+		JobInstance jobInstance = jdbcJobInstanceDao.createJobInstance("job", jobParameters);
+		jdbcJobExecutionDao.createJobExecution(jobInstance, jobParameters);
+		JobExecution lastJobExecution = jdbcJobExecutionDao.createJobExecution(jobInstance, jobParameters);
+
+		// when
+		JobExecution retrievedJobExecution = jdbcJobExecutionDao.getLastJobExecution(jobInstance);
+
+		// then
+		Assertions.assertNotNull(retrievedJobExecution);
+		Assertions.assertEquals(lastJobExecution.getId(), retrievedJobExecution.getId());
+	}
+
+	@Test
+	void testGetLastJobExecutionWhenNoJobExecution() {
+		JobParameters jobParameters = new JobParametersBuilder().addString("name", "foo").toJobParameters();
+		JobInstance jobInstance = jdbcJobInstanceDao.createJobInstance("job", jobParameters);
+
+		JobExecution lastJobExecution = jdbcJobExecutionDao.getLastJobExecution(jobInstance);
+
+		Assertions.assertNull(lastJobExecution);
+	}
+
+	@Test
+	void testUpdateJobExecutionWhenRowNoLongerExists() {
+		// given
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = jdbcJobInstanceDao.createJobInstance("job", jobParameters);
+		JobExecution jobExecution = jdbcJobExecutionDao.createJobExecution(jobInstance, jobParameters);
+		jdbcTemplate.update("DELETE FROM BATCH_JOB_EXECUTION WHERE JOB_EXECUTION_ID = ?", jobExecution.getId());
+
+		// when & then
+		Assertions.assertThrows(OptimisticLockingFailureException.class,
+				() -> jdbcJobExecutionDao.updateJobExecution(jobExecution));
+	}
+
+	@Test
+	void testFindJobExecutionsLoadsTheParametersOfEachExecution() {
+		// given
+		JobInstance jobInstance = jdbcJobInstanceDao.createJobInstance("job",
+				new JobParametersBuilder().addString("name", "foo").toJobParameters());
+		JobExecution first = jdbcJobExecutionDao.createJobExecution(jobInstance,
+				new JobParametersBuilder().addString("name", "foo").toJobParameters());
+		JobExecution second = jdbcJobExecutionDao.createJobExecution(jobInstance,
+				new JobParametersBuilder().addString("name", "bar").addLong("run", 2L).toJobParameters());
+		JobExecution third = jdbcJobExecutionDao.createJobExecution(jobInstance, new JobParameters());
+
+		// when
+		List<JobExecution> jobExecutions = jdbcJobExecutionDao.findJobExecutions(jobInstance);
+
+		// then, newest first, each with its own parameters
+		Assertions.assertEquals(3, jobExecutions.size());
+
+		Assertions.assertEquals(third.getId(), jobExecutions.get(0).getId());
+		Assertions.assertTrue(jobExecutions.get(0).getJobParameters().isEmpty());
+
+		Assertions.assertEquals(second.getId(), jobExecutions.get(1).getId());
+		Assertions.assertEquals("bar", jobExecutions.get(1).getJobParameters().getString("name"));
+		Assertions.assertEquals(2L, jobExecutions.get(1).getJobParameters().getLong("run"));
+
+		Assertions.assertEquals(first.getId(), jobExecutions.get(2).getId());
+		Assertions.assertEquals("foo", jobExecutions.get(2).getJobParameters().getString("name"));
+		Assertions.assertEquals(1, jobExecutions.get(2).getJobParameters().parameters().size());
+
+		// the given job instance is reused rather than loaded again
+		Assertions.assertSame(jobInstance, jobExecutions.get(0).getJobInstance());
 	}
 
 }

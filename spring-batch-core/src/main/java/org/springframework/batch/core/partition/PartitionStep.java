@@ -17,7 +17,9 @@
 package org.springframework.batch.core.partition;
 
 import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobExecutionException;
+import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.observability.jfr.events.step.partition.PartitionAggregateEvent;
 import org.springframework.batch.core.observability.jfr.events.step.partition.PartitionSplitEvent;
 import org.springframework.batch.core.repository.JobRepository;
@@ -28,7 +30,12 @@ import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.util.Assert;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import org.jspecify.annotations.NullUnmarked;
 
@@ -124,17 +131,66 @@ public class PartitionStep extends AbstractStep {
 		stepExecution.upgradeStatus(BatchStatus.COMPLETED);
 		partitionSplitEvent.commit();
 
-		// aggregate the results of the executions
+		// aggregate the results of the executions, including the partitions that have
+		// already completed in a previous run of the same job instance
 		PartitionAggregateEvent partitionAggregateEvent = new PartitionAggregateEvent(stepExecution.getStepName(),
 				stepExecution.getId());
 		partitionAggregateEvent.begin();
-		stepExecutionAggregator.aggregate(stepExecution, executions);
+		stepExecutionAggregator.aggregate(stepExecution, withCompletedPartitions(stepExecution, executions));
 		partitionAggregateEvent.commit();
 
 		// If anything failed or had a problem we need to crap out
 		if (stepExecution.getStatus().isUnsuccessful()) {
 			throw new JobExecutionException("Partition handler returned an unsuccessful step");
 		}
+	}
+
+	/**
+	 * Complete the executions returned by the {@link PartitionHandler} with the
+	 * executions of the partitions that already completed in a previous run of the same
+	 * job instance.
+	 * <p>
+	 * On a restart, a {@link StepExecutionSplitter} only returns the partitions that need
+	 * to be re-executed. Without this, the aggregated result of a restarted partitioned
+	 * step would only reflect the partitions that have been re-executed, and would be
+	 * empty when all partitions had already completed before the restart.
+	 * @param managerStepExecution the manager step execution for the partition
+	 * @param executions the executions returned by the {@link PartitionHandler}
+	 * @return the executions to aggregate, with at most one execution per partition
+	 */
+	private Collection<StepExecution> withCompletedPartitions(StepExecution managerStepExecution,
+			Collection<StepExecution> executions) {
+
+		String partitionNamePrefix = stepExecutionSplitter.getStepName() + StepExecutionSplitter.STEP_NAME_SEPARATOR;
+		Set<String> handledPartitions = new HashSet<>();
+		for (StepExecution execution : executions) {
+			handledPartitions.add(execution.getStepName());
+		}
+
+		// keep the latest completed execution of each partition that has not been
+		// re-executed in the current run
+		Map<String, StepExecution> completedPartitions = new HashMap<>();
+		JobInstance jobInstance = managerStepExecution.getJobExecution().getJobInstance();
+		for (JobExecution jobExecution : getJobRepository().getJobExecutions(jobInstance)) {
+			for (StepExecution candidate : jobExecution.getStepExecutions()) {
+				String partitionName = candidate.getStepName();
+				if (candidate.getStatus() != BatchStatus.COMPLETED || !partitionName.startsWith(partitionNamePrefix)
+						|| handledPartitions.contains(partitionName)) {
+					continue;
+				}
+				StepExecution current = completedPartitions.get(partitionName);
+				if (current == null || candidate.getId() > current.getId()) {
+					completedPartitions.put(partitionName, candidate);
+				}
+			}
+		}
+
+		if (completedPartitions.isEmpty()) {
+			return executions;
+		}
+		Collection<StepExecution> executionsToAggregate = new ArrayList<>(executions);
+		executionsToAggregate.addAll(completedPartitions.values());
+		return executionsToAggregate;
 	}
 
 	protected StepExecutionSplitter getStepExecutionSplitter() {

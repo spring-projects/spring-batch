@@ -15,10 +15,13 @@
  */
 package org.springframework.batch.core.repository.dao.mongodb;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import org.jspecify.annotations.Nullable;
 
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.step.StepExecution;
@@ -195,6 +198,18 @@ public class MongoStepExecutionDao extends AbstractMongoBatchMetadataDao impleme
 						.toList())
 					.and("name")
 					.is(stepName)),
+				org.springframework.batch.core.repository.persistence.StepExecution.class,
+				getCollectionName(STEP_EXECUTIONS_COLLECTION_NAME));
+	}
+
+	@Override
+	public long countRunningStepExecutions(Collection<Long> stepExecutionIds) {
+		if (stepExecutionIds.isEmpty()) {
+			return 0;
+		}
+		List<BatchStatus> runningStatuses = Arrays.stream(BatchStatus.values()).filter(BatchStatus::isRunning).toList();
+		return this.mongoOperations.count(
+				query(where("stepExecutionId").in(stepExecutionIds).and("status").in(runningStatuses)),
 				org.springframework.batch.core.repository.persistence.StepExecution.class,
 				getCollectionName(STEP_EXECUTIONS_COLLECTION_NAME));
 	}

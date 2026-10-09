@@ -24,9 +24,11 @@ build
 .gradle
 out
 
-# Claude artifacts
+# AI agent artifacts
 .claude/*
+.codex/*
 CLAUDE.md
+AGENTS.md
 
 /.gradletasknamecache
 **/*.flattened-pom.xml

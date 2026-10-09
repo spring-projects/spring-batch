@@ -35,6 +35,7 @@ import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -222,6 +223,17 @@ public class SimpleJobRepository extends SimpleJobExplorer implements JobReposit
 		Assert.notNull(jobParameters, "Job parameters are required to create a JobInstance");
 
 		return jobInstanceDao.createJobInstance(jobName, jobParameters);
+	}
+
+	/**
+	 * @since 6.1
+	 */
+	@Override
+	public long countRunningStepExecutions(Collection<Long> stepExecutionIds) {
+		if (stepExecutionIds.isEmpty()) {
+			return 0;
+		}
+		return this.stepExecutionDao.countRunningStepExecutions(stepExecutionIds);
 	}
 
 }

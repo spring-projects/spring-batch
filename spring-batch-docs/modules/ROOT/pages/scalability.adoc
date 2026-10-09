@@ -391,7 +391,10 @@ how to split the input data or how to aggregate the result of multiple `Step` ex
 Generally speaking, it probably also does not need to know about resilience or failover,
 since those are features of the fabric in many cases. In any case, Spring Batch always
 provides restartability independent of the fabric. A failed `Job` can always be restarted,
-and, in that case, only the failed `Steps` are re-executed.
+and, in that case, only the failed `Steps` are re-executed. The partitions that already
+completed are not re-executed, but they are still part of the result aggregated into the
+manager `StepExecution`, so that the aggregated status and counts of a restarted
+partitioned step cover all partitions and not only the ones that have been re-executed.
 
 The `PartitionHandler` interface can have specialized implementations for a variety of
 fabric types, including simple RMI remoting, EJB remoting, custom web service, JMS, Java

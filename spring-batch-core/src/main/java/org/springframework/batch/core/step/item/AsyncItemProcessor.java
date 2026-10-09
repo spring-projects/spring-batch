@@ -22,6 +22,7 @@ import org.springframework.batch.core.step.StepExecution;
 
 import org.jspecify.annotations.Nullable;
 import org.springframework.batch.core.listener.ItemProcessListener;
+import org.springframework.batch.core.scope.context.JobSynchronizationManager;
 import org.springframework.batch.core.scope.context.StepContext;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.batch.infrastructure.item.ItemProcessor;
@@ -48,7 +49,7 @@ import org.springframework.util.Assert;
  * @see AsyncItemWriter
  * @since 6.1.0
  */
-public class AsyncItemProcessor<I, O> implements ItemProcessor<I, Future<O>> {
+public class AsyncItemProcessor<I, O> implements ItemProcessor<I, Future<@Nullable O>> {
 
 	private ItemProcessor<I, O> delegate;
 
@@ -87,19 +88,20 @@ public class AsyncItemProcessor<I, O> implements ItemProcessor<I, Future<O>> {
 	 *
 	 * @see ItemProcessor#process(Object)
 	 */
-	@SuppressWarnings("DataFlowIssue")
 	@Override
-	public @Nullable Future<O> process(I item) throws Exception {
+	public @Nullable Future<@Nullable O> process(I item) throws Exception {
 		final StepExecution stepExecution = getStepExecution();
-		FutureTask<O> task = new FutureTask<>(() -> {
+		FutureTask<@Nullable O> task = new FutureTask<>(() -> {
 			if (stepExecution != null) {
 				StepSynchronizationManager.register(stepExecution);
+				JobSynchronizationManager.register(stepExecution.getJobExecution());
 			}
 			try {
 				return delegate.process(item);
 			}
 			finally {
 				if (stepExecution != null) {
+					JobSynchronizationManager.close();
 					StepSynchronizationManager.close();
 				}
 			}

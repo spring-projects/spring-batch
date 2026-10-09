@@ -24,6 +24,7 @@ import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Timer;
 import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationRegistry;
+import org.jspecify.annotations.Nullable;
 
 import org.springframework.batch.core.observability.BatchMetrics;
 
@@ -42,11 +43,12 @@ public final class MicrometerMetrics {
 	 * Create a new {@link Observation}. It's not started, you must explicitly call
 	 * {@link Observation#start()} to start it.
 	 * @param name of the observation
-	 * @param observationRegistry the observation registry to use
+	 * @param observationRegistry the observation registry to use. If {@code null}, a
+	 * no-op observation is returned.
 	 * @return a new observation instance
 	 * @since 6.0
 	 */
-	public static Observation createObservation(String name, ObservationRegistry observationRegistry) {
+	public static Observation createObservation(String name, @Nullable ObservationRegistry observationRegistry) {
 		return Observation.createNotStarted(name, observationRegistry);
 	}
 

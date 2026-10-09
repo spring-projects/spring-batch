@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2025 the original author or authors.
+ * Copyright 2022-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,6 @@ package org.springframework.batch.core.launch.support;
 
 import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationRegistry;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.jspecify.annotations.Nullable;
 
 import org.springframework.batch.core.configuration.JobRegistry;
@@ -62,18 +60,7 @@ import static org.springframework.batch.core.observability.BatchMetrics.METRICS_
 @SuppressWarnings("removal")
 public class TaskExecutorJobOperator extends SimpleJobOperator {
 
-	private static final Log logger = LogFactory.getLog(TaskExecutorJobOperator.class.getName());
-
 	protected @Nullable ObservationRegistry observationRegistry;
-
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		super.afterPropertiesSet();
-		if (this.observationRegistry == null) {
-			logger.debug("No ObservationRegistry has been set, defaulting to ObservationRegistry NOOP");
-			this.observationRegistry = ObservationRegistry.NOOP;
-		}
-	}
 
 	@Override
 	public void setJobRegistry(JobRegistry jobRegistry) {
@@ -94,9 +81,24 @@ public class TaskExecutorJobOperator extends SimpleJobOperator {
 	}
 
 	/**
-	 * Set the observation registry to use for observations. Defaults to
-	 * {@link ObservationRegistry#NOOP}.
-	 * @param observationRegistry the observation registry
+	 * Return the observation registry configured on this job operator, or {@code null} if
+	 * none has been set, in which case no observations are created unless a registry is
+	 * provided by the application context (see
+	 * {@link org.springframework.batch.core.configuration.annotation.BatchObservabilityBeanPostProcessor}).
+	 * @return the observation registry, or {@code null} if none has been set
+	 * @since 6.1
+	 */
+	public @Nullable ObservationRegistry getObservationRegistry() {
+		return this.observationRegistry;
+	}
+
+	/**
+	 * Set the observation registry to use for observations. If not set, no observations
+	 * are created unless a registry is provided by the application context (see
+	 * {@link org.springframework.batch.core.configuration.annotation.BatchObservabilityBeanPostProcessor}).
+	 * Use {@link ObservationRegistry#NOOP} to explicitly disable observations for this
+	 * job operator.
+	 * @param observationRegistry the observation registry, must not be {@code null}
 	 * @since 6.0
 	 */
 	public void setObservationRegistry(ObservationRegistry observationRegistry) {

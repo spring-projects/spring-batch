@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -86,7 +86,7 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean<Step>, BeanNameA
 
 	protected JobRepository jobRepository;
 
-	protected ObservationRegistry observationRegistry = ObservationRegistry.NOOP;
+	protected ObservationRegistry observationRegistry;
 
 	private boolean singleton = true;
 
@@ -277,8 +277,11 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean<Step>, BeanNameA
 
 	/**
 	 * Public setter for {@link ObservationRegistry}.
-	 * @param observationRegistry is an optional dependency (defaults to
-	 * {@link ObservationRegistry#NOOP}).
+	 * @param observationRegistry is an optional dependency. If not set, the
+	 * {@link ObservationRegistry} bean of the application context is used if there is one
+	 * (see
+	 * {@link org.springframework.batch.core.configuration.annotation.BatchObservabilityBeanPostProcessor}),
+	 * and {@link ObservationRegistry#NOOP} otherwise.
 	 */
 	public void setObservationRegistry(ObservationRegistry observationRegistry) {
 		this.observationRegistry = observationRegistry;
@@ -470,7 +473,9 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean<Step>, BeanNameA
 		}
 		builder.transactionManager(transactionManager);
 		builder.transactionAttribute(getTransactionAttribute());
-		builder.observationRegistry(observationRegistry);
+		if (observationRegistry != null) {
+			builder.observationRegistry(observationRegistry);
+		}
 		builder.startLimit(startLimit);
 		builder.allowStartIfComplete(allowStartIfComplete);
 		builder.chunk(commitInterval);

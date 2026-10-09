@@ -16,7 +16,6 @@
 package org.springframework.batch.core.launch.support;
 
 import java.time.Duration;
-import java.util.List;
 
 import io.micrometer.observation.ObservationRegistry;
 import org.apache.commons.logging.Log;
@@ -115,88 +114,79 @@ public class TaskExecutorJobLauncher implements JobLauncher, InitializingBean {
 			throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException,
 			InvalidJobParametersException {
 		JobInstance jobInstance = jobRepository.getJobInstance(job.getName(), jobParameters);
-		ExecutionContext executionContext;
 		if (jobInstance == null) { // fresh start
 			logger.debug(
 					"Creating a new job instance for job = " + job.getName() + " with parameters = " + jobParameters);
-			jobInstance = jobRepository.createJobInstance(job.getName(), jobParameters);
-			executionContext = new ExecutionContext();
+			// Check the validity of the parameters before creating anything
+			// in the repository...
+			job.getJobParametersValidator().validate(jobParameters);
+
+			// the job instance and its first execution are created in a single
+			// transaction: if this fails, no job instance should be left behind
+			return jobRepository.createJobExecution(job.getName(), jobParameters);
 		}
 		else { // restart
 			logger.debug(
 					"Found existing job instance for job = " + job.getName() + " with parameters = " + jobParameters);
-			List<JobExecution> executions = jobRepository.getJobExecutions(jobInstance);
-			if (executions.isEmpty()) {
+			JobExecution lastJobExecution = jobRepository.getLastJobExecution(jobInstance);
+			if (lastJobExecution == null) {
 				throw new IllegalStateException("Cannot find any job execution for job instance: " + jobInstance);
 			}
-			else {
-				// check for running executions and find the last started
-				for (JobExecution execution : executions) {
-					if (execution.isRunning()) {
-						throw new JobExecutionAlreadyRunningException(
-								"A job execution for this job is already running: " + execution);
-					}
-					BatchStatus status = execution.getStatus();
-					if (status == BatchStatus.UNKNOWN) {
-						throw new JobRestartException("Cannot restart job from UNKNOWN status. "
-								+ "The last execution ended with a failure that could not be rolled back, "
-								+ "so it may be dangerous to proceed. Manual intervention is probably necessary.");
-					}
-					JobParameters allJobParameters = execution.getJobParameters();
-					JobParameters identifyingJobParameters = new JobParameters(
-							allJobParameters.getIdentifyingParameters());
-					if (status == BatchStatus.COMPLETED || status == BatchStatus.ABANDONED) {
-						throw new JobInstanceAlreadyCompleteException(
-								"A job instance already exists and is complete for identifying parameters="
-										+ identifyingJobParameters + ".  If you want to run this job again, "
-										+ "change the parameters.");
-					}
+			// A new execution is only created once these checks pass on the previous one,
+			// so only the last execution can be running or complete.
+			if (lastJobExecution.isRunning()) {
+				throw new JobExecutionAlreadyRunningException(
+						"A job execution for this job is already running: " + lastJobExecution);
+			}
+			BatchStatus status = lastJobExecution.getStatus();
+			if (status == BatchStatus.UNKNOWN) {
+				throw new JobRestartException("Cannot restart job from UNKNOWN status. "
+						+ "The last execution ended with a failure that could not be rolled back, "
+						+ "so it may be dangerous to proceed. Manual intervention is probably necessary.");
+			}
+			if (status == BatchStatus.COMPLETED || status == BatchStatus.ABANDONED) {
+				JobParameters identifyingJobParameters = new JobParameters(
+						lastJobExecution.getJobParameters().getIdentifyingParameters());
+				throw new JobInstanceAlreadyCompleteException(
+						"A job instance already exists and is complete for identifying parameters="
+								+ identifyingJobParameters + ".  If you want to run this job again, "
+								+ "change the parameters.");
+			}
+			// check if the job is restartable
+			if (!job.isRestartable()) {
+				throw new JobRestartException("JobInstance already exists and is not restartable");
+			}
+			/*
+			 * validate here if it has stepExecutions that are UNKNOWN, STARTING, STARTED
+			 * and STOPPING retrieve the previous execution and check
+			 */
+			for (StepExecution execution : lastJobExecution.getStepExecutions()) {
+				BatchStatus stepStatus = execution.getStatus();
+				if (stepStatus.isRunning()) {
+					throw new JobExecutionAlreadyRunningException(
+							"A job execution for this job is already running: " + lastJobExecution);
+				}
+				else if (stepStatus == BatchStatus.UNKNOWN) {
+					throw new JobRestartException(
+							"Cannot restart step [" + execution.getStepName() + "] from UNKNOWN status. "
+									+ "The last execution ended with a failure that could not be rolled back, "
+									+ "so it may be dangerous to proceed. Manual intervention is probably necessary.");
 				}
 			}
 
-			JobExecution lastJobExecution = jobRepository.getLastJobExecution(jobInstance);
-			if (lastJobExecution == null) { // should never happen, already checked above
-				throw new IllegalStateException("A job instance with no job executions exists for job = "
-						+ job.getName() + " and parameters = " + jobParameters);
-			}
-			else {
-				// check if the job is restartable
-				if (!job.isRestartable()) {
-					throw new JobRestartException("JobInstance already exists and is not restartable");
-				}
-				/*
-				 * validate here if it has stepExecutions that are UNKNOWN, STARTING,
-				 * STARTED and STOPPING retrieve the previous execution and check
-				 */
-				for (StepExecution execution : lastJobExecution.getStepExecutions()) {
-					BatchStatus status = execution.getStatus();
-					if (status.isRunning()) {
-						throw new JobExecutionAlreadyRunningException(
-								"A job execution for this job is already running: " + lastJobExecution);
-					}
-					else if (status == BatchStatus.UNKNOWN) {
-						throw new JobRestartException("Cannot restart step [" + execution.getStepName()
-								+ "] from UNKNOWN status. "
-								+ "The last execution ended with a failure that could not be rolled back, "
-								+ "so it may be dangerous to proceed. Manual intervention is probably necessary.");
-					}
-				}
+			// Check the validity of the parameters before creating anything
+			// in the repository...
+			job.getJobParametersValidator().validate(jobParameters);
 
-				executionContext = lastJobExecution.getExecutionContext();
-			}
+			/*
+			 * There is a very small probability that a non-restartable job can be
+			 * restarted, but only if another process or thread manages to launch
+			 * <i>and</i> fail a job execution for this instance between the last
+			 * assertion and the next method returning successfully.
+			 */
+			ExecutionContext executionContext = lastJobExecution.getExecutionContext();
+			return jobRepository.createJobExecution(jobInstance, jobParameters, executionContext);
 		}
-
-		// Check the validity of the parameters before creating anything
-		// in the repository...
-		job.getJobParametersValidator().validate(jobParameters);
-
-		/*
-		 * There is a very small probability that a non-restartable job can be restarted,
-		 * but only if another process or thread manages to launch <i>and</i> fail a job
-		 * execution for this instance between the last assertion and the next method
-		 * returning successfully.
-		 */
-		return jobRepository.createJobExecution(jobInstance, jobParameters, executionContext);
 	}
 
 	/**

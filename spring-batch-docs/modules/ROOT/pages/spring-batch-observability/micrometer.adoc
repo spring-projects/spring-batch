@@ -45,6 +45,48 @@ table explains all the metrics in details:
 NOTE: The `status` tag for jobs and steps is equal to the exit status. For item reading, processing
 and writing, this `status` tag can be either `SUCCESS` or `FAILURE`.
 
+[[observation-registry-selection]]
+== Choosing the observation registry
+
+By default, Spring Batch uses the `ObservationRegistry` bean of the application context for the
+job operator and for all jobs and steps. You can use a different registry for a specific job or
+step by setting it on its builder:
+
+[source, java]
+----
+@Bean
+public Job job(JobRepository jobRepository, Step step) {
+    return new JobBuilder("job", jobRepository)
+            .observationRegistry(myJobObservationRegistry)
+            .start(step)
+            .build();
+}
+
+@Bean
+public Step step(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+    return new StepBuilder("step", jobRepository)
+            .tasklet(new MyTasklet(), transactionManager)
+            .observationRegistry(myStepObservationRegistry)
+            .build();
+}
+----
+
+The following rules apply:
+
+* An observation registry that is set explicitly on a job, a step, or the job operator is never
+replaced by the one of the application context.
+* To disable observations for a specific job or step, set `ObservationRegistry.NOOP` on it. This is
+treated as an explicit choice, like any other registry.
+* Jobs, steps, and job operators without an explicit observation registry use the
+`ObservationRegistry` bean of the application context, if there is one. Otherwise, no observations
+are created.
+* If the application context contains several `ObservationRegistry` beans, mark one of them as
+`@Primary` to use it by default. Without a primary bean, no registry is applied by default (and a
+warning is logged), so only the artifacts with an explicit registry are observed.
+* For the job operator, you can also use the `observationRegistryRef` attribute of
+`@EnableBatchProcessing`, or override the `getObservationRegistry()` method of
+`DefaultBatchConfiguration`, to select a specific registry.
+
 [[custom-metrics]]
 == Custom metrics
 
@@ -114,4 +156,5 @@ With that in place, Spring Batch will create a trace for each job execution and 
 
 If you do not use `EnableBatchProcessing` or `DefaultBatchConfiguration`, you need to register a
 `BatchObservabilityBeanPostProcessor` in your application context, which will automatically set Micrometer's observation
-registry in observable batch artefacts.
+registry in observable batch artefacts that do not have one configured explicitly (see
+<<observation-registry-selection>>).

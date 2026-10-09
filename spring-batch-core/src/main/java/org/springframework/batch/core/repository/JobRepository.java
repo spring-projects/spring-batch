@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package org.springframework.batch.core.repository;
 
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
@@ -26,6 +27,7 @@ import org.springframework.batch.core.repository.explore.JobExplorer;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.jspecify.annotations.Nullable;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -294,6 +296,21 @@ public interface JobRepository extends JobExplorer {
 		throw new UnsupportedOperationException();
 	}
 
+	/**
+	 * Count, among the step executions with the given ids, those that are still running
+	 * (see {@link BatchStatus#isRunning()}). Unlike {@link #getJobExecution(long)}, this
+	 * does not load any step execution (nor its execution context) in memory, which makes
+	 * it suitable for polling the progress of a large number of step executions, such as
+	 * the workers of a partitioned step.
+	 * @param stepExecutionIds the ids of the step executions to check
+	 * @return the number of step executions with one of the given ids that are running,
+	 * or {@code 0} if none is found.
+	 * @since 6.1
+	 */
+	default long countRunningStepExecutions(Collection<Long> stepExecutionIds) {
+		throw new UnsupportedOperationException();
+	}
+
 	/*
 	 * ===================================================================================
 	 * Write operations
@@ -334,6 +351,26 @@ public interface JobRepository extends JobExplorer {
 	default JobExecution createJobExecution(JobInstance jobInstance, JobParameters jobParameters,
 			ExecutionContext executionContext) {
 		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 * Create a new {@link JobInstance} for the given job name and {@link JobParameters},
+	 * along with its first {@link JobExecution} (with an empty {@link ExecutionContext}).
+	 * <p>
+	 * The job instance and the job execution (including its parameters and execution
+	 * context) are meant to be created atomically, so that nothing is persisted if any of
+	 * these steps fails. The default implementation creates the job instance and then the
+	 * job execution in the same call, which makes it atomic when this method runs in a
+	 * single transaction, as is the case for job repositories created by the provided
+	 * factory beans (where {@code create*} methods are transactional).
+	 * @param jobName logical name of the job
+	 * @param jobParameters the runtime parameters for the job
+	 * @return the new {@link JobExecution}, associated with the new {@link JobInstance}
+	 * @since 6.1
+	 */
+	default JobExecution createJobExecution(String jobName, JobParameters jobParameters) {
+		JobInstance jobInstance = createJobInstance(jobName, jobParameters);
+		return createJobExecution(jobInstance, jobParameters, new ExecutionContext());
 	}
 
 	/**

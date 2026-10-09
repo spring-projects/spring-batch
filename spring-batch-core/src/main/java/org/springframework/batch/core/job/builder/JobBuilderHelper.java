@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -110,7 +110,12 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 	}
 
 	/**
-	 * Sets the observation registry for the job.
+	 * Sets the observation registry for the job. If not set, the
+	 * {@link ObservationRegistry} bean of the application context is used if there is one
+	 * (see
+	 * {@link org.springframework.batch.core.configuration.annotation.BatchObservabilityBeanPostProcessor}),
+	 * and {@link ObservationRegistry#NOOP} otherwise. Use
+	 * {@link ObservationRegistry#NOOP} to explicitly disable observations for this job.
 	 * @param observationRegistry the observation registry (optional)
 	 * @return this to enable fluent chaining
 	 */
