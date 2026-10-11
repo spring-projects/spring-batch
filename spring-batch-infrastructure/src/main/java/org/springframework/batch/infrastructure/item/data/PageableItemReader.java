@@ -15,18 +15,11 @@
  */
 package org.springframework.batch.infrastructure.item.data;
 
-import java.util.List;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.Iterator;
 import java.util.function.Function;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.jspecify.annotations.Nullable;
 
 import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.batch.infrastructure.item.ItemReader;
-import org.springframework.batch.infrastructure.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -59,23 +52,11 @@ import org.springframework.util.Assert;
  * @author Stefano Cordio
  * @since 6.1
  */
-public class PageableItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> {
-
-	protected Log logger = LogFactory.getLog(getClass());
+public class PageableItemReader<T> extends AbstractPaginatedDataItemReader<T> {
 
 	private final Function<Pageable, ? extends Slice<? extends T>> query;
 
 	private final Sort sort;
-
-	private final int pageSize;
-
-	private int page = 0;
-
-	private int current = 0;
-
-	private @Nullable List<? extends T> results;
-
-	private final Lock lock = new ReentrantLock();
 
 	/**
 	 * Create a new {@link PageableItemReader}.
@@ -96,79 +77,10 @@ public class PageableItemReader<T> extends AbstractItemCountingItemStreamItemRea
 	}
 
 	@Override
-	protected @Nullable T doRead() throws Exception {
-
-		lock.lock();
-		try {
-			boolean nextPageNeeded = (results != null && current >= results.size());
-
-			if (results == null || nextPageNeeded) {
-
-				if (logger.isDebugEnabled()) {
-					logger.debug("Reading page " + page);
-				}
-
-				results = doPageRead();
-				page++;
-
-				if (results.isEmpty()) {
-					return null;
-				}
-
-				if (nextPageNeeded) {
-					current = 0;
-				}
-			}
-
-			if (current < results.size()) {
-				T item = results.get(current);
-				current++;
-				return item;
-			}
-			return null;
-		}
-		finally {
-			lock.unlock();
-		}
-	}
-
-	/**
-	 * Performs the actual reading of a page by applying the configured query. Available
-	 * for overriding as needed.
-	 * @return the list of items that make up the page
-	 */
-	protected List<? extends T> doPageRead() {
+	@SuppressWarnings("unchecked")
+	protected Iterator<T> doPageRead() {
 		PageRequest pageRequest = PageRequest.of(page, pageSize, sort);
-		return query.apply(pageRequest).getContent();
-	}
-
-	@Override
-	protected void doOpen() throws Exception {
-	}
-
-	@Override
-	protected void doClose() throws Exception {
-		lock.lock();
-		try {
-			current = 0;
-			page = 0;
-			results = null;
-		}
-		finally {
-			lock.unlock();
-		}
-	}
-
-	@Override
-	protected void jumpToItem(int itemLastIndex) throws Exception {
-		lock.lock();
-		try {
-			page = itemLastIndex / pageSize;
-			current = itemLastIndex % pageSize;
-		}
-		finally {
-			lock.unlock();
-		}
+		return (Iterator<T>) query.apply(pageRequest).iterator();
 	}
 
 }
