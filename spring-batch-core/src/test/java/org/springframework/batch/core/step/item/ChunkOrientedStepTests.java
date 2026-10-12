@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.step.item;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -22,6 +23,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.annotation.AfterStep;
 import org.springframework.batch.core.annotation.BeforeStep;
@@ -31,6 +33,8 @@ import org.springframework.batch.core.annotation.OnSkipInWrite;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.listener.ChunkListener;
+import org.springframework.batch.core.listener.ItemWriteListener;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.ResourcelessJobRepository;
 import org.springframework.batch.core.step.FatalStepExecutionException;
@@ -613,6 +617,175 @@ public class ChunkOrientedStepTests {
 		// then
 		assertEquals(itemCount, stepExecution.getProcessSkipCount(),
 				"Sequential mode should have accurate process skip count");
+	}
+
+	@Test
+	void testListenerExceptionOnChunkWriteIsNotSkippable() throws Exception {
+		// given: a listener bug on the first write of the chunk containing "b"
+		ItemWriteListener<String> beforeWriteBug = new ItemWriteListener<>() {
+			@Override
+			public void beforeWrite(Chunk<? extends String> items) {
+				if (items.getItems().contains("b")) {
+					throw new IllegalStateException("beforeWrite bug");
+				}
+			}
+		};
+		ItemWriteListener<String> afterWriteBug = new ItemWriteListener<>() {
+			@Override
+			public void afterWrite(Chunk<? extends String> items) {
+				if (items.getItems().contains("b")) {
+					throw new IllegalStateException("afterWrite bug");
+				}
+			}
+		};
+		ItemWriteListener<String> onWriteErrorBug = new ItemWriteListener<>() {
+			@Override
+			public void onWriteError(Exception exception, Chunk<? extends String> items) {
+				throw new IllegalStateException("onWriteError bug");
+			}
+		};
+		ItemWriter<String> workingWriter = items -> {
+		};
+		// onWriteError is only called if the write fails
+		ItemWriter<String> failingWriter = items -> {
+			if (items.getItems().contains("b")) {
+				throw new IllegalArgumentException("write failure");
+			}
+		};
+
+		for (boolean concurrent : new boolean[] { false, true }) {
+			assertListenerBugFailsStep(workingWriter, beforeWriteBug, concurrent);
+			assertListenerBugFailsStep(workingWriter, afterWriteBug, concurrent);
+			assertListenerBugFailsStep(failingWriter, onWriteErrorBug, concurrent);
+		}
+	}
+
+	private void assertListenerBugFailsStep(ItemWriter<String> writer, ItemWriteListener<String> listener,
+			boolean concurrent) throws Exception {
+		// when
+		StepExecution stepExecution = execute(writer, listener, null, concurrent);
+
+		// then
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
+		assertEquals(0, stepExecution.getWriteSkipCount());
+		assertInstanceOf(FatalStepExecutionException.class, stepExecution.getFailureExceptions().get(0));
+	}
+
+	@Test
+	void testListenerExceptionInScanIsNotSkippable() throws Exception {
+		// given: the chunk write fails, which triggers a scan; the listener fails for "b"
+		// when "b" is written on its own
+		ItemWriter<String> writer = items -> {
+			if (items.size() > 1 && items.getItems().contains("b")) {
+				throw new IllegalArgumentException("write failure");
+			}
+		};
+		List<ItemWriteListener<String>> listeners = List.of(new ItemWriteListener<>() {
+			@Override
+			public void beforeWrite(Chunk<? extends String> items) {
+				if (items.size() == 1 && items.getItems().contains("b")) {
+					throw new IllegalStateException("beforeWrite bug in scan");
+				}
+			}
+		}, new ItemWriteListener<>() {
+			@Override
+			public void afterWrite(Chunk<? extends String> items) {
+				if (items.size() == 1 && items.getItems().contains("b")) {
+					throw new IllegalStateException("afterWrite bug in scan");
+				}
+			}
+		});
+
+		for (boolean concurrent : new boolean[] { false, true }) {
+			for (ItemWriteListener<String> listener : listeners) {
+				// when
+				StepExecution stepExecution = execute(writer, listener, null, concurrent);
+
+				// then: the listener exception fails the step instead of skipping "b"
+				assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
+				assertEquals(0, stepExecution.getWriteSkipCount());
+				Throwable failure = stepExecution.getFailureExceptions().get(0);
+				assertInstanceOf(FatalStepExecutionException.class, failure);
+				assertEquals("Unable to process chunk during scan", failure.getMessage());
+			}
+		}
+	}
+
+	@Test
+	void testChunkListenerIsNotifiedOfListenerExceptionInScan() throws Exception {
+		// given
+		ItemWriter<String> writer = items -> {
+			if (items.size() > 1 && items.getItems().contains("b")) {
+				throw new IllegalArgumentException("write failure");
+			}
+		};
+		ItemWriteListener<String> writeListener = new ItemWriteListener<>() {
+			@Override
+			public void afterWrite(Chunk<? extends String> items) {
+				if (items.size() == 1 && items.getItems().contains("b")) {
+					throw new IllegalStateException("afterWrite bug in scan");
+				}
+			}
+		};
+		List<Exception> chunkErrors = new ArrayList<>();
+		ChunkListener<String, String> chunkListener = new ChunkListener<>() {
+			@Override
+			public void onChunkError(Exception exception, Chunk<String> chunk) {
+				chunkErrors.add(exception);
+			}
+		};
+
+		// when
+		StepExecution stepExecution = execute(writer, writeListener, chunkListener, false);
+
+		// then: once for the failed chunk write, once for the listener exception
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
+		assertEquals(2, chunkErrors.size());
+		assertEquals("afterWrite bug in scan", chunkErrors.get(1).getMessage());
+	}
+
+	@Test
+	void testWriteFailureInScanIsStillSkippable() throws Exception {
+		// given: "b" can never be written, no listener bug
+		ItemWriter<String> writer = items -> {
+			if (items.getItems().contains("b")) {
+				throw new IllegalArgumentException("write failure");
+			}
+		};
+
+		for (boolean concurrent : new boolean[] { false, true }) {
+			// when
+			StepExecution stepExecution = execute(writer, new ItemWriteListener<>() {
+			}, null, concurrent);
+
+			// then
+			assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
+			assertEquals(1, stepExecution.getWriteSkipCount());
+			assertEquals(5, stepExecution.getWriteCount());
+		}
+	}
+
+	private StepExecution execute(ItemWriter<String> writer, ItemWriteListener<String> writeListener,
+			ChunkListener<String, String> chunkListener, boolean concurrent) throws Exception {
+		ChunkOrientedStep<String, String> step = new ChunkOrientedStep<>("step", 3,
+				new ListItemReader<>(List.of("a", "b", "c", "d", "e", "f")), writer, new ResourcelessJobRepository());
+		step.setTransactionManager(new ResourcelessTransactionManager());
+		step.setFaultTolerant(true);
+		step.setRetryPolicy(RetryPolicy.withMaxRetries(0));
+		step.setSkipPolicy((throwable, skipCount) -> true);
+		step.registerItemWriteListener(writeListener);
+		if (chunkListener != null) {
+			step.registerChunkListener(chunkListener);
+		}
+		if (concurrent) {
+			step.setTaskExecutor(new SimpleAsyncTaskExecutor());
+		}
+		step.afterPropertiesSet();
+
+		JobExecution jobExecution = new JobExecution(1L, new JobInstance(1L, "job"), new JobParameters());
+		StepExecution stepExecution = new StepExecution(1L, "step", jobExecution);
+		step.execute(stepExecution);
+		return stepExecution;
 	}
 
 }

@@ -14,6 +14,14 @@ recommend that you declare the listeners at the level at which its function appl
 or, if it is multi-featured (such as `StepExecutionListener` and `ItemReadListener`),
 declare it at the most granular level where it applies.
 
+[NOTE]
+====
+Step listeners are not designed to throw exceptions: none of the listener methods declares
+a checked exception, and errors must be handled in the implementation. An exception thrown
+by a listener is not considered a read, process, or write failure. It is never subject to
+the skip or retry policies of a fault-tolerant step, and it terminates the step.
+====
+
 
 [tabs]
 ====
