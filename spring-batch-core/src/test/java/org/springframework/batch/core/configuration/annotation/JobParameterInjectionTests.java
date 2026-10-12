@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-present the original author or authors.
+ * Copyright 2026-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,14 @@
  */
 package org.springframework.batch.core.configuration.annotation;
 
+import java.lang.reflect.Method;
 import java.time.LocalDate;
 import java.util.Set;
 
 import javax.sql.DataSource;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -40,9 +42,12 @@ import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.infrastructure.repeat.RepeatStatus;
 import org.springframework.batch.infrastructure.support.DatabaseType;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.DependencyDescriptor;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.MethodParameter;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.jdbc.support.JdbcTransactionManager;
@@ -50,12 +55,13 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 /**
  * @author Yanming Zhou
+ * @author Mahmoud Ben Hassine
  */
 class JobParameterInjectionTests {
 
 	@ParameterizedTest
 	@ValueSource(classes = { MethodParameterWithImplicitName.class, MethodParameterWithExplicitName.class,
-			FieldWithImplicitName.class, FieldWithExplicitName.class })
+			FieldWithImplicitName.class, FieldWithExplicitName.class, MethodParameterInJobScope.class })
 	void testInjection(Class<?> configurationClass) throws Exception {
 		// given
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(configurationClass);
@@ -70,6 +76,94 @@ class JobParameterInjectionTests {
 		// then
 		Assertions.assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
 		Assertions.assertEquals(date, context.getBean(JobParameterHolder.class).getDate());
+	}
+
+	@Test
+	void testMissingJobParameterIsInjectedAsNull() throws Exception {
+		// given
+		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(
+				MethodParameterWithImplicitName.class);
+		Job job = context.getBean(Job.class);
+		JobOperator jobOperator = context.getBean(JobOperator.class);
+
+		// when
+		JobExecution jobExecution = jobOperator.start(job, new JobParameters());
+
+		// then
+		Assertions.assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
+		Assertions.assertNull(context.getBean(JobParameterHolder.class).getDate());
+	}
+
+	@Test
+	void testSuggestedValue() throws Exception {
+		AutowireCandidateResolverHolder holder = new AutowireCandidateResolverHolder();
+
+		Assertions.assertEquals("#{jobParameters['myName']}",
+				holder.resolver.getSuggestedValue(descriptor("implicitName", 0)));
+		Assertions.assertEquals("#{jobParameters['date']}",
+				holder.resolver.getSuggestedValue(descriptor("explicitName", 0)));
+	}
+
+	@Test
+	void testSuggestedValueDelegatesWhenNotAnnotated() throws Exception {
+		AutowireCandidateResolverHolder holder = new AutowireCandidateResolverHolder();
+
+		Assertions.assertNull(holder.resolver.getSuggestedValue(descriptor("notAnnotated", 0)));
+	}
+
+	@Test
+	void testImplicitNameNotAvailable() throws Exception {
+		AutowireCandidateResolverHolder holder = new AutowireCandidateResolverHolder();
+		Method method = JobParameterInjectionTests.class.getDeclaredMethod("implicitName", String.class);
+		MethodParameter parameterWithoutName = new MethodParameter(method, 0) {
+			@Override
+			public String getParameterName() {
+				return null;
+			}
+		};
+
+		IllegalStateException exception = Assertions.assertThrows(IllegalStateException.class,
+				() -> holder.resolver.getSuggestedValue(new DependencyDescriptor(parameterWithoutName, true)));
+		Assertions.assertTrue(exception.getMessage().contains("implicitName"), exception.getMessage());
+		Assertions.assertTrue(exception.getMessage().contains("-parameters"), exception.getMessage());
+	}
+
+	@Test
+	void testCloneIfNecessaryKeepsJobParameterSupport() throws Exception {
+		AutowireCandidateResolverHolder holder = new AutowireCandidateResolverHolder();
+		DefaultListableBeanFactory copy = new DefaultListableBeanFactory();
+
+		copy.copyConfigurationFrom(holder.beanFactory);
+
+		Assertions.assertEquals("#{jobParameters['date']}",
+				copy.getAutowireCandidateResolver().getSuggestedValue(descriptor("explicitName", 0)));
+	}
+
+	void implicitName(@JobParameter String myName) {
+	}
+
+	void explicitName(@JobParameter("date") String name) {
+	}
+
+	void notAnnotated(String name) {
+	}
+
+	private static DependencyDescriptor descriptor(String methodName, int parameterIndex) throws Exception {
+		Method method = JobParameterInjectionTests.class.getDeclaredMethod(methodName, String.class);
+		return new DependencyDescriptor(new MethodParameter(method, parameterIndex), true);
+	}
+
+	static class AutowireCandidateResolverHolder {
+
+		final DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
+
+		final org.springframework.beans.factory.support.AutowireCandidateResolver resolver;
+
+		AutowireCandidateResolverHolder() {
+			new JobParameterBeanFactoryPostProcessor().postProcessBeanFactory(this.beanFactory);
+			this.resolver = this.beanFactory.getAutowireCandidateResolver();
+		}
+
 	}
 
 	static class JobParameterInjectionConfiguration extends JdbcDefaultBatchConfiguration {
@@ -126,6 +220,20 @@ class JobParameterInjectionTests {
 		public Tasklet myTasklet(JobParameterHolder jobParameterHolder, @JobParameter("date") LocalDate myDate) {
 			return (contribution, chunkContext) -> {
 				jobParameterHolder.setDate(myDate);
+				return RepeatStatus.FINISHED;
+			};
+		}
+
+	}
+
+	@Configuration
+	static class MethodParameterInJobScope extends JobParameterInjectionConfiguration {
+
+		@Bean
+		@JobScope
+		public Tasklet myTasklet(JobParameterHolder jobParameterHolder, @JobParameter LocalDate date) {
+			return (contribution, chunkContext) -> {
+				jobParameterHolder.setDate(date);
 				return RepeatStatus.FINISHED;
 			};
 		}

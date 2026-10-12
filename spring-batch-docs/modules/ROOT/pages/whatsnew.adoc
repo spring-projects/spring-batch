@@ -17,6 +17,7 @@ Spring Batch 6.1 includes the following features and improvements:
 * xref:whatsnew.adoc#compile-time-safety-for-mutually-exclusive-builder-methods[Compile-time safety for mutually exclusive builder methods]
 * xref:whatsnew.adoc#avro-reflection-based-deserialization-now-requires-trusted-classes[Avro reflection-based (de)serialization now requires trusted classes]
 * xref:whatsnew.adoc#jdbc-daos-migrated-to-jdbcclient[JDBC DAOs migrated to `JdbcClient`]
+* xref:whatsnew.adoc#jobparameter-annotation-for-injecting-job-parameters[`@JobParameter` annotation for injecting job parameters]
 * xref:whatsnew.adoc#deprecations[Deprecations]
 
 [[dependencies-upgrade]]
@@ -394,6 +395,52 @@ removed. Such code needs to pass a `JdbcClient` to the constructor as shown abov
 
 For more details, see
 https://github.com/spring-projects/spring-batch/issues/4804[issue #4804].
+
+[[jobparameter-annotation-for-injecting-job-parameters]]
+== `@JobParameter` annotation for injecting job parameters
+
+Injecting a job parameter into a job or step scoped bean used to require a SpEL
+expression, which is a string that is only evaluated at runtime and is easy to get wrong.
+The new `@JobParameter` annotation is a shorter alternative that defaults the name of the
+job parameter to the name of the annotated field or parameter:
+
+[source, java]
+----
+// before
+@Bean
+@StepScope
+public FlatFileItemReader<Foo> fooReader(@Value("#{jobParameters['inputFile']}") String inputFile) {
+    return new FlatFileItemReaderBuilder<Foo>()
+                    .resource(new FileSystemResource(inputFile))
+                    // other properties omitted
+                    .build();
+}
+
+// after
+@Bean
+@StepScope
+public FlatFileItemReader<Foo> fooReader(@JobParameter String inputFile) {
+    return new FlatFileItemReaderBuilder<Foo>()
+                    .resource(new FileSystemResource(inputFile))
+                    // other properties omitted
+                    .build();
+}
+----
+
+The name can also be specified explicitly, for example `@JobParameter("input.file.name")`,
+which is required when it is not a valid Java identifier or differs from the name of the
+field or parameter. `@JobParameter` can be used on fields and on method or constructor
+parameters, and is supported with `@EnableBatchProcessing` and `DefaultBatchConfiguration`.
+
+NOTE: `@JobParameter` is equivalent to `@Value("#{jobParameters['name']}")`, so it behaves
+the same way: it is meant for beans defined in the job or step scope, and a missing job
+parameter is injected as `null`. When the name is omitted on a method or constructor
+parameter, the code must be compiled with the `-parameters` flag (which is the default
+with the Spring Boot Maven and Gradle plugins), otherwise an exception is thrown.
+
+For more details, please refer to the
+xref:step/late-binding.adoc[Late Binding of `Job` and `Step` Attributes] section, and
+see https://github.com/spring-projects/spring-batch/issues/5563[issue #5563].
 
 [[deprecations]]
 == Deprecations

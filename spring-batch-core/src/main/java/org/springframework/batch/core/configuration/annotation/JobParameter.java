@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-present the original author or authors.
+ * Copyright 2026-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,26 +25,39 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * <p>
- * Convenient annotation for injecting job parameters in @JobScope or @StepScope. The
+ * Convenient annotation for injecting a job parameter into a field or a parameter of a
+ * bean defined in {@link JobScope &#64;JobScope} or {@link StepScope &#64;StepScope}. The
  * following listing shows an example:
  * </p>
  *
  * <pre class="code">
  * &#064;Bean
  * &#064;StepScope
- * protected Callable&lt;String&gt; value(@JobParameter final String key) {
+ * public Callable&lt;String&gt; callable(&#064;JobParameter("key") String value) {
  *     return new SimpleCallable(value);
  * }
  * </pre>
  *
  * <p>
  * Marking a parameter or field as &#64;JobParameter is equivalent to marking it as
- * <code>&#64;Value(&quot;#{jobParameters['key']}&quot;)</code>
+ * <code>&#64;Value(&quot;#{jobParameters['key']}&quot;)</code>. As with
+ * <code>&#64;Value</code>, a job parameter that is not present in the job parameters is
+ * injected as <code>null</code>, and the injection fails on a bean that is neither job
+ * scoped nor step scoped, as there is no job or step context to resolve the job parameter
+ * from.
+ * </p>
+ *
+ * <p>
+ * When no name is specified, the name of the annotated field or parameter is used. For a
+ * method or constructor parameter, this requires the code to be compiled with the
+ * <code>-parameters</code> flag, otherwise the name has to be specified explicitly.
  * </p>
  *
  * @author Yanming Zhou
+ * @author Mahmoud Ben Hassine
  * @since 6.1
- *
+ * @see JobScope
+ * @see StepScope
  */
 @Target({ ElementType.FIELD, ElementType.PARAMETER })
 @Retention(RetentionPolicy.RUNTIME)
@@ -52,6 +65,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Autowired
 public @interface JobParameter {
 
+	/**
+	 * The name of the job parameter to inject. Defaults to the name of the annotated
+	 * field or parameter.
+	 * @return the name of the job parameter
+	 */
 	String value() default "";
 
 }

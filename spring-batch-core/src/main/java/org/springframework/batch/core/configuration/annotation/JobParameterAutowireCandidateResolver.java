@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-present the original author or authors.
+ * Copyright 2026-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,14 @@ import org.springframework.beans.factory.support.AutowireCandidateResolver;
 import org.springframework.core.MethodParameter;
 
 /**
- * {@link AutowireCandidateResolver} implementation that matches bean definition
- * qualifiers against {@link JobParameter} on the field or parameter to be autowired.
+ * {@link AutowireCandidateResolver} implementation that supports {@link JobParameter}.
+ * The value suggested for a field or parameter annotated with {@link JobParameter} is the
+ * expression that resolves the corresponding job parameter, equivalent to
+ * <code>&#64;Value("#{jobParameters['name']}")</code>. Everything else is delegated to
+ * the wrapped resolver.
  *
  * @author Yanming Zhou
+ * @author Mahmoud Ben Hassine
  * @since 6.1
  * @see JobParameter
  */
@@ -34,7 +38,7 @@ class JobParameterAutowireCandidateResolver implements AutowireCandidateResolver
 
 	private final AutowireCandidateResolver delegate;
 
-	public JobParameterAutowireCandidateResolver(AutowireCandidateResolver delegate) {
+	JobParameterAutowireCandidateResolver(AutowireCandidateResolver delegate) {
 		this.delegate = delegate;
 	}
 
@@ -52,8 +56,12 @@ class JobParameterAutowireCandidateResolver implements AutowireCandidateResolver
 			if (key.isEmpty()) {
 				key = descriptor.getDependencyName();
 				if (key == null) {
-					throw new IllegalStateException(
-							"Value of @JobParameter on method parameter is not specified, and parameter name information not available via reflection. Ensure that the compiler uses the '-parameters' flag.");
+					MethodParameter methodParam = descriptor.getMethodParameter();
+					String target = (methodParam != null) ? "parameter " + methodParam.getParameterIndex() + " of "
+							+ methodParam.getExecutable().toGenericString() : descriptor.toString();
+					throw new IllegalStateException("No name specified for @JobParameter on " + target
+							+ ", and parameter name information is not available via reflection. "
+							+ "Specify the name with @JobParameter(\"name\") or compile with the '-parameters' flag.");
 				}
 			}
 			return String.format("#{jobParameters['%s']}", key);

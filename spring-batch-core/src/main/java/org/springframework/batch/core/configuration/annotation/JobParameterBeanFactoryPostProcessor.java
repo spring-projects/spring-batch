@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-present the original author or authors.
+ * Copyright 2026-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,11 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 
 /**
- * Bean factory post processor that configures job parameter autowire candidate resolver.
+ * Bean factory post processor that configures the autowire candidate resolver that
+ * supports {@link JobParameter}.
  *
  * @author Yanming Zhou
+ * @author Mahmoud Ben Hassine
  * @since 6.1
  */
 public class JobParameterBeanFactoryPostProcessor implements BeanFactoryPostProcessor {
