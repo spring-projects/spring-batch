@@ -1036,8 +1036,18 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			return new Chunk<>();
 		}
 		Chunk<O> singleItemChunk = new Chunk<>(item);
+		// listeners are not designed to throw: an exception thrown by one of them is
+		// not a write failure of the item, so it is kept out of the try block below and
+		// is never checked against the skip policy. It fails the step, as it does when
+		// the chunk is written in writeChunk().
 		try {
 			this.compositeItemWriteListener.beforeWrite(singleItemChunk);
+		}
+		catch (Exception listenerException) {
+			notifyChunkError(listenerException, singleItemChunk);
+			throw listenerException;
+		}
+		try {
 			this.itemWriter.write(singleItemChunk);
 			// see the equivalent check in writeChunk(): the write may return normally
 			// even though the transaction has independently been marked rollback-only
@@ -1046,7 +1056,6 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 						"The scanned item write completed without an exception, but the transaction is rollback-only");
 			}
 			contribution.incrementWriteCount(singleItemChunk.size());
-			this.compositeItemWriteListener.afterWrite(singleItemChunk);
 		}
 		catch (Exception exception) {
 			// the chunk listener is notified from here rather than from the caller's
@@ -1060,6 +1069,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 				contribution.getStepExecution().incrementRollbackCount();
 				status.setRollbackOnly();
 				notifyChunkError(exception, singleItemChunk);
+				return singleItemChunk;
 			}
 			else {
 				logger.error("Failed to write item: " + item, exception);
@@ -1067,6 +1077,13 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 				notifyChunkError(exception, singleItemChunk);
 				throw new NonSkippableWriteException("Skip policy rejected skipping item", exception);
 			}
+		}
+		try {
+			this.compositeItemWriteListener.afterWrite(singleItemChunk);
+		}
+		catch (Exception listenerException) {
+			notifyChunkError(listenerException, singleItemChunk);
+			throw listenerException;
 		}
 		return singleItemChunk;
 	}
