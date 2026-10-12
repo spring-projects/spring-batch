@@ -45,6 +45,7 @@ import org.springframework.util.StringUtils;
  * @author LEE Juchan
  * @author Mahmoud Ben Hassine
  * @author Jimmy Praet
+ * @author JungKyun Ryu
  * @since 5.1
  */
 public class MongoCursorItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> implements InitializingBean {
@@ -282,10 +283,11 @@ public class MongoCursorItemReader<T> extends AbstractItemCountingItemStreamItem
 		return cursor.hasNext() ? cursor.next() : null;
 	}
 
-	@SuppressWarnings("DataFlowIssue")
 	@Override
 	protected void doClose() throws Exception {
-		this.cursor.close();
+		if (this.cursor != null) {
+			this.cursor.close();
+		}
 	}
 
 	private Sort convertToSort(Map<String, Sort.Direction> sorts) {
