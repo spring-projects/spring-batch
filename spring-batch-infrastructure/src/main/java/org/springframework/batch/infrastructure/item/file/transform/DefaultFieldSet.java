@@ -576,8 +576,10 @@ public class DefaultFieldSet implements FieldSet {
 	/**
 	 * Veto a decimal token before it is parsed.
 	 * <p>
-	 * Called for float, double and {@link BigDecimal} reads when the token is not blank.
-	 * The default implementation does nothing.
+	 * Called for float, double and {@link BigDecimal} reads. Float and double reads
+	 * invoke this hook even when the trimmed token is blank. {@link BigDecimal} reads
+	 * skip validation for blank tokens and return the default value. The default
+	 * implementation does nothing.
 	 * @param input the trimmed token
 	 * @since 6.1
 	 */
