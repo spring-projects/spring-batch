@@ -419,10 +419,18 @@ public interface JobRepository extends JobExplorer {
 	 * {@link JobExecution} must already exist. The returned {@link StepExecution} should
 	 * be associated with the {@link JobExecution} (ie. should be added to the list of
 	 * {@link JobExecution#getStepExecutions()}.
+	 * <p>
+	 * The given {@link ExecutionContext} is associated with the new
+	 * {@link StepExecution}. The default implementation creates the step execution with
+	 * {@link #createStepExecution(String, JobExecution)} and then persists the context
+	 * with {@link #updateExecutionContext(StepExecution)}. Implementations are encouraged
+	 * to override it in order to persist the context along with the step execution.
 	 * @param stepName the name of the step
 	 * @param jobExecution the job execution to which the step execution belongs
-	 * @param stepExecutionContext the step execution context
+	 * @param stepExecutionContext the execution context of the step execution, must not
+	 * be {@code null} (use an empty context if there is nothing to store)
 	 * @return a valid {@link StepExecution} for the arguments provided
+	 * @since 6.1
 	 */
 	default StepExecution createStepExecution(String stepName, JobExecution jobExecution,
 			ExecutionContext stepExecutionContext) {

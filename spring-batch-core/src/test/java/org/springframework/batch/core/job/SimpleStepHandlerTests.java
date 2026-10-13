@@ -18,10 +18,25 @@ package org.springframework.batch.core.job;
 
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
+
+import org.springframework.batch.infrastructure.support.DatabaseType;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.batch.core.BatchConstants.BATCH_EXECUTED;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
+import org.mockito.ArgumentCaptor;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.parameters.JobParameters;
@@ -33,12 +48,9 @@ import org.springframework.batch.core.step.StepSupport;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.batch.infrastructure.repeat.RepeatStatus;
-import org.springframework.batch.infrastructure.support.DatabaseType;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Dave Syer
@@ -108,6 +120,48 @@ class SimpleStepHandlerTests {
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 		assertEquals("foo", stepExecution.getExecutionContext().get("foo"));
 		assertFalse(stepExecution.getExecutionContext().containsKey("failed"));
+	}
+
+	@Test
+	void testRestartCopiesPreviousExecutionContext() throws Exception {
+		// given a failed previous step execution whose context contains BATCH_EXECUTED
+		JobInstance jobInstance = jobExecution.getJobInstance();
+		JobExecution previousJobExecution = new JobExecution(100L, jobInstance, new JobParameters());
+		StepExecution previousStepExecution = new StepExecution(100L, "step", previousJobExecution);
+		previousStepExecution.getExecutionContext().putString("foo", "bar");
+		previousStepExecution.getExecutionContext().put(BATCH_EXECUTED, true);
+		previousStepExecution.setStatus(BatchStatus.FAILED);
+		JobExecution restartedJobExecution = new JobExecution(101L, jobInstance, new JobParameters());
+		JobRepository repository = mock();
+		when(repository.getLastStepExecution(jobInstance, "step")).thenReturn(previousStepExecution);
+		when(repository.createStepExecution(eq("step"), eq(restartedJobExecution), any())).thenAnswer(invocation -> {
+			StepExecution stepExecution = new StepExecution(101L, "step", restartedJobExecution);
+			stepExecution.setExecutionContext(invocation.getArgument(2));
+			return stepExecution;
+		});
+		AtomicReference<ExecutionContext> contextAtStart = new AtomicReference<>();
+		StepSupport step = new StepSupport("step") {
+			@Override
+			public void execute(StepExecution stepExecution) throws JobInterruptedException {
+				contextAtStart.set(new ExecutionContext(stepExecution.getExecutionContext()));
+				stepExecution.setStatus(BatchStatus.COMPLETED);
+				stepExecution.setExitStatus(ExitStatus.COMPLETED);
+			}
+		};
+
+		// when
+		new SimpleStepHandler(repository).handleStep(step, restartedJobExecution);
+
+		// then the new step execution starts with a copy of the previous context,
+		// without BATCH_EXECUTED
+		ArgumentCaptor<ExecutionContext> captor = ArgumentCaptor.forClass(ExecutionContext.class);
+		verify(repository).createStepExecution(eq("step"), eq(restartedJobExecution), captor.capture());
+		assertNotSame(previousStepExecution.getExecutionContext(), captor.getValue());
+		assertEquals("bar", contextAtStart.get().getString("foo"));
+		assertFalse(contextAtStart.get().containsKey(BATCH_EXECUTED));
+		// and the context of the previous step execution is left untouched
+		assertEquals("bar", previousStepExecution.getExecutionContext().getString("foo"));
+		assertTrue(previousStepExecution.getExecutionContext().containsKey(BATCH_EXECUTED));
 	}
 
 	// https://github.com/spring-projects/spring-batch/issues/5278

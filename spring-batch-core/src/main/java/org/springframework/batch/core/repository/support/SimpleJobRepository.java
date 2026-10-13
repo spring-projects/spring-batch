@@ -130,6 +130,18 @@ public class SimpleJobRepository extends SimpleJobExplorer implements JobReposit
 		return this.createStepExecution(stepName, jobExecution, new ExecutionContext());
 	}
 
+	/**
+	 * Create a new {@link StepExecution} for the given {@link JobExecution} and step
+	 * name, associate a copy of the given {@link ExecutionContext} with it, persist both
+	 * and add the new {@link StepExecution} to the {@link JobExecution}.
+	 * @param stepName the name of the step
+	 * @param jobExecution the job execution to which the step execution belongs
+	 * @param stepExecutionContext the execution context of the step execution, must not
+	 * be {@code null}
+	 * @return the new step execution
+	 * @since 6.1
+	 */
+	@Override
 	public StepExecution createStepExecution(String stepName, JobExecution jobExecution,
 			ExecutionContext stepExecutionContext) {
 		Assert.notNull(stepName, "Step name must not be null.");

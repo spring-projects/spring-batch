@@ -118,23 +118,22 @@ public class SimpleStepHandler implements StepHandler {
 
 		if (shouldStart(lastStepExecution, execution, step)) {
 
-			ExecutionContext toBeSavedStepExecutionContext;
+			ExecutionContext stepExecutionContext;
 
 			boolean isRestart = (lastStepExecution != null
 					&& !lastStepExecution.getStatus().equals(BatchStatus.COMPLETED));
 
 			if (isRestart) {
-				toBeSavedStepExecutionContext = new ExecutionContext(lastStepExecution.getExecutionContext());
+				stepExecutionContext = new ExecutionContext(lastStepExecution.getExecutionContext());
 
-				if (toBeSavedStepExecutionContext.containsKey(BATCH_EXECUTED)) {
-					toBeSavedStepExecutionContext.remove(BATCH_EXECUTED);
+				if (stepExecutionContext.containsKey(BATCH_EXECUTED)) {
+					stepExecutionContext.remove(BATCH_EXECUTED);
 				}
 			}
 			else {
-				toBeSavedStepExecutionContext = new ExecutionContext(executionContext);
+				stepExecutionContext = new ExecutionContext(executionContext);
 			}
-			currentStepExecution = jobRepository.createStepExecution(step.getName(), execution,
-					toBeSavedStepExecutionContext);
+			currentStepExecution = jobRepository.createStepExecution(step.getName(), execution, stepExecutionContext);
 			try {
 				step.execute(currentStepExecution);
 				currentStepExecution.getExecutionContext().put(BATCH_EXECUTED, true);

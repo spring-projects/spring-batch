@@ -42,7 +42,9 @@ import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SimpleStepExecutionSplitterTests {
 
@@ -122,6 +124,32 @@ class SimpleStepExecutionSplitterTests {
 			assertNotNull(persisted);
 			assertTrue(persisted.getExecutionContext().containsKey("foo"));
 		}
+	}
+
+	@Test
+	void testRestartedPartitionStartsWithContextOfPreviousExecution() throws Exception {
+		// given a failed partition from a previous job execution
+		Map<String, ExecutionContext> firstPartitions = Map.of("partition", new ExecutionContext(Map.of("foo", "bar")));
+		SimpleStepExecutionSplitter splitter = new SimpleStepExecutionSplitter(jobRepository, step.getName(),
+				gridSize -> firstPartitions);
+		StepExecution failedPartition = splitter.split(stepExecution, 1).iterator().next();
+		failedPartition.setStatus(BatchStatus.FAILED);
+		jobRepository.update(failedPartition);
+
+		// when the job is restarted with a partitioner returning a different context
+		JobExecution restartedJobExecution = jobRepository.createJobExecution(
+				stepExecution.getJobExecution().getJobInstance(), new JobParameters(), new ExecutionContext());
+		StepExecution restartedStepExecution = jobRepository.createStepExecution("step", restartedJobExecution);
+		Map<String, ExecutionContext> otherPartitions = Map.of("partition", new ExecutionContext(Map.of("foo", "baz")));
+		splitter = new SimpleStepExecutionSplitter(jobRepository, step.getName(), gridSize -> otherPartitions);
+		Set<StepExecution> execs = splitter.split(restartedStepExecution, 1);
+
+		// then the new partition is persisted with the context of the failed one
+		assertEquals(1, execs.size());
+		StepExecution restartedPartition = execs.iterator().next();
+		StepExecution persisted = jobRepository.getStepExecution(restartedPartition.getId());
+		assertNotNull(persisted);
+		assertEquals("bar", persisted.getExecutionContext().get("foo"));
 	}
 
 	@Test
