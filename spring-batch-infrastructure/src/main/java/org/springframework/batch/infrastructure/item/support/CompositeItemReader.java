@@ -32,6 +32,7 @@ import org.springframework.batch.infrastructure.item.ItemStreamReader;
  * @author Mahmoud Ben Hassine
  * @author Elimelec Burghelea
  * @author Yanming Zhou
+ * @author SangHoon Han
  * @param <T> type of objects to read
  * @since 5.2
  */
@@ -77,10 +78,17 @@ public class CompositeItemReader<T> implements ItemStreamReader<T> {
 		return item;
 	}
 
+	/**
+	 * Update the delegates up to and including the current one, so that the state of a
+	 * delegate which was exhausted during the current chunk is saved as well.
+	 */
 	@Override
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
-		if (this.currentDelegate != null) {
-			this.currentDelegate.update(executionContext);
+		for (ItemStreamReader<? extends T> delegate : this.delegates) {
+			delegate.update(executionContext);
+			if (delegate == this.currentDelegate) {
+				break;
+			}
 		}
 	}
 
