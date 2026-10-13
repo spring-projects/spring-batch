@@ -22,19 +22,20 @@ import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 
 /**
  * Bean factory post processor that configures the autowire candidate resolver that
- * supports {@link JobParameter}.
+ * supports the annotations used to late bind values to job and step scoped beans, such as
+ * {@link JobParameter}.
  *
  * @author Yanming Zhou
  * @author Mahmoud Ben Hassine
  * @since 6.1
  */
-public class JobParameterBeanFactoryPostProcessor implements BeanFactoryPostProcessor {
+public class LateBindingBeanFactoryPostProcessor implements BeanFactoryPostProcessor {
 
 	@Override
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
 		if (beanFactory instanceof DefaultListableBeanFactory dlbf) {
 			dlbf.setAutowireCandidateResolver(
-					new JobParameterAutowireCandidateResolver(dlbf.getAutowireCandidateResolver()));
+					new LateBindingAutowireCandidateResolver(dlbf.getAutowireCandidateResolver()));
 		}
 	}
 

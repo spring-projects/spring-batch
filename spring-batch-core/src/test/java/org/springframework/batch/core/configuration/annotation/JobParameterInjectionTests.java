@@ -160,7 +160,7 @@ class JobParameterInjectionTests {
 		final org.springframework.beans.factory.support.AutowireCandidateResolver resolver;
 
 		AutowireCandidateResolverHolder() {
-			new JobParameterBeanFactoryPostProcessor().postProcessBeanFactory(this.beanFactory);
+			new LateBindingBeanFactoryPostProcessor().postProcessBeanFactory(this.beanFactory);
 			this.resolver = this.beanFactory.getAutowireCandidateResolver();
 		}
 

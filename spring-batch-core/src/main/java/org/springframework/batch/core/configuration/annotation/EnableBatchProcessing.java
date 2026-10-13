@@ -150,7 +150,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Import({ BatchRegistrar.class, ScopeConfiguration.class, AutomaticJobRegistrarBeanPostProcessor.class,
-		BatchObservabilityBeanPostProcessor.class, JobParameterBeanFactoryPostProcessor.class })
+		BatchObservabilityBeanPostProcessor.class, LateBindingBeanFactoryPostProcessor.class })
 public @interface EnableBatchProcessing {
 
 	/**

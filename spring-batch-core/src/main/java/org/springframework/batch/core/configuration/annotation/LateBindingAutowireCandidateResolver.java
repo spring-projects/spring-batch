@@ -23,8 +23,9 @@ import org.springframework.beans.factory.support.AutowireCandidateResolver;
 import org.springframework.core.MethodParameter;
 
 /**
- * {@link AutowireCandidateResolver} implementation that supports {@link JobParameter}.
- * The value suggested for a field or parameter annotated with {@link JobParameter} is the
+ * {@link AutowireCandidateResolver} implementation that supports the annotations used to
+ * late bind values to job and step scoped beans, currently {@link JobParameter}. The
+ * value suggested for a field or parameter annotated with {@link JobParameter} is the
  * expression that resolves the corresponding job parameter, equivalent to
  * <code>&#64;Value("#{jobParameters['name']}")</code>. Everything else is delegated to
  * the wrapped resolver.
@@ -34,11 +35,11 @@ import org.springframework.core.MethodParameter;
  * @since 6.1
  * @see JobParameter
  */
-class JobParameterAutowireCandidateResolver implements AutowireCandidateResolver {
+class LateBindingAutowireCandidateResolver implements AutowireCandidateResolver {
 
 	private final AutowireCandidateResolver delegate;
 
-	JobParameterAutowireCandidateResolver(AutowireCandidateResolver delegate) {
+	LateBindingAutowireCandidateResolver(AutowireCandidateResolver delegate) {
 		this.delegate = delegate;
 	}
 
@@ -72,7 +73,7 @@ class JobParameterAutowireCandidateResolver implements AutowireCandidateResolver
 
 	@Override
 	public AutowireCandidateResolver cloneIfNecessary() {
-		return new JobParameterAutowireCandidateResolver(this.delegate.cloneIfNecessary());
+		return new LateBindingAutowireCandidateResolver(this.delegate.cloneIfNecessary());
 	}
 
 	@Override
