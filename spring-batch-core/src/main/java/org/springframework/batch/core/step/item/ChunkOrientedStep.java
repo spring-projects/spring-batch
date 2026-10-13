@@ -25,6 +25,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jspecify.annotations.Nullable;
 
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.job.JobInterruptedException;
 import org.springframework.batch.core.listener.ChunkListener;
 import org.springframework.batch.core.listener.CompositeChunkListener;
@@ -77,6 +78,8 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 import org.springframework.transaction.interceptor.TransactionAttribute;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.Assert;
 
@@ -97,6 +100,7 @@ import static org.springframework.batch.core.observability.BatchMetrics.METRICS_
  * @author Yanming Zhou
  * @author Taeik Lim
  * @author Kim ByeongChang
+ * @author Andrea Bosman
  * @since 6.0
  */
 public class ChunkOrientedStep<I, O> extends AbstractStep {
@@ -444,6 +448,8 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 		while (this.chunkTracker.get().moreItems() && !interrupted(stepExecution)) {
 			// process next chunk in its own transaction
 			this.transactionTemplate.executeWithoutResult(transactionStatus -> {
+				ChunkTransactionSynchronization synchronization = new ChunkTransactionSynchronization(stepExecution);
+				TransactionSynchronizationManager.registerSynchronization(synchronization);
 				ChunkTransactionEvent chunkTransactionEvent = new ChunkTransactionEvent(stepExecution.getStepName(),
 						stepExecution.getId());
 				chunkTransactionEvent.begin();
@@ -464,6 +470,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 					return;
 				}
 
+				synchronization.metadataUpdateStarted = true;
 				ExecutionContext executionContext = stepExecution.getExecutionContext();
 				// Both terms are required: the transaction must have re-attempted a
 				// scanned item (scanning), and the scan must still have items pending
@@ -485,6 +492,49 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 				chunkTransactionEvent.commit();
 			});
 		}
+	}
+
+	private static class ChunkTransactionSynchronization implements TransactionSynchronization {
+
+		private final StepExecution stepExecution;
+
+		private final StepExecution previousStepExecution;
+
+		private boolean metadataUpdateStarted;
+
+		ChunkTransactionSynchronization(StepExecution stepExecution) {
+			this.stepExecution = stepExecution;
+			this.previousStepExecution = new StepExecution(stepExecution.getStepName(),
+					stepExecution.getJobExecution());
+			copy(stepExecution, this.previousStepExecution);
+		}
+
+		@Override
+		public void afterCompletion(int status) {
+			if (status == STATUS_ROLLED_BACK && this.metadataUpdateStarted) {
+				// The database rolled back the metadata update; restore its in-memory
+				// counterpart before AbstractStep saves the failed execution.
+				copy(this.previousStepExecution, this.stepExecution);
+				this.stepExecution.incrementRollbackCount();
+			}
+			else if (status == STATUS_UNKNOWN) {
+				this.stepExecution.upgradeStatus(BatchStatus.UNKNOWN);
+				this.stepExecution.setTerminateOnly();
+			}
+		}
+
+		private static void copy(StepExecution source, StepExecution target) {
+			// Preserve read and skip counts, as in TaskletStep's rollback recovery.
+			Integer version = source.getVersion();
+			if (version != null) {
+				target.setVersion(version);
+			}
+			target.setWriteCount(source.getWriteCount());
+			target.setFilterCount(source.getFilterCount());
+			target.setCommitCount(source.getCommitCount());
+			target.setExecutionContext(new ExecutionContext(source.getExecutionContext()));
+		}
+
 	}
 
 	/*
