@@ -52,6 +52,7 @@ import org.springframework.batch.infrastructure.support.transaction.Resourceless
  * @author Sanghyuk Jung
  * @author Andrey Litvitski
  * @author Yanming Zhou
+ * @author Taeik Lim
  */
 public class ResourcelessJobRepository implements JobRepository {
 
@@ -133,7 +134,7 @@ public class ResourcelessJobRepository implements JobRepository {
 	}
 
 	@Override
-	@Nullable public JobInstance getJobInstance(long instanceId) {
+	public @Nullable JobInstance getJobInstance(long instanceId) {
 		if (this.jobInstance == null || !(this.jobInstance.getId() == instanceId)) {
 			return null;
 		}
@@ -141,7 +142,7 @@ public class ResourcelessJobRepository implements JobRepository {
 	}
 
 	@Override
-	@Nullable public JobInstance getLastJobInstance(String jobName) {
+	public @Nullable JobInstance getLastJobInstance(String jobName) {
 		if (this.jobInstance == null || !this.jobInstance.getJobName().equals(jobName)) {
 			return null;
 		}
@@ -149,7 +150,7 @@ public class ResourcelessJobRepository implements JobRepository {
 	}
 
 	@Override
-	@Nullable public JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
+	public @Nullable JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
 		if (this.jobInstance == null || !this.jobInstance.getJobName().equals(jobName)) {
 			return null;
 		}
@@ -205,7 +206,7 @@ public class ResourcelessJobRepository implements JobRepository {
 	 */
 
 	@Override
-	@Nullable public JobExecution getJobExecution(long executionId) {
+	public @Nullable JobExecution getJobExecution(long executionId) {
 		if (this.jobExecution == null || !(this.jobExecution.getId() == executionId)) {
 			return null;
 		}
@@ -213,7 +214,7 @@ public class ResourcelessJobRepository implements JobRepository {
 	}
 
 	@Override
-	@Nullable public JobExecution getLastJobExecution(String jobName, JobParameters jobParameters) {
+	public @Nullable JobExecution getLastJobExecution(String jobName, JobParameters jobParameters) {
 		if (this.jobInstance == null || !this.jobInstance.getJobName().equals(jobName)) {
 			return null;
 		}
@@ -221,7 +222,7 @@ public class ResourcelessJobRepository implements JobRepository {
 	}
 
 	@Override
-	@Nullable public JobExecution getLastJobExecution(JobInstance jobInstance) {
+	public @Nullable JobExecution getLastJobExecution(JobInstance jobInstance) {
 		if (this.jobInstance == null || !(this.jobInstance.getId() == jobInstance.getId())) {
 			return null;
 		}
@@ -290,7 +291,7 @@ public class ResourcelessJobRepository implements JobRepository {
 
 	@Deprecated(since = "6.0", forRemoval = true)
 	@Override
-	@Nullable public StepExecution getStepExecution(long jobExecutionId, long stepExecutionId) {
+	public @Nullable StepExecution getStepExecution(long jobExecutionId, long stepExecutionId) {
 		if (this.jobExecution == null || !(this.jobExecution.getId() == jobExecutionId)) {
 			return null;
 		}
@@ -308,7 +309,7 @@ public class ResourcelessJobRepository implements JobRepository {
 	 * @since 6.0
 	 */
 	@Override
-	@Nullable public StepExecution getStepExecution(long stepExecutionId) {
+	public @Nullable StepExecution getStepExecution(long stepExecutionId) {
 		if (this.jobExecution == null) {
 			return null;
 		}
@@ -320,7 +321,7 @@ public class ResourcelessJobRepository implements JobRepository {
 	}
 
 	@Override
-	@Nullable public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
+	public @Nullable StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
 		if (this.jobExecution == null || !(this.jobExecution.getJobInstance().getId() == jobInstance.getId())) {
 			return null;
 		}

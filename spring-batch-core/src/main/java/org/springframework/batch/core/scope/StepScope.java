@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,6 +62,7 @@ import org.springframework.beans.factory.config.Scope;
  * @author Dave Syer
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ * @author Taeik Lim
  * @since 2.0
  */
 public class StepScope extends BatchScopeSupport {
@@ -84,9 +85,8 @@ public class StepScope extends BatchScopeSupport {
 	/**
 	 * This will be used to resolve expressions in step-scoped beans.
 	 */
-	@Nullable
 	@Override
-	public Object resolveContextualObject(String key) {
+	public @Nullable Object resolveContextualObject(String key) {
 		StepContext context = getContext();
 		// TODO: support for attributes as well maybe (setters not exposed yet
 		// so not urgent).
@@ -146,9 +146,8 @@ public class StepScope extends BatchScopeSupport {
 	/**
 	 * @see Scope#remove(String)
 	 */
-	@Nullable
 	@Override
-	public Object remove(String name) {
+	public @Nullable Object remove(String name) {
 		StepContext context = getContext();
 		if (logger.isDebugEnabled()) {
 			logger.debug(String.format("Removing from scope=%s, name=%s", this.getName(), name));
