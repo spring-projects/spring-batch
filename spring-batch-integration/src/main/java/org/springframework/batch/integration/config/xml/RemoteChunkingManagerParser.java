@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2019 the original author or authors.
+ * Copyright 2014-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,10 @@ import org.w3c.dom.Element;
  * @author Chris Schaefer
  * @author Mahmoud Ben Hassine
  * @since 3.1
+ * @deprecated since 6.0 in favor of Java configuration or plain XML bean definitions.
+ * Scheduled for removal in 7.0.
  */
+@Deprecated(since = "6.0", forRemoval = true)
 public class RemoteChunkingManagerParser extends AbstractBeanDefinitionParser {
 
 	private static final String MESSAGE_TEMPLATE_ATTRIBUTE = "message-template";
