@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,6 +44,7 @@ import org.springframework.util.Assert;
  * @author Mahmoud Ben Hassine
  * @author Henning Pöttker
  * @author Jimmy Praet
+ * @author JungKyun Ryu
  */
 public class MultiResourceItemWriter<T> extends AbstractItemStreamItemWriter<T> {
 
@@ -118,9 +119,12 @@ public class MultiResourceItemWriter<T> extends AbstractItemStreamItemWriter<T> 
 	 * After this limit is exceeded the next chunk will be written into newly created
 	 * resource.
 	 * @param itemCountLimitPerResource int item threshold used to determine when a new
-	 * resource should be created.
+	 * resource should be created. Must be greater than zero.
+	 * @throws IllegalArgumentException if itemCountLimitPerResource is not greater than
+	 * zero
 	 */
 	public void setItemCountLimitPerResource(int itemCountLimitPerResource) {
+		Assert.isTrue(itemCountLimitPerResource > 0, "Item count limit per resource must be greater than zero");
 		this.itemCountLimitPerResource = itemCountLimitPerResource;
 	}
 

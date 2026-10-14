@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2025 the original author or authors.
+ * Copyright 2008-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,8 @@ import java.io.File;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import org.springframework.batch.infrastructure.item.Chunk;
 import org.springframework.batch.infrastructure.item.file.transform.PassThroughLineAggregator;
@@ -29,6 +31,7 @@ import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -38,7 +41,7 @@ public class MultiResourceItemWriterFlatFileTests extends AbstractMultiResourceI
 
 	/**
 	 * @author dsyer
-	 *
+	 * @author JungKyun Ryu
 	 */
 	private final class WriterCallback implements TransactionCallback<Void> {
 
@@ -68,6 +71,14 @@ public class MultiResourceItemWriterFlatFileTests extends AbstractMultiResourceI
 	void setUp() throws Exception {
 		super.createFile();
 		delegate = new FlatFileItemWriter<>(new PassThroughLineAggregator<>());
+	}
+
+	@ParameterizedTest
+	@ValueSource(ints = { 0, -1 })
+	void testNonPositiveItemCountLimitPerResource(int limit) {
+		MultiResourceItemWriter<String> writer = new MultiResourceItemWriter<>(delegate);
+
+		assertThrows(IllegalArgumentException.class, () -> writer.setItemCountLimitPerResource(limit));
 	}
 
 	@Test
