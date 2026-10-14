@@ -429,9 +429,7 @@ public Step step1Manager(JobRepository jobRepository) {
 
 @Bean
 public PartitionHandler partitionHandler() {
-    TaskExecutorPartitionHandler retVal = new TaskExecutorPartitionHandler();
-    retVal.setTaskExecutor(taskExecutor());
-    retVal.setStep(step1());
+    TaskExecutorPartitionHandler retVal = new TaskExecutorPartitionHandler(step1(), taskExecutor());
     retVal.setGridSize(10);
     return retVal;
 }
@@ -449,8 +447,8 @@ namespace shown previously. You can also configure it explicitly, as follows:
 </step>
 
 <bean class="org.spr...TaskExecutorPartitionHandler">
-    <property name="taskExecutor" ref="taskExecutor"/>
-    <property name="step" ref="step1" />
+    <constructor-arg name="step" ref="step1" />
+    <constructor-arg name="taskExecutor" ref="taskExecutor"/>
     <property name="gridSize" value="10" />
 </bean>
 ----

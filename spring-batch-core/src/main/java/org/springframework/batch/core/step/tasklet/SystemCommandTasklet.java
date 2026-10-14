@@ -96,6 +96,28 @@ public class SystemCommandTasklet implements StepExecutionListener, StoppableTas
 	private boolean stoppable = false;
 
 	/**
+	 * Create a new {@link SystemCommandTasklet}. Note that the timeout is also required
+	 * and must be set with {@link #setTimeout(long)}.
+	 * @param command the command to execute, as the program followed by its arguments
+	 * @since 6.1
+	 * @see #setCommand(String...)
+	 */
+	public SystemCommandTasklet(String... command) {
+		Assert.isTrue(!ObjectUtils.isEmpty(command) && StringUtils.hasText(command[0]),
+				"command is required with at least 1 element");
+		this.cmdArray = command;
+	}
+
+	/**
+	 * Create a new {@link SystemCommandTasklet}.
+	 * @deprecated since 6.1 for removal in 7.0. Use
+	 * {@link #SystemCommandTasklet(String...)} instead.
+	 */
+	@Deprecated(since = "6.1", forRemoval = true)
+	public SystemCommandTasklet() {
+	}
+
+	/**
 	 * Execute system command and map its exit code to {@link ExitStatus} using
 	 * {@link SystemProcessExitCodeMapper}.
 	 */

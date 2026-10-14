@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,6 +55,42 @@ public class TaskExecutorPartitionHandler extends AbstractPartitionHandler imple
 	private TaskExecutor taskExecutor = new SyncTaskExecutor();
 
 	private Step step;
+
+	/**
+	 * Create a new {@link TaskExecutorPartitionHandler} that executes the given step with
+	 * a {@link SyncTaskExecutor}.
+	 * @param step the {@link Step} to execute for each partition, must not be null
+	 * @since 6.1
+	 * @see #TaskExecutorPartitionHandler(Step, TaskExecutor)
+	 */
+	public TaskExecutorPartitionHandler(Step step) {
+		this(step, new SyncTaskExecutor());
+	}
+
+	/**
+	 * Create a new {@link TaskExecutorPartitionHandler} that executes the given step with
+	 * the given task executor.
+	 * @param step the {@link Step} to execute for each partition, must not be null
+	 * @param taskExecutor the {@link TaskExecutor} used to farm out step executions to
+	 * multiple threads, must not be null
+	 * @since 6.1
+	 */
+	public TaskExecutorPartitionHandler(Step step, TaskExecutor taskExecutor) {
+		Assert.notNull(step, "A Step must be provided.");
+		Assert.notNull(taskExecutor, "A TaskExecutor must be provided.");
+		this.step = step;
+		this.taskExecutor = taskExecutor;
+	}
+
+	/**
+	 * Create a new {@link TaskExecutorPartitionHandler}.
+	 * @deprecated since 6.1 for removal in 7.0. Use
+	 * {@link #TaskExecutorPartitionHandler(Step)} or
+	 * {@link #TaskExecutorPartitionHandler(Step, TaskExecutor)} instead.
+	 */
+	@Deprecated(since = "6.1", forRemoval = true)
+	public TaskExecutorPartitionHandler() {
+	}
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
