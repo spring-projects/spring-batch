@@ -42,7 +42,7 @@ class MongoCursorItemReaderBuilderTests {
 		MongoTemplate template = mock();
 		Class<String> targetType = String.class;
 		Query query = mock();
-		Map<String, Sort.Direction> sorts = mock();
+		Sort sort = Sort.by(Sort.Direction.DESC, "name");
 		int batchSize = 100;
 		int limit = 10000;
 		Duration maxTime = Duration.ofSeconds(1);
@@ -52,7 +52,7 @@ class MongoCursorItemReaderBuilderTests {
 			.template(template)
 			.targetType(targetType)
 			.query(query)
-			.sorts(sorts)
+			.sort(sort)
 			.batchSize(batchSize)
 			.limit(limit)
 			.maxTime(maxTime)
@@ -62,9 +62,28 @@ class MongoCursorItemReaderBuilderTests {
 		Assertions.assertEquals(template, ReflectionTestUtils.getField(reader, "template"));
 		Assertions.assertEquals(targetType, ReflectionTestUtils.getField(reader, "targetType"));
 		Assertions.assertEquals(query, ReflectionTestUtils.getField(reader, "query"));
+		Assertions.assertEquals(sort, ReflectionTestUtils.getField(reader, "sort"));
 		Assertions.assertEquals(batchSize, ReflectionTestUtils.getField(reader, "batchSize"));
 		Assertions.assertEquals(limit, ReflectionTestUtils.getField(reader, "limit"));
 		Assertions.assertEquals(maxTime, ReflectionTestUtils.getField(reader, "maxTime"));
+	}
+
+	@Test
+	@SuppressWarnings("removal")
+	void testBuildWithDeprecatedSorts() {
+		// given
+		MongoTemplate template = mock();
+
+		// when
+		MongoCursorItemReader<String> reader = new MongoCursorItemReaderBuilder<String>().name("reader")
+			.template(template)
+			.targetType(String.class)
+			.jsonQuery("{ }")
+			.sorts(Map.of("name", Sort.Direction.DESC))
+			.build();
+
+		// then
+		Assertions.assertEquals(Sort.by(Sort.Direction.DESC, "name"), ReflectionTestUtils.getField(reader, "sort"));
 	}
 
 	@Test

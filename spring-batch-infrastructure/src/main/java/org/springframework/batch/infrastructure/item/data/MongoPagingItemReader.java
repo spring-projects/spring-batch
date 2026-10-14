@@ -174,11 +174,25 @@ public class MongoPagingItemReader<T> extends AbstractPaginatedDataItemReader<T>
 	}
 
 	/**
+	 * The {@link Sort} to sort the input by. Use {@link Sort#by(Sort.Order...)} to sort
+	 * by multiple properties, each with its own direction.
+	 * @param sort the sort parameters. Must not be null.
+	 * @since 6.1
+	 */
+	public void setSort(Sort sort) {
+		Assert.notNull(sort, "Sort must not be null");
+		this.sort = sort;
+	}
+
+	/**
 	 * {@link Map} of property
 	 * names/{@link org.springframework.data.domain.Sort.Direction} values to sort the
 	 * input by.
 	 * @param sorts map of properties and direction to sort each.
+	 * @deprecated since 6.1 in favor of {@link #setSort(Sort)}. Scheduled for removal in
+	 * 7.0.
 	 */
+	@Deprecated(since = "6.1", forRemoval = true)
 	public void setSort(Map<String, Sort.Direction> sorts) {
 		Assert.notNull(sorts, "Sorts must not be null");
 		this.sort = convertToSort(sorts);

@@ -64,6 +64,8 @@ public class MongoCursorItemReaderBuilder<T> {
 
 	private @Nullable String fields;
 
+	private @Nullable Sort sort;
+
 	private @Nullable Map<String, Sort.Direction> sorts;
 
 	private @Nullable String hint;
@@ -213,13 +215,29 @@ public class MongoCursorItemReaderBuilder<T> {
 	}
 
 	/**
+	 * The {@link Sort} to sort the input by.
+	 * @param sort the sort parameters.
+	 * @return The current instance of the builder
+	 * @since 6.1
+	 * @see MongoCursorItemReader#setSort(Sort)
+	 */
+	public MongoCursorItemReaderBuilder<T> sort(Sort sort) {
+		this.sort = sort;
+
+		return this;
+	}
+
+	/**
 	 * {@link Map} of property
 	 * names/{@link org.springframework.data.domain.Sort.Direction} values to sort the
 	 * input by.
 	 * @param sorts map of properties and direction to sort each.
 	 * @return The current instance of the builder
+	 * @deprecated since 6.1 in favor of {@link #sort(Sort)}. Scheduled for removal in
+	 * 7.0.
 	 * @see MongoCursorItemReader#setSort(Map)
 	 */
+	@Deprecated(since = "6.1", forRemoval = true)
 	public MongoCursorItemReaderBuilder<T> sorts(Map<String, Sort.Direction> sorts) {
 		this.sorts = sorts;
 
@@ -275,13 +293,14 @@ public class MongoCursorItemReaderBuilder<T> {
 		return this;
 	}
 
+	@SuppressWarnings("removal")
 	public MongoCursorItemReader<T> build() {
 		Assert.notNull(this.template, "template is required.");
 		Assert.notNull(this.targetType, "targetType is required.");
 		Assert.state(StringUtils.hasText(this.jsonQuery) || this.query != null, "A query is required");
 
 		if (StringUtils.hasText(this.jsonQuery) && this.query == null) {
-			Assert.notNull(this.sorts, "sorts map is required.");
+			Assert.isTrue(this.sort != null || this.sorts != null, "sort is required.");
 		}
 
 		MongoCursorItemReader<T> reader = new MongoCursorItemReader<>(this.template, this.targetType);
@@ -305,7 +324,10 @@ public class MongoCursorItemReaderBuilder<T> {
 		if (this.fields != null) {
 			reader.setFields(this.fields);
 		}
-		if (this.sorts != null) {
+		if (this.sort != null) {
+			reader.setSort(this.sort);
+		}
+		else if (this.sorts != null) {
 			reader.setSort(this.sorts);
 		}
 		if (this.hint != null) {
