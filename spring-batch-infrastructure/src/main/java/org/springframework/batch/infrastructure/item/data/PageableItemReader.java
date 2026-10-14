@@ -34,8 +34,7 @@ import org.springframework.util.Assert;
  * reasonably large page size and matching that to the commit interval should yield better
  * performance.
  * <p>
- * The reader must be configured with a query function, {@linkplain Sort sort parameters},
- * and a page size greater than 0.
+ * The reader must be configured with a query function and a page size greater than 0.
  * <p>
  * This implementation is thread-safe between calls to {@link #open(ExecutionContext)},
  * but remember to set {@link #setSaveState(boolean) saveState} to {@code false} if used
@@ -50,30 +49,27 @@ import org.springframework.util.Assert;
  * NOTE: The {@code PageableItemReader} only reads Java Objects, i.e., non primitives.
  *
  * @author Stefano Cordio
+ * @author Mahmoud Ben Hassine
  * @since 6.1
  */
 public class PageableItemReader<T> extends AbstractPaginatedDataItemReader<T> {
 
 	private final Function<Pageable, ? extends Slice<? extends T>> query;
 
-	private final Sort sort;
+	private Sort sort = Sort.unsorted();
 
 	/**
 	 * Create a new {@link PageableItemReader}.
 	 * @param query a function that accepts a {@link Pageable} and returns a {@link Slice}
 	 * of items
 	 * @param pageSize the number of items to retrieve per page. Must be greater than 0.
-	 * @param sort the sort parameters to use when building the {@link PageRequest}. Must
-	 * not be null, use {@link Sort#unsorted()} instead.
 	 * @since 6.1
 	 */
-	public PageableItemReader(Function<Pageable, ? extends Slice<? extends T>> query, int pageSize, Sort sort) {
+	public PageableItemReader(Function<Pageable, ? extends Slice<? extends T>> query, int pageSize) {
 		Assert.notNull(query, "'query' cannot be null");
 		Assert.isTrue(pageSize > 0, "'pageSize' must be greater than 0");
-		Assert.notNull(sort, "'sort' must not be null");
 		this.query = query;
 		this.pageSize = pageSize;
-		this.sort = sort;
 	}
 
 	@Override
@@ -81,6 +77,19 @@ public class PageableItemReader<T> extends AbstractPaginatedDataItemReader<T> {
 	protected Iterator<T> doPageRead() {
 		PageRequest pageRequest = PageRequest.of(page, pageSize, sort);
 		return (Iterator<T>) query.apply(pageRequest).iterator();
+	}
+
+	/**
+	 * Set the sort parameters to use when building the {@link PageRequest}. Use
+	 * {@link Sort#by(Sort.Order...)} to sort by multiple properties, each with its own
+	 * direction. If not set, the results are not sorted ({@link Sort#unsorted()}).
+	 * @param sort the sort parameters. Must not be null, use {@link Sort#unsorted()} to
+	 * skip sorting.
+	 * @since 6.1
+	 */
+	public void setSort(Sort sort) {
+		Assert.notNull(sort, "'sort' must not be null");
+		this.sort = sort;
 	}
 
 }

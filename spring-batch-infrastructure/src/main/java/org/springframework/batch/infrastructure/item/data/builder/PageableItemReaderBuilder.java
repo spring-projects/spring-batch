@@ -55,7 +55,7 @@ public class PageableItemReaderBuilder<T> {
 	 * A function that accepts a {@link Pageable} and returns a {@link Slice} of items.
 	 * @param query the query function to apply for each page
 	 * @return this instance for method chaining
-	 * @see PageableItemReader#PageableItemReader(Function, int, Sort)
+	 * @see PageableItemReader#PageableItemReader(Function, int)
 	 */
 	public PageableItemReaderBuilder<T> query(Function<Pageable, ? extends Slice<? extends T>> query) {
 		this.query = query;
@@ -68,7 +68,7 @@ public class PageableItemReaderBuilder<T> {
 	 * @param pageSize the number of items per page. Defaults to 10 and must be greater
 	 * than 0.
 	 * @return this instance for method chaining
-	 * @see PageableItemReader#PageableItemReader(Function, int, Sort)
+	 * @see PageableItemReader#PageableItemReader(Function, int)
 	 */
 	public PageableItemReaderBuilder<T> pageSize(int pageSize) {
 		this.pageSize = pageSize;
@@ -77,10 +77,11 @@ public class PageableItemReaderBuilder<T> {
 	}
 
 	/**
-	 * Configures the sort parameters for the query.
+	 * Configures the sort parameters for the query. Optional, defaults to
+	 * {@link Sort#unsorted()}.
 	 * @param sort the sort to apply to the query
 	 * @return this instance for method chaining
-	 * @see PageableItemReader#PageableItemReader(Function, int, Sort)
+	 * @see PageableItemReader#setSort(Sort)
 	 */
 	public PageableItemReaderBuilder<T> sort(Sort sort) {
 		this.sort = sort;
@@ -145,9 +146,9 @@ public class PageableItemReaderBuilder<T> {
 	public PageableItemReader<T> build() {
 		Assert.notNull(this.query, "query is required.");
 		Assert.isTrue(this.pageSize > 0, "Page size must be greater than 0");
-		Assert.notNull(this.sort, "sort is required.");
 
-		PageableItemReader<T> reader = new PageableItemReader<>(this.query, this.pageSize, this.sort);
+		PageableItemReader<T> reader = new PageableItemReader<>(this.query, this.pageSize);
+		reader.setSort(this.sort);
 		reader.setCurrentItemCount(this.currentItemCount);
 		reader.setMaxItemCount(this.maxItemCount);
 		reader.setSaveState(this.saveState);

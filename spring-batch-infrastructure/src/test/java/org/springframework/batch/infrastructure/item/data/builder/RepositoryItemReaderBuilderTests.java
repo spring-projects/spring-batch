@@ -17,7 +17,6 @@
 package org.springframework.batch.infrastructure.item.data.builder;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -61,14 +60,13 @@ class RepositoryItemReaderBuilderTests {
 	@Mock
 	private Slice<String> slice;
 
-	private Map<String, Sort.Direction> sorts;
+	private Sort sort;
 
 	private ArgumentCaptor<PageRequest> pageRequestContainer;
 
 	@BeforeEach
 	void setUp() {
-		this.sorts = new HashMap<>();
-		this.sorts.put("id", Sort.Direction.ASC);
+		this.sort = Sort.by(Sort.Direction.ASC, "id");
 		this.pageRequestContainer = ArgumentCaptor.forClass(PageRequest.class);
 
 		List<String> testResult = new ArrayList<>();
@@ -81,7 +79,7 @@ class RepositoryItemReaderBuilderTests {
 	@Test
 	void testBasicRead() throws Exception {
 		RepositoryItemReader<Object> reader = new RepositoryItemReaderBuilder<>().repository(this.repository)
-			.sorts(this.sorts)
+			.sort(this.sort)
 			.maxItemCount(5)
 			.methodName("foo")
 			.name("bar")
@@ -94,7 +92,7 @@ class RepositoryItemReaderBuilderTests {
 	@Test
 	void testCurrentItemCount() throws Exception {
 		RepositoryItemReader<Object> reader = new RepositoryItemReaderBuilder<>().repository(this.repository)
-			.sorts(this.sorts)
+			.sort(this.sort)
 			.currentItemCount(6)
 			.maxItemCount(5)
 			.methodName("foo")
@@ -106,7 +104,7 @@ class RepositoryItemReaderBuilderTests {
 	@Test
 	void testPageSize() throws Exception {
 		RepositoryItemReader<Object> reader = new RepositoryItemReaderBuilder<>().repository(this.repository)
-			.sorts(this.sorts)
+			.sort(this.sort)
 			.maxItemCount(5)
 			.methodName("foo")
 			.name("bar")
@@ -118,14 +116,12 @@ class RepositoryItemReaderBuilderTests {
 
 	@Test
 	void testNoMethodName() {
-		var builder = new RepositoryItemReaderBuilder<>().repository(this.repository)
-			.sorts(this.sorts)
-			.maxItemCount(10);
+		var builder = new RepositoryItemReaderBuilder<>().repository(this.repository).sort(this.sort).maxItemCount(10);
 		Exception exception = assertThrows(IllegalArgumentException.class, builder::build);
 		assertEquals("methodName is required.", exception.getMessage());
 
 		builder = new RepositoryItemReaderBuilder<>().repository(this.repository)
-			.sorts(this.sorts)
+			.sort(this.sort)
 			.methodName("")
 			.maxItemCount(5);
 		exception = assertThrows(IllegalArgumentException.class, builder::build);
@@ -136,7 +132,7 @@ class RepositoryItemReaderBuilderTests {
 	void testSaveStateNoName() throws Exception {
 		RepositoryItemReader<Object> reader = new RepositoryItemReaderBuilder<>().repository(repository)
 			.methodName("foo")
-			.sorts(sorts)
+			.sort(sort)
 			.maxItemCount(5)
 			.build();
 		reader.afterPropertiesSet();
@@ -144,22 +140,41 @@ class RepositoryItemReaderBuilderTests {
 	}
 
 	@Test
-	void testNullSort() {
-		var builder = new RepositoryItemReaderBuilder<>().repository(repository).methodName("foo").maxItemCount(5);
-		Exception exception = assertThrows(IllegalArgumentException.class, builder::build);
-		assertEquals("sorts map is required.", exception.getMessage());
+	void testNoSort() throws Exception {
+		RepositoryItemReader<Object> reader = new RepositoryItemReaderBuilder<>().repository(repository)
+			.methodName("foo")
+			.maxItemCount(5)
+			.build();
+
+		reader.read();
+
+		assertEquals(Sort.unsorted(), this.pageRequestContainer.getValue().getSort());
+	}
+
+	@Test
+	@SuppressWarnings("removal")
+	void testDeprecatedSorts() throws Exception {
+		RepositoryItemReader<Object> reader = new RepositoryItemReaderBuilder<>().repository(repository)
+			.methodName("foo")
+			.sorts(Map.of("id", Sort.Direction.DESC))
+			.maxItemCount(5)
+			.build();
+
+		reader.read();
+
+		assertEquals("id: DESC", this.pageRequestContainer.getValue().getSort().toString());
 	}
 
 	@Test
 	void testNoRepository() {
-		var builder = new RepositoryItemReaderBuilder<>().sorts(this.sorts).maxItemCount(10).methodName("foo");
+		var builder = new RepositoryItemReaderBuilder<>().sort(this.sort).maxItemCount(10).methodName("foo");
 		Exception exception = assertThrows(IllegalArgumentException.class, builder::build);
 		assertEquals("repository is required.", exception.getMessage());
 	}
 
 	@Test
 	void testInvalidPageSize() {
-		var builder = new RepositoryItemReaderBuilder<>().repository(repository).sorts(this.sorts).pageSize(-1);
+		var builder = new RepositoryItemReaderBuilder<>().repository(repository).sort(this.sort).pageSize(-1);
 		Exception exception = assertThrows(IllegalArgumentException.class, builder::build);
 		assertEquals("Page size must be greater than 0", exception.getMessage());
 	}
@@ -178,7 +193,7 @@ class RepositoryItemReaderBuilderTests {
 			.thenReturn(this.slice);
 
 		RepositoryItemReader<Object> reader = new RepositoryItemReaderBuilder<>().repository(this.repository)
-			.sorts(this.sorts)
+			.sort(this.sort)
 			.maxItemCount(5)
 			.methodName("foo")
 			.name("bar")
@@ -199,7 +214,7 @@ class RepositoryItemReaderBuilderTests {
 			.thenReturn(this.slice);
 
 		RepositoryItemReader<Object> reader = new RepositoryItemReaderBuilder<>().repository(this.repository)
-			.sorts(this.sorts)
+			.sort(this.sort)
 			.maxItemCount(5)
 			.methodName("foo")
 			.name("bar")

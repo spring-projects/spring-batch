@@ -236,7 +236,7 @@ compile time:
 RepositoryItemReader<Customer> reader = new RepositoryItemReaderBuilder<Customer>()
 				.repository(customerRepository)
 				.methodName("findAll")
-				.sorts(Map.of("id", Sort.Direction.ASC))
+				.sort(Sort.by(Sort.Direction.ASC, "id"))
 				.pageSize(100)
 				.name("customerReader")
 				.build();

@@ -196,8 +196,9 @@ The `PageableItemReader` reads records by applying a query function to a Spring 
 custom repository query returning a `Slice`. Unlike `RepositoryItemReader`, it does not
 use reflection to select a repository method.
 
-The reader requires a query function, a page size and a `Sort` parameter, which can be
-unsorted when the query does not require an explicit ordering. Spring Batch provides a
+The reader requires a query function and a page size. A `Sort` can optionally be
+specified, in which case it is passed to the query function through the `Pageable`. If no
+`Sort` is specified, the results are not sorted. Spring Batch provides a
 `PageableItemReaderBuilder` to construct an instance of the `PageableItemReader`. For
 example, a repository that extends `PagingAndSortingRepository` can be used as follows:
 

@@ -59,7 +59,7 @@ This reader stores message offsets in the execution context to support restart c
 |`PageableItemReader`|Applies a query function to a Spring Data `Pageable` and returns
             items from the resulting `Slice`.|Yes
 |`RepositoryItemReader`|Given a Spring Data `PagingAndSortingRepository` object,
-            a `Sort`, and the name of method to execute, returns items provided by the
+            an optional `Sort`, and the name of method to execute, returns items provided by the
             Spring Data repository implementation.|Yes
 |`StoredProcedureItemReader`|Reads from a database cursor resulting from the
             execution of a database stored procedure. See link:readersAndWriters.html#StoredProcedureItemReader[`StoredProcedureItemReader`]|No

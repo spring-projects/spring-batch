@@ -33,11 +33,12 @@
 				<value>#{new java.math.BigDecimal(jobParameters[credit])}</value>
 			</list>
 		</property>
- 		<constructor-arg name="sorts">
-			<map>
-				<entry key="id" value="ASC"/>
-			</map>
- 		</constructor-arg>
+		<property name="sort">
+			<bean class="org.springframework.data.domain.Sort" factory-method="by">
+				<constructor-arg value="ASC"/>
+				<constructor-arg value="id"/>
+			</bean>
+		</property>
 	</bean>
 
 	<bean id="itemWriter"
