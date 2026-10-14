@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2023 the original author or authors.
+ * Copyright 2018-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.springframework.batch.integration.chunk.RemoteChunkingManagerBuilder;
 import org.springframework.batch.integration.chunk.RemoteChunkingWorkerBuilder;
-import org.springframework.batch.integration.chunk.RemoteChunkingManagerStepBuilderFactory;
 import org.springframework.batch.integration.partition.RemotePartitioningManagerStepBuilderFactory;
 import org.springframework.batch.integration.partition.RemotePartitioningWorkerStepBuilderFactory;
 import org.springframework.context.annotation.Import;
@@ -37,9 +37,6 @@ import org.springframework.integration.config.EnableIntegration;
  * to autowire the following beans:
  *
  * <ul>
- * <li>{@link RemoteChunkingManagerStepBuilderFactory}: used to create a manager step of a
- * remote chunking setup by automatically setting the job repository and transaction
- * manager.</li>
  * <li>{@link RemoteChunkingWorkerBuilder}: used to create the integration flow on the
  * worker side of a remote chunking setup.</li>
  * <li>{@link RemotePartitioningManagerStepBuilderFactory}: used to create a manager step
@@ -50,7 +47,10 @@ import org.springframework.integration.config.EnableIntegration;
  * bean factory and transaction manager.</li>
  * </ul>
  *
- * For remote chunking, an example of a configuration class would be:
+ * For remote chunking, the manager step is created with a
+ * {@link RemoteChunkingManagerBuilder}, which is instantiated directly (it is not an
+ * autowirable bean) as it is specific to each manager step. An example of a configuration
+ * class would be:
  *
  * <pre class="code">
  * &#064;Configuration
@@ -59,19 +59,16 @@ import org.springframework.integration.config.EnableIntegration;
  * public class RemoteChunkingAppConfig {
  *
  *     &#064;Autowired
- *     private RemoteChunkingManagerStepBuilderFactory managerStepBuilderFactory;
- *
- *     &#064;Autowired
  *     private RemoteChunkingWorkerBuilder workerBuilder;
  *
  *     &#064;Bean
- *     public TaskletStep managerStep() {
- *         return this.managerStepBuilderFactory
- *                 .get("managerStep")
- *                 .chunk(100)
- *                 .reader(itemReader())
+ *     public Step managerStep(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+ *         return new RemoteChunkingManagerBuilder("managerStep", jobRepository)
  *                 .outputChannel(outgoingRequestsToWorkers())
  *                 .inputChannel(incomingRepliesFromWorkers())
+ *                 .chunk(100)
+ *                 .reader(itemReader())
+ *                 .transactionManager(transactionManager)
  *                 .build();
  *     }
  *

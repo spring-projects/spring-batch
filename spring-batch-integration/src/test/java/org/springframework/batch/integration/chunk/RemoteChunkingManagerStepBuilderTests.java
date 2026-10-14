@@ -81,6 +81,7 @@ import static org.mockito.Mockito.when;
 /**
  * @author Mahmoud Ben Hassine
  */
+@SuppressWarnings("removal")
 @SpringJUnitConfig(classes = { RemoteChunkingManagerStepBuilderTests.BatchConfiguration.class })
 class RemoteChunkingManagerStepBuilderTests {
 

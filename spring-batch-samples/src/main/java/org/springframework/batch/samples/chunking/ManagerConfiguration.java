@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 the original author or authors.
+ * Copyright 2018-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,12 +25,11 @@ import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.step.tasklet.TaskletStep;
-import org.springframework.batch.integration.chunk.RemoteChunkingManagerStepBuilderFactory;
+import org.springframework.batch.core.step.Step;
+import org.springframework.batch.integration.chunk.RemoteChunkingManagerBuilder;
 import org.springframework.batch.integration.config.annotation.EnableBatchIntegration;
 import org.springframework.batch.infrastructure.item.support.ListItemReader;
 import org.springframework.batch.samples.common.DataSourceConfiguration;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -41,6 +40,7 @@ import org.springframework.integration.config.EnableIntegration;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.jms.DefaultJmsHeaderMapper;
 import org.springframework.integration.jms.dsl.Jms;
+import org.springframework.transaction.PlatformTransactionManager;
 
 /**
  * This configuration class is for the manager side of the remote chunking sample. The
@@ -60,9 +60,6 @@ public class ManagerConfiguration {
 
 	@Value("${broker.url}")
 	private String brokerUrl;
-
-	@Autowired
-	private RemoteChunkingManagerStepBuilderFactory managerStepBuilderFactory;
 
 	@Bean
 	public ActiveMQConnectionFactory connectionFactory() throws JMSException {
@@ -113,18 +110,18 @@ public class ManagerConfiguration {
 	}
 
 	@Bean
-	public TaskletStep managerStep() {
-		return this.managerStepBuilderFactory.get("managerStep")
+	public Step managerStep(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+		return new RemoteChunkingManagerBuilder("managerStep", jobRepository).outputChannel(requests())
+			.inputChannel(replies())
 			.chunk(3)
 			.reader(itemReader())
-			.outputChannel(requests())
-			.inputChannel(replies())
+			.transactionManager(transactionManager)
 			.build();
 	}
 
 	@Bean
-	public Job remoteChunkingJob(JobRepository jobRepository) {
-		return new JobBuilder("remoteChunkingJob", jobRepository).start(managerStep()).build();
+	public Job remoteChunkingJob(JobRepository jobRepository, Step managerStep) {
+		return new JobBuilder("remoteChunkingJob", jobRepository).start(managerStep).build();
 	}
 
 }

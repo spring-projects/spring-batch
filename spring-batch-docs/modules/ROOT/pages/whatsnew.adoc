@@ -19,6 +19,7 @@ Spring Batch 6.1 includes the following features and improvements:
 * xref:whatsnew.adoc#avro-reflection-based-deserialization-now-requires-trusted-classes[Avro reflection-based (de)serialization now requires trusted classes]
 * xref:whatsnew.adoc#jdbc-daos-migrated-to-jdbcclient[JDBC DAOs migrated to `JdbcClient`]
 * xref:whatsnew.adoc#jobparameter-annotation-for-injecting-job-parameters[`@JobParameter` annotation for injecting job parameters]
+* xref:whatsnew.adoc#new-remotechunkingmanagerbuilder[New `RemoteChunkingManagerBuilder`]
 * xref:whatsnew.adoc#deprecations[Deprecations]
 
 [[dependencies-upgrade]]
@@ -489,6 +490,54 @@ For more details, please refer to the
 xref:step/late-binding.adoc[Late Binding of `Job` and `Step` Attributes] section, and
 see https://github.com/spring-projects/spring-batch/issues/5563[issue #5563].
 
+[[new-remotechunkingmanagerbuilder]]
+== New `RemoteChunkingManagerBuilder`
+
+The new `RemoteChunkingManagerBuilder` is the counterpart of `RemoteChunkingWorkerBuilder`
+for configuring the manager step of a remote chunking setup. It only holds the settings that
+are specific to remote chunking (channels, messaging template, maximum number of wait
+timeouts and throttle limit), and `chunk(int)` returns a standard `ChunkOrientedStepBuilder`
+for everything else. The resulting step is a `ChunkOrientedStep`, and the builder does not
+expose any deprecated API:
+
+[source, java]
+----
+// before
+@Bean
+public TaskletStep managerStep() {
+    return this.managerStepBuilderFactory.get("managerStep")
+                .chunk(100)
+                .reader(itemReader())
+                .outputChannel(requests())
+                .inputChannel(replies())
+                .build();
+}
+
+// after
+@Bean
+public Step managerStep(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+    return new RemoteChunkingManagerBuilder("managerStep", jobRepository)
+                .outputChannel(requests())
+                .inputChannel(replies())
+                .chunk(100)
+                .reader(itemReader())
+                .transactionManager(transactionManager)
+                .build();
+}
+----
+
+NOTE: The channels must be set before calling `chunk(int)`. Also, the transaction manager
+defaults to a resourceless one, whereas `RemoteChunkingManagerStepBuilderFactory` used the
+transaction manager of the application context, so it should be set explicitly if the item
+reader of the manager step needs a transactional resource.
+
+`RemoteChunkingManagerStepBuilder` and `RemoteChunkingManagerStepBuilderFactory` are
+deprecated in favor of `RemoteChunkingManagerBuilder`.
+
+For more details, please refer to the
+xref:spring-batch-integration/externalizing-execution.adoc#remote-chunking[Remote Chunking]
+section.
+
 [[deprecations]]
 == Deprecations
 
@@ -502,4 +551,5 @@ The following features have been deprecated in Spring Batch 6.1:
 * Deprecate `RepositoryItemWriter#setRepository(CrudRepository)` in favor of passing the repository to the constructor, scheduled for removal in version 7.0
 * Deprecate `org.springframework.batch.integration.async.AsyncItemProcessor`, `org.springframework.batch.integration.async.AsyncItemWriter`, and `org.springframework.batch.integration.chunk.ChunkTaskExecutorItemWriter` in favor of their counterparts in `org.springframework.batch.core.step.item`, see the xref:whatsnew.adoc#async-processing-apis-and-local-chunking-moved-to-core[Async processing APIs and local chunking moved to `spring-batch-core`] section for more details
 * Deprecate `AbstractJdbcBatchMetadataDao#setJdbcTemplate(JdbcOperations)` in favor of passing a `JdbcClient` to the constructor of the JDBC DAOs, and `AbstractJdbcBatchMetadataDao#getJdbcTemplate()` in favor of `AbstractJdbcBatchMetadataDao#getJdbcClient()`, see the xref:whatsnew.adoc#jdbc-daos-migrated-to-jdbcclient[JDBC DAOs migrated to `JdbcClient`] section for more details. Scheduled for removal in version 7.0
+* Deprecate `RemoteChunkingManagerStepBuilder` and `RemoteChunkingManagerStepBuilderFactory` in favor of `RemoteChunkingManagerBuilder`, see the xref:whatsnew.adoc#new-remotechunkingmanagerbuilder[New `RemoteChunkingManagerBuilder`] section for more details. Scheduled for removal in version 7.0
 * Deprecate `JobRepository#getJobInstanceCount(String)`, `JobExplorer#getJobInstanceCount(String)`, and `JobInstanceDao#getJobInstanceCount(String)` in favor of `countJobInstances(String)`, and `JobRepository#getStepExecutionCount(JobInstance, String)` and `JobExplorer#getStepExecutionCount(JobInstance, String)` in favor of `countStepExecutions(JobInstance, String)`. These methods cannot soundly determine whether a job or step name is unknown, as opposed to simply never having been persisted or executed yet; that validation belongs at the job operator level, where the job registry is available. Scheduled for removal in version 7.0

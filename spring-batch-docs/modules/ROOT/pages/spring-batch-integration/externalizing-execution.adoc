@@ -351,23 +351,35 @@ For more information, see the section of the "`Scalability`" chapter on
 link:$$https://docs.spring.io/spring-batch/reference/scalability.html#remoteChunking[Remote Chunking].
 
 Starting from version 4.1, Spring Batch Integration introduces the `@EnableBatchIntegration`
-annotation that can be used to simplify a remote chunking setup. This annotation provides
-two beans that you can autowire in your application context:
+annotation that can be used to simplify a remote chunking setup. Starting from version 6.1,
+the following builders are available:
 
-* `RemoteChunkingManagerStepBuilderFactory`: Configures the manager step
-* `RemoteChunkingWorkerBuilder`: Configures the remote worker integration flow
+* `RemoteChunkingManagerBuilder`: Configures the manager step
+* `RemoteChunkingWorkerBuilder`: Configures the remote worker integration flow. This
+builder is provided as a bean by `@EnableBatchIntegration`, that you can autowire in your
+application context
+
+NOTE: The `RemoteChunkingManagerStepBuilderFactory` bean and the
+`RemoteChunkingManagerStepBuilder` are deprecated since version 6.1 in favor of
+`RemoteChunkingManagerBuilder`, and are scheduled for removal in version 7.0.
 
 These APIs take care of configuring a number of components, as the following diagram shows:
 
 .Remote Chunking Configuration
 image::remote-chunking-config.png[Remote Chunking Configuration, scaledwidth="80%"]
 
-On the manager side, the `RemoteChunkingManagerStepBuilderFactory` lets you
-configure a manager step by declaring:
+On the manager side, the `RemoteChunkingManagerBuilder` lets you configure a manager step by
+declaring:
 
-* The item reader to read items and send them to workers
 * The output channel ("Outgoing requests") to send requests to workers
 * The input channel ("Incoming replies") to receive replies from workers
+
+The call to `chunk(int)` returns the same `ChunkOrientedStepBuilder` as for any other
+chunk-oriented step, on which you declare the item reader to read items and send them to
+workers, and any other property of the step (listeners, skip and retry policies, etc).
+The item writer is set by the builder and must not be changed. Like for any other
+chunk-oriented step, the transaction manager defaults to a resourceless one, so you should
+set it explicitly if the item reader of the manager step needs a transactional resource.
 
 You need not explicitly configure `ChunkMessageChannelItemWriter` and the `MessagingTemplate`.
 (You can still explicitly configure them if find a reason to do so).
@@ -394,16 +406,14 @@ public class RemoteChunkingJobConfiguration {
     @Configuration
     public static class ManagerConfiguration {
 
-        @Autowired
-        private RemoteChunkingManagerStepBuilderFactory managerStepBuilderFactory;
-
         @Bean
-        public TaskletStep managerStep() {
-            return this.managerStepBuilderFactory.get("managerStep")
-                       .chunk(100)
-                       .reader(itemReader())
+        public Step managerStep(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+            return new RemoteChunkingManagerBuilder("managerStep", jobRepository)
                        .outputChannel(requests()) // requests sent to workers
                        .inputChannel(replies())   // replies received from workers
+                       .chunk(100)
+                       .reader(itemReader())
+                       .transactionManager(transactionManager)
                        .build();
         }
 

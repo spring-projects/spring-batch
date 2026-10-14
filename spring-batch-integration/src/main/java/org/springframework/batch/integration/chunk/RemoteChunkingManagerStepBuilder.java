@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2025 the original author or authors.
+ * Copyright 2019-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,8 +67,11 @@ import org.springframework.util.Assert;
  * @param <O> type of output items
  * @since 4.2
  * @author Mahmoud Ben Hassine
+ * @deprecated since 6.1 in favor of {@link RemoteChunkingManagerBuilder}. Scheduled for
+ * removal in 7.0.
  */
 @NullUnmarked
+@Deprecated(since = "6.1", forRemoval = true)
 public class RemoteChunkingManagerStepBuilder<I, O> extends FaultTolerantStepBuilder<I, O> {
 
 	private MessagingTemplate messagingTemplate;
