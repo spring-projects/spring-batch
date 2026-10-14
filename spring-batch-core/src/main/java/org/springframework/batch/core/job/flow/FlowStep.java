@@ -53,7 +53,11 @@ public class FlowStep extends AbstractStep {
 	/**
 	 * Constructor for a {@link FlowStep} that sets the flow and of the step explicitly.
 	 * @param flow the {@link Flow} instance to be associated with this step.
+	 * @deprecated since 6.0 for removal in 7.0. Use {@link #FlowStep(JobRepository)} and
+	 * set the name and the flow with {@link #setName(String)} and {@link #setFlow(Flow)}
+	 * instead.
 	 */
+	@Deprecated(since = "6.0", forRemoval = true)
 	public FlowStep(Flow flow) {
 		super(flow.getName());
 	}
