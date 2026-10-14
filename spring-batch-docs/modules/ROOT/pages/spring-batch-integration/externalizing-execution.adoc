@@ -274,15 +274,15 @@ public IntegrationFlow outboundFlow(ActiveMQConnectionFactory connectionFactory)
 }
 
 /*
- * Configure the ChunkProcessorChunkHandler
+ * Configure the ChunkProcessorChunkRequestHandler
  */
 @Bean
 @ServiceActivator(inputChannel = "requests", outputChannel = "replies")
-public ChunkProcessorChunkHandler<Integer> chunkProcessorChunkHandler() {
+public ChunkProcessorChunkRequestHandler<Integer> chunkProcessorChunkHandler() {
     ChunkProcessor<Integer> chunkProcessor
-            = new SimpleChunkProcessor<>(itemProcessor(), itemWriter());
-    ChunkProcessorChunkHandler<Integer> chunkProcessorChunkHandler
-            = new ChunkProcessorChunkHandler<>();
+            = new DefaultChunkProcessor<>(itemProcessor(), itemWriter());
+    ChunkProcessorChunkRequestHandler<Integer> chunkProcessorChunkHandler
+            = new ChunkProcessorChunkRequestHandler<>();
     chunkProcessorChunkHandler.setChunkProcessor(chunkProcessor);
     return chunkProcessorChunkHandler;
 }
@@ -315,18 +315,18 @@ The following example shows the worker configuration in XML:
     input-channel="requests"
     output-channel="replies"
     ref="chunkProcessorChunkHandler"
-    method="handleChunk"/>
+    method="handle"/>
 
 <bean id="chunkProcessorChunkHandler"
     class="org.springframework.batch.integration.chunk.ChunkProcessorChunkRequestHandler">
   <property name="chunkProcessor">
-    <bean class="org.springframework.batch.core.step.item.SimpleChunkProcessor">
-      <property name="itemWriter">
-        <bean class="io.spring.sbi.PersonItemWriter"/>
-      </property>
-      <property name="itemProcessor">
+    <bean class="org.springframework.batch.core.step.item.DefaultChunkProcessor">
+      <constructor-arg name="itemProcessor">
         <bean class="io.spring.sbi.PersonItemProcessor"/>
-      </property>
+      </constructor-arg>
+      <constructor-arg name="itemWriter">
+        <bean class="io.spring.sbi.PersonItemWriter"/>
+      </constructor-arg>
     </bean>
   </property>
 </bean>
@@ -342,7 +342,7 @@ the Spring Batch `JobRepository` nor
 to the actual job configuration file. The main bean of interest
 is the `chunkProcessorChunkHandler`. The
 `chunkProcessor` property of `ChunkProcessorChunkRequestHandler` takes a
-configured `SimpleChunkProcessor`, which is where you would provide a reference to your
+configured `DefaultChunkProcessor`, which is where you would provide a reference to your
 `ItemWriter` (and, optionally, your
 `ItemProcessor`) that will run on the worker
 when it receives chunks from the manager.
@@ -387,11 +387,11 @@ You need not explicitly configure `ChunkMessageChannelItemWriter` and the `Messa
 On the worker side, the `RemoteChunkingWorkerBuilder` lets you configure a worker to:
 
 * Listen to requests sent by the manager on the input channel ("`Incoming requests`")
-* Call the `handleChunk` method of `ChunkProcessorChunkRequestHandler` for each request
+* Call the `handle` method of `ChunkProcessorChunkRequestHandler` for each request
 with the configured `ItemProcessor` and `ItemWriter`
 * Send replies on the output channel ("`Outgoing replies`") to the manager
 
-You need not explicitly configure the `SimpleChunkProcessor`
+You need not explicitly configure the `DefaultChunkProcessor`
 and the `ChunkProcessorChunkRequestHandler`. (You can still explicitly configure them if you find
    a reason to do so).
 

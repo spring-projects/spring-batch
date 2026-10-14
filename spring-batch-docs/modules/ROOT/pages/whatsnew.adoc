@@ -20,6 +20,7 @@ Spring Batch 6.1 includes the following features and improvements:
 * xref:whatsnew.adoc#jdbc-daos-migrated-to-jdbcclient[JDBC DAOs migrated to `JdbcClient`]
 * xref:whatsnew.adoc#jobparameter-annotation-for-injecting-job-parameters[`@JobParameter` annotation for injecting job parameters]
 * xref:whatsnew.adoc#new-remotechunkingmanagerbuilder[New `RemoteChunkingManagerBuilder`]
+* xref:whatsnew.adoc#new-defaultchunkprocessor[New `DefaultChunkProcessor`]
 * xref:whatsnew.adoc#deprecations[Deprecations]
 
 [[dependencies-upgrade]]
@@ -537,6 +538,33 @@ deprecated in favor of `RemoteChunkingManagerBuilder`.
 For more details, please refer to the
 xref:spring-batch-integration/externalizing-execution.adoc#remote-chunking[Remote Chunking]
 section.
+
+[[new-defaultchunkprocessor]]
+== New `DefaultChunkProcessor`
+
+`SimpleChunkProcessor` has been deprecated since 6.0 as part of the legacy chunk-oriented
+processing engine, but it was still the way to process chunks outside of a step: in a remote
+chunking worker (`ChunkProcessorChunkRequestHandler`) or with a `ChunkTaskExecutorItemWriter`.
+The new `DefaultChunkProcessor` is its replacement for those use cases. It is a minimal
+implementation of `ChunkProcessor` that applies an optional `ItemProcessor` to each item of
+a chunk and writes the result with an `ItemWriter`. Items filtered by the item processor are
+counted as such in the `StepContribution`, and failures are rethrown as is.
+
+Unlike `SimpleChunkProcessor`, it does not support listeners, does not record metrics, and is
+configured through its constructor:
+
+[source, java]
+----
+// before
+SimpleChunkProcessor<Integer, Integer> chunkProcessor = new SimpleChunkProcessor<>(itemProcessor, itemWriter);
+
+// after
+DefaultChunkProcessor<Integer, Integer> chunkProcessor = new DefaultChunkProcessor<>(itemProcessor, itemWriter);
+----
+
+`RemoteChunkingWorkerBuilder` now uses it internally. This is also the equivalent to use
+when replacing the `<remote-chunking-worker>` element of the batch-integration XML namespace
+(deprecated since 6.0) with plain XML bean definitions.
 
 [[deprecations]]
 == Deprecations
