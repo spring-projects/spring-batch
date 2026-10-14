@@ -85,7 +85,9 @@ public abstract class AbstractJob implements Job, ListableStepLocator, BeanNameA
 
 	/**
 	 * Default constructor.
+	 * @deprecated since 6.0 for removal in 7.0. Use {@link #AbstractJob(String)} instead.
 	 */
+	@Deprecated(since = "6.0", forRemoval = true)
 	public AbstractJob() {
 		super();
 	}

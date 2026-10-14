@@ -57,9 +57,11 @@ public class FlowJob extends AbstractJob {
 
 	/**
 	 * Create a {@link FlowJob} with null name and no flow (invalid state).
+	 * @deprecated since 6.0 for removal in 7.0. Use {@link #FlowJob(String)} instead.
 	 */
+	@Deprecated(since = "6.0", forRemoval = true)
 	public FlowJob() {
-		super();
+		this(null);
 	}
 
 	/**
