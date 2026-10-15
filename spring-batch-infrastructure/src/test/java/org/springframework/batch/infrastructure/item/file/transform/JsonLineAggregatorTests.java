@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2026 the original author or authors.
+ * Copyright 2026-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,33 +15,73 @@
  */
 package org.springframework.batch.infrastructure.item.file.transform;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import org.springframework.batch.infrastructure.item.file.mapping.JsonLineMapper;
+import org.springframework.batch.infrastructure.item.json.GsonJsonObjectMarshaller;
+import org.springframework.batch.infrastructure.item.json.GsonJsonObjectUnmarshaller;
 import org.springframework.batch.infrastructure.item.json.JacksonJsonObjectMarshaller;
+import org.springframework.batch.infrastructure.item.json.JacksonJsonObjectUnmarshaller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Yanming Zhou
- *
+ * @author Mahmoud Ben Hassine
  */
 class JsonLineAggregatorTests {
 
-	private JsonLineAggregator<User> aggregator;
+	private static final User USER = new User("foo", "bar@example.com", """
+			I'm
+			powerful
+			man""");
 
-	@BeforeEach
-	void setup() {
-		this.aggregator = new JsonLineAggregator<>(new JacksonJsonObjectMarshaller<>());
+	private static final String USER_LINE = """
+			{"name":"foo","email":"bar@example.com","introduction":"I'm\\npowerful\\nman"}""";
+
+	@Test
+	void testAggregateWithJackson() {
+		JsonLineAggregator<User> aggregator = new JsonLineAggregator<>(new JacksonJsonObjectMarshaller<>());
+		assertEquals(USER_LINE, aggregator.aggregate(USER));
 	}
 
 	@Test
-	void testAggregate() {
-		assertEquals("""
-				{"name":"foo","email":"bar@example.com","introduction":"I'm\\npowerful\\nman"}""",
-				aggregator.aggregate(new User("foo", "bar@example.com", """
-						I'm
-						powerful
-						man""")));
+	void testAggregateWithGson() {
+		JsonLineAggregator<User> aggregator = new JsonLineAggregator<>(new GsonJsonObjectMarshaller<>());
+		// Gson escapes the apostrophe by default
+		assertEquals(USER_LINE.replace("'", "\\u0027"), aggregator.aggregate(USER));
+	}
+
+	@Test
+	void testAggregateWithCustomMarshaller() {
+		JsonLineAggregator<User> aggregator = new JsonLineAggregator<>(user -> "{\"name\":\"" + user.name() + "\"}");
+		assertEquals("{\"name\":\"foo\"}", aggregator.aggregate(USER));
+	}
+
+	@Test
+	void testAggregatedLineHasNoLineBreak() {
+		JsonLineAggregator<User> aggregator = new JsonLineAggregator<>(new JacksonJsonObjectMarshaller<>());
+		String line = aggregator.aggregate(USER);
+		assertEquals(-1, line.indexOf('\n'));
+		assertEquals(-1, line.indexOf('\r'));
+	}
+
+	@Test
+	void testRoundTripWithJsonLineMapper() {
+		JsonLineAggregator<User> aggregator = new JsonLineAggregator<>(new JacksonJsonObjectMarshaller<>());
+		JsonLineMapper<User> jacksonMapper = new JsonLineMapper<>(new JacksonJsonObjectUnmarshaller<>(User.class));
+		JsonLineMapper<User> gsonMapper = new JsonLineMapper<>(new GsonJsonObjectUnmarshaller<>(User.class));
+
+		String line = aggregator.aggregate(USER);
+
+		assertEquals(USER, jacksonMapper.mapLine(line, 1));
+		assertEquals(USER, gsonMapper.mapLine(line, 1));
+	}
+
+	@Test
+	void testNullMarshaller() {
+		assertThrows(IllegalArgumentException.class, () -> new JsonLineAggregator<User>(null));
 	}
 
 	record User(String name, String email, String introduction) {

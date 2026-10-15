@@ -44,9 +44,8 @@ import org.springframework.util.Assert;
  * </pre>
  *
  * This is the reader-side counterpart of
- * {@link org.springframework.batch.infrastructure.item.file.transform.LineAggregator}
- * implementations that write JSON lines. For example, to map each line to a domain type
- * with Jackson:
+ * {@link org.springframework.batch.infrastructure.item.file.transform.JsonLineAggregator}.
+ * For example, to map each line to a domain type with Jackson:
  *
  * <pre>
  * new JsonLineMapper&lt;&gt;(new JacksonJsonObjectUnmarshaller&lt;&gt;(Trade.class));

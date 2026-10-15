@@ -22,6 +22,7 @@ Spring Batch 6.1 includes the following features and improvements:
 * xref:whatsnew.adoc#new-remotechunkingmanagerbuilder[New `RemoteChunkingManagerBuilder`]
 * xref:whatsnew.adoc#new-defaultchunkprocessor[New `DefaultChunkProcessor`]
 * xref:whatsnew.adoc#jsonlinemapper-agnostic-to-the-json-library[`JsonLineMapper` agnostic to the JSON library]
+* xref:whatsnew.adoc#new-jsonlineaggregator[New `JsonLineAggregator`]
 * xref:whatsnew.adoc#deprecations[Deprecations]
 
 [[dependencies-upgrade]]
@@ -632,6 +633,36 @@ code needs to declare the variable with its type argument, or to type it as
 a line that cannot be parsed now causes a `ParseException` wrapping the exception of the JSON
 library, instead of the exception of the JSON library itself. Code that only passes the mapper
 to a reader (the vast majority of usages) needs no changes beyond a recompile.
+
+For more details, please refer to the
+xref:readers-and-writers/json-reading-writing.adoc#jsonLineMapper[`JsonLineMapper`] section.
+
+[[new-jsonlineaggregator]]
+== New `JsonLineAggregator`
+
+This release introduces `JsonLineAggregator`, a `LineAggregator` that makes it possible to
+write items to a https://jsonlines.org[JSON Lines] file with a `FlatFileItemWriter`. It is
+the writer-side counterpart of `JsonLineMapper` and, like it, it is agnostic to the JSON
+library: it delegates the conversion of an item to a `JsonObjectMarshaller`, so either the
+Jackson or the Gson implementation can be used:
+
+[source, java]
+----
+// before: a custom LineAggregator was needed
+// after
+FlatFileItemWriter<Trade> writer = new FlatFileItemWriterBuilder<Trade>()
+				.name("tradeWriter")
+				.resource(new FileSystemResource("trades.jsonl"))
+				.lineAggregator(new JsonLineAggregator<>(new JacksonJsonObjectMarshaller<>()))
+				.build();
+----
+
+NOTE: Each item is written as a single line, so the marshaller must produce a JSON object
+that fits on one line, which is the case of the default Jackson and Gson marshallers.
+
+For more details, please refer to the
+xref:readers-and-writers/json-reading-writing.adoc#jsonLineAggregator[`JsonLineAggregator`]
+section.
 
 [[deprecations]]
 == Deprecations
