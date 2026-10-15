@@ -22,6 +22,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
@@ -619,8 +621,9 @@ public class ChunkOrientedStepTests {
 				"Sequential mode should have accurate process skip count");
 	}
 
-	@Test
-	void testListenerExceptionOnChunkWriteIsNotSkippable() throws Exception {
+	@ParameterizedTest(name = "concurrent = {0}")
+	@ValueSource(booleans = { false, true })
+	void testListenerExceptionOnChunkWriteIsNotSkippable(boolean concurrent) throws Exception {
 		// given: a listener bug on the first write of the chunk containing "b"
 		ItemWriteListener<String> beforeWriteBug = new ItemWriteListener<>() {
 			@Override
@@ -653,11 +656,9 @@ public class ChunkOrientedStepTests {
 			}
 		};
 
-		for (boolean concurrent : new boolean[] { false, true }) {
-			assertListenerBugFailsStep(workingWriter, beforeWriteBug, concurrent);
-			assertListenerBugFailsStep(workingWriter, afterWriteBug, concurrent);
-			assertListenerBugFailsStep(failingWriter, onWriteErrorBug, concurrent);
-		}
+		assertListenerBugFailsStep(workingWriter, beforeWriteBug, concurrent);
+		assertListenerBugFailsStep(workingWriter, afterWriteBug, concurrent);
+		assertListenerBugFailsStep(failingWriter, onWriteErrorBug, concurrent);
 	}
 
 	private void assertListenerBugFailsStep(ItemWriter<String> writer, ItemWriteListener<String> listener,
@@ -671,8 +672,9 @@ public class ChunkOrientedStepTests {
 		assertInstanceOf(FatalStepExecutionException.class, stepExecution.getFailureExceptions().get(0));
 	}
 
-	@Test
-	void testListenerExceptionInScanIsNotSkippable() throws Exception {
+	@ParameterizedTest(name = "concurrent = {0}")
+	@ValueSource(booleans = { false, true })
+	void testListenerExceptionInScanIsNotSkippable(boolean concurrent) throws Exception {
 		// given: the chunk write fails, which triggers a scan; the listener fails for "b"
 		// when "b" is written on its own
 		ItemWriter<String> writer = items -> {
@@ -696,18 +698,16 @@ public class ChunkOrientedStepTests {
 			}
 		});
 
-		for (boolean concurrent : new boolean[] { false, true }) {
-			for (ItemWriteListener<String> listener : listeners) {
-				// when
-				StepExecution stepExecution = execute(writer, listener, null, concurrent);
+		for (ItemWriteListener<String> listener : listeners) {
+			// when
+			StepExecution stepExecution = execute(writer, listener, null, concurrent);
 
-				// then: the listener exception fails the step instead of skipping "b"
-				assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
-				assertEquals(0, stepExecution.getWriteSkipCount());
-				Throwable failure = stepExecution.getFailureExceptions().get(0);
-				assertInstanceOf(FatalStepExecutionException.class, failure);
-				assertEquals("Unable to process chunk during scan", failure.getMessage());
-			}
+			// then: the listener exception fails the step instead of skipping "b"
+			assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
+			assertEquals(0, stepExecution.getWriteSkipCount());
+			Throwable failure = stepExecution.getFailureExceptions().get(0);
+			assertInstanceOf(FatalStepExecutionException.class, failure);
+			assertEquals("Unable to process chunk during scan", failure.getMessage());
 		}
 	}
 
@@ -744,8 +744,9 @@ public class ChunkOrientedStepTests {
 		assertEquals("afterWrite bug in scan", chunkErrors.get(1).getMessage());
 	}
 
-	@Test
-	void testWriteFailureInScanIsStillSkippable() throws Exception {
+	@ParameterizedTest(name = "concurrent = {0}")
+	@ValueSource(booleans = { false, true })
+	void testWriteFailureInScanIsStillSkippable(boolean concurrent) throws Exception {
 		// given: "b" can never be written, no listener bug
 		ItemWriter<String> writer = items -> {
 			if (items.getItems().contains("b")) {
@@ -753,16 +754,14 @@ public class ChunkOrientedStepTests {
 			}
 		};
 
-		for (boolean concurrent : new boolean[] { false, true }) {
-			// when
-			StepExecution stepExecution = execute(writer, new ItemWriteListener<>() {
-			}, null, concurrent);
+		// when
+		StepExecution stepExecution = execute(writer, new ItemWriteListener<>() {
+		}, null, concurrent);
 
-			// then
-			assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
-			assertEquals(1, stepExecution.getWriteSkipCount());
-			assertEquals(5, stepExecution.getWriteCount());
-		}
+		// then
+		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
+		assertEquals(1, stepExecution.getWriteSkipCount());
+		assertEquals(5, stepExecution.getWriteCount());
 	}
 
 	private StepExecution execute(ItemWriter<String> writer, ItemWriteListener<String> writeListener,
