@@ -764,6 +764,68 @@ public class ChunkOrientedStepTests {
 		assertEquals(5, stepExecution.getWriteCount());
 	}
 
+	@ParameterizedTest(name = "concurrent = {0}")
+	@ValueSource(booleans = { false, true })
+	void testCommitCountOfScanEndingWithAWrittenItem(boolean concurrent) throws Exception {
+		// given: "b", in the middle of the first chunk, can never be written
+		ItemWriter<String> writer = items -> {
+			if (items.getItems().contains("b")) {
+				throw new IllegalArgumentException("write failure");
+			}
+		};
+
+		// when
+		StepExecution stepExecution = execute(writer, new ItemWriteListener<>() {
+		}, null, concurrent);
+
+		// then: the scanned chunk and the second chunk are committed
+		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
+		assertEquals(1, stepExecution.getWriteSkipCount());
+		assertEquals(2, stepExecution.getCommitCount());
+	}
+
+	@ParameterizedTest(name = "concurrent = {0}")
+	@ValueSource(booleans = { false, true })
+	void testCommitCountOfScanEndingWithASkippedItem(boolean concurrent) throws Exception {
+		// given: "c", the last item of the first chunk, can never be written
+		ItemWriter<String> writer = items -> {
+			if (items.getItems().contains("c")) {
+				throw new IllegalArgumentException("write failure");
+			}
+		};
+
+		// when
+		StepExecution stepExecution = execute(writer, new ItemWriteListener<>() {
+		}, null, concurrent);
+
+		// then: the scanned chunk is committed with the skip of its last item
+		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
+		assertEquals(1, stepExecution.getWriteSkipCount());
+		assertEquals(5, stepExecution.getWriteCount());
+		assertEquals(2, stepExecution.getCommitCount());
+	}
+
+	@ParameterizedTest(name = "concurrent = {0}")
+	@ValueSource(booleans = { false, true })
+	void testCommitCountOfScanSkippingAllItems(boolean concurrent) throws Exception {
+		// given: none of the items of the first chunk can be written
+		ItemWriter<String> writer = items -> {
+			if (items.getItems().stream().anyMatch(List.of("a", "b", "c")::contains)) {
+				throw new IllegalArgumentException("write failure");
+			}
+		};
+
+		// when
+		StepExecution stepExecution = execute(writer, new ItemWriteListener<>() {
+		}, null, concurrent);
+
+		// then: the scanned chunk is committed with the skips of its items
+		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
+		assertEquals(3, stepExecution.getWriteSkipCount());
+		assertEquals(3, stepExecution.getWriteCount());
+		assertEquals(2, stepExecution.getCommitCount());
+	}
+
 	private StepExecution execute(ItemWriter<String> writer, ItemWriteListener<String> writeListener,
 			ChunkListener<String, String> chunkListener, boolean concurrent) throws Exception {
 		ChunkOrientedStep<String, String> step = new ChunkOrientedStep<>("step", 3,
