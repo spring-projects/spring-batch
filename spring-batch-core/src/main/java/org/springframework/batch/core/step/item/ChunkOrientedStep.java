@@ -566,7 +566,9 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 				if (!tracker.hasPendingScanItems()) {
 					logger.debug("Chunk scan completed");
 					tracker.exitScanMode();
-					if (!status.isRollbackOnly()) {
+					// a scan that ends with a skip on write is rolled back, but the skip
+					// is then committed in a new transaction
+					if (!status.isRollbackOnly() || tracker.hasScannedItemSkip()) {
 						stepExecution.incrementCommitCount();
 					}
 				}
@@ -670,7 +672,9 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 				if (!tracker.hasPendingScanItems()) {
 					logger.debug("Chunk scan completed");
 					tracker.exitScanMode();
-					if (!status.isRollbackOnly()) {
+					// a scan that ends with a skip on write is rolled back, but the skip
+					// is then committed in a new transaction
+					if (!status.isRollbackOnly() || tracker.hasScannedItemSkip()) {
 						stepExecution.incrementCommitCount();
 					}
 				}
@@ -1218,6 +1222,14 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 		 */
 		void scannedItemSkipped() {
 			this.scannedItemSkipped = true;
+		}
+
+		/*
+		 * Tell whether a scanned item has been skipped on write since the last call to
+		 * consumeScannedItemSkip(), without consuming it.
+		 */
+		boolean hasScannedItemSkip() {
+			return this.scannedItemSkipped;
 		}
 
 		/*
