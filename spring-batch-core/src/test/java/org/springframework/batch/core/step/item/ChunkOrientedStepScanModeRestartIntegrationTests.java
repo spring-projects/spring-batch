@@ -15,11 +15,14 @@
  */
 package org.springframework.batch.core.step.item;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Proxy;
 import java.time.Duration;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,6 +35,8 @@ import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.listener.SkipListener;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.scope.context.StepContext;
+import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.step.builder.ChunkOrientedStepBuilder;
@@ -84,6 +89,20 @@ class ChunkOrientedStepScanModeRestartIntegrationTests {
 	/** Items of the read skips reported to the skip listener. */
 	private static final List<String> REPORTED_READ_SKIPS = new CopyOnWriteArrayList<>();
 
+	/** Items of the write skips reported to the skip listener. */
+	private static final List<String> REPORTED_WRITE_SKIPS = new CopyOnWriteArrayList<>();
+
+	/** Items whose skip on write stops the step at the next chunk boundary. */
+	private static final Set<String> STOP_AFTER_WRITE_SKIPS = ConcurrentHashMap.newKeySet();
+
+	/**
+	 * Items whose write simulates a crash of the JVM: from then on, nothing is saved in
+	 * the job repository anymore, see {@link #crashable(JobRepository)}.
+	 */
+	private static final Set<String> CRASHING_WRITES = ConcurrentHashMap.newKeySet();
+
+	private static final AtomicBoolean CRASHED = new AtomicBoolean();
+
 	@BeforeEach
 	void clearFailures() {
 		SKIPPABLE_WRITE_FAILURES.clear();
@@ -92,6 +111,10 @@ class ChunkOrientedStepScanModeRestartIntegrationTests {
 		NON_SKIPPABLE_READ_FAILURES.clear();
 		TRANSIENT_READ_FAILURES.clear();
 		REPORTED_READ_SKIPS.clear();
+		REPORTED_WRITE_SKIPS.clear();
+		STOP_AFTER_WRITE_SKIPS.clear();
+		CRASHING_WRITES.clear();
+		CRASHED.set(false);
 	}
 
 	@Test
@@ -235,9 +258,8 @@ class ChunkOrientedStepScanModeRestartIntegrationTests {
 	@Test
 	void testRestartAfterFailureDuringScanFollowingAScanThatEndedWithASkip() throws Exception {
 		// given: items [1..10] in chunks of 5 with two skips allowed. The scan of [1..5]
-		// writes 1 to 4 and ends by skipping 5, in a transaction that is rolled back, so
-		// no reader checkpoint is saved. The scan of [6..10] then writes 6, skips 7,
-		// writes 8 and fails on 9
+		// writes 1 to 4 and ends by skipping 5. The scan of [6..10] then writes 6, skips
+		// 7, writes 8 and fails on 9
 		SKIPPABLE_WRITE_FAILURES.addAll(Set.of("5", "7", "9"));
 		ApplicationContext context = new AnnotationConfigApplicationContext(TestConfiguration.class,
 				TenItemsTwoSkipsStepConfiguration.class);
@@ -279,9 +301,8 @@ class ChunkOrientedStepScanModeRestartIntegrationTests {
 
 	@Test
 	void testRestartAfterFailureInTheChunkFollowingAScanThatEndedWithASkip() throws Exception {
-		// given: the scan of chunk [1..5] writes 1 to 4 and ends by skipping 5, in a
-		// transaction that is rolled back, then chunk [6..10] fails with a
-		// non-skippable exception on 8 before any transaction is committed
+		// given: the scan of chunk [1..5] writes 1 to 4 and ends by skipping 5, then
+		// chunk [6..10] fails with a non-skippable exception on 8
 		SKIPPABLE_WRITE_FAILURES.add("5");
 		NON_SKIPPABLE_WRITE_FAILURES.add("8");
 		ApplicationContext context = new AnnotationConfigApplicationContext(TestConfiguration.class,
@@ -345,6 +366,148 @@ class ChunkOrientedStepScanModeRestartIntegrationTests {
 	}
 
 	@Test
+	void testRestartAfterFailureInTheChunkFollowingAScanThatEndedWithASkipDoesNotReportTheSkipAgain() throws Exception {
+		// given: same as above, but 5 still fails on write when the job is restarted
+		SKIPPABLE_WRITE_FAILURES.add("5");
+		NON_SKIPPABLE_WRITE_FAILURES.add("8");
+		ApplicationContext context = new AnnotationConfigApplicationContext(TestConfiguration.class,
+				TwoChunksStepConfiguration.class);
+
+		// when
+		JobExecution firstExecution = start(context);
+		List<String> skipsReportedBeforeRestart = List.copyOf(REPORTED_WRITE_SKIPS);
+		REPORTED_WRITE_SKIPS.clear();
+		NON_SKIPPABLE_WRITE_FAILURES.clear();
+		JobExecution secondExecution = restart(context, firstExecution);
+
+		// then: 5 is not processed again, so its skip is reported only once
+		assertEquals(BatchStatus.FAILED, firstExecution.getStatus());
+		assertEquals(List.of("5"), skipsReportedBeforeRestart);
+		assertEquals(BatchStatus.COMPLETED, secondExecution.getStatus());
+		assertEquals(List.of(), REPORTED_WRITE_SKIPS);
+		assertEquals(List.of("1", "10", "2", "3", "4", "6", "7", "8", "9"), deliveredItems(context));
+	}
+
+	@Test
+	void testRestartAfterStopFollowingAScanThatEndedWithASkip() throws Exception {
+		// given: the scan of chunk [1..5] writes 1 to 4 and ends by skipping 5, then the
+		// step is stopped before processing chunk [6..10]
+		SKIPPABLE_WRITE_FAILURES.add("5");
+		STOP_AFTER_WRITE_SKIPS.add("5");
+		ApplicationContext context = new AnnotationConfigApplicationContext(TestConfiguration.class,
+				TwoChunksStepConfiguration.class);
+
+		// when
+		JobExecution firstExecution = start(context);
+		List<String> deliveredBeforeRestart = deliveredItems(context);
+		SKIPPABLE_WRITE_FAILURES.clear();
+		STOP_AFTER_WRITE_SKIPS.clear();
+		JobExecution secondExecution = restart(context, firstExecution);
+
+		// then: the restart resumes with chunk [6..10], 5 is not processed again
+		assertEquals(BatchStatus.STOPPED, firstExecution.getStatus());
+		assertEquals(List.of("1", "2", "3", "4"), deliveredBeforeRestart);
+		assertEquals(BatchStatus.COMPLETED, secondExecution.getStatus());
+		assertEquals(List.of("1", "10", "2", "3", "4", "6", "7", "8", "9"), deliveredItems(context));
+	}
+
+	@Test
+	void testRestartAfterFailureDuringScanRightAfterASkip() throws Exception {
+		// given: in the single chunk [1..5], the scan writes 1, skips 2, then fails the
+		// step on 3 with a non-skippable exception
+		SKIPPABLE_WRITE_FAILURES.add("2");
+		NON_SKIPPABLE_WRITE_FAILURES.add("3");
+		ApplicationContext context = new AnnotationConfigApplicationContext(TestConfiguration.class,
+				SequentialStepConfiguration.class);
+
+		// when
+		JobExecution firstExecution = start(context);
+		List<String> deliveredBeforeRestart = deliveredItems(context);
+		SKIPPABLE_WRITE_FAILURES.clear();
+		NON_SKIPPABLE_WRITE_FAILURES.clear();
+		JobExecution secondExecution = restart(context, firstExecution);
+
+		// then: the restart resumes with 3, 2 is not processed again
+		assertEquals(BatchStatus.FAILED, firstExecution.getStatus());
+		assertEquals(List.of("1"), deliveredBeforeRestart);
+		assertEquals(BatchStatus.COMPLETED, secondExecution.getStatus());
+		assertEquals(List.of("1", "3", "4", "5"), deliveredItems(context));
+		assertEquals(3, secondExecution.getStepExecutions().iterator().next().getWriteCount());
+	}
+
+	@Test
+	void testRestartAfterFailureDuringScanRightAfterASkipWithAReaderThatDoesNotSaveItsState() throws Exception {
+		// given: same as above, but the reader does not save its state and only returns
+		// the items that are not delivered yet (a process indicator)
+		SKIPPABLE_WRITE_FAILURES.add("2");
+		NON_SKIPPABLE_WRITE_FAILURES.add("3");
+		ApplicationContext context = new AnnotationConfigApplicationContext(TestConfiguration.class,
+				ProcessIndicatorStepConfiguration.class);
+
+		// when
+		JobExecution firstExecution = start(context);
+		List<String> deliveredBeforeRestart = deliveredItems(context);
+		int updatesBeforeRestart = context.getBean(ProcessIndicatorItemReader.class).updateCount;
+		SKIPPABLE_WRITE_FAILURES.clear();
+		NON_SKIPPABLE_WRITE_FAILURES.clear();
+		JobExecution secondExecution = restart(context, firstExecution);
+
+		// then: the reader is updated once per committed transaction, the scanned item 1
+		// and the skip of 2
+		assertEquals(2, updatesBeforeRestart);
+		// and the reader restarts from its own state (2, 3, 4 and 5), nothing is
+		// discarded
+		assertEquals(BatchStatus.FAILED, firstExecution.getStatus());
+		assertEquals(List.of("1"), deliveredBeforeRestart);
+		assertEquals(BatchStatus.COMPLETED, secondExecution.getStatus());
+		assertEquals(List.of("1", "2", "3", "4", "5"), deliveredItems(context));
+	}
+
+	@Test
+	void testRestartAfterCrashFollowingAScanThatEndedWithASkip() throws Exception {
+		// given: the scan of chunk [1..5] writes 1 to 4 and ends by skipping 5, then the
+		// JVM crashes while writing chunk [6..10]
+		SKIPPABLE_WRITE_FAILURES.add("5");
+		CRASHING_WRITES.add("8");
+		ApplicationContext context = new AnnotationConfigApplicationContext(TestConfiguration.class,
+				CrashableTwoChunksStepConfiguration.class);
+
+		// when
+		JobExecution firstExecution = start(context);
+		List<String> deliveredBeforeRestart = deliveredItems(context);
+		SKIPPABLE_WRITE_FAILURES.clear();
+		CRASHING_WRITES.clear();
+		JobExecution secondExecution = restartAfterCrash(context, firstExecution);
+
+		// then: the restart resumes with chunk [6..10], 5 is not processed again
+		assertEquals(List.of("1", "2", "3", "4"), deliveredBeforeRestart);
+		assertEquals(BatchStatus.COMPLETED, secondExecution.getStatus());
+		assertEquals(List.of("1", "10", "2", "3", "4", "6", "7", "8", "9"), deliveredItems(context));
+	}
+
+	@Test
+	void testRestartAfterCrashDuringScanRightAfterASkip() throws Exception {
+		// given: in the single chunk [1..5], the scan writes 1, skips 2, then the JVM
+		// crashes while scanning 3
+		SKIPPABLE_WRITE_FAILURES.add("2");
+		CRASHING_WRITES.add("3");
+		ApplicationContext context = new AnnotationConfigApplicationContext(TestConfiguration.class,
+				CrashableSequentialStepConfiguration.class);
+
+		// when
+		JobExecution firstExecution = start(context);
+		List<String> deliveredBeforeRestart = deliveredItems(context);
+		SKIPPABLE_WRITE_FAILURES.clear();
+		CRASHING_WRITES.clear();
+		JobExecution secondExecution = restartAfterCrash(context, firstExecution);
+
+		// then: the restart resumes with 3, 2 is not processed again
+		assertEquals(List.of("1"), deliveredBeforeRestart);
+		assertEquals(BatchStatus.COMPLETED, secondExecution.getStatus());
+		assertEquals(List.of("1", "3", "4", "5"), deliveredItems(context));
+	}
+
+	@Test
 	void testRestartAfterFailureDuringScanWithAReaderThatDoesNotSaveItsState() throws Exception {
 		// given: same as the first test, but the reader does not save its state and
 		// only returns the items that are not delivered yet (a process indicator)
@@ -360,8 +523,8 @@ class ChunkOrientedStepScanModeRestartIntegrationTests {
 		JobExecution secondExecution = restart(context, firstExecution);
 
 		// then: the reader is updated once per committed transaction, the scanned
-		// items 1 and 3
-		assertEquals(2, updatesBeforeRestart);
+		// items 1 and 3 and the skip of 2
+		assertEquals(3, updatesBeforeRestart);
 		// and the reader restarts from its own state (2, 4 and 5), nothing is
 		// discarded
 		assertEquals(BatchStatus.FAILED, firstExecution.getStatus());
@@ -377,6 +540,38 @@ class ChunkOrientedStepScanModeRestartIntegrationTests {
 
 	private static JobExecution restart(ApplicationContext context, JobExecution jobExecution) throws Exception {
 		return context.getBean(JobOperator.class).restart(jobExecution);
+	}
+
+	/*
+	 * Restart after a simulated crash: the step execution was left as STARTED in the job
+	 * repository, so it is marked as FAILED first, as an operator would do.
+	 */
+	private static JobExecution restartAfterCrash(ApplicationContext context, JobExecution jobExecution)
+			throws Exception {
+		CRASHED.set(false);
+		context.getBean(JdbcTemplate.class)
+			.update("UPDATE BATCH_STEP_EXECUTION SET STATUS = 'FAILED', END_TIME = CURRENT_TIMESTAMP"
+					+ " WHERE STATUS = 'STARTED'");
+		return restart(context, jobExecution);
+	}
+
+	/*
+	 * Wrap the job repository of a step so that it saves nothing anymore once a crash has
+	 * been simulated, like a JVM that died at that point.
+	 */
+	private static JobRepository crashable(JobRepository jobRepository) {
+		return (JobRepository) Proxy.newProxyInstance(JobRepository.class.getClassLoader(),
+				new Class<?>[] { JobRepository.class }, (proxy, method, args) -> {
+					if (CRASHED.get() && method.getName().startsWith("update")) {
+						return null;
+					}
+					try {
+						return method.invoke(jobRepository, args);
+					}
+					catch (InvocationTargetException exception) {
+						throw exception.getCause();
+					}
+				});
 	}
 
 	private static List<String> deliveredItems(ApplicationContext context) {
@@ -402,13 +597,30 @@ class ChunkOrientedStepScanModeRestartIntegrationTests {
 				if (NON_SKIPPABLE_WRITE_FAILURES.contains(item)) {
 					throw new IllegalArgumentException("Simulated non-skippable write error for item: " + item);
 				}
+				if (CRASHING_WRITES.contains(item)) {
+					CRASHED.set(true);
+					throw new IllegalArgumentException("Simulated crash while writing item: " + item);
+				}
 				jdbcTemplate.update("INSERT INTO delivery (item_number) VALUES (?)", item);
 			}
 		})
 			.transactionManager(transactionManager)
 			.faultTolerant()
 			.skip(IllegalStateException.class)
-			.skipLimit(skipLimit);
+			.skipLimit(skipLimit)
+			.skipListener(new SkipListener<String, String>() {
+				@Override
+				public void onSkipInWrite(String item, Throwable t) {
+					REPORTED_WRITE_SKIPS.add(item);
+					if (STOP_AFTER_WRITE_SKIPS.contains(item)) {
+						// what JobOperator#stop does to a running step
+						StepContext stepContext = StepSynchronizationManager.getContext();
+						if (stepContext != null) {
+							stepContext.getStepExecution().setTerminateOnly();
+						}
+					}
+				}
+			});
 	}
 
 	/**
@@ -661,6 +873,30 @@ class ChunkOrientedStepScanModeRestartIntegrationTests {
 			return stepBuilder(jobRepository, transactionManager, jdbcTemplate, TEN_ITEMS, 5, 5)
 				.taskExecutor(new SimpleAsyncTaskExecutor())
 				.build();
+		}
+
+	}
+
+	@Configuration
+	static class CrashableSequentialStepConfiguration {
+
+		@Bean
+		public Step step(JobRepository jobRepository, JdbcTransactionManager transactionManager,
+				JdbcTemplate jdbcTemplate) {
+			return stepBuilder(crashable(jobRepository), transactionManager, jdbcTemplate,
+					List.of("1", "2", "3", "4", "5"), 5, 1)
+				.build();
+		}
+
+	}
+
+	@Configuration
+	static class CrashableTwoChunksStepConfiguration {
+
+		@Bean
+		public Step step(JobRepository jobRepository, JdbcTransactionManager transactionManager,
+				JdbcTemplate jdbcTemplate) {
+			return stepBuilder(crashable(jobRepository), transactionManager, jdbcTemplate, TEN_ITEMS, 5, 5).build();
 		}
 
 	}

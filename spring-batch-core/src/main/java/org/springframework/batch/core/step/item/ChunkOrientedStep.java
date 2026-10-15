@@ -459,35 +459,49 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 					// (eg JpaTransactionManager) has marked it as globally rollback-only
 					// (eg after a JPA flush failure) but not locally rollback-only.
 					transactionStatus.setRollbackOnly();
-					if (scanning && !tracker.isScanMode()) {
-						recordScanEndedWithSkip(stepExecution.getExecutionContext(), tracker);
-					}
 					chunkTransactionEvent.transactionStatus = BatchMetrics.STATUS_ROLLED_BACK;
 					chunkTransactionEvent.commit();
 					return;
 				}
 
-				ExecutionContext executionContext = stepExecution.getExecutionContext();
-				// Both terms are required: the transaction must have re-attempted a
-				// scanned item (scanning), and the scan must still have items pending
-				// (isScanMode). The transaction that commits the last scanned item
-				// leaves scan mode, and at that point the whole chunk is settled and the
-				// reader sits exactly at its end, so that commit takes a regular
-				// checkpoint and clears the offset rather than recording one.
-				if (scanning && tracker.isScanMode()) {
-					updateStreamsWhileScanning(executionContext, tracker);
-				}
-				else {
-					this.compositeItemStream.update(executionContext);
-					executionContext.remove(CHUNK_SCAN_OFFSET);
-					tracker.readerCheckpointSaved();
-				}
-				getJobRepository().updateExecutionContext(stepExecution);
-				getJobRepository().update(stepExecution);
+				saveState(stepExecution, tracker, scanning);
 				chunkTransactionEvent.transactionStatus = BatchMetrics.STATUS_COMMITTED;
 				chunkTransactionEvent.commit();
 			});
+			// a scanned item skipped on write is rolled back with its transaction, so the
+			// skip is committed in a new transaction, as if the item had been written:
+			// otherwise, a restart after the step ended (or the JVM crashed) before the
+			// next commit would process the skipped item again
+			ChunkTracker<I, O> tracker = this.chunkTracker.get();
+			if (tracker.consumeScannedItemSkip()) {
+				this.transactionTemplate
+					.executeWithoutResult(transactionStatus -> saveState(stepExecution, tracker, true));
+			}
 		}
+	}
+
+	/*
+	 * Save the state of the streams and of the step execution for a commit.
+	 */
+	private void saveState(StepExecution stepExecution, ChunkTracker<I, O> tracker, boolean scanning) {
+		ExecutionContext executionContext = stepExecution.getExecutionContext();
+		// Both terms are required: the transaction must have re-attempted a scanned item
+		// (scanning), and the scan must still have items pending (isScanMode). The
+		// transaction that commits the last scanned item (or its skip) leaves scan mode,
+		// and at that point the whole chunk is settled and the reader sits exactly at its
+		// end, so that commit takes a regular checkpoint and clears the offset rather
+		// than
+		// recording one.
+		if (scanning && tracker.isScanMode()) {
+			updateStreamsWhileScanning(executionContext, tracker);
+		}
+		else {
+			this.compositeItemStream.update(executionContext);
+			executionContext.remove(CHUNK_SCAN_OFFSET);
+			tracker.readerCheckpointSaved();
+		}
+		getJobRepository().updateExecutionContext(stepExecution);
+		getJobRepository().update(stepExecution);
 	}
 
 	/*
@@ -511,23 +525,6 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 		}
 		else {
 			executionContext.putInt(CHUNK_SCAN_OFFSET, tracker.getLastScannedReadPosition());
-		}
-	}
-
-	/*
-	 * Record the end of a scan whose last scanned item was skipped. The transaction of
-	 * that item is rolled back, so no reader checkpoint is taken for the end of the scan,
-	 * although all the reads of the chunk are settled at that point. If the reader keeps
-	 * restart state, the scan offset is moved past all of them, so that a restart after a
-	 * failure occurring before the next commit does not process the skipped item again.
-	 * The offset is kept in memory only: the next commit replaces it, otherwise it is
-	 * saved with the execution context when the step ends.
-	 */
-	private void recordScanEndedWithSkip(ExecutionContext executionContext, ChunkTracker<I, O> tracker) {
-		ExecutionContext readerState = new ExecutionContext();
-		this.readerItemStream.update(readerState);
-		if (!readerState.isEmpty()) {
-			executionContext.putInt(CHUNK_SCAN_OFFSET, tracker.getReadsSinceCheckpoint());
 		}
 	}
 
@@ -1088,6 +1085,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 				contribution.incrementWriteSkipCount();
 				contribution.getStepExecution().incrementRollbackCount();
 				status.setRollbackOnly();
+				this.chunkTracker.get().scannedItemSkipped();
 				notifyChunkError(exception, singleItemChunk);
 				return singleItemChunk;
 			}
@@ -1158,12 +1156,15 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 
 		private int lastScannedReadPosition;
 
+		private boolean scannedItemSkipped;
+
 		void init() {
 			this.moreItems = true;
 			this.scanMode = false;
 			this.pendingScanItems = null;
 			this.readsSinceCheckpoint = 0;
 			this.lastScannedReadPosition = 0;
+			this.scannedItemSkipped = false;
 		}
 
 		/*
@@ -1208,6 +1209,23 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 				this.lastScannedReadPosition = scanItem.readPosition();
 			}
 			return scanItem;
+		}
+
+		/*
+		 * The item that has just been polled has been skipped on write, in a transaction
+		 * that is rolled back.
+		 */
+		void scannedItemSkipped() {
+			this.scannedItemSkipped = true;
+		}
+
+		/*
+		 * Tell whether a scanned item has been skipped on write since the last call.
+		 */
+		boolean consumeScannedItemSkip() {
+			boolean skipped = this.scannedItemSkipped;
+			this.scannedItemSkipped = false;
+			return skipped;
 		}
 
 		boolean hasPendingScanItems() {
