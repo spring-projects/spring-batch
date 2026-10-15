@@ -22,8 +22,7 @@ import org.springframework.batch.core.listener.StepListenerSupport;
 import org.springframework.batch.infrastructure.item.ItemReader;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.OptimisticLockingFailureException;
-import org.springframework.jdbc.core.JdbcOperations;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.util.Assert;
 
 /**
@@ -31,21 +30,22 @@ import org.springframework.util.Assert;
  */
 public class StagingItemListener extends StepListenerSupport<Long, Long> implements InitializingBean {
 
-	private JdbcOperations jdbcTemplate;
+	private JdbcClient jdbcClient;
 
 	public void setDataSource(DataSource dataSource) {
-		jdbcTemplate = new JdbcTemplate(dataSource);
+		jdbcClient = JdbcClient.create(dataSource);
 	}
 
 	@Override
 	public final void afterPropertiesSet() throws Exception {
-		Assert.state(jdbcTemplate != null, "You must provide a DataSource.");
+		Assert.state(jdbcClient != null, "You must provide a DataSource.");
 	}
 
 	@Override
 	public void afterRead(Long id) {
-		int count = jdbcTemplate.update("UPDATE BATCH_STAGING SET PROCESSED=? WHERE ID=? AND PROCESSED=?",
-				StagingItemWriter.DONE, id, StagingItemWriter.NEW);
+		int count = jdbcClient.sql("UPDATE BATCH_STAGING SET PROCESSED=? WHERE ID=? AND PROCESSED=?")
+			.params(StagingItemWriter.DONE, id, StagingItemWriter.NEW)
+			.update();
 		if (count != 1) {
 			throw new OptimisticLockingFailureException("The staging record with ID=" + id
 					+ " was updated concurrently when trying to mark as complete (updated " + count + " records.");

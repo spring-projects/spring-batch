@@ -50,7 +50,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.orm.jpa.EntityManagerFactoryUtils;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
@@ -63,6 +63,7 @@ import org.springframework.test.jdbc.JdbcTestUtils;
  * JPA setup.
  *
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  */
 public class ChunkOrientedStepFaultToleranceJpaIntegrationTests {
 
@@ -72,7 +73,7 @@ public class ChunkOrientedStepFaultToleranceJpaIntegrationTests {
 		ApplicationContext context = new AnnotationConfigApplicationContext(JobConfiguration.class);
 		JobOperator jobOperator = context.getBean(JobOperator.class);
 		Job job = context.getBean(Job.class);
-		JdbcTemplate jdbcTemplate = context.getBean(JdbcTemplate.class);
+		JdbcClient jdbcClient = context.getBean(JdbcClient.class);
 
 		// when
 		JobParameters jobParameters = new JobParameters();
@@ -88,7 +89,7 @@ public class ChunkOrientedStepFaultToleranceJpaIntegrationTests {
 		Assertions.assertEquals(0, stepExecution.getReadSkipCount());
 		Assertions.assertEquals(2, stepExecution.getWriteSkipCount());
 		Assertions.assertEquals(2, stepExecution.getSkipCount());
-		Assertions.assertEquals(4, JdbcTestUtils.countRowsInTable(jdbcTemplate, "person_target"));
+		Assertions.assertEquals(4, JdbcTestUtils.countRowsInTable(jdbcClient, "person_target"));
 	}
 
 	/*
@@ -108,8 +109,8 @@ public class ChunkOrientedStepFaultToleranceJpaIntegrationTests {
 		ApplicationContext context = new AnnotationConfigApplicationContext(OptimisticLockingJobConfiguration.class);
 		JobOperator jobOperator = context.getBean(JobOperator.class);
 		Job job = context.getBean(Job.class);
-		JdbcTemplate jdbcTemplate = context.getBean(JdbcTemplate.class);
-		jdbcTemplate.update("insert into person_target (id, name, version) values (1, 'v1', 0)");
+		JdbcClient jdbcClient = context.getBean(JdbcClient.class);
+		jdbcClient.sql("insert into person_target (id, name, version) values (1, 'v1', 0)").update();
 
 		// when
 		JobExecution jobExecution = jobOperator.start(job, new JobParameters());
@@ -122,7 +123,9 @@ public class ChunkOrientedStepFaultToleranceJpaIntegrationTests {
 		Assertions.assertEquals(0, stepExecution.getWriteCount());
 		Assertions.assertEquals(0, stepExecution.getCommitCount());
 		Assertions.assertEquals(1, stepExecution.getRollbackCount());
-		String persistedName = jdbcTemplate.queryForObject("select name from person_target where id = 1", String.class);
+		String persistedName = jdbcClient.sql("select name from person_target where id = 1")
+			.query(String.class)
+			.single();
 		Assertions.assertEquals("v1", persistedName);
 	}
 
@@ -163,7 +166,7 @@ public class ChunkOrientedStepFaultToleranceJpaIntegrationTests {
 
 		@Bean
 		public Step step(JobRepository jobRepository, JpaTransactionManager transactionManager,
-				EntityManagerFactory entityManagerFactory, JdbcTemplate jdbcTemplate) {
+				EntityManagerFactory entityManagerFactory, JdbcClient jdbcClient) {
 			AtomicInteger writeInvocations = new AtomicInteger();
 			ItemWriter<Integer> writer = chunk -> {
 				EntityManager entityManager = EntityManagerFactoryUtils
@@ -174,7 +177,7 @@ public class ChunkOrientedStepFaultToleranceJpaIntegrationTests {
 				if (writeInvocations.incrementAndGet() == 1) {
 					// simulate a concurrent process bumping the row's version between
 					// this writer's read and its flush
-					jdbcTemplate.update("update person_target set version = version + 1 where id = 1");
+					jdbcClient.sql("update person_target set version = version + 1 where id = 1").update();
 				}
 				// attempt 1: flush throws OptimisticLockException and marks the
 				// transaction rollback-only

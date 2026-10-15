@@ -32,7 +32,7 @@ import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
@@ -55,7 +55,7 @@ class JobRepositoryTestUtilsTests {
 	@Autowired
 	private DataSource dataSource;
 
-	private JdbcTemplate jdbcTemplate;
+	private JdbcClient jdbcClient;
 
 	private int beforeJobs;
 
@@ -63,9 +63,9 @@ class JobRepositoryTestUtilsTests {
 
 	@BeforeEach
 	void init() {
-		jdbcTemplate = new JdbcTemplate(dataSource);
-		beforeJobs = JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_EXECUTION");
-		beforeSteps = JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_STEP_EXECUTION");
+		jdbcClient = JdbcClient.create(dataSource);
+		beforeJobs = JdbcTestUtils.countRowsInTable(jdbcClient, "BATCH_JOB_EXECUTION");
+		beforeSteps = JdbcTestUtils.countRowsInTable(jdbcClient, "BATCH_STEP_EXECUTION");
 	}
 
 	@Test
@@ -73,11 +73,11 @@ class JobRepositoryTestUtilsTests {
 		utils = new JobRepositoryTestUtils(jobRepository);
 		List<JobExecution> list = utils.createJobExecutions(3);
 		assertEquals(3, list.size());
-		assertEquals(beforeJobs + 3, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_EXECUTION"));
-		assertEquals(beforeSteps + 3, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_STEP_EXECUTION"));
+		assertEquals(beforeJobs + 3, JdbcTestUtils.countRowsInTable(jdbcClient, "BATCH_JOB_EXECUTION"));
+		assertEquals(beforeSteps + 3, JdbcTestUtils.countRowsInTable(jdbcClient, "BATCH_STEP_EXECUTION"));
 		utils.removeJobExecutions(list);
-		assertEquals(beforeJobs, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_EXECUTION"));
-		assertEquals(beforeSteps, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_STEP_EXECUTION"));
+		assertEquals(beforeJobs, JdbcTestUtils.countRowsInTable(jdbcClient, "BATCH_JOB_EXECUTION"));
+		assertEquals(beforeSteps, JdbcTestUtils.countRowsInTable(jdbcClient, "BATCH_STEP_EXECUTION"));
 	}
 
 	@Test
@@ -95,9 +95,9 @@ class JobRepositoryTestUtilsTests {
 		jobRepository.update(jobExecution);
 		jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters, executionContext);
 		list.add(jobExecution);
-		assertEquals(beforeJobs + 2, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_EXECUTION"));
+		assertEquals(beforeJobs + 2, JdbcTestUtils.countRowsInTable(jdbcClient, "BATCH_JOB_EXECUTION"));
 		utils.removeJobExecutions(list);
-		assertEquals(beforeJobs, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_EXECUTION"));
+		assertEquals(beforeJobs, JdbcTestUtils.countRowsInTable(jdbcClient, "BATCH_JOB_EXECUTION"));
 	}
 
 	@Test
@@ -105,11 +105,11 @@ class JobRepositoryTestUtilsTests {
 		utils = new JobRepositoryTestUtils(jobRepository);
 		List<JobExecution> list = utils.createJobExecutions("foo", new String[] { "bar", "spam" }, 3);
 		assertEquals(3, list.size());
-		assertEquals(beforeJobs + 3, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_EXECUTION"));
-		assertEquals(beforeSteps + 6, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_STEP_EXECUTION"));
+		assertEquals(beforeJobs + 3, JdbcTestUtils.countRowsInTable(jdbcClient, "BATCH_JOB_EXECUTION"));
+		assertEquals(beforeSteps + 6, JdbcTestUtils.countRowsInTable(jdbcClient, "BATCH_STEP_EXECUTION"));
 		utils.removeJobExecutions(list);
-		assertEquals(beforeJobs, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_EXECUTION"));
-		assertEquals(beforeSteps, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_STEP_EXECUTION"));
+		assertEquals(beforeJobs, JdbcTestUtils.countRowsInTable(jdbcClient, "BATCH_JOB_EXECUTION"));
+		assertEquals(beforeSteps, JdbcTestUtils.countRowsInTable(jdbcClient, "BATCH_STEP_EXECUTION"));
 	}
 
 	@Test
@@ -121,7 +121,7 @@ class JobRepositoryTestUtilsTests {
 		assertEquals(1, list.size());
 		assertEquals("bar", list.get(0).getJobParameters().getString("foo"));
 		utils.removeJobExecutions(list);
-		assertEquals(beforeJobs, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_EXECUTION"));
+		assertEquals(beforeJobs, JdbcTestUtils.countRowsInTable(jdbcClient, "BATCH_JOB_EXECUTION"));
 	}
 
 	@Test
@@ -129,15 +129,15 @@ class JobRepositoryTestUtilsTests {
 		// given
 		utils = new JobRepositoryTestUtils(jobRepository);
 		utils.createJobExecutions("foo", new String[] { "step1", "step2" }, 1);
-		assertEquals(1, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_EXECUTION"));
-		assertEquals(2, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_STEP_EXECUTION"));
+		assertEquals(1, JdbcTestUtils.countRowsInTable(jdbcClient, "BATCH_JOB_EXECUTION"));
+		assertEquals(2, JdbcTestUtils.countRowsInTable(jdbcClient, "BATCH_STEP_EXECUTION"));
 
 		// when
 		utils.removeJobExecutions();
 
 		// then
-		assertEquals(0, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_STEP_EXECUTION"));
-		assertEquals(0, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_EXECUTION"));
+		assertEquals(0, JdbcTestUtils.countRowsInTable(jdbcClient, "BATCH_STEP_EXECUTION"));
+		assertEquals(0, JdbcTestUtils.countRowsInTable(jdbcClient, "BATCH_JOB_EXECUTION"));
 	}
 
 	@Test
@@ -145,28 +145,28 @@ class JobRepositoryTestUtilsTests {
 		// given
 		utils = new JobRepositoryTestUtils(jobRepository);
 		JobExecution jobExecution = utils.createJobExecutions(1).get(0);
-		assertEquals(1, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_EXECUTION"));
-		assertEquals(1, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_STEP_EXECUTION"));
+		assertEquals(1, JdbcTestUtils.countRowsInTable(jdbcClient, "BATCH_JOB_EXECUTION"));
+		assertEquals(1, JdbcTestUtils.countRowsInTable(jdbcClient, "BATCH_STEP_EXECUTION"));
 
 		// when
 		jobExecution.setVersion(-1); // simulate stale version
 		utils.removeJobExecution(jobExecution);
 
 		// then
-		assertEquals(0, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_STEP_EXECUTION"));
-		assertEquals(0, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_EXECUTION"));
+		assertEquals(0, JdbcTestUtils.countRowsInTable(jdbcClient, "BATCH_STEP_EXECUTION"));
+		assertEquals(0, JdbcTestUtils.countRowsInTable(jdbcClient, "BATCH_JOB_EXECUTION"));
 
 		List<JobExecution> jobExecutions = utils.createJobExecutions("test", new String[] { "step1", "step2" }, 2);
-		assertEquals(2, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_EXECUTION"));
-		assertEquals(4, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_STEP_EXECUTION"));
+		assertEquals(2, JdbcTestUtils.countRowsInTable(jdbcClient, "BATCH_JOB_EXECUTION"));
+		assertEquals(4, JdbcTestUtils.countRowsInTable(jdbcClient, "BATCH_STEP_EXECUTION"));
 
 		// when
 		jobExecutions.forEach(je -> je.setVersion(-1)); // simulate stale version
 		utils.removeJobExecutions(jobExecutions);
 
 		// then
-		assertEquals(0, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_STEP_EXECUTION"));
-		assertEquals(0, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_EXECUTION"));
+		assertEquals(0, JdbcTestUtils.countRowsInTable(jdbcClient, "BATCH_STEP_EXECUTION"));
+		assertEquals(0, JdbcTestUtils.countRowsInTable(jdbcClient, "BATCH_JOB_EXECUTION"));
 	}
 
 }

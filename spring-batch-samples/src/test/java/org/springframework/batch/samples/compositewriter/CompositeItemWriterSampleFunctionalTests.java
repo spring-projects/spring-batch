@@ -30,8 +30,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.batch.samples.domain.trade.Trade;
 import org.springframework.batch.test.JobOperatorTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
@@ -50,20 +50,20 @@ class CompositeItemWriterSampleFunctionalTests {
 			+ "Trade: [isin=UK21341EAH44,quantity=214,price=34.11,customer=customer4]"
 			+ "Trade: [isin=UK21341EAH45,quantity=215,price=35.11,customer=customer5]";
 
-	private JdbcTemplate jdbcTemplate;
+	private JdbcClient jdbcClient;
 
 	@Autowired
 	private JobOperatorTestUtils jobOperatorTestUtils;
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
-		this.jdbcTemplate = new JdbcTemplate(dataSource);
+		this.jdbcClient = JdbcClient.create(dataSource);
 	}
 
 	@Test
 	void testJobLaunch() throws Exception {
-		JdbcTestUtils.deleteFromTables(jdbcTemplate, "TRADE");
-		int before = JdbcTestUtils.countRowsInTable(jdbcTemplate, "TRADE");
+		JdbcTestUtils.deleteFromTables(jdbcClient, "TRADE");
+		int before = JdbcTestUtils.countRowsInTable(jdbcClient, "TRADE");
 
 		jobOperatorTestUtils.startJob();
 
@@ -80,11 +80,11 @@ class CompositeItemWriterSampleFunctionalTests {
 				new Trade("UK21341EAH44", 214, new BigDecimal("34.11"), "customer4"),
 				new Trade("UK21341EAH45", 215, new BigDecimal("35.11"), "customer5"));
 
-		int after = JdbcTestUtils.countRowsInTable(jdbcTemplate, "TRADE");
+		int after = JdbcTestUtils.countRowsInTable(jdbcClient, "TRADE");
 
 		assertEquals(before + 5, after);
 
-		jdbcTemplate.query(GET_TRADES, new RowCallbackHandler() {
+		jdbcClient.sql(GET_TRADES).query(new RowCallbackHandler() {
 			private int activeRow = 0;
 
 			@Override

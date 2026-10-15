@@ -28,15 +28,19 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.jdbc.JdbcTestUtils;
+
+import javax.sql.DataSource;
 
 @SpringJUnitConfig(locations = { "/simple-job-launcher-context.xml", "/jobs/sample-steps.xml" })
 class SampleStepTests implements ApplicationContextAware {
 
 	@Autowired
-	private JdbcTemplate jdbcTemplate;
+	private DataSource dataSource;
+
+	private JdbcClient jdbcClient;
 
 	private JobOperatorTestUtils jobOperatorTestUtils;
 
@@ -50,21 +54,22 @@ class SampleStepTests implements ApplicationContextAware {
 
 	@BeforeEach
 	void setUp() {
-		jdbcTemplate.update("create table TESTS (ID integer, NAME varchar(40))");
+		jdbcClient = JdbcClient.create(dataSource);
+		jdbcClient.sql("create table TESTS (ID integer, NAME varchar(40))").update();
 		jobOperatorTestUtils = new JobOperatorTestUtils(jobOperator, jobRepository);
 	}
 
 	@AfterEach
 	void tearDown() {
-		JdbcTestUtils.dropTables(this.jdbcTemplate, "TESTS");
+		JdbcTestUtils.dropTables(this.jdbcClient, "TESTS");
 	}
 
 	@Test
 	void testTasklet() {
 		Step step = context.getBean("s2", Step.class);
 		assertEquals(BatchStatus.COMPLETED, jobOperatorTestUtils.startStep(step).getStatus());
-		assertEquals(2, jdbcTemplate.queryForObject("SELECT ID from TESTS where NAME = 'SampleTasklet2'", Integer.class)
-			.intValue());
+		assertEquals(2,
+				jdbcClient.sql("SELECT ID from TESTS where NAME = 'SampleTasklet2'").query(Integer.class).single());
 	}
 
 	@Override
