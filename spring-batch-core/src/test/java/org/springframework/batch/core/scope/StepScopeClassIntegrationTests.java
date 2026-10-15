@@ -65,7 +65,7 @@ public class StepScopeClassIntegrationTests implements BeanFactoryAware {
 
 		StepSynchronizationManager.close();
 		StepExecution stepExecution = new StepExecution(123L, "foo",
-				new JobExecution(11L, new JobInstance(1L, "job"), new JobParameters()));
+				new JobExecution(11L, new JobInstance(1L, "job"), JobParameters.EMPTY));
 
 		ExecutionContext executionContext = new ExecutionContext();
 		executionContext.put("foo", foo);

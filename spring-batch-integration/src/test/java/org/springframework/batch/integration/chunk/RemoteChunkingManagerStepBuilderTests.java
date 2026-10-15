@@ -311,7 +311,7 @@ class RemoteChunkingManagerStepBuilderTests {
 			.keyGenerator(Object::hashCode)
 			.build();
 
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		JobInstance jobInstance = jobRepository.createJobInstance("job1", jobParameters);
 		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
 				new ExecutionContext());

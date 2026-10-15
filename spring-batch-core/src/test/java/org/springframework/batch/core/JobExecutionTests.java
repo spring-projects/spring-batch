@@ -45,7 +45,7 @@ class JobExecutionTests {
 
 	{
 		JobInstance jobInstance = new JobInstance(11L, "foo");
-		execution = new JobExecution(12L, jobInstance, new JobParameters());
+		execution = new JobExecution(12L, jobInstance, JobParameters.EMPTY);
 	}
 
 	/**

@@ -97,9 +97,9 @@ class MessageChannelPartitionHandlerConcurrencyTests {
 		StepExecutionSplitter splitter1 = fixedSplitter(1L, Set.of(2L, 3L));
 		StepExecutionSplitter splitter2 = fixedSplitter(2L, Set.of(4L, 5L));
 		StepExecution manager1 = new StepExecution(10L, "managerStep",
-				new JobExecution(1L, new JobInstance(1L, "job"), new JobParameters()));
+				new JobExecution(1L, new JobInstance(1L, "job"), JobParameters.EMPTY));
 		StepExecution manager2 = new StepExecution(11L, "managerStep",
-				new JobExecution(2L, new JobInstance(2L, "job"), new JobParameters()));
+				new JobExecution(2L, new JobInstance(2L, "job"), JobParameters.EMPTY));
 
 		ExecutorService executor = Executors.newFixedThreadPool(2);
 		try {
@@ -142,7 +142,7 @@ class MessageChannelPartitionHandlerConcurrencyTests {
 	private Message<StepExecution> workerReply(long jobExecutionId, long stepExecutionId, int sequenceNumber,
 			int sequenceSize) {
 		JobExecution jobExecution = new JobExecution(jobExecutionId, new JobInstance(jobExecutionId, "job"),
-				new JobParameters());
+				JobParameters.EMPTY);
 		StepExecution stepExecution = new StepExecution(stepExecutionId, "workerStep:partition" + stepExecutionId,
 				jobExecution);
 		return MessageBuilder.withPayload(stepExecution)
@@ -156,7 +156,7 @@ class MessageChannelPartitionHandlerConcurrencyTests {
 			throws Exception {
 		StepExecutionSplitter splitter = mock();
 		JobExecution jobExecution = new JobExecution(jobExecutionId, new JobInstance(jobExecutionId, "job"),
-				new JobParameters());
+				JobParameters.EMPTY);
 		Set<StepExecution> split = new HashSet<>();
 		for (Long id : partitionStepExecutionIds) {
 			split.add(new StepExecution(id, "workerStep:partition" + id, jobExecution));

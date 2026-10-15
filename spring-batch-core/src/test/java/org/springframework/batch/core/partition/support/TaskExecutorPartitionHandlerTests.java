@@ -47,7 +47,7 @@ class TaskExecutorPartitionHandlerTests {
 	private final Collection<String> stepExecutions = new TreeSet<>();
 
 	private final StepExecution stepExecution = new StepExecution(1L, "step",
-			new JobExecution(1L, new JobInstance(1L, "job"), new JobParameters()));
+			new JobExecution(1L, new JobInstance(1L, "job"), JobParameters.EMPTY));
 
 	private final StepExecutionSplitter stepExecutionSplitter = new StepExecutionSplitter() {
 

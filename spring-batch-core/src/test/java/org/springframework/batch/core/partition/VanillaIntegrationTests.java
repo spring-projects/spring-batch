@@ -61,7 +61,7 @@ public class VanillaIntegrationTests {
 				"STEP_NAME='step1:manager'");
 		int beforePartition = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "BATCH_STEP_EXECUTION",
 				"STEP_NAME like 'step1:partition%'");
-		assertNotNull(jobOperator.start(job, new JobParameters()));
+		assertNotNull(jobOperator.start(job, JobParameters.EMPTY));
 		int afterManager = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "BATCH_STEP_EXECUTION",
 				"STEP_NAME='step1:manager'");
 		int afterPartition = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "BATCH_STEP_EXECUTION",

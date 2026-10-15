@@ -43,7 +43,7 @@ class JobLaunchingGatewayTests {
 	void testExceptionRaised() throws Exception {
 
 		final Message<JobLaunchRequest> message = MessageBuilder
-			.withPayload(new JobLaunchRequest(new JobSupport("testJob"), new JobParameters()))
+			.withPayload(new JobLaunchRequest(new JobSupport("testJob"), JobParameters.EMPTY))
 			.build();
 
 		final JobOperator jobOperator = mock();

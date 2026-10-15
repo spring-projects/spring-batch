@@ -59,7 +59,7 @@ abstract class AbstractJobRepositoryIntegrationTests {
 
 	private final JobSupport job = new JobSupport("SimpleJobRepositoryIntegrationTestsJob");
 
-	private JobParameters jobParameters = new JobParameters();
+	private JobParameters jobParameters = JobParameters.EMPTY;
 
 	/*
 	 * Create two job executions for same job+parameters tuple. Check both executions
@@ -325,7 +325,7 @@ abstract class AbstractJobRepositoryIntegrationTests {
 	void createStepExecutionWithExecutionContext() {
 		// given
 		String jobName = "job";
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		JobInstance jobInstance = jobRepository.createJobInstance(jobName, jobParameters);
 		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
 				new ExecutionContext());

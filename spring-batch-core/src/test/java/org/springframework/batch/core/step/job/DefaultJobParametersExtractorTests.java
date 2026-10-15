@@ -40,7 +40,7 @@ class DefaultJobParametersExtractorTests {
 	private final DefaultJobParametersExtractor extractor = new DefaultJobParametersExtractor();
 
 	private final StepExecution stepExecution = new StepExecution(1L, "step",
-			new JobExecution(0L, new JobInstance(1L, "job"), new JobParameters()));
+			new JobExecution(0L, new JobInstance(1L, "job"), JobParameters.EMPTY));
 
 	@Test
 	void testGetEmptyJobParameters() {

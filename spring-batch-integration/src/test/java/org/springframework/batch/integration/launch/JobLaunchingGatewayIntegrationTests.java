@@ -82,7 +82,7 @@ class JobLaunchingGatewayIntegrationTests {
 	@DirtiesContext
 	@SuppressWarnings("unchecked")
 	void testNoReply() {
-		GenericMessage<JobLaunchRequest> trigger = new GenericMessage<>(new JobLaunchRequest(job, new JobParameters()));
+		GenericMessage<JobLaunchRequest> trigger = new GenericMessage<>(new JobLaunchRequest(job, JobParameters.EMPTY));
 		Exception exception = assertThrows(MessagingException.class, () -> requestChannel.send(trigger));
 		String message = exception.getCause().getMessage();
 		assertTrue(message.contains("replyChannel"), "Wrong message: " + message);

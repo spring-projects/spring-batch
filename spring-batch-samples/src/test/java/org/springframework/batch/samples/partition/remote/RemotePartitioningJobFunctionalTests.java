@@ -86,7 +86,7 @@ public abstract class RemotePartitioningJobFunctionalTests {
 	@Test
 	void testRemotePartitioningJob(@Autowired Job job) throws Exception {
 		// when
-		JobExecution jobExecution = this.jobOperator.start(job, new JobParameters());
+		JobExecution jobExecution = this.jobOperator.start(job, JobParameters.EMPTY);
 
 		// then
 		assertEquals(ExitStatus.COMPLETED.getExitCode(), jobExecution.getExitStatus().getExitCode());

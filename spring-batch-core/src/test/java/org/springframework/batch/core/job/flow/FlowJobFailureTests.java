@@ -78,7 +78,7 @@ class FlowJobFailureTests {
 		factory.afterPropertiesSet();
 		jobRepository = factory.getObject();
 		job.setJobRepository(jobRepository);
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		JobInstance jobInstance = jobRepository.createJobInstance("job", jobParameters);
 		execution = jobRepository.createJobExecution(jobInstance, jobParameters, new ExecutionContext());
 
@@ -123,7 +123,7 @@ class FlowJobFailureTests {
 		otherFlow.setStateTransitions(List.of(StateTransition.createEndStateTransition(otherStep)));
 		otherJob.setFlow(otherFlow);
 		otherJob.afterPropertiesSet();
-		JobParameters parameters = new JobParameters();
+		JobParameters parameters = JobParameters.EMPTY;
 		JobInstance instance = jobRepository.createJobInstance("otherJob", parameters);
 		JobExecution otherExecution = jobRepository.createJobExecution(instance, parameters, new ExecutionContext());
 		otherJob.execute(otherExecution);
@@ -141,7 +141,7 @@ class FlowJobFailureTests {
 		job.execute(execution);
 		assertEquals(BatchStatus.FAILED, execution.getStatus());
 
-		JobExecution restart = jobRepository.createJobExecution(execution.getJobInstance(), new JobParameters(),
+		JobExecution restart = jobRepository.createJobExecution(execution.getJobInstance(), JobParameters.EMPTY,
 				new ExecutionContext());
 		job.execute(restart);
 
@@ -168,7 +168,7 @@ class FlowJobFailureTests {
 
 	@Test
 	void testExecutorsKeepSeparateStepExecutions() throws Exception {
-		JobExecution otherExecution = jobRepository.createJobExecution(execution.getJobInstance(), new JobParameters(),
+		JobExecution otherExecution = jobRepository.createJobExecution(execution.getJobInstance(), JobParameters.EMPTY,
 				new ExecutionContext());
 		JobFlowExecutor executor = new JobFlowExecutor(jobRepository, new SimpleStepHandler(jobRepository), execution);
 		JobFlowExecutor otherExecutor = new JobFlowExecutor(jobRepository, new SimpleStepHandler(jobRepository),

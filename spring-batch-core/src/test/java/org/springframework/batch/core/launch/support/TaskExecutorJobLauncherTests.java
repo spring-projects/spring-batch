@@ -53,7 +53,7 @@ class TaskExecutorJobLauncherTests {
 	void testRunWithRunningJobExecution() {
 		// given
 		String jobName = "job";
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		Job job = mock();
 		Mockito.when(job.getName()).thenReturn(jobName);
 		JobInstance jobInstance = new JobInstance(1L, jobName);

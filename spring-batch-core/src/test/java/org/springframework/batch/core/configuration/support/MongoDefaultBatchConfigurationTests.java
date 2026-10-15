@@ -73,7 +73,7 @@ class MongoDefaultBatchConfigurationTests {
 	@Test
 	void testCustomCollectionPrefix(@Autowired JobOperator jobOperator, @Autowired Job job) throws Exception {
 		// when
-		JobExecution jobExecution = jobOperator.start(job, new JobParameters());
+		JobExecution jobExecution = jobOperator.start(job, JobParameters.EMPTY);
 
 		// then
 		assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());

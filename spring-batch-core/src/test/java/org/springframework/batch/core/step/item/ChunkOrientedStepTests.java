@@ -105,7 +105,7 @@ public class ChunkOrientedStepTests {
 			})
 			.listener(listener)
 			.build();
-		JobExecution jobExecution = new JobExecution(1L, new JobInstance(1L, "job"), new JobParameters());
+		JobExecution jobExecution = new JobExecution(1L, new JobInstance(1L, "job"), JobParameters.EMPTY);
 		StepExecution stepExecution = new StepExecution(1L, "step", jobExecution);
 
 		step.execute(stepExecution);
@@ -168,7 +168,7 @@ public class ChunkOrientedStepTests {
 			.skip(IllegalStateException.class)
 			.listener(listener)
 			.build();
-		JobExecution jobExecution = new JobExecution(1L, new JobInstance(1L, "job"), new JobParameters());
+		JobExecution jobExecution = new JobExecution(1L, new JobInstance(1L, "job"), JobParameters.EMPTY);
 		StepExecution stepExecution = new StepExecution(1L, "step", jobExecution);
 
 		step.execute(stepExecution);
@@ -213,7 +213,7 @@ public class ChunkOrientedStepTests {
 		ChunkOrientedStep<String, String> step = new ChunkOrientedStep<>("step", 10, reader, writer, jobRepository);
 		step.afterPropertiesSet();
 		JobInstance jobInstance = new JobInstance(1L, "job");
-		JobExecution jobExecution = new JobExecution(1L, jobInstance, new JobParameters());
+		JobExecution jobExecution = new JobExecution(1L, jobInstance, JobParameters.EMPTY);
 		StepExecution stepExecution = new StepExecution(1L, "step", jobExecution);
 
 		// when
@@ -235,7 +235,7 @@ public class ChunkOrientedStepTests {
 		step.setTaskExecutor(new SimpleAsyncTaskExecutor());
 		step.afterPropertiesSet();
 		JobInstance jobInstance = new JobInstance(1L, "job");
-		JobExecution jobExecution = new JobExecution(1L, jobInstance, new JobParameters());
+		JobExecution jobExecution = new JobExecution(1L, jobInstance, JobParameters.EMPTY);
 		StepExecution stepExecution = new StepExecution(1L, "step", jobExecution);
 
 		// when
@@ -266,7 +266,7 @@ public class ChunkOrientedStepTests {
 			.build();
 
 		JobInstance jobInstance = new JobInstance(1L, "job");
-		JobExecution jobExecution = new JobExecution(1L, jobInstance, new JobParameters());
+		JobExecution jobExecution = new JobExecution(1L, jobInstance, JobParameters.EMPTY);
 		StepExecution stepExecution = new StepExecution(1L, "step", jobExecution);
 
 		// when
@@ -300,7 +300,7 @@ public class ChunkOrientedStepTests {
 			.build();
 
 		JobInstance jobInstance = new JobInstance(1L, "job");
-		JobExecution jobExecution = new JobExecution(1L, jobInstance, new JobParameters());
+		JobExecution jobExecution = new JobExecution(1L, jobInstance, JobParameters.EMPTY);
 		StepExecution stepExecution = new StepExecution(1L, "step", jobExecution);
 
 		// When: Execute step
@@ -335,7 +335,7 @@ public class ChunkOrientedStepTests {
 			.build();
 
 		JobInstance jobInstance = new JobInstance(1L, "job");
-		JobExecution jobExecution = new JobExecution(1L, jobInstance, new JobParameters());
+		JobExecution jobExecution = new JobExecution(1L, jobInstance, JobParameters.EMPTY);
 		StepExecution stepExecution = new StepExecution(1L, "step", jobExecution);
 
 		// When & Then: Should fail immediately without retry
@@ -372,7 +372,7 @@ public class ChunkOrientedStepTests {
 		step.afterPropertiesSet();
 
 		JobInstance jobInstance = new JobInstance(1L, "job");
-		JobExecution jobExecution = new JobExecution(1L, jobInstance, new JobParameters());
+		JobExecution jobExecution = new JobExecution(1L, jobInstance, JobParameters.EMPTY);
 		StepExecution stepExecution = new StepExecution(1L, "step", jobExecution);
 
 		// when - execute step
@@ -416,7 +416,7 @@ public class ChunkOrientedStepTests {
 			.build();
 
 		JobInstance jobInstance = new JobInstance(1L, "job");
-		JobExecution jobExecution = new JobExecution(1L, jobInstance, new JobParameters());
+		JobExecution jobExecution = new JobExecution(1L, jobInstance, JobParameters.EMPTY);
 		StepExecution stepExecution = new StepExecution(1L, "step", jobExecution);
 
 		// when - execute step
@@ -441,7 +441,7 @@ public class ChunkOrientedStepTests {
 		step.registerItemStream(trackingItemStream);
 		step.afterPropertiesSet();
 		JobInstance jobInstance = new JobInstance(1L, "job");
-		JobExecution jobExecution = new JobExecution(1L, jobInstance, new JobParameters());
+		JobExecution jobExecution = new JobExecution(1L, jobInstance, JobParameters.EMPTY);
 		StepExecution stepExecution = new StepExecution(1L, "step", jobExecution);
 
 		// when: execute step (writer causes chunk rollback)
@@ -499,7 +499,7 @@ public class ChunkOrientedStepTests {
 		step.afterPropertiesSet();
 
 		JobInstance jobInstance = new JobInstance(1L, "job");
-		JobExecution jobExecution = new JobExecution(1L, jobInstance, new JobParameters());
+		JobExecution jobExecution = new JobExecution(1L, jobInstance, JobParameters.EMPTY);
 		StepExecution stepExecution = new StepExecution(1L, "step", jobExecution);
 
 		// when
@@ -531,7 +531,7 @@ public class ChunkOrientedStepTests {
 		step.afterPropertiesSet();
 
 		JobInstance jobInstance = new JobInstance(1L, "job");
-		JobExecution jobExecution = new JobExecution(1L, jobInstance, new JobParameters());
+		JobExecution jobExecution = new JobExecution(1L, jobInstance, JobParameters.EMPTY);
 		StepExecution stepExecution = new StepExecution(1L, "step", jobExecution);
 
 		// when
@@ -570,7 +570,7 @@ public class ChunkOrientedStepTests {
 		step.afterPropertiesSet();
 
 		JobInstance jobInstance = new JobInstance(1L, "job");
-		JobExecution jobExecution = new JobExecution(1L, jobInstance, new JobParameters());
+		JobExecution jobExecution = new JobExecution(1L, jobInstance, JobParameters.EMPTY);
 		StepExecution stepExecution = new StepExecution(1L, "step", jobExecution);
 
 		// when
@@ -608,7 +608,7 @@ public class ChunkOrientedStepTests {
 		step.afterPropertiesSet();
 
 		JobInstance jobInstance = new JobInstance(1L, "job");
-		JobExecution jobExecution = new JobExecution(1L, jobInstance, new JobParameters());
+		JobExecution jobExecution = new JobExecution(1L, jobInstance, JobParameters.EMPTY);
 		StepExecution stepExecution = new StepExecution(1L, "step", jobExecution);
 
 		// when
@@ -782,7 +782,7 @@ public class ChunkOrientedStepTests {
 		}
 		step.afterPropertiesSet();
 
-		JobExecution jobExecution = new JobExecution(1L, new JobInstance(1L, "job"), new JobParameters());
+		JobExecution jobExecution = new JobExecution(1L, new JobInstance(1L, "job"), JobParameters.EMPTY);
 		StepExecution stepExecution = new StepExecution(1L, "step", jobExecution);
 		step.execute(stepExecution);
 		return stepExecution;

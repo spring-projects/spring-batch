@@ -43,14 +43,14 @@ class ResourcelessJobRepositoryTests {
 
 	@Test
 	void isJobInstanceExists() {
-		assertFalse(this.jobRepository.isJobInstanceExists("job", new JobParameters()));
+		assertFalse(this.jobRepository.isJobInstanceExists("job", JobParameters.EMPTY));
 	}
 
 	@Test
 	void createJobInstance() {
 		// given
 		String jobName = "job";
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 
 		// when
 		JobInstance jobInstance = this.jobRepository.createJobInstance(jobName, jobParameters);
@@ -65,7 +65,7 @@ class ResourcelessJobRepositoryTests {
 	void createJobExecution() {
 		// given
 		String jobName = "job";
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 
 		// when
 		JobInstance jobInstance = jobRepository.createJobInstance(jobName, jobParameters);
@@ -83,7 +83,7 @@ class ResourcelessJobRepositoryTests {
 	void getLastJobExecution() {
 		// given
 		String jobName = "job";
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		JobInstance jobInstance = jobRepository.createJobInstance(jobName, jobParameters);
 		jobRepository.createJobExecution(jobInstance, jobParameters, new ExecutionContext());
 
@@ -117,7 +117,7 @@ class ResourcelessJobRepositoryTests {
 	void getJobInstancesWithDifferentJobName() {
 		// given
 		String jobName = "job";
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		jobRepository.createJobInstance(jobName, jobParameters);
 
 		// when
@@ -131,7 +131,7 @@ class ResourcelessJobRepositoryTests {
 	void getJobInstancesWithCorrectJobName() {
 		// given
 		String jobName = "job";
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		jobRepository.createJobInstance(jobName, jobParameters);
 
 		// when
@@ -146,7 +146,7 @@ class ResourcelessJobRepositoryTests {
 	void findJobInstancesWithDifferentJobName() {
 		// given
 		String jobName = "job";
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		jobRepository.createJobInstance(jobName, jobParameters);
 
 		// when
@@ -160,7 +160,7 @@ class ResourcelessJobRepositoryTests {
 	void findJobInstancesWithCorrectJobName() {
 		// given
 		String jobName = "job";
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		jobRepository.createJobInstance(jobName, jobParameters);
 
 		// when
@@ -175,7 +175,7 @@ class ResourcelessJobRepositoryTests {
 	void getJobInstanceWithDifferentId() {
 		// given
 		String jobName = "job";
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		jobRepository.createJobInstance(jobName, jobParameters);
 
 		// when
@@ -189,7 +189,7 @@ class ResourcelessJobRepositoryTests {
 	void getJobInstanceWithCorrectId() {
 		// given
 		String jobName = "job";
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		jobRepository.createJobInstance(jobName, jobParameters);
 
 		// when
@@ -205,7 +205,7 @@ class ResourcelessJobRepositoryTests {
 	void getLastJobInstanceWithDifferentJobName() {
 		// given
 		String jobName = "job";
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		jobRepository.createJobInstance(jobName, jobParameters);
 
 		// when
@@ -219,7 +219,7 @@ class ResourcelessJobRepositoryTests {
 	void getLastJobInstanceWithCorrectJobName() {
 		// given
 		String jobName = "job";
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		jobRepository.createJobInstance(jobName, jobParameters);
 
 		// when
@@ -234,7 +234,7 @@ class ResourcelessJobRepositoryTests {
 	void getJobInstanceCountWithDifferentJobName() throws Exception {
 		// given
 		String jobName = "job";
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		jobRepository.createJobInstance(jobName, jobParameters);
 
 		assertThrows(NoSuchJobException.class, () -> jobRepository.getJobInstanceCount("differentJob"));
@@ -244,7 +244,7 @@ class ResourcelessJobRepositoryTests {
 	void getJobInstanceCountWithCorrectJobName() throws Exception {
 		// given
 		String jobName = "job";
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		jobRepository.createJobInstance(jobName, jobParameters);
 
 		// when
@@ -258,7 +258,7 @@ class ResourcelessJobRepositoryTests {
 	void countJobInstancesWithUnknownJobName() {
 		// given
 		String jobName = "job";
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		jobRepository.createJobInstance(jobName, jobParameters);
 
 		// when
@@ -272,7 +272,7 @@ class ResourcelessJobRepositoryTests {
 	void countJobInstancesWithCorrectJobName() {
 		// given
 		String jobName = "job";
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		jobRepository.createJobInstance(jobName, jobParameters);
 
 		// when
@@ -286,7 +286,7 @@ class ResourcelessJobRepositoryTests {
 	void getJobExecutionWithDifferentId() {
 		// given
 		String jobName = "job";
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		JobInstance jobInstance = jobRepository.createJobInstance(jobName, jobParameters);
 		jobRepository.createJobExecution(jobInstance, jobParameters, new ExecutionContext());
 
@@ -301,7 +301,7 @@ class ResourcelessJobRepositoryTests {
 	void getJobExecutionWithCorrectId() {
 		// given
 		String jobName = "job";
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		JobInstance jobInstance = jobRepository.createJobInstance(jobName, jobParameters);
 		jobRepository.createJobExecution(jobInstance, jobParameters, new ExecutionContext());
 
@@ -317,7 +317,7 @@ class ResourcelessJobRepositoryTests {
 	void getLastJobExecutionWithDifferentJobName() {
 		// given
 		String jobName = "job";
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		JobInstance jobInstance = jobRepository.createJobInstance(jobName, jobParameters);
 		jobRepository.createJobExecution(jobInstance, jobParameters, new ExecutionContext());
 
@@ -348,7 +348,7 @@ class ResourcelessJobRepositoryTests {
 	void getLastJobExecutionByJobInstanceWithDifferentId() {
 		// given
 		String jobName = "job";
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		JobInstance jobInstance = jobRepository.createJobInstance(jobName, jobParameters);
 		jobRepository.createJobExecution(jobInstance, jobParameters, new ExecutionContext());
 
@@ -364,7 +364,7 @@ class ResourcelessJobRepositoryTests {
 	void getLastJobExecutionByJobInstanceWithCorrectId() {
 		// given
 		String jobName = "job";
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		JobInstance jobInstance = jobRepository.createJobInstance(jobName, jobParameters);
 		jobRepository.createJobExecution(jobInstance, jobParameters, new ExecutionContext());
 
@@ -380,7 +380,7 @@ class ResourcelessJobRepositoryTests {
 	void getJobExecutionsWithDifferentJobInstance() {
 		// given
 		String jobName = "job";
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		JobInstance jobInstance = jobRepository.createJobInstance(jobName, jobParameters);
 		jobRepository.createJobExecution(jobInstance, jobParameters, new ExecutionContext());
 
@@ -396,7 +396,7 @@ class ResourcelessJobRepositoryTests {
 	void getJobExecutionsWithCorrectJobInstance() {
 		// given
 		String jobName = "job";
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		JobInstance jobInstance = jobRepository.createJobInstance(jobName, jobParameters);
 		jobRepository.createJobExecution(jobInstance, jobParameters, new ExecutionContext());
 
@@ -414,7 +414,7 @@ class ResourcelessJobRepositoryTests {
 	void deleteJobInstanceWithCorrectId() {
 		// given
 		String jobName = "job";
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		JobInstance jobInstance = jobRepository.createJobInstance(jobName, jobParameters);
 		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
 				new ExecutionContext());
@@ -433,7 +433,7 @@ class ResourcelessJobRepositoryTests {
 	void deleteJobInstanceWithDifferentId() {
 		// given
 		String jobName = "job";
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		JobInstance jobInstance = jobRepository.createJobInstance(jobName, jobParameters);
 		jobRepository.createJobExecution(jobInstance, jobParameters, new ExecutionContext());
 
@@ -450,7 +450,7 @@ class ResourcelessJobRepositoryTests {
 	void deleteJobExecutionWithCorrectId() {
 		// given
 		String jobName = "job";
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		JobInstance jobInstance = jobRepository.createJobInstance(jobName, jobParameters);
 		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
 				new ExecutionContext());
@@ -466,7 +466,7 @@ class ResourcelessJobRepositoryTests {
 	void deleteJobExecutionWithDifferentId() {
 		// given
 		String jobName = "job";
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		JobInstance jobInstance = jobRepository.createJobInstance(jobName, jobParameters);
 		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
 				new ExecutionContext());
@@ -483,7 +483,7 @@ class ResourcelessJobRepositoryTests {
 	void countStepExecutionsForUnknownStepName() {
 		// given
 		String jobName = "job";
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		JobInstance jobInstance = jobRepository.createJobInstance(jobName, jobParameters);
 		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
 				new ExecutionContext());
@@ -499,7 +499,7 @@ class ResourcelessJobRepositoryTests {
 	@Test
 	void countRunningStepExecutions() {
 		// given
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		JobInstance jobInstance = jobRepository.createJobInstance("job", jobParameters);
 		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
 				new ExecutionContext());
@@ -521,7 +521,7 @@ class ResourcelessJobRepositoryTests {
 	void countStepExecutionsForKnownStepName() {
 		// given
 		String jobName = "job";
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		JobInstance jobInstance = jobRepository.createJobInstance(jobName, jobParameters);
 		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
 				new ExecutionContext());
@@ -538,7 +538,7 @@ class ResourcelessJobRepositoryTests {
 	void createStepExecutionWithExecutionContext() {
 		// given
 		String jobName = "job";
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		JobInstance jobInstance = jobRepository.createJobInstance(jobName, jobParameters);
 		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
 				new ExecutionContext());

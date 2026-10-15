@@ -69,8 +69,8 @@ class JobStepTests {
 		jobRepository = factory.getObject();
 		step = new JobStep(jobRepository);
 		step.setName("step");
-		JobInstance jobInstance = jobRepository.createJobInstance("job", new JobParameters());
-		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, new JobParameters(),
+		JobInstance jobInstance = jobRepository.createJobInstance("job", JobParameters.EMPTY);
+		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, JobParameters.EMPTY,
 				new ExecutionContext());
 		stepExecution = jobRepository.createStepExecution("step", jobExecution);
 		TaskExecutorJobOperator jobOperator = new TaskExecutorJobOperator();
