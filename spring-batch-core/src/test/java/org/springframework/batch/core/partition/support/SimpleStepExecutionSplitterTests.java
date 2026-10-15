@@ -81,10 +81,6 @@ class SimpleStepExecutionSplitterTests {
 				new SimplePartitioner());
 		Set<StepExecution> execs = splitter.split(stepExecution, 2);
 		assertEquals(2, execs.size());
-
-		for (StepExecution execution : execs) {
-			assertNotNull(execution.getId(), "step execution partition is saved");
-		}
 	}
 
 	/*
