@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2022 the original author or authors.
+ * Copyright 2012-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Thomas Risberg
  * @author Michael Minella
+ * @author Philippe Marschall
  */
 class OraclePagingQueryProviderTests extends AbstractSqlPagingQueryProviderTests {
 
@@ -31,12 +32,12 @@ class OraclePagingQueryProviderTests extends AbstractSqlPagingQueryProviderTests
 
 	@Test
 	@Override
-	void testGenerateFirstPageQuery() {
-		String sql = "SELECT * FROM (SELECT id, name, age FROM foo WHERE bar = 1 ORDER BY id ASC) WHERE ROWNUM <= 100";
+	public void testGenerateFirstPageQuery() {
+		String sql = "SELECT id, name, age FROM foo WHERE bar = 1 ORDER BY id ASC FETCH FIRST 100 ROWS ONLY";
 		String s = pagingQueryProvider.generateFirstPageQuery(pageSize);
 		assertEquals(sql, s);
 		pagingQueryProvider.setWhereClause("");
-		String sql2 = "SELECT * FROM (SELECT id, name, age FROM foo ORDER BY id ASC) WHERE ROWNUM <= 100";
+		String sql2 = "SELECT id, name, age FROM foo ORDER BY id ASC FETCH FIRST 100 ROWS ONLY";
 		String s2 = pagingQueryProvider.generateFirstPageQuery(pageSize);
 		assertEquals(sql2, s2);
 	}
@@ -44,7 +45,7 @@ class OraclePagingQueryProviderTests extends AbstractSqlPagingQueryProviderTests
 	@Test
 	@Override
 	void testGenerateRemainingPagesQuery() {
-		String sql = "SELECT * FROM (SELECT id, name, age FROM foo WHERE bar = 1 ORDER BY id ASC) WHERE ROWNUM <= 100 AND ((id > ?))";
+		String sql = "SELECT id, name, age FROM foo WHERE (bar = 1) AND ((id > ?)) ORDER BY id ASC FETCH FIRST 100 ROWS ONLY";
 		String s = pagingQueryProvider.generateRemainingPagesQuery(pageSize);
 		assertEquals(sql, s);
 	}
@@ -53,7 +54,7 @@ class OraclePagingQueryProviderTests extends AbstractSqlPagingQueryProviderTests
 	@Test
 	void testGenerateFirstPageQueryWithGroupBy() {
 		pagingQueryProvider.setGroupClause("dep");
-		String sql = "SELECT * FROM (SELECT id, name, age FROM foo WHERE bar = 1 GROUP BY dep ORDER BY id ASC) WHERE ROWNUM <= 100";
+		String sql = "SELECT id, name, age FROM foo WHERE bar = 1 GROUP BY dep ORDER BY id ASC FETCH FIRST 100 ROWS ONLY";
 		String s = pagingQueryProvider.generateFirstPageQuery(pageSize);
 		assertEquals(sql, s);
 	}
@@ -62,19 +63,19 @@ class OraclePagingQueryProviderTests extends AbstractSqlPagingQueryProviderTests
 	@Test
 	void testGenerateRemainingPagesQueryWithGroupBy() {
 		pagingQueryProvider.setGroupClause("dep");
-		String sql = "SELECT * FROM (SELECT id, name, age FROM foo WHERE bar = 1 GROUP BY dep ORDER BY id ASC) WHERE ROWNUM <= 100 AND ((id > ?))";
+		String sql = "SELECT id, name, age FROM foo WHERE (bar = 1) AND ((id > ?)) GROUP BY dep ORDER BY id ASC FETCH FIRST 100 ROWS ONLY";
 		String s = pagingQueryProvider.generateRemainingPagesQuery(pageSize);
 		assertEquals(sql, s);
 	}
 
 	@Override
 	String getFirstPageSqlWithMultipleSortKeys() {
-		return "SELECT * FROM (SELECT id, name, age FROM foo WHERE bar = 1 ORDER BY name ASC, id DESC) WHERE ROWNUM <= 100";
+		return "SELECT id, name, age FROM foo WHERE bar = 1 ORDER BY name ASC, id DESC FETCH FIRST 100 ROWS ONLY";
 	}
 
 	@Override
 	String getRemainingSqlWithMultipleSortKeys() {
-		return "SELECT * FROM (SELECT id, name, age FROM foo WHERE bar = 1 ORDER BY name ASC, id DESC) WHERE ROWNUM <= 100 AND ((name > ?) OR (name = ? AND id < ?))";
+		return "SELECT id, name, age FROM foo WHERE (bar = 1) AND ((name > ?) OR (name = ? AND id < ?)) ORDER BY name ASC, id DESC FETCH FIRST 100 ROWS ONLY";
 	}
 
 }
