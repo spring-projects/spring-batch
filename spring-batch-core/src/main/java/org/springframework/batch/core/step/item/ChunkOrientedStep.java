@@ -96,6 +96,7 @@ import static org.springframework.batch.core.observability.BatchMetrics.METRICS_
  * @author Yanming Zhou
  * @author Taeik Lim
  * @author Kim ByeongChang
+ * @author WooSeung Kim
  * @since 6.0
  */
 public class ChunkOrientedStep<I, O> extends AbstractStep {
@@ -458,6 +459,9 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 					// (eg JpaTransactionManager) has marked it as globally rollback-only
 					// (eg after a JPA flush failure) but not locally rollback-only.
 					transactionStatus.setRollbackOnly();
+					if (scanning && !tracker.isScanMode()) {
+						recordScanEndedWithSkip(stepExecution.getExecutionContext(), tracker);
+					}
 					chunkTransactionEvent.transactionStatus = BatchMetrics.STATUS_ROLLED_BACK;
 					chunkTransactionEvent.commit();
 					return;
@@ -507,6 +511,23 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 		}
 		else {
 			executionContext.putInt(CHUNK_SCAN_OFFSET, tracker.getLastScannedReadPosition());
+		}
+	}
+
+	/*
+	 * Record the end of a scan whose last scanned item was skipped. The transaction of
+	 * that item is rolled back, so no reader checkpoint is taken for the end of the scan,
+	 * although all the reads of the chunk are settled at that point. If the reader keeps
+	 * restart state, the scan offset is moved past all of them, so that a restart after a
+	 * failure occurring before the next commit does not process the skipped item again.
+	 * The offset is kept in memory only: the next commit replaces it, otherwise it is
+	 * saved with the execution context when the step ends.
+	 */
+	private void recordScanEndedWithSkip(ExecutionContext executionContext, ChunkTracker<I, O> tracker) {
+		ExecutionContext readerState = new ExecutionContext();
+		this.readerItemStream.update(readerState);
+		if (!readerState.isEmpty()) {
+			executionContext.putInt(CHUNK_SCAN_OFFSET, tracker.getReadsSinceCheckpoint());
 		}
 	}
 

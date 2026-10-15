@@ -60,6 +60,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * after the last item read.
  *
  * @author Kim ByeongChang
+ * @author WooSeung Kim
  */
 class ChunkOrientedStepScanModeRestartIntegrationTests {
 
@@ -274,6 +275,73 @@ class ChunkOrientedStepScanModeRestartIntegrationTests {
 		assertEquals(List.of("1", "3", "4", "5"), deliveredBeforeRestart);
 		assertEquals(BatchStatus.COMPLETED, secondExecution.getStatus());
 		assertEquals(List.of("1", "10", "3", "4", "5", "6", "7", "8", "9"), deliveredItems(context));
+	}
+
+	@Test
+	void testRestartAfterFailureInTheChunkFollowingAScanThatEndedWithASkip() throws Exception {
+		// given: the scan of chunk [1..5] writes 1 to 4 and ends by skipping 5, in a
+		// transaction that is rolled back, then chunk [6..10] fails with a
+		// non-skippable exception on 8 before any transaction is committed
+		SKIPPABLE_WRITE_FAILURES.add("5");
+		NON_SKIPPABLE_WRITE_FAILURES.add("8");
+		ApplicationContext context = new AnnotationConfigApplicationContext(TestConfiguration.class,
+				TwoChunksStepConfiguration.class);
+
+		// when
+		JobExecution firstExecution = start(context);
+		List<String> deliveredBeforeRestart = deliveredItems(context);
+		SKIPPABLE_WRITE_FAILURES.clear();
+		NON_SKIPPABLE_WRITE_FAILURES.clear();
+		JobExecution secondExecution = restart(context, firstExecution);
+
+		// then: the restart resumes with chunk [6..10], 5 is not processed again
+		assertEquals(BatchStatus.FAILED, firstExecution.getStatus());
+		assertEquals(List.of("1", "2", "3", "4"), deliveredBeforeRestart);
+		assertEquals(BatchStatus.COMPLETED, secondExecution.getStatus());
+		assertEquals(List.of("1", "10", "2", "3", "4", "6", "7", "8", "9"), deliveredItems(context));
+	}
+
+	@Test
+	void testRestartAfterFailureInTheChunkFollowingAScanThatEndedWithASkipInConcurrentMode() throws Exception {
+		// given
+		SKIPPABLE_WRITE_FAILURES.add("5");
+		NON_SKIPPABLE_WRITE_FAILURES.add("8");
+		ApplicationContext context = new AnnotationConfigApplicationContext(TestConfiguration.class,
+				TwoChunksConcurrentStepConfiguration.class);
+
+		// when
+		JobExecution firstExecution = start(context);
+		SKIPPABLE_WRITE_FAILURES.clear();
+		NON_SKIPPABLE_WRITE_FAILURES.clear();
+		JobExecution secondExecution = restart(context, firstExecution);
+
+		// then
+		assertEquals(BatchStatus.FAILED, firstExecution.getStatus());
+		assertEquals(BatchStatus.COMPLETED, secondExecution.getStatus());
+		assertEquals(List.of("1", "10", "2", "3", "4", "6", "7", "8", "9"), deliveredItems(context));
+	}
+
+	@Test
+	void testRestartAfterFailureInTheChunkFollowingAScanThatSkippedAllItems() throws Exception {
+		// given: the scan of chunk [1..5] skips all of its items, so nothing is committed
+		// while scanning, then chunk [6..10] fails with a non-skippable exception on 8
+		SKIPPABLE_WRITE_FAILURES.addAll(Set.of("1", "2", "3", "4", "5"));
+		NON_SKIPPABLE_WRITE_FAILURES.add("8");
+		ApplicationContext context = new AnnotationConfigApplicationContext(TestConfiguration.class,
+				TwoChunksStepConfiguration.class);
+
+		// when
+		JobExecution firstExecution = start(context);
+		List<String> deliveredBeforeRestart = deliveredItems(context);
+		SKIPPABLE_WRITE_FAILURES.clear();
+		NON_SKIPPABLE_WRITE_FAILURES.clear();
+		JobExecution secondExecution = restart(context, firstExecution);
+
+		// then: the restart resumes with chunk [6..10]
+		assertEquals(BatchStatus.FAILED, firstExecution.getStatus());
+		assertEquals(List.of(), deliveredBeforeRestart);
+		assertEquals(BatchStatus.COMPLETED, secondExecution.getStatus());
+		assertEquals(List.of("10", "6", "7", "8", "9"), deliveredItems(context));
 	}
 
 	@Test
@@ -579,6 +647,19 @@ class ChunkOrientedStepScanModeRestartIntegrationTests {
 				JdbcTemplate jdbcTemplate) {
 			return stepBuilder(jobRepository, transactionManager, jdbcTemplate,
 					List.of("1", "2", "3", "4", "5", "6", "7", "8", "9", "10"), 5, 5)
+				.build();
+		}
+
+	}
+
+	@Configuration
+	static class TwoChunksConcurrentStepConfiguration {
+
+		@Bean
+		public Step step(JobRepository jobRepository, JdbcTransactionManager transactionManager,
+				JdbcTemplate jdbcTemplate) {
+			return stepBuilder(jobRepository, transactionManager, jdbcTemplate, TEN_ITEMS, 5, 5)
+				.taskExecutor(new SimpleAsyncTaskExecutor())
 				.build();
 		}
 
