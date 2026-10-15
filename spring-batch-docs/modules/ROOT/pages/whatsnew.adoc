@@ -21,6 +21,7 @@ Spring Batch 6.1 includes the following features and improvements:
 * xref:whatsnew.adoc#jobparameter-annotation-for-injecting-job-parameters[`@JobParameter` annotation for injecting job parameters]
 * xref:whatsnew.adoc#new-remotechunkingmanagerbuilder[New `RemoteChunkingManagerBuilder`]
 * xref:whatsnew.adoc#new-defaultchunkprocessor[New `DefaultChunkProcessor`]
+* xref:whatsnew.adoc#jsonlinemapper-agnostic-to-the-json-library[`JsonLineMapper` agnostic to the JSON library]
 * xref:whatsnew.adoc#deprecations[Deprecations]
 
 [[dependencies-upgrade]]
@@ -566,6 +567,72 @@ DefaultChunkProcessor<Integer, Integer> chunkProcessor = new DefaultChunkProcess
 when replacing the `<remote-chunking-worker>` element of the batch-integration XML namespace
 (deprecated since 6.0) with plain XML bean definitions.
 
+[[jsonlinemapper-agnostic-to-the-json-library]]
+== `JsonLineMapper` agnostic to the JSON library
+
+`JsonLineMapper` could only map each line of a JSON Lines file to a `Map<String, Object>`,
+and only with Jackson. It is now generic and delegates the conversion of a line to a new
+`JsonObjectUnmarshaller` collaborator, the counterpart of `JsonObjectMarshaller`. This makes
+it independent of the JSON library and able to map lines to any type, such as a domain class
+or a record. Implementations based on Jackson (`JacksonJsonObjectUnmarshaller`) and Gson
+(`GsonJsonObjectUnmarshaller`) are provided:
+
+[source, java]
+----
+record Trade(String isin, int quantity, double price, String customer) {
+}
+
+// before: items could only be maps, mapped with Jackson
+FlatFileItemReader<Map<String, Object>> reader = new FlatFileItemReaderBuilder<Map<String, Object>>()
+				.name("tradeReader")
+				.resource(resource)
+				.lineMapper(new JsonLineMapper())
+				.build();
+
+// after: items can be of any type, mapped with Jackson or Gson
+FlatFileItemReader<Trade> reader = new FlatFileItemReaderBuilder<Trade>()
+				.name("tradeReader")
+				.resource(resource)
+				.lineMapper(new JsonLineMapper<>(new JacksonJsonObjectUnmarshaller<>(Trade.class)))
+				// or .lineMapper(new JsonLineMapper<>(new GsonJsonObjectUnmarshaller<>(Trade.class)))
+				.build();
+----
+
+A custom `JsonMapper` or `Gson` can be provided to the unmarshaller, for example
+`new JacksonJsonObjectUnmarshaller<>(jsonMapper, Trade.class)`. For parameterized target
+types, which cannot be expressed with a `Class`, the unmarshallers accept a Jackson
+`TypeReference` or a Gson `TypeToken`. `JsonObjectUnmarshaller` is a functional interface, so
+a custom implementation can be provided as a lambda.
+
+The no-argument constructor and the constructor that takes a `JsonMapper` are deprecated.
+Code that still maps lines to a `Map<String, Object>` should provide the unmarshaller
+explicitly:
+
+[source, java]
+----
+// before
+LineMapper<Map<String, Object>> lineMapper = new JsonLineMapper();
+LineMapper<Map<String, Object>> customLineMapper = new JsonLineMapper(jsonMapper);
+
+// after
+LineMapper<Map<String, Object>> lineMapper = new JsonLineMapper<>(
+		new JacksonJsonObjectUnmarshaller<>(new TypeReference<Map<String, Object>>() {}));
+LineMapper<Map<String, Object>> customLineMapper = new JsonLineMapper<>(
+		new JacksonJsonObjectUnmarshaller<>(jsonMapper, new TypeReference<Map<String, Object>>() {}));
+----
+
+where `TypeReference` is `tools.jackson.core.type.TypeReference`. See the
+xref:whatsnew.adoc#deprecations[Deprecations] section for more details.
+
+TIP: This is a source and binary breaking change for code compiled against Spring Batch
+6.0 that uses the raw `JsonLineMapper` type and calls `mapLine` directly on it, since the
+return type of `mapLine` is now the type parameter instead of `Map<String, Object>`. Such
+code needs to declare the variable with its type argument, or to type it as
+`LineMapper<Map<String, Object>>`. Also, `mapLine` no longer declares `throws Exception`, and
+a line that cannot be parsed now causes a `ParseException` wrapping the exception of the JSON
+library, instead of the exception of the JSON library itself. Code that only passes the mapper
+to a reader (the vast majority of usages) needs no changes beyond a recompile.
+
 [[deprecations]]
 == Deprecations
 
@@ -580,4 +647,5 @@ The following features have been deprecated in Spring Batch 6.1:
 * Deprecate `org.springframework.batch.integration.async.AsyncItemProcessor`, `org.springframework.batch.integration.async.AsyncItemWriter`, and `org.springframework.batch.integration.chunk.ChunkTaskExecutorItemWriter` in favor of their counterparts in `org.springframework.batch.core.step.item`, see the xref:whatsnew.adoc#async-processing-apis-and-local-chunking-moved-to-core[Async processing APIs and local chunking moved to `spring-batch-core`] section for more details
 * Deprecate `AbstractJdbcBatchMetadataDao#setJdbcTemplate(JdbcOperations)` in favor of passing a `JdbcClient` to the constructor of the JDBC DAOs, and `AbstractJdbcBatchMetadataDao#getJdbcTemplate()` in favor of `AbstractJdbcBatchMetadataDao#getJdbcClient()`, see the xref:whatsnew.adoc#jdbc-daos-migrated-to-jdbcclient[JDBC DAOs migrated to `JdbcClient`] section for more details. Scheduled for removal in version 7.0
 * Deprecate `RemoteChunkingManagerStepBuilder` and `RemoteChunkingManagerStepBuilderFactory` in favor of `RemoteChunkingManagerBuilder`, see the xref:whatsnew.adoc#new-remotechunkingmanagerbuilder[New `RemoteChunkingManagerBuilder`] section for more details. Scheduled for removal in version 7.0
+* Deprecate `JsonLineMapper()` and `JsonLineMapper(JsonMapper)` in favor of `JsonLineMapper(JsonObjectUnmarshaller)`, see the xref:whatsnew.adoc#jsonlinemapper-agnostic-to-the-json-library[`JsonLineMapper` agnostic to the JSON library] section for more details. Scheduled for removal in version 7.0
 * Deprecate `JobRepository#getJobInstanceCount(String)`, `JobExplorer#getJobInstanceCount(String)`, and `JobInstanceDao#getJobInstanceCount(String)` in favor of `countJobInstances(String)`, and `JobRepository#getStepExecutionCount(JobInstance, String)` and `JobExplorer#getStepExecutionCount(JobInstance, String)` in favor of `countStepExecutions(JobInstance, String)`. These methods cannot soundly determine whether a job or step name is unknown, as opposed to simply never having been persisted or executed yet; that validation belongs at the job operator level, where the job registry is available. Scheduled for removal in version 7.0
