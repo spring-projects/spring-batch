@@ -25,6 +25,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jspecify.annotations.Nullable;
 
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.job.JobInterruptedException;
 import org.springframework.batch.core.listener.ChunkListener;
 import org.springframework.batch.core.listener.CompositeChunkListener;
@@ -77,6 +78,8 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 import org.springframework.transaction.interceptor.TransactionAttribute;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.Assert;
 
@@ -447,6 +450,8 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 				ChunkTransactionEvent chunkTransactionEvent = new ChunkTransactionEvent(stepExecution.getStepName(),
 						stepExecution.getId());
 				chunkTransactionEvent.begin();
+				markUnknownIfOutcomeIsUnknown(stepExecution);
+				StepExecutionState stateBeforeTransaction = StepExecutionState.of(stepExecution);
 				StepContribution contribution = stepExecution.createStepContribution();
 				ChunkTracker<I, O> tracker = this.chunkTracker.get();
 				boolean scanning = tracker.isScanMode();
@@ -464,7 +469,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 					return;
 				}
 
-				saveState(stepExecution, tracker, scanning);
+				saveState(stepExecution, tracker, scanning, stateBeforeTransaction);
 				chunkTransactionEvent.transactionStatus = BatchMetrics.STATUS_COMMITTED;
 				chunkTransactionEvent.commit();
 			});
@@ -474,16 +479,22 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			// next commit would process the skipped item again
 			ChunkTracker<I, O> tracker = this.chunkTracker.get();
 			if (tracker.consumeScannedItemSkip()) {
-				this.transactionTemplate
-					.executeWithoutResult(transactionStatus -> saveState(stepExecution, tracker, true));
+				this.transactionTemplate.executeWithoutResult(transactionStatus -> {
+					markUnknownIfOutcomeIsUnknown(stepExecution);
+					saveState(stepExecution, tracker, true, StepExecutionState.of(stepExecution));
+				});
 			}
 		}
 	}
 
 	/*
-	 * Save the state of the streams and of the step execution for a commit.
+	 * Save the state of the streams and of the step execution for a commit. If the
+	 * transaction is not committed after that, the step execution is restored to its
+	 * state before the transaction, see restoreStateIfNotCommitted().
 	 */
-	private void saveState(StepExecution stepExecution, ChunkTracker<I, O> tracker, boolean scanning) {
+	private void saveState(StepExecution stepExecution, ChunkTracker<I, O> tracker, boolean scanning,
+			StepExecutionState stateBeforeTransaction) {
+		restoreStateIfNotCommitted(stepExecution, stateBeforeTransaction);
 		ExecutionContext executionContext = stepExecution.getExecutionContext();
 		// Both terms are required: the transaction must have re-attempted a scanned item
 		// (scanning), and the scan must still have items pending (isScanMode). The
@@ -502,6 +513,66 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 		}
 		getJobRepository().updateExecutionContext(stepExecution);
 		getJobRepository().update(stepExecution);
+	}
+
+	/*
+	 * Mark the step execution as UNKNOWN if the outcome of the current transaction is
+	 * unknown (for example, because its commit or its rollback fails), whether or not the
+	 * state of the step has been saved in it: the items of that transaction may or may
+	 * not have been written, so the step must not be restarted without a manual
+	 * intervention. The step is also asked to terminate, so that a flow does not go on
+	 * with the next step as if this one had failed.
+	 */
+	private void markUnknownIfOutcomeIsUnknown(StepExecution stepExecution) {
+		registerSynchronization(new TransactionSynchronization() {
+			@Override
+			public void afterCompletion(int status) {
+				if (status == STATUS_UNKNOWN) {
+					logger.error("Chunk transaction ended with an unknown outcome, the step execution is marked as "
+							+ BatchStatus.UNKNOWN);
+					stepExecution.upgradeStatus(BatchStatus.UNKNOWN);
+					stepExecution.setTerminateOnly();
+				}
+			}
+		});
+	}
+
+	/*
+	 * Restore the step execution to its state before the current transaction if that
+	 * transaction is not committed once the state of the step has started to be saved in
+	 * it: for example, because saving the state of a stream fails, because a transaction
+	 * synchronization fails in beforeCommit, or because the commit itself fails.
+	 * Otherwise, the step execution would keep the version, the counts and the execution
+	 * context saved in a transaction that was rolled back: the version would make saving
+	 * the step execution fail when the step ends, and the execution context, if saved,
+	 * would make a restart skip the items of that transaction.
+	 */
+	private void restoreStateIfNotCommitted(StepExecution stepExecution, StepExecutionState stateBeforeTransaction) {
+		registerSynchronization(new TransactionSynchronization() {
+			@Override
+			public void afterCompletion(int status) {
+				if (status == STATUS_COMMITTED) {
+					return;
+				}
+				if (logger.isDebugEnabled()) {
+					logger.debug("Chunk transaction not committed after the state of the step was saved, "
+							+ "restoring the step execution to its state before the transaction");
+				}
+				stateBeforeTransaction.restore(stepExecution);
+				stepExecution.incrementRollbackCount();
+			}
+		});
+	}
+
+	/*
+	 * Register a synchronization with the current transaction, unless synchronization is
+	 * not active (for example, if the transaction manager is configured to never
+	 * synchronize transactions).
+	 */
+	private static void registerSynchronization(TransactionSynchronization synchronization) {
+		if (TransactionSynchronizationManager.isSynchronizationActive()) {
+			TransactionSynchronizationManager.registerSynchronization(synchronization);
+		}
 	}
 
 	/*
@@ -1142,6 +1213,39 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 	 * one that returned the input item
 	 */
 	private record ScanItem<I, O>(I input, O output, int readPosition) {
+	}
+
+	/**
+	 * The state of a step execution that is saved in a chunk transaction, retained so
+	 * that it can be restored if that transaction is not committed. The read and skip
+	 * counts are not part of it: the items have been read, and the skipped items have
+	 * been reported to the skip listener, whatever the outcome of the transaction.
+	 *
+	 * @param version the version of the step execution
+	 * @param writeCount the number of items written
+	 * @param filterCount the number of items filtered out
+	 * @param commitCount the number of commits
+	 * @param executionContext a copy of the execution context of the step execution
+	 */
+	private record StepExecutionState(@Nullable Integer version, long writeCount, long filterCount, long commitCount,
+			ExecutionContext executionContext) {
+
+		static StepExecutionState of(StepExecution stepExecution) {
+			return new StepExecutionState(stepExecution.getVersion(), stepExecution.getWriteCount(),
+					stepExecution.getFilterCount(), stepExecution.getCommitCount(),
+					new ExecutionContext(stepExecution.getExecutionContext()));
+		}
+
+		void restore(StepExecution stepExecution) {
+			if (this.version != null) {
+				stepExecution.setVersion(this.version);
+			}
+			stepExecution.setWriteCount(this.writeCount);
+			stepExecution.setFilterCount(this.filterCount);
+			stepExecution.setCommitCount(this.commitCount);
+			stepExecution.setExecutionContext(new ExecutionContext(this.executionContext));
+		}
+
 	}
 
 	private static class ChunkTracker<I, O> {
