@@ -17,7 +17,6 @@ package org.springframework.batch.core.repository.support;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import org.jspecify.annotations.Nullable;
@@ -98,9 +97,9 @@ public class ResourcelessJobRepository implements JobRepository {
 	@Override
 	public List<String> getJobNames() {
 		if (this.jobInstance == null) {
-			return Collections.emptyList();
+			return List.of();
 		}
-		return Collections.singletonList(this.jobInstance.getJobName());
+		return List.of(this.jobInstance.getJobName());
 	}
 
 	/*
@@ -112,9 +111,9 @@ public class ResourcelessJobRepository implements JobRepository {
 	@Override
 	public List<JobInstance> getJobInstances(String jobName, int start, int count) {
 		if (this.jobInstance == null || !this.jobInstance.getJobName().equals(jobName)) {
-			return Collections.emptyList();
+			return List.of();
 		}
-		return Collections.singletonList(this.jobInstance);
+		return List.of(this.jobInstance);
 	}
 
 	/**
@@ -127,9 +126,9 @@ public class ResourcelessJobRepository implements JobRepository {
 	@Override
 	public List<JobInstance> findJobInstances(String jobName) {
 		if (this.jobInstance == null || !this.jobInstance.getJobName().equals(jobName)) {
-			return Collections.emptyList();
+			return List.of();
 		}
-		return Collections.singletonList(this.jobInstance);
+		return List.of(this.jobInstance);
 	}
 
 	@Override
@@ -230,13 +229,13 @@ public class ResourcelessJobRepository implements JobRepository {
 
 	@Override
 	public List<JobExecution> getJobExecutions(JobInstance jobInstance) {
-		if (this.jobInstance == null || !(this.jobInstance.getId() == jobInstance.getId())) {
-			return Collections.emptyList();
+		if (this.jobInstance == null || this.jobInstance.getId() != jobInstance.getId()) {
+			return List.of();
 		}
 		if (this.jobExecution == null) {
-			return Collections.emptyList();
+			return List.of();
 		}
-		return Collections.singletonList(this.jobExecution);
+		return List.of(this.jobExecution);
 	}
 
 	@Override
