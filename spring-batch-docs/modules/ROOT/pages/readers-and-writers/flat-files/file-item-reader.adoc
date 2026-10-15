@@ -38,15 +38,22 @@ interpreted, as described in the following table:
 |encoding|String|Specifies what text encoding to use. The default value is `UTF-8`.
 |lineMapper|`LineMapper`|Converts a `String` to an `Object` representing the item.
 |linesToSkip|int|Number of lines to ignore at the top of the file.
+|name|String|The name used to compute the keys of the values stored in the `ExecutionContext`. Required if `saveState` is `true`.
 |recordSeparatorPolicy|RecordSeparatorPolicy|Used to determine where the line endings are
 and do things like continue over a line ending if inside a quoted string.
 |resource|`Resource`|The resource from which to read.
+|saveState|boolean|Specifies whether the state of the reader is saved in the `ExecutionContext` for restartability. The default value is `true`.
 |skippedLinesCallback|LineCallbackHandler|Interface that passes the raw line content of
 the lines in the file to be skipped. If `linesToSkip` is set to 2, then this interface is
 called twice.
 |strict|boolean|In strict mode, the reader throws an exception on `ExecutionContext` if
 the input resource does not exist. Otherwise, it logs the problem and continues.
 |===============
+
+[NOTE]
+====
+Unlike `FlatFileItemReader`, which defaults its name to the short class name, `FlatFileItemReaderBuilder` requires you to set a name when `saveState` is `true` (the default). The name is used to prefix the keys of the values stored in the `ExecutionContext`, so a unique name is required to avoid key collisions between stateful readers of the same type within a job. If restartability is not needed, you can set `saveState(false)`, in which case no name is required.
+====
 
 [[lineMapper]]
 == `LineMapper`
