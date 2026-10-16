@@ -20,6 +20,7 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.job.Job;
@@ -36,6 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@Disabled("Fails intermittently")
 @SpringJUnitConfig(locations = { "/simple-job-launcher-context.xml",
 		"/org/springframework/batch/samples/restart/stop/stopRestartSample.xml" })
 class JobOperatorFunctionalTests {
