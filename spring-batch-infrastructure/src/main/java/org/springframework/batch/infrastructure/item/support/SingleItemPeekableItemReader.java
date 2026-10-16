@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,9 @@ import org.springframework.util.Assert;
  * <p>
  * A {@link PeekableItemReader} that allows the user to peek one item ahead. Repeated
  * calls to {@link #peek()} will return the same item, and this will be the next item
- * returned from {@link #read()}.
+ * returned from {@link #read()}. An exception thrown by the delegate's {@code read()}
+ * method during a peek is rethrown by subsequent calls to {@code peek()} and by the next
+ * call to {@code read()}.
  * </p>
  *
  * <p>
@@ -42,12 +44,15 @@ import org.springframework.util.Assert;
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
+ * @author Lee Sang Won
  */
 public class SingleItemPeekableItemReader<T> implements ItemStreamReader<T>, PeekableItemReader<T> {
 
 	private ItemReader<T> delegate;
 
 	private @Nullable T next;
+
+	private @Nullable Exception peekException;
 
 	private ExecutionContext executionContext = new ExecutionContext();
 
@@ -77,6 +82,11 @@ public class SingleItemPeekableItemReader<T> implements ItemStreamReader<T>, Pee
 	 */
 	@Override
 	public @Nullable T read() throws Exception {
+		if (peekException != null) {
+			Exception exception = peekException;
+			peekException = null;
+			throw exception;
+		}
 		if (next != null) {
 			T item = next;
 			next = null;
@@ -94,9 +104,18 @@ public class SingleItemPeekableItemReader<T> implements ItemStreamReader<T>, Pee
 	 */
 	@Override
 	public @Nullable T peek() throws Exception {
+		if (peekException != null) {
+			throw peekException;
+		}
 		if (next == null) {
 			updateDelegate(executionContext);
-			next = delegate.read();
+			try {
+				next = delegate.read();
+			}
+			catch (Exception exception) {
+				peekException = exception;
+				throw exception;
+			}
 		}
 		return next;
 	}
@@ -110,6 +129,7 @@ public class SingleItemPeekableItemReader<T> implements ItemStreamReader<T>, Pee
 	@Override
 	public void close() throws ItemStreamException {
 		next = null;
+		peekException = null;
 		if (delegate instanceof ItemStream itemStream) {
 			itemStream.close();
 		}
@@ -126,6 +146,7 @@ public class SingleItemPeekableItemReader<T> implements ItemStreamReader<T>, Pee
 	@Override
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
 		next = null;
+		peekException = null;
 		if (delegate instanceof ItemStream itemStream) {
 			itemStream.open(executionContext);
 		}
@@ -133,15 +154,16 @@ public class SingleItemPeekableItemReader<T> implements ItemStreamReader<T>, Pee
 	}
 
 	/**
-	 * If there is a cached peek, then retrieve the execution context state from that
-	 * point. If there is no peek cached, then call directly to the delegate.
+	 * If there is a cached peeked item or exception, then retrieve the execution context
+	 * state from that point. If there is no peek cached, then call directly to the
+	 * delegate.
 	 * @param executionContext the current context
 	 * @throws ItemStreamException if there is a problem
 	 * @see ItemStream#update(ExecutionContext)
 	 */
 	@Override
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
-		if (next != null) {
+		if (next != null || peekException != null) {
 			// Get the last state from the delegate instead of using
 			// current value.
 			for (Entry<String, Object> entry : this.executionContext.entrySet()) {
