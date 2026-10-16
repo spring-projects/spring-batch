@@ -25,7 +25,7 @@ import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.batch.test.JobOperatorTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
@@ -37,6 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  * @author Glenn Renfro
+ * @author Yanming Zhou
  */
 
 @SpringJUnitConfig(locations = { "classpath:/org/springframework/batch/samples/jobstep/job/jobStepSample.xml",
@@ -49,24 +50,24 @@ class JobStepFunctionalTests {
 	@Autowired
 	private JobOperatorTestUtils jobOperatorTestUtils;
 
-	private JdbcTemplate jdbcTemplate;
+	private JdbcClient jdbcClient;
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
-		this.jdbcTemplate = new JdbcTemplate(dataSource);
+		this.jdbcClient = JdbcClient.create(dataSource);
 	}
 
 	@Test
 	void testJobLaunch() throws Exception {
 		jobOperatorTestUtils.setJob(jobStepJob);
-		JdbcTestUtils.deleteFromTables(jdbcTemplate, "TRADE");
+		JdbcTestUtils.deleteFromTables(jdbcClient, "TRADE");
 
 		JobParameters jobParameters = new JobParametersBuilder()
 			.addString("input.file", "org/springframework/batch/samples/jobstep/data/ImportTradeDataStep.txt")
 			.toJobParameters();
 		jobOperatorTestUtils.startJob(jobParameters);
 
-		int after = JdbcTestUtils.countRowsInTable(jdbcTemplate, "TRADE");
+		int after = JdbcTestUtils.countRowsInTable(jdbcClient, "TRADE");
 		assertEquals(5, after);
 	}
 

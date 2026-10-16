@@ -16,28 +16,25 @@
 
 package org.springframework.batch.samples.common;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.ListIterator;
 
-import org.springframework.batch.core.ExitStatus;
-
-import org.jspecify.annotations.Nullable;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.listener.StepExecutionListener;
 import org.springframework.batch.infrastructure.item.Chunk;
 import org.springframework.batch.infrastructure.item.ItemWriter;
-import org.springframework.jdbc.core.BatchPreparedStatementSetter;
-import org.springframework.jdbc.core.support.JdbcDaoSupport;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.SerializationUtils;
 
+import javax.sql.DataSource;
+
 /**
  * Database {@link ItemWriter} implementing the process indicator pattern.
  */
-public class StagingItemWriter<T> extends JdbcDaoSupport implements StepExecutionListener, ItemWriter<T> {
+public class StagingItemWriter<T> implements StepExecutionListener, ItemWriter<T>, InitializingBean {
 
 	protected static final String NEW = "N";
 
@@ -47,14 +44,17 @@ public class StagingItemWriter<T> extends JdbcDaoSupport implements StepExecutio
 
 	private StepExecution stepExecution;
 
+	private JdbcClient jdbcClient;
+
+	public void setDataSource(DataSource dataSource) {
+		jdbcClient = JdbcClient.create(dataSource);
+	}
+
 	/**
 	 * Check mandatory properties.
-	 *
-	 * @see org.springframework.dao.support.DaoSupport#initDao()
 	 */
 	@Override
-	protected void initDao() throws Exception {
-		super.initDao();
+	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(incrementer, "DataFieldMaxValueIncrementer is required - set the incrementer property in the "
 				+ ClassUtils.getShortName(StagingItemWriter.class));
 	}
@@ -76,24 +76,18 @@ public class StagingItemWriter<T> extends JdbcDaoSupport implements StepExecutio
 	public void write(Chunk<? extends T> chunk) {
 		final ListIterator<? extends T> itemIterator = chunk.getItems().listIterator();
 
-		getJdbcTemplate().batchUpdate("INSERT into BATCH_STAGING (ID, JOB_ID, VALUE, PROCESSED) values (?,?,?,?)",
-				new BatchPreparedStatementSetter() {
-					@Override
-					public int getBatchSize() {
-						return chunk.size();
-					}
-
-					@Override
-					public void setValues(PreparedStatement ps, int i) throws SQLException {
-						Assert.state(itemIterator.nextIndex() == i,
-								"Item ordering must be preserved in batch sql update");
-
-						ps.setLong(1, incrementer.nextLongValue());
-						ps.setLong(2, stepExecution.getJobExecution().getJobInstance().getId());
-						ps.setBytes(3, SerializationUtils.serialize(itemIterator.next()));
-						ps.setString(4, NEW);
-					}
-				});
+		JdbcClient.BatchSpec batch = jdbcClient
+			.sql("INSERT into BATCH_STAGING (ID, JOB_ID, VALUE, PROCESSED) values (?,?,?,?)")
+			.batch();
+		while (itemIterator.hasNext()) {
+			batch.entry(entry -> {
+				entry.param(1, incrementer.nextLongValue())
+					.param(2, stepExecution.getJobExecution().getJobInstance().getId())
+					.param(3, SerializationUtils.serialize(itemIterator.next()))
+					.param(4, NEW);
+			});
+		}
+		batch.update();
 	}
 
 	@Override

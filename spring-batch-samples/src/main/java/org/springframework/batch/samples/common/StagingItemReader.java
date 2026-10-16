@@ -29,15 +29,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jspecify.annotations.Nullable;
 
-import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.listener.StepExecutionListener;
 import org.springframework.batch.infrastructure.item.ItemReader;
 import org.springframework.batch.infrastructure.item.ReaderNotOpenException;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.jdbc.core.JdbcOperations;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.util.Assert;
 
 /**
@@ -58,10 +56,10 @@ public class StagingItemReader<T>
 
 	private volatile Iterator<Long> keys;
 
-	private JdbcOperations jdbcTemplate;
+	private JdbcClient jdbcClient;
 
 	public void setDataSource(DataSource dataSource) {
-		jdbcTemplate = new JdbcTemplate(dataSource);
+		jdbcClient = JdbcClient.create(dataSource);
 	}
 
 	@Override
@@ -72,7 +70,7 @@ public class StagingItemReader<T>
 
 	@Override
 	public final void afterPropertiesSet() throws Exception {
-		Assert.state(jdbcTemplate != null, "You must provide a DataSource.");
+		Assert.state(jdbcClient != null, "You must provide a DataSource.");
 	}
 
 	private List<Long> retrieveKeys() {
@@ -80,13 +78,16 @@ public class StagingItemReader<T>
 		this.lock.lock();
 		try {
 
-			return jdbcTemplate.query(
+			return jdbcClient.sql(
 
-					"SELECT ID FROM BATCH_STAGING WHERE JOB_ID=? AND PROCESSED=? ORDER BY ID",
+					"SELECT ID FROM BATCH_STAGING WHERE JOB_ID=? AND PROCESSED=? ORDER BY ID")
+				.params(
 
-					(rs, rowNum) -> rs.getLong(1),
+						stepExecution.getJobExecution().getJobInstance().getId(), StagingItemWriter.NEW)
+				.query(
 
-					stepExecution.getJobExecution().getJobInstance().getId(), StagingItemWriter.NEW);
+						(rs, rowNum) -> rs.getLong(1))
+				.list();
 
 		}
 		finally {
@@ -114,8 +115,10 @@ public class StagingItemReader<T>
 			return null;
 		}
 		@SuppressWarnings("unchecked")
-		T result = (T) jdbcTemplate.queryForObject("SELECT VALUE FROM BATCH_STAGING WHERE ID=?",
-				(rs, rowNum) -> deserialize(rs.getBinaryStream(1)), id);
+		T result = (T) jdbcClient.sql("SELECT VALUE FROM BATCH_STAGING WHERE ID=?")
+			.params(id)
+			.query((rs, rowNum) -> deserialize(rs.getBinaryStream(1)))
+			.single();
 
 		return new ProcessIndicatorItemWrapper<>(id, result);
 	}

@@ -21,7 +21,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.infrastructure.item.jms.JmsItemReader;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.retry.RetryCallback;
 import org.springframework.retry.support.RetryTemplate;
@@ -55,11 +55,11 @@ public class SynchronousTests {
 	private RetryTemplate retryTemplate;
 
 	@Autowired
-	private JdbcTemplate jdbcTemplate;
+	private JdbcClient jdbcClient;
 
 	@BeforeTransaction
 	public void onSetUpBeforeTransaction() {
-		JdbcTestUtils.deleteFromTables(jdbcTemplate, "T_BARS");
+		JdbcTestUtils.deleteFromTables(jdbcClient, "T_BARS");
 		jmsTemplate.convertAndSend("queue", "foo");
 		jmsTemplate.convertAndSend("queue", "foo");
 		final String text = (String) jmsTemplate.receiveAndConvert("queue");
@@ -79,11 +79,11 @@ public class SynchronousTests {
 			foo = (String) jmsTemplate.receiveAndConvert("queue");
 			count++;
 		}
-		JdbcTestUtils.deleteFromTables(jdbcTemplate, "T_BARS");
+		JdbcTestUtils.deleteFromTables(jdbcClient, "T_BARS");
 	}
 
 	private void assertInitialState() {
-		int count = JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_BARS");
+		int count = JdbcTestUtils.countRowsInTable(jdbcClient, "T_BARS");
 		assertEquals(0, count);
 	}
 
@@ -116,7 +116,9 @@ public class SynchronousTests {
 			return transactionTemplate.execute(status1 -> {
 
 				list.add(text);
-				jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(), text);
+				jdbcClient.sql("INSERT into T_BARS (id,name,foo_date) values (?,?,null)")
+					.params(list.size(), text)
+					.update();
 				if (list.size() == 1) {
 					throw new RuntimeException("Rollback!");
 				}
@@ -131,7 +133,7 @@ public class SynchronousTests {
 		List<String> msgs = getMessages();
 
 		// The database portion committed once...
-		int count = JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_BARS");
+		int count = JdbcTestUtils.countRowsInTable(jdbcClient, "T_BARS");
 		assertEquals(1, count);
 
 		// ... and so did the message session.
@@ -161,7 +163,9 @@ public class SynchronousTests {
 			return transactionTemplate.execute(status -> {
 
 				list.add(item);
-				jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(), item);
+				jdbcClient.sql("INSERT into T_BARS (id,name,foo_date) values (?,?,null)")
+					.params(list.size(), item)
+					.update();
 				if (list.size() == 1) {
 					throw new RuntimeException("Rollback!");
 				}
@@ -177,7 +181,7 @@ public class SynchronousTests {
 		List<String> msgs = getMessages();
 
 		// The database portion committed once...
-		int count = JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_BARS");
+		int count = JdbcTestUtils.countRowsInTable(jdbcClient, "T_BARS");
 		assertEquals(1, count);
 
 		// ... and so did the message session.
@@ -216,8 +220,9 @@ public class SynchronousTests {
 					return nestedTxTemplate.execute(nestedStatus -> {
 
 						list.add(text);
-						jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(),
-								text);
+						jdbcClient.sql("INSERT into T_BARS (id,name,foo_date) values (?,?,null)")
+							.params(list.size(), text)
+							.update();
 						return text;
 
 					});
@@ -229,7 +234,7 @@ public class SynchronousTests {
 			}
 
 			// The nested database transaction has committed...
-			int count = JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_BARS");
+			int count = JdbcTestUtils.countRowsInTable(jdbcClient, "T_BARS");
 			assertEquals(1, count);
 
 			// force rollback...
@@ -243,7 +248,7 @@ public class SynchronousTests {
 		List<String> msgs = getMessages();
 
 		// The database portion rolled back...
-		int count = JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_BARS");
+		int count = JdbcTestUtils.countRowsInTable(jdbcClient, "T_BARS");
 		assertEquals(0, count);
 
 		// ... and so did the message session.
@@ -271,7 +276,9 @@ public class SynchronousTests {
 				// transaction...
 				final String text = (String) jmsTemplate.receiveAndConvert("queue");
 				list.add(text);
-				jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(), text);
+				jdbcClient.sql("INSERT into T_BARS (id,name,foo_date) values (?,?,null)")
+					.params(list.size(), text)
+					.update();
 				if (list.size() == 1) {
 					throw new RuntimeException("Rollback!");
 				}
@@ -286,7 +293,7 @@ public class SynchronousTests {
 		List<String> msgs = getMessages();
 
 		// The database portion committed once...
-		int count = JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_BARS");
+		int count = JdbcTestUtils.countRowsInTable(jdbcClient, "T_BARS");
 		assertEquals(1, count);
 
 		// ... and so did the message session.
@@ -315,8 +322,9 @@ public class SynchronousTests {
 						// transaction...
 						final String text = (String) jmsTemplate.receiveAndConvert("queue");
 						list.add(text);
-						jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(),
-								text);
+						jdbcClient.sql("INSERT into T_BARS (id,name,foo_date) values (?,?,null)")
+							.params(list.size(), text)
+							.update();
 						throw new RuntimeException("Rollback!");
 
 					});
@@ -332,7 +340,7 @@ public class SynchronousTests {
 		List<String> msgs = getMessages();
 
 		// The database portion rolled back...
-		int count = JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_BARS");
+		int count = JdbcTestUtils.countRowsInTable(jdbcClient, "T_BARS");
 		assertEquals(0, count);
 
 		// ... and so did the message session.

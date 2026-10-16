@@ -21,28 +21,28 @@ import javax.sql.DataSource;
 import org.springframework.batch.samples.domain.trade.CustomerDebit;
 import org.springframework.batch.samples.domain.trade.CustomerDebitDao;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcOperations;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 
 /**
  * Reduces customer's credit by the provided amount.
  *
  * @author Robert Kasanicky
+ * @author Yanming Zhou
  */
 public class JdbcCustomerDebitDao implements CustomerDebitDao {
 
 	private static final String UPDATE_CREDIT = "UPDATE CUSTOMER SET credit= credit-? WHERE name=?";
 
-	private JdbcOperations jdbcTemplate;
+	private JdbcClient jdbcClient;
 
 	@Override
 	public void write(CustomerDebit customerDebit) {
-		jdbcTemplate.update(UPDATE_CREDIT, customerDebit.getDebit(), customerDebit.getName());
+		jdbcClient.sql(UPDATE_CREDIT).params(customerDebit.getDebit(), customerDebit.getName()).update();
 	}
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
-		this.jdbcTemplate = new JdbcTemplate(dataSource);
+		this.jdbcClient = JdbcClient.create(dataSource);
 	}
 
 }

@@ -22,8 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.samples.domain.trade.Trade;
 import org.springframework.batch.samples.domain.trade.TradeDao;
-import org.springframework.jdbc.core.JdbcOperations;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 
 /**
@@ -44,7 +43,7 @@ public class JdbcTradeDao implements TradeDao {
 	/**
 	 * handles the processing of SQL query
 	 */
-	private JdbcOperations jdbcTemplate;
+	private JdbcClient jdbcClient;
 
 	/**
 	 * database is not expected to be setup for auto increment
@@ -60,12 +59,13 @@ public class JdbcTradeDao implements TradeDao {
 		if (log.isDebugEnabled()) {
 			log.debug("Processing: " + trade);
 		}
-		jdbcTemplate.update(INSERT_TRADE_RECORD, id, trade.getIsin(), trade.getQuantity(), trade.getPrice(),
-				trade.getCustomer());
+		jdbcClient.sql(INSERT_TRADE_RECORD)
+			.params(id, trade.getIsin(), trade.getQuantity(), trade.getPrice(), trade.getCustomer())
+			.update();
 	}
 
 	public void setDataSource(DataSource dataSource) {
-		this.jdbcTemplate = new JdbcTemplate(dataSource);
+		this.jdbcClient = JdbcClient.create(dataSource);
 	}
 
 	public void setIncrementer(DataFieldMaxValueIncrementer incrementer) {

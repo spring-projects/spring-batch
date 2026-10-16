@@ -23,20 +23,20 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import org.springframework.batch.infrastructure.item.database.support.SqliteMaxValueIncrementer;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
 /**
  * @author Luke Taylor
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  */
 class SqliteMaxValueIncrementerTests {
 
 	static String dbFile;
 	static SimpleDriverDataSource dataSource;
-	static JdbcTemplate template;
+	static JdbcClient jdbcClient;
 
 	@BeforeAll
 	static void setUp() {
@@ -44,8 +44,8 @@ class SqliteMaxValueIncrementerTests {
 		dataSource = new SimpleDriverDataSource();
 		dataSource.setDriverClass(org.sqlite.JDBC.class);
 		dataSource.setUrl("jdbc:sqlite:" + dbFile);
-		template = new JdbcTemplate(dataSource);
-		template.execute("create table max_value (id integer primary key autoincrement)");
+		jdbcClient = JdbcClient.create(dataSource);
+		jdbcClient.sql("create table max_value (id integer primary key autoincrement)").update();
 	}
 
 	@AfterAll
@@ -55,7 +55,7 @@ class SqliteMaxValueIncrementerTests {
 			db.delete();
 		}
 		dataSource = null;
-		template = null;
+		jdbcClient = null;
 	}
 
 	@Test
@@ -64,7 +64,7 @@ class SqliteMaxValueIncrementerTests {
 		assertEquals(1, mvi.getNextKey());
 		assertEquals(2, mvi.getNextKey());
 		assertEquals(3, mvi.getNextKey());
-		assertEquals(1, JdbcTestUtils.countRowsInTable(template, "max_value"));
+		assertEquals(1, JdbcTestUtils.countRowsInTable(jdbcClient, "max_value"));
 	}
 
 }
