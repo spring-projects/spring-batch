@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,12 @@
 package org.springframework.batch.infrastructure.item.file.separator;
 
 import org.jspecify.annotations.Nullable;
-import org.springframework.util.StringUtils;
 
 /**
  * JSON-based record separator. Waits for a valid JSON object before returning a complete
  * line. A valid object has balanced braces ({}), possibly nested, and ends with a closing
- * brace. This separator can be used to split a stream into JSON objects, even if those
- * objects are spread over multiple lines, e.g.
+ * brace. Braces within quoted strings are ignored. This separator can be used to split a
+ * stream into JSON objects, even if those objects are spread over multiple lines, e.g.
  *
  * <pre>
  * {"foo": "bar",
@@ -33,6 +32,7 @@ import org.springframework.util.StringUtils;
  * </pre>
  *
  * @author Dave Syer
+ * @author Lee Sang Won
  *
  */
 public class JsonRecordSeparatorPolicy extends SimpleRecordSeparatorPolicy {
@@ -44,8 +44,36 @@ public class JsonRecordSeparatorPolicy extends SimpleRecordSeparatorPolicy {
 	 */
 	@Override
 	public boolean isEndOfRecord(@Nullable String line) {
-		return line != null && StringUtils.countOccurrencesOf(line, "{") == StringUtils.countOccurrencesOf(line, "}")
-				&& line.trim().endsWith("}");
+		if (line == null) {
+			return false;
+		}
+		boolean inString = false;
+		boolean escaped = false;
+		int braceCount = 0;
+		for (int i = 0; i < line.length(); i++) {
+			char character = line.charAt(i);
+			if (inString) {
+				if (escaped) {
+					escaped = false;
+				}
+				else if (character == '\\') {
+					escaped = true;
+				}
+				else if (character == '"') {
+					inString = false;
+				}
+			}
+			else if (character == '"') {
+				inString = true;
+			}
+			else if (character == '{') {
+				braceCount++;
+			}
+			else if (character == '}') {
+				braceCount--;
+			}
+		}
+		return !inString && braceCount == 0 && line.trim().endsWith("}");
 	}
 
 }
