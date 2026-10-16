@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2025 the original author or authors.
+ * Copyright 2008-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -189,6 +189,31 @@ public class MultiResourceItemWriterFlatFileTests extends AbstractMultiResourceI
 		assertFileExistsAndContains(3, "56");
 		assertFileExistsAndContains(4, "78");
 		assertFileExistsAndContains(5, "9");
+	}
+
+	@Test
+	void testRestartAtResourceBoundary() throws Exception {
+
+		super.setUp(delegate);
+		tested.open(executionContext);
+
+		// Save the delegate position while the first file is still open.
+		tested.write(Chunk.of("1"));
+		tested.update(executionContext);
+		// This chunk closes the first file.
+		tested.write(Chunk.of("2"));
+		tested.update(executionContext);
+		tested.close();
+
+		assertFileExistsAndContains(1, "12");
+
+		tested.open(executionContext);
+
+		tested.write(Chunk.of("3", "4"));
+		tested.close();
+
+		assertFileExistsAndContains(1, "12");
+		assertFileExistsAndContains(2, "34");
 	}
 
 	@Test
