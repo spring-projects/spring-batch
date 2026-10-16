@@ -64,8 +64,8 @@
 		<spring-amqp.version>4.0.6-SNAPSHOT</spring-amqp.version>
 		<spring-ldap.version>4.0.6-SNAPSHOT</spring-ldap.version>
 
-		<jackson2.version>2.20.2</jackson2.version>
-		<jackson3.version>3.0.4</jackson3.version>
+		<jackson2.version>2.21.7</jackson2.version>
+		<jackson3.version>3.1.7</jackson3.version>
 		<avro.version>1.12.2</avro.version>
 		<gson.version>2.13.2</gson.version>
 		<hibernate-core.version>7.2.25.Final</hibernate-core.version>
