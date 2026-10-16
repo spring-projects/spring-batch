@@ -45,6 +45,7 @@ import org.springframework.util.Assert;
  * @author Henning Pöttker
  * @author Jimmy Praet
  * @author JungKyun Ryu
+ * @author Hyunwoo Jung
  */
 public class MultiResourceItemWriter<T> extends AbstractItemStreamItemWriter<T> {
 
@@ -178,7 +179,7 @@ public class MultiResourceItemWriter<T> extends AbstractItemStreamItemWriter<T> 
 			throw new ItemStreamException("Couldn't assign resource", e);
 		}
 
-		if (executionContext.containsKey(getExecutionContextKey(CURRENT_RESOURCE_ITEM_COUNT))) {
+		if (currentResourceItemCount > 0) {
 			// It's a restart
 			delegate.open(executionContext);
 			opened = true;
