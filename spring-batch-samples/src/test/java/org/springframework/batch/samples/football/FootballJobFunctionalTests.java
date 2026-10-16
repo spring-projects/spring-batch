@@ -66,7 +66,7 @@ class FootballJobFunctionalTests {
 		Job job = context.getBean(Job.class);
 
 		// when
-		jobOperator.start(job, new JobParameters());
+		jobOperator.start(job, JobParameters.EMPTY);
 
 		// then
 		int count = JdbcTestUtils.countRowsInTable(new JdbcTemplate(context.getBean(DataSource.class)),
@@ -83,7 +83,7 @@ class FootballJobFunctionalTests {
 		Job job = context.getBean(Job.class);
 
 		// when
-		jobOperator.start(job, new JobParameters());
+		jobOperator.start(job, JobParameters.EMPTY);
 
 		// then
 		int count = JdbcTestUtils.countRowsInTable(new JdbcTemplate(context.getBean(DataSource.class)),

@@ -190,7 +190,7 @@ public class StepScopeConfigurationTests {
 	void setup() {
 		StepSynchronizationManager.release();
 		JobInstance jobInstance = new JobInstance(1, "JOB");
-		JobExecution jobExecution = new JobExecution(1, jobInstance, new JobParameters());
+		JobExecution jobExecution = new JobExecution(1, jobInstance, JobParameters.EMPTY);
 		stepExecution = new StepExecution(1, "STEP", jobExecution);
 	}
 

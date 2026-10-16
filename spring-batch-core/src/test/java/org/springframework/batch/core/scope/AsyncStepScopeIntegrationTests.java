@@ -79,7 +79,7 @@ public class AsyncStepScopeIntegrationTests implements BeanFactoryAware {
 	@Test
 	void testSimpleProperty() {
 		StepExecution stepExecution = new StepExecution(123L, "step",
-				new JobExecution(0L, new JobInstance(1L, "job"), new JobParameters()));
+				new JobExecution(0L, new JobInstance(1L, "job"), JobParameters.EMPTY));
 		ExecutionContext executionContext = stepExecution.getExecutionContext();
 		executionContext.put("foo", "bar");
 		StepSynchronizationManager.register(stepExecution);
@@ -96,7 +96,7 @@ public class AsyncStepScopeIntegrationTests implements BeanFactoryAware {
 			final Long id = 123L + i;
 			FutureTask<String> task = new FutureTask<>(() -> {
 				StepExecution stepExecution = new StepExecution(value,
-						new JobExecution(0L, new JobInstance(1L, "job"), new JobParameters()));
+						new JobExecution(0L, new JobInstance(1L, "job"), JobParameters.EMPTY));
 				ExecutionContext executionContext = stepExecution.getExecutionContext();
 				executionContext.put("foo", value);
 				StepContext context = StepSynchronizationManager.register(stepExecution);
@@ -125,7 +125,7 @@ public class AsyncStepScopeIntegrationTests implements BeanFactoryAware {
 
 		List<FutureTask<String>> tasks = new ArrayList<>();
 		final StepExecution stepExecution = new StepExecution(123L, "foo",
-				new JobExecution(0L, new JobInstance(1L, "job"), new JobParameters()));
+				new JobExecution(0L, new JobInstance(1L, "job"), JobParameters.EMPTY));
 		ExecutionContext executionContext = stepExecution.getExecutionContext();
 		executionContext.put("foo", "foo");
 		StepSynchronizationManager.register(stepExecution);

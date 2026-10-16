@@ -66,7 +66,7 @@ class RemoteStepExecutionAggregatorTests {
 		factory.afterPropertiesSet();
 		jobRepository = factory.getObject();
 		aggregator = new RemoteStepExecutionAggregator(jobRepository);
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		jobInstance = jobRepository.createJobInstance("job", jobParameters);
 		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
 				new ExecutionContext());
@@ -101,7 +101,7 @@ class RemoteStepExecutionAggregatorTests {
 	 */
 	@Test
 	void testAggregateStepExecutionFromAnotherJobExecution() {
-		JobExecution otherJobExecution = jobRepository.createJobExecution(jobInstance, new JobParameters(),
+		JobExecution otherJobExecution = jobRepository.createJobExecution(jobInstance, JobParameters.EMPTY,
 				new ExecutionContext());
 		StepExecution completedPartition = jobRepository.createStepExecution("foo:3", otherJobExecution);
 		completedPartition.setStatus(BatchStatus.COMPLETED);

@@ -33,7 +33,7 @@ class CompositeJobParametersValidatorTests {
 
 	private CompositeJobParametersValidator compositeJobParametersValidator;
 
-	private final JobParameters parameters = new JobParameters();
+	private final JobParameters parameters = JobParameters.EMPTY;
 
 	@BeforeEach
 	void setUp() {

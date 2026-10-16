@@ -46,7 +46,7 @@ class StepScopeTests {
 	private final StepScope scope = new StepScope();
 
 	private final StepExecution stepExecution = new StepExecution(123L, "foo",
-			new JobExecution(0L, new JobInstance(1L, "job"), new JobParameters()));
+			new JobExecution(0L, new JobInstance(1L, "job"), JobParameters.EMPTY));
 
 	private StepContext context;
 
@@ -88,7 +88,7 @@ class StepScopeTests {
 	void testGetWithSomethingAlreadyInParentContext() {
 		context.setAttribute("foo", "bar");
 		StepContext context = StepSynchronizationManager.register(
-				new StepExecution(0L, "bar", new JobExecution(0L, new JobInstance(0L, "job"), new JobParameters())));
+				new StepExecution(0L, "bar", new JobExecution(0L, new JobInstance(0L, "job"), JobParameters.EMPTY)));
 		Object value = scope.get("foo", () -> "spam");
 		assertEquals("spam", value);
 		assertTrue(context.hasAttribute("foo"));

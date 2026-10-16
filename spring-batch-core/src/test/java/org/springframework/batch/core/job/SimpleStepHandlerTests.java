@@ -78,7 +78,7 @@ class SimpleStepHandlerTests {
 		factory.setTransactionManager(new JdbcTransactionManager(embeddedDatabase));
 		factory.afterPropertiesSet();
 		jobRepository = factory.getObject();
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		JobInstance jobInstance = jobRepository.createJobInstance("job", jobParameters);
 		jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters, new ExecutionContext());
 		stepHandler = new SimpleStepHandler(jobRepository);
@@ -126,12 +126,12 @@ class SimpleStepHandlerTests {
 	void testRestartCopiesPreviousExecutionContext() throws Exception {
 		// given a failed previous step execution whose context contains BATCH_EXECUTED
 		JobInstance jobInstance = jobExecution.getJobInstance();
-		JobExecution previousJobExecution = new JobExecution(100L, jobInstance, new JobParameters());
+		JobExecution previousJobExecution = new JobExecution(100L, jobInstance, JobParameters.EMPTY);
 		StepExecution previousStepExecution = new StepExecution(100L, "step", previousJobExecution);
 		previousStepExecution.getExecutionContext().putString("foo", "bar");
 		previousStepExecution.getExecutionContext().put(BATCH_EXECUTED, true);
 		previousStepExecution.setStatus(BatchStatus.FAILED);
-		JobExecution restartedJobExecution = new JobExecution(101L, jobInstance, new JobParameters());
+		JobExecution restartedJobExecution = new JobExecution(101L, jobInstance, JobParameters.EMPTY);
 		JobRepository repository = mock();
 		when(repository.getLastStepExecution(jobInstance, "step")).thenReturn(previousStepExecution);
 		when(repository.createStepExecution(eq("step"), eq(restartedJobExecution), any())).thenAnswer(invocation -> {

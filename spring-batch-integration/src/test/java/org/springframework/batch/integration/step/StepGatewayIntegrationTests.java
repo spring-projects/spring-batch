@@ -54,7 +54,7 @@ class StepGatewayIntegrationTests {
 
 	@Test
 	void testLaunchJob() throws Exception {
-		JobExecution jobExecution = jobOperator.start(job, new JobParameters());
+		JobExecution jobExecution = jobOperator.start(job, JobParameters.EMPTY);
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
 	}

@@ -52,7 +52,7 @@ public class JacksonExecutionContextStringSerializerIntegrationTests {
 		ApplicationContext context = new AnnotationConfigApplicationContext(JobConfiguration.class);
 		JobOperator jobOperator = context.getBean(JobOperator.class);
 		Job job = context.getBean(Job.class);
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 
 		// when
 		JobExecution jobExecution = jobOperator.start(job, jobParameters);

@@ -74,7 +74,7 @@ class RemoteChunkingJobFunctionalTests {
 	@Test
 	void testRemoteChunkingJob(@Autowired Job job) throws Exception {
 		// when
-		JobExecution jobExecution = this.jobOperator.start(job, new JobParameters());
+		JobExecution jobExecution = this.jobOperator.start(job, JobParameters.EMPTY);
 
 		// then
 		// the manager sent 2 chunks ({1, 2, 3} and {4, 5, 6}) to workers

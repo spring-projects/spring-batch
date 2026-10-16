@@ -98,7 +98,7 @@ class ChunkTaskExecutorItemWriterTests {
 	}
 
 	private StepExecution createStepExecution() {
-		return new StepExecution("step", new JobExecution(1, new JobInstance(1, "job"), new JobParameters()));
+		return new StepExecution("step", new JobExecution(1, new JobInstance(1, "job"), JobParameters.EMPTY));
 	}
 
 }

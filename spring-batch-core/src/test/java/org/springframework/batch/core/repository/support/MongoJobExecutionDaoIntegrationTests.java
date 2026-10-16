@@ -57,7 +57,7 @@ class MongoJobExecutionDaoIntegrationTests extends AbstractMongoDBDaoIntegration
 
 	@BeforeEach
 	public void setUp(@Autowired JobInstanceDao jobInstanceDao) throws Exception {
-		jobParameters = new JobParameters();
+		jobParameters = JobParameters.EMPTY;
 		jobInstance = jobInstanceDao.createJobInstance("execTestJob", jobParameters);
 	}
 
@@ -381,7 +381,7 @@ class MongoJobExecutionDaoIntegrationTests extends AbstractMongoDBDaoIntegration
 	@Test
 	void testDeleteJobExecution() {
 		// given
-		JobExecution execution = dao.createJobExecution(jobInstance, new JobParameters());
+		JobExecution execution = dao.createJobExecution(jobInstance, JobParameters.EMPTY);
 
 		// when
 		dao.deleteJobExecution(execution);
