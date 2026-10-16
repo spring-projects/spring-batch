@@ -56,7 +56,7 @@
 		<spring-framework.version>7.0.10-SNAPSHOT</spring-framework.version>
 		<spring-retry.version>2.0.13</spring-retry.version>
 		<spring-integration.version>7.0.7-SNAPSHOT</spring-integration.version>
-		<micrometer.version>1.16.7</micrometer.version>
+		<micrometer.version>1.16.8-SNAPSHOT</micrometer.version>
 
 		<!-- optional production dependencies -->
 		<spring-data-bom.version>2025.1.8-SNAPSHOT</spring-data-bom.version>
