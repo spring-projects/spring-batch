@@ -211,6 +211,29 @@ step processing. To use this feature, you need a database that supports this and
 driver supporting JDBC 3.0 or later. Defaults to `false`.
 |===============
 
+[CAUTION]
+====
+When using `JdbcCursorItemReader` with PostgreSQL, server-side cursors are
+only enabled when the connection's auto-commit mode is disabled. If
+`autoCommit=true` (the default in many connection pools), PostgreSQL will
+materialize the entire result set in memory, which can lead to excessive
+memory usage or `OutOfMemoryError` for large datasets.
+
+To avoid this issue, configure your `DataSource` with `autoCommit=false`.
+
+For example, with HikariCP:
+[source,java]
+----
+HikariDataSource dataSource = new HikariDataSource();
+dataSource.setJdbcUrl("jdbc:postgresql://localhost:5432/mydb");
+dataSource.setUsername("user");
+dataSource.setPassword("password");
+dataSource.setAutoCommit(false); // Required for PostgreSQL cursor streaming
+----
+
+This ensures that the cursor can stream rows efficiently instead of loading the
+entire result set at once.
+====
 
 [[StoredProcedureItemReader]]
 === `StoredProcedureItemReader`
