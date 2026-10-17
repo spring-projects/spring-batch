@@ -60,6 +60,7 @@ import org.springframework.util.ClassUtils;
  * @author Lucas Ward
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
+ * @author Minkuk Jo
  */
 @NullUnmarked // FIXME to remove once default constructors (required by the batch XML
 				// namespace) are removed
@@ -83,6 +84,8 @@ public abstract class AbstractJob implements Job, ListableStepLocator, BeanNameA
 
 	private @Nullable ObservationRegistry observationRegistry;
 
+	private String description;
+
 	/**
 	 * Default constructor.
 	 * @deprecated since 6.0 for removal in 7.0. Use {@link #AbstractJob(String)} instead.
@@ -99,6 +102,24 @@ public abstract class AbstractJob implements Job, ListableStepLocator, BeanNameA
 	public AbstractJob(String name) {
 		super();
 		this.name = name;
+	}
+
+	/**
+	 * Set the description of the job.
+	 * @param description the job description
+	 * @since 6.0
+	 */
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	/**
+	 * Get the description of the job.
+	 * @return the job description
+	 * @since 6.0
+	 */
+	public String getDescription() {
+		return this.description;
 	}
 
 	/**
