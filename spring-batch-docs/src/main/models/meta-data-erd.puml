@@ -1,0 +1,86 @@
+@startuml
+' Regenerate with PlantUML 1.2026.9 from the repository root:
+' java -jar plantuml.jar -tsvg -o ../../../modules/ROOT/assets/images spring-batch-docs/src/main/models/meta-data-erd.puml
+!pragma layout smetana
+hide circle
+skinparam linetype ortho
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam classBackgroundColor white
+skinparam classHeaderBackgroundColor #E8EEF2
+skinparam classBorderColor #4B5963
+skinparam ArrowColor #4B5963
+
+entity "BATCH_JOB_INSTANCE" as jobInstance {
+  * JOB_INSTANCE_ID : BIGINT <<PK>>
+  --
+  VERSION : BIGINT
+  * JOB_NAME : VARCHAR(100)
+  * JOB_KEY : VARCHAR(32)
+}
+
+entity "BATCH_JOB_EXECUTION" as jobExecution {
+  * JOB_EXECUTION_ID : BIGINT <<PK>>
+  --
+  VERSION : BIGINT
+  * JOB_INSTANCE_ID : BIGINT <<FK>>
+  * CREATE_TIME : DATETIME(6)
+  START_TIME : DATETIME(6)
+  END_TIME : DATETIME(6)
+  STATUS : VARCHAR(10)
+  EXIT_CODE : VARCHAR(2500)
+  EXIT_MESSAGE : VARCHAR(2500)
+  LAST_UPDATED : DATETIME(6)
+}
+
+entity "BATCH_JOB_EXECUTION_PARAMS" as jobParams {
+  * JOB_EXECUTION_ID : BIGINT <<FK>>
+  * PARAMETER_NAME : VARCHAR(100)
+  * PARAMETER_TYPE : VARCHAR(100)
+  PARAMETER_VALUE : VARCHAR(2500)
+  * IDENTIFYING : CHAR(1)
+}
+
+entity "BATCH_STEP_EXECUTION" as stepExecution {
+  * STEP_EXECUTION_ID : BIGINT <<PK>>
+  --
+  * VERSION : BIGINT
+  * STEP_NAME : VARCHAR(100)
+  * JOB_EXECUTION_ID : BIGINT <<FK>>
+  * CREATE_TIME : DATETIME(6)
+  START_TIME : DATETIME(6)
+  END_TIME : DATETIME(6)
+  STATUS : VARCHAR(10)
+  COMMIT_COUNT : BIGINT
+  READ_COUNT : BIGINT
+  FILTER_COUNT : BIGINT
+  WRITE_COUNT : BIGINT
+  READ_SKIP_COUNT : BIGINT
+  WRITE_SKIP_COUNT : BIGINT
+  PROCESS_SKIP_COUNT : BIGINT
+  ROLLBACK_COUNT : BIGINT
+  EXIT_CODE : VARCHAR(2500)
+  EXIT_MESSAGE : VARCHAR(2500)
+  LAST_UPDATED : DATETIME(6)
+}
+
+entity "BATCH_JOB_EXECUTION_CONTEXT" as jobContext {
+  * JOB_EXECUTION_ID : BIGINT <<PK, FK>>
+  --
+  * SHORT_CONTEXT : VARCHAR(2500)
+  SERIALIZED_CONTEXT : TEXT
+}
+
+entity "BATCH_STEP_EXECUTION_CONTEXT" as stepContext {
+  * STEP_EXECUTION_ID : BIGINT <<PK, FK>>
+  --
+  * SHORT_CONTEXT : VARCHAR(2500)
+  SERIALIZED_CONTEXT : TEXT
+}
+
+jobInstance ||..o{ jobExecution
+jobExecution ||..o{ stepExecution
+jobExecution ||..o{ jobParams
+jobExecution ||--|| jobContext
+stepExecution ||--|| stepContext
+@enduml
