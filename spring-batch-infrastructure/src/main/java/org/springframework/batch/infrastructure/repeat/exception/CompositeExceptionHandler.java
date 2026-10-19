@@ -32,7 +32,7 @@ public class CompositeExceptionHandler implements ExceptionHandler {
 	private ExceptionHandler[] handlers = new ExceptionHandler[0];
 
 	public void setHandlers(ExceptionHandler[] handlers) {
-		this.handlers = Arrays.asList(handlers).toArray(new ExceptionHandler[handlers.length]);
+		this.handlers = Arrays.asList(handlers).toArray(new ExceptionHandler[0]);
 	}
 
 	/**
