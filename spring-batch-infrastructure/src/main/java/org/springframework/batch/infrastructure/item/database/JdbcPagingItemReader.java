@@ -88,6 +88,8 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 
 	private @Nullable Map<String, Object> parameterValues;
 
+	private @Nullable JdbcTemplate jdbcTemplate;
+
 	private @Nullable NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
 	private @Nullable RowMapper<T> rowMapper;
@@ -103,8 +105,7 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 	private int fetchSize = VALUE_NOT_SET;
 
 	/**
-	 * Create a new {@link JdbcPagingItemReader} instance. The DataSource and
-	 * PagingQueryProvider must be provided through their respective setters.
+	 * Create a new {@link JdbcPagingItemReader} instance.
 	 * @param dataSource the DataSource to use
 	 * @param pagingQueryProvider the {@link PagingQueryProvider} to use
 	 * @since 6.0
@@ -114,6 +115,24 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 		Assert.notNull(pagingQueryProvider, "PagingQueryProvider must not be null");
 		this.dataSource = dataSource;
 		this.queryProvider = pagingQueryProvider;
+	}
+
+	/**
+	 * Create a new {@link JdbcPagingItemReader} instance using the given template. The
+	 * template must have a {@link DataSource} configured. The reader applies its page
+	 * size as the template's maximum row count and, if specified, its fetch size.
+	 * @param jdbcTemplate the JdbcTemplate to use
+	 * @param pagingQueryProvider the {@link PagingQueryProvider} to use
+	 * @since 6.1
+	 */
+	public JdbcPagingItemReader(JdbcTemplate jdbcTemplate, PagingQueryProvider pagingQueryProvider) {
+		Assert.notNull(jdbcTemplate, "JdbcTemplate must not be null");
+		DataSource dataSource = jdbcTemplate.getDataSource();
+		Assert.notNull(dataSource, "JdbcTemplate must have a DataSource");
+		Assert.notNull(pagingQueryProvider, "PagingQueryProvider must not be null");
+		this.dataSource = dataSource;
+		this.queryProvider = pagingQueryProvider;
+		this.jdbcTemplate = jdbcTemplate;
 	}
 
 	/**
@@ -178,7 +197,7 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
-		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+		JdbcTemplate jdbcTemplate = this.jdbcTemplate != null ? this.jdbcTemplate : new JdbcTemplate(dataSource);
 		if (fetchSize != VALUE_NOT_SET) {
 			jdbcTemplate.setFetchSize(fetchSize);
 		}
