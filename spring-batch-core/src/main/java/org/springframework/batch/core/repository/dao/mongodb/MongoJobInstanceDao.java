@@ -122,6 +122,7 @@ public class MongoJobInstanceDao extends AbstractMongoBatchMetadataDao implement
 		return jobInstance != null ? this.jobInstanceConverter.toJobInstance(jobInstance) : null;
 	}
 
+	@Deprecated(since = "6.1", forRemoval = true)
 	@Override
 	public JobInstance getJobInstance(JobExecution jobExecution) {
 		return getJobInstance(jobExecution.getJobInstance().getId());
