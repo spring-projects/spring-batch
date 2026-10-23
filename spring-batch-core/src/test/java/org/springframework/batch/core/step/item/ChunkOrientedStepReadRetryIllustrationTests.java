@@ -43,7 +43,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.dao.TransientDataAccessResourceException;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.jdbc.support.JdbcTransactionManager;
@@ -56,6 +56,7 @@ import org.springframework.jdbc.support.JdbcTransactionManager;
  * re-consumed when the retry succeeds.
  *
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  */
 class ChunkOrientedStepReadRetryIllustrationTests {
 
@@ -86,14 +87,14 @@ class ChunkOrientedStepReadRetryIllustrationTests {
 	 */
 	static class FlakyKeysetItemReader implements ItemReader<String> {
 
-		private final JdbcTemplate jdbcTemplate;
+		private final JdbcClient jdbcClient;
 
 		private long lastId = 0;
 
 		private boolean firstCallDone = false;
 
-		FlakyKeysetItemReader(JdbcTemplate jdbcTemplate) {
-			this.jdbcTemplate = jdbcTemplate;
+		FlakyKeysetItemReader(JdbcClient jdbcClient) {
+			this.jdbcClient = jdbcClient;
 		}
 
 		@Override
@@ -105,8 +106,11 @@ class ChunkOrientedStepReadRetryIllustrationTests {
 				// consumed yet: lastId is still 0.
 				throw new TransientDataAccessResourceException("Connection lost, please retry");
 			}
-			List<Map<String, Object>> rows = this.jdbcTemplate
-				.queryForList("select id, name from source_item where id > ? order by id limit 1", this.lastId);
+			List<Map<String, Object>> rows = this.jdbcClient
+				.sql("select id, name from source_item where id > ? order by id limit 1")
+				.param(1, this.lastId)
+				.query()
+				.listOfRows();
 			if (rows.isEmpty()) {
 				return null;
 			}
@@ -148,13 +152,13 @@ class ChunkOrientedStepReadRetryIllustrationTests {
 		}
 
 		@Bean
-		public JdbcTemplate jdbcTemplate(DataSource dataSource) {
-			JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-			jdbcTemplate.execute("create table source_item (id int primary key, name varchar(10))");
-			jdbcTemplate.update("insert into source_item (id, name) values (1, 'foo')");
-			jdbcTemplate.update("insert into source_item (id, name) values (2, 'bar')");
-			jdbcTemplate.update("insert into source_item (id, name) values (3, 'baz')");
-			return jdbcTemplate;
+		public JdbcClient jdbcClient(DataSource dataSource) {
+			JdbcClient jdbcClient = JdbcClient.create(dataSource);
+			jdbcClient.sql("create table source_item (id int primary key, name varchar(10))").update();
+			jdbcClient.sql("insert into source_item (id, name) values (1, 'foo')").update();
+			jdbcClient.sql("insert into source_item (id, name) values (2, 'bar')").update();
+			jdbcClient.sql("insert into source_item (id, name) values (3, 'baz')").update();
+			return jdbcClient;
 		}
 
 		@Bean
@@ -168,10 +172,10 @@ class ChunkOrientedStepReadRetryIllustrationTests {
 		}
 
 		@Bean
-		public Step step(JobRepository jobRepository, JdbcTransactionManager transactionManager,
-				JdbcTemplate jdbcTemplate, RecordingItemWriter recordingItemWriter) {
+		public Step step(JobRepository jobRepository, JdbcTransactionManager transactionManager, JdbcClient jdbcClient,
+				RecordingItemWriter recordingItemWriter) {
 			return new ChunkOrientedStepBuilder<String, String>(jobRepository, 10)
-				.reader(new FlakyKeysetItemReader(jdbcTemplate))
+				.reader(new FlakyKeysetItemReader(jdbcClient))
 				.writer(recordingItemWriter)
 				.transactionManager(transactionManager)
 				.faultTolerant()

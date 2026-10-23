@@ -33,7 +33,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.batch.infrastructure.item.database.support.AbstractSqlPagingQueryProvider;
 import org.springframework.batch.infrastructure.item.database.support.SqlPagingQueryProviderFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.jdbc.JdbcTestUtils;
@@ -47,6 +47,7 @@ import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFOR
  * @author Dave Syer
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  * @since 2.1
  */
 @SpringJUnitConfig(locations = "JdbcPagingItemReaderCommonTests-context.xml")
@@ -60,27 +61,28 @@ class JdbcPagingQueryIntegrationTests {
 
 	private int maxId;
 
-	private JdbcTemplate jdbcTemplate;
+	private JdbcClient jdbcClient;
 
 	private final int pageSize = 2;
 
 	@BeforeEach
 	void testInit() {
-		jdbcTemplate = new JdbcTemplate(dataSource);
+		jdbcClient = JdbcClient.create(dataSource);
 		String[] names = { "Foo", "Bar", "Baz", "Foo", "Bar", "Baz", "Foo", "Bar", "Baz" };
 		String[] codes = { "A", "B", "A", "B", "B", "B", "A", "B", "A" };
-		JdbcTestUtils.deleteFromTables(jdbcTemplate, "T_FOOS");
+		JdbcTestUtils.deleteFromTables(jdbcClient, "T_FOOS");
 		for (int i = 0; i < names.length; i++) {
-			jdbcTemplate.update("INSERT into T_FOOS (ID,NAME, CODE, VALUE) values (?, ?, ?, ?)", maxId, names[i],
-					codes[i], i);
+			jdbcClient.sql("INSERT into T_FOOS (ID,NAME, CODE, VALUE) values (?, ?, ?, ?)")
+				.params(maxId, names[i], codes[i], i)
+				.update();
 			maxId++;
 		}
-		assertEquals(9, JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_FOOS"));
+		assertEquals(9, JdbcTestUtils.countRowsInTable(jdbcClient, "T_FOOS"));
 	}
 
 	@AfterEach
 	void destroy() {
-		JdbcTestUtils.deleteFromTables(jdbcTemplate, "T_FOOS");
+		JdbcTestUtils.deleteFromTables(jdbcClient, "T_FOOS");
 	}
 
 	@Test
@@ -88,13 +90,15 @@ class JdbcPagingQueryIntegrationTests {
 
 		PagingQueryProvider queryProvider = getPagingQueryProvider();
 
-		int total = JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_FOOS");
+		int total = JdbcTestUtils.countRowsInTable(jdbcClient, "T_FOOS");
 		assertTrue(total > pageSize);
 		int pages = total / pageSize;
 
 		int count = 0;
 
-		List<Map<String, Object>> list = jdbcTemplate.queryForList(queryProvider.generateFirstPageQuery(pageSize));
+		List<Map<String, Object>> list = jdbcClient.sql(queryProvider.generateFirstPageQuery(pageSize))
+			.query()
+			.listOfRows();
 		logger.debug("First page result: " + list);
 		assertEquals(pageSize, list.size());
 		count += pageSize;
@@ -103,8 +107,10 @@ class JdbcPagingQueryIntegrationTests {
 		while (count < pages * pageSize) {
 			Map<String, Object> startAfterValues = getStartAfterValues(queryProvider, list);
 			assertNotSame(oldValues, startAfterValues);
-			list = jdbcTemplate.queryForList(queryProvider.generateRemainingPagesQuery(pageSize),
-					getParameterList(null, startAfterValues).toArray());
+			list = jdbcClient.sql(queryProvider.generateRemainingPagesQuery(pageSize))
+				.params(getParameterList(null, startAfterValues))
+				.query()
+				.listOfRows();
 			assertEquals(pageSize, list.size());
 			count += pageSize;
 			oldValues = startAfterValues;
@@ -112,8 +118,10 @@ class JdbcPagingQueryIntegrationTests {
 
 		if (count < total) {
 			Map<String, Object> startAfterValues = getStartAfterValues(queryProvider, list);
-			list = jdbcTemplate.queryForList(queryProvider.generateRemainingPagesQuery(pageSize),
-					getParameterList(null, startAfterValues).toArray());
+			list = jdbcClient.sql(queryProvider.generateRemainingPagesQuery(pageSize))
+				.params(getParameterList(null, startAfterValues))
+				.query()
+				.listOfRows();
 			assertEquals(total - pages * pageSize, list.size());
 			count += list.size();
 		}
@@ -134,7 +142,9 @@ class JdbcPagingQueryIntegrationTests {
 		int count = 0;
 		int total = 5;
 
-		List<Map<String, Object>> list = jdbcTemplate.queryForList(queryProvider.generateFirstPageQuery(pageSize));
+		List<Map<String, Object>> list = jdbcClient.sql(queryProvider.generateFirstPageQuery(pageSize))
+			.query()
+			.listOfRows();
 		logger.debug("First page result: " + list);
 		assertEquals(pageSize, list.size());
 		count += pageSize;
@@ -143,8 +153,10 @@ class JdbcPagingQueryIntegrationTests {
 		while (count < total) {
 			Map<String, Object> startAfterValues = getStartAfterValues(queryProvider, list);
 			assertNotSame(oldValues, startAfterValues);
-			list = jdbcTemplate.queryForList(queryProvider.generateRemainingPagesQuery(pageSize),
-					getParameterList(null, startAfterValues).toArray());
+			list = jdbcClient.sql(queryProvider.generateRemainingPagesQuery(pageSize))
+				.params(getParameterList(null, startAfterValues))
+				.query()
+				.listOfRows();
 			count += list.size();
 
 			if (list.size() < pageSize) {

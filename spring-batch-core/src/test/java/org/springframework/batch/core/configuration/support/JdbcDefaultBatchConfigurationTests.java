@@ -37,10 +37,11 @@ import org.springframework.batch.infrastructure.repeat.RepeatStatus;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.jdbc.support.JdbcTransactionManager;
+import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.transaction.PlatformTransactionManager;
 
 /**
@@ -60,40 +61,27 @@ class JdbcDefaultBatchConfigurationTests {
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(MyJobConfiguration.class);
 		Job job = context.getBean(Job.class);
 		JobOperator jobOperator = context.getBean(JobOperator.class);
-		JdbcTemplate jdbcTemplate = new JdbcTemplate(context.getBean(DataSource.class));
+		JdbcClient jdbcClient = JdbcClient.create(context.getBean(DataSource.class));
 
 		// when
 		JobExecution jobExecution = jobOperator.start(job, new JobParameters());
 
 		// then
 		Assertions.assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
-		Assertions
-			.assertEquals(1L,
-					jdbcTemplate.queryForObject("select count(*) from "
-							+ AbstractJdbcBatchMetadataDao.DEFAULT_TABLE_PREFIX + jobInstanceIncrementerName,
-							Long.class));
+		Assertions.assertEquals(1L, count(jdbcClient, jobInstanceIncrementerName));
 		Assertions.assertEquals(0L,
-				jdbcTemplate.queryForObject("select count(*) from " + AbstractJdbcBatchMetadataDao.DEFAULT_TABLE_PREFIX
-						+ AbstractJdbcBatchMetadataDao.DEFAULT_JOB_INSTANCE_INCREMENTER_NAME, Long.class));
-		Assertions
-			.assertEquals(1L,
-					jdbcTemplate.queryForObject("select count(*) from "
-							+ AbstractJdbcBatchMetadataDao.DEFAULT_TABLE_PREFIX + jobExecutionIncrementerName,
-							Long.class));
+				count(jdbcClient, AbstractJdbcBatchMetadataDao.DEFAULT_JOB_INSTANCE_INCREMENTER_NAME));
+		Assertions.assertEquals(1L, count(jdbcClient, jobExecutionIncrementerName));
 		Assertions.assertEquals(0L,
-				jdbcTemplate.queryForObject("select count(*) from " + AbstractJdbcBatchMetadataDao.DEFAULT_TABLE_PREFIX
-						+ AbstractJdbcBatchMetadataDao.DEFAULT_JOB_EXECUTION_INCREMENTER_NAME, Long.class));
-		Assertions
-			.assertEquals(1L,
-					jdbcTemplate.queryForObject("select count(*) from "
-							+ AbstractJdbcBatchMetadataDao.DEFAULT_TABLE_PREFIX + stepExecutionIncrementerName,
-							Long.class));
-		Assertions
-			.assertEquals(0L,
-					jdbcTemplate.queryForObject(
-							"select count(*) from " + AbstractJdbcBatchMetadataDao.DEFAULT_TABLE_PREFIX
-									+ AbstractJdbcBatchMetadataDao.DEFAULT_STEP_EXECUTION_INCREMENTER_NAME,
-							Long.class));
+				count(jdbcClient, AbstractJdbcBatchMetadataDao.DEFAULT_JOB_EXECUTION_INCREMENTER_NAME));
+		Assertions.assertEquals(1L, count(jdbcClient, stepExecutionIncrementerName));
+		Assertions.assertEquals(0L,
+				count(jdbcClient, AbstractJdbcBatchMetadataDao.DEFAULT_STEP_EXECUTION_INCREMENTER_NAME));
+	}
+
+	private static long count(JdbcClient jdbcClient, String incrementerName) {
+		return JdbcTestUtils.countRowsInTable(jdbcClient,
+				AbstractJdbcBatchMetadataDao.DEFAULT_TABLE_PREFIX + incrementerName);
 	}
 
 	@Configuration

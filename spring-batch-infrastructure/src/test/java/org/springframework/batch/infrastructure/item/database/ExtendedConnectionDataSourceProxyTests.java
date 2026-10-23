@@ -36,7 +36,6 @@ import javax.sql.DataSource;
 
 import org.junit.jupiter.api.Test;
 
-import org.springframework.batch.infrastructure.item.database.ExtendedConnectionDataSourceProxy;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.jdbc.datasource.DataSourceUtils;

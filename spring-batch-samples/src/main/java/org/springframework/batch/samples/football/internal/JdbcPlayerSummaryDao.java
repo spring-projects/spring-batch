@@ -22,8 +22,7 @@ import org.springframework.batch.infrastructure.item.Chunk;
 import org.springframework.batch.infrastructure.item.ItemWriter;
 import org.springframework.batch.samples.football.PlayerSummary;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 
 public class JdbcPlayerSummaryDao implements ItemWriter<PlayerSummary> {
 
@@ -32,7 +31,7 @@ public class JdbcPlayerSummaryDao implements ItemWriter<PlayerSummary> {
 			+ "values(:id, :year, :completes, :attempts, :passingYards, :passingTd, "
 			+ ":interceptions, :rushes, :rushYards, :receptions, :receptionYards, :totalTd)";
 
-	private NamedParameterJdbcOperations namedParameterJdbcTemplate;
+	private JdbcClient jdbcClient;
 
 	@Override
 	public void write(Chunk<? extends PlayerSummary> summaries) {
@@ -52,12 +51,12 @@ public class JdbcPlayerSummaryDao implements ItemWriter<PlayerSummary> {
 				.addValue("receptionYards", summary.getReceptionYards())
 				.addValue("totalTd", summary.getTotalTd());
 
-			namedParameterJdbcTemplate.update(INSERT_SUMMARY, args);
+			jdbcClient.sql(INSERT_SUMMARY).paramSource(args).update();
 		}
 	}
 
 	public void setDataSource(DataSource dataSource) {
-		this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
+		this.jdbcClient = JdbcClient.create(dataSource);
 	}
 
 }

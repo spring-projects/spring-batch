@@ -37,7 +37,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.DefaultResourceLoader;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
@@ -68,8 +68,8 @@ class H2CompatibilityModeJobRepositoryIntegrationTests {
 		assertNotNull(jobExecution);
 		assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
 
-		var jdbcTemplate = new JdbcTemplate(context.getBean(DataSource.class));
-		jdbcTemplate.execute("SHUTDOWN");
+		var jdbcClient = JdbcClient.create(context.getBean(DataSource.class));
+		jdbcClient.sql("SHUTDOWN").update();
 	}
 
 	private static DataSource buildDataSource(ModeEnum compatibilityMode) {

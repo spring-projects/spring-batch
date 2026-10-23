@@ -19,19 +19,22 @@ import java.util.Map;
 
 import org.springframework.batch.infrastructure.item.sample.Foo;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.support.JdbcDaoSupport;
+import org.springframework.jdbc.core.simple.JdbcClient;
 
 import javax.sql.DataSource;
 
 /**
  * @author Lucas Ward
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  *
  */
-public class CompositeKeyFooDao extends JdbcDaoSupport implements FooDao {
+public class CompositeKeyFooDao implements FooDao {
+
+	private final JdbcClient jdbcClient;
 
 	public CompositeKeyFooDao(DataSource dataSource) {
-		this.setDataSource(dataSource);
+		this.jdbcClient = JdbcClient.create(dataSource);
 	}
 
 	@Override
@@ -48,8 +51,10 @@ public class CompositeKeyFooDao extends JdbcDaoSupport implements FooDao {
 			return foo;
 		};
 
-		return getJdbcTemplate().query("SELECT ID, NAME, VALUE from T_FOOS where ID = ? and VALUE = ?", fooMapper, args)
-			.get(0);
+		return jdbcClient.sql("SELECT ID, NAME, VALUE from T_FOOS where ID = ? and VALUE = ?")
+			.param(args)
+			.query(fooMapper)
+			.single();
 	}
 
 }

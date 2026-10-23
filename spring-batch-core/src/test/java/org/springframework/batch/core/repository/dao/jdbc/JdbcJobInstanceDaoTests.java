@@ -29,7 +29,6 @@ import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersBuilder;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
@@ -45,7 +44,7 @@ public class JdbcJobInstanceDaoTests {
 
 	private JdbcJobInstanceDao jdbcJobInstanceDao;
 
-	JdbcTemplate jdbcTemplate;
+	private JdbcClient jdbcClient;
 
 	@BeforeEach
 	void setup() throws Exception {
@@ -53,14 +52,15 @@ public class JdbcJobInstanceDaoTests {
 			.addScript(DatabaseType.H2.getProductSchemaDrop())
 			.addScript(DatabaseType.H2.getProductSchema())
 			.build();
-		jdbcTemplate = new JdbcTemplate(database);
-		jdbcJobInstanceDao = new JdbcJobInstanceDao(JdbcClient.create(jdbcTemplate));
+		jdbcClient = JdbcClient.create(database);
+
+		jdbcJobInstanceDao = new JdbcJobInstanceDao(jdbcClient);
 		H2SequenceMaxValueIncrementer jobInstanceIncrementer = new H2SequenceMaxValueIncrementer(database,
 				"BATCH_JOB_INSTANCE_SEQ");
 		jdbcJobInstanceDao.setJobInstanceIncrementer(jobInstanceIncrementer);
 		jdbcJobInstanceDao.afterPropertiesSet();
 
-		jdbcJobExecutionDao = new JdbcJobExecutionDao(JdbcClient.create(jdbcTemplate));
+		jdbcJobExecutionDao = new JdbcJobExecutionDao(jdbcClient);
 		H2SequenceMaxValueIncrementer jobExecutionIncrementer = new H2SequenceMaxValueIncrementer(database,
 				"BATCH_JOB_EXECUTION_SEQ");
 		jdbcJobExecutionDao.setJobExecutionIncrementer(jobExecutionIncrementer);
@@ -149,7 +149,7 @@ public class JdbcJobInstanceDaoTests {
 		jdbcJobInstanceDao.deleteJobInstance(jobInstance);
 
 		// then
-		Assertions.assertEquals(0, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_INSTANCE"));
+		Assertions.assertEquals(0, JdbcTestUtils.countRowsInTable(jdbcClient, "BATCH_JOB_INSTANCE"));
 	}
 
 	/*

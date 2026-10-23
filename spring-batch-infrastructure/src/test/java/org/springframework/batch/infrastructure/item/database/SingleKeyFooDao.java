@@ -17,9 +17,17 @@ package org.springframework.batch.infrastructure.item.database;
 
 import org.springframework.batch.infrastructure.item.sample.Foo;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.support.JdbcDaoSupport;
+import org.springframework.jdbc.core.simple.JdbcClient;
 
-public class SingleKeyFooDao extends JdbcDaoSupport implements FooDao {
+import javax.sql.DataSource;
+
+public class SingleKeyFooDao implements FooDao {
+
+	private final JdbcClient jdbcClient;
+
+	public SingleKeyFooDao(DataSource dataSource) {
+		this.jdbcClient = JdbcClient.create(dataSource);
+	}
 
 	@Override
 	public Foo getFoo(Object key) {
@@ -32,7 +40,10 @@ public class SingleKeyFooDao extends JdbcDaoSupport implements FooDao {
 			return foo;
 		};
 
-		return getJdbcTemplate().query("SELECT ID, NAME, VALUE from T_FOOS where ID = ?", fooMapper, key).get(0);
+		return jdbcClient.sql("SELECT ID, NAME, VALUE from T_FOOS where ID = ?")
+			.param(1, key)
+			.query(fooMapper)
+			.single();
 
 	}
 
