@@ -17,6 +17,7 @@
 package org.springframework.batch.infrastructure.item.database;
 
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,6 +38,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.support.JdbcUtils;
 import org.springframework.util.Assert;
 
 /**
@@ -320,15 +322,52 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 
 	private class PagingRowMapper implements RowMapper<T> {
 
+		private final Map<String, Integer> sortKeyColumns = new LinkedHashMap<>();
+
 		@SuppressWarnings("DataFlowIssue")
 		@Override
 		public @Nullable T mapRow(ResultSet rs, int rowNum) throws SQLException {
 			startAfterValues = new LinkedHashMap<>();
 			for (Map.Entry<String, Order> sortKey : queryProvider.getSortKeys().entrySet()) {
-				startAfterValues.put(sortKey.getKey(), rs.getObject(sortKey.getKey()));
+				String key = sortKey.getKey();
+				Integer column = sortKeyColumns.get(key);
+				if (column == null) {
+					column = findSortKeyColumn(rs, key);
+					sortKeyColumns.put(key, column);
+				}
+				startAfterValues.put(key, rs.getObject(column));
 			}
 
 			return rowMapper.mapRow(rs, rowNum);
+		}
+
+		private int findSortKeyColumn(ResultSet rs, String key) throws SQLException {
+			try {
+				// Preserve existing output aliases and driver-specific qualified lookup.
+				return rs.findColumn(key);
+			}
+			catch (SQLException original) {
+				int separator = key.lastIndexOf('.');
+				if (separator < 0) {
+					throw original;
+				}
+				String label = key.substring(separator + 1);
+				ResultSetMetaData metadata = rs.getMetaData();
+				int match = -1;
+				for (int i = 1; i <= metadata.getColumnCount(); i++) {
+					if (label.equalsIgnoreCase(JdbcUtils.lookupColumnName(metadata, i))) {
+						if (match != -1) {
+							// Do not silently choose between duplicate output labels.
+							throw original;
+						}
+						match = i;
+					}
+				}
+				if (match == -1) {
+					throw original;
+				}
+				return match;
+			}
 		}
 
 	}
