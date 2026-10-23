@@ -60,5 +60,6 @@
 * Appendices
 ** xref:appendix.adoc[]
 ** xref:schema-appendix.adoc[]
+** xref:database-tips-appendix.adoc[]
 ** xref:glossary.adoc[]
 ** xref:faq.adoc[]
