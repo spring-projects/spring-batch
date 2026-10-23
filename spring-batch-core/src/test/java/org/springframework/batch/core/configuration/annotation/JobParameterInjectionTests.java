@@ -17,6 +17,8 @@ package org.springframework.batch.core.configuration.annotation;
 
 import java.lang.reflect.Method;
 import java.time.LocalDate;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.sql.DataSource;
@@ -60,8 +62,9 @@ import org.springframework.transaction.PlatformTransactionManager;
 class JobParameterInjectionTests {
 
 	@ParameterizedTest
-	@ValueSource(classes = { MethodParameterWithImplicitName.class, MethodParameterWithExplicitName.class,
-			FieldWithImplicitName.class, FieldWithExplicitName.class, MethodParameterInJobScope.class })
+	@ValueSource(classes = { JobParametersAsMethodParameter.class, JobParametersAsField.class,
+			MethodParameterWithImplicitName.class, MethodParameterWithExplicitName.class, FieldWithImplicitName.class,
+			FieldWithExplicitName.class, MethodParameterInJobScope.class })
 	void testInjection(Class<?> configurationClass) throws Exception {
 		// given
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(configurationClass);
@@ -199,6 +202,21 @@ class JobParameterInjectionTests {
 	}
 
 	@Configuration
+	static class JobParametersAsMethodParameter extends JobParameterInjectionConfiguration {
+
+		@Bean
+		@StepScope
+		public Tasklet myTasklet(JobParameterHolder jobParameterHolder,
+				@JobParameter Map<String, Object> jobParameters) {
+			return (contribution, chunkContext) -> {
+				jobParameterHolder.setDate(Objects.requireNonNull((LocalDate) jobParameters.get("date")));
+				return RepeatStatus.FINISHED;
+			};
+		}
+
+	}
+
+	@Configuration
 	static class MethodParameterWithImplicitName extends JobParameterInjectionConfiguration {
 
 		@Bean
@@ -236,6 +254,17 @@ class JobParameterInjectionTests {
 				jobParameterHolder.setDate(date);
 				return RepeatStatus.FINISHED;
 			};
+		}
+
+	}
+
+	@Configuration
+	static class JobParametersAsField extends JobParameterInjectionConfiguration {
+
+		@Bean
+		@StepScope
+		public Tasklet myTasklet() {
+			return new MyTaskletWithJobParameters();
 		}
 
 	}
@@ -287,6 +316,22 @@ class JobParameterInjectionTests {
 		@Override
 		public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 			jobParameterHolder.setDate(date);
+			return RepeatStatus.FINISHED;
+		}
+
+	}
+
+	static class MyTaskletWithJobParameters implements Tasklet {
+
+		@Autowired
+		JobParameterHolder jobParameterHolder;
+
+		@JobParameter
+		Map<String, Object> jobParameters;
+
+		@Override
+		public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+			jobParameterHolder.setDate(Objects.requireNonNull((LocalDate) jobParameters.get("date")));
 			return RepeatStatus.FINISHED;
 		}
 
