@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2025 the original author or authors.
+ * Copyright 2012-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,6 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
 import org.springframework.util.MethodInvoker;
 import org.springframework.util.StringUtils;
 
@@ -54,8 +53,9 @@ import org.springframework.util.StringUtils;
  * </p>
  *
  * <p>
- * The reader must be configured with a {@link PagingAndSortingRepository}, a
- * {@link Sort}, and a pageSize greater than 0.
+ * The reader must be configured with a {@link PagingAndSortingRepository} and a pageSize
+ * greater than 0. A {@link Sort} can optionally be set with {@link #setSort(Sort)}, if
+ * not set the results are not sorted.
  * </p>
  *
  * <p>
@@ -88,7 +88,7 @@ public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemR
 
 	private PagingAndSortingRepository<?, ?> repository;
 
-	private Map<String, Sort.Direction> sorts;
+	private Sort sort = Sort.unsorted();
 
 	private volatile int page = 0;
 
@@ -105,16 +105,30 @@ public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemR
 	private @Nullable String methodName;
 
 	/**
+	 * Create a new {@link RepositoryItemReader}. The results are not sorted unless a
+	 * {@link Sort} is set with {@link #setSort(Sort)}.
+	 * @param repository the {@link PagingAndSortingRepository} to use
+	 * @since 6.1
+	 */
+	public RepositoryItemReader(PagingAndSortingRepository<?, ?> repository) {
+		Assert.notNull(repository, "A PagingAndSortingRepository is required.");
+		this.repository = repository;
+	}
+
+	/**
 	 * Create a new {@link RepositoryItemReader}.
 	 * @param repository the {@link PagingAndSortingRepository} to use
 	 * @param sorts the sort parameters to pass to the repository
 	 * @since 6.0
+	 * @deprecated since 6.1 in favor of
+	 * {@link #RepositoryItemReader(PagingAndSortingRepository)} and
+	 * {@link #setSort(Sort)}. Scheduled for removal in 7.0.
 	 */
+	@Deprecated(since = "6.1", forRemoval = true)
 	public RepositoryItemReader(PagingAndSortingRepository<?, ?> repository, Map<String, Sort.Direction> sorts) {
-		Assert.notNull(repository, "A PagingAndSortingRepository is required.");
+		this(repository);
 		Assert.notNull(sorts, "A Map of sorts is required.");
-		this.repository = repository;
-		this.sorts = sorts;
+		this.sort = convertToSort(sorts);
 	}
 
 	/**
@@ -127,12 +141,29 @@ public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemR
 
 	/**
 	 * Provides ordering of the results so that order is maintained between paged queries.
+	 * Use {@link Sort#by(Sort.Order...)} to sort by multiple properties, each with its
+	 * own direction. If not set, the results are not sorted ({@link Sort#unsorted()}).
+	 * @param sort the sort parameters. Must not be null, use {@link Sort#unsorted()} to
+	 * skip sorting.
+	 * @since 6.1
+	 */
+	public void setSort(Sort sort) {
+		Assert.notNull(sort, "A Sort is required.");
+		this.sort = sort;
+	}
+
+	/**
+	 * Provides ordering of the results so that order is maintained between paged queries.
 	 * Use a {@link java.util.LinkedHashMap} in case of multiple sort entries to keep the
 	 * order.
 	 * @param sorts the fields to sort by and the directions
+	 * @deprecated since 6.1 in favor of {@link #setSort(Sort)}. Scheduled for removal in
+	 * 7.0.
 	 */
+	@Deprecated(since = "6.1", forRemoval = true)
 	public void setSorts(Map<String, Sort.Direction> sorts) {
-		this.sorts = sorts;
+		Assert.notNull(sorts, "A Map of sorts is required.");
+		this.sort = convertToSort(sorts);
 	}
 
 	/**
@@ -145,7 +176,10 @@ public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemR
 	/**
 	 * The {@link PagingAndSortingRepository} implementation used to read input from.
 	 * @param repository underlying repository for input to be read from.
+	 * @deprecated since 6.1 in favor of passing the repository to the constructor.
+	 * Scheduled for removal in 7.0.
 	 */
+	@Deprecated(since = "6.1", forRemoval = true)
 	public void setRepository(PagingAndSortingRepository<?, ?> repository) {
 		this.repository = repository;
 	}
@@ -162,10 +196,7 @@ public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemR
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(pageSize > 0, "Page size must be greater than 0");
-		Assert.state(this.methodName != null && !this.methodName.isEmpty(), "methodName is required.");
-		if (isSaveState()) {
-			Assert.state(StringUtils.hasText(getName()), "A name is required when saveState is set to true.");
-		}
+		Assert.state(StringUtils.hasText(this.methodName), "methodName is required.");
 	}
 
 	@Override
@@ -228,8 +259,7 @@ public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemR
 	 */
 	@SuppressWarnings("unchecked")
 	protected List<T> doPageRead() throws Exception {
-		@SuppressWarnings("DataFlowIssue")
-		Pageable pageRequest = PageRequest.of(page, pageSize, convertToSort(sorts));
+		Pageable pageRequest = PageRequest.of(page, pageSize, sort);
 
 		@SuppressWarnings("DataFlowIssue")
 		MethodInvoker invoker = createMethodInvoker(repository, methodName);

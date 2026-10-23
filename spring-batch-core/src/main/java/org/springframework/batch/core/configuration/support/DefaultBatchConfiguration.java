@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2026 the original author or authors.
+ * Copyright 2012-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import io.micrometer.observation.ObservationRegistry;
 
 import org.springframework.batch.core.configuration.DuplicateJobException;
 import org.springframework.batch.core.configuration.annotation.BatchObservabilityBeanPostProcessor;
+import org.springframework.batch.core.configuration.annotation.LateBindingBeanFactoryPostProcessor;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.configuration.BatchConfigurationException;
 import org.springframework.batch.core.configuration.JobRegistry;
@@ -78,7 +79,8 @@ import org.springframework.transaction.PlatformTransactionManager;
  * @since 5.0
  */
 @Configuration(proxyBeanMethods = false)
-@Import({ ScopeConfiguration.class, BatchObservabilityBeanPostProcessor.class })
+@Import({ ScopeConfiguration.class, BatchObservabilityBeanPostProcessor.class,
+		LateBindingBeanFactoryPostProcessor.class })
 public class DefaultBatchConfiguration implements ApplicationContextAware {
 
 	@SuppressWarnings("NullAway.Init")
@@ -129,13 +131,15 @@ public class DefaultBatchConfiguration implements ApplicationContextAware {
 	}
 
 	/**
-	 * Return the {@link ObservationRegistry} to use for the job operator. Defaults to
-	 * {@link ObservationRegistry#NOOP}.
+	 * Return the {@link ObservationRegistry} to use for the job operator. Defaults to the
+	 * {@link ObservationRegistry} bean of the application context if there is a unique
+	 * one, and to {@link ObservationRegistry#NOOP} otherwise.
 	 * @return The ObservationRegistry to use for the job operator
 	 * @since 6.0
 	 */
 	protected ObservationRegistry getObservationRegistry() {
-		return ObservationRegistry.NOOP;
+		return this.applicationContext.getBeanProvider(ObservationRegistry.class)
+			.getIfUnique(() -> ObservationRegistry.NOOP);
 	}
 
 	/**

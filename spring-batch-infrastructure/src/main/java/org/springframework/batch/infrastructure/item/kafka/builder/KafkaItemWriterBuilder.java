@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2025 the original author or authors.
+ * Copyright 2019-present the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -43,7 +43,6 @@ public class KafkaItemWriterBuilder<K, V> {
 	 * Establish the KafkaTemplate to be used by the KafkaItemWriter.
 	 * @param kafkaTemplate the template to be used
 	 * @return this instance for method chaining
-	 * @see KafkaItemWriter#setKafkaTemplate(KafkaTemplate)
 	 */
 	public KafkaItemWriterBuilder<K, V> kafkaTemplate(KafkaTemplate<K, V> kafkaTemplate) {
 		this.kafkaTemplate = kafkaTemplate;
@@ -54,7 +53,6 @@ public class KafkaItemWriterBuilder<K, V> {
 	 * Set the {@link Converter} to use to derive the key from the item.
 	 * @param itemKeyMapper the Converter to use.
 	 * @return The current instance of the builder.
-	 * @see KafkaItemWriter#setItemKeyMapper(Converter)
 	 */
 	public KafkaItemWriterBuilder<K, V> itemKeyMapper(Converter<V, K> itemKeyMapper) {
 		this.itemKeyMapper = itemKeyMapper;
@@ -97,8 +95,6 @@ public class KafkaItemWriterBuilder<K, V> {
 		Assert.notNull(this.itemKeyMapper, "itemKeyMapper is required.");
 
 		KafkaItemWriter<K, V> writer = new KafkaItemWriter<>(this.itemKeyMapper, this.kafkaTemplate);
-		writer.setKafkaTemplate(this.kafkaTemplate);
-		writer.setItemKeyMapper(this.itemKeyMapper);
 		writer.setDelete(this.delete);
 		writer.setTimeout(this.timeout);
 		return writer;

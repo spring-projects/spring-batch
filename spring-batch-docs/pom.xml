@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.springframework.batch</groupId>
 		<artifactId>spring-batch</artifactId>
-		<version>6.0.5-SNAPSHOT</version>
+		<version>6.1.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>spring-batch-docs</artifactId>
 	<name>Spring Batch Docs</name>
@@ -33,7 +33,7 @@
 			<plugin>
 				<groupId>io.spring.maven.antora</groupId>
 				<artifactId>antora-component-version-maven-plugin</artifactId>
-				<version>${io.spring.maven.antora-version}</version>
+				<version>${io.spring.maven.antora.version}</version>
 				<executions>
 					<execution>
 						<goals>

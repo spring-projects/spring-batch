@@ -83,10 +83,6 @@ class StoredProcedureItemReaderBuilderTests {
 	void testValidation() {
 		var builder = new StoredProcedureItemReaderBuilder<Foo>();
 		Exception exception = assertThrows(IllegalArgumentException.class, builder::build);
-		assertEquals("A name is required when saveSate is set to true", exception.getMessage());
-
-		builder = new StoredProcedureItemReaderBuilder<Foo>().saveState(false);
-		exception = assertThrows(IllegalArgumentException.class, builder::build);
 		assertEquals("The name of the stored procedure must be provided", exception.getMessage());
 
 		builder = new StoredProcedureItemReaderBuilder<Foo>().saveState(false).procedureName("read_foos");

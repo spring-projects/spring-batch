@@ -469,6 +469,9 @@ that auto-detects the database that is being used and determine the appropriate
 `PagingQueryProvider` implementation. This simplifies the configuration and is the
 recommended best practice.
 
+WARNING: `DerbyPagingQueryProvider` is deprecated as of Spring Batch 6.1.0 and will be
+removed in version 7.0.0, along with the rest of the Apache Derby support.
+
 The `SqlPagingQueryProviderFactoryBean` requires that you specify a `select` clause and a
 `from` clause. You can also provide an optional `where` clause. These clauses and the
 required `sortKey` are used to build an SQL statement.

@@ -111,11 +111,6 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean<Jo
 		return JobRepository.class;
 	}
 
-	@Override
-	public boolean isSingleton() {
-		return true;
-	}
-
 	/**
 	 * Flag to determine whether to check for an existing transaction when a JobExecution
 	 * is created. Defaults to true because it is usually a mistake, and leads to problems

@@ -224,8 +224,7 @@ public class JobOperatorTestUtils extends JobLauncherTestUtils {
 	 */
 	public JobExecution startStep(Step step, JobParameters jobParameters, ExecutionContext jobExecutionContext) {
 		// Create a fake job
-		SimpleJob job = new SimpleJob();
-		job.setName(JOB_NAME);
+		SimpleJob job = new SimpleJob(JOB_NAME);
 		job.setJobRepository(this.jobRepository);
 
 		List<Step> stepsToExecute = new ArrayList<>();

@@ -72,6 +72,35 @@ class CompositeItemStreamTests {
 	}
 
 	@Test
+	void testRegisterDefaultNameCollisionIsNotBlocking() {
+		// two distinct, non-bean instances of the same class fall back to the same
+		// default (short class name) - registration must still succeed for both
+		RecordingItemStream stream1 = new RecordingItemStream(list, "first");
+		RecordingItemStream stream2 = new RecordingItemStream(list, "second");
+		assertEquals(stream1.getName(), stream2.getName());
+
+		manager.register(stream1);
+		manager.register(stream2);
+		manager.open(null);
+
+		assertEquals(2, list.size());
+	}
+
+	@Test
+	void testRegisterExplicitNameCollisionIsNotBlocking() {
+		RecordingItemStream stream1 = new RecordingItemStream(list, "first");
+		RecordingItemStream stream2 = new RecordingItemStream(list, "second");
+		stream1.setName("duplicate");
+		stream2.setName("duplicate");
+
+		manager.register(stream1);
+		manager.register(stream2);
+		manager.open(null);
+
+		assertEquals(2, list.size());
+	}
+
+	@Test
 	void testMark() {
 		manager.register(new ItemStreamSupport() {
 			@Override
@@ -144,6 +173,25 @@ class CompositeItemStreamTests {
 		manager.close();
 		manager.open(null);
 		assertEquals(2, list.size());
+	}
+
+	private static class RecordingItemStream extends ItemStreamSupport {
+
+		private final List<String> events;
+
+		private final String label;
+
+		RecordingItemStream(List<String> events, String label) {
+			this.events = events;
+			this.label = label;
+		}
+
+		@Override
+		public void open(ExecutionContext executionContext) {
+			super.open(executionContext);
+			this.events.add(this.label);
+		}
+
 	}
 
 }

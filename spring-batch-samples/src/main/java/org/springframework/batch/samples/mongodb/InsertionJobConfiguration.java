@@ -15,9 +15,6 @@
  */
 package org.springframework.batch.samples.mongodb;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.job.builder.JobBuilder;
@@ -42,14 +39,12 @@ public class InsertionJobConfiguration {
 
 	@Bean
 	public MongoPagingItemReader<Person> mongoItemReader(MongoTemplate mongoTemplate) {
-		Map<String, Sort.Direction> sortOptions = new HashMap<>();
-		sortOptions.put("name", Sort.Direction.DESC);
 		return new MongoPagingItemReaderBuilder<Person>().name("personItemReader")
 			.collection("person_in")
 			.targetType(Person.class)
 			.template(mongoTemplate)
 			.jsonQuery("{}")
-			.sorts(sortOptions)
+			.sort(Sort.by(Sort.Direction.DESC, "name"))
 			.build();
 	}
 

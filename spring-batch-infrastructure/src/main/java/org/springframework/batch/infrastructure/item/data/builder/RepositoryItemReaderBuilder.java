@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2025 the original author or authors.
+ * Copyright 2017-present the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -24,12 +24,11 @@ import org.jspecify.annotations.Nullable;
 
 import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.batch.infrastructure.item.ItemStreamSupport;
-import org.springframework.batch.infrastructure.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.batch.infrastructure.item.data.RepositoryItemReader;
+import org.springframework.batch.infrastructure.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
 
 /**
  * A builder implementation for the {@link RepositoryItemReader}.
@@ -44,7 +43,7 @@ public class RepositoryItemReaderBuilder<T> {
 
 	private @Nullable PagingAndSortingRepository<?, ?> repository;
 
-	private @Nullable Map<String, Sort.Direction> sorts;
+	private Sort sort = Sort.unsorted();
 
 	private @Nullable List<?> arguments;
 
@@ -73,8 +72,9 @@ public class RepositoryItemReaderBuilder<T> {
 	}
 
 	/**
-	 * The name used to calculate the key within the {@link ExecutionContext}. Required if
-	 * {@link #saveState(boolean)} is set to true.
+	 * The name used to calculate the key within the {@link ExecutionContext}. Defaults to
+	 * the bean name, or to the short class name if this instance is not a bean. Set it
+	 * explicitly to disambiguate several non-bean instances of the same type in a step.
 	 * @param name name of the reader instance
 	 * @return The current instance of the builder.
 	 * @see ItemStreamSupport#setName(String)
@@ -133,14 +133,31 @@ public class RepositoryItemReaderBuilder<T> {
 
 	/**
 	 * Provides ordering of the results so that order is maintained between paged queries.
+	 * Optional, defaults to {@link Sort#unsorted()}.
+	 * @param sort the sort parameters.
+	 * @return The current instance of the builder.
+	 * @since 6.1
+	 * @see RepositoryItemReader#setSort(Sort)
+	 */
+	public RepositoryItemReaderBuilder<T> sort(Sort sort) {
+		this.sort = sort;
+
+		return this;
+	}
+
+	/**
+	 * Provides ordering of the results so that order is maintained between paged queries.
 	 * Use a {@link java.util.LinkedHashMap} in case of multiple sort entries to keep the
 	 * order.
 	 * @param sorts the fields to sort by and the directions.
 	 * @return The current instance of the builder.
-	 * @see RepositoryItemReader#setSorts(Map)
+	 * @deprecated since 6.1 in favor of {@link #sort(Sort)}. Scheduled for removal in
+	 * 7.0.
 	 */
+	@Deprecated(since = "6.1", forRemoval = true)
 	public RepositoryItemReaderBuilder<T> sorts(Map<String, Sort.Direction> sorts) {
-		this.sorts = sorts;
+		Assert.notNull(sorts, "sorts map must not be null.");
+		this.sort = Sort.by(sorts.entrySet().stream().map(e -> new Sort.Order(e.getValue(), e.getKey())).toList());
 
 		return this;
 	}
@@ -158,11 +175,10 @@ public class RepositoryItemReaderBuilder<T> {
 	}
 
 	/**
-	 * The {@link org.springframework.data.repository.PagingAndSortingRepository}
-	 * implementation used to read input from.
+	 * The {@link PagingAndSortingRepository} implementation used to read input from.
 	 * @param repository underlying repository for input to be read from.
 	 * @return The current instance of the builder.
-	 * @see RepositoryItemReader#setRepository(PagingAndSortingRepository)
+	 * @see RepositoryItemReader#RepositoryItemReader(PagingAndSortingRepository)
 	 */
 	public RepositoryItemReaderBuilder<T> repository(PagingAndSortingRepository<?, ?> repository) {
 		this.repository = repository;
@@ -188,19 +204,15 @@ public class RepositoryItemReaderBuilder<T> {
 	 * @return a {@link RepositoryItemReader}
 	 */
 	public RepositoryItemReader<T> build() {
-		Assert.notNull(this.sorts, "sorts map is required.");
 		Assert.notNull(this.repository, "repository is required.");
 		Assert.isTrue(this.pageSize > 0, "Page size must be greater than 0");
 		Assert.hasText(this.methodName, "methodName is required.");
-		if (this.saveState) {
-			Assert.state(StringUtils.hasText(this.name), "A name is required when saveState is set to true.");
-		}
 
-		RepositoryItemReader<T> reader = new RepositoryItemReader<>(this.repository, this.sorts);
+		RepositoryItemReader<T> reader = new RepositoryItemReader<>(this.repository);
+		reader.setSort(this.sort);
 		if (this.arguments != null) {
 			reader.setArguments(this.arguments);
 		}
-		reader.setRepository(this.repository);
 		reader.setMethodName(this.methodName);
 		reader.setPageSize(this.pageSize);
 		reader.setCurrentItemCount(this.currentItemCount);

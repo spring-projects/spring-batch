@@ -27,12 +27,12 @@
 	</bean>
 
 	<bean id="executionContextDao" class="org.springframework.batch.core.repository.dao.jdbc.JdbcExecutionContextDao">
-		<property name="jdbcTemplate" ref="jdbcTemplate" />
+		<constructor-arg ref="jdbcClient" />
 		<property name="serializer" ref="serializer"/>
 	</bean>
 
 	<bean id="jobInstanceDao" class="org.springframework.batch.core.repository.dao.jdbc.JdbcJobInstanceDao">
-		<property name="jdbcTemplate" ref="jdbcTemplate" />
+		<constructor-arg ref="jdbcClient" />
 		<property name="jobInstanceIncrementer" ref="jobInstanceIncrementer" />
 		<property name="jobKeyGenerator" ref="jobKeyGenerator" />
 	</bean>
@@ -40,19 +40,23 @@
 	<bean id="jobKeyGenerator" class="org.springframework.batch.core.repository.dao.jdbc.CustomJobKeyGenerator" />
 
 	<bean id="jobExecutionDao" class="org.springframework.batch.core.repository.dao.jdbc.JdbcJobExecutionDao">
-		<property name="jdbcTemplate" ref="jdbcTemplate" />
+		<constructor-arg ref="jdbcClient" />
 		<property name="jobExecutionIncrementer" ref="jobExecutionIncrementer" />
 		<property name="jobInstanceDao" ref="jobInstanceDao" />
 	</bean>
 
 	<bean id="stepExecutionDao" class="org.springframework.batch.core.repository.dao.jdbc.JdbcStepExecutionDao">
-		<property name="jdbcTemplate" ref="jdbcTemplate" />
+		<constructor-arg ref="jdbcClient" />
 		<property name="stepExecutionIncrementer" ref="stepExecutionIncrementer" />
 		<property name="jobExecutionDao" ref="jobExecutionDao" />
 	</bean>
 
 	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
 		<constructor-arg ref="dataSource" />
+	</bean>
+
+	<bean id="jdbcClient" class="org.springframework.jdbc.core.simple.JdbcClient" factory-method="create">
+		<constructor-arg ref="jdbcTemplate" />
 	</bean>
 
 	<bean id="serializer" class="org.springframework.batch.core.repository.dao.DefaultExecutionContextSerializer"/>

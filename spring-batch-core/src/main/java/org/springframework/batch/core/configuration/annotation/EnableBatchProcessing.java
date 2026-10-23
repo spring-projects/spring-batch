@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2025 the original author or authors.
+ * Copyright 2012-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,7 +59,8 @@ import java.lang.annotation.Target;
  * }
  * </pre>
  *
- * By default,this annotation configures a resouceless batch infrastructure (ie based on a
+ * By default, this annotation configures a resourceless batch infrastructure (i.e. based
+ * on a
  * {@link org.springframework.batch.core.repository.support.ResourcelessJobRepository} and
  * a {@link ResourcelessTransactionManager}).
  *
@@ -141,6 +142,7 @@ import java.lang.annotation.Target;
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  * @author Taeik Lim
+ * @author Yanming Zhou
  * @see EnableJdbcJobRepository
  * @see EnableMongoJobRepository
  */
@@ -148,7 +150,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Import({ BatchRegistrar.class, ScopeConfiguration.class, AutomaticJobRegistrarBeanPostProcessor.class,
-		BatchObservabilityBeanPostProcessor.class })
+		BatchObservabilityBeanPostProcessor.class, LateBindingBeanFactoryPostProcessor.class })
 public @interface EnableBatchProcessing {
 
 	/**
@@ -179,7 +181,11 @@ public @interface EnableBatchProcessing {
 	String jobRegistryRef() default "jobRegistry";
 
 	/**
-	 * Set the observation registry to use in batch artifacts.
+	 * Set the observation registry to use in the job operator. If there is no bean with
+	 * this name, the {@link io.micrometer.observation.ObservationRegistry} bean of the
+	 * application context is used if there is a unique (or primary) one. Jobs and steps
+	 * that have no observation registry configured explicitly use that bean too (see
+	 * {@link BatchObservabilityBeanPostProcessor}).
 	 * @return the bean name of the observation registry to use. Defaults to
 	 * {@literal observationRegistry}
 	 */

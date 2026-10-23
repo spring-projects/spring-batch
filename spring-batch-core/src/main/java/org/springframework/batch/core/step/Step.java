@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.step;
 
+import org.springframework.batch.core.BatchConstants;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobInterruptedException;
 
@@ -32,8 +33,11 @@ public interface Step {
 
 	/**
 	 * The key to use when retrieving the batch step type.
+	 * @deprecated since 6.1, scheduled for removal in 7.0. Use
+	 * {@link BatchConstants#BATCH_STEP_TYPE} instead.
 	 */
-	String STEP_TYPE_KEY = "batch.stepType";
+	@Deprecated(since = "6.1", forRemoval = true)
+	String STEP_TYPE_KEY = BatchConstants.BATCH_STEP_TYPE;
 
 	/**
 	 * The name of the step. This is used to distinguish between different steps and must

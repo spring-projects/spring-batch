@@ -34,6 +34,21 @@ modified with additional indexes and constraints, as desired. The file names are
 form `schema-\*.sql`, where `*` is the short name of the target database platform.
 The scripts are in the package `org.springframework.batch.core`.
 
+Since version 6.1, the location of these scripts (and their corresponding drop scripts)
+is exposed programmatically through `DatabaseType#getProductSchema()` and
+`DatabaseType#getProductSchemaDrop()`, so that they do not need to be hard-coded:
+
+[source, java]
+----
+new EmbeddedDatabaseBuilder()
+    .addScript(DatabaseType.H2.getProductSchema())
+    .build();
+----
+
+WARNING: Support for Apache Derby is deprecated as of Spring Batch 6.1.0 and will be
+removed in version 7.0.0. The `schema-derby.sql` and `schema-drop-derby.sql` scripts, as
+well as the Derby migration scripts, will be removed at the same time.
+
 [[migrationDDLScripts]]
 === Migration DDL Scripts
 

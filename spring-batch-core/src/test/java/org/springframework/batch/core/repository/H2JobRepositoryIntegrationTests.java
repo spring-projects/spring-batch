@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2025 the original author or authors.
+ * Copyright 2020-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.infrastructure.repeat.RepeatStatus;
+import org.springframework.batch.infrastructure.support.DatabaseType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -75,7 +76,7 @@ class H2JobRepositoryIntegrationTests {
 		@Bean
 		public DataSource dataSource() {
 			return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2)
-				.addScript("/org/springframework/batch/core/schema-h2.sql")
+				.addScript(DatabaseType.H2.getProductSchema())
 				.generateUniqueName(true)
 				.build();
 		}

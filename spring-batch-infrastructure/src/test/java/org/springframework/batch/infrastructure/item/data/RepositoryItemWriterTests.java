@@ -30,6 +30,7 @@ import org.springframework.data.repository.CrudRepository;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 
@@ -80,6 +81,17 @@ class RepositoryItemWriterTests {
 		writer.write(items);
 
 		verify(repository).saveAll(items);
+	}
+
+	@Test
+	void testWriteItemsWithIterableAcceptingMethodName() throws Exception {
+		Chunk<String> items = Chunk.of("foo", "bar");
+
+		writer.setMethodName("saveAll");
+		writer.afterPropertiesSet();
+		writer.write(items);
+
+		verify(repository, times(1)).saveAll(items.getItems());
 	}
 
 }

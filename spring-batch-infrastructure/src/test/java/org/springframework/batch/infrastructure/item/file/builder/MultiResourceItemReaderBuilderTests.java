@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2023 the original author or authors.
+ * Copyright 2017-present the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -26,10 +26,13 @@ import org.springframework.batch.infrastructure.item.ItemReader;
 import org.springframework.batch.infrastructure.item.file.FlatFileItemReader;
 import org.springframework.batch.infrastructure.item.file.LineMapper;
 import org.springframework.batch.infrastructure.item.file.MultiResourceItemReader;
+import org.springframework.batch.infrastructure.item.file.mapping.PassThroughLineMapper;
 import org.springframework.batch.infrastructure.item.sample.Foo;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
@@ -82,12 +85,73 @@ class MultiResourceItemReaderBuilderTests extends AbstractItemStreamItemReaderTe
 		assertEquals("resources array is required.", exception.getMessage());
 	}
 
+	@Test
+	void testResourcesFromLocationPattern() throws Exception {
+		FlatFileItemReader<String> delegate = new FlatFileItemReaderBuilder<String>().name("textReader")
+			.lineMapper(new PassThroughLineMapper())
+			.build();
+
+		String basePath = new ClassPathResource("", this.getClass()).getFile().getPath();
+		MultiResourceItemReader<String> reader = new MultiResourceItemReaderBuilder<String>().delegate(delegate)
+			.resources("file:" + basePath + "/test?.txt")
+			.name("multiFileReader")
+			.build();
+
+		reader.open(new ExecutionContext());
+		assertEquals("1", reader.read());
+		assertEquals("2", reader.read());
+		assertNull(reader.read());
+		reader.close();
+	}
+
 	@Override
 	protected void pointToEmptyInput(ItemReader<Foo> tested) throws Exception {
 		MultiResourceItemReader<Foo> multiReader = (MultiResourceItemReader<Foo>) tested;
 		multiReader.close();
 		multiReader.setResources(new Resource[] { new ByteArrayResource("".getBytes()) });
 		multiReader.open(new ExecutionContext());
+	}
+
+	@Test
+	void testStrictMethodChaining() {
+		LineMapper<Foo> fooLineMapper = (line, lineNumber) -> {
+			Foo foo = new Foo();
+			foo.setValue(Integer.parseInt(line));
+			return foo;
+		};
+		FlatFileItemReader<Foo> fileReader = new FlatFileItemReader<>(fooLineMapper);
+
+		// Test that strict() returns the builder for method chaining
+		MultiResourceItemReader<Foo> reader = new MultiResourceItemReaderBuilder<Foo>().delegate(fileReader)
+			.resources(new Resource[] {})
+			.strict(false)
+			.name("TEST")
+			.saveState(true)
+			.build();
+
+		// If chaining works, build() should succeed
+		assertEquals("TEST", reader.getName());
+	}
+
+	@Test
+	void testSetStrictStillWorks() {
+		LineMapper<Foo> fooLineMapper = (line, lineNumber) -> {
+			Foo foo = new Foo();
+			foo.setValue(Integer.parseInt(line));
+			return foo;
+		};
+		FlatFileItemReader<Foo> fileReader = new FlatFileItemReader<>(fooLineMapper);
+
+		// Test that setStrict() still works for backward compatibility
+		MultiResourceItemReader<Foo> reader = new MultiResourceItemReaderBuilder<Foo>().delegate(fileReader)
+			.resources(new Resource[] {})
+			.setStrict(true)
+			.name("TEST")
+			.build();
+
+		Exception exception = assertThrows(IllegalStateException.class, () -> reader.open(new ExecutionContext()));
+		assertEquals("No resources to read. Set strict=false if this is not an error condition.",
+				exception.getMessage());
 	}
 
 }

@@ -49,17 +49,13 @@ class AbstractFileItemWriterTests {
 		writer.setName(writer.getClass().getSimpleName());
 		writer.open(new ExecutionContext());
 
-		try (MockedStatic<Files> mocked = Mockito.mockStatic(Files.class, Mockito.CALLS_REAL_METHODS)) {
+		when(mocked.delete()).thenReturn(false);
 
-			mocked.when(() -> Files.delete(any())).thenThrow(new IOException("Failed to delete file"));
+		ItemStreamException exception = assertThrows(ItemStreamException.class, writer::close,
+				"Expected exception when file deletion fails");
 
-			ItemStreamException exception = assertThrows(ItemStreamException.class, writer::close,
-					"Expected exception when file deletion fails");
-
-			assertEquals("Failed to delete empty file on close", exception.getMessage());
-
-			assertNotNull(exception.getCause());
-		}
+		assertEquals("Failed to delete empty file on close", exception.getMessage(), "Wrong exception message");
+		assertNotNull(exception.getCause(), "Exception should have a cause");
 	}
 
 	private static class TestFileItemWriter extends AbstractFileItemWriter<String> {

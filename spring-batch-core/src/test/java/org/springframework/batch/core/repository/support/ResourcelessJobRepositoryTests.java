@@ -15,13 +15,17 @@
  */
 package org.springframework.batch.core.repository.support;
 
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
+import org.springframework.batch.core.BatchStatus;
 
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.batch.core.launch.NoSuchJobException;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -54,7 +58,7 @@ class ResourcelessJobRepositoryTests {
 		// then
 		assertNotNull(jobInstance);
 		assertEquals(jobName, jobInstance.getJobName());
-		assertEquals(1L, jobInstance.getInstanceId());
+		assertEquals(1L, jobInstance.getId());
 	}
 
 	@Test
@@ -72,7 +76,7 @@ class ResourcelessJobRepositoryTests {
 		assertNotNull(jobExecution);
 		assertEquals(1L, jobExecution.getId());
 		assertEquals(jobName, jobExecution.getJobInstance().getJobName());
-		assertEquals(1L, jobExecution.getJobInstance().getInstanceId());
+		assertEquals(1L, jobExecution.getJobInstance().getId());
 	}
 
 	@Test
@@ -90,7 +94,7 @@ class ResourcelessJobRepositoryTests {
 		assertNotNull(jobExecution);
 		assertEquals(1L, jobExecution.getId());
 		assertEquals(jobName, jobExecution.getJobInstance().getJobName());
-		assertEquals(1L, jobExecution.getJobInstance().getInstanceId());
+		assertEquals(1L, jobExecution.getJobInstance().getId());
 	}
 
 	@Test
@@ -194,7 +198,7 @@ class ResourcelessJobRepositoryTests {
 		// then
 		assertNotNull(jobInstance);
 		assertEquals(jobName, jobInstance.getJobName());
-		assertEquals(1L, jobInstance.getInstanceId());
+		assertEquals(1L, jobInstance.getId());
 	}
 
 	@Test
@@ -245,6 +249,34 @@ class ResourcelessJobRepositoryTests {
 
 		// when
 		long count = jobRepository.getJobInstanceCount(jobName);
+
+		// then
+		assertEquals(1L, count);
+	}
+
+	@Test
+	void countJobInstancesWithUnknownJobName() {
+		// given
+		String jobName = "job";
+		JobParameters jobParameters = new JobParameters();
+		jobRepository.createJobInstance(jobName, jobParameters);
+
+		// when
+		long count = jobRepository.countJobInstances("differentJob");
+
+		// then
+		assertEquals(0L, count);
+	}
+
+	@Test
+	void countJobInstancesWithCorrectJobName() {
+		// given
+		String jobName = "job";
+		JobParameters jobParameters = new JobParameters();
+		jobRepository.createJobInstance(jobName, jobParameters);
+
+		// when
+		long count = jobRepository.countJobInstances(jobName);
 
 		// then
 		assertEquals(1L, count);
@@ -445,6 +477,81 @@ class ResourcelessJobRepositoryTests {
 
 		// then
 		assertEquals(jobExecution, jobRepository.getJobExecution(jobExecution.getId()));
+	}
+
+	@Test
+	void countStepExecutionsForUnknownStepName() {
+		// given
+		String jobName = "job";
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = jobRepository.createJobInstance(jobName, jobParameters);
+		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
+				new ExecutionContext());
+		jobRepository.createStepExecution("step", jobExecution);
+
+		// when
+		long count = jobRepository.countStepExecutions(jobInstance, "unknownStep");
+
+		// then
+		assertEquals(0L, count);
+	}
+
+	@Test
+	void countRunningStepExecutions() {
+		// given
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = jobRepository.createJobInstance("job", jobParameters);
+		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
+				new ExecutionContext());
+		StepExecution running = jobRepository.createStepExecution("running", jobExecution);
+		StepExecution completed = jobRepository.createStepExecution("completed", jobExecution);
+		completed.setStatus(BatchStatus.COMPLETED);
+		StepExecution other = jobRepository.createStepExecution("other", jobExecution);
+
+		// when
+		long count = jobRepository.countRunningStepExecutions(List.of(running.getId(), completed.getId()));
+
+		// then
+		assertEquals(1L, count);
+		assertEquals(0L, jobRepository.countRunningStepExecutions(List.of(completed.getId())));
+		assertEquals(1L, jobRepository.countRunningStepExecutions(List.of(other.getId())));
+	}
+
+	@Test
+	void countStepExecutionsForKnownStepName() {
+		// given
+		String jobName = "job";
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = jobRepository.createJobInstance(jobName, jobParameters);
+		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
+				new ExecutionContext());
+		jobRepository.createStepExecution("step", jobExecution);
+
+		// when
+		long count = jobRepository.countStepExecutions(jobInstance, "step");
+
+		// then
+		assertEquals(1L, count);
+	}
+
+	@Test
+	void createStepExecutionWithExecutionContext() {
+		// given
+		String jobName = "job";
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = jobRepository.createJobInstance(jobName, jobParameters);
+		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
+				new ExecutionContext());
+		ExecutionContext stepExecutionContext = new ExecutionContext();
+		stepExecutionContext.put("key", "value");
+		long stepExecutionId = jobRepository.createStepExecution("step", jobExecution, stepExecutionContext).getId();
+
+		// when
+		StepExecution stepExecution = jobRepository.getStepExecution(stepExecutionId);
+
+		// then
+		assertNotNull(stepExecution);
+		assertEquals("value", stepExecution.getExecutionContext().get("key"));
 	}
 
 }

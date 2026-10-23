@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -96,6 +96,28 @@ public class SystemCommandTasklet implements StepExecutionListener, StoppableTas
 	private boolean stoppable = false;
 
 	/**
+	 * Create a new {@link SystemCommandTasklet}. Note that the timeout is also required
+	 * and must be set with {@link #setTimeout(long)}.
+	 * @param command the command to execute, as the program followed by its arguments
+	 * @since 6.1
+	 * @see #setCommand(String...)
+	 */
+	public SystemCommandTasklet(String... command) {
+		Assert.isTrue(!ObjectUtils.isEmpty(command) && StringUtils.hasText(command[0]),
+				"command is required with at least 1 element");
+		this.cmdArray = command;
+	}
+
+	/**
+	 * Create a new {@link SystemCommandTasklet}.
+	 * @deprecated since 6.1 for removal in 7.0. Use
+	 * {@link #SystemCommandTasklet(String...)} instead.
+	 */
+	@Deprecated(since = "6.1", forRemoval = true)
+	public SystemCommandTasklet() {
+	}
+
+	/**
 	 * Execute system command and map its exit code to {@link ExitStatus} using
 	 * {@link SystemProcessExitCodeMapper}.
 	 */
@@ -116,7 +138,7 @@ public class SystemCommandTasklet implements StepExecutionListener, StoppableTas
 
 			if (stoppable) {
 				JobExecution jobExecution = jobRepository
-					.getJobExecution(chunkContext.getStepContext().getStepExecution().getJobExecutionId());
+					.getJobExecution(chunkContext.getStepContext().getStepExecution().getJobExecution().getId());
 
 				if (jobExecution.isStopping()) {
 					stopped = true;

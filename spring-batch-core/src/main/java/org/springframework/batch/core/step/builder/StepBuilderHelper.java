@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,6 +83,16 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 		this.properties = new CommonStepProperties(parent.properties);
 	}
 
+	/**
+	 * Sets the observation registry for the step. If not set, the
+	 * {@link ObservationRegistry} bean of the application context is used if there is one
+	 * (see
+	 * {@link org.springframework.batch.core.configuration.annotation.BatchObservabilityBeanPostProcessor}),
+	 * and {@link ObservationRegistry#NOOP} otherwise. Use
+	 * {@link ObservationRegistry#NOOP} to explicitly disable observations for this step.
+	 * @param observationRegistry the observation registry (optional)
+	 * @return this to enable fluent chaining
+	 */
 	public B observationRegistry(ObservationRegistry observationRegistry) {
 		properties.observationRegistry = observationRegistry;
 		return self();
@@ -169,7 +179,7 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 
 		private JobRepository jobRepository;
 
-		private ObservationRegistry observationRegistry = ObservationRegistry.NOOP;
+		private ObservationRegistry observationRegistry;
 
 		public CommonStepProperties() {
 		}

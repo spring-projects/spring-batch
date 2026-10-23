@@ -23,15 +23,18 @@ import org.jspecify.annotations.NullUnmarked;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.launch.JobRestartException;
-import org.springframework.batch.core.step.NoSuchStepException;
+import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
+
+import static org.springframework.batch.core.BatchConstants.BATCH_EXECUTED;
 
 /**
  * Implementation of {@link StepHandler} that manages repository and restart concerns.
  *
  * @author Dave Syer
+ * @author Yanming Zhou
  *
  */
 @NullUnmarked
@@ -90,6 +93,13 @@ public class SimpleStepHandler implements StepHandler {
 			throw new JobInterruptedException("JobExecution interrupted.");
 		}
 
+		if (step.getName() == null && step instanceof AbstractStep abstractStep) {
+			// The step is not a Spring bean (its name was never set explicitly nor
+			// derived from a bean name), so fall back to the Step contract's default:
+			// the fully qualified class name (see Step#getName()).
+			abstractStep.setName(step.getClass().getName());
+		}
+
 		JobInstance jobInstance = execution.getJobInstance();
 
 		StepExecution lastStepExecution = jobRepository.getLastStepExecution(jobInstance, step.getName());
@@ -108,25 +118,25 @@ public class SimpleStepHandler implements StepHandler {
 
 		if (shouldStart(lastStepExecution, execution, step)) {
 
-			currentStepExecution = jobRepository.createStepExecution(step.getName(), execution);
+			ExecutionContext stepExecutionContext;
 
 			boolean isRestart = (lastStepExecution != null
 					&& !lastStepExecution.getStatus().equals(BatchStatus.COMPLETED));
 
 			if (isRestart) {
-				currentStepExecution.setExecutionContext(lastStepExecution.getExecutionContext());
+				stepExecutionContext = new ExecutionContext(lastStepExecution.getExecutionContext());
 
-				if (lastStepExecution.getExecutionContext().containsKey("batch.executed")) {
-					currentStepExecution.getExecutionContext().remove("batch.executed");
+				if (stepExecutionContext.containsKey(BATCH_EXECUTED)) {
+					stepExecutionContext.remove(BATCH_EXECUTED);
 				}
 			}
 			else {
-				currentStepExecution.setExecutionContext(new ExecutionContext(executionContext));
+				stepExecutionContext = new ExecutionContext(executionContext);
 			}
-
+			currentStepExecution = jobRepository.createStepExecution(step.getName(), execution, stepExecutionContext);
 			try {
 				step.execute(currentStepExecution);
-				currentStepExecution.getExecutionContext().put("batch.executed", true);
+				currentStepExecution.getExecutionContext().put(BATCH_EXECUTED, true);
 			}
 			catch (JobInterruptedException e) {
 				// Ensure that the job gets the message that it is stopping
@@ -157,7 +167,7 @@ public class SimpleStepHandler implements StepHandler {
 	 * @return true if the {@link StepExecution} is part of the {@link JobExecution}
 	 */
 	private boolean stepExecutionPartOfExistingJobExecution(JobExecution jobExecution, StepExecution stepExecution) {
-		return stepExecution != null && stepExecution.getJobExecutionId() == jobExecution.getId();
+		return stepExecution != null && stepExecution.getJobExecution().getId() == jobExecution.getId();
 	}
 
 	/**
@@ -200,13 +210,7 @@ public class SimpleStepHandler implements StepHandler {
 		}
 
 		JobInstance jobInstance = jobExecution.getJobInstance();
-		long stepExecutionCount = 0;
-		try {
-			stepExecutionCount = jobRepository.getStepExecutionCount(jobInstance, step.getName());
-		}
-		catch (NoSuchStepException e) {
-			throw new JobRestartException("Unable to count step executions for job instance " + jobInstance.getId(), e);
-		}
+		long stepExecutionCount = jobRepository.countStepExecutions(jobInstance, step.getName());
 		if (stepExecutionCount < step.getStartLimit()) {
 			// step start count is less than start max, return true
 			return true;

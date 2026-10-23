@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.repository;
 
+import org.springframework.batch.infrastructure.support.DatabaseType;
 import javax.sql.DataSource;
 
 import org.junit.jupiter.api.Test;
@@ -106,8 +107,8 @@ public class JacksonExecutionContextStringSerializerIntegrationTests {
 
 		@Bean
 		public DataSource dataSource() {
-			return new EmbeddedDatabaseBuilder().addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-				.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
+			return new EmbeddedDatabaseBuilder().addScript(DatabaseType.HSQL.getProductSchemaDrop())
+				.addScript(DatabaseType.HSQL.getProductSchema())
 				.generateUniqueName(true)
 				.build();
 		}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,9 @@ import io.micrometer.observation.ObservationRegistry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jspecify.annotations.NullUnmarked;
+import org.jspecify.annotations.Nullable;
 
+import org.springframework.batch.core.BatchConstants;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.parameters.DefaultJobParametersValidator;
@@ -79,11 +81,13 @@ public abstract class AbstractJob implements Job, ListableStepLocator, BeanNameA
 
 	private StepHandler stepHandler;
 
-	private ObservationRegistry observationRegistry;
+	private @Nullable ObservationRegistry observationRegistry;
 
 	/**
 	 * Default constructor.
+	 * @deprecated since 6.0 for removal in 7.0. Use {@link #AbstractJob(String)} instead.
 	 */
+	@Deprecated(since = "6.0", forRemoval = true)
 	public AbstractJob() {
 		super();
 	}
@@ -114,10 +118,6 @@ public abstract class AbstractJob implements Job, ListableStepLocator, BeanNameA
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(jobRepository != null, "JobRepository must be set");
-		if (this.observationRegistry == null) {
-			logger.debug("No ObservationRegistry has been set, defaulting to ObservationRegistry NOOP");
-			this.observationRegistry = ObservationRegistry.NOOP;
-		}
 	}
 
 	/**
@@ -262,7 +262,7 @@ public abstract class AbstractJob implements Job, ListableStepLocator, BeanNameA
 	public final void execute(JobExecution execution) throws JobInterruptedException {
 
 		Assert.notNull(execution, "jobExecution must not be null");
-		execution.getExecutionContext().put(SpringBatchVersion.BATCH_VERSION_KEY, SpringBatchVersion.getVersion());
+		execution.getExecutionContext().put(BatchConstants.BATCH_VERSION, SpringBatchVersion.getVersion());
 
 		if (logger.isDebugEnabled()) {
 			logger.debug("Job execution starting: " + execution);
@@ -420,7 +420,28 @@ public abstract class AbstractJob implements Job, ListableStepLocator, BeanNameA
 		jobRepository.update(jobExecution);
 	}
 
+	/**
+	 * Return the observation registry configured on this job, or {@code null} if none has
+	 * been set, in which case no observations are created unless a registry is provided
+	 * by the application context (see
+	 * {@link org.springframework.batch.core.configuration.annotation.BatchObservabilityBeanPostProcessor}).
+	 * @return the observation registry, or {@code null} if none has been set
+	 * @since 6.1
+	 */
+	public @Nullable ObservationRegistry getObservationRegistry() {
+		return this.observationRegistry;
+	}
+
+	/**
+	 * Set the observation registry to use for observations. If not set, no observations
+	 * are created unless a registry is provided by the application context (see
+	 * {@link org.springframework.batch.core.configuration.annotation.BatchObservabilityBeanPostProcessor}).
+	 * Use {@link ObservationRegistry#NOOP} to explicitly disable observations for this
+	 * job.
+	 * @param observationRegistry the observation registry, must not be {@code null}
+	 */
 	public void setObservationRegistry(ObservationRegistry observationRegistry) {
+		Assert.notNull(observationRegistry, "ObservationRegistry must not be null");
 		this.observationRegistry = observationRegistry;
 	}
 

@@ -27,7 +27,6 @@ import org.springframework.batch.infrastructure.item.avro.AvroItemReader;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
 
 /**
  * A builder implementation for the {@link AvroItemReader}.
@@ -123,8 +122,9 @@ public class AvroItemReaderBuilder<T> {
 	}
 
 	/**
-	 * The name used to calculate the key within the {@link ExecutionContext}. Required if
-	 * {@link #saveState(boolean)} is set to true.
+	 * The name used to calculate the key within the {@link ExecutionContext}. Defaults to
+	 * the bean name, or to the short class name if this instance is not a bean. Set it
+	 * explicitly to disambiguate several non-bean instances of the same type in a step.
 	 * @param name name of the reader instance
 	 * @return The current instance of the builder.
 	 * @see ItemStreamSupport#setName(String)
@@ -175,10 +175,6 @@ public class AvroItemReaderBuilder<T> {
 		}
 
 		avroItemReader.setSaveState(this.saveState);
-
-		if (this.saveState) {
-			Assert.state(StringUtils.hasText(this.name), "A name is required when saveState is set to true.");
-		}
 
 		avroItemReader.setName(this.name);
 		avroItemReader.setCurrentItemCount(this.currentItemCount);

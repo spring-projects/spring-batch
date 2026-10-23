@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2025 the original author or authors.
+ * Copyright 2019-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -97,7 +97,10 @@ public class KafkaItemWriter<K, T> extends KeyValueItemWriter<K, T> {
 	/**
 	 * Set the {@link KafkaTemplate} to use.
 	 * @param kafkaTemplate to use
+	 * @deprecated since 6.1 in favor of passing the kafka template to the constructor.
+	 * Scheduled for removal in 7.0.
 	 */
+	@Deprecated(since = "6.1", forRemoval = true)
 	public void setKafkaTemplate(KafkaTemplate<K, T> kafkaTemplate) {
 		this.kafkaTemplate = kafkaTemplate;
 	}

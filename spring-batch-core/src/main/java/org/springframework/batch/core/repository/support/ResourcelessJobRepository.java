@@ -16,6 +16,7 @@
 package org.springframework.batch.core.repository.support;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -162,12 +163,25 @@ public class ResourcelessJobRepository implements JobRepository {
 		return false;
 	}
 
+	/**
+	 * @deprecated since 6.1 in favor of {@link #countJobInstances(String)}. Scheduled for
+	 * removal in 7.0.
+	 */
+	@Deprecated(since = "6.1", forRemoval = true)
 	@Override
 	public long getJobInstanceCount(String jobName) throws NoSuchJobException {
 		if (!getJobNames().contains(jobName)) {
 			throw new NoSuchJobException("No job instances were found for job name " + jobName);
 		}
-		return 1;
+		return countJobInstances(jobName);
+	}
+
+	/**
+	 * @since 6.1
+	 */
+	@Override
+	public long countJobInstances(String jobName) {
+		return getJobNames().contains(jobName) ? 1 : 0;
 	}
 
 	@Override
@@ -265,11 +279,20 @@ public class ResourcelessJobRepository implements JobRepository {
 
 	@Override
 	public StepExecution createStepExecution(String stepName, JobExecution jobExecution) {
+		return createStepExecution(stepName, jobExecution, new ExecutionContext());
+	}
+
+	@Override
+	public StepExecution createStepExecution(String stepName, JobExecution jobExecution,
+			ExecutionContext stepExecutionContext) {
 		StepExecution stepExecution = new StepExecution(++stepExecutionIdIncrementer, stepName, jobExecution);
 		stepExecution.setStartTime(LocalDateTime.now());
 		stepExecution.setStatus(BatchStatus.STARTING);
 		stepExecution.setLastUpdated(LocalDateTime.now());
 		stepExecution.incrementVersion();
+		if (!stepExecutionContext.isEmpty()) {
+			stepExecution.setExecutionContext(new ExecutionContext(stepExecutionContext));
+		}
 		jobExecution.addStepExecution(stepExecution);
 		return stepExecution;
 	}
@@ -317,8 +340,21 @@ public class ResourcelessJobRepository implements JobRepository {
 			.orElse(null);
 	}
 
+	/**
+	 * @deprecated since 6.1 in favor of
+	 * {@link #countStepExecutions(JobInstance, String)}. Scheduled for removal in 7.0.
+	 */
+	@Deprecated(since = "6.1", forRemoval = true)
 	@Override
 	public long getStepExecutionCount(JobInstance jobInstance, String stepName) {
+		return countStepExecutions(jobInstance, stepName);
+	}
+
+	/**
+	 * @since 6.1
+	 */
+	@Override
+	public long countStepExecutions(JobInstance jobInstance, String stepName) {
 		if (this.jobExecution == null || !(this.jobExecution.getJobInstance().getId() == jobInstance.getId())) {
 			throw new IllegalStateException(
 					"The job instance passed as a parameter is not recognized by this job repository");
@@ -326,6 +362,21 @@ public class ResourcelessJobRepository implements JobRepository {
 		return this.jobExecution.getStepExecutions()
 			.stream()
 			.filter(stepExecution -> stepExecution.getStepName().equals(stepName))
+			.count();
+	}
+
+	/**
+	 * @since 6.1
+	 */
+	@Override
+	public long countRunningStepExecutions(Collection<Long> stepExecutionIds) {
+		if (this.jobExecution == null) {
+			return 0;
+		}
+		return this.jobExecution.getStepExecutions()
+			.stream()
+			.filter(stepExecution -> stepExecutionIds.contains(stepExecution.getId()))
+			.filter(stepExecution -> stepExecution.getStatus().isRunning())
 			.count();
 	}
 

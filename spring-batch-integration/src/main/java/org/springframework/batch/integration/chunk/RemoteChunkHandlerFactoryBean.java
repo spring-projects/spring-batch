@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,9 +49,12 @@ import org.springframework.util.ReflectionUtils;
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
+ * @deprecated since 6.0 with no replacement, as it is only used by the deprecated
+ * batch-integration XML namespace. Scheduled for removal in 7.0.
  *
  */
 @NullUnmarked
+@Deprecated(since = "6.0", forRemoval = true)
 public class RemoteChunkHandlerFactoryBean<T> implements FactoryBean<ChunkRequestHandler<T>> {
 
 	private static final Log logger = LogFactory.getLog(RemoteChunkHandlerFactoryBean.class);
@@ -98,16 +101,6 @@ public class RemoteChunkHandlerFactoryBean<T> implements FactoryBean<ChunkReques
 	@Override
 	public Class<?> getObjectType() {
 		return ChunkRequestHandler.class;
-	}
-
-	/**
-	 * Optimization for the bean factory (always returns true).
-	 *
-	 * @see FactoryBean#isSingleton()
-	 */
-	@Override
-	public boolean isSingleton() {
-		return true;
 	}
 
 	/**

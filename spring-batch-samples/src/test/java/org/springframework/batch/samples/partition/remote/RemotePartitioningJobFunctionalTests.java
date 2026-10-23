@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2025 the original author or authors.
+ * Copyright 2018-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.samples.partition.remote;
 
+import org.springframework.batch.infrastructure.support.DatabaseType;
 import javax.sql.DataSource;
 
 import org.apache.activemq.artemis.core.config.Configuration;
@@ -76,8 +77,8 @@ public abstract class RemotePartitioningJobFunctionalTests {
 		// FIXME Does not work when importing
 		// org.springframework.batch.samples.common.DataSourceConfiguration?
 		ResourceDatabasePopulator databasePopulator = new ResourceDatabasePopulator();
-		databasePopulator.addScript(new ClassPathResource("/org/springframework/batch/core/schema-drop-hsqldb.sql"));
-		databasePopulator.addScript(new ClassPathResource("/org/springframework/batch/core/schema-hsqldb.sql"));
+		databasePopulator.addScript(new ClassPathResource(DatabaseType.HSQL.getProductSchemaDrop()));
+		databasePopulator.addScript(new ClassPathResource(DatabaseType.HSQL.getProductSchema()));
 		databasePopulator.execute(this.dataSource);
 		this.workerApplicationContext = new AnnotationConfigApplicationContext(getWorkerConfigurationClass());
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,7 +68,10 @@ public class JpaItemWriter<T> implements ItemWriter<T> {
 	/**
 	 * Set the EntityManager to be used internally.
 	 * @param entityManagerFactory the entityManagerFactory to set
+	 * @deprecated since 6.1 in favor of passing the entity manager factory to the
+	 * constructor. Scheduled for removal in 7.0.
 	 */
+	@Deprecated(since = "6.1", forRemoval = true)
 	public void setEntityManagerFactory(EntityManagerFactory entityManagerFactory) {
 		this.entityManagerFactory = entityManagerFactory;
 	}

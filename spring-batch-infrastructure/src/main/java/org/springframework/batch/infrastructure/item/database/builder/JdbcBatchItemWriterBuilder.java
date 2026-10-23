@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2025 the original author or authors.
+ * Copyright 2016-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -139,25 +139,25 @@ public class JdbcBatchItemWriterBuilder<T> {
 	 * <p>
 	 * NOTE: The item type for this {@link ItemWriter} must be castable to
 	 * <code>Map&lt;String,Object&gt;&gt;</code>.
-	 * @return The current instance of the builder for chaining
+	 * @return A stage that prevents calling beanMapped()
 	 * @see ColumnMapItemPreparedStatementSetter
 	 */
-	public JdbcBatchItemWriterBuilder<T> columnMapped() {
+	public ColumnMappedStage<T> columnMapped() {
 		this.mapped = this.mapped.setBit(0);
 
-		return this;
+		return new ColumnMappedStageImpl<>(this);
 	}
 
 	/**
 	 * Creates a {@link BeanPropertyItemSqlParameterSourceProvider} to be used as your
 	 * {@link ItemSqlParameterSourceProvider}.
-	 * @return The current instance of the builder for chaining
+	 * @return A stage that prevents calling columnMapped()
 	 * @see BeanPropertyItemSqlParameterSourceProvider
 	 */
-	public JdbcBatchItemWriterBuilder<T> beanMapped() {
+	public BeanMappedStage<T> beanMapped() {
 		this.mapped = this.mapped.setBit(1);
 
-		return this;
+		return new BeanMappedStageImpl<>(this);
 	}
 
 	/**
@@ -202,6 +202,256 @@ public class JdbcBatchItemWriterBuilder<T> {
 		writer.afterPropertiesSet();
 
 		return writer;
+	}
+
+	/**
+	 * Stage reached once {@link #columnMapped()} has been called. It exposes the common
+	 * configuration methods of {@link JdbcBatchItemWriterBuilder}, but not
+	 * {@link #beanMapped()}, preventing an item from being mapped both via db column and
+	 * via bean spec on the same builder instance.
+	 *
+	 * @param <T> the type of the item to write
+	 * @since 6.1
+	 */
+	public interface ColumnMappedStage<T> {
+
+		/**
+		 * Configure the {@link DataSource} to be used.
+		 * @param dataSource the DataSource
+		 * @return The current instance of the stage.
+		 * @see JdbcBatchItemWriter#setDataSource(DataSource)
+		 */
+		ColumnMappedStage<T> dataSource(DataSource dataSource);
+
+		/**
+		 * If set to true, confirms that every insert results in the update of at least
+		 * one row in the database. Defaults to true.
+		 * @param assertUpdates boolean indicator
+		 * @return The current instance of the stage.
+		 * @see JdbcBatchItemWriter#setAssertUpdates(boolean)
+		 */
+		ColumnMappedStage<T> assertUpdates(boolean assertUpdates);
+
+		/**
+		 * Set the SQL statement to be used for each item's updates. This is a required
+		 * field.
+		 * @param sql SQL string
+		 * @return The current instance of the stage.
+		 * @see JdbcBatchItemWriter#setSql(String)
+		 */
+		ColumnMappedStage<T> sql(String sql);
+
+		/**
+		 * Configures a {@link ItemPreparedStatementSetter} for use by the writer.
+		 * @param itemPreparedStatementSetter The {@link ItemPreparedStatementSetter}
+		 * @return The current instance of the stage.
+		 * @see JdbcBatchItemWriter#setItemPreparedStatementSetter(ItemPreparedStatementSetter)
+		 */
+		ColumnMappedStage<T> itemPreparedStatementSetter(ItemPreparedStatementSetter<T> itemPreparedStatementSetter);
+
+		/**
+		 * Configures a {@link ItemSqlParameterSourceProvider} for use by the writer.
+		 * @param itemSqlParameterSourceProvider The
+		 * {@link ItemSqlParameterSourceProvider}
+		 * @return The current instance of the stage.
+		 * @see JdbcBatchItemWriter#setItemSqlParameterSourceProvider(ItemSqlParameterSourceProvider)
+		 */
+		ColumnMappedStage<T> itemSqlParameterSourceProvider(
+				ItemSqlParameterSourceProvider<T> itemSqlParameterSourceProvider);
+
+		/**
+		 * The {@link NamedParameterJdbcOperations} instance to use. If one isn't
+		 * provided, a {@link DataSource} is required.
+		 * @param namedParameterJdbcOperations The template
+		 * @return The current instance of the stage.
+		 */
+		ColumnMappedStage<T> namedParametersJdbcTemplate(NamedParameterJdbcOperations namedParameterJdbcOperations);
+
+		/**
+		 * Validates configuration and builds the {@link JdbcBatchItemWriter}.
+		 * @return a {@link JdbcBatchItemWriter}
+		 */
+		JdbcBatchItemWriter<T> build();
+
+	}
+
+	/**
+	 * Stage reached once {@link #beanMapped()} has been called. It exposes the common
+	 * configuration methods of {@link JdbcBatchItemWriterBuilder}, but not
+	 * {@link #columnMapped()}, preventing an item from being mapped both via db column
+	 * and via bean spec on the same builder instance.
+	 *
+	 * @param <T> the type of the item to write
+	 * @since 6.1
+	 */
+	public interface BeanMappedStage<T> {
+
+		/**
+		 * Configure the {@link DataSource} to be used.
+		 * @param dataSource the DataSource
+		 * @return The current instance of the stage.
+		 * @see JdbcBatchItemWriter#setDataSource(DataSource)
+		 */
+		BeanMappedStage<T> dataSource(DataSource dataSource);
+
+		/**
+		 * If set to true, confirms that every insert results in the update of at least
+		 * one row in the database. Defaults to true.
+		 * @param assertUpdates boolean indicator
+		 * @return The current instance of the stage.
+		 * @see JdbcBatchItemWriter#setAssertUpdates(boolean)
+		 */
+		BeanMappedStage<T> assertUpdates(boolean assertUpdates);
+
+		/**
+		 * Set the SQL statement to be used for each item's updates. This is a required
+		 * field.
+		 * @param sql SQL string
+		 * @return The current instance of the stage.
+		 * @see JdbcBatchItemWriter#setSql(String)
+		 */
+		BeanMappedStage<T> sql(String sql);
+
+		/**
+		 * Configures a {@link ItemPreparedStatementSetter} for use by the writer.
+		 * @param itemPreparedStatementSetter The {@link ItemPreparedStatementSetter}
+		 * @return The current instance of the stage.
+		 * @see JdbcBatchItemWriter#setItemPreparedStatementSetter(ItemPreparedStatementSetter)
+		 */
+		BeanMappedStage<T> itemPreparedStatementSetter(ItemPreparedStatementSetter<T> itemPreparedStatementSetter);
+
+		/**
+		 * Configures a {@link ItemSqlParameterSourceProvider} for use by the writer.
+		 * @param itemSqlParameterSourceProvider The
+		 * {@link ItemSqlParameterSourceProvider}
+		 * @return The current instance of the stage.
+		 * @see JdbcBatchItemWriter#setItemSqlParameterSourceProvider(ItemSqlParameterSourceProvider)
+		 */
+		BeanMappedStage<T> itemSqlParameterSourceProvider(
+				ItemSqlParameterSourceProvider<T> itemSqlParameterSourceProvider);
+
+		/**
+		 * The {@link NamedParameterJdbcOperations} instance to use. If one isn't
+		 * provided, a {@link DataSource} is required.
+		 * @param namedParameterJdbcOperations The template
+		 * @return The current instance of the stage.
+		 */
+		BeanMappedStage<T> namedParametersJdbcTemplate(NamedParameterJdbcOperations namedParameterJdbcOperations);
+
+		/**
+		 * Validates configuration and builds the {@link JdbcBatchItemWriter}.
+		 * @return a {@link JdbcBatchItemWriter}
+		 */
+		JdbcBatchItemWriter<T> build();
+
+	}
+
+	private static class ColumnMappedStageImpl<T> implements ColumnMappedStage<T> {
+
+		private final JdbcBatchItemWriterBuilder<T> parent;
+
+		private ColumnMappedStageImpl(JdbcBatchItemWriterBuilder<T> parent) {
+			this.parent = parent;
+		}
+
+		@Override
+		public ColumnMappedStage<T> dataSource(DataSource dataSource) {
+			this.parent.dataSource(dataSource);
+			return this;
+		}
+
+		@Override
+		public ColumnMappedStage<T> assertUpdates(boolean assertUpdates) {
+			this.parent.assertUpdates(assertUpdates);
+			return this;
+		}
+
+		@Override
+		public ColumnMappedStage<T> sql(String sql) {
+			this.parent.sql(sql);
+			return this;
+		}
+
+		@Override
+		public ColumnMappedStage<T> itemPreparedStatementSetter(
+				ItemPreparedStatementSetter<T> itemPreparedStatementSetter) {
+			this.parent.itemPreparedStatementSetter(itemPreparedStatementSetter);
+			return this;
+		}
+
+		@Override
+		public ColumnMappedStage<T> itemSqlParameterSourceProvider(
+				ItemSqlParameterSourceProvider<T> itemSqlParameterSourceProvider) {
+			this.parent.itemSqlParameterSourceProvider(itemSqlParameterSourceProvider);
+			return this;
+		}
+
+		@Override
+		public ColumnMappedStage<T> namedParametersJdbcTemplate(
+				NamedParameterJdbcOperations namedParameterJdbcOperations) {
+			this.parent.namedParametersJdbcTemplate(namedParameterJdbcOperations);
+			return this;
+		}
+
+		@Override
+		public JdbcBatchItemWriter<T> build() {
+			return this.parent.build();
+		}
+
+	}
+
+	private static class BeanMappedStageImpl<T> implements BeanMappedStage<T> {
+
+		private final JdbcBatchItemWriterBuilder<T> parent;
+
+		private BeanMappedStageImpl(JdbcBatchItemWriterBuilder<T> parent) {
+			this.parent = parent;
+		}
+
+		@Override
+		public BeanMappedStage<T> dataSource(DataSource dataSource) {
+			this.parent.dataSource(dataSource);
+			return this;
+		}
+
+		@Override
+		public BeanMappedStage<T> assertUpdates(boolean assertUpdates) {
+			this.parent.assertUpdates(assertUpdates);
+			return this;
+		}
+
+		@Override
+		public BeanMappedStage<T> sql(String sql) {
+			this.parent.sql(sql);
+			return this;
+		}
+
+		@Override
+		public BeanMappedStage<T> itemPreparedStatementSetter(
+				ItemPreparedStatementSetter<T> itemPreparedStatementSetter) {
+			this.parent.itemPreparedStatementSetter(itemPreparedStatementSetter);
+			return this;
+		}
+
+		@Override
+		public BeanMappedStage<T> itemSqlParameterSourceProvider(
+				ItemSqlParameterSourceProvider<T> itemSqlParameterSourceProvider) {
+			this.parent.itemSqlParameterSourceProvider(itemSqlParameterSourceProvider);
+			return this;
+		}
+
+		@Override
+		public BeanMappedStage<T> namedParametersJdbcTemplate(
+				NamedParameterJdbcOperations namedParameterJdbcOperations) {
+			this.parent.namedParametersJdbcTemplate(namedParameterJdbcOperations);
+			return this;
+		}
+
+		@Override
+		public JdbcBatchItemWriter<T> build() {
+			return this.parent.build();
+		}
+
 	}
 
 }

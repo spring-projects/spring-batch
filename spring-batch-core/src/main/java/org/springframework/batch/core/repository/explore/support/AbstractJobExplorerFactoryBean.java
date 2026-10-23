@@ -142,11 +142,6 @@ public abstract class AbstractJobExplorerFactoryBean implements FactoryBean<JobE
 	}
 
 	@Override
-	public boolean isSingleton() {
-		return true;
-	}
-
-	@Override
 	public JobExplorer getObject() throws Exception {
 		TransactionInterceptor advice = new TransactionInterceptor((TransactionManager) this.transactionManager,
 				this.transactionAttributeSource);

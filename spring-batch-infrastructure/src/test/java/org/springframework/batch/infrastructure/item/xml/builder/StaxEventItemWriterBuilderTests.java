@@ -190,9 +190,19 @@ class StaxEventItemWriterBuilderTests {
 	}
 
 	@Test
-	void testMissingNameValidation() {
+	void testMissingResourceValidation() {
 		var builder = new StaxEventItemWriterBuilder<Foo>().marshaller(new Jaxb2Marshaller());
 		assertThrows(IllegalArgumentException.class, builder::build);
+	}
+
+	@Test
+	void testSaveStateNoName() {
+		StaxEventItemWriter<Foo> writer = new StaxEventItemWriterBuilder<Foo>().marshaller(this.marshaller)
+			.resource(this.resource)
+			.saveState(true)
+			.build();
+
+		assertEquals("StaxEventItemWriter", writer.getName());
 	}
 
 	@Test

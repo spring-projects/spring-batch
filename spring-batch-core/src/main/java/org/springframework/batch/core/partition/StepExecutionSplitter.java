@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,9 +27,18 @@ import java.util.Set;
  * independent from the fabric they are going to run on.
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  * @since 2.0
  */
 public interface StepExecutionSplitter {
+
+	/**
+	 * The separator used to build the name of the {@link StepExecution} of a partition
+	 * from the name of the target step and the partition key, for example
+	 * {@code step1:partition0}.
+	 * @since 6.1
+	 */
+	String STEP_NAME_SEPARATOR = ":";
 
 	/**
 	 * The name of the step configuration that will be executed remotely. Remote workers

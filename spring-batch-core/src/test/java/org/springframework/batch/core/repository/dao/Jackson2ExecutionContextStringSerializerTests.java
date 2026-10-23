@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2023 the original author or authors.
+ * Copyright 2008-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.job.parameters.JobParameter;
@@ -36,6 +37,7 @@ import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -197,8 +199,7 @@ class Jackson2ExecutionContextStringSerializerTests extends AbstractExecutionCon
 
 		// then
 		Object deserializedValue = deserializedContext.get(key);
-		assertTrue(List.class.isAssignableFrom(deserializedValue.getClass()));
-		assertTrue(((List<String>) deserializedValue).containsAll(list));
+		assertThat(deserializedValue).asInstanceOf(InstanceOfAssertFactories.list(String.class)).containsAll(list);
 	}
 
 	@Test

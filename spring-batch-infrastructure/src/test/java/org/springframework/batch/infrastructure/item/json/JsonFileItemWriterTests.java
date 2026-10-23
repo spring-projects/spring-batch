@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 the original author or authors.
+ * Copyright 2018-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@ package org.springframework.batch.infrastructure.item.json;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -122,6 +124,70 @@ class JsonFileItemWriterTests {
 	}
 
 	@Test
+	void appendAllowedWithCustomHeaderAndFooter() throws Exception {
+		JsonFileItemWriter<String> writer = new JsonFileItemWriter<>(this.resource,
+				new JacksonJsonObjectMarshaller<>());
+		writer.setAppendAllowed(true);
+		writer.setHeaderCallback(headerWriter -> headerWriter.write("{\"entries\":["));
+		writer.setFooterCallback(footerWriter -> footerWriter.write("]}"));
+
+		writer.open(new ExecutionContext());
+		writer.close();
+
+		wrappedResourceShouldContain();
+
+		writer.open(new ExecutionContext());
+		writer.write(Chunk.of("foo"));
+		writer.close();
+
+		wrappedResourceShouldContain("foo");
+
+		writer.open(new ExecutionContext());
+		writer.write(Chunk.of("bar"));
+		writer.close();
+
+		wrappedResourceShouldContain("foo", "bar");
+	}
+
+	@Test
+	void appendAllowedWithExistingContentContainingArrayBeforeCustomArray() throws Exception {
+		JsonFileItemWriter<String> writer = new JsonFileItemWriter<>(this.resource,
+				new JacksonJsonObjectMarshaller<>());
+		writer.setAppendAllowed(true);
+		writer.setFooterCallback(footerWriter -> footerWriter.write("]}"));
+
+		Files.writeString(this.resource.getFilePath(), "{\"existing\": [1, 2], \"entries\":[", StandardCharsets.UTF_8);
+
+		writer.open(new ExecutionContext());
+		writer.close();
+
+		writer.open(new ExecutionContext());
+		writer.write(Chunk.of("foo"));
+		writer.close();
+
+		wrappedResourceShouldContain(List.of(1, 2), "foo");
+	}
+
+	@Test
+	void appendAllowedWithCustomFooterContainingArrayStartInString() throws Exception {
+		JsonFileItemWriter<String> writer = new JsonFileItemWriter<>(this.resource,
+				new JacksonJsonObjectMarshaller<>());
+		writer.setAppendAllowed(true);
+		writer.setHeaderCallback(headerWriter -> headerWriter.write("{\"entries\":["));
+		writer.setFooterCallback(footerWriter -> footerWriter.write("],\"status\":\"[pending\"}"));
+
+		writer.open(new ExecutionContext());
+		writer.write(Chunk.of("foo"));
+		writer.close();
+
+		writer.open(new ExecutionContext());
+		writer.write(Chunk.of("bar"));
+		writer.close();
+
+		wrappedResourceShouldContainStatus("[pending", "foo", "bar");
+	}
+
+	@Test
 	void appendNotAllowed() throws Exception {
 		JsonFileItemWriter<String> writer = new JsonFileItemWriter<>(this.resource,
 				new JacksonJsonObjectMarshaller<>());
@@ -158,6 +224,26 @@ class JsonFileItemWriterTests {
 
 	private void resourceShouldContain(String... array) throws Exception {
 		assertArrayEquals(array, new JsonMapper().readValue(this.resource.getContentAsByteArray(), String[].class));
+	}
+
+	@SuppressWarnings("unchecked")
+	private void wrappedResourceShouldContain(String... entries) throws Exception {
+		Map<String, Object> wrapper = new JsonMapper().readValue(this.resource.getContentAsByteArray(), Map.class);
+		assertEquals(List.of(entries), wrapper.get("entries"));
+	}
+
+	@SuppressWarnings("unchecked")
+	private void wrappedResourceShouldContain(List<Integer> existing, String... entries) throws Exception {
+		Map<String, Object> wrapper = new JsonMapper().readValue(this.resource.getContentAsByteArray(), Map.class);
+		assertEquals(existing, wrapper.get("existing"));
+		assertEquals(List.of(entries), wrapper.get("entries"));
+	}
+
+	@SuppressWarnings("unchecked")
+	private void wrappedResourceShouldContainStatus(String status, String... entries) throws Exception {
+		Map<String, Object> wrapper = new JsonMapper().readValue(this.resource.getContentAsByteArray(), Map.class);
+		assertEquals(status, wrapper.get("status"));
+		assertEquals(List.of(entries), wrapper.get("entries"));
 	}
 
 }

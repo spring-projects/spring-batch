@@ -58,3 +58,25 @@ directories until completed successfully.
 NOTE: Input resources are ordered by using `MultiResourceItemReader#setComparator(Comparator)`
  to make sure resource ordering is preserved between job runs in restart scenario.
 
+[[multiFileInputLocationPatterns]]
+== Specifying Resources With a Location Pattern
+
+Since version 6.1, `MultiResourceItemReaderBuilder` can resolve resources directly from
+one or more location patterns, without requiring the resources to be resolved and
+injected beforehand:
+
+[source, java]
+----
+@Bean
+public MultiResourceItemReader multiResourceReader() {
+	return new MultiResourceItemReaderBuilder<Foo>()
+					.delegate(flatFileItemReader())
+					.resources("classpath:data/input/file-*.txt")
+					.build();
+}
+----
+
+Each pattern is resolved with a `PathMatchingResourcePatternResolver`, so any resource
+prefix supported by Spring (`file:`, `classpath:`, `classpath*:`, and so on) can be used,
+in addition to Ant-style wildcards (`*`, `**`, and `?`).
+

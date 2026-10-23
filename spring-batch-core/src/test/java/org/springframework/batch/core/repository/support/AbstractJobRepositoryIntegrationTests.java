@@ -116,6 +116,27 @@ abstract class AbstractJobRepositoryIntegrationTests {
 	}
 
 	/*
+	 * Create a job instance and its first job execution in a single call. Check both are
+	 * persisted and linked.
+	 */
+	@Test
+	void testCreateJobInstanceAndExecution() {
+		JobParameters parameters = new JobParametersBuilder().addString("stringKey", "stringValue").toJobParameters();
+
+		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), parameters);
+
+		assertNotNull(jobExecution.getId());
+		assertEquals(job.getName(), jobExecution.getJobInstance().getJobName());
+		assertEquals(parameters, jobExecution.getJobParameters());
+		JobInstance jobInstance = jobRepository.getJobInstance(job.getName(), parameters);
+		assertNotNull(jobInstance);
+		assertEquals(jobExecution.getJobInstance().getId(), jobInstance.getId());
+		JobExecution lastJobExecution = jobRepository.getLastJobExecution(jobInstance);
+		assertNotNull(lastJobExecution);
+		assertEquals(jobExecution.getId(), lastJobExecution.getId());
+	}
+
+	/*
 	 * Save multiple StepExecutions for the same step and check the returned count and
 	 * last execution are correct.
 	 */
@@ -130,7 +151,7 @@ abstract class AbstractJobRepositoryIntegrationTests {
 		JobExecution firstJobExec = jobRepository.createJobExecution(jobInstance, jobParameters, executionContext);
 		StepExecution firstStepExec = jobRepository.createStepExecution(step.getName(), firstJobExec);
 
-		assertEquals(1, jobRepository.getStepExecutionCount(firstJobExec.getJobInstance(), step.getName()));
+		assertEquals(1, jobRepository.countStepExecutions(firstJobExec.getJobInstance(), step.getName()));
 		assertEquals(firstStepExec, jobRepository.getLastStepExecution(firstJobExec.getJobInstance(), step.getName()));
 
 		// first execution failed
@@ -148,7 +169,7 @@ abstract class AbstractJobRepositoryIntegrationTests {
 		JobExecution secondJobExec = jobRepository.createJobExecution(jobInstance, jobParameters, executionContext);
 		StepExecution secondStepExec = jobRepository.createStepExecution(step.getName(), firstJobExec);
 
-		assertEquals(2, jobRepository.getStepExecutionCount(secondJobExec.getJobInstance(), step.getName()));
+		assertEquals(2, jobRepository.countStepExecutions(secondJobExec.getJobInstance(), step.getName()));
 		assertEquals(secondStepExec,
 				jobRepository.getLastStepExecution(secondJobExec.getJobInstance(), step.getName()));
 	}
@@ -298,6 +319,26 @@ abstract class AbstractJobRepositoryIntegrationTests {
 		assertTrue(ctx.isDirty());
 		jobRepository.updateExecutionContext(stepExec);
 		assertFalse(ctx.isDirty());
+	}
+
+	@Test
+	void createStepExecutionWithExecutionContext() {
+		// given
+		String jobName = "job";
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = jobRepository.createJobInstance(jobName, jobParameters);
+		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
+				new ExecutionContext());
+		ExecutionContext stepExecutionContext = new ExecutionContext();
+		stepExecutionContext.put("key", "value");
+		long stepExecutionId = jobRepository.createStepExecution("step", jobExecution, stepExecutionContext).getId();
+
+		// when
+		StepExecution stepExecution = jobRepository.getStepExecution(stepExecutionId);
+
+		// then
+		assertNotNull(stepExecution);
+		assertEquals("value", stepExecution.getExecutionContext().get("key"));
 	}
 
 }

@@ -61,9 +61,7 @@
 
 	<integration:channel id="requests" />
 	<!-- If we use a direct channel for requests then the replies can come in on a thread-local -->
-	<integration:channel id="replies" scope="thread">
-		<integration:queue />
-	</integration:channel>
+	<integration:channel id="replies" scope="thread" />
 	<integration:service-activator input-channel="requests" output-channel="replies" ref="chunkRequestHandler" />
 
 	<bean id="chunkRequestHandler" class="org.springframework.batch.integration.chunk.RemoteChunkHandlerFactoryBean">

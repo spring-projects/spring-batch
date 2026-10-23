@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,9 @@
  */
 package org.springframework.batch.core.launch.support;
 
+import org.springframework.batch.infrastructure.support.DatabaseType;
+import java.time.LocalDateTime;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,7 +28,9 @@ import org.springframework.batch.core.configuration.support.MapJobRegistry;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.batch.core.job.parameters.InvalidJobParametersException;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.launch.JobExecutionAlreadyRunningException;
@@ -37,6 +42,7 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.StepContribution;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.core.step.tasklet.Tasklet;
+import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.batch.infrastructure.repeat.RepeatStatus;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
@@ -63,8 +69,8 @@ class TaskExecutorJobOperatorTests {
 	@BeforeEach
 	void setUp() throws Exception {
 		EmbeddedDatabase database = new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2)
-			.addScript("/org/springframework/batch/core/schema-drop-h2.sql")
-			.addScript("/org/springframework/batch/core/schema-h2.sql")
+			.addScript(DatabaseType.H2.getProductSchemaDrop())
+			.addScript(DatabaseType.H2.getProductSchema())
 			.build();
 		JdbcTransactionManager transactionManager = new JdbcTransactionManager(database);
 
@@ -125,6 +131,74 @@ class TaskExecutorJobOperatorTests {
 
 		Assertions.assertNotNull(jobExecution);
 		Assertions.assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
+	}
+
+	@Test
+	void testRestartFromUnknownStatusSurfacesRealReason() throws Exception {
+		JobParameters jobParameters = new JobParameters();
+		JobExecution jobExecution = jobOperator.start(job, jobParameters);
+
+		Assertions.assertNotNull(jobExecution);
+		Assertions.assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
+
+		// Simulate an execution that ended in UNKNOWN status.
+		jobExecution.setStatus(BatchStatus.UNKNOWN);
+		jobExecution.setEndTime(LocalDateTime.now());
+		jobRepository.update(jobExecution);
+
+		JobRestartException exception = Assertions.assertThrows(JobRestartException.class,
+				() -> jobOperator.restart(jobExecution));
+
+		Assertions.assertTrue(exception.getMessage().contains("Cannot restart job from UNKNOWN status"),
+				"Expected the UNKNOWN status reason to be surfaced but was: " + exception.getMessage());
+	}
+
+	@Test
+	void testStartWhenLastExecutionIsRunning() {
+		JobParameters jobParameters = new JobParametersBuilder().addString("name", "foo").toJobParameters();
+		JobInstance jobInstance = jobRepository.createJobInstance(job.getName(), jobParameters);
+		// a freshly created execution is in STARTING status, i.e. running
+		jobRepository.createJobExecution(jobInstance, jobParameters, new ExecutionContext());
+
+		Assertions.assertThrows(JobExecutionAlreadyRunningException.class, () -> jobOperator.start(job, jobParameters));
+	}
+
+	@Test
+	void testStartWhenLastExecutionIsComplete() throws Exception {
+		JobParameters jobParameters = new JobParametersBuilder().addString("name", "foo").toJobParameters();
+		JobExecution jobExecution = jobOperator.start(job, jobParameters);
+		Assertions.assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
+
+		Assertions.assertThrows(JobInstanceAlreadyCompleteException.class, () -> jobOperator.start(job, jobParameters));
+	}
+
+	@Test
+	void testRestartAfterSeveralFailedExecutions() throws Exception {
+		Tasklet tasklet = new Tasklet() {
+			int attempts = 0;
+
+			@Override
+			public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+				if (++attempts < 4) {
+					throw new RuntimeException("Planned failure " + attempts);
+				}
+				return RepeatStatus.FINISHED;
+			}
+		};
+		job = new JobBuilder("job", jobRepository)
+			.start(new StepBuilder("step", jobRepository).tasklet(tasklet).build())
+			.build();
+		JobParameters jobParameters = new JobParametersBuilder().addString("name", "foo").toJobParameters();
+
+		// starting the same instance again is a restart
+		JobExecution jobExecution = jobOperator.start(job, jobParameters);
+		for (int i = 0; i < 3; i++) {
+			Assertions.assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
+			jobExecution = jobOperator.start(job, jobParameters);
+		}
+
+		Assertions.assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
+		Assertions.assertEquals(4, jobRepository.getJobExecutions(jobExecution.getJobInstance()).size());
 	}
 
 }

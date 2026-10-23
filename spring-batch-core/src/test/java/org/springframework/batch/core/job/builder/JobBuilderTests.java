@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2025 the original author or authors.
+ * Copyright 2020-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.job.builder;
 
+import org.springframework.batch.infrastructure.support.DatabaseType;
 import javax.sql.DataSource;
 
 import org.junit.jupiter.api.Test;
@@ -83,8 +84,8 @@ class JobBuilderTests {
 
 		@Bean
 		public DataSource dataSource() {
-			return new EmbeddedDatabaseBuilder().addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-				.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
+			return new EmbeddedDatabaseBuilder().addScript(DatabaseType.HSQL.getProductSchemaDrop())
+				.addScript(DatabaseType.HSQL.getProductSchema())
 				.generateUniqueName(true)
 				.build();
 		}

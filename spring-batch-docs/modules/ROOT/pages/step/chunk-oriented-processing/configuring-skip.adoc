@@ -72,3 +72,53 @@ skip triggers the exception, not the tenth.
 The skip limit applies to all skips (read, process and write).
 ====
 
+[[skippingWriteFailures]]
+== Skipping Write Failures and Chunk Scanning
+
+Read and process failures affect a single item, so they can be skipped without discarding
+the rest of the chunk. A write failure is different: the `ItemWriter` receives the whole
+chunk at once, so the framework cannot tell which item caused the failure. When a write
+fails with a skippable exception, the chunk transaction is rolled back and the step enters
+*scan mode*: the items of the failed chunk are re-attempted **one item per transaction**, so
+that only the offending item is skipped and the others are still written.
+
+Giving every scanned item its own transaction matters for writers whose failures poison the
+underlying resource. A `JpaItemWriter` whose `flush()` fails marks the persistence context
+as rollback-only, which would make every subsequent item in the same transaction fail too.
+
+By default, the `ItemProcessor` is *transactional*, which means it is re-invoked for every
+item that is re-attempted during a chunk scan. The output produced in the rolled back
+transaction is discarded. This is the safe default, because the writer may have mutated the
+output item before failing: a JPA entity, for example, keeps the generated id assigned by
+the failed flush, and writing that same instance again fails with an unrelated exception
+that hides the original failure.
+
+If your processor is expensive and its output is safe to write again after a failed,
+rolled back write, you can cache the processor output and re-use it during chunk scanning
+with `processorNonTransactional()`:
+
+[source, java]
+----
+@Bean
+public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+	return new StepBuilder("step1", jobRepository)
+				.<String, String>chunk(10).transactionManager(transactionManager)
+				.reader(itemReader())
+				.processor(expensiveItemProcessor())
+				.writer(itemWriter())
+				.faultTolerant()
+				.processorNonTransactional()
+				.skip(MyBusinessException.class)
+				.skipLimit(10)
+				.build();
+}
+----
+
+[WARNING]
+====
+Do not set `processorNonTransactional()` if the item writer mutates the items it is given.
+Doing so makes the second write attempt operate on a stale item, which typically fails with
+an exception unrelated to the original failure. If that exception is not skippable, the step
+fails instead of skipping the offending item.
+====
+

@@ -87,7 +87,10 @@ public class JsonItemReader<T> extends AbstractItemCountingItemStreamItemReader<
 	 * Set the {@link JsonObjectReader} to use to read and map Json fragments to domain
 	 * objects.
 	 * @param jsonObjectReader the json object reader to use
+	 * @deprecated since 6.1 in favor of passing the json object reader to the
+	 * constructor. Scheduled for removal in 7.0.
 	 */
+	@Deprecated(since = "6.1", forRemoval = true)
 	public void setJsonObjectReader(JsonObjectReader<T> jsonObjectReader) {
 		this.jsonObjectReader = jsonObjectReader;
 	}

@@ -66,8 +66,9 @@ public class MappingLdifReaderBuilder<T> {
 	}
 
 	/**
-	 * The name used to calculate the key within the {@link ExecutionContext}. Required if
-	 * {@link #saveState(boolean)} is set to true.
+	 * The name used to calculate the key within the {@link ExecutionContext}. Defaults to
+	 * the bean name, or to the short class name if this instance is not a bean. Set it
+	 * explicitly to disambiguate several non-bean instances of the same type in a step.
 	 * @param name name of the reader instance
 	 * @return The current instance of the builder.
 	 * @see ItemStreamSupport#setName(String)
@@ -174,9 +175,6 @@ public class MappingLdifReaderBuilder<T> {
 	public MappingLdifReader<T> build() throws Exception {
 		Assert.notNull(this.resource, "Resource is required.");
 		Assert.notNull(this.recordMapper, "RecordMapper is required.");
-		if (this.saveState) {
-			Assert.hasText(this.name, "A name is required when saveState is set to true");
-		}
 		MappingLdifReader<T> reader = new MappingLdifReader<>(this.resource);
 		reader.setRecordsToSkip(this.recordsToSkip);
 		reader.setSaveState(saveState);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2024 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,9 @@ import org.springframework.util.StringUtils;
  * @author Michael Minella
  * @author Henning Pöttker
  * @since 2.0
+ * @deprecated since 6.1.0 with no replacement. Scheduled for removal in 7.0.0.
  */
+@Deprecated(since = "6.1.0", forRemoval = true)
 public class DerbyPagingQueryProvider extends AbstractSqlPagingQueryProvider {
 
 	@Override

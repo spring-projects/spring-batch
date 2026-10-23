@@ -20,7 +20,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.logging.Log;
@@ -39,9 +43,8 @@ import org.springframework.batch.infrastructure.item.ItemStreamException;
 import org.springframework.batch.infrastructure.item.ItemWriter;
 import org.springframework.integration.core.MessagingTemplate;
 import org.springframework.messaging.Message;
-import org.springframework.messaging.PollableChannel;
+import org.springframework.messaging.SubscribableChannel;
 import org.springframework.messaging.support.GenericMessage;
-import org.springframework.util.Assert;
 
 @NullUnmarked
 public class ChunkMessageChannelItemWriter<T>
@@ -65,7 +68,13 @@ public class ChunkMessageChannelItemWriter<T>
 
 	protected int maxWaitTimeouts = DEFAULT_MAX_WAIT_TIMEOUTS;
 
-	protected PollableChannel replyChannel;
+	protected SubscribableChannel replyChannel;
+
+	/**
+	 * Routes replies arriving on {@link #replyChannel} to whichever job instance they
+	 * belong to.
+	 */
+	private ReplyRouter replyRouter;
 
 	/**
 	 * The maximum number of times to wait at the end of a step for a non-null result from
@@ -91,8 +100,18 @@ public class ChunkMessageChannelItemWriter<T>
 		this.messagingGateway = messagingGateway;
 	}
 
-	public void setReplyChannel(PollableChannel replyChannel) {
+	/**
+	 * The channel on which replies from workers are expected. Must be a
+	 * {@link SubscribableChannel} so that this component can demultiplex replies by job
+	 * instance id instead of blindly dequeuing from a shared, FIFO
+	 * {@link org.springframework.messaging.PollableChannel}, which can hand a reply
+	 * belonging to one job instance to a concurrently running job instance sharing this
+	 * writer.
+	 * @param replyChannel the reply channel to set
+	 */
+	public void setReplyChannel(SubscribableChannel replyChannel) {
 		this.replyChannel = replyChannel;
+		this.replyRouter = ReplyRouter.forChannel(replyChannel);
 	}
 
 	@Override
@@ -119,6 +138,10 @@ public class ChunkMessageChannelItemWriter<T>
 	@Override
 	public void beforeStep(StepExecution stepExecution) {
 		localState.setStepExecution(stepExecution);
+		// Ensure a queue exists even if no reply has arrived yet; a queue may already
+		// exist and hold replies to a backlog of requests sent before this step
+		// (re)started.
+		this.replyRouter.queueFor(localState.getJobInstanceId());
 	}
 
 	@Override
@@ -159,6 +182,7 @@ public class ChunkMessageChannelItemWriter<T>
 
 	@Override
 	public void close() throws ItemStreamException {
+		this.replyRouter.forget(localState.getJobInstanceId());
 		localState.reset();
 	}
 
@@ -223,22 +247,23 @@ public class ChunkMessageChannelItemWriter<T>
 	 * gateway), otherwise do nothing.
 	 * @throws AsynchronousFailureException If there is a response and it contains a
 	 * failed chunk response.
-	 * @throws IllegalStateException if the result contains the wrong job instance id
-	 * (maybe we are sharing a channel and we shouldn't be)
 	 */
-	@SuppressWarnings("unchecked")
 	protected void getNextResult() throws AsynchronousFailureException {
-		Message<ChunkResponse> message = (Message<ChunkResponse>) messagingGateway.receive(replyChannel);
+		BlockingQueue<Message<ChunkResponse>> queue = this.replyRouter.queueFor(localState.getJobInstanceId());
+		long receiveTimeout = messagingGateway.getReceiveTimeout();
+		Message<ChunkResponse> message;
+		try {
+			message = receiveTimeout >= 0 ? queue.poll(receiveTimeout, TimeUnit.MILLISECONDS) : queue.take();
+		}
+		catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+			throw new IllegalStateException("Interrupted while waiting for a chunk response", e);
+		}
 		if (message != null) {
 			ChunkResponse payload = message.getPayload();
 			if (logger.isDebugEnabled()) {
 				logger.debug("Found result: " + payload);
 			}
-			Long jobInstanceId = payload.getJobInstanceId();
-			Assert.state(jobInstanceId != null, "Message did not contain job instance id.");
-			Assert.state(jobInstanceId.equals(localState.getJobInstanceId()),
-					"Message contained wrong job instance id [" + jobInstanceId + "] should have been ["
-							+ localState.getJobInstanceId() + "].");
 			if (payload.isRedelivered()) {
 				logger.warn(
 						"Redelivered result detected, which may indicate stale state. In the best case, we just picked up a timed out message "
@@ -335,7 +360,7 @@ public class ChunkMessageChannelItemWriter<T>
 		}
 
 		public Long getJobInstanceId() {
-			return stepExecution.getJobExecution().getJobInstanceId();
+			return stepExecution.getJobExecution().getJobInstance().getId();
 		}
 
 		public void setStepExecution(StepExecution stepExecution) {
@@ -345,6 +370,54 @@ public class ChunkMessageChannelItemWriter<T>
 		public void reset() {
 			expected.set(0);
 			actual.set(0);
+		}
+
+	}
+
+	/**
+	 * Routes chunk responses arriving on a reply channel to whichever job instance they
+	 * belong to. Exactly one router - and therefore exactly one subscriber - is created
+	 * per distinct reply channel, no matter how many
+	 * {@link ChunkMessageChannelItemWriter} instances use that channel over time (for
+	 * example, step-scoped writers created for successive executions): a
+	 * {@link SubscribableChannel} such as
+	 * {@link org.springframework.integration.channel.DirectChannel} dispatches each
+	 * message to a single subscriber rather than broadcasting, so multiple subscribers
+	 * sharing one channel would not just leak, they would also steal each other's
+	 * messages.
+	 */
+	private static final class ReplyRouter {
+
+		private static final ConcurrentMap<SubscribableChannel, ReplyRouter> ROUTERS_BY_CHANNEL = new ConcurrentHashMap<>();
+
+		private final ConcurrentMap<Long, BlockingQueue<Message<ChunkResponse>>> pendingReplies = new ConcurrentHashMap<>();
+
+		private ReplyRouter(SubscribableChannel channel) {
+			channel.subscribe(this::onReply);
+		}
+
+		static ReplyRouter forChannel(SubscribableChannel channel) {
+			return ROUTERS_BY_CHANNEL.computeIfAbsent(channel, ReplyRouter::new);
+		}
+
+		BlockingQueue<Message<ChunkResponse>> queueFor(Long jobInstanceId) {
+			return this.pendingReplies.computeIfAbsent(jobInstanceId, id -> new LinkedBlockingQueue<>());
+		}
+
+		void forget(Long jobInstanceId) {
+			this.pendingReplies.remove(jobInstanceId);
+		}
+
+		@SuppressWarnings("unchecked")
+		private void onReply(Message<?> message) {
+			ChunkResponse payload = (ChunkResponse) message.getPayload();
+			Long jobInstanceId = payload.getJobInstanceId();
+			if (jobInstanceId != null) {
+				queueFor(jobInstanceId).offer((Message<ChunkResponse>) message);
+			}
+			else if (logger.isWarnEnabled()) {
+				logger.warn("Received a chunk response with no job instance id: " + message);
+			}
 		}
 
 	}

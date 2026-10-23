@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2025 the original author or authors.
+ * Copyright 2020-present the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.TimeoutException;
 
 import org.junit.jupiter.api.Test;
@@ -31,10 +32,14 @@ import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.partition.StepExecutionSplitter;
+import org.springframework.integration.IntegrationMessageHeaderAccessor;
 import org.springframework.integration.MessageTimeoutException;
+import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.core.MessagingTemplate;
+import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.Message;
-import org.springframework.messaging.PollableChannel;
+import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.SubscribableChannel;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -42,6 +47,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -72,7 +78,6 @@ class MessageChannelPartitionHandlerTests {
 		assertTrue(executions.isEmpty());
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Test
 	void testHandleNoReply() throws Exception {
 		// execute with no default set
@@ -81,7 +86,6 @@ class MessageChannelPartitionHandlerTests {
 		StepExecution managerStepExecution = mock();
 		StepExecutionSplitter stepExecutionSplitter = mock();
 		MessagingTemplate operations = mock();
-		Message message = mock();
 		// when
 		HashSet<StepExecution> stepExecutions = new HashSet<>();
 		JobInstance jobInstance = new JobInstance(1L, "job");
@@ -89,11 +93,13 @@ class MessageChannelPartitionHandlerTests {
 		StepExecution stepExecution = new StepExecution(1L, "step1", jobExecution);
 		stepExecutions.add(stepExecution);
 		when(stepExecutionSplitter.split(any(StepExecution.class), eq(1))).thenReturn(stepExecutions);
-		when(message.getPayload()).thenReturn(Collections.emptySet());
-		when(operations.receive((PollableChannel) any())).thenReturn(message);
 		when(managerStepExecution.getJobExecution()).thenReturn(jobExecution);
+		doAnswer(invocation -> replyWith(invocation.getArgument(0), Collections.emptySet())).when(operations)
+			.send(any());
 		// set
 		messageChannelPartitionHandler.setMessagingOperations(operations);
+		messageChannelPartitionHandler.setStepName("step1");
+		messageChannelPartitionHandler.afterPropertiesSet();
 
 		// execute
 		Collection<StepExecution> executions = messageChannelPartitionHandler.handle(stepExecutionSplitter,
@@ -103,7 +109,6 @@ class MessageChannelPartitionHandlerTests {
 		assertTrue(executions.isEmpty());
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Test
 	void testHandleWithReplyChannel() throws Exception {
 		// execute with no default set
@@ -112,8 +117,7 @@ class MessageChannelPartitionHandlerTests {
 		StepExecution managerStepExecution = mock();
 		StepExecutionSplitter stepExecutionSplitter = mock();
 		MessagingTemplate operations = mock();
-		Message message = mock();
-		PollableChannel replyChannel = mock();
+		SubscribableChannel replyChannel = new DirectChannel();
 		// when
 		HashSet<StepExecution> stepExecutions = new HashSet<>();
 		JobInstance jobInstance = new JobInstance(1L, "job");
@@ -121,12 +125,14 @@ class MessageChannelPartitionHandlerTests {
 		StepExecution stepExecution = new StepExecution(1L, "step1", jobExecution);
 		stepExecutions.add(stepExecution);
 		when(stepExecutionSplitter.split(any(StepExecution.class), eq(1))).thenReturn(stepExecutions);
-		when(message.getPayload()).thenReturn(Collections.emptySet());
-		when(operations.receive(replyChannel)).thenReturn(message);
 		when(managerStepExecution.getJobExecution()).thenReturn(jobExecution);
+		doAnswer(invocation -> replyWith(invocation.getArgument(0), Collections.emptySet())).when(operations)
+			.send(any());
 		// set
 		messageChannelPartitionHandler.setMessagingOperations(operations);
 		messageChannelPartitionHandler.setReplyChannel(replyChannel);
+		messageChannelPartitionHandler.setStepName("step1");
+		messageChannelPartitionHandler.afterPropertiesSet();
 
 		// execute
 		Collection<StepExecution> executions = messageChannelPartitionHandler.handle(stepExecutionSplitter,
@@ -153,12 +159,25 @@ class MessageChannelPartitionHandlerTests {
 		stepExecutions.add(stepExecution);
 		when(managerStepExecution.getJobExecution()).thenReturn(jobExecution);
 		when(stepExecutionSplitter.split(any(StepExecution.class), eq(1))).thenReturn(stepExecutions);
-		// set
+		// set: no reply is ever sent back, so the handler must time out
 		messageChannelPartitionHandler.setMessagingOperations(operations);
+		messageChannelPartitionHandler.setStepName("step1");
+		messageChannelPartitionHandler.afterPropertiesSet();
 
 		// execute
 		assertThrows(MessageTimeoutException.class,
 				() -> messageChannelPartitionHandler.handle(stepExecutionSplitter, managerStepExecution));
+	}
+
+	/**
+	 * Simulates a worker reply by sending a message with the same correlation id as the
+	 * given request onto the request's reply channel.
+	 */
+	private static Object replyWith(Message<?> request, Object payload) {
+		String correlationId = (String) request.getHeaders().get(IntegrationMessageHeaderAccessor.CORRELATION_ID);
+		MessageChannel replyChannel = (MessageChannel) request.getHeaders().getReplyChannel();
+		replyChannel.send(MessageBuilder.withPayload(payload).setCorrelationId(correlationId).build());
+		return null;
 	}
 
 	@Test
@@ -211,6 +230,82 @@ class MessageChannelPartitionHandlerTests {
 
 		// verify
 		verify(operations, times(3)).send(any(Message.class));
+	}
+
+	@Test
+	void testHandleWithJobRepositoryPollingOnlyCountsRunningStepExecutionsUntilAllAreDone() throws Exception {
+		// given
+		messageChannelPartitionHandler = new MessageChannelPartitionHandler();
+		JobExecution jobExecution = new JobExecution(5L, new JobInstance(1L, "job"), new JobParameters());
+		StepExecution managerStepExecution = new StepExecution(1L, "step1", jobExecution);
+		StepExecutionSplitter stepExecutionSplitter = mock();
+		MessagingTemplate operations = mock();
+		JobRepository jobRepository = mock();
+		StepExecution partition1 = new StepExecution(2L, "step1:partition1", jobExecution);
+		StepExecution partition2 = new StepExecution(3L, "step1:partition2", jobExecution);
+		partition1.setStatus(BatchStatus.COMPLETED);
+		partition2.setStatus(BatchStatus.COMPLETED);
+		when(stepExecutionSplitter.split(any(StepExecution.class), eq(1)))
+			.thenReturn(new HashSet<>(Arrays.asList(partition1, partition2)));
+		JobExecution completedJobExecution = new JobExecution(5L, new JobInstance(1L, "job"), new JobParameters());
+		completedJobExecution.addStepExecutions(Arrays.asList(partition1, partition2));
+		when(jobRepository.countRunningStepExecutions(Set.of(2L, 3L))).thenReturn(2L, 1L, 0L);
+		when(jobRepository.getJobExecution(5L)).thenReturn(completedJobExecution);
+
+		messageChannelPartitionHandler.setMessagingOperations(operations);
+		messageChannelPartitionHandler.setJobRepository(jobRepository);
+		messageChannelPartitionHandler.setStepName("step1");
+		messageChannelPartitionHandler.setPollInterval(50L);
+		messageChannelPartitionHandler.afterPropertiesSet();
+
+		// when
+		Collection<StepExecution> executions = messageChannelPartitionHandler.handle(stepExecutionSplitter,
+				managerStepExecution);
+
+		// then: the job execution is loaded only once, when no worker is running anymore
+		assertEquals(Set.of(partition1, partition2), new HashSet<>(executions));
+		verify(jobRepository, times(3)).countRunningStepExecutions(Set.of(2L, 3L));
+		verify(jobRepository, times(1)).getJobExecution(5L);
+	}
+
+	@Test
+	void testHandleWithJobRepositoryPollingFallsBackWhenCountingIsNotSupported() throws Exception {
+		// given
+		messageChannelPartitionHandler = new MessageChannelPartitionHandler();
+		JobExecution jobExecution = new JobExecution(5L, new JobInstance(1L, "job"), new JobParameters());
+		StepExecution managerStepExecution = new StepExecution(1L, "step1", jobExecution);
+		StepExecutionSplitter stepExecutionSplitter = mock();
+		MessagingTemplate operations = mock();
+		JobRepository jobRepository = mock();
+		StepExecution partition1 = new StepExecution(2L, "step1:partition1", jobExecution);
+		StepExecution partition2 = new StepExecution(3L, "step1:partition2", jobExecution);
+		StepExecution runningPartition2 = new StepExecution(3L, "step1:partition2", jobExecution);
+		partition1.setStatus(BatchStatus.COMPLETED);
+		partition2.setStatus(BatchStatus.COMPLETED);
+		runningPartition2.setStatus(BatchStatus.STARTED);
+		when(stepExecutionSplitter.split(any(StepExecution.class), eq(1)))
+			.thenReturn(new HashSet<>(Arrays.asList(partition1, partition2)));
+		JobExecution runningJobExecution = new JobExecution(5L, new JobInstance(1L, "job"), new JobParameters());
+		runningJobExecution.addStepExecutions(Arrays.asList(partition1, runningPartition2));
+		JobExecution completedJobExecution = new JobExecution(5L, new JobInstance(1L, "job"), new JobParameters());
+		completedJobExecution.addStepExecutions(Arrays.asList(partition1, partition2));
+		when(jobRepository.countRunningStepExecutions(any())).thenThrow(new UnsupportedOperationException());
+		when(jobRepository.getJobExecution(5L)).thenReturn(runningJobExecution, completedJobExecution);
+
+		messageChannelPartitionHandler.setMessagingOperations(operations);
+		messageChannelPartitionHandler.setJobRepository(jobRepository);
+		messageChannelPartitionHandler.setStepName("step1");
+		messageChannelPartitionHandler.setPollInterval(50L);
+		messageChannelPartitionHandler.afterPropertiesSet();
+
+		// when
+		Collection<StepExecution> executions = messageChannelPartitionHandler.handle(stepExecutionSplitter,
+				managerStepExecution);
+
+		// then: counting is attempted once, then the job execution is loaded at each poll
+		assertEquals(Set.of(partition1, partition2), new HashSet<>(executions));
+		verify(jobRepository, times(1)).countRunningStepExecutions(any());
+		verify(jobRepository, times(2)).getJobExecution(5L);
 	}
 
 	@Test

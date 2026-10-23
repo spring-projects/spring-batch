@@ -16,6 +16,7 @@
 package org.springframework.batch.infrastructure.item.data;
 
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -56,6 +57,16 @@ import org.springframework.util.StringUtils;
  * NOTE: The {@code RepositoryItemWriter} only stores Java Objects i.e. non primitives.
  * </p>
  *
+ * <p>
+ * If the underlying repository needs to be flushed after writing (for example
+ * {@code JpaRepository}), this can be achieved in one of two ways: if the repository
+ * exposes a single method that both saves and flushes items, such as
+ * {@code JpaRepository#saveAllAndFlush(Iterable)}, that method name can be set with
+ * {@link #setMethodName(java.lang.String)} and it will be invoked once with the whole
+ * chunk. Otherwise, if saving and flushing are separate operations, {@link #flush()} can
+ * be overridden in a subclass to perform the flush after the chunk has been written.
+ * </p>
+ *
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
  * @since 2.2
@@ -64,9 +75,11 @@ public class RepositoryItemWriter<T> implements ItemWriter<T>, InitializingBean 
 
 	protected static final Log logger = LogFactory.getLog(RepositoryItemWriter.class);
 
-	private CrudRepository<T, ?> repository;
+	protected CrudRepository<T, ?> repository;
 
 	private @Nullable String methodName;
+
+	private boolean methodNameAcceptsIterable;
 
 	/**
 	 * Create a new {@link RepositoryItemWriter} instance with the provided repository.
@@ -79,19 +92,26 @@ public class RepositoryItemWriter<T> implements ItemWriter<T>, InitializingBean 
 	}
 
 	/**
-	 * Specifies what method on the repository to call. This method must have the type of
-	 * object passed to this writer as the <em>sole</em> argument.
+	 * Specifies what method on the repository to call. This method must either accept the
+	 * type of object passed to this writer as its <em>sole</em> argument, in which case
+	 * it is invoked once per item, or accept an {@link Iterable} as its <em>sole</em>
+	 * argument (for example {@code saveAll} or {@code saveAllAndFlush}), in which case it
+	 * is invoked once with the whole chunk.
 	 * @param methodName {@link String} containing the method name.
 	 */
 	public void setMethodName(String methodName) {
 		this.methodName = methodName;
+		this.methodNameAcceptsIterable = false;
 	}
 
 	/**
 	 * Set the {@link org.springframework.data.repository.CrudRepository} implementation
-	 * for persistence
+	 * for persistence.
 	 * @param repository the Spring Data repository to be set
+	 * @deprecated since 6.1 in favor of passing the repository to the constructor.
+	 * Scheduled for removal in 7.0.
 	 */
+	@Deprecated(since = "6.1", forRemoval = true)
 	public void setRepository(CrudRepository<T, ?> repository) {
 		this.repository = repository;
 	}
@@ -105,7 +125,19 @@ public class RepositoryItemWriter<T> implements ItemWriter<T>, InitializingBean 
 	public void write(Chunk<? extends T> chunk) throws Exception {
 		if (!chunk.isEmpty()) {
 			doWrite(chunk);
+			flush();
 		}
+	}
+
+	/**
+	 * Flush the repository if necessary. This method is a no-op by default, but can be
+	 * overridden by a subclass to flush the underlying repository when it exposes a
+	 * separate flush operation, rather than a single method that both saves and flushes
+	 * (such as {@code JpaRepository#saveAllAndFlush}, which can be used directly via
+	 * {@link #setMethodName}).
+	 * @since 6.1
+	 */
+	protected void flush() {
 	}
 
 	/**
@@ -124,6 +156,13 @@ public class RepositoryItemWriter<T> implements ItemWriter<T>, InitializingBean 
 			return;
 		}
 
+		if (this.methodNameAcceptsIterable) {
+			MethodInvoker invoker = createMethodInvoker(repository, methodName);
+			invoker.setArguments(items.getItems());
+			doInvoke(invoker);
+			return;
+		}
+
 		MethodInvoker invoker = createMethodInvoker(repository, methodName);
 
 		for (T object : items) {
@@ -133,12 +172,31 @@ public class RepositoryItemWriter<T> implements ItemWriter<T>, InitializingBean 
 	}
 
 	/**
+	 * Determine whether the given method on the repository accepts a single
+	 * {@link Iterable} argument, such as {@code saveAll} or {@code saveAllAndFlush}. Such
+	 * methods are invoked once with the whole chunk, instead of once per item.
+	 * @param methodName the name of the method to look up on the repository
+	 * @return {@code true} if the repository has a single-argument method with that name
+	 * whose parameter type is assignable from {@link Iterable}
+	 */
+	private boolean acceptsIterable(String methodName) {
+		for (Method method : this.repository.getClass().getMethods()) {
+			if (method.getName().equals(methodName) && method.getParameterCount() == 1
+					&& Iterable.class.isAssignableFrom(method.getParameterTypes()[0])) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
 	 * Check mandatory properties - there must be a repository.
 	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		if (this.methodName != null) {
 			Assert.state(StringUtils.hasText(this.methodName), "methodName must not be empty.");
+			this.methodNameAcceptsIterable = acceptsIterable(this.methodName);
 		}
 		else {
 			logger.debug("No method name provided, CrudRepository.saveAll will be used.");

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package org.springframework.batch.core.repository;
 
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
@@ -26,6 +27,7 @@ import org.springframework.batch.core.repository.explore.JobExplorer;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.jspecify.annotations.Nullable;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -45,6 +47,7 @@ import java.util.Set;
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
  * @author Parikshit Dutta
+ * @author Yanming Zhou
  */
 @SuppressWarnings("removal")
 public interface JobRepository extends JobExplorer {
@@ -137,8 +140,26 @@ public interface JobRepository extends JobExplorer {
 	 * repository.
 	 * @throws NoSuchJobException thrown when there is no {@link JobInstance} for the
 	 * jobName specified.
+	 * @deprecated since 6.1 in favor of {@link #countJobInstances(String)}. The job
+	 * repository has no access to the registry of known jobs, so it cannot soundly
+	 * determine whether a job name is unknown as opposed to simply never having been
+	 * persisted yet; validating that a job name is known is a concern of the job operator
+	 * at start/restart time. Scheduled for removal in 7.0.
 	 */
+	@Deprecated(since = "6.1", forRemoval = true)
 	default long getJobInstanceCount(String jobName) throws NoSuchJobException {
+		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 * Query the repository for the number of unique {@link JobInstance} objects
+	 * associated with the supplied job name.
+	 * @param jobName The name of the job for which to query.
+	 * @return the number of {@link JobInstance}s that exist within the associated job
+	 * repository, or {@code 0} if none is found.
+	 * @since 6.1
+	 */
+	default long countJobInstances(String jobName) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -254,8 +275,40 @@ public interface JobRepository extends JobExplorer {
 	 * @param jobInstance {@link JobInstance} instance containing the step executions.
 	 * @param stepName the name of the step execution that might have run.
 	 * @return the execution count of the step within the given job instance.
+	 * @deprecated since 6.1 in favor of
+	 * {@link #countStepExecutions(JobInstance, String)}. The job repository has no access
+	 * to the job's step definitions, so it cannot soundly determine whether a step name
+	 * is unknown as opposed to simply never having run yet for this job instance.
+	 * Scheduled for removal in 7.0.
 	 */
+	@Deprecated(since = "6.1", forRemoval = true)
 	default long getStepExecutionCount(JobInstance jobInstance, String stepName) throws NoSuchStepException {
+		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 * @param jobInstance {@link JobInstance} instance containing the step executions.
+	 * @param stepName the name of the step execution that might have run.
+	 * @return the execution count of the step within the given job instance, or {@code 0}
+	 * if none is found.
+	 * @since 6.1
+	 */
+	default long countStepExecutions(JobInstance jobInstance, String stepName) {
+		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 * Count, among the step executions with the given ids, those that are still running
+	 * (see {@link BatchStatus#isRunning()}). Unlike {@link #getJobExecution(long)}, this
+	 * does not load any step execution (nor its execution context) in memory, which makes
+	 * it suitable for polling the progress of a large number of step executions, such as
+	 * the workers of a partitioned step.
+	 * @param stepExecutionIds the ids of the step executions to check
+	 * @return the number of step executions with one of the given ids that are running,
+	 * or {@code 0} if none is found.
+	 * @since 6.1
+	 */
+	default long countRunningStepExecutions(Collection<Long> stepExecutionIds) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -302,6 +355,26 @@ public interface JobRepository extends JobExplorer {
 	}
 
 	/**
+	 * Create a new {@link JobInstance} for the given job name and {@link JobParameters},
+	 * along with its first {@link JobExecution} (with an empty {@link ExecutionContext}).
+	 * <p>
+	 * The job instance and the job execution (including its parameters and execution
+	 * context) are meant to be created atomically, so that nothing is persisted if any of
+	 * these steps fails. The default implementation creates the job instance and then the
+	 * job execution in the same call, which makes it atomic when this method runs in a
+	 * single transaction, as is the case for job repositories created by the provided
+	 * factory beans (where {@code create*} methods are transactional).
+	 * @param jobName logical name of the job
+	 * @param jobParameters the runtime parameters for the job
+	 * @return the new {@link JobExecution}, associated with the new {@link JobInstance}
+	 * @since 6.1
+	 */
+	default JobExecution createJobExecution(String jobName, JobParameters jobParameters) {
+		JobInstance jobInstance = createJobInstance(jobName, jobParameters);
+		return createJobExecution(jobInstance, jobParameters, new ExecutionContext());
+	}
+
+	/**
 	 * Update the {@link JobExecution} (but not its {@link ExecutionContext}).
 	 * <p>
 	 * Preconditions: {@link JobExecution} must contain a valid {@link JobInstance} and be
@@ -339,6 +412,32 @@ public interface JobRepository extends JobExplorer {
 	 */
 	default StepExecution createStepExecution(String stepName, JobExecution jobExecution) {
 		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 * Create a {@link StepExecution} for a given {@link JobExecution} and step name. The
+	 * {@link JobExecution} must already exist. The returned {@link StepExecution} should
+	 * be associated with the {@link JobExecution} (ie. should be added to the list of
+	 * {@link JobExecution#getStepExecutions()}.
+	 * <p>
+	 * The given {@link ExecutionContext} is associated with the new
+	 * {@link StepExecution}. The default implementation creates the step execution with
+	 * {@link #createStepExecution(String, JobExecution)} and then persists the context
+	 * with {@link #updateExecutionContext(StepExecution)}. Implementations are encouraged
+	 * to override it in order to persist the context along with the step execution.
+	 * @param stepName the name of the step
+	 * @param jobExecution the job execution to which the step execution belongs
+	 * @param stepExecutionContext the execution context of the step execution, must not
+	 * be {@code null} (use an empty context if there is nothing to store)
+	 * @return a valid {@link StepExecution} for the arguments provided
+	 * @since 6.1
+	 */
+	default StepExecution createStepExecution(String stepName, JobExecution jobExecution,
+			ExecutionContext stepExecutionContext) {
+		StepExecution stepExecution = createStepExecution(stepName, jobExecution);
+		stepExecution.setExecutionContext(stepExecutionContext);
+		updateExecutionContext(stepExecution);
+		return stepExecution;
 	}
 
 	/**

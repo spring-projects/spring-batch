@@ -37,7 +37,7 @@ The following example shows how to configuration the `AsyncItemProcessor` in XML
 [source, xml]
 ----
 <bean id="processor"
-    class="org.springframework.batch.integration.async.AsyncItemProcessor">
+    class="org.springframework.batch.core.step.item.AsyncItemProcessor">
   <property name="delegate">
     <bean class="your.ItemProcessor"/>
   </property>
@@ -78,7 +78,7 @@ The following example shows how to configure the `AsyncItemWriter` in XML:
 [source, xml]
 ----
 <bean id="itemWriter"
-    class="org.springframework.batch.integration.async.AsyncItemWriter">
+    class="org.springframework.batch.core.step.item.AsyncItemWriter">
   <property name="delegate">
     <bean id="itemWriter" class="your.ItemWriter"/>
   </property>

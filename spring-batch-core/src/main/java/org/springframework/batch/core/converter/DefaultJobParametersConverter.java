@@ -24,8 +24,8 @@ import org.springframework.batch.core.job.parameters.JobParameter;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.core.convert.support.ConfigurableConversionService;
-import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
 /**
@@ -73,28 +73,12 @@ import org.springframework.util.StringUtils;
  * @author Dave Syer
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
- *
+ * @author Yanming Zhou
+ * @author Stefano Cordio
  */
 public class DefaultJobParametersConverter implements JobParametersConverter {
 
-	protected ConfigurableConversionService conversionService;
-
-	public DefaultJobParametersConverter() {
-		DefaultConversionService conversionService = new DefaultConversionService();
-		conversionService.addConverter(new DateToStringConverter());
-		conversionService.addConverter(new StringToDateConverter());
-		conversionService.addConverter(new LocalDateToStringConverter());
-		conversionService.addConverter(new StringToLocalDateConverter());
-		conversionService.addConverter(new LocalTimeToStringConverter());
-		conversionService.addConverter(new StringToLocalTimeConverter());
-		conversionService.addConverter(new LocalDateTimeToStringConverter());
-		conversionService.addConverter(new StringToLocalDateTimeConverter());
-		conversionService.addConverter(new ZonedDateTimeToStringConverter());
-		conversionService.addConverter(new StringToZonedDateTimeConverter());
-		conversionService.addConverter(new OffsetDateTimeToStringConverter());
-		conversionService.addConverter(new StringToOffsetDateTimeConverter());
-		this.conversionService = conversionService;
-	}
+	protected ConfigurableConversionService conversionService = ConversionServiceFactory.createConversionService();
 
 	/**
 	 * @see org.springframework.batch.core.converter.JobParametersConverter#getJobParameters(java.util.Properties)
@@ -155,14 +139,14 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 	 * @param encodedJobParameter the encoded job parameter
 	 * @return the decoded job parameter
 	 */
-	@SuppressWarnings(value = { "unchecked", "rawtypes" })
-	protected JobParameter decode(String parameterName, String encodedJobParameter) {
+	@SuppressWarnings("unchecked")
+	protected <T> JobParameter<T> decode(String parameterName, String encodedJobParameter) {
 		String parameterStringValue = parseValue(encodedJobParameter);
-		Class<?> parameterType = parseType(encodedJobParameter);
+		Class<T> parameterType = (Class<T>) parseType(encodedJobParameter);
 		boolean parameterIdentifying = parseIdentifying(encodedJobParameter);
 		try {
-			Object typedValue = this.conversionService.convert(parameterStringValue, parameterType);
-			return new JobParameter(parameterName, typedValue, parameterType, parameterIdentifying);
+			T typedValue = this.conversionService.convert(parameterStringValue, parameterType);
+			return new JobParameter<>(parameterName, typedValue, parameterType, parameterIdentifying);
 		}
 		catch (Exception e) {
 			throw new JobParametersConversionException(
@@ -184,8 +168,7 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 			return String.class;
 		}
 		try {
-			Class<?> type = Class.forName(tokens[1]);
-			return type;
+			return ClassUtils.forName(tokens[1], null);
 		}
 		catch (ClassNotFoundException e) {
 			throw new JobParametersConversionException("Unable to parse job parameter " + encodedJobParameter, e);

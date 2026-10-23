@@ -1,5 +1,5 @@
 /*
- * Copyright 2024-2025 the original author or authors.
+ * Copyright 2024-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.repository.explore.support;
 
+import org.springframework.batch.core.repository.dao.AbstractMongoBatchMetadataDao;
 import org.springframework.batch.core.repository.dao.ExecutionContextDao;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.dao.JobInstanceDao;
@@ -38,6 +39,7 @@ import org.springframework.util.Assert;
  * "batch.version")</strong>
  *
  * @author Mahmoud Ben Hassine
+ * @author Myeongha Shin
  * @since 5.2.0
  * @deprecated since 6.0 in favor of {@link MongoJobRepositoryFactoryBean}. Scheduled for
  * removal in 6.2 or later.
@@ -47,28 +49,49 @@ public class MongoJobExplorerFactoryBean extends AbstractJobExplorerFactoryBean 
 
 	private MongoOperations mongoOperations;
 
+	private String collectionPrefix = AbstractMongoBatchMetadataDao.DEFAULT_COLLECTION_PREFIX;
+
 	public void setMongoOperations(MongoOperations mongoOperations) {
 		this.mongoOperations = mongoOperations;
 	}
 
+	/**
+	 * Set the prefix prepended to the batch metadata collections. Defaults to
+	 * {@link AbstractMongoBatchMetadataDao#DEFAULT_COLLECTION_PREFIX}.
+	 * @param collectionPrefix the prefix prepended to the batch metadata collections
+	 * @since 6.1.0
+	 */
+	public void setCollectionPrefix(String collectionPrefix) {
+		Assert.notNull(collectionPrefix, "Collection prefix must not be null.");
+		this.collectionPrefix = collectionPrefix;
+	}
+
 	@Override
 	protected JobInstanceDao createJobInstanceDao() {
-		return new MongoJobInstanceDao(this.mongoOperations);
+		MongoJobInstanceDao jobInstanceDao = new MongoJobInstanceDao(this.mongoOperations);
+		jobInstanceDao.setCollectionPrefix(this.collectionPrefix);
+		return jobInstanceDao;
 	}
 
 	@Override
 	protected JobExecutionDao createJobExecutionDao() {
-		return new MongoJobExecutionDao(this.mongoOperations);
+		MongoJobExecutionDao jobExecutionDao = new MongoJobExecutionDao(this.mongoOperations);
+		jobExecutionDao.setCollectionPrefix(this.collectionPrefix);
+		return jobExecutionDao;
 	}
 
 	@Override
 	protected StepExecutionDao createStepExecutionDao() {
-		return new MongoStepExecutionDao(this.mongoOperations);
+		MongoStepExecutionDao stepExecutionDao = new MongoStepExecutionDao(this.mongoOperations);
+		stepExecutionDao.setCollectionPrefix(this.collectionPrefix);
+		return stepExecutionDao;
 	}
 
 	@Override
 	protected ExecutionContextDao createExecutionContextDao() {
-		return new MongoExecutionContextDao(this.mongoOperations);
+		MongoExecutionContextDao executionContextDao = new MongoExecutionContextDao(this.mongoOperations);
+		executionContextDao.setCollectionPrefix(this.collectionPrefix);
+		return executionContextDao;
 	}
 
 	@Override

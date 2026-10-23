@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 the original author or authors.
+ * Copyright 2023-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@ package org.springframework.batch.infrastructure.item.data;
 
 import java.time.Duration;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -32,6 +31,7 @@ import org.springframework.batch.infrastructure.item.data.MongoCursorItemReader;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.junit.jupiter.api.Assertions.*;
@@ -43,6 +43,7 @@ import static org.mockito.Mockito.when;
  *
  * @author LEE Juchan
  * @author Mahmoud Ben Hassine
+ * @author JungKyun Ryu
  */
 @ExtendWith(MockitoExtension.class)
 class MongoCursorItemReaderTest {
@@ -52,18 +53,18 @@ class MongoCursorItemReaderTest {
 	@Mock
 	private MongoTemplate template;
 
-	private Map<String, Sort.Direction> sortOptions;
-
 	@BeforeEach
 	void setUp() {
 		reader = new MongoCursorItemReader<>(template, String.class);
 
-		sortOptions = new HashMap<>();
-		sortOptions.put("name", Sort.Direction.DESC);
-
 		reader.setQuery("{ }");
-		reader.setSort(sortOptions);
+		reader.setSort(Sort.by(Sort.Direction.DESC, "name"));
 		reader.afterPropertiesSet();
+	}
+
+	@Test
+	void testCloseWithoutOpen() {
+		assertDoesNotThrow(reader::close);
 	}
 
 	@Test
@@ -260,8 +261,45 @@ class MongoCursorItemReaderTest {
 		reader = new MongoCursorItemReader<>(template, String.class);
 
 		// when + then
-		assertThatIllegalArgumentException().isThrownBy(() -> reader.setSort(null))
+		assertThatIllegalArgumentException().isThrownBy(() -> reader.setSort((Sort) null))
+			.withMessage("Sort must not be null");
+	}
+
+	@Test
+	@SuppressWarnings("removal")
+	void testDeprecatedSortThrowsExceptionWhenInvokedWithNull() {
+		// given
+		reader = new MongoCursorItemReader<>(template, String.class);
+
+		// when + then
+		assertThatIllegalArgumentException().isThrownBy(() -> reader.setSort((Map<String, Sort.Direction>) null))
 			.withMessage("Sorts must not be null");
+	}
+
+	@Test
+	@SuppressWarnings("removal")
+	void testDeprecatedSortWithMap() {
+		// given
+		reader = new MongoCursorItemReader<>(template, String.class);
+
+		// when
+		reader.setSort(Map.of("name", Sort.Direction.DESC));
+
+		// then
+		assertEquals(Sort.by(Sort.Direction.DESC, "name"), ReflectionTestUtils.getField(reader, "sort"));
+	}
+
+	@Test
+	void testSortWithMultipleCriteria() {
+		// given
+		reader = new MongoCursorItemReader<>(template, String.class);
+		Sort sort = Sort.by(Sort.Order.asc("id"), Sort.Order.desc("name"));
+
+		// when
+		reader.setSort(sort);
+
+		// then
+		assertEquals(sort, ReflectionTestUtils.getField(reader, "sort"));
 	}
 
 	@Test

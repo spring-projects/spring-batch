@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.job;
 
+import org.springframework.batch.infrastructure.support.DatabaseType;
 import javax.sql.DataSource;
 
 import org.junit.jupiter.api.Assertions;
@@ -78,8 +79,8 @@ public class JobRestartIntegrationTests {
 
 		@Bean
 		public DataSource dataSource() {
-			return new EmbeddedDatabaseBuilder().addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-				.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
+			return new EmbeddedDatabaseBuilder().addScript(DatabaseType.HSQL.getProductSchemaDrop())
+				.addScript(DatabaseType.HSQL.getProductSchema())
 				.generateUniqueName(true)
 				.build();
 		}

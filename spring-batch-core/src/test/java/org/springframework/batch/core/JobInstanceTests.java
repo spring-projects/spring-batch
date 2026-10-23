@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@ class JobInstanceTests {
 
 	@Test
 	void testGetInstanceId() {
-		assertEquals(11, instance.getInstanceId());
+		assertEquals(11, instance.getId());
 	}
 
 }

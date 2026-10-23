@@ -1,5 +1,5 @@
 /*
- * Copyright 2024-2025 the original author or authors.
+ * Copyright 2024-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package org.springframework.batch.core.repository.support;
 
 import org.jspecify.annotations.Nullable;
 
+import org.springframework.batch.core.repository.dao.AbstractMongoBatchMetadataDao;
 import org.springframework.batch.core.repository.dao.mongodb.MongoExecutionContextDao;
 import org.springframework.batch.core.repository.dao.mongodb.MongoJobExecutionDao;
 import org.springframework.batch.core.repository.dao.mongodb.MongoJobInstanceDao;
@@ -26,6 +27,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.Assert;
 
 /**
@@ -37,6 +39,7 @@ import org.springframework.util.Assert;
  * "batch.version")</strong>
  *
  * @author Mahmoud Ben Hassine
+ * @author Myeongha Shin
  * @since 5.2.0
  */
 public class MongoJobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean implements InitializingBean {
@@ -48,6 +51,8 @@ public class MongoJobRepositoryFactoryBean extends AbstractJobRepositoryFactoryB
 	private @Nullable DataFieldMaxValueIncrementer jobExecutionIncrementer;
 
 	private @Nullable DataFieldMaxValueIncrementer stepExecutionIncrementer;
+
+	private String collectionPrefix = AbstractMongoBatchMetadataDao.DEFAULT_COLLECTION_PREFIX;
 
 	public void setMongoOperations(MongoOperations mongoOperations) {
 		this.mongoOperations = mongoOperations;
@@ -65,6 +70,17 @@ public class MongoJobRepositoryFactoryBean extends AbstractJobRepositoryFactoryB
 		this.stepExecutionIncrementer = stepExecutionIncrementer;
 	}
 
+	/**
+	 * Set the prefix prepended to the batch metadata collections. Defaults to
+	 * {@link AbstractMongoBatchMetadataDao#DEFAULT_COLLECTION_PREFIX}.
+	 * @param collectionPrefix the prefix prepended to the batch metadata collections
+	 * @since 6.1.0
+	 */
+	public void setCollectionPrefix(String collectionPrefix) {
+		Assert.notNull(collectionPrefix, "Collection prefix must not be null.");
+		this.collectionPrefix = collectionPrefix;
+	}
+
 	@Override
 	protected Object getTarget() throws Exception {
 		MongoJobInstanceDao jobInstanceDao = createJobInstanceDao();
@@ -79,6 +95,7 @@ public class MongoJobRepositoryFactoryBean extends AbstractJobRepositoryFactoryB
 	@Override
 	protected MongoJobInstanceDao createJobInstanceDao() {
 		MongoJobInstanceDao mongoJobInstanceDao = new MongoJobInstanceDao(this.mongoOperations);
+		mongoJobInstanceDao.setCollectionPrefix(this.collectionPrefix);
 		mongoJobInstanceDao.setJobKeyGenerator(this.jobKeyGenerator);
 		mongoJobInstanceDao.setJobInstanceIncrementer(this.jobInstanceIncrementer);
 		return mongoJobInstanceDao;
@@ -87,6 +104,7 @@ public class MongoJobRepositoryFactoryBean extends AbstractJobRepositoryFactoryB
 	@Override
 	protected MongoJobExecutionDao createJobExecutionDao() {
 		MongoJobExecutionDao mongoJobExecutionDao = new MongoJobExecutionDao(this.mongoOperations);
+		mongoJobExecutionDao.setCollectionPrefix(this.collectionPrefix);
 		mongoJobExecutionDao.setJobExecutionIncrementer(this.jobExecutionIncrementer);
 		return mongoJobExecutionDao;
 	}
@@ -94,30 +112,45 @@ public class MongoJobRepositoryFactoryBean extends AbstractJobRepositoryFactoryB
 	@Override
 	protected MongoStepExecutionDao createStepExecutionDao() {
 		MongoStepExecutionDao mongoStepExecutionDao = new MongoStepExecutionDao(this.mongoOperations);
+		mongoStepExecutionDao.setCollectionPrefix(this.collectionPrefix);
 		mongoStepExecutionDao.setStepExecutionIncrementer(this.stepExecutionIncrementer);
 		return mongoStepExecutionDao;
 	}
 
 	@Override
 	protected MongoExecutionContextDao createExecutionContextDao() {
-		return new MongoExecutionContextDao(this.mongoOperations);
+		MongoExecutionContextDao mongoExecutionContextDao = new MongoExecutionContextDao(this.mongoOperations);
+		mongoExecutionContextDao.setCollectionPrefix(this.collectionPrefix);
+		return mongoExecutionContextDao;
 	}
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
 		Assert.notNull(this.mongoOperations, "MongoOperations must not be null.");
+		PlatformTransactionManager transactionManager = getTransactionManager();
+		Assert.notNull(transactionManager, "TransactionManager must not be null.");
 		if (this.jobInstanceIncrementer == null) {
-			this.jobInstanceIncrementer = new MongoSequenceIncrementer(this.mongoOperations, "BATCH_JOB_INSTANCE_SEQ");
+			this.jobInstanceIncrementer = createSequenceIncrementer(
+					AbstractMongoBatchMetadataDao.DEFAULT_JOB_INSTANCE_INCREMENTER_NAME, transactionManager);
 		}
 		if (this.jobExecutionIncrementer == null) {
-			this.jobExecutionIncrementer = new MongoSequenceIncrementer(this.mongoOperations,
-					"BATCH_JOB_EXECUTION_SEQ");
+			this.jobExecutionIncrementer = createSequenceIncrementer(
+					AbstractMongoBatchMetadataDao.DEFAULT_JOB_EXECUTION_INCREMENTER_NAME, transactionManager);
 		}
 		if (this.stepExecutionIncrementer == null) {
-			this.stepExecutionIncrementer = new MongoSequenceIncrementer(this.mongoOperations,
-					"BATCH_STEP_EXECUTION_SEQ");
+			this.stepExecutionIncrementer = createSequenceIncrementer(
+					AbstractMongoBatchMetadataDao.DEFAULT_STEP_EXECUTION_INCREMENTER_NAME, transactionManager);
 		}
+	}
+
+	private MongoSequenceIncrementer createSequenceIncrementer(String sequenceName,
+			PlatformTransactionManager transactionManager) {
+		Assert.notNull(this.mongoOperations, "MongoOperations must not be null.");
+		MongoSequenceIncrementer incrementer = new MongoSequenceIncrementer(this.mongoOperations,
+				this.collectionPrefix + sequenceName, transactionManager);
+		incrementer.setCollectionPrefix(this.collectionPrefix);
+		return incrementer;
 	}
 
 }

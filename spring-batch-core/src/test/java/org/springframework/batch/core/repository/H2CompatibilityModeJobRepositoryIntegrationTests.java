@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2025 the original author or authors.
+ * Copyright 2022-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.repository;
 
+import org.springframework.batch.infrastructure.support.DatabaseType;
 import java.util.UUID;
 
 import javax.sql.DataSource;
@@ -76,7 +77,7 @@ class H2CompatibilityModeJobRepositoryIntegrationTests {
 				UUID.randomUUID(), compatibilityMode);
 		var dataSource = new SimpleDriverDataSource(new org.h2.Driver(), connectionUrl, "sa", "");
 		var populator = new ResourceDatabasePopulator();
-		var resource = new DefaultResourceLoader().getResource("/org/springframework/batch/core/schema-h2.sql");
+		var resource = new DefaultResourceLoader().getResource(DatabaseType.H2.getProductSchema());
 		populator.addScript(resource);
 		DatabasePopulatorUtils.execute(populator, dataSource);
 		return dataSource;

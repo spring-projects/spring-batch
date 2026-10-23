@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2025 the original author or authors.
+ * Copyright 2023-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,6 @@ public class RedisItemWriterBuilder<K, V> {
 	 * Set the {@link RedisTemplate} to use to write items to Redis.
 	 * @param redisTemplate the template to use.
 	 * @return The current instance of the builder.
-	 * @see RedisItemWriter#setRedisTemplate(RedisTemplate)
 	 */
 	public RedisItemWriterBuilder<K, V> redisTemplate(RedisTemplate<K, V> redisTemplate) {
 		this.redisTemplate = redisTemplate;
@@ -51,7 +50,6 @@ public class RedisItemWriterBuilder<K, V> {
 	 * Set the {@link Converter} to use to derive the key from the item.
 	 * @param itemKeyMapper the Converter to use.
 	 * @return The current instance of the builder.
-	 * @see RedisItemWriter#setItemKeyMapper(Converter)
 	 */
 	public RedisItemWriterBuilder<K, V> itemKeyMapper(Converter<@NonNull V, @NonNull K> itemKeyMapper) {
 		this.itemKeyMapper = itemKeyMapper;

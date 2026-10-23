@@ -1,15 +1,20 @@
-[[reusingExistingServices]]
-= Reusing Existing Services
+[[reusingExistingServicesAndAPIs]]
+= Reusing Existing Services and APIs
 
 Batch systems are often used in conjunction with other application styles. The most
 common is an online system, but it may also support integration or even a thick client
 application by moving necessary bulk data that each application style uses. For this
-reason, it is common that many users want to reuse existing DAOs or other services within
-their batch jobs. The Spring container itself makes this fairly easy by allowing any
-necessary class to be injected. However, there may be cases where the existing service
-needs to act as an `ItemReader` or `ItemWriter`, either to satisfy the dependency of
-another Spring Batch class or because it truly is the main `ItemReader` for a step. It is
-fairly trivial to write an adapter class for each service that needs wrapping, but
+reason, it is common that many users want to reuse existing DAOs, services, or other APIs
+within their batch jobs. The Spring container itself makes this fairly easy by allowing
+any necessary class to be injected. However, there may be cases where the existing
+service or API needs to act as an `ItemReader` or `ItemWriter`, either to satisfy the
+dependency of another Spring Batch class or because it truly is the main `ItemReader`
+for a step.
+
+[[reusingExistingServices]]
+== Reusing Existing Services
+
+It is fairly trivial to write an adapter class for each service that needs wrapping, but
 because it is such a common concern, Spring Batch provides implementations:
 `ItemReaderAdapter` and `ItemWriterAdapter`. Both classes implement the standard Spring
 method by invoking the delegate pattern and are fairly simple to set up.
@@ -109,4 +114,80 @@ The following XML example uses the `ItemWriterAdapter`:
 ====
 
 
+
+[[reusingExistingAPIs]]
+== Reusing Existing APIs
+
+Besides services, it is also common to want to reuse an existing API that exposes its
+data through a Java `Iterator` (or `Iterable`), without having to write a dedicated
+`ItemReader` for it. Spring Batch provides `IteratorItemReader` for exactly that purpose:
+it adapts any `Iterator` or `Iterable` to the `ItemReader` contract.
+
+A good example is the
+https://docs.spring.io/spring-data/data-commons/reference/repositories/scrolling.html[scrolling]
+support introduced in Spring Data Commons 3.1, which exposes a `WindowIterator` to iterate
+over successive `Window` instances returned by a repository, using either offset-based or
+keyset-based scrolling.
+
+[tabs]
+====
+Java::
++
+The following Java example shows how to reuse a `WindowIterator` obtained from a Spring
+Data repository as an `ItemReader`, without needing a dedicated reader implementation:
++
+.Java Configuration
+[source, java]
+----
+interface UserRepository extends Repository<User, Long> {
+
+	Window<User> findFirst10ByLastnameOrderByFirstname(String lastname, KeysetScrollPosition position);
+
+}
+
+@Bean
+public ItemReader<User> itemReader(UserRepository userRepository) {
+	WindowIterator<User> users = WindowIterator
+		.of(position -> userRepository.findFirst10ByLastnameOrderByFirstname("Doe", position))
+		.startingAt(ScrollPosition.keyset());
+
+	return new IteratorItemReader<>(users);
+}
+----
+
+XML::
++
+Building a `WindowIterator` requires a lambda expression, so it cannot be expressed
+directly as a `<bean>` definition. The construction logic can instead be extracted to a
+factory method and referenced from XML, as follows:
++
+.Factory class
+[source, java]
+----
+public class UserItemReaderFactory {
+
+	public static ItemReader<User> createItemReader(UserRepository userRepository) {
+		WindowIterator<User> users = WindowIterator
+			.of(position -> userRepository.findFirst10ByLastnameOrderByFirstname("Doe", position))
+			.startingAt(ScrollPosition.keyset());
+
+		return new IteratorItemReader<>(users);
+	}
+
+}
+----
++
+.XML Configuration
+[source,xml]
+----
+<bean id="itemReader" class="org.springframework.batch.infrastructure.item.sample.UserItemReaderFactory"
+      factory-method="createItemReader">
+    <constructor-arg ref="userRepository" />
+</bean>
+----
+
+====
+
+This pattern is not specific to Spring Data's scrolling API: any API that exposes an
+`Iterator` or an `Iterable` can be adapted to an `ItemReader` in the same way.
 

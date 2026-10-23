@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.step.item;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Future;
@@ -24,6 +25,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jspecify.annotations.Nullable;
 
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.job.JobInterruptedException;
 import org.springframework.batch.core.listener.ChunkListener;
 import org.springframework.batch.core.listener.CompositeChunkListener;
@@ -41,6 +43,7 @@ import org.springframework.batch.core.observability.jfr.events.step.chunk.ChunkT
 import org.springframework.batch.core.observability.jfr.events.step.chunk.ChunkWriteEvent;
 import org.springframework.batch.core.observability.jfr.events.step.chunk.ItemProcessEvent;
 import org.springframework.batch.core.observability.jfr.events.step.chunk.ItemReadEvent;
+import org.springframework.batch.core.scope.context.JobSynchronizationManager;
 import org.springframework.batch.core.scope.context.StepContext;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.batch.core.step.StepContribution;
@@ -54,13 +57,13 @@ import org.springframework.batch.core.step.skip.NeverSkipItemSkipPolicy;
 import org.springframework.batch.core.step.skip.NonSkippableProcessException;
 import org.springframework.batch.core.step.skip.NonSkippableReadException;
 import org.springframework.batch.core.step.skip.NonSkippableWriteException;
-import org.springframework.batch.core.step.skip.SkipLimitExceededException;
 import org.springframework.batch.core.step.skip.SkipPolicy;
 import org.springframework.batch.infrastructure.item.Chunk;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.batch.infrastructure.item.ItemProcessor;
 import org.springframework.batch.infrastructure.item.ItemReader;
 import org.springframework.batch.infrastructure.item.ItemStream;
+import org.springframework.batch.infrastructure.item.ItemStreamException;
 import org.springframework.batch.infrastructure.item.ItemWriter;
 import org.springframework.batch.infrastructure.item.support.CompositeItemStream;
 import org.springframework.batch.infrastructure.support.transaction.ResourcelessTransactionManager;
@@ -75,9 +78,12 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 import org.springframework.transaction.interceptor.TransactionAttribute;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.Assert;
 
+import static org.springframework.batch.core.BatchConstants.BATCH_STEP_TYPE;
 import static org.springframework.batch.core.observability.BatchMetrics.METRICS_PREFIX;
 
 /**
@@ -93,11 +99,20 @@ import static org.springframework.batch.core.observability.BatchMetrics.METRICS_
  * @author Minchul Son
  * @author Yanming Zhou
  * @author Taeik Lim
+ * @author Kim ByeongChang
+ * @author WooSeung Kim
  * @since 6.0
  */
 public class ChunkOrientedStep<I, O> extends AbstractStep {
 
 	private static final Log logger = LogFactory.getLog(ChunkOrientedStep.class.getName());
+
+	/*
+	 * Execution context key holding the number of reads, since the reader checkpoint
+	 * saved in the execution context, whose outcome has already been committed while a
+	 * chunk was being scanned, see #doExecute.
+	 */
+	private static final String CHUNK_SCAN_OFFSET = "batch.chunkScanOffset";
 
 	/*
 	 * Step Input / Output parameters
@@ -120,24 +135,32 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 	 */
 	private final CompositeItemStream compositeItemStream = new CompositeItemStream();
 
+	/*
+	 * The registered streams, split into item readers and other streams. During scanning,
+	 * reader checkpoints are preserved while updates from non-reader streams are
+	 * persisted, see #updateStreamsWhileScanning.
+	 */
+	private final CompositeItemStream readerItemStream = new CompositeItemStream();
+
+	private final CompositeItemStream nonReaderItemStream = new CompositeItemStream();
+
 	private StepInterruptionPolicy interruptionPolicy = new ThreadStepInterruptionPolicy();
 
 	/*
 	 * Transaction related parameters
 	 */
-	private @Nullable PlatformTransactionManager transactionManager;
+	private PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
 
-	@SuppressWarnings("NullAway.Init")
-	private TransactionTemplate transactionTemplate;
+	private TransactionAttribute transactionAttribute = new DefaultTransactionAttribute();
 
-	private @Nullable TransactionAttribute transactionAttribute;
+	private TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager, transactionAttribute);
 
 	/*
 	 * Chunk related parameters
 	 */
 	private final int chunkSize;
 
-	private final ThreadLocal<ChunkTracker<O>> chunkTracker = ThreadLocal.withInitial(ChunkTracker::create);
+	private final ThreadLocal<ChunkTracker<I, O>> chunkTracker = ThreadLocal.withInitial(ChunkTracker::create);
 
 	private final CompositeChunkListener<I, O> compositeChunkListener = new CompositeChunkListener<>();
 
@@ -145,6 +168,8 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 	 * Fault-tolerance parameters
 	 */
 	private boolean faultTolerant = false;
+
+	private boolean processorTransactional = true;
 
 	private RetryPolicy retryPolicy = throwable -> false;
 
@@ -159,8 +184,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 	/*
 	 * Concurrency parameters
 	 */
-	@SuppressWarnings("NullAway.Init")
-	private AsyncTaskExecutor taskExecutor;
+	private @Nullable AsyncTaskExecutor taskExecutor;
 
 	/**
 	 * Create a new {@link ChunkOrientedStep}.
@@ -206,6 +230,12 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 	public void registerItemStream(ItemStream stream) {
 		Assert.notNull(stream, "Item stream must not be null");
 		this.compositeItemStream.register(stream);
+		if (stream instanceof ItemReader<?>) {
+			this.readerItemStream.register(stream);
+		}
+		else {
+			this.nonReaderItemStream.register(stream);
+		}
 	}
 
 	/**
@@ -275,6 +305,25 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 	}
 
 	/**
+	 * Set whether the {@link ItemProcessor} is transactional. Defaults to {@code true},
+	 * which means that the processor is re-invoked for every item that is re-attempted
+	 * during chunk scanning (ie after a write failure has rolled back the chunk
+	 * transaction). Set this flag to {@code false} to cache the results of item
+	 * processing and re-use them during chunk scanning instead.
+	 * <p>
+	 * Only set this flag to {@code false} if the output of the processor is safe to write
+	 * again after a failed, rolled back write. This is typically not the case for items
+	 * that the writer mutates, like JPA entities: a failed flush can leave the entity in
+	 * a state that makes the next write attempt fail with an unrelated exception.
+	 * @param processorTransactional {@code true} to re-invoke the processor during chunk
+	 * scanning (the default), {@code false} to re-use the cached processor output
+	 * @since 6.0.6
+	 */
+	public void setProcessorTransactional(boolean processorTransactional) {
+		this.processorTransactional = processorTransactional;
+	}
+
+	/**
 	 * Set the {@link AsyncTaskExecutor} to use for processing items asynchronously.
 	 * @param asyncTaskExecutor the asynchronous task executor to set
 	 */
@@ -325,25 +374,15 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
-		if (this.transactionManager == null) {
-			logger.debug("No transaction manager has been set. Defaulting to ResourcelessTransactionManager.");
-			this.transactionManager = new ResourcelessTransactionManager();
-		}
-		if (this.transactionAttribute == null) {
-			logger.debug("No transaction attribute has been set. Defaulting to DefaultTransactionAttribute.");
-			this.transactionAttribute = new DefaultTransactionAttribute();
-		}
 		Assert.isTrue(this.chunkSize > 0, "Chunk size must be greater than 0");
-		Assert.notNull(this.itemReader, "Item reader must not be null");
-		Assert.notNull(this.itemWriter, "Item writer must not be null");
 		if (this.itemReader instanceof ItemStream itemStream) {
-			this.compositeItemStream.register(itemStream);
+			registerItemStream(itemStream);
 		}
 		if (this.itemWriter instanceof ItemStream itemStream) {
-			this.compositeItemStream.register(itemStream);
+			registerItemStream(itemStream);
 		}
 		if (this.itemProcessor instanceof ItemStream itemStream) {
-			this.compositeItemStream.register(itemStream);
+			registerItemStream(itemStream);
 		}
 		this.transactionTemplate = new TransactionTemplate(this.transactionManager, this.transactionAttribute);
 		if (this.faultTolerant) {
@@ -356,6 +395,45 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 	protected void open(ExecutionContext executionContext) throws Exception {
 		this.compositeItemStream.open(executionContext);
 		this.chunkTracker.get().init();
+		positionReaderAfterScannedItems(executionContext);
+	}
+
+	/*
+	 * If the previous execution failed while scanning a chunk, the reader checkpoint
+	 * saved in the execution context precedes that chunk, and the scan offset is the
+	 * number of reads since that checkpoint whose outcome (item written or skipped, read
+	 * skipped) was committed before the failure. Those reads are replayed and their items
+	 * discarded, so that the restart resumes with the first item that was not processed.
+	 * The checkpoint itself does not move until the next commit that persists the reader
+	 * state, so the replayed reads remain counted from it. Replayed reads go through the
+	 * same retry and skip policies as in the previous execution: a read that is skipped
+	 * again consumes one read of the offset, as it did then, while a failure that cannot
+	 * be skipped fails the restart.
+	 */
+	private void positionReaderAfterScannedItems(ExecutionContext executionContext) throws Exception {
+		if (!executionContext.containsKey(CHUNK_SCAN_OFFSET)) {
+			return;
+		}
+		int offset = executionContext.getInt(CHUNK_SCAN_OFFSET);
+		if (logger.isDebugEnabled()) {
+			logger.debug("Positioning reader after " + offset + " already scanned reads of the chunk being scanned");
+		}
+		ChunkTracker<I, O> tracker = this.chunkTracker.get();
+		for (int i = 0; i < offset; i++) {
+			try {
+				if (doRead() == null) {
+					return;
+				}
+			}
+			catch (RetryException exception) {
+				Throwable cause = exception.getCause();
+				if (!(this.faultTolerant && this.skipPolicy.shouldSkip(cause, -1))) {
+					throw new ItemStreamException(
+							"Unable to position the reader after the " + offset + " already scanned reads", cause);
+				}
+			}
+			tracker.recordRead();
+		}
 	}
 
 	@Override
@@ -366,14 +444,18 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 
 	@Override
 	protected void doExecute(StepExecution stepExecution) throws Exception {
-		stepExecution.getExecutionContext().put(STEP_TYPE_KEY, this.getClass().getName());
+		stepExecution.getExecutionContext().put(BATCH_STEP_TYPE, this.getClass().getName());
 		while (this.chunkTracker.get().moreItems() && !interrupted(stepExecution)) {
 			// process next chunk in its own transaction
 			this.transactionTemplate.executeWithoutResult(transactionStatus -> {
 				ChunkTransactionEvent chunkTransactionEvent = new ChunkTransactionEvent(stepExecution.getStepName(),
 						stepExecution.getId());
 				chunkTransactionEvent.begin();
+				markUnknownIfOutcomeIsUnknown(stepExecution);
+				StepExecutionState stateBeforeTransaction = StepExecutionState.of(stepExecution);
 				StepContribution contribution = stepExecution.createStepContribution();
+				ChunkTracker<I, O> tracker = this.chunkTracker.get();
+				boolean scanning = tracker.isScanMode();
 				processNextChunk(transactionStatus, contribution, stepExecution);
 
 				// Skip update during rollback to avoid OptimisticLockingFailureException
@@ -388,12 +470,133 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 					return;
 				}
 
-				this.compositeItemStream.update(stepExecution.getExecutionContext());
-				getJobRepository().updateExecutionContext(stepExecution);
-				getJobRepository().update(stepExecution);
+				saveState(stepExecution, tracker, scanning, stateBeforeTransaction);
 				chunkTransactionEvent.transactionStatus = BatchMetrics.STATUS_COMMITTED;
 				chunkTransactionEvent.commit();
 			});
+			// a scanned item skipped on write is rolled back with its transaction, so the
+			// skip is committed in a new transaction, as if the item had been written:
+			// otherwise, a restart after the step ended (or the JVM crashed) before the
+			// next commit would process the skipped item again
+			ChunkTracker<I, O> tracker = this.chunkTracker.get();
+			if (tracker.consumeScannedItemSkip()) {
+				this.transactionTemplate.executeWithoutResult(transactionStatus -> {
+					markUnknownIfOutcomeIsUnknown(stepExecution);
+					saveState(stepExecution, tracker, true, StepExecutionState.of(stepExecution));
+				});
+			}
+		}
+	}
+
+	/*
+	 * Save the state of the streams and of the step execution for a commit. If the
+	 * transaction is not committed after that, the step execution is restored to its
+	 * state before the transaction, see restoreStateIfNotCommitted().
+	 */
+	private void saveState(StepExecution stepExecution, ChunkTracker<I, O> tracker, boolean scanning,
+			StepExecutionState stateBeforeTransaction) {
+		restoreStateIfNotCommitted(stepExecution, stateBeforeTransaction);
+		ExecutionContext executionContext = stepExecution.getExecutionContext();
+		// Both terms are required: the transaction must have re-attempted a scanned item
+		// (scanning), and the scan must still have items pending (isScanMode). The
+		// transaction that commits the last scanned item (or its skip) leaves scan mode,
+		// and at that point the whole chunk is settled and the reader sits exactly at its
+		// end, so that commit takes a regular checkpoint and clears the offset rather
+		// than
+		// recording one.
+		if (scanning && tracker.isScanMode()) {
+			updateStreamsWhileScanning(executionContext, tracker);
+		}
+		else {
+			this.compositeItemStream.update(executionContext);
+			executionContext.remove(CHUNK_SCAN_OFFSET);
+			tracker.readerCheckpointSaved();
+		}
+		getJobRepository().updateExecutionContext(stepExecution);
+		getJobRepository().update(stepExecution);
+	}
+
+	/*
+	 * Mark the step execution as UNKNOWN if the outcome of the current transaction is
+	 * unknown (for example, because its commit or its rollback fails), whether or not the
+	 * state of the step has been saved in it: the items of that transaction may or may
+	 * not have been written, so the step must not be restarted without a manual
+	 * intervention. The step is also asked to terminate, so that a flow does not go on
+	 * with the next step as if this one had failed.
+	 */
+	private void markUnknownIfOutcomeIsUnknown(StepExecution stepExecution) {
+		registerSynchronization(new TransactionSynchronization() {
+			@Override
+			public void afterCompletion(int status) {
+				if (status == STATUS_UNKNOWN) {
+					logger.error("Chunk transaction ended with an unknown outcome, the step execution is marked as "
+							+ BatchStatus.UNKNOWN);
+					stepExecution.upgradeStatus(BatchStatus.UNKNOWN);
+					stepExecution.setTerminateOnly();
+				}
+			}
+		});
+	}
+
+	/*
+	 * Restore the step execution to its state before the current transaction if that
+	 * transaction is not committed once the state of the step has started to be saved in
+	 * it: for example, because saving the state of a stream fails, because a transaction
+	 * synchronization fails in beforeCommit, or because the commit itself fails.
+	 * Otherwise, the step execution would keep the version, the counts and the execution
+	 * context saved in a transaction that was rolled back: the version would make saving
+	 * the step execution fail when the step ends, and the execution context, if saved,
+	 * would make a restart skip the items of that transaction.
+	 */
+	private void restoreStateIfNotCommitted(StepExecution stepExecution, StepExecutionState stateBeforeTransaction) {
+		registerSynchronization(new TransactionSynchronization() {
+			@Override
+			public void afterCompletion(int status) {
+				if (status == STATUS_COMMITTED) {
+					return;
+				}
+				if (logger.isDebugEnabled()) {
+					logger.debug("Chunk transaction not committed after the state of the step was saved, "
+							+ "restoring the step execution to its state before the transaction");
+				}
+				stateBeforeTransaction.restore(stepExecution);
+				stepExecution.incrementRollbackCount();
+			}
+		});
+	}
+
+	/*
+	 * Register a synchronization with the current transaction, unless synchronization is
+	 * not active (for example, if the transaction manager is configured to never
+	 * synchronize transactions).
+	 */
+	private static void registerSynchronization(TransactionSynchronization synchronization) {
+		if (TransactionSynchronizationManager.isSynchronizationActive()) {
+			TransactionSynchronizationManager.registerSynchronization(synchronization);
+		}
+	}
+
+	/*
+	 * Update the streams for a commit made while a chunk is being scanned. The reader has
+	 * already read the whole chunk, but only part of it is committed, so the advanced
+	 * reader state must not be persisted. The reader streams are updated with an empty
+	 * execution context that is discarded, which tells whether the reader keeps restart
+	 * state at all: - if it does, the checkpoint in the execution context is left as is,
+	 * and the number of reads since that checkpoint whose outcome is committed is saved
+	 * as the scan offset, so that a restart resumes right after them; - if it does not
+	 * (typically a reader with saveState(false) relying on a process indicator), the
+	 * reader is restarted from its own state and must not be offset. Either way, the
+	 * reader streams are updated once, as in any other commit.
+	 */
+	private void updateStreamsWhileScanning(ExecutionContext executionContext, ChunkTracker<I, O> tracker) {
+		ExecutionContext readerState = new ExecutionContext();
+		this.readerItemStream.update(readerState);
+		this.nonReaderItemStream.update(executionContext);
+		if (readerState.isEmpty()) {
+			executionContext.remove(CHUNK_SCAN_OFFSET);
+		}
+		else {
+			executionContext.putInt(CHUNK_SCAN_OFFSET, tracker.getLastScannedReadPosition());
 		}
 	}
 
@@ -409,31 +612,34 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 
 	private void processChunkConcurrently(TransactionStatus status, StepContribution contribution,
 			StepExecution stepExecution) {
-		List<Future<O>> itemProcessingTasks = new LinkedList<>();
+		Assert.state(this.taskExecutor != null, "TaskExecutor must not be null");
+		List<Future<@Nullable O>> itemProcessingTasks = new ArrayList<>();
+		List<I> inputItems = new ArrayList<>();
+		List<ScanItem<I, O>> scanItems = new ArrayList<>();
 		Chunk<O> processedChunk = new Chunk<>();
-		ChunkTracker<O> tracker = this.chunkTracker.get();
+		ChunkTracker<I, O> tracker = this.chunkTracker.get();
+		boolean scanning = tracker.isScanMode();
 
 		try {
-			if (tracker.isScanMode()) {
-				logger.info("Executing scan in new transaction after rollback");
-				O item = tracker.pollNextScanItem();
-				if (item != null) {
-					Chunk<O> singleItemChunk = new Chunk<>(item);
+			if (scanning) {
+				logger.debug("Executing scan in new transaction after rollback");
+				ScanItem<I, O> scanItem = tracker.pollNextScanItem();
+				if (scanItem != null) {
 					ChunkScanEvent chunkScanEvent = new ChunkScanEvent(stepExecution.getStepName(),
 							stepExecution.getId());
 					chunkScanEvent.begin();
-					compositeChunkListener.beforeChunk(singleItemChunk);
-					scan(singleItemChunk, contribution, status);
-					if (!status.isRollbackOnly()) {
-						compositeChunkListener.afterChunk(singleItemChunk);
-					}
+					// no chunk listener callbacks here: ChunkListener is not called in
+					// concurrent steps
+					scan(scanItem, contribution, status);
 					chunkScanEvent.skipCount = contribution.getSkipCount();
 					chunkScanEvent.commit();
 				}
 				if (!tracker.hasPendingScanItems()) {
-					logger.info("Chunk scan completed");
+					logger.debug("Chunk scan completed");
 					tracker.exitScanMode();
-					if (!status.isRollbackOnly()) {
+					// a scan that ends with a skip on write is rolled back, but the skip
+					// is then committed in a new transaction
+					if (!status.isRollbackOnly() || tracker.hasScannedItemSkip()) {
 						stepExecution.incrementCommitCount();
 					}
 				}
@@ -441,15 +647,20 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			}
 
 			// read items and submit concurrent item processing tasks
+			List<Integer> readPositions = new ArrayList<>();
 			for (int i = 0; i < this.chunkSize && this.chunkTracker.get().moreItems(); i++) {
 				I item = readItem(contribution);
 				if (item != null) {
-					Future<O> itemProcessingFuture = this.taskExecutor.submit(() -> {
+					inputItems.add(item);
+					readPositions.add(tracker.getReadsSinceCheckpoint());
+					Future<@Nullable O> itemProcessingFuture = this.taskExecutor.submit(() -> {
 						try {
 							StepSynchronizationManager.register(stepExecution);
+							JobSynchronizationManager.register(stepExecution.getJobExecution());
 							return processItem(item, contribution);
 						}
 						finally {
+							JobSynchronizationManager.close();
 							StepSynchronizationManager.close();
 						}
 					});
@@ -461,30 +672,41 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 				return;
 			}
 
-			// collect processed items
-			for (Future<O> future : itemProcessingTasks) {
-				O processedItem = future.get();
+			// collect processed items, keeping track of the input item each output item
+			// was produced from, so that it can be re-processed during a chunk scan
+			for (int i = 0; i < itemProcessingTasks.size(); i++) {
+				O processedItem = itemProcessingTasks.get(i).get();
 				if (processedItem != null) {
 					processedChunk.add(processedItem);
+					scanItems.add(new ScanItem<>(inputItems.get(i), processedItem, readPositions.get(i)));
 				}
 			}
 
 			// write processed items
-			writeChunk(processedChunk, contribution);
+			writeChunk(processedChunk, scanItems, contribution, status);
 			stepExecution.incrementCommitCount();
 		}
 		catch (Exception e) {
-			logger.error("Rolling back chunk transaction", e);
 			status.setRollbackOnly();
 			stepExecution.incrementRollbackCount();
 
-			if (tracker.isScanMode()) {
-				if (e instanceof SkipLimitExceededException || e instanceof NonSkippableWriteException) {
-					tracker.exitScanMode();
-					throw new FatalStepExecutionException("Unable to process chunk during scan", e);
-				}
-				logger.info("Rollback complete, scan will execute in next transaction");
+			// the write of this chunk has just failed with a skippable exception and the
+			// chunk has been queued for scanning: roll back and start the scan in the
+			// next transaction. This rollback is an expected part of the skip algorithm
+			// and not a step failure, so it is only reported at debug level.
+			if (!scanning && tracker.isScanMode()) {
+				logger.debug("Chunk transaction rolled back, scan will execute in next transaction");
 				return;
+			}
+
+			logger.error("Rolling back chunk transaction", e);
+
+			// a scan attempt itself failed: the pending item has already been polled off
+			// the scan queue, so carrying on would silently lose it. Fail the step
+			// instead, leaving the job restartable.
+			if (scanning) {
+				tracker.exitScanMode();
+				throw new FatalStepExecutionException("Unable to process chunk during scan", e);
 			}
 
 			throw new FatalStepExecutionException("Unable to process chunk", e);
@@ -496,21 +718,22 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 
 	private void processChunkSequentially(TransactionStatus status, StepContribution contribution,
 			StepExecution stepExecution) {
-		Chunk<I> inputChunk = new Chunk<>();
+		Chunk<I> inputChunk;
 		Chunk<O> processedChunk = new Chunk<>();
-		ChunkTracker<O> tracker = this.chunkTracker.get();
+		List<ScanItem<I, O>> scanItems = new ArrayList<>();
+		ChunkTracker<I, O> tracker = this.chunkTracker.get();
+		boolean scanning = tracker.isScanMode();
 
 		try {
-			if (tracker.isScanMode()) {
-				logger.info("Executing scan in new transaction after rollback");
-				O item = tracker.pollNextScanItem();
-				if (item != null) {
-					Chunk<O> singleItemChunk = new Chunk<>(item);
+			if (scanning) {
+				logger.debug("Executing scan in new transaction after rollback");
+				ScanItem<I, O> scanItem = tracker.pollNextScanItem();
+				if (scanItem != null) {
 					ChunkScanEvent chunkScanEvent = new ChunkScanEvent(stepExecution.getStepName(),
 							stepExecution.getId());
 					chunkScanEvent.begin();
-					compositeChunkListener.beforeChunk(singleItemChunk);
-					scan(singleItemChunk, contribution, status);
+					compositeChunkListener.beforeChunk(new Chunk<>(scanItem.input()));
+					Chunk<O> singleItemChunk = scan(scanItem, contribution, status);
 					if (!status.isRollbackOnly()) {
 						compositeChunkListener.afterChunk(singleItemChunk);
 					}
@@ -518,45 +741,70 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 					chunkScanEvent.commit();
 				}
 				if (!tracker.hasPendingScanItems()) {
-					logger.info("Chunk scan completed");
+					logger.debug("Chunk scan completed");
 					tracker.exitScanMode();
-					if (!status.isRollbackOnly()) {
+					// a scan that ends with a skip on write is rolled back, but the skip
+					// is then committed in a new transaction
+					if (!status.isRollbackOnly() || tracker.hasScannedItemSkip()) {
 						stepExecution.incrementCommitCount();
 					}
 				}
 				return;
 			}
 
-			inputChunk = readChunk(contribution);
+			List<Integer> readPositions = new ArrayList<>();
+			inputChunk = readChunk(contribution, readPositions);
 			if (inputChunk.isEmpty()) {
 				return;
 			}
 			compositeChunkListener.beforeChunk(inputChunk);
-			processedChunk = processChunk(inputChunk, contribution);
-			writeChunk(processedChunk, contribution);
+			processedChunk = processChunk(inputChunk, readPositions, contribution, scanItems);
+			writeChunk(processedChunk, scanItems, contribution, status);
 			compositeChunkListener.afterChunk(processedChunk);
 			stepExecution.incrementCommitCount();
 		}
 		catch (Exception e) {
-			logger.error("Rolling back chunk transaction", e);
 			status.setRollbackOnly();
 			stepExecution.incrementRollbackCount();
 
-			if (tracker.isScanMode()) {
-				if (e instanceof SkipLimitExceededException || e instanceof NonSkippableWriteException) {
-					tracker.exitScanMode();
-					compositeChunkListener.onChunkError(e, processedChunk);
-					throw new FatalStepExecutionException("Unable to process chunk during scan", e);
-				}
-				logger.info("Rollback complete, scan will execute in next transaction");
+			// the write of this chunk has just failed with a skippable exception and the
+			// chunk has been queued for scanning: roll back and start the scan in the
+			// next transaction. This rollback is an expected part of the skip algorithm
+			// and not a step failure, so it is only reported at debug level.
+			if (!scanning && tracker.isScanMode()) {
+				notifyChunkError(e, processedChunk);
+				logger.debug("Chunk transaction rolled back, scan will execute in next transaction");
 				return;
 			}
 
-			compositeChunkListener.onChunkError(e, processedChunk);
+			logger.error("Rolling back chunk transaction", e);
+
+			// a scan attempt itself failed: the pending item has already been polled off
+			// the scan queue, so carrying on would silently lose it. Fail the step
+			// instead, leaving the job restartable. Failures of the scanned item itself
+			// have already been reported to the chunk listener by scan().
+			if (scanning) {
+				tracker.exitScanMode();
+				throw new FatalStepExecutionException("Unable to process chunk during scan", e);
+			}
+
+			notifyChunkError(e, processedChunk);
 			throw new FatalStepExecutionException("Unable to process chunk", e);
 		}
 		finally {
 			stepExecution.apply(contribution);
+		}
+	}
+
+	/*
+	 * Report a chunk failure to the chunk listener. The listener is never called with an
+	 * empty chunk: a failure that happens before any item was processed (a read failure,
+	 * for example) has no processed chunk to report and is signalled by the read or
+	 * process listeners instead. The listener is not called in concurrent steps either.
+	 */
+	private void notifyChunkError(Exception exception, Chunk<O> processedChunk) {
+		if (!isConcurrent() && !processedChunk.isEmpty()) {
+			this.compositeChunkListener.onChunkError(exception, processedChunk);
 		}
 	}
 
@@ -573,18 +821,24 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			return true;
 		}
 		// check external interruption via job operator
-		if (stepExecution.isTerminateOnly()) {
-			return true;
-		}
-		return false;
+		return stepExecution.isTerminateOnly();
 	}
 
-	private Chunk<I> readChunk(StepContribution contribution) throws Exception {
+	/*
+	 * Read the next chunk. The position of each item, in terms of reads that returned an
+	 * item or were skipped (a read that succeeds after being retried counts once) since
+	 * the reader checkpoint saved in the execution context, is added to readPositions so
+	 * that a restart after a failure during a scan of this chunk can resume right after
+	 * the items whose outcome was committed.
+	 */
+	private Chunk<I> readChunk(StepContribution contribution, List<Integer> readPositions) throws Exception {
 		Chunk<I> chunk = new Chunk<>();
-		for (int i = 0; i < chunkSize && this.chunkTracker.get().moreItems(); i++) {
+		ChunkTracker<I, O> tracker = this.chunkTracker.get();
+		for (int i = 0; i < chunkSize && tracker.moreItems(); i++) {
 			I item = readItem(contribution);
 			if (item != null) {
 				chunk.add(item);
+				readPositions.add(tracker.getReadsSinceCheckpoint());
 			}
 		}
 		return chunk;
@@ -610,6 +864,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			}
 			else {
 				contribution.incrementReadCount();
+				this.chunkTracker.get().recordRead();
 				this.compositeItemReadListener.afterRead(item);
 			}
 			itemReadEvent.itemReadStatus = BatchMetrics.STATUS_SUCCESS;
@@ -619,6 +874,10 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			this.compositeItemReadListener.onReadError(exception);
 			if (this.faultTolerant && exception instanceof RetryException retryException) {
 				doSkipInRead(retryException, contribution);
+				// unlike the read count reported on the contribution, a skipped read
+				// still counts here: it moved the reader past its input, so a restart
+				// has to replay it to land on the same item
+				this.chunkTracker.get().recordRead();
 			}
 			else {
 				throw exception;
@@ -634,12 +893,11 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 		return item;
 	}
 
-	@SuppressWarnings("NullAway")
 	private @Nullable I doRead() throws Exception {
 		if (this.faultTolerant) {
-			Retryable<I> retryableRead = new Retryable<>() {
+			Retryable<@Nullable I> retryableRead = new Retryable<@Nullable I>() {
 				@Override
-				public I execute() throws Throwable {
+				public @Nullable I execute() throws Throwable {
 					return itemReader.read();
 				}
 
@@ -666,12 +924,18 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 		}
 	}
 
-	private Chunk<O> processChunk(Chunk<I> chunk, StepContribution contribution) throws Exception {
+	private Chunk<O> processChunk(Chunk<I> chunk, List<Integer> readPositions, StepContribution contribution,
+			List<ScanItem<I, O>> scanItems) throws Exception {
 		Chunk<O> processedChunk = new Chunk<>();
-		for (I item : chunk) {
+		List<I> items = chunk.getItems();
+		for (int i = 0; i < items.size(); i++) {
+			I item = items.get(i);
 			O processedItem = processItem(item, contribution);
 			if (processedItem != null) {
 				processedChunk.add(processedItem);
+				// keep track of the input item each output item was produced from, so
+				// that it can be re-processed during a chunk scan
+				scanItems.add(new ScanItem<>(item, processedItem, readPositions.get(i)));
 			}
 		}
 		return processedChunk;
@@ -718,12 +982,11 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 		return processedItem;
 	}
 
-	@SuppressWarnings("NullAway")
 	private @Nullable O doProcess(I item) throws Exception {
 		if (this.faultTolerant) {
-			Retryable<O> retryableProcess = new Retryable<>() {
+			Retryable<@Nullable O> retryableProcess = new Retryable<@Nullable O>() {
 				@Override
-				public O execute() throws Throwable {
+				public @Nullable O execute() throws Throwable {
 					StepContext context = StepSynchronizationManager.getContext();
 					final StepExecution stepExecution = context == null ? null : context.getStepExecution();
 					if (isConcurrent() && stepExecution != null) {
@@ -762,7 +1025,8 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 		}
 	}
 
-	private void writeChunk(Chunk<O> chunk, StepContribution contribution) throws Exception {
+	private void writeChunk(Chunk<O> chunk, List<ScanItem<I, O>> scanItems, StepContribution contribution,
+			TransactionStatus status) throws Exception {
 		ChunkWriteEvent chunkWriteEvent = new ChunkWriteEvent(contribution.getStepExecution().getStepName(),
 				contribution.getStepExecution().getId(), chunk.size());
 		String fullyQualifiedMetricName = METRICS_PREFIX + "chunk.write";
@@ -776,6 +1040,15 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 		try (var scope = observation.openScope()) {
 			this.compositeItemWriteListener.beforeWrite(chunk);
 			doWrite(chunk);
+			// the write may return normally (eg because a retried write attempt no
+			// longer throws) even though a participant (eg a JPA transaction manager,
+			// after a resource-level failure like an OptimisticLockException) has
+			// independently marked the transaction rollback-only: the chunk must not be
+			// counted as written in that case
+			if (status.isRollbackOnly()) {
+				throw new SilentlyRolledBackException(
+						"The chunk write completed without an exception, but the transaction is rollback-only");
+			}
 			contribution.incrementWriteCount(chunk.size());
 			this.compositeItemWriteListener.afterWrite(chunk);
 			chunkWriteEvent.chunkWriteStatus = BatchMetrics.STATUS_SUCCESS;
@@ -787,13 +1060,26 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			observation.lowCardinalityKeyValue(fullyQualifiedMetricName + ".status", BatchMetrics.STATUS_FAILURE);
 			observation.error(exception);
 
-			if (this.faultTolerant && exception instanceof RetryException retryException
+			if (exception instanceof SilentlyRolledBackException) {
+				logger.error("Chunk write completed but the transaction was independently marked rollback-only",
+						exception);
+			}
+			else if (this.faultTolerant && exception instanceof RetryException retryException
 					&& this.skipPolicy.shouldSkip(retryException.getCause(), -1)) {
-				logger.info("Retry exhausted, entering scan mode for next transaction", retryException);
-				this.chunkTracker.get().enterScanMode(chunk);
+				// the write failed (after exhausting the retry policy, which may allow
+				// no retry at all) with an exception the skip policy accepts: queue the
+				// chunk for scanning so that the offending item can be identified and
+				// skipped. This is an expected part of the skip algorithm and not a step
+				// failure, so it is only reported at debug level, and with the exception
+				// raised by the writer rather than the RetryException wrapping it.
+				if (logger.isDebugEnabled()) {
+					logger.debug("Chunk write failed with a skippable exception, entering scan mode "
+							+ "for next transaction", retryException.getCause());
+				}
+				this.chunkTracker.get().enterScanMode(scanItems);
 			}
 			else {
-				logger.error("Retry exhausted after last attempt in recovery path, but exception is not skippable");
+				logger.error("Chunk write failed with an exception that cannot be skipped");
 			}
 			throw exception;
 		}
@@ -824,38 +1110,148 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 		}
 	}
 
-	private void scan(Chunk<O> chunk, StepContribution contribution, TransactionStatus status) {
-		for (O item : chunk) {
-			Chunk<O> singleItemChunk = new Chunk<>(item);
-			try {
-				this.compositeItemWriteListener.beforeWrite(singleItemChunk);
-				this.itemWriter.write(singleItemChunk);
-				contribution.incrementWriteCount(singleItemChunk.size());
-				this.compositeItemWriteListener.afterWrite(singleItemChunk);
+	/*
+	 * Re-attempt a single item in its own transaction after the enclosing chunk has been
+	 * rolled back. Unless the item processor has been marked as non-transactional, the
+	 * item is re-processed first: the output produced in the rolled back transaction may
+	 * have been mutated by the failed write (a JPA entity whose flush failed, for
+	 * example) and would otherwise fail again for an unrelated reason.
+	 *
+	 * Returns the chunk that was actually written, which is empty if the re-processed
+	 * item was filtered out or skipped in processing.
+	 */
+	private Chunk<O> scan(ScanItem<I, O> scanItem, StepContribution contribution, TransactionStatus status)
+			throws Exception {
+		O item = this.processorTransactional ? processItem(scanItem.input(), contribution) : scanItem.output();
+		if (item == null) {
+			// the item was filtered out or skipped while being re-processed: there is
+			// nothing left to write
+			return new Chunk<>();
+		}
+		Chunk<O> singleItemChunk = new Chunk<>(item);
+		// listeners are not designed to throw: an exception thrown by one of them is
+		// not a write failure of the item, so it is kept out of the try block below and
+		// is never checked against the skip policy. It fails the step, as it does when
+		// the chunk is written in writeChunk().
+		try {
+			this.compositeItemWriteListener.beforeWrite(singleItemChunk);
+		}
+		catch (Exception listenerException) {
+			notifyChunkError(listenerException, singleItemChunk);
+			throw listenerException;
+		}
+		try {
+			this.itemWriter.write(singleItemChunk);
+			// see the equivalent check in writeChunk(): the write may return normally
+			// even though the transaction has independently been marked rollback-only
+			if (status.isRollbackOnly()) {
+				throw new SilentlyRolledBackException(
+						"The scanned item write completed without an exception, but the transaction is rollback-only");
 			}
-			catch (Exception exception) {
-				if (this.skipPolicy.shouldSkip(exception, contribution.getStepSkipCount())) {
-					this.compositeSkipListener.onSkipInWrite(item, exception);
-					contribution.incrementWriteSkipCount();
-					contribution.getStepExecution().incrementRollbackCount();
-					status.setRollbackOnly();
-				}
-				else {
-					logger.error("Failed to write item: " + item, exception);
-					this.compositeItemWriteListener.onWriteError(exception, singleItemChunk);
-					throw new NonSkippableWriteException("Skip policy rejected skipping item", exception);
-				}
+			contribution.incrementWriteCount(singleItemChunk.size());
+		}
+		catch (Exception exception) {
+			// the chunk listener is notified from here rather than from the caller's
+			// error handling, because this is where the item that failed is known:
+			// the skip path below does not propagate the exception at all, and by the
+			// time the other path does, the caller no longer has a processed chunk to
+			// report
+			if (this.skipPolicy.shouldSkip(exception, contribution.getStepSkipCount())) {
+				this.compositeSkipListener.onSkipInWrite(item, exception);
+				contribution.incrementWriteSkipCount();
+				contribution.getStepExecution().incrementRollbackCount();
+				status.setRollbackOnly();
+				this.chunkTracker.get().scannedItemSkipped();
+				notifyChunkError(exception, singleItemChunk);
+				return singleItemChunk;
+			}
+			else {
+				logger.error("Failed to write item: " + item, exception);
+				this.compositeItemWriteListener.onWriteError(exception, singleItemChunk);
+				notifyChunkError(exception, singleItemChunk);
+				throw new NonSkippableWriteException("Skip policy rejected skipping item", exception);
 			}
 		}
+		try {
+			this.compositeItemWriteListener.afterWrite(singleItemChunk);
+		}
+		catch (Exception listenerException) {
+			notifyChunkError(listenerException, singleItemChunk);
+			throw listenerException;
+		}
+		return singleItemChunk;
 	}
 
 	private boolean isConcurrent() {
 		return this.taskExecutor != null;
 	}
 
-	private static class ChunkTracker<O> {
+	/*
+	 * Signals that a write returned normally while the transaction it ran in had already
+	 * been independently marked rollback-only by a participant (eg a JPA transaction
+	 * manager, after a resource-level failure like an OptimisticLockException that a
+	 * retried write no longer raises). It is used internally to route this case into the
+	 * same failure handling as a write that threw, so that the chunk is never counted as
+	 * committed.
+	 */
+	private static class SilentlyRolledBackException extends RuntimeException {
 
-		static <T> ChunkTracker<T> create() {
+		SilentlyRolledBackException(String message) {
+			super(message);
+		}
+
+	}
+
+	/**
+	 * An input item together with the output item produced for it by the
+	 * {@link ItemProcessor}, retained so that the item can be re-attempted during a chunk
+	 * scan.
+	 *
+	 * @param input the item as read by the item reader
+	 * @param output the item as produced by the item processor
+	 * @param readPosition the number of reads, since the reader checkpoint saved in the
+	 * execution context, that returned an item or were skipped, up to and including the
+	 * one that returned the input item
+	 */
+	private record ScanItem<I, O>(I input, O output, int readPosition) {
+	}
+
+	/**
+	 * The state of a step execution that is saved in a chunk transaction, retained so
+	 * that it can be restored if that transaction is not committed. The read and skip
+	 * counts are not part of it: the items have been read, and the skipped items have
+	 * been reported to the skip listener, whatever the outcome of the transaction.
+	 *
+	 * @param version the version of the step execution
+	 * @param writeCount the number of items written
+	 * @param filterCount the number of items filtered out
+	 * @param commitCount the number of commits
+	 * @param executionContext a copy of the execution context of the step execution
+	 */
+	private record StepExecutionState(@Nullable Integer version, long writeCount, long filterCount, long commitCount,
+			ExecutionContext executionContext) {
+
+		static StepExecutionState of(StepExecution stepExecution) {
+			return new StepExecutionState(stepExecution.getVersion(), stepExecution.getWriteCount(),
+					stepExecution.getFilterCount(), stepExecution.getCommitCount(),
+					new ExecutionContext(stepExecution.getExecutionContext()));
+		}
+
+		void restore(StepExecution stepExecution) {
+			if (this.version != null) {
+				stepExecution.setVersion(this.version);
+			}
+			stepExecution.setWriteCount(this.writeCount);
+			stepExecution.setFilterCount(this.filterCount);
+			stepExecution.setCommitCount(this.commitCount);
+			stepExecution.setExecutionContext(new ExecutionContext(this.executionContext));
+		}
+
+	}
+
+	private static class ChunkTracker<I, O> {
+
+		static <T, U> ChunkTracker<T, U> create() {
 			return new ChunkTracker<>();
 		}
 
@@ -863,12 +1259,40 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 
 		private boolean scanMode;
 
-		@Nullable private LinkedList<O> pendingScanItems;
+		@Nullable private LinkedList<ScanItem<I, O>> pendingScanItems;
+
+		private int readsSinceCheckpoint;
+
+		private int lastScannedReadPosition;
+
+		private boolean scannedItemSkipped;
 
 		void init() {
 			this.moreItems = true;
 			this.scanMode = false;
 			this.pendingScanItems = null;
+			this.readsSinceCheckpoint = 0;
+			this.lastScannedReadPosition = 0;
+			this.scannedItemSkipped = false;
+		}
+
+		/*
+		 * The reader state has just been persisted: reads are now counted from there.
+		 */
+		void readerCheckpointSaved() {
+			this.readsSinceCheckpoint = 0;
+		}
+
+		void recordRead() {
+			this.readsSinceCheckpoint++;
+		}
+
+		int getReadsSinceCheckpoint() {
+			return this.readsSinceCheckpoint;
+		}
+
+		int getLastScannedReadPosition() {
+			return this.lastScannedReadPosition;
 		}
 
 		void reset() {
@@ -879,17 +1303,46 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			return this.moreItems || this.scanMode;
 		}
 
-		void enterScanMode(Chunk<O> chunk) {
+		void enterScanMode(List<ScanItem<I, O>> scanItems) {
 			this.scanMode = true;
-			this.pendingScanItems = new LinkedList<>(chunk.getItems());
+			this.pendingScanItems = new LinkedList<>(scanItems);
 		}
 
 		boolean isScanMode() {
 			return this.scanMode;
 		}
 
-		@Nullable O pollNextScanItem() {
-			return (this.pendingScanItems != null) ? this.pendingScanItems.poll() : null;
+		@Nullable ScanItem<I, O> pollNextScanItem() {
+			ScanItem<I, O> scanItem = (this.pendingScanItems != null) ? this.pendingScanItems.poll() : null;
+			if (scanItem != null) {
+				this.lastScannedReadPosition = scanItem.readPosition();
+			}
+			return scanItem;
+		}
+
+		/*
+		 * The item that has just been polled has been skipped on write, in a transaction
+		 * that is rolled back.
+		 */
+		void scannedItemSkipped() {
+			this.scannedItemSkipped = true;
+		}
+
+		/*
+		 * Tell whether a scanned item has been skipped on write since the last call to
+		 * consumeScannedItemSkip(), without consuming it.
+		 */
+		boolean hasScannedItemSkip() {
+			return this.scannedItemSkipped;
+		}
+
+		/*
+		 * Tell whether a scanned item has been skipped on write since the last call.
+		 */
+		boolean consumeScannedItemSkip() {
+			boolean skipped = this.scannedItemSkipped;
+			this.scannedItemSkipped = false;
+			return skipped;
 		}
 
 		boolean hasPendingScanItems() {

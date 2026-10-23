@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2025 the original author or authors.
+ * Copyright 2017-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -93,8 +93,9 @@ public class StoredProcedureItemReaderBuilder<T> {
 	}
 
 	/**
-	 * The name used to calculate the key within the {@link ExecutionContext}. Required if
-	 * {@link #saveState(boolean)} is set to true.
+	 * The name used to calculate the key within the {@link ExecutionContext}. Defaults to
+	 * the bean name, or to the short class name if this instance is not a bean. Set it
+	 * explicitly to disambiguate several non-bean instances of the same type in a step.
 	 * @param name name of the reader instance
 	 * @return The current instance of the builder.
 	 * @see ItemStreamSupport#setName(String)
@@ -133,7 +134,6 @@ public class StoredProcedureItemReaderBuilder<T> {
 	 * The {@link DataSource} to read from
 	 * @param dataSource a relational data base
 	 * @return this instance for method chaining
-	 * @see StoredProcedureItemReader#setDataSource(DataSource)
 	 */
 	public StoredProcedureItemReaderBuilder<T> dataSource(DataSource dataSource) {
 		this.dataSource = dataSource;
@@ -247,7 +247,6 @@ public class StoredProcedureItemReaderBuilder<T> {
 	 * The {@link RowMapper} used to map the results of the cursor to each item.
 	 * @param rowMapper {@link RowMapper}
 	 * @return this instance for method chaining
-	 * @see StoredProcedureItemReader#setRowMapper(RowMapper)
 	 */
 	public StoredProcedureItemReaderBuilder<T> rowMapper(RowMapper<T> rowMapper) {
 		this.rowMapper = rowMapper;
@@ -259,7 +258,6 @@ public class StoredProcedureItemReaderBuilder<T> {
 	 * The name of the stored procedure to execute
 	 * @param procedureName name of the procedure
 	 * @return this instance for method chaining
-	 * @see StoredProcedureItemReader#setProcedureName(String)
 	 */
 	public StoredProcedureItemReaderBuilder<T> procedureName(String procedureName) {
 		this.procedureName = procedureName;
@@ -308,10 +306,6 @@ public class StoredProcedureItemReaderBuilder<T> {
 	 * @return a fully constructed {@link StoredProcedureItemReader}
 	 */
 	public StoredProcedureItemReader<T> build() {
-		if (this.saveState) {
-			Assert.hasText(this.name, "A name is required when saveSate is set to true");
-		}
-
 		Assert.notNull(this.procedureName, "The name of the stored procedure must be provided");
 		Assert.notNull(this.dataSource, "A datasource is required");
 		Assert.notNull(this.rowMapper, "A rowmapper is required");

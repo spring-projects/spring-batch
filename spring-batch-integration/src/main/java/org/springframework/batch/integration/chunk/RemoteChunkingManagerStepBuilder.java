@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2025 the original author or authors.
+ * Copyright 2019-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ import org.springframework.batch.infrastructure.repeat.RepeatOperations;
 import org.springframework.batch.infrastructure.repeat.exception.ExceptionHandler;
 import org.springframework.integration.core.MessagingTemplate;
 import org.springframework.messaging.MessageChannel;
-import org.springframework.messaging.PollableChannel;
+import org.springframework.messaging.SubscribableChannel;
 import org.springframework.retry.RetryPolicy;
 import org.springframework.retry.backoff.BackOffPolicy;
 import org.springframework.retry.policy.RetryContextCache;
@@ -67,13 +67,16 @@ import org.springframework.util.Assert;
  * @param <O> type of output items
  * @since 4.2
  * @author Mahmoud Ben Hassine
+ * @deprecated since 6.1 in favor of {@link RemoteChunkingManagerBuilder}. Scheduled for
+ * removal in 7.0.
  */
 @NullUnmarked
+@Deprecated(since = "6.1", forRemoval = true)
 public class RemoteChunkingManagerStepBuilder<I, O> extends FaultTolerantStepBuilder<I, O> {
 
 	private MessagingTemplate messagingTemplate;
 
-	private PollableChannel inputChannel;
+	private SubscribableChannel inputChannel;
 
 	private MessageChannel outputChannel;
 
@@ -104,7 +107,7 @@ public class RemoteChunkingManagerStepBuilder<I, O> extends FaultTolerantStepBui
 	 *
 	 * @see ChunkMessageChannelItemWriter#setReplyChannel
 	 */
-	public RemoteChunkingManagerStepBuilder<I, O> inputChannel(PollableChannel inputChannel) {
+	public RemoteChunkingManagerStepBuilder<I, O> inputChannel(SubscribableChannel inputChannel) {
 		Assert.notNull(inputChannel, "inputChannel must not be null");
 		this.inputChannel = inputChannel;
 		return this;

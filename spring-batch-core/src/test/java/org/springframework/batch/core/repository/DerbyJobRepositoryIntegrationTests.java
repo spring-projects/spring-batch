@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2025 the original author or authors.
+ * Copyright 2020-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.repository;
 
+import org.springframework.batch.infrastructure.support.DatabaseType;
 import javax.sql.DataSource;
 
 import org.junit.jupiter.api.Test;
@@ -75,7 +76,7 @@ class DerbyJobRepositoryIntegrationTests {
 		@Bean
 		public DataSource dataSource() {
 			return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.DERBY)
-				.addScript("/org/springframework/batch/core/schema-derby.sql")
+				.addScript(DatabaseType.DERBY.getProductSchema())
 				.generateUniqueName(true)
 				.build();
 		}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2025 the original author or authors.
+ * Copyright 2002-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -182,11 +182,6 @@ public abstract class AbstractListenerFactoryBean<T> implements FactoryBean<Obje
 		}
 	}
 
-	@Override
-	public boolean isSingleton() {
-		return true;
-	}
-
 	public void setDelegate(Object delegate) {
 		this.delegate = delegate;
 	}
@@ -218,7 +213,7 @@ public abstract class AbstractListenerFactoryBean<T> implements FactoryBean<Obje
 		}
 		if (target instanceof Advised advised) {
 			TargetSource targetSource = advised.getTargetSource();
-			if (targetSource.getTargetClass() != null && listenerType.isAssignableFrom(targetSource.getTargetClass())) {
+			if (targetSource.getTargetClass() != null && listenerType.isInstance(targetSource)) {
 				return true;
 			}
 
