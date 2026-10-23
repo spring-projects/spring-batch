@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2025 the original author or authors.
+ * Copyright 2020-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,9 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.infrastructure.item.file.transform.DefaultFieldSet;
 import org.springframework.batch.infrastructure.item.file.transform.FieldSet;
+import org.springframework.beans.TypeMismatchException;
+import org.springframework.core.convert.support.DefaultConversionService;
+import org.springframework.core.convert.support.GenericConversionService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -96,6 +99,65 @@ class RecordFieldSetMapperTests {
 		assertNull(user.id());
 	}
 
+	@Test
+	void testConstructorWhenTargetTypeIsNull() {
+		Exception exception = assertThrows(IllegalArgumentException.class, () -> new RecordFieldSetMapper<>(null));
+		assertEquals("targetType must not be null", exception.getMessage());
+	}
+
+	@Test
+	void testConstructorWhenTargetTypeIsNotARecord() {
+		Exception exception = assertThrows(IllegalArgumentException.class,
+				() -> new RecordFieldSetMapper<>(NonRecordClass.class));
+		assertEquals("Target class [" + NonRecordClass.class.getName() + "] must be a record", exception.getMessage());
+	}
+
+	@Test
+	void testConstructorWhenConversionServiceIsNull() {
+		Exception exception = assertThrows(IllegalArgumentException.class,
+				() -> new RecordFieldSetMapper<>(Person.class, null));
+		assertEquals("conversionService must not be null", exception.getMessage());
+	}
+
+	@Test
+	void testMapFieldSetWhenFieldSetIsNull() {
+		RecordFieldSetMapper<Person> recordFieldSetMapper = new RecordFieldSetMapper<>(Person.class);
+		Exception exception = assertThrows(IllegalArgumentException.class,
+				() -> recordFieldSetMapper.mapFieldSet(null));
+		assertEquals("FieldSet must not be null", exception.getMessage());
+	}
+
+	@Test
+	void testMapFieldSetWhenFieldNamesDoNotMatch() {
+		RecordFieldSetMapper<Person> recordFieldSetMapper = new RecordFieldSetMapper<>(Person.class);
+		FieldSet fieldSet = new DefaultFieldSet(new String[] { "1", "foo" }, new String[] { "code", "name" });
+
+		Exception exception = assertThrows(IllegalArgumentException.class,
+				() -> recordFieldSetMapper.mapFieldSet(fieldSet));
+		assertEquals("Cannot access column [id] from [code, name]", exception.getMessage());
+	}
+
+	@Test
+	void testMapFieldSetWhenTypeConversionFails() {
+		RecordFieldSetMapper<Person> recordFieldSetMapper = new RecordFieldSetMapper<>(Person.class);
+		FieldSet fieldSet = new DefaultFieldSet(new String[] { "not-a-number", "foo" }, new String[] { "id", "name" });
+
+		assertThrows(TypeMismatchException.class, () -> recordFieldSetMapper.mapFieldSet(fieldSet));
+	}
+
+	@Test
+	void testMapFieldSetWithCustomConversionService() {
+		GenericConversionService conversionService = new DefaultConversionService();
+		RecordFieldSetMapper<Person> recordFieldSetMapper = new RecordFieldSetMapper<>(Person.class, conversionService);
+		FieldSet fieldSet = new DefaultFieldSet(new String[] { "42", "bar" }, new String[] { "id", "name" });
+
+		Person person = recordFieldSetMapper.mapFieldSet(fieldSet);
+
+		assertNotNull(person);
+		assertEquals(42, person.id());
+		assertEquals("bar", person.name());
+	}
+
 	record Person(int id, String name) {
 	}
 
@@ -103,6 +165,20 @@ class RecordFieldSetMapperTests {
 	}
 
 	record User(Integer id, String name) {
+	}
+
+	static class NonRecordClass {
+
+		private final String name;
+
+		public NonRecordClass(String name) {
+			this.name = name;
+		}
+
+		public String getName() {
+			return name;
+		}
+
 	}
 
 }
