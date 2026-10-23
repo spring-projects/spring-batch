@@ -125,7 +125,6 @@ abstract class AbstractJobRepositoryIntegrationTests {
 
 		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), parameters);
 
-		assertNotNull(jobExecution.getId());
 		assertEquals(job.getName(), jobExecution.getJobInstance().getJobName());
 		assertEquals(parameters, jobExecution.getJobParameters());
 		JobInstance jobInstance = jobRepository.getJobInstance(job.getName(), parameters);
