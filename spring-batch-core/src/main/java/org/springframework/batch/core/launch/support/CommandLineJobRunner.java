@@ -374,14 +374,14 @@ public class CommandLineJobRunner {
 				JobParametersIncrementer incrementer = job.getJobParametersIncrementer();
 				if (lastInstance == null) {
 					// Start from a completely clean sheet
-					jobParameters = incrementer.getNext(new JobParameters());
+					jobParameters = incrementer.getNext(JobParameters.EMPTY);
 				}
 				else {
 					JobExecution previousExecution = jobRepository.getLastJobExecution(lastInstance);
 					if (previousExecution == null) {
 						// Normally this will not happen - an instance exists with no
 						// executions
-						jobParameters = incrementer.getNext(new JobParameters());
+						jobParameters = incrementer.getNext(JobParameters.EMPTY);
 					}
 					else {
 						jobParameters = incrementer.getNext(previousExecution.getJobParameters());

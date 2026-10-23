@@ -61,7 +61,7 @@ class SimpleJobFailureTests {
 		factory.afterPropertiesSet();
 		JobRepository jobRepository = factory.getObject();
 		job.setJobRepository(jobRepository);
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		JobInstance jobInstance = jobRepository.createJobInstance("job", jobParameters);
 		execution = jobRepository.createJobExecution(jobInstance, jobParameters, new ExecutionContext());
 	}

@@ -173,7 +173,7 @@ public class JobScopeConfigurationTests {
 	@BeforeEach
 	void setup() {
 		JobSynchronizationManager.release();
-		jobExecution = new JobExecution(1L, new JobInstance(5l, "JOB"), new JobParameters());
+		jobExecution = new JobExecution(1L, new JobInstance(5l, "JOB"), JobParameters.EMPTY);
 	}
 
 	@AfterEach

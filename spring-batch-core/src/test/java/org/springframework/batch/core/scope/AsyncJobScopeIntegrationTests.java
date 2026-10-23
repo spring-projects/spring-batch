@@ -78,7 +78,7 @@ public class AsyncJobScopeIntegrationTests implements BeanFactoryAware {
 	@Test
 	void testSimpleProperty() {
 		JobInstance jobInstance = new JobInstance(1L, "job");
-		JobExecution jobExecution = new JobExecution(11L, jobInstance, new JobParameters());
+		JobExecution jobExecution = new JobExecution(11L, jobInstance, JobParameters.EMPTY);
 		ExecutionContext executionContext = jobExecution.getExecutionContext();
 		executionContext.put("foo", "bar");
 		JobSynchronizationManager.register(jobExecution);
@@ -95,7 +95,7 @@ public class AsyncJobScopeIntegrationTests implements BeanFactoryAware {
 			final Long id = 123L + i;
 			FutureTask<String> task = new FutureTask<>(() -> {
 				JobInstance jobInstance = new JobInstance(1L, "job");
-				JobExecution jobExecution = new JobExecution(id, jobInstance, new JobParameters());
+				JobExecution jobExecution = new JobExecution(id, jobInstance, JobParameters.EMPTY);
 				ExecutionContext executionContext = jobExecution.getExecutionContext();
 				executionContext.put("foo", value);
 				JobContext context = JobSynchronizationManager.register(jobExecution);
@@ -124,7 +124,7 @@ public class AsyncJobScopeIntegrationTests implements BeanFactoryAware {
 
 		List<FutureTask<String>> tasks = new ArrayList<>();
 		JobInstance jobInstance = new JobInstance(1L, "job");
-		JobExecution jobExecution = new JobExecution(11L, jobInstance, new JobParameters());
+		JobExecution jobExecution = new JobExecution(11L, jobInstance, JobParameters.EMPTY);
 		ExecutionContext executionContext = jobExecution.getExecutionContext();
 		executionContext.put("foo", "foo");
 		JobSynchronizationManager.register(jobExecution);

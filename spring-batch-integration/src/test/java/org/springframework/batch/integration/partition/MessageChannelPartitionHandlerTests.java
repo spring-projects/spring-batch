@@ -89,7 +89,7 @@ class MessageChannelPartitionHandlerTests {
 		// when
 		HashSet<StepExecution> stepExecutions = new HashSet<>();
 		JobInstance jobInstance = new JobInstance(1L, "job");
-		JobExecution jobExecution = new JobExecution(5L, jobInstance, new JobParameters());
+		JobExecution jobExecution = new JobExecution(5L, jobInstance, JobParameters.EMPTY);
 		StepExecution stepExecution = new StepExecution(1L, "step1", jobExecution);
 		stepExecutions.add(stepExecution);
 		when(stepExecutionSplitter.split(any(StepExecution.class), eq(1))).thenReturn(stepExecutions);
@@ -121,7 +121,7 @@ class MessageChannelPartitionHandlerTests {
 		// when
 		HashSet<StepExecution> stepExecutions = new HashSet<>();
 		JobInstance jobInstance = new JobInstance(1L, "job");
-		JobExecution jobExecution = new JobExecution(5L, jobInstance, new JobParameters());
+		JobExecution jobExecution = new JobExecution(5L, jobInstance, JobParameters.EMPTY);
 		StepExecution stepExecution = new StepExecution(1L, "step1", jobExecution);
 		stepExecutions.add(stepExecution);
 		when(stepExecutionSplitter.split(any(StepExecution.class), eq(1))).thenReturn(stepExecutions);
@@ -154,7 +154,7 @@ class MessageChannelPartitionHandlerTests {
 		// when
 		HashSet<StepExecution> stepExecutions = new HashSet<>();
 		JobInstance jobInstance = new JobInstance(1L, "job");
-		JobExecution jobExecution = new JobExecution(5L, jobInstance, new JobParameters());
+		JobExecution jobExecution = new JobExecution(5L, jobInstance, JobParameters.EMPTY);
 		StepExecution stepExecution = new StepExecution(1L, "step1", jobExecution);
 		stepExecutions.add(stepExecution);
 		when(managerStepExecution.getJobExecution()).thenReturn(jobExecution);
@@ -185,7 +185,7 @@ class MessageChannelPartitionHandlerTests {
 		// execute with no default set
 		messageChannelPartitionHandler = new MessageChannelPartitionHandler();
 		// mock
-		JobExecution jobExecution = new JobExecution(5L, new JobInstance(1L, "job"), new JobParameters());
+		JobExecution jobExecution = new JobExecution(5L, new JobInstance(1L, "job"), JobParameters.EMPTY);
 		StepExecution managerStepExecution = new StepExecution(1L, "step1", jobExecution);
 		StepExecutionSplitter stepExecutionSplitter = mock();
 		MessagingTemplate operations = mock();
@@ -204,9 +204,9 @@ class MessageChannelPartitionHandlerTests {
 		stepExecutions.add(partition2);
 		stepExecutions.add(partition3);
 		when(stepExecutionSplitter.split(any(StepExecution.class), eq(1))).thenReturn(stepExecutions);
-		JobExecution runningJobExecution = new JobExecution(5L, new JobInstance(1L, "job"), new JobParameters());
+		JobExecution runningJobExecution = new JobExecution(5L, new JobInstance(1L, "job"), JobParameters.EMPTY);
 		runningJobExecution.addStepExecutions(Arrays.asList(partition2, partition1, partition3));
-		JobExecution completedJobExecution = new JobExecution(5L, new JobInstance(1L, "job"), new JobParameters());
+		JobExecution completedJobExecution = new JobExecution(5L, new JobInstance(1L, "job"), JobParameters.EMPTY);
 		completedJobExecution.addStepExecutions(Arrays.asList(partition2, partition1, partition4));
 		when(jobRepository.getJobExecution(5L)).thenReturn(runningJobExecution, runningJobExecution,
 				runningJobExecution, completedJobExecution);
@@ -236,7 +236,7 @@ class MessageChannelPartitionHandlerTests {
 	void testHandleWithJobRepositoryPollingOnlyCountsRunningStepExecutionsUntilAllAreDone() throws Exception {
 		// given
 		messageChannelPartitionHandler = new MessageChannelPartitionHandler();
-		JobExecution jobExecution = new JobExecution(5L, new JobInstance(1L, "job"), new JobParameters());
+		JobExecution jobExecution = new JobExecution(5L, new JobInstance(1L, "job"), JobParameters.EMPTY);
 		StepExecution managerStepExecution = new StepExecution(1L, "step1", jobExecution);
 		StepExecutionSplitter stepExecutionSplitter = mock();
 		MessagingTemplate operations = mock();
@@ -247,7 +247,7 @@ class MessageChannelPartitionHandlerTests {
 		partition2.setStatus(BatchStatus.COMPLETED);
 		when(stepExecutionSplitter.split(any(StepExecution.class), eq(1)))
 			.thenReturn(new HashSet<>(Arrays.asList(partition1, partition2)));
-		JobExecution completedJobExecution = new JobExecution(5L, new JobInstance(1L, "job"), new JobParameters());
+		JobExecution completedJobExecution = new JobExecution(5L, new JobInstance(1L, "job"), JobParameters.EMPTY);
 		completedJobExecution.addStepExecutions(Arrays.asList(partition1, partition2));
 		when(jobRepository.countRunningStepExecutions(Set.of(2L, 3L))).thenReturn(2L, 1L, 0L);
 		when(jobRepository.getJobExecution(5L)).thenReturn(completedJobExecution);
@@ -272,7 +272,7 @@ class MessageChannelPartitionHandlerTests {
 	void testHandleWithJobRepositoryPollingFallsBackWhenCountingIsNotSupported() throws Exception {
 		// given
 		messageChannelPartitionHandler = new MessageChannelPartitionHandler();
-		JobExecution jobExecution = new JobExecution(5L, new JobInstance(1L, "job"), new JobParameters());
+		JobExecution jobExecution = new JobExecution(5L, new JobInstance(1L, "job"), JobParameters.EMPTY);
 		StepExecution managerStepExecution = new StepExecution(1L, "step1", jobExecution);
 		StepExecutionSplitter stepExecutionSplitter = mock();
 		MessagingTemplate operations = mock();
@@ -285,9 +285,9 @@ class MessageChannelPartitionHandlerTests {
 		runningPartition2.setStatus(BatchStatus.STARTED);
 		when(stepExecutionSplitter.split(any(StepExecution.class), eq(1)))
 			.thenReturn(new HashSet<>(Arrays.asList(partition1, partition2)));
-		JobExecution runningJobExecution = new JobExecution(5L, new JobInstance(1L, "job"), new JobParameters());
+		JobExecution runningJobExecution = new JobExecution(5L, new JobInstance(1L, "job"), JobParameters.EMPTY);
 		runningJobExecution.addStepExecutions(Arrays.asList(partition1, runningPartition2));
-		JobExecution completedJobExecution = new JobExecution(5L, new JobInstance(1L, "job"), new JobParameters());
+		JobExecution completedJobExecution = new JobExecution(5L, new JobInstance(1L, "job"), JobParameters.EMPTY);
 		completedJobExecution.addStepExecutions(Arrays.asList(partition1, partition2));
 		when(jobRepository.countRunningStepExecutions(any())).thenThrow(new UnsupportedOperationException());
 		when(jobRepository.getJobExecution(5L)).thenReturn(runningJobExecution, completedJobExecution);
@@ -313,7 +313,7 @@ class MessageChannelPartitionHandlerTests {
 		// execute with no default set
 		messageChannelPartitionHandler = new MessageChannelPartitionHandler();
 		// mock
-		JobExecution jobExecution = new JobExecution(5L, new JobInstance(1L, "job"), new JobParameters());
+		JobExecution jobExecution = new JobExecution(5L, new JobInstance(1L, "job"), JobParameters.EMPTY);
 		StepExecution managerStepExecution = new StepExecution(1L, "step1", jobExecution);
 		StepExecutionSplitter stepExecutionSplitter = mock();
 		MessagingTemplate operations = mock();
@@ -330,7 +330,7 @@ class MessageChannelPartitionHandlerTests {
 		stepExecutions.add(partition2);
 		stepExecutions.add(partition3);
 		when(stepExecutionSplitter.split(any(StepExecution.class), eq(1))).thenReturn(stepExecutions);
-		JobExecution runningJobExecution = new JobExecution(5L, new JobInstance(1L, "job"), new JobParameters());
+		JobExecution runningJobExecution = new JobExecution(5L, new JobInstance(1L, "job"), JobParameters.EMPTY);
 		runningJobExecution.addStepExecutions(Arrays.asList(partition2, partition1, partition3));
 		when(jobRepository.getJobExecution(5L)).thenReturn(runningJobExecution);
 

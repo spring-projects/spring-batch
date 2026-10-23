@@ -70,7 +70,7 @@ public class JdbcJobInstanceDaoTests {
 
 	@Test
 	void testCreateJobInstance() {
-		JobInstance jobInstance = jdbcJobInstanceDao.createJobInstance("job", new JobParameters());
+		JobInstance jobInstance = jdbcJobInstanceDao.createJobInstance("job", JobParameters.EMPTY);
 
 		Assertions.assertNotNull(jobInstance);
 		assertEquals("job", jobInstance.getJobName());
@@ -80,7 +80,7 @@ public class JdbcJobInstanceDaoTests {
 
 	@Test
 	void testGetJobInstance() {
-		jdbcJobInstanceDao.createJobInstance("job", new JobParameters());
+		jdbcJobInstanceDao.createJobInstance("job", JobParameters.EMPTY);
 
 		JobInstance jobInstance = jdbcJobInstanceDao.getJobInstance(1L);
 
@@ -92,7 +92,7 @@ public class JdbcJobInstanceDaoTests {
 
 	@Test
 	void testGetJobNames() {
-		jdbcJobInstanceDao.createJobInstance("job", new JobParameters());
+		jdbcJobInstanceDao.createJobInstance("job", JobParameters.EMPTY);
 
 		List<String> jobNames = jdbcJobInstanceDao.getJobNames();
 
@@ -102,7 +102,7 @@ public class JdbcJobInstanceDaoTests {
 
 	@Test
 	void testFindJobInstanceByExecution() {
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		JobInstance jobInstance = jdbcJobInstanceDao.createJobInstance("testInstance", jobParameters);
 		JobExecution jobExecution = jdbcJobExecutionDao.createJobExecution(jobInstance, jobParameters);
 		JobInstance returnedInstance = jdbcJobInstanceDao.getJobInstance(jobExecution);
@@ -125,8 +125,8 @@ public class JdbcJobInstanceDaoTests {
 
 	@Test
 	void testJobInstanceWildcard() {
-		jdbcJobInstanceDao.createJobInstance("anotherJob", new JobParameters());
-		jdbcJobInstanceDao.createJobInstance("someJob", new JobParameters());
+		jdbcJobInstanceDao.createJobInstance("anotherJob", JobParameters.EMPTY);
+		jdbcJobInstanceDao.createJobInstance("someJob", JobParameters.EMPTY);
 
 		List<JobInstance> jobInstances = jdbcJobInstanceDao.getJobInstances("*Job", 0, 2);
 		assertEquals(2, jobInstances.size());
@@ -142,7 +142,7 @@ public class JdbcJobInstanceDaoTests {
 	@Test
 	void testDeleteJobInstance() {
 		// given
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		JobInstance jobInstance = jdbcJobInstanceDao.createJobInstance("someTestInstance", jobParameters);
 
 		// when
@@ -166,7 +166,7 @@ public class JdbcJobInstanceDaoTests {
 	void testGetLastInstance() {
 		JobParameters jobParameters1 = new JobParametersBuilder().addString("name", "foo").toJobParameters();
 		JobParameters jobParameters2 = new JobParametersBuilder().addString("name", "bar").toJobParameters();
-		JobParameters jobParameters3 = new JobParameters();
+		JobParameters jobParameters3 = JobParameters.EMPTY;
 		jdbcJobInstanceDao.createJobInstance("job", jobParameters1);
 		JobInstance jobInstance2 = jdbcJobInstanceDao.createJobInstance("job", jobParameters2);
 		jdbcJobInstanceDao.createJobInstance("anotherJob", jobParameters3);

@@ -285,7 +285,7 @@ public abstract class AbstractJobDaoTests {
 	@Test
 	void testCreateDuplicateInstance() {
 
-		jobParameters = new JobParameters();
+		jobParameters = JobParameters.EMPTY;
 
 		jobInstanceDao.createJobInstance(jobName, jobParameters);
 
@@ -296,7 +296,7 @@ public abstract class AbstractJobDaoTests {
 	@Test
 	void testCreationAddsVersion() {
 
-		jobInstance = jobInstanceDao.createJobInstance("testCreationAddsVersion", new JobParameters());
+		jobInstance = jobInstanceDao.createJobInstance("testCreationAddsVersion", JobParameters.EMPTY);
 
 		assertNotNull(jobInstance.getVersion());
 	}

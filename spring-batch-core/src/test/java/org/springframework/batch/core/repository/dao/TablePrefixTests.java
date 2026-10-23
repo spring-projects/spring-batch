@@ -53,7 +53,7 @@ class TablePrefixTests {
 
 	@Test
 	void testJobLaunch() throws Exception {
-		JobExecution jobExecution = jobOperator.start(job, new JobParameters());
+		JobExecution jobExecution = jobOperator.start(job, JobParameters.EMPTY);
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		assertEquals(1, JdbcTestUtils.countRowsInTable(jdbcTemplate, "PREFIX_JOB_INSTANCE"));
 	}

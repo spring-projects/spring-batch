@@ -69,7 +69,7 @@ public class MongoDBSampleApp {
 		// run the insertion job
 		JobOperator jobOperator = context.getBean(JobOperator.class);
 		Job insertionJob = context.getBean("insertionJob", Job.class);
-		jobOperator.start(insertionJob, new JobParameters());
+		jobOperator.start(insertionJob, JobParameters.EMPTY);
 
 		// check results
 		List<Person> persons = mongoTemplate.findAll(Person.class, "person_out");
@@ -80,7 +80,7 @@ public class MongoDBSampleApp {
 
 		// run the deletion job
 		Job deletionJob = context.getBean("deletionJob", Job.class);
-		jobOperator.start(deletionJob, new JobParameters());
+		jobOperator.start(deletionJob, JobParameters.EMPTY);
 
 		// check results (foo3 should have been removed)
 		persons = mongoTemplate.findAll(Person.class, "person_out");

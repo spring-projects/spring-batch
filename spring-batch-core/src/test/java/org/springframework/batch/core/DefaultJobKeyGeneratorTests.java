@@ -72,8 +72,8 @@ class DefaultJobKeyGeneratorTests {
 
 	@Test
 	public void testCreateJobKeyForEmptyParameters() {
-		JobParameters jobParameters1 = new JobParameters();
-		JobParameters jobParameters2 = new JobParameters();
+		JobParameters jobParameters1 = JobParameters.EMPTY;
+		JobParameters jobParameters2 = JobParameters.EMPTY;
 		String key1 = jobKeyGenerator.generateKey(jobParameters1);
 		String key2 = jobKeyGenerator.generateKey(jobParameters2);
 		assertEquals(key1, key2);
@@ -81,7 +81,7 @@ class DefaultJobKeyGeneratorTests {
 
 	@Test
 	public void testCreateJobKeyForEmptyParametersAndNonIdentifying() {
-		JobParameters jobParameters1 = new JobParameters();
+		JobParameters jobParameters1 = JobParameters.EMPTY;
 		JobParameters jobParameters2 = new JobParametersBuilder().addString("name", "foo", false).toJobParameters();
 		String key1 = jobKeyGenerator.generateKey(jobParameters1);
 		String key2 = jobKeyGenerator.generateKey(jobParameters2);

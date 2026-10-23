@@ -51,7 +51,7 @@ class FlowBuilderTests {
 	void testNext() throws Exception {
 		FlowBuilder<Flow> builder = new FlowBuilder<>("flow");
 		JobRepository jobRepository = new ResourcelessJobRepository();
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		JobInstance jobInstance = jobRepository.createJobInstance("foo", jobParameters);
 		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
 				new ExecutionContext());
@@ -69,7 +69,7 @@ class FlowBuilderTests {
 	void testMultipleNext() throws Exception {
 		FlowBuilder<Flow> builder = new FlowBuilder<>("flow");
 		JobRepository jobRepository = new ResourcelessJobRepository();
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		JobInstance jobInstance = jobRepository.createJobInstance("foo", jobParameters);
 		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
 				new ExecutionContext());
@@ -91,7 +91,7 @@ class FlowBuilderTests {
 	void testStart() throws Exception {
 		FlowBuilder<Flow> builder = new FlowBuilder<>("flow");
 		JobRepository jobRepository = new ResourcelessJobRepository();
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		JobInstance jobInstance = jobRepository.createJobInstance("foo", jobParameters);
 		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
 				new ExecutionContext());
@@ -109,7 +109,7 @@ class FlowBuilderTests {
 	void testFrom() throws Exception {
 		FlowBuilder<Flow> builder = new FlowBuilder<>("flow");
 		JobRepository jobRepository = new ResourcelessJobRepository();
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		JobInstance jobInstance = jobRepository.createJobInstance("foo", jobParameters);
 		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
 				new ExecutionContext());
@@ -127,7 +127,7 @@ class FlowBuilderTests {
 	void testTransitionOrdering() throws Exception {
 		FlowBuilder<Flow> builder = new FlowBuilder<>("transitionsFlow");
 		JobRepository jobRepository = new ResourcelessJobRepository();
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		JobInstance jobInstance = jobRepository.createJobInstance("foo", jobParameters);
 		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
 				new ExecutionContext());

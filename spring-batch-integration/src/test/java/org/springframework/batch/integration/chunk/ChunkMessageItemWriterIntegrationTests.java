@@ -195,7 +195,7 @@ class ChunkMessageItemWriterIntegrationTests {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private GenericMessage<ChunkRequest> getSimpleMessage(Long jobId, String... items) {
 		JobInstance jobInstance = new JobInstance(0L, "job");
-		JobExecution jobExecution = new JobExecution(1L, jobInstance, new JobParameters());
+		JobExecution jobExecution = new JobExecution(1L, jobInstance, JobParameters.EMPTY);
 		StepExecution stepExecution = new StepExecution(1L, "step", jobExecution);
 		StepContribution stepContribution = stepExecution.createStepContribution();
 		ChunkRequest chunk = new ChunkRequest(0, Chunk.of(items), jobId, stepContribution);
