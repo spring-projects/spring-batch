@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2025 the original author or authors.
+ * Copyright 2020-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.util.Assert;
 
 /**
- * This is a {@link FieldSetMapper} that supports Java records mapping (requires JKD 14 or
+ * This is a {@link FieldSetMapper} that supports Java records mapping (requires JDK 14 or
  * higher). It uses the record's canonical constructor to map components with the same
  * name as tokens in the {@link FieldSet}.
  *
@@ -60,6 +60,10 @@ public class RecordFieldSetMapper<T> implements FieldSetMapper<T> {
 	 * @param conversionService service to use to convert raw data to typed fields
 	 */
 	public RecordFieldSetMapper(Class<T> targetType, ConversionService conversionService) {
+		Assert.notNull(targetType, "targetType must not be null");
+		Assert.isTrue(targetType.isRecord(), "Target class [" + targetType.getName() + "] must be a record");
+		Assert.notNull(conversionService, "conversionService must not be null");
+
 		this.typeConverter.setConversionService(conversionService);
 		this.mappedConstructor = BeanUtils.getResolvableConstructor(targetType);
 		if (this.mappedConstructor.getParameterCount() > 0) {
@@ -74,9 +78,10 @@ public class RecordFieldSetMapper<T> implements FieldSetMapper<T> {
 
 	@Override
 	public T mapFieldSet(FieldSet fieldSet) {
+		Assert.notNull(fieldSet, "FieldSet must not be null");
+		Assert.isTrue(fieldSet.hasNames(), "Field names must be specified");
 		Assert.isTrue(fieldSet.getFieldCount() == this.constructorParameterNames.length,
 				"Fields count must be equal to record components count");
-		Assert.isTrue(fieldSet.hasNames(), "Field names must be specified");
 		@Nullable Object[] args = new Object[this.constructorParameterNames.length];
 		for (int i = 0; i < args.length; i++) {
 			String name = this.constructorParameterNames[i];
