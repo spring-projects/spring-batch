@@ -20,6 +20,16 @@ jobs:
       - name: Build with Maven
         run: mvn -DaltDeploymentRepository=local::file:deployment-repository --no-transfer-progress --batch-mode --update-snapshots deploy
 
+      - name: Upload test reports
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: test-reports
+          path: |
+            **/target/surefire-reports
+            **/target/failsafe-reports
+          if-no-files-found: ignore
+
       - name: Deploy to Artifactory
         if: ${{ github.repository == 'spring-projects/spring-batch' && github.ref_name == 'main' }}
         uses: spring-io/artifactory-deploy-action@9cb1c7df78cd8d1223de1dde974819fa6378af9f # v0.0.6

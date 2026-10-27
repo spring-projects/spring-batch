@@ -133,6 +133,19 @@
 		<io.spring.maven.antora.version>0.0.4</io.spring.maven.antora.version>
 		<antora-maven-plugin.version>1.0.0-alpha.5</antora-maven-plugin.version>
 
+		<!-- JVM arguments of the forked test JVMs (Surefire and Failsafe): allow dynamic agent loading
+			(Mockito) and native access and Unsafe usage (SQLite, XStream) without warnings on recent JDKs.
+			-Xshare:off avoids the "Sharing is only supported for boot loader classes" warning, which the
+			JVM prints when the Mockito agent extends the boot class path. -XX:+IgnoreUnrecognizedVMOptions
+			makes the options that do not exist before JDK 23 harmless on older runtimes, so the tests
+			still run on Java 17. -->
+		<test.jvm.args>-XX:+IgnoreUnrecognizedVMOptions -XX:+EnableDynamicAgentLoading --enable-native-access=ALL-UNNAMED --sun-misc-unsafe-memory-access=allow -Xshare:off</test.jvm.args>
+
+		<!-- Whether Surefire and Failsafe write the output of the tests to
+			target/{surefire,failsafe}-reports/<class>-output.txt instead of the console. Use
+			-Dtest.redirect.output=false to see the output on the console, for example to debug a test. -->
+		<test.redirect.output>true</test.redirect.output>
+
 		<!-- plugin versions -->
 		<maven-compiler-plugin.version>3.16.0</maven-compiler-plugin.version>
 		<maven-surefire-plugin.version>3.6.0</maven-surefire-plugin.version>
@@ -237,7 +250,9 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>${maven-surefire-plugin.version}</version>
 				<configuration>
-					<argLine>${surefireArgLine}</argLine>
+					<argLine>${test.jvm.args}</argLine>
+					<redirectTestOutputToFile>${test.redirect.output}</redirectTestOutputToFile>
+					<trimStackTrace>true</trimStackTrace>
 					<excludes>
 						<exclude>**/*IntegrationTests.java</exclude>
 						<exclude>**/*FunctionalTests.java</exclude>
@@ -249,6 +264,9 @@
 				<artifactId>maven-failsafe-plugin</artifactId>
 				<version>${maven-failsafe-plugin.version}</version>
 				<configuration>
+					<argLine>${test.jvm.args}</argLine>
+					<redirectTestOutputToFile>${test.redirect.output}</redirectTestOutputToFile>
+					<trimStackTrace>true</trimStackTrace>
 					<includes>
 						<include>**/*IntegrationTests.java</include>
 						<include>**/*FunctionalTests.java</include>
