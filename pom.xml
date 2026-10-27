@@ -146,6 +146,11 @@
 			-Dtest.redirect.output=false to see the output on the console, for example to debug a test. -->
 		<test.redirect.output>true</test.redirect.output>
 
+		<!-- JUnit tags that Surefire and Failsafe do not run. The "migration" tests validate the
+			migration scripts on demand, they are not part of the build. Run them with
+			-Dexcluded.groups= -Dgroups=migration -->
+		<excluded.groups>migration</excluded.groups>
+
 		<!-- plugin versions -->
 		<maven-compiler-plugin.version>3.16.0</maven-compiler-plugin.version>
 		<maven-surefire-plugin.version>3.6.0</maven-surefire-plugin.version>
@@ -253,6 +258,7 @@
 					<argLine>${test.jvm.args}</argLine>
 					<redirectTestOutputToFile>${test.redirect.output}</redirectTestOutputToFile>
 					<trimStackTrace>true</trimStackTrace>
+					<excludedGroups>${excluded.groups}</excludedGroups>
 					<excludes>
 						<exclude>**/*IntegrationTests.java</exclude>
 						<exclude>**/*FunctionalTests.java</exclude>
@@ -267,6 +273,7 @@
 					<argLine>${test.jvm.args}</argLine>
 					<redirectTestOutputToFile>${test.redirect.output}</redirectTestOutputToFile>
 					<trimStackTrace>true</trimStackTrace>
+					<excludedGroups>${excluded.groups}</excludedGroups>
 					<includes>
 						<include>**/*IntegrationTests.java</include>
 						<include>**/*FunctionalTests.java</include>

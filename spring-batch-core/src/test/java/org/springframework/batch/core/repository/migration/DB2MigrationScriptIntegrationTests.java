@@ -17,7 +17,7 @@ package org.springframework.batch.core.repository.migration;
 
 import com.ibm.db2.jcc.DB2SimpleDataSource;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
@@ -28,12 +28,15 @@ import org.testcontainers.utility.DockerImageName;
 
 /**
  * Integration tests for DB2 migration script for v6.0
+ * <p>
+ * Excluded from the build by default through the {@code migration} tag. Run it on demand
+ * with {@code -Dexcluded.groups= -Dgroups=migration}.
  *
  * @author Jinwoo Bae
  * @author Mahmoud Ben Hassine
  */
 @Testcontainers(disabledWithoutDocker = true)
-@Disabled("On purpose, not part of the CI build. Used on demand to validate migration scripts.")
+@Tag("migration")
 class DB2MigrationScriptIntegrationTests {
 
 	private static final DockerImageName DB2_IMAGE = DockerImageName.parse("icr.io/db2_community/db2:12.1.0.0");

@@ -16,7 +16,7 @@
 package org.springframework.batch.core.repository.migration;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.mariadb.jdbc.MariaDbDataSource;
 import org.springframework.core.io.FileSystemResource;
@@ -30,10 +30,13 @@ import java.sql.SQLException;
 
 /**
  * Integration tests for MariaDB migration script for v6.0
+ * <p>
+ * Excluded from the build by default through the {@code migration} tag. Run it on demand
+ * with {@code -Dexcluded.groups= -Dgroups=migration}.
  *
  * @author Andrii Hrytsiuk
  */
-@Disabled("On purpose, not part of the CI build. Used on demand to validate migration scripts.")
+@Tag("migration")
 @Testcontainers(disabledWithoutDocker = true)
 class MariaDbMigrationScriptIntegrationTests {
 
