@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2025 the original author or authors.
+ * Copyright 2009-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -127,6 +127,31 @@ class MultiResourceItemWriterXmlTests extends AbstractMultiResourceItemWriterTes
 		assertEquals(xmlDocStart + "<prefix:5/><prefix:6/>" + xmlDocEnd, readFile(part3));
 		assertEquals(xmlDocStart + "<prefix:7/><prefix:8/>" + xmlDocEnd, readFile(part4));
 		assertEquals(xmlDocStart + "<prefix:9/>" + xmlDocEnd, readFile(part5));
+	}
+
+	@Test
+	void testRestartAtResourceBoundary() throws Exception {
+
+		super.setUp(delegate);
+		tested.open(executionContext);
+
+		// Save the delegate position while the first file is still open.
+		tested.write(Chunk.of("1"));
+		tested.update(executionContext);
+		// This chunk closes the first file.
+		tested.write(Chunk.of("2"));
+		tested.update(executionContext);
+		tested.close();
+
+		tested.open(executionContext);
+
+		tested.write(Chunk.of("3", "4"));
+		tested.close();
+
+		File part1 = new File(file.getAbsolutePath() + suffixCreator.getSuffix(1));
+		File part2 = new File(file.getAbsolutePath() + suffixCreator.getSuffix(2));
+		assertEquals(xmlDocStart + "<prefix:1/><prefix:2/>" + xmlDocEnd, readFile(part1));
+		assertEquals(xmlDocStart + "<prefix:3/><prefix:4/>" + xmlDocEnd, readFile(part2));
 	}
 
 }
