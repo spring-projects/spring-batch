@@ -54,13 +54,8 @@ public class TestConfiguration {
 
 	@Bean
 	@StepScope
-	public ItemProcessor<Person, Person> itemProcessor() {
-		return item -> {
-			if (System.getProperty("fail") != null) {
-				throw new Exception("Unable to process item " + item);
-			}
-			return new Person(item.id(), item.name().toUpperCase());
-		};
+	public PersonItemProcessor itemProcessor() {
+		return new PersonItemProcessor();
 	}
 
 	@Bean
@@ -72,6 +67,24 @@ public class TestConfiguration {
 	@Bean
 	public Job job(JobRepository jobRepository, Step step) {
 		return new JobBuilder(jobRepository).start(step).build();
+	}
+
+	/**
+	 * A concrete type, returned by the step scoped bean method above: a bean method that
+	 * returns the {@link ItemProcessor} interface would be proxied through that
+	 * interface, and the implementing class could not be queried for listener
+	 * annotations.
+	 */
+	public static class PersonItemProcessor implements ItemProcessor<Person, Person> {
+
+		@Override
+		public Person process(Person item) throws Exception {
+			if (System.getProperty("fail") != null) {
+				throw new Exception("Unable to process item " + item);
+			}
+			return new Person(item.id(), item.name().toUpperCase());
+		}
+
 	}
 
 }

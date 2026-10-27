@@ -112,7 +112,7 @@ class BatchTestContextBeanPostProcessorTests {
 		}
 
 		@Bean
-		BatchTestContextBeanPostProcessor beanPostProcessor() {
+		static BatchTestContextBeanPostProcessor beanPostProcessor() {
 			return new BatchTestContextBeanPostProcessor();
 		}
 
