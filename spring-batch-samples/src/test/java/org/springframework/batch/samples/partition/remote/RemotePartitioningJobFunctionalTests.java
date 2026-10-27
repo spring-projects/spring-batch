@@ -18,9 +18,11 @@ package org.springframework.batch.samples.partition.remote;
 import org.springframework.batch.infrastructure.support.DatabaseType;
 import javax.sql.DataSource;
 
+import org.apache.activemq.artemis.api.core.SimpleString;
 import org.apache.activemq.artemis.core.config.Configuration;
 import org.apache.activemq.artemis.core.config.impl.ConfigurationImpl;
 import org.apache.activemq.artemis.core.server.embedded.EmbeddedActiveMQ;
+import org.apache.activemq.artemis.core.settings.impl.AddressSettings;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -72,7 +74,9 @@ public abstract class RemotePartitioningJobFunctionalTests {
 			.setPersistenceEnabled(false)
 			.setSecurityEnabled(false)
 			.setJMXManagementEnabled(false)
-			.setJournalDatasync(false);
+			.setJournalDatasync(false)
+			.addAddressSetting("#", new AddressSettings().setDeadLetterAddress(SimpleString.of("DLQ"))
+				.setExpiryAddress(SimpleString.of("ExpiryQueue")));
 		this.brokerService = new EmbeddedActiveMQ().setConfiguration(configuration).start();
 		// FIXME Does not work when importing
 		// org.springframework.batch.samples.common.DataSourceConfiguration?
