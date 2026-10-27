@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.step.item;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -368,8 +369,7 @@ public class ChunkOrientedStepTests {
 		ChunkOrientedStep<String, String> step = new ChunkOrientedStep<>("step", 3, reader, writer, jobRepository);
 		step.setItemProcessor(processor);
 		step.setFaultTolerant(true);
-		step.setRetryPolicy(RetryPolicy.withMaxRetries(1)); // retry once (initial + 1
-															// retry)
+		step.setRetryPolicy(retryOnceWithoutDelay()); // retry once (initial + 1 retry)
 		step.setSkipPolicy(new NeverSkipItemSkipPolicy()); // never skip
 		step.afterPropertiesSet();
 
@@ -566,7 +566,7 @@ public class ChunkOrientedStepTests {
 		step.setItemProcessor(failingProcessor);
 		step.setTaskExecutor(new SimpleAsyncTaskExecutor());
 		step.setFaultTolerant(true);
-		step.setRetryPolicy(RetryPolicy.withMaxRetries(1));
+		step.setRetryPolicy(retryOnceWithoutDelay());
 		step.setSkipPolicy((throwable, skipCount) -> throwable instanceof RuntimeException);
 
 		step.afterPropertiesSet();
@@ -605,7 +605,7 @@ public class ChunkOrientedStepTests {
 		ChunkOrientedStep<Integer, Integer> step = new ChunkOrientedStep<>("step", 100, reader, writer, jobRepository);
 		step.setItemProcessor(failingProcessor);
 		step.setFaultTolerant(true);
-		step.setRetryPolicy(RetryPolicy.withMaxRetries(1));
+		step.setRetryPolicy(retryOnceWithoutDelay());
 		step.setSkipPolicy((throwable, skipCount) -> throwable instanceof RuntimeException);
 		step.afterPropertiesSet();
 
@@ -824,6 +824,15 @@ public class ChunkOrientedStepTests {
 		assertEquals(3, stepExecution.getWriteSkipCount());
 		assertEquals(3, stepExecution.getWriteCount());
 		assertEquals(2, stepExecution.getCommitCount());
+	}
+
+	/**
+	 * The default delay of a {@link RetryPolicy} is one second, which would make each
+	 * retry of the tests that use this policy sleep for no reason: they check how the
+	 * step handles failures, not the back-off.
+	 */
+	private static RetryPolicy retryOnceWithoutDelay() {
+		return RetryPolicy.builder().maxRetries(1).delay(Duration.ZERO).build();
 	}
 
 	private StepExecution execute(ItemWriter<String> writer, ItemWriteListener<String> writeListener,
