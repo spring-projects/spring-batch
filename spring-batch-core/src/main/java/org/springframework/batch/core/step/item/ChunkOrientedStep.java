@@ -452,7 +452,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 						stepExecution.getId());
 				chunkTransactionEvent.begin();
 				markUnknownIfOutcomeIsUnknown(stepExecution);
-				StepExecutionState stateBeforeTransaction = StepExecutionState.of(stepExecution);
+				restoreStateIfNotCommitted(stepExecution, StepExecutionState.of(stepExecution));
 				StepContribution contribution = stepExecution.createStepContribution();
 				ChunkTracker<I, O> tracker = this.chunkTracker.get();
 				boolean scanning = tracker.isScanMode();
@@ -470,7 +470,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 					return;
 				}
 
-				saveState(stepExecution, tracker, scanning, stateBeforeTransaction);
+				saveState(stepExecution, tracker, scanning);
 				chunkTransactionEvent.transactionStatus = BatchMetrics.STATUS_COMMITTED;
 				chunkTransactionEvent.commit();
 			});
@@ -482,20 +482,23 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			if (tracker.consumeScannedItemSkip()) {
 				this.transactionTemplate.executeWithoutResult(transactionStatus -> {
 					markUnknownIfOutcomeIsUnknown(stepExecution);
-					saveState(stepExecution, tracker, true, StepExecutionState.of(stepExecution));
+					restoreStateIfNotCommitted(stepExecution, StepExecutionState.of(stepExecution));
+					if (!tracker.isScanMode()) {
+						stepExecution.incrementCommitCount();
+					}
+					saveState(stepExecution, tracker, true);
 				});
 			}
 		}
 	}
 
 	/*
-	 * Save the state of the streams and of the step execution for a commit. If the
-	 * transaction is not committed after that, the step execution is restored to its
-	 * state before the transaction, see restoreStateIfNotCommitted().
+	 * Save the state of the streams and of the step execution for a commit.
 	 */
-	private void saveState(StepExecution stepExecution, ChunkTracker<I, O> tracker, boolean scanning,
-			StepExecutionState stateBeforeTransaction) {
-		restoreStateIfNotCommitted(stepExecution, stateBeforeTransaction);
+	private void saveState(StepExecution stepExecution, ChunkTracker<I, O> tracker, boolean scanning) {
+		// Items filtered out before scanning are not queued for reprocessing. Commit
+		// their count with the first successfully persisted scan checkpoint.
+		stepExecution.setFilterCount(stepExecution.getFilterCount() + tracker.getPendingFilterCount());
 		ExecutionContext executionContext = stepExecution.getExecutionContext();
 		// Both terms are required: the transaction must have re-attempted a scanned item
 		// (scanning), and the scan must still have items pending (isScanMode). The
@@ -540,23 +543,24 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 
 	/*
 	 * Restore the step execution to its state before the current transaction if that
-	 * transaction is not committed once the state of the step has started to be saved in
-	 * it: for example, because saving the state of a stream fails, because a transaction
-	 * synchronization fails in beforeCommit, or because the commit itself fails.
+	 * transaction is not committed: for example, because processing, writing, a chunk
+	 * listener, saving stream state, a beforeCommit synchronization, or the commit fails.
 	 * Otherwise, the step execution would keep the version, the counts and the execution
 	 * context saved in a transaction that was rolled back: the version would make saving
 	 * the step execution fail when the step ends, and the execution context, if saved,
 	 * would make a restart skip the items of that transaction.
 	 */
 	private void restoreStateIfNotCommitted(StepExecution stepExecution, StepExecutionState stateBeforeTransaction) {
+		ChunkTracker<I, O> tracker = this.chunkTracker.get();
 		registerSynchronization(new TransactionSynchronization() {
 			@Override
 			public void afterCompletion(int status) {
 				if (status == STATUS_COMMITTED) {
+					tracker.filtersCommitted();
 					return;
 				}
 				if (logger.isDebugEnabled()) {
-					logger.debug("Chunk transaction not committed after the state of the step was saved, "
+					logger.debug("Chunk transaction not committed, "
 							+ "restoring the step execution to its state before the transaction");
 				}
 				stateBeforeTransaction.restore(stepExecution);
@@ -637,9 +641,8 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 				if (!tracker.hasPendingScanItems()) {
 					logger.debug("Chunk scan completed");
 					tracker.exitScanMode();
-					// a scan that ends with a skip on write is rolled back, but the skip
-					// is then committed in a new transaction
-					if (!status.isRollbackOnly() || tracker.hasScannedItemSkip()) {
+					// A skip on write is committed and counted in a separate transaction.
+					if (!status.isRollbackOnly()) {
 						stepExecution.incrementCommitCount();
 					}
 				}
@@ -743,9 +746,8 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 				if (!tracker.hasPendingScanItems()) {
 					logger.debug("Chunk scan completed");
 					tracker.exitScanMode();
-					// a scan that ends with a skip on write is rolled back, but the skip
-					// is then committed in a new transaction
-					if (!status.isRollbackOnly() || tracker.hasScannedItemSkip()) {
+					// A skip on write is committed and counted in a separate transaction.
+					if (!status.isRollbackOnly()) {
 						stepExecution.incrementCommitCount();
 					}
 				}
@@ -1076,7 +1078,11 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 					logger.debug("Chunk write failed with a skippable exception, entering scan mode "
 							+ "for next transaction", retryException.getCause());
 				}
-				this.chunkTracker.get().enterScanMode(scanItems);
+				// Without synchronization the filter contribution is already retained on
+				// rollback.
+				long pendingFilterCount = TransactionSynchronizationManager.isSynchronizationActive()
+						? contribution.getFilterCount() : 0;
+				this.chunkTracker.get().enterScanMode(scanItems, pendingFilterCount);
 			}
 			else {
 				logger.error("Chunk write failed with an exception that cannot be skipped");
@@ -1226,14 +1232,15 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 	 * @param writeCount the number of items written
 	 * @param filterCount the number of items filtered out
 	 * @param commitCount the number of commits
+	 * @param rollbackCount the number of rollbacks
 	 * @param executionContext a copy of the execution context of the step execution
 	 */
 	private record StepExecutionState(@Nullable Integer version, long writeCount, long filterCount, long commitCount,
-			ExecutionContext executionContext) {
+			long rollbackCount, ExecutionContext executionContext) {
 
 		static StepExecutionState of(StepExecution stepExecution) {
 			return new StepExecutionState(stepExecution.getVersion(), stepExecution.getWriteCount(),
-					stepExecution.getFilterCount(), stepExecution.getCommitCount(),
+					stepExecution.getFilterCount(), stepExecution.getCommitCount(), stepExecution.getRollbackCount(),
 					new ExecutionContext(stepExecution.getExecutionContext()));
 		}
 
@@ -1244,7 +1251,18 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			stepExecution.setWriteCount(this.writeCount);
 			stepExecution.setFilterCount(this.filterCount);
 			stepExecution.setCommitCount(this.commitCount);
-			stepExecution.setExecutionContext(new ExecutionContext(this.executionContext));
+			// The synchronization counts this rollback once, even if processing already
+			// did.
+			stepExecution.setRollbackCount(this.rollbackCount);
+			// Preserve references injected into step-scoped components while scanning
+			// continues.
+			ExecutionContext context = stepExecution.getExecutionContext();
+			for (var entry : context.entrySet()) {
+				if (!this.executionContext.containsKey(entry.getKey())) {
+					context.remove(entry.getKey());
+				}
+			}
+			this.executionContext.entrySet().forEach(entry -> context.put(entry.getKey(), entry.getValue()));
 		}
 
 	}
@@ -1267,6 +1285,8 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 
 		private boolean scannedItemSkipped;
 
+		private long pendingFilterCount;
+
 		void init() {
 			this.moreItems = true;
 			this.scanMode = false;
@@ -1274,6 +1294,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			this.readsSinceCheckpoint = 0;
 			this.lastScannedReadPosition = 0;
 			this.scannedItemSkipped = false;
+			this.pendingFilterCount = 0;
 		}
 
 		/*
@@ -1303,9 +1324,18 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			return this.moreItems || this.scanMode;
 		}
 
-		void enterScanMode(List<ScanItem<I, O>> scanItems) {
+		void enterScanMode(List<ScanItem<I, O>> scanItems, long filterCount) {
 			this.scanMode = true;
 			this.pendingScanItems = new LinkedList<>(scanItems);
+			this.pendingFilterCount = filterCount;
+		}
+
+		long getPendingFilterCount() {
+			return this.pendingFilterCount;
+		}
+
+		void filtersCommitted() {
+			this.pendingFilterCount = 0;
 		}
 
 		boolean isScanMode() {
@@ -1326,14 +1356,6 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 		 */
 		void scannedItemSkipped() {
 			this.scannedItemSkipped = true;
-		}
-
-		/*
-		 * Tell whether a scanned item has been skipped on write since the last call to
-		 * consumeScannedItemSkip(), without consuming it.
-		 */
-		boolean hasScannedItemSkip() {
-			return this.scannedItemSkipped;
 		}
 
 		/*
