@@ -17,6 +17,8 @@
 package org.springframework.batch.core.step.tasklet;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.concurrent.FutureTask;
 
 import org.apache.commons.logging.Log;
@@ -37,6 +39,7 @@ import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StreamUtils;
 import org.springframework.util.StringUtils;
 
 /**
@@ -56,12 +59,16 @@ import org.springframework.util.StringUtils;
  * {@link #setInterruptOnCancel(boolean)} specifies whether the tasklet should attempt to
  * interrupt the thread that executes the system command if it is still running when
  * tasklet exits (abnormally).
+ * <p>
+ * The standard output and error of the system command are consumed and discarded, so that
+ * the command does not block when it writes more than the operating system buffers.
  *
  * @author Robert Kasanicky
  * @author Will Schipp
  * @author Mahmoud Ben Hassine
  * @author Injae Kim
  * @author Hyunsang Han
+ * @author Xavier Mesas
  */
 // FIXME remove once default constructors (required by the XML namespace) are removed
 @NullUnmarked
@@ -126,6 +133,8 @@ public class SystemCommandTasklet implements StepExecutionListener, StoppableTas
 
 		FutureTask<Integer> systemCommandTask = new FutureTask<>(() -> {
 			Process process = commandRunner.exec(cmdArray, environmentParams, workingDirectory);
+			discardInBackground(process.getInputStream());
+			discardInBackground(process.getErrorStream());
 			return process.waitFor();
 		});
 
@@ -171,6 +180,24 @@ public class SystemCommandTasklet implements StepExecutionListener, StoppableTas
 				return RepeatStatus.FINISHED;
 			}
 		}
+	}
+
+	/**
+	 * Read the given output of the system command until it ends, without blocking the
+	 * caller, so that {@link #setInterruptOnCancel(boolean) interrupting} the thread
+	 * waiting for the command still works.
+	 */
+	private static void discardInBackground(InputStream output) {
+		Thread drainer = new Thread(() -> {
+			try {
+				StreamUtils.drain(output);
+			}
+			catch (IOException ex) {
+				logger.debug("Stopped reading the output of the system command", ex);
+			}
+		}, "system-command-output");
+		drainer.setDaemon(true);
+		drainer.start();
 	}
 
 	/**
