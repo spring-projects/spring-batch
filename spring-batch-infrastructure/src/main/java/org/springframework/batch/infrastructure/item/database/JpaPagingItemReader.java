@@ -200,7 +200,14 @@ public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
 		catch (RuntimeException e) {
 			// do not leave the transaction of the failed page open
 			if (this.transacted && this.entityManager.getTransaction().isActive()) {
-				this.entityManager.getTransaction().rollback();
+				try {
+					this.entityManager.getTransaction().rollback();
+				}
+				catch (RuntimeException rollbackException) {
+					// keep the original failure, which is what callers (e.g. a retry
+					// policy) need to see
+					e.addSuppressed(rollbackException);
+				}
 			}
 			throw e;
 		}
