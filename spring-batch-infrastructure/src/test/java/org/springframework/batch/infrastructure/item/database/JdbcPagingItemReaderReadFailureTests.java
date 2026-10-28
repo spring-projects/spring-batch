@@ -26,6 +26,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.sql.DataSource;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.batch.infrastructure.item.database.builder.JdbcPagingItemReaderBuilder;
@@ -71,15 +73,7 @@ class JdbcPagingItemReaderReadFailureTests {
 
 	@Test
 	void readAfterFailureWhileMappingPageReadsPageAgainFromSamePosition() throws Exception {
-		AtomicBoolean fail = new AtomicBoolean(true);
-		RowMapper<Integer> rowMapper = (rs, rowNum) -> {
-			int id = rs.getInt("ID");
-			if (id == 4 && fail.getAndSet(false)) {
-				throw new SQLTransientConnectionException("Connection reset");
-			}
-			return id;
-		};
-		JdbcPagingItemReader<Integer> reader = createItemReader(this.dataSource, rowMapper);
+		JdbcPagingItemReader<Integer> reader = createItemReader(this.dataSource, failingOnceAt(4));
 
 		assertEquals(1, reader.read());
 		assertEquals(2, reader.read());
@@ -87,16 +81,45 @@ class JdbcPagingItemReaderReadFailureTests {
 		assertEquals(List.of(3, 4, 5), readAll(reader));
 	}
 
-	private JdbcPagingItemReader<Integer> createItemReader(DataSource dataSource, RowMapper<Integer> rowMapper)
-			throws Exception {
-		JdbcPagingItemReader<Integer> reader = new JdbcPagingItemReaderBuilder<Integer>().name("fooReader")
+	@ParameterizedTest
+	@CsvSource({ "ID > :min, min", "ID > ?, 1" })
+	void readAfterFailureWhileMappingPageWithParametersReadsPageAgainFromSamePosition(String whereClause,
+			String parameterName) throws Exception {
+		JdbcPagingItemReader<Integer> reader = readerBuilder(this.dataSource, failingOnceAt(4)).whereClause(whereClause)
+			.parameterValues(Map.of(parameterName, 0))
+			.build();
+		reader.open(new ExecutionContext());
+
+		assertEquals(1, reader.read());
+		assertEquals(2, reader.read());
+		assertThrows(DataAccessException.class, reader::read);
+		assertEquals(List.of(3, 4, 5), readAll(reader));
+	}
+
+	private RowMapper<Integer> failingOnceAt(int failingId) {
+		AtomicBoolean fail = new AtomicBoolean(true);
+		return (rs, rowNum) -> {
+			int id = rs.getInt("ID");
+			if (id == failingId && fail.getAndSet(false)) {
+				throw new SQLTransientConnectionException("Connection reset");
+			}
+			return id;
+		};
+	}
+
+	private JdbcPagingItemReaderBuilder<Integer> readerBuilder(DataSource dataSource, RowMapper<Integer> rowMapper) {
+		return new JdbcPagingItemReaderBuilder<Integer>().name("fooReader")
 			.dataSource(dataSource)
 			.selectClause("select ID")
 			.fromClause("from T_FOOS")
 			.sortKeys(Map.of("ID", Order.ASCENDING))
 			.rowMapper(rowMapper)
-			.pageSize(2)
-			.build();
+			.pageSize(2);
+	}
+
+	private JdbcPagingItemReader<Integer> createItemReader(DataSource dataSource, RowMapper<Integer> rowMapper)
+			throws Exception {
+		JdbcPagingItemReader<Integer> reader = readerBuilder(dataSource, rowMapper).build();
 		reader.open(new ExecutionContext());
 		return reader;
 	}
