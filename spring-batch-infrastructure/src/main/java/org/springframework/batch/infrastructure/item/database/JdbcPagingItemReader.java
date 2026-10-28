@@ -74,6 +74,7 @@ import org.springframework.util.Assert;
  * @author Stefano Cordio
  * @author Jimmy Praet
  * @author Duyeor Kim
+ * @author WooSeung Kim
  * @since 2.0
  */
 public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> implements InitializingBean {
@@ -240,6 +241,10 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 			query = Collections.emptyList();
 		}
 
+		// only move past the page once it has been read
+		if (rowCallback.sortKeyValues != null) {
+			this.startAfterValues = rowCallback.sortKeyValues;
+		}
 		results.addAll(query);
 	}
 
@@ -320,12 +325,14 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 
 	private class PagingRowMapper implements RowMapper<T> {
 
+		private @Nullable Map<String, Object> sortKeyValues;
+
 		@SuppressWarnings("DataFlowIssue")
 		@Override
 		public @Nullable T mapRow(ResultSet rs, int rowNum) throws SQLException {
-			startAfterValues = new LinkedHashMap<>();
+			this.sortKeyValues = new LinkedHashMap<>();
 			for (Map.Entry<String, Order> sortKey : queryProvider.getSortKeys().entrySet()) {
-				startAfterValues.put(sortKey.getKey(), rs.getObject(sortKey.getKey()));
+				this.sortKeyValues.put(sortKey.getKey(), rs.getObject(sortKey.getKey()));
 			}
 
 			return rowMapper.mapRow(rs, rowNum);
