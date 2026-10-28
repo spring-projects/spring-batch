@@ -76,6 +76,7 @@ import org.springframework.util.Assert;
  * @author Stefano Cordio
  * @author Jimmy Praet
  * @author Duyeor Kim
+ * @author WooSeung Kim
  * @since 2.0
  */
 public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> implements InitializingBean {
@@ -242,6 +243,10 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 			query = Collections.emptyList();
 		}
 
+		// only move past the page once it has been read
+		if (rowCallback.sortKeyValues != null) {
+			this.startAfterValues = rowCallback.sortKeyValues;
+		}
 		results.addAll(query);
 	}
 
@@ -324,10 +329,12 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 
 		private final Map<String, Integer> sortKeyColumns = new LinkedHashMap<>();
 
+		private @Nullable Map<String, Object> sortKeyValues;
+
 		@SuppressWarnings("DataFlowIssue")
 		@Override
 		public @Nullable T mapRow(ResultSet rs, int rowNum) throws SQLException {
-			startAfterValues = new LinkedHashMap<>();
+			this.sortKeyValues = new LinkedHashMap<>();
 			for (Map.Entry<String, Order> sortKey : queryProvider.getSortKeys().entrySet()) {
 				String key = sortKey.getKey();
 				Integer column = sortKeyColumns.get(key);
@@ -335,7 +342,7 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 					column = findSortKeyColumn(rs, key);
 					sortKeyColumns.put(key, column);
 				}
-				startAfterValues.put(key, rs.getObject(column));
+				this.sortKeyValues.put(key, rs.getObject(column));
 			}
 
 			return rowMapper.mapRow(rs, rowNum);
