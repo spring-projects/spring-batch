@@ -83,6 +83,7 @@ import org.springframework.util.StringUtils;
  * @author Mahmoud Ben Hassine
  * @author Jinwoo Bae
  * @author Jimmy Praet
+ * @author WooSeung Kim
  * @since 2.0
  */
 public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
@@ -197,9 +198,23 @@ public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
 
 	}
 
-	@SuppressWarnings({ "unchecked", "DataFlowIssue" })
+	@SuppressWarnings("DataFlowIssue")
 	@Override
 	protected void doReadPage() {
+		try {
+			readPage();
+		}
+		catch (RuntimeException e) {
+			// do not leave the transaction of the failed page open
+			if (this.transacted && this.entityManager.getTransaction().isActive()) {
+				this.entityManager.getTransaction().rollback();
+			}
+			throw e;
+		}
+	}
+
+	@SuppressWarnings({ "unchecked", "DataFlowIssue" })
+	private void readPage() {
 
 		EntityTransaction tx = null;
 
