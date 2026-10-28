@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,8 +33,8 @@ import org.springframework.util.ReflectionUtils.MethodCallback;
  * injection into unit tests. A {@link StepContext} will be created for the duration of a
  * test method and made available to any dependencies that are injected. The default
  * behaviour is just to create a {@link StepExecution} with fixed properties.
- * Alternatively, it can be provided by the test case as a factory methods returning the
- * correct type. Example:
+ * Alternatively, it can be provided by the test case as a factory method without
+ * parameters returning the correct type. Example:
  *
  * <pre>
  * &#064;ContextConfiguration
@@ -67,6 +67,7 @@ import org.springframework.util.ReflectionUtils.MethodCallback;
  * @author Mahmoud Ben Hassine
  * @author Stefano Cordio
  * @author Hyuntae Park
+ * @author Xavier Mesas
  */
 public class StepScopeTestExecutionListener implements TestExecutionListener {
 
@@ -114,7 +115,8 @@ public class StepScopeTestExecutionListener implements TestExecutionListener {
 	}
 
 	/**
-	 * Discover a {@link StepExecution} as a field in the test case or create one if none
+	 * Discover a {@link StepExecution} from a factory method of the test case, that is a
+	 * method without parameters returning a {@link StepExecution}, or create one if none
 	 * is available.
 	 * @param testContext the current test context
 	 * @return a {@link StepExecution}
@@ -145,8 +147,8 @@ public class StepScopeTestExecutionListener implements TestExecutionListener {
 	}
 
 	/**
-	 * Look for a method returning the type provided, preferring one with the name
-	 * provided.
+	 * Look for a method without parameters returning the type provided, preferring one
+	 * with the name provided.
 	 */
 	private static final class ExtractorMethodCallback implements MethodCallback {
 
@@ -168,7 +170,7 @@ public class StepScopeTestExecutionListener implements TestExecutionListener {
 		@Override
 		public void doWith(Method method) throws IllegalArgumentException {
 			Class<?> type = method.getReturnType();
-			if (preferredType.isAssignableFrom(type)) {
+			if (preferredType.isAssignableFrom(type) && method.getParameterCount() == 0) {
 				if (result == null || method.getName().equals(preferredName)) {
 					result = method;
 				}
