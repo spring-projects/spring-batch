@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,10 +65,19 @@ import org.springframework.util.ReflectionUtils.MethodCallback;
  * @author Jimmy Praet
  * @author Mahmoud Ben Hassine
  * @author Hyuntae Park
+ * @author Xavier Mesas
  */
 public class JobScopeTestExecutionListener implements TestExecutionListener {
 
 	private static final String JOB_EXECUTION = JobScopeTestExecutionListener.class.getName() + ".JOB_EXECUTION";
+
+	/**
+	 * Id of the {@link JobExecution} created when the test case does not provide one. Job
+	 * repositories do not generate such a high id, so a job launched in the test never
+	 * gets the same id, which would make {@link JobSynchronizationManager} hand it the
+	 * {@link JobContext} of this listener instead of its own.
+	 */
+	private static final long DEFAULT_JOB_EXECUTION_ID = Long.MAX_VALUE;
 
 	/**
 	 * Set up a {@link JobExecution} as a test context attribute.
@@ -136,7 +145,7 @@ public class JobScopeTestExecutionListener implements TestExecutionListener {
 			}
 		}
 
-		return MetaDataInstanceFactory.createJobExecution();
+		return MetaDataInstanceFactory.createJobExecution(DEFAULT_JOB_EXECUTION_ID);
 	}
 
 	/**
