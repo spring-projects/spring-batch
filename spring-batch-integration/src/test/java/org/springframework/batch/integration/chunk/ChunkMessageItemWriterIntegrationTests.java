@@ -131,6 +131,7 @@ class ChunkMessageItemWriterIntegrationTests {
 
 		assertEquals(6, TestItemWriter.count);
 		assertEquals(6, stepExecution.getReadCount());
+		assertEquals(6, stepExecution.getWriteCount());
 
 	}
 
