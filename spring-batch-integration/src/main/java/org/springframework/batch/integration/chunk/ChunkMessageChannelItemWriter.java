@@ -168,6 +168,8 @@ public class ChunkMessageChannelItemWriter<T>
 						+ localState.getExpecting());
 			}
 
+			stepExecution.setWriteCount(0);
+			stepExecution.setWriteSkipCount(0);
 			for (StepContribution contribution : getStepContributions()) {
 				stepExecution.apply(contribution);
 			}
