@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,10 @@ public interface JobExecutionListener {
 
 	/**
 	 * Callback after completion of a job. Called after both successful and failed
-	 * executions. To perform logic on a particular status, use
+	 * executions. The job's {@link JobExecution#getStatus() status} has already been
+	 * saved in the job repository and should not be changed in this callback.
+	 * <p>
+	 * To perform logic on a particular status, use
 	 * {@code if (jobExecution.getStatus() == BatchStatus.X)}.
 	 * @param jobExecution the current {@link JobExecution}
 	 */
