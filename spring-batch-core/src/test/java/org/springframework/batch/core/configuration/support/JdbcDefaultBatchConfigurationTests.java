@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.ExitStatus;
+import org.springframework.batch.core.configuration.BatchConfigurationException;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.builder.JobBuilder;
@@ -94,6 +95,38 @@ class JdbcDefaultBatchConfigurationTests {
 							"select count(*) from " + AbstractJdbcBatchMetadataDao.DEFAULT_TABLE_PREFIX
 									+ AbstractJdbcBatchMetadataDao.DEFAULT_STEP_EXECUTION_INCREMENTER_NAME,
 							Long.class));
+	}
+
+	@Test
+	void testSchemaValidationCanBeEnabled() {
+		var dataSource = new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.HSQL)
+			.generateUniqueName(true)
+			.build();
+		try {
+			JdbcDefaultBatchConfiguration configuration = new JdbcDefaultBatchConfiguration() {
+
+				@Override
+				protected DataSource getDataSource() {
+					return dataSource;
+				}
+
+				@Override
+				protected PlatformTransactionManager getTransactionManager() {
+					return new JdbcTransactionManager(dataSource);
+				}
+
+				@Override
+				protected boolean getValidateSchema() {
+					return true;
+				}
+
+			};
+
+			Assertions.assertThrows(BatchConfigurationException.class, configuration::jobRepository);
+		}
+		finally {
+			dataSource.shutdown();
+		}
 	}
 
 	@Configuration

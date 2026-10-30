@@ -63,6 +63,13 @@ The max `varchar` length defaults to `2500`, which is the
 length of the long `VARCHAR` columns in the
 xref:schema-appendix.adoc#metaDataSchemaOverview[sample schema scripts]
 
+When using `JdbcDefaultBatchConfiguration`, you can opt in to checking that the required
+JDBC metadata tables are accessible when the job repository is initialized by overriding
+`getValidateSchema()` to return `true`. This check is disabled by default, so applications
+that initialize the schema after the repository bean can continue to do so. If a required
+table is missing or inaccessible, initialization fails with a `BatchConfigurationException`
+that identifies the table.
+
 
 XML::
 +

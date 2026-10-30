@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2025 the original author or authors.
+ * Copyright 2002-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.repository.support;
 
+import org.springframework.batch.core.configuration.BatchConfigurationException;
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
 import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDao;
 import org.springframework.batch.core.repository.dao.DefaultExecutionContextSerializer;
@@ -26,6 +27,7 @@ import org.springframework.batch.infrastructure.item.database.support.DataFieldM
 import org.springframework.batch.infrastructure.item.database.support.DefaultDataFieldMaxValueIncrementerFactory;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.core.convert.support.ConfigurableConversionService;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -47,6 +49,8 @@ import java.nio.charset.Charset;
  */
 @SuppressWarnings("removal")
 public class JdbcJobRepositoryFactoryBean extends JobRepositoryFactoryBean {
+
+	private boolean validateSchema;
 
 	/**
 	 * @param type a value from the {@link java.sql.Types} class to indicate the type to
@@ -197,6 +201,16 @@ public class JdbcJobRepositoryFactoryBean extends JobRepositoryFactoryBean {
 	}
 
 	/**
+	 * Set whether the required Batch metadata tables should be validated when this
+	 * factory initializes. Defaults to {@code false}.
+	 * @param validateSchema whether to validate the Batch metadata tables
+	 * @since 6.1
+	 */
+	public void setValidateSchema(boolean validateSchema) {
+		this.validateSchema = validateSchema;
+	}
+
+	/**
 	 * Set the conversion service to use in the job repository. This service is used to
 	 * convert job parameters from String literal to typed values and vice versa.
 	 * @param conversionService the conversion service to use
@@ -210,6 +224,26 @@ public class JdbcJobRepositoryFactoryBean extends JobRepositoryFactoryBean {
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
+		if (this.validateSchema) {
+			validateMetadataTables();
+		}
+	}
+
+	private void validateMetadataTables() {
+		String[] tableNames = { "JOB_INSTANCE", "JOB_EXECUTION", "JOB_EXECUTION_PARAMS", "STEP_EXECUTION",
+				"JOB_EXECUTION_CONTEXT", "STEP_EXECUTION_CONTEXT" };
+		for (String tableName : tableNames) {
+			String qualifiedTableName = this.tablePrefix + tableName;
+			try {
+				this.jdbcOperations.query("SELECT 1 FROM " + qualifiedTableName + " WHERE 1 = 0", rs -> null);
+			}
+			catch (DataAccessException ex) {
+				throw new BatchConfigurationException("Unable to validate Spring Batch metadata table '"
+						+ qualifiedTableName
+						+ "'. Make sure the Batch schema is initialized and the configured table prefix is correct.",
+						ex);
+			}
+		}
 	}
 
 }
