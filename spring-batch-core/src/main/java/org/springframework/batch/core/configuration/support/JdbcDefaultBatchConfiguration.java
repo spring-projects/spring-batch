@@ -96,6 +96,7 @@ public class JdbcDefaultBatchConfiguration extends DefaultBatchConfiguration {
 			jobRepositoryFactoryBean.setJobKeyGenerator(getJobKeyGenerator());
 			jobRepositoryFactoryBean.setClobType(getClobType());
 			jobRepositoryFactoryBean.setTablePrefix(getTablePrefix());
+			jobRepositoryFactoryBean.setValidateSchema(getValidateSchema());
 			jobRepositoryFactoryBean.setJobInstanceIncrementerName(getJobInstanceIncrementerName());
 			jobRepositoryFactoryBean.setJobExecutionIncrementerName(getJobExecutionIncrementerName());
 			jobRepositoryFactoryBean.setStepExecutionIncrementerName(getStepExecutionIncrementerName());
@@ -177,6 +178,18 @@ public class JdbcDefaultBatchConfiguration extends DefaultBatchConfiguration {
 	 */
 	protected String getTablePrefix() {
 		return AbstractJdbcBatchMetadataDao.DEFAULT_TABLE_PREFIX;
+	}
+
+	/**
+	 * Return whether to validate the required Batch metadata tables while creating the
+	 * JDBC job repository. Defaults to {@code false} to allow applications to initialize
+	 * the schema after the repository bean is created. Override this method to fail fast
+	 * when the configured tables are missing or inaccessible.
+	 * @return whether to validate the Batch metadata tables
+	 * @since 6.1
+	 */
+	protected boolean getValidateSchema() {
+		return false;
 	}
 
 	/**
