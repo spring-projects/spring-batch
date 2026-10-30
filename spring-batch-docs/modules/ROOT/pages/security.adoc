@@ -1,0 +1,177 @@
+[[security]]
+[appendix]
+[[security-appendix]]
+= Security Considerations
+
+This appendix describes what Spring Batch assumes is already secure, what it treats as
+untrusted input and protects against by default, and what remains the responsibility of
+the application that embeds it.
+
+[[security-trust-model]]
+== Trust Model
+
+Spring Batch distinguishes between actors who configure and operate a job and actors who
+merely supply data that a job processes:
+
+Developer::
+Writes the job configuration: beans, XML or Java configuration, SQL statements, Spring
+expressions.
+
+Operator::
+Launches, stops and restarts jobs, and supplies job parameters, typically from a command
+line, a scheduler, or application code.
+
+Infrastructure administrator::
+Owns the job repository data store, the message brokers, and the file systems that a job
+uses.
+
+User::
+Any party outside the roles above whose data reaches a job: an end user who uploads a
+file, a partner that drops a file on an SFTP server, an upstream system, or a caller of
+an endpoint of the application. A user never launches jobs or chooses their parameters
+directly. If the application maps a user's request or file to a job launch, the
+application acts as the operator, and it must validate what it passes on.
+
+Everything that a developer, an operator, or an infrastructure administrator supplies is
+trusted by Spring Batch. Content that originates from a user, or from a network request,
+is not.
+
+A role describes what an actor can do in an interaction, not a job title. The same call
+can sit on either side of the boundary, depending on who is allowed to make it: Spring
+Batch has no authentication or authorization of its own, so granting someone the operator
+role is a decision of the application. The following scenarios show the difference:
+
+.Operators and users
+[options="header"]
+|===
+|Scenario|Operator|User|What the user controls
+|A job reads a CSV file that customers uploaded through a web application.|A scheduler or an ops engineer|The customer|The content of the file.
+|A job reads a file that a partner drops on an SFTP server.|A scheduler|The partner|The content of the file.
+|A web endpoint calls `JobOperator#start` with values taken from the request.|The application code|The caller of the endpoint|The values of the request, which the application must validate before they become job parameters.
+|An internal console lets authorized staff enter job parameters.|The staff member|None|Nothing: what the staff member enters is operator input and is trusted.
+|===
+
+[[security-trusted-boundaries]]
+== What Spring Batch Trusts by Default
+
+The following are trusted, and Spring Batch does not sandbox, sanitize, or re-validate
+them:
+
+Job configuration::
+Everything the developer writes in the configuration is trusted: bean definitions, SQL
+statements and fragments (`sql`, `whereClause`, `sortKeys`), the table prefix of the job
+repository, the command and environment of `SystemCommandTasklet`, Spring expressions,
+method names invoked by adapters, resource locations, and custom classes.
+
+Job parameters::
+Job parameters, including their string encoding, are operator input and are trusted. This
+covers the `name=value,type,identifying` format used by `DefaultJobParametersConverter`,
+the JSON format used by `JsonJobParametersConverter`, the arguments of
+`CommandLineJobOperator` and `CommandLineJobRunner`, and
+`JobOperator#start(String, Properties)`. In particular, the `type` of a job parameter is a
+class name chosen by the operator, and its value is converted with the configured
+`ConversionService`.
++
+[IMPORTANT]
+====
+If an application forwards a value from its users into a job parameter, it must validate
+that value first, as it would for any other untrusted data reaching a sensitive
+operation. Spring Batch does not treat the encoded string of a job parameter as a
+security boundary.
+====
+
+Data stores::
+The connection, credentials, and schema of a data store are assumed to be secure.
+Everything read from the job repository is trusted, including the serialized execution
+context, the stored job parameters (including their type, which is loaded as a class
+name), and the status, exit code, and exit message of executions. The same assumption
+applies to the data stores that item readers and writers access directly -- relational
+databases, MongoDB, Redis, and so on: data read from them is trusted.
++
+As defense in depth, the execution context serializers restrict what they deserialize.
+`DefaultExecutionContextSerializer` applies an `ObjectInputFilter` allow-list by default
+(since version 6.0.5), and `JacksonExecutionContextStringSerializer` restricts polymorphic
+types to a set of JDK packages and the `org.springframework.batch` packages. These
+allow-lists are not a security boundary, because the execution context is read from a
+trusted data store.
+
+Message brokers::
+Spring Batch assumes that message brokers used for remote chunking, remote partitioning,
+and messaging-based item readers and writers (JMS, Kafka, AMQP) reside within a secure,
+isolated network where only authenticated, authorized internal services can publish
+messages. Spring Batch does not independently authenticate or re-validate these messages
+beyond what the configured messaging infrastructure provides, so treat these brokers with
+the same care as any other trusted, internal channel.
+
+[[security-untrusted-input]]
+== What Spring Batch Does Not Trust
+
+[[security-untrusted-files]]
+=== File and Resource Content
+
+The location of a resource (a path or a URL) and the credentials used to access it are
+chosen by the developer or the operator and are trusted. The *content* of a file or
+resource that a reader retrieves from external storage -- a public object store, an FTP
+server, a file a user uploaded -- is untrusted input, regardless of which reader parses
+it: flat file, XML, JSON, Avro, LDIF, or a custom format built on the infrastructure
+classes.
+
+A reader must not let a small, crafted file cause:
+
+* CPU or memory consumption disproportionate to the size of the file -- for example,
+  quadratic work or unbounded accumulation driven by the file's content.
+* Unsafe parsing -- external entity resolution, unrestricted polymorphic deserialization,
+  or references that make the reader access resources outside what the developer
+  configured.
+
+The following protections against these effects are enabled by default:
+
+* `StaxEventItemReader` uses a defensive `XMLInputFactory` by default (no DTD processing,
+  no external entity resolution).
+* `FlatFileItemReader` caps the number of lines and the number of characters that a
+  single multi-line record may span (1,000 lines and 1 MiB of characters, by default,
+  since version 6.0.4).
+
+Disabling one of them -- for example, calling
+`setMaxLinesPerRecord(Integer.MAX_VALUE)` on `FlatFileItemReader` -- is an explicit
+decision of the application, and that application then owns the risk the default
+otherwise mitigated.
+
+[[security-untrusted-network]]
+=== Network Data
+
+Data, headers, cookies, and payloads that originate from a network request are always
+untrusted, and the application is responsible for validating how that data is used. This
+includes the content of a resource that a reader fetches over a network protocol -- a
+file read from an HTTP URL, for instance -- which is treated the same way as file content,
+above.
+
+Spring Batch exposes no network endpoint of its own: no HTTP endpoint and no JMX endpoint.
+A job can be launched from a network request only through application code, and
+validating that request's data and mapping it to job parameters is entirely the
+responsibility of that code.
+
+Spring Batch ships no client for FTP, SFTP, S3, or similar services. The transport -- the
+connection, protocol handling, and TLS or host-key verification -- belongs to the library
+that the application uses, for example through Spring Integration. A malicious or
+compromised server attacking that client is out of scope. What the server returns as file
+content remains untrusted, as described above.
+
+[[security-application-responsibilities]]
+== Application Responsibilities
+
+* Validate any value that comes from a user before it becomes a job parameter, a resource
+  location, or a query fragment.
+* Do not put secrets in job parameters: they are persisted in the job repository and
+  written to the logs when a job is launched.
+* Keep the content limits of readers enabled when the files they read come from users,
+  and size those limits for your application.
+* Restrict access to the data stores and the message brokers that your jobs use, as
+  described above.
+
+[[security-reporting]]
+== Reporting a Vulnerability
+
+If you believe you have found a security vulnerability in Spring Batch, please *do not*
+report it using GitHub issues. Instead, follow the responsible disclosure process
+described at https://spring.io/security-policy[spring.io/security-policy].
