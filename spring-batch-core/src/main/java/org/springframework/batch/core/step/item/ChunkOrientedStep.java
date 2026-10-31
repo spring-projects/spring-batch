@@ -689,6 +689,14 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			writeChunk(processedChunk, scanItems, contribution, status);
 			stepExecution.incrementCommitCount();
 		}
+		catch (InterruptedException e) {
+			status.setRollbackOnly();
+			stepExecution.incrementRollbackCount();
+			stepExecution.setTerminateOnly();
+			itemProcessingTasks.forEach(task -> task.cancel(true));
+			Thread.currentThread().interrupt();
+			logger.info("Step interrupted while processing chunk");
+		}
 		catch (Exception e) {
 			status.setRollbackOnly();
 			stepExecution.incrementRollbackCount();
