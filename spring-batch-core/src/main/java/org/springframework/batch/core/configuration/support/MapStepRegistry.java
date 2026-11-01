@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2025 the original author or authors.
+ * Copyright 2012-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,7 @@ import org.springframework.util.Assert;
  *
  * @author Sebastien Gerard
  * @author Stephane Nicoll
+ * @author Taeik Lim
  * @deprecated as of 6.0 with no replacement. Scheduled for removal in 6.2.
  */
 @Deprecated(since = "6.0", forRemoval = true)
@@ -64,7 +65,7 @@ public class MapStepRegistry implements StepRegistry {
 	}
 
 	@Override
-	@Nullable public Step getStep(String jobName, String stepName) {
+	public @Nullable Step getStep(String jobName, String stepName) {
 		Assert.notNull(jobName, "The job name cannot be null.");
 		Assert.notNull(stepName, "The step name cannot be null.");
 		if (!map.containsKey(jobName)) {

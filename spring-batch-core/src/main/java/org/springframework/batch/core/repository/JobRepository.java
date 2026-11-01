@@ -48,6 +48,7 @@ import java.util.Set;
  * @author Mahmoud Ben Hassine
  * @author Parikshit Dutta
  * @author Yanming Zhou
+ * @author Taeik Lim
  */
 @SuppressWarnings("removal")
 public interface JobRepository extends JobExplorer {
@@ -105,7 +106,7 @@ public interface JobRepository extends JobExplorer {
 	 * @param jobInstanceId The ID for the {@link JobInstance} to obtain.
 	 * @return the {@code JobInstance} that has this ID, or {@code null} if not found.
 	 */
-	@Nullable default JobInstance getJobInstance(long jobInstanceId) {
+	default @Nullable JobInstance getJobInstance(long jobInstanceId) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -116,7 +117,7 @@ public interface JobRepository extends JobExplorer {
 	 *
 	 * @since 4.2
 	 */
-	@Nullable default JobInstance getLastJobInstance(String jobName) {
+	default @Nullable JobInstance getLastJobInstance(String jobName) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -128,7 +129,7 @@ public interface JobRepository extends JobExplorer {
 	 *
 	 * @since 5.0
 	 */
-	@Nullable default JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
+	default @Nullable JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -177,7 +178,7 @@ public interface JobRepository extends JobExplorer {
 	 * @param executionId The job execution ID.
 	 * @return the {@link JobExecution} that has this ID or {@code null} if not found.
 	 */
-	@Nullable default JobExecution getJobExecution(long executionId) {
+	default @Nullable JobExecution getJobExecution(long executionId) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -203,7 +204,7 @@ public interface JobRepository extends JobExplorer {
 	 *
 	 * @since 4.2
 	 */
-	@Nullable default JobExecution getLastJobExecution(JobInstance jobInstance) {
+	default @Nullable JobExecution getLastJobExecution(JobInstance jobInstance) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -212,7 +213,7 @@ public interface JobRepository extends JobExplorer {
 	 * @param jobParameters parameters identifying the {@link JobInstance}
 	 * @return the last execution of job if exists, null otherwise
 	 */
-	@Nullable default JobExecution getLastJobExecution(String jobName, JobParameters jobParameters) {
+	default @Nullable JobExecution getLastJobExecution(String jobName, JobParameters jobParameters) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -246,7 +247,7 @@ public interface JobRepository extends JobExplorer {
 	 * @deprecated since 6.0 in favor of {@link #getStepExecution(long)}
 	 */
 	@Deprecated(since = "6.0", forRemoval = true)
-	@Nullable default StepExecution getStepExecution(long jobExecutionId, long stepExecutionId) {
+	default @Nullable StepExecution getStepExecution(long jobExecutionId, long stepExecutionId) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -258,7 +259,7 @@ public interface JobRepository extends JobExplorer {
 	 * @return the {@link StepExecution} that has this ID or {@code null} if not found.
 	 * @since 6.0
 	 */
-	@Nullable default StepExecution getStepExecution(long stepExecutionId) {
+	default @Nullable StepExecution getStepExecution(long stepExecutionId) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -267,7 +268,7 @@ public interface JobRepository extends JobExplorer {
 	 * @param stepName the name of the step execution that might have run.
 	 * @return the last execution of step for the given job instance.
 	 */
-	@Nullable default StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
+	default @Nullable StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
 		throw new UnsupportedOperationException();
 	}
 

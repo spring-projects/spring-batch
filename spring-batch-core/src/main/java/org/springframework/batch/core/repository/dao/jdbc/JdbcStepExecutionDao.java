@@ -62,6 +62,7 @@ import org.springframework.util.Assert;
  * @author Baris Cubukcuoglu
  * @author Minsoo Kim
  * @author Yanming Zhou
+ * @author Taeik Lim
  * @see StepExecutionDao
  */
 public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implements StepExecutionDao, InitializingBean {
@@ -296,7 +297,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 	}
 
 	@Override
-	@Nullable public StepExecution getStepExecution(long stepExecutionId) {
+	public @Nullable StepExecution getStepExecution(long stepExecutionId) {
 		long jobExecutionId = getJobExecutionId(stepExecutionId);
 		JobExecution jobExecution = this.jobExecutionDao.getJobExecution(jobExecutionId);
 		return getStepExecution(jobExecution, stepExecutionId);
@@ -310,9 +311,8 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 	}
 
 	@Override
-	@Nullable
 	@Deprecated(since = "6.0", forRemoval = true)
-	public StepExecution getStepExecution(JobExecution jobExecution, long stepExecutionId) {
+	public @Nullable StepExecution getStepExecution(JobExecution jobExecution, long stepExecutionId) {
 		List<StepExecution> executions = getJdbcClient().sql(getQuery(GET_STEP_EXECUTION))
 			.param("stepExecutionId", stepExecutionId)
 			.query(new StepExecutionRowMapper())
@@ -347,9 +347,8 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 			});
 	}
 
-	@Nullable
 	@Override
-	public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
+	public @Nullable StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
 		// both halves of the joined row are mapped while the result set is open, so that
 		// they can be assembled once it is closed
 		record JoinedRow(StepExecutionRow stepExecutionRow, JobExecutionRow jobExecutionRow) {
