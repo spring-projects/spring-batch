@@ -89,7 +89,7 @@ class ChunkOrientedStepShutdownTests {
 	@BeforeEach
 	void setUp() throws Exception {
 		this.database = new EmbeddedDatabaseBuilder().generateUniqueName(true)
-			.addScript(DatabaseType.HSQL.getProductSchema())
+			.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
 			.build();
 		this.jdbcTemplate = new JdbcTemplate(this.database);
 		this.jdbcTemplate.execute("CREATE TABLE OUTPUT_ITEMS (ID INTEGER PRIMARY KEY)");
