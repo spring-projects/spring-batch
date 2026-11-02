@@ -26,6 +26,7 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.configuration.BatchConfigurationException;
 import org.springframework.batch.infrastructure.support.DatabaseType;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
@@ -69,6 +70,20 @@ class JdbcJobRepositoryFactoryBeanTests {
 
 		Assertions.assertTrue(exception.getMessage().contains("CUSTOM_JOB_INSTANCE"));
 		Assertions.assertTrue(exception.getMessage().contains("schema is initialized"));
+	}
+
+	@Test
+	void schemaValidationFailsWhenRequiredColumnIsMissing() {
+		DataSource dataSource = createDataSource(true);
+		new JdbcTemplate(dataSource).execute("ALTER TABLE BATCH_JOB_INSTANCE DROP COLUMN VERSION");
+		JdbcJobRepositoryFactoryBean factoryBean = createFactoryBean(dataSource);
+		factoryBean.setValidateSchema(true);
+
+		BatchConfigurationException exception = Assertions.assertThrows(BatchConfigurationException.class,
+				factoryBean::afterPropertiesSet);
+
+		Assertions.assertTrue(exception.getMessage().contains("BATCH_JOB_INSTANCE"));
+		Assertions.assertTrue(exception.getCause().getMessage().contains("VERSION"));
 	}
 
 	private JdbcJobRepositoryFactoryBean createFactoryBean(DataSource dataSource) {

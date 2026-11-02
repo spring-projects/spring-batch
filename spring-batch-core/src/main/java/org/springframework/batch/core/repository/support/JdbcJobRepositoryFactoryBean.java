@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.core.repository.support;
 
+import java.util.List;
+
 import org.springframework.batch.core.configuration.BatchConfigurationException;
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
 import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDao;
@@ -49,6 +51,17 @@ import java.nio.charset.Charset;
  */
 @SuppressWarnings("removal")
 public class JdbcJobRepositoryFactoryBean extends JobRepositoryFactoryBean {
+
+	private static final List<MetadataTable> METADATA_TABLE_COLUMNS = List.of(
+			new MetadataTable("JOB_INSTANCE", "JOB_INSTANCE_ID, VERSION, JOB_NAME, JOB_KEY"),
+			new MetadataTable("JOB_EXECUTION",
+					"JOB_EXECUTION_ID, VERSION, JOB_INSTANCE_ID, CREATE_TIME, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, LAST_UPDATED"),
+			new MetadataTable("JOB_EXECUTION_PARAMS",
+					"JOB_EXECUTION_ID, PARAMETER_NAME, PARAMETER_TYPE, PARAMETER_VALUE, IDENTIFYING"),
+			new MetadataTable("STEP_EXECUTION",
+					"STEP_EXECUTION_ID, VERSION, STEP_NAME, JOB_EXECUTION_ID, CREATE_TIME, START_TIME, END_TIME, STATUS, COMMIT_COUNT, READ_COUNT, FILTER_COUNT, WRITE_COUNT, READ_SKIP_COUNT, WRITE_SKIP_COUNT, PROCESS_SKIP_COUNT, ROLLBACK_COUNT, EXIT_CODE, EXIT_MESSAGE, LAST_UPDATED"),
+			new MetadataTable("JOB_EXECUTION_CONTEXT", "JOB_EXECUTION_ID, SHORT_CONTEXT, SERIALIZED_CONTEXT"),
+			new MetadataTable("STEP_EXECUTION_CONTEXT", "STEP_EXECUTION_ID, SHORT_CONTEXT, SERIALIZED_CONTEXT"));
 
 	private boolean validateSchema;
 
@@ -230,20 +243,24 @@ public class JdbcJobRepositoryFactoryBean extends JobRepositoryFactoryBean {
 	}
 
 	private void validateMetadataTables() {
-		String[] tableNames = { "JOB_INSTANCE", "JOB_EXECUTION", "JOB_EXECUTION_PARAMS", "STEP_EXECUTION",
-				"JOB_EXECUTION_CONTEXT", "STEP_EXECUTION_CONTEXT" };
-		for (String tableName : tableNames) {
+		for (MetadataTable table : METADATA_TABLE_COLUMNS) {
+			String tableName = table.tableName();
 			String qualifiedTableName = this.tablePrefix + tableName;
 			try {
-				this.jdbcOperations.query("SELECT 1 FROM " + qualifiedTableName + " WHERE 1 = 0", rs -> null);
+				this.jdbcOperations.query(
+						"SELECT " + table.requiredColumns() + " FROM " + qualifiedTableName + " WHERE 1 = 0",
+						rs -> null);
 			}
 			catch (DataAccessException ex) {
 				throw new BatchConfigurationException("Unable to validate Spring Batch metadata table '"
 						+ qualifiedTableName
-						+ "'. Make sure the Batch schema is initialized and the configured table prefix is correct.",
+						+ "' and its required columns. Make sure the Batch schema is initialized and the configured table prefix is correct.",
 						ex);
 			}
 		}
+	}
+
+	private record MetadataTable(String tableName, String requiredColumns) {
 	}
 
 }
