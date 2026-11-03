@@ -26,6 +26,7 @@ import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.step.item.ChunkProcessor;
 import org.springframework.batch.infrastructure.item.Chunk;
 import org.springframework.batch.test.MetaDataInstanceFactory;
+import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -65,6 +66,34 @@ class ChunkTaskExecutorItemWriterTests {
 		finally {
 			taskExecutor.shutdown();
 		}
+	}
+
+	@Test
+	void stateIsResetBeforeEachStep() {
+		// given
+		ChunkProcessor<String> chunkProcessor = (chunk, contribution) -> {
+			contribution.incrementWriteCount(chunk.size());
+			contribution.setExitStatus(ExitStatus.COMPLETED);
+		};
+		ChunkTaskExecutorItemWriter<String> itemWriter = new ChunkTaskExecutorItemWriter<>(chunkProcessor,
+				new SyncTaskExecutor());
+		StepExecution firstStepExecution = MetaDataInstanceFactory.createStepExecution();
+		itemWriter.beforeStep(firstStepExecution);
+		itemWriter.write(Chunk.of("foo", "bar"));
+		itemWriter.afterStep(firstStepExecution);
+		assertEquals(2, firstStepExecution.getWriteCount());
+		assertEquals(1, firstStepExecution.getCommitCount());
+
+		// when
+		StepExecution secondStepExecution = MetaDataInstanceFactory.createStepExecution();
+		itemWriter.beforeStep(secondStepExecution);
+		ExitStatus exitStatus = itemWriter.afterStep(secondStepExecution);
+
+		// then
+		assertEquals(ExitStatus.COMPLETED.getExitCode(), exitStatus.getExitCode());
+		assertEquals("Waited for 0 results.", exitStatus.getExitDescription());
+		assertEquals(0, secondStepExecution.getWriteCount());
+		assertEquals(0, secondStepExecution.getCommitCount());
 	}
 
 }

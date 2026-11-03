@@ -114,6 +114,8 @@ public class ChunkTaskExecutorItemWriter<T> implements ItemWriter<T>, StepExecut
 	@Override
 	public void beforeStep(StepExecution stepExecution) {
 		this.stepExecution = stepExecution;
+		this.responses.clear();
+		this.sequence = 0;
 	}
 
 	@Override
