@@ -64,6 +64,7 @@ import static org.mockito.Mockito.when;
  * @author Andrey Litvitski
  * @author xeounxzxu
  * @author Taeik Lim
+ * @author Gabriel Hall
  */
 public class ChunkOrientedStepTests {
 
@@ -824,6 +825,31 @@ public class ChunkOrientedStepTests {
 		assertEquals(3, stepExecution.getWriteSkipCount());
 		assertEquals(3, stepExecution.getWriteCount());
 		assertEquals(2, stepExecution.getCommitCount());
+	}
+
+	@Test
+	void testStepStopsWhenItsThreadIsInterrupted() throws Exception {
+		// given: the thread running the step is interrupted while writing the first chunk
+		ChunkOrientedStep<String, String> step = new StepBuilder("step", new ResourcelessJobRepository())
+			.<String, String>chunk(3)
+			.reader(new ListItemReader<>(List.of("a", "b", "c", "d", "e", "f")))
+			.writer(items -> Thread.currentThread().interrupt())
+			.build();
+		JobExecution jobExecution = new JobExecution(1L, new JobInstance(1L, "job"), new JobParameters());
+		StepExecution stepExecution = new StepExecution(1L, "step", jobExecution);
+
+		// when
+		try {
+			step.execute(stepExecution);
+		}
+		finally {
+			Thread.interrupted();
+		}
+
+		// then: the step stops at the chunk boundary, so it can be restarted
+		assertEquals(BatchStatus.STOPPED, stepExecution.getStatus());
+		assertEquals(ExitStatus.STOPPED.getExitCode(), stepExecution.getExitStatus().getExitCode());
+		assertEquals(3, stepExecution.getWriteCount());
 	}
 
 	private StepExecution execute(ItemWriter<String> writer, ItemWriteListener<String> writeListener,
