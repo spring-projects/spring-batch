@@ -52,6 +52,7 @@ import org.springframework.util.Assert;
  * @author Mahmoud Ben Hassine
  * @author Jimmy Praet
  * @author Yanming Zhou
+ * @author Hyunwoo Jung
  * @since 4.1
  */
 public class JsonFileItemWriter<T> extends AbstractFileItemWriter<T> {
@@ -115,15 +116,17 @@ public class JsonFileItemWriter<T> extends AbstractFileItemWriter<T> {
 	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public String doWrite(Chunk<? extends T> items) {
+		if (items.isEmpty()) {
+			return "";
+		}
+
 		StringBuilder lines = new StringBuilder();
-		if (this.hasExistingItems) {
+		if (this.hasExistingItems || state.getLinesWritten() > 0) {
 			lines.append(JSON_OBJECT_SEPARATOR).append(this.lineSeparator);
-			this.hasExistingItems = false;
 		}
+		this.hasExistingItems = false;
+
 		Iterator<? extends T> iterator = items.iterator();
-		if (!items.isEmpty() && state.getLinesWritten() > 0) {
-			lines.append(JSON_OBJECT_SEPARATOR).append(this.lineSeparator);
-		}
 		while (iterator.hasNext()) {
 			T item = iterator.next();
 			lines.append(' ').append(this.jsonObjectMarshaller.marshal(item));
