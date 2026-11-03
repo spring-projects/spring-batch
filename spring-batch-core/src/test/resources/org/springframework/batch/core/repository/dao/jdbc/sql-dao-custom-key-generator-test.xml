@@ -43,12 +43,19 @@
 		<constructor-arg ref="jdbcClient" />
 		<property name="jobExecutionIncrementer" ref="jobExecutionIncrementer" />
 		<property name="jobInstanceDao" ref="jobInstanceDao" />
+		<property name="jobParameterDao" ref="jobParameterDao" />
 	</bean>
 
 	<bean id="stepExecutionDao" class="org.springframework.batch.core.repository.dao.jdbc.JdbcStepExecutionDao">
 		<constructor-arg ref="jdbcClient" />
 		<property name="stepExecutionIncrementer" ref="stepExecutionIncrementer" />
 		<property name="jobExecutionDao" ref="jobExecutionDao" />
+		<property name="jobParameterDao" ref="jobParameterDao" />
+
+	</bean>
+
+	<bean id="jobParameterDao" class="org.springframework.batch.core.repository.dao.jdbc.JdbcJobParameterDao">
+		<constructor-arg ref="jdbcClient" />
 	</bean>
 
 	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">

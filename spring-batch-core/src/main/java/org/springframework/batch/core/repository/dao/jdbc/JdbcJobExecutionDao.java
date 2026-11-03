@@ -16,12 +16,8 @@
 
 package org.springframework.batch.core.repository.dao.jdbc;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -36,19 +32,16 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
-import org.springframework.batch.core.job.parameters.JobParameter;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDao;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.dao.jdbc.JobExecutionRowMapper.JobExecutionRow;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.OptimisticLockingFailureException;
-import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.jspecify.annotations.Nullable;
 import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
 
 /**
  * JDBC implementation of {@link JobExecutionDao}. Uses sequences (via Spring's
@@ -67,6 +60,7 @@ import org.springframework.util.ClassUtils;
  * @author Philippe Marschall
  * @author Jinwoo Bae
  * @author Yanming Zhou
+ * @author Moad Elfatihi
  */
 public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements JobExecutionDao, InitializingBean {
 
@@ -107,31 +101,9 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 			WHERE E.JOB_INSTANCE_ID = I.JOB_INSTANCE_ID AND I.JOB_NAME = :jobName AND E.STATUS IN ('STARTING', 'STARTED', 'STOPPING')
 			""";
 
-	private static final String FIND_PARAMS_FROM_ID = """
-			SELECT JOB_EXECUTION_ID, PARAMETER_NAME, PARAMETER_TYPE, PARAMETER_VALUE, IDENTIFYING
-			FROM %PREFIX%JOB_EXECUTION_PARAMS
-			WHERE JOB_EXECUTION_ID = :jobExecutionId
-			""";
-
-	private static final String FIND_PARAMS_FROM_IDS = """
-			SELECT JOB_EXECUTION_ID, PARAMETER_NAME, PARAMETER_TYPE, PARAMETER_VALUE, IDENTIFYING
-			FROM %PREFIX%JOB_EXECUTION_PARAMS
-			WHERE JOB_EXECUTION_ID IN (:jobExecutionIds)
-			""";
-
-	private static final String CREATE_JOB_PARAMETERS = """
-			INSERT INTO %PREFIX%JOB_EXECUTION_PARAMS(JOB_EXECUTION_ID, PARAMETER_NAME, PARAMETER_TYPE, PARAMETER_VALUE, IDENTIFYING)
-				VALUES (:jobExecutionId, :parameterName, :parameterType, :parameterValue, :identifying)
-			""";
-
 	private static final String DELETE_JOB_EXECUTION = """
 			DELETE FROM %PREFIX%JOB_EXECUTION
 			WHERE JOB_EXECUTION_ID = :jobExecutionId AND VERSION = :version
-			""";
-
-	private static final String DELETE_JOB_EXECUTION_PARAMETERS = """
-			DELETE FROM %PREFIX%JOB_EXECUTION_PARAMS
-			WHERE JOB_EXECUTION_ID = :jobExecutionId
 			""";
 
 	private static final String GET_EXECUTIONS_BY_INSTANCE_ID = """
@@ -142,6 +114,8 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 			""";
 
 	JdbcJobInstanceDao jobInstanceDao;
+
+	JdbcJobParameterDao jobParameterDao;
 
 	private int exitMessageLength = DEFAULT_EXIT_MESSAGE_LENGTH;
 
@@ -180,11 +154,17 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		this.jobInstanceDao = jobInstanceDao;
 	}
 
+	public void setJobParameterDao(JdbcJobParameterDao jobParameterDao) {
+		this.jobParameterDao = jobParameterDao;
+	}
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
 		Assert.state(jobExecutionIncrementer != null, "The jobExecutionIncrementer must not be null.");
 		Assert.state(jobInstanceDao != null, "The jobInstanceDao must not be null.");
+		Assert.state(jobParameterDao != null, "The jobParameterDao must not be null.");
+
 	}
 
 	public JobExecution createJobExecution(JobInstance jobInstance, JobParameters jobParameters) {
@@ -202,9 +182,6 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		Timestamp createTime = Timestamp.valueOf(jobExecution.getCreateTime());
 		Timestamp lastUpdated = jobExecution.getLastUpdated() == null ? null
 				: Timestamp.valueOf(jobExecution.getLastUpdated());
-		Object[] parameters = new Object[] { jobExecution.getId(), jobInstance.getId(), startTime, endTime,
-				jobExecution.getStatus().toString(), jobExecution.getExitStatus().getExitCode(),
-				jobExecution.getExitStatus().getExitDescription(), jobExecution.getVersion(), createTime, lastUpdated };
 		getJdbcClient().sql(getQuery(SAVE_JOB_EXECUTION))
 			.param("jobExecutionId", jobExecution.getId(), Types.BIGINT)
 			.param("jobInstanceId", jobExecution.getJobInstance().getId(), Types.BIGINT)
@@ -218,7 +195,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 			.param("lastUpdated", lastUpdated, Types.TIMESTAMP)
 			.update();
 
-		insertJobParameters(jobExecution.getId(), jobExecution.getJobParameters());
+		jobParameterDao.insertJobParameters(jobExecution.getId(), jobExecution.getJobParameters());
 
 		return jobExecution;
 	}
@@ -231,8 +208,8 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 			.param("jobInstanceId", jobInstance.getId())
 			.query(new JobExecutionRowMapper())
 			.list();
-		Map<Long, JobParameters> jobParameters = getJobParameters(
-				jobExecutionRows.stream().map(JobExecutionRow::jobExecutionId).toList());
+		Map<Long, JobParameters> jobParameters = jobParameterDao
+			.getJobParameters(jobExecutionRows.stream().map(JobExecutionRow::jobExecutionId).toList());
 		return jobExecutionRows.stream()
 			.map(jobExecutionRow -> jobExecutionRow.toJobExecution(jobInstance,
 					jobParameters.getOrDefault(jobExecutionRow.jobExecutionId(), new JobParameters())))
@@ -318,7 +295,8 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		if (jobExecutionRow == null) {
 			return null;
 		}
-		return jobExecutionRow.toJobExecution(jobInstance, getJobParameters(jobExecutionRow.jobExecutionId()));
+		return jobExecutionRow.toJobExecution(jobInstance,
+				jobParameterDao.getJobParameters(jobExecutionRow.jobExecutionId()));
 	}
 
 	@Override
@@ -333,7 +311,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		}
 		// resolved once the result set is closed, to avoid nesting queries in it
 		JobInstance jobInstance = jobInstanceDao.getJobInstance(jobExecutionRow.jobInstanceId());
-		return jobExecutionRow.toJobExecution(jobInstance, getJobParameters(jobExecutionId));
+		return jobExecutionRow.toJobExecution(jobInstance, jobParameterDao.getJobParameters(jobExecutionId));
 	}
 
 	@Override
@@ -380,93 +358,9 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		}
 	}
 
-	// TODO the following methods are better extracted in a JobParametersDao
-
-	/**
-	 * Delete the parameters associated with the given job execution.
-	 * @param jobExecution the job execution for which job parameters should be deleted
-	 */
 	@Override
 	public void deleteJobExecutionParameters(JobExecution jobExecution) {
-		getJdbcClient().sql(getQuery(DELETE_JOB_EXECUTION_PARAMETERS))
-			.param("jobExecutionId", jobExecution.getId())
-			.update();
-	}
-
-	/**
-	 * Convenience method that inserts all parameters from the provided JobParameters.
-	 *
-	 */
-	private void insertJobParameters(long executionId, JobParameters jobParameters) {
-
-		if (jobParameters.isEmpty()) {
-			return;
-		}
-		JdbcClient.BatchSpec batch = getJdbcClient().sql(getQuery(CREATE_JOB_PARAMETERS)).batch();
-		for (JobParameter<?> jobParameter : jobParameters) {
-			batch.entry(entry -> {
-				entry.param("jobExecutionId", executionId);
-				entry.param("parameterName", jobParameter.name());
-				entry.param("parameterType", jobParameter.type().getName());
-				entry.param("parameterValue", getConversionService().convert(jobParameter.value(), String.class));
-				entry.param("identifying", jobParameter.identifying() ? "Y" : "N");
-			});
-		}
-		batch.update();
-	}
-
-	/**
-	 * @param executionId {@link Long} containing the id for the execution.
-	 * @return job parameters for the requested execution id
-	 */
-	@SuppressWarnings(value = { "unchecked", "rawtypes" })
-	public JobParameters getJobParameters(Long executionId) {
-		final Set<JobParameter<?>> jobParameters = new HashSet<>();
-		RowCallbackHandler handler = rs -> jobParameters.add(mapJobParameter(rs));
-
-		getJdbcClient().sql(getQuery(FIND_PARAMS_FROM_ID)).param("jobExecutionId", executionId).query(handler);
-
-		return new JobParameters(jobParameters);
-	}
-
-	/**
-	 * Retrieve the job parameters of several job executions at once, to avoid querying
-	 * them one execution at a time.
-	 * @param executionIds the ids of the job executions to retrieve the parameters of
-	 * @return the parameters of each job execution that has any, keyed by execution id
-	 */
-	private Map<Long, JobParameters> getJobParameters(List<Long> executionIds) {
-		if (executionIds.isEmpty()) {
-			return Map.of();
-		}
-		Map<Long, Set<JobParameter<?>>> jobParameters = new HashMap<>();
-		RowCallbackHandler handler = rs -> jobParameters
-			.computeIfAbsent(rs.getLong("JOB_EXECUTION_ID"), executionId -> new HashSet<>())
-			.add(mapJobParameter(rs));
-
-		getJdbcClient().sql(getQuery(FIND_PARAMS_FROM_IDS)).param("jobExecutionIds", executionIds).query(handler);
-
-		return jobParameters.entrySet()
-			.stream()
-			.collect(Collectors.toMap(Map.Entry::getKey, entry -> new JobParameters(entry.getValue())));
-	}
-
-	private JobParameter<?> mapJobParameter(ResultSet rs) throws SQLException {
-		String parameterName = rs.getString("PARAMETER_NAME");
-
-		Class<?> parameterType;
-		try {
-			parameterType = ClassUtils.forName(rs.getString("PARAMETER_TYPE"), null);
-		}
-		catch (ClassNotFoundException e) {
-			throw new RuntimeException(e);
-		}
-		String stringValue = rs.getString("PARAMETER_VALUE");
-		Object typedValue = getConversionService().convert(stringValue, parameterType);
-
-		boolean identifying = rs.getString("IDENTIFYING").equalsIgnoreCase("Y");
-
-		return new JobParameter(parameterName, typedValue, parameterType, identifying);
+		jobParameterDao.deleteParametersOf(jobExecution);
 	}
 
 }

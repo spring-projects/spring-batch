@@ -20,11 +20,11 @@ import org.springframework.batch.core.repository.dao.mongodb.MongoExecutionConte
 import org.springframework.batch.core.repository.dao.mongodb.MongoJobExecutionDao;
 import org.springframework.batch.core.repository.dao.mongodb.MongoJobInstanceDao;
 import org.springframework.batch.core.repository.dao.mongodb.MongoStepExecutionDao;
+import org.springframework.batch.core.repository.dao.mongodb.MongoJobParameterDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
@@ -32,7 +32,6 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.stream.Stream;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
@@ -78,9 +77,11 @@ abstract class AbstractMongoDBDaoIntegrationTests {
 		}
 
 		@Bean
-		MongoJobExecutionDao jobExecutionDao(MongoOperations mongoOperations, MongoJobInstanceDao jobInstanceDao) {
+		MongoJobExecutionDao jobExecutionDao(MongoOperations mongoOperations, MongoJobInstanceDao jobInstanceDao,
+				MongoJobParameterDao jobParameterDao) {
 			MongoJobExecutionDao jobExecutionDao = new MongoJobExecutionDao(mongoOperations);
 			jobExecutionDao.setJobInstanceDao(jobInstanceDao);
+			jobExecutionDao.setJobParameterDao(jobParameterDao);
 			return jobExecutionDao;
 		}
 
@@ -89,6 +90,11 @@ abstract class AbstractMongoDBDaoIntegrationTests {
 			MongoStepExecutionDao stepExecutionDao = new MongoStepExecutionDao(mongoOperations);
 			stepExecutionDao.setJobExecutionDao(jobExecutionDao);
 			return stepExecutionDao;
+		}
+
+		@Bean
+		MongoJobParameterDao jobParameterDao(MongoOperations mongoOperations) {
+			return new MongoJobParameterDao(mongoOperations);
 		}
 
 		@Bean

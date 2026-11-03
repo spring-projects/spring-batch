@@ -27,6 +27,7 @@ import org.springframework.batch.core.repository.dao.DefaultExecutionContextSeri
 import org.springframework.batch.core.repository.dao.jdbc.JdbcExecutionContextDao;
 import org.springframework.batch.core.repository.dao.jdbc.JdbcJobExecutionDao;
 import org.springframework.batch.core.repository.dao.jdbc.JdbcJobInstanceDao;
+import org.springframework.batch.core.repository.dao.jdbc.JdbcJobParameterDao;
 import org.springframework.batch.core.repository.dao.jdbc.JdbcStepExecutionDao;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.batch.infrastructure.item.database.support.DataFieldMaxValueIncrementerFactory;
@@ -61,6 +62,7 @@ import static org.springframework.batch.infrastructure.support.DatabaseType.SYBA
  * @author Mahmoud Ben Hassine
  * @author Yanming Zhou
  * @author Thomas Risberg
+ * @author Moad Elfatihi
  * @deprecated since 6.0 in favor of {@link JdbcJobRepositoryFactoryBean}. Scheduled for
  * removal in 6.2 or later.
  */
@@ -116,9 +118,12 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 	protected Object getTarget() {
 		JdbcJobInstanceDao jobInstanceDao = createJobInstanceDao();
 		JdbcJobExecutionDao jobExecutionDao = createJobExecutionDao();
+		JdbcJobParameterDao jobParameterDao = createJobParameterDao();
 		jobExecutionDao.setJobInstanceDao(jobInstanceDao);
+		jobExecutionDao.setJobParameterDao(jobParameterDao);
 		JdbcStepExecutionDao stepExecutionDao = createStepExecutionDao();
 		stepExecutionDao.setJobExecutionDao(jobExecutionDao);
+		stepExecutionDao.setJobParameterDao(jobParameterDao);
 		JdbcExecutionContextDao executionContextDao = createExecutionContextDao();
 		return new SimpleJobRepository(jobInstanceDao, jobExecutionDao, stepExecutionDao, executionContextDao);
 	}
@@ -336,6 +341,11 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 		dao.setExitMessageLength(this.maxVarCharLengthForExitMessage);
 		dao.setConversionService(this.conversionService);
 		return dao;
+	}
+
+	@Override
+	protected JdbcJobParameterDao createJobParameterDao() {
+		return new JdbcJobParameterDao(JdbcClient.create(jdbcOperations));
 	}
 
 	@Override

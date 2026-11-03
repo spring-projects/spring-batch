@@ -62,6 +62,7 @@ import org.springframework.util.Assert;
  * @author Baris Cubukcuoglu
  * @author Minsoo Kim
  * @author Yanming Zhou
+ * @author Moad Elfatihi
  * @see StepExecutionDao
  */
 public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implements StepExecutionDao, InitializingBean {
@@ -144,6 +145,8 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 
 	private JdbcJobExecutionDao jobExecutionDao;
 
+	private JdbcJobParameterDao jobParameterDao;
+
 	private final Lock lock = new ReentrantLock();
 
 	/**
@@ -172,11 +175,16 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 		this.jobExecutionDao = jobExecutionDao;
 	}
 
+	public void setJobParameterDao(JdbcJobParameterDao jobParameterDao) {
+		this.jobParameterDao = jobParameterDao;
+	}
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
 		Assert.state(stepExecutionIncrementer != null, "StepExecutionIncrementer cannot be null.");
 		Assert.state(jobExecutionDao != null, "JobExecutionDao cannot be null.");
+		Assert.state(jobParameterDao != null, "JobParameterDao cannot be null.");
 	}
 
 	public StepExecution createStepExecution(String stepName, JobExecution jobExecution) {
@@ -368,7 +376,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 		}
 		JobExecutionRow jobExecutionRow = row.jobExecutionRow();
 		JobExecution jobExecution = jobExecutionRow.toJobExecution(jobInstance,
-				jobExecutionDao.getJobParameters(jobExecutionRow.jobExecutionId()));
+				jobParameterDao.getJobParameters(jobExecutionRow.jobExecutionId()));
 		return row.stepExecutionRow().toStepExecution(jobExecution);
 	}
 

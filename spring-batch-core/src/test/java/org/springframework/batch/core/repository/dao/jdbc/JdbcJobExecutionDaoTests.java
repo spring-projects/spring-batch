@@ -49,6 +49,8 @@ public class JdbcJobExecutionDaoTests {
 
 	private JdbcJobInstanceDao jdbcJobInstanceDao;
 
+	private JdbcJobParameterDao jdbcJobParameterDao;
+
 	private JdbcTemplate jdbcTemplate;
 
 	@BeforeEach
@@ -68,8 +70,12 @@ public class JdbcJobExecutionDaoTests {
 		jdbcJobExecutionDao = new JdbcJobExecutionDao(JdbcClient.create(jdbcTemplate));
 		H2SequenceMaxValueIncrementer jobExecutionIncrementer = new H2SequenceMaxValueIncrementer(database,
 				"BATCH_JOB_EXECUTION_SEQ");
+		jdbcJobParameterDao = new JdbcJobParameterDao(JdbcClient.create(jdbcTemplate));
+		jdbcJobParameterDao.afterPropertiesSet();
+
 		jdbcJobExecutionDao.setJobExecutionIncrementer(jobExecutionIncrementer);
 		jdbcJobExecutionDao.setJobInstanceDao(jdbcJobInstanceDao);
+		jdbcJobExecutionDao.setJobParameterDao(jdbcJobParameterDao);
 		jdbcJobExecutionDao.afterPropertiesSet();
 
 	}
@@ -113,7 +119,7 @@ public class JdbcJobExecutionDaoTests {
 		JobExecution jobExecution = jdbcJobExecutionDao.createJobExecution(jobInstance, jobParameters);
 
 		// when
-		jdbcJobExecutionDao.deleteJobExecutionParameters(jobExecution);
+		jdbcJobParameterDao.deleteParametersOf(jobExecution);
 
 		// then
 		Assertions.assertEquals(0, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_EXECUTION_PARAMS"));
