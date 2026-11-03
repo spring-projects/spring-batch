@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -168,8 +168,12 @@ public class ChunkMessageChannelItemWriter<T>
 						+ localState.getExpecting());
 			}
 
+			// The manager step has already counted the chunks as written as soon as they
+			// were sent to the workers. The contributions of the workers are the source
+			// of truth, so reset the write count to not count the same items twice. The
+			// write skip count is not reset: the manager only counts the skips of its
+			// own write calls, which are not reported by the workers.
 			stepExecution.setWriteCount(0);
-			stepExecution.setWriteSkipCount(0);
 			for (StepContribution contribution : getStepContributions()) {
 				stepExecution.apply(contribution);
 			}
