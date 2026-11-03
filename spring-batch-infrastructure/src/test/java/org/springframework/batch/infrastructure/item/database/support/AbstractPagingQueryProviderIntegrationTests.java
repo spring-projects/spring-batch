@@ -22,23 +22,23 @@ import javax.sql.DataSource;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.infrastructure.item.database.Order;
-import org.springframework.batch.infrastructure.item.database.support.AbstractSqlPagingQueryProvider;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.simple.JdbcClient;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Henning Pöttker
+ * @author Yanming Zhou
  */
 abstract class AbstractPagingQueryProviderIntegrationTests {
 
-	private final JdbcTemplate jdbcTemplate;
+	private final JdbcClient jdbcClient;
 
 	private final AbstractSqlPagingQueryProvider queryProvider;
 
 	AbstractPagingQueryProviderIntegrationTests(DataSource dataSource, AbstractSqlPagingQueryProvider queryProvider) {
-		this.jdbcTemplate = new JdbcTemplate(dataSource);
+		this.jdbcClient = JdbcClient.create(dataSource);
 		this.queryProvider = queryProvider;
 	}
 
@@ -50,10 +50,13 @@ abstract class AbstractPagingQueryProviderIntegrationTests {
 		sortKeys.put("ID", Order.ASCENDING);
 		queryProvider.setSortKeys(sortKeys);
 
-		List<Item> firstPage = jdbcTemplate.query(queryProvider.generateFirstPageQuery(2), MAPPER);
+		List<Item> firstPage = jdbcClient.sql(queryProvider.generateFirstPageQuery(2)).query(MAPPER).list();
 		assertEquals(List.of(new Item(1, "Spring"), new Item(2, "Batch")), firstPage);
 
-		List<Item> secondPage = jdbcTemplate.query(queryProvider.generateRemainingPagesQuery(2), MAPPER, 2);
+		List<Item> secondPage = jdbcClient.sql(queryProvider.generateRemainingPagesQuery(2))
+			.param(1, 2)
+			.query(MAPPER)
+			.list();
 		assertEquals(List.of(new Item(3, "Infrastructure")), secondPage);
 	}
 
@@ -66,11 +69,13 @@ abstract class AbstractPagingQueryProviderIntegrationTests {
 		sortKeys.put("STRING", Order.ASCENDING);
 		queryProvider.setSortKeys(sortKeys);
 
-		List<String> firstPage = jdbcTemplate.queryForList(queryProvider.generateFirstPageQuery(2), String.class);
+		List<String> firstPage = jdbcClient.sql(queryProvider.generateFirstPageQuery(2)).query(String.class).list();
 		assertEquals(List.of("Batch", "Infrastructure"), firstPage);
 
-		List<String> secondPage = jdbcTemplate.queryForList(queryProvider.generateRemainingPagesQuery(2), String.class,
-				"Infrastructure");
+		List<String> secondPage = jdbcClient.sql(queryProvider.generateRemainingPagesQuery(2))
+			.param(1, "Infrastructure")
+			.query(String.class)
+			.list();
 		assertEquals(List.of("Spring"), secondPage);
 	}
 

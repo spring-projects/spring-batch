@@ -24,8 +24,7 @@ import javax.sql.DataSource;
 import org.springframework.batch.infrastructure.item.Chunk;
 import org.springframework.batch.infrastructure.item.ItemWriter;
 import org.springframework.batch.samples.domain.trade.Trade;
-import org.springframework.jdbc.core.JdbcOperations;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 
 public class ItemTrackingTradeItemWriter implements ItemWriter<Trade> {
 
@@ -33,10 +32,10 @@ public class ItemTrackingTradeItemWriter implements ItemWriter<Trade> {
 
 	private String writeFailureISIN;
 
-	private JdbcOperations jdbcTemplate;
+	private JdbcClient jdbcClient;
 
 	public void setDataSource(DataSource dataSource) {
-		jdbcTemplate = new JdbcTemplate(dataSource);
+		jdbcClient = JdbcClient.create(dataSource);
 	}
 
 	public void setWriteFailureISIN(String writeFailureISIN) {
@@ -58,9 +57,10 @@ public class ItemTrackingTradeItemWriter implements ItemWriter<Trade> {
 
 			newItems.add(t);
 
-			if (jdbcTemplate != null) {
-				jdbcTemplate.update("UPDATE TRADE set VERSION=? where ID=? and version=?", t.getVersion() + 1,
-						t.getId(), t.getVersion());
+			if (jdbcClient != null) {
+				jdbcClient.sql("UPDATE TRADE set VERSION=? where ID=? and version=?")
+					.params(t.getVersion() + 1, t.getId(), t.getVersion())
+					.update();
 			}
 		}
 

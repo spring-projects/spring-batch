@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDao;
@@ -51,8 +50,11 @@ public class JdbcJobDaoTests extends AbstractJobDaoTests {
 		jobExecution.setExitStatus(ExitStatus.COMPLETED.addExitDescription(LONG_STRING));
 		jobExecutionDao.updateJobExecution(jobExecution);
 
-		List<Map<String, Object>> executions = jdbcTemplate
-			.queryForList("SELECT * FROM BATCH_JOB_EXECUTION where JOB_INSTANCE_ID=?", jobInstance.getId());
+		List<Map<String, Object>> executions = jdbcClient
+			.sql("SELECT * FROM BATCH_JOB_EXECUTION where JOB_INSTANCE_ID=?")
+			.param(1, jobInstance.getId())
+			.query()
+			.listOfRows();
 		assertEquals(1, executions.size());
 		assertEquals(LONG_STRING.substring(0, 250), executions.get(0).get("EXIT_MESSAGE"));
 	}

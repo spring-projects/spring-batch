@@ -29,7 +29,7 @@ import org.springframework.batch.core.step.StepExecution;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -40,7 +40,7 @@ public class LocalChunkingJobFunctionalTests {
 	public void testLaunchJobWithJavaConfig() throws Exception {
 		// given
 		ApplicationContext context = new AnnotationConfigApplicationContext(LocalChunkingJobConfiguration.class);
-		JdbcTemplate jdbcTemplate = context.getBean(JdbcTemplate.class);
+		JdbcClient jdbcClient = context.getBean(JdbcClient.class);
 		JobOperator jobOperator = context.getBean(JobOperator.class);
 		Job job = context.getBean(Job.class);
 		JobParameters jobParameters = new JobParametersBuilder()
@@ -52,7 +52,7 @@ public class LocalChunkingJobFunctionalTests {
 
 		// then
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
-		int vetsCount = JdbcTestUtils.countRowsInTable(jdbcTemplate, "vets");
+		int vetsCount = JdbcTestUtils.countRowsInTable(jdbcClient, "vets");
 		assertEquals(6, vetsCount);
 		StepExecution stepExecution = jobExecution.getStepExecutions().iterator().next();
 		assertEquals(6, stepExecution.getReadCount());
@@ -66,7 +66,7 @@ public class LocalChunkingJobFunctionalTests {
 	public void testLaunchJobWithJavaConfigFailure() throws Exception {
 		// given
 		ApplicationContext context = new AnnotationConfigApplicationContext(LocalChunkingJobConfiguration.class);
-		JdbcTemplate jdbcTemplate = context.getBean(JdbcTemplate.class);
+		JdbcClient jdbcClient = context.getBean(JdbcClient.class);
 		JobOperator jobOperator = context.getBean(JobOperator.class);
 		Job job = context.getBean(Job.class);
 		JobParameters jobParameters = new JobParametersBuilder()
@@ -83,7 +83,7 @@ public class LocalChunkingJobFunctionalTests {
 		Throwable throwable = failureExceptions.get(0);
 		assertInstanceOf(DataIntegrityViolationException.class, throwable);
 		assertTrue(throwable.getMessage().contains("size limit: 30"));
-		int vetsCount = JdbcTestUtils.countRowsInTable(jdbcTemplate, "vets");
+		int vetsCount = JdbcTestUtils.countRowsInTable(jdbcClient, "vets");
 		assertEquals(4, vetsCount);
 		StepExecution stepExecution = jobExecution.getStepExecutions().iterator().next();
 		assertEquals(6, stepExecution.getReadCount());

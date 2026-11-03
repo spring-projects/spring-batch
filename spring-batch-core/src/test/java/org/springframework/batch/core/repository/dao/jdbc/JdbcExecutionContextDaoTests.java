@@ -28,7 +28,6 @@ import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.repository.dao.Jackson2ExecutionContextStringSerializer;
 import org.springframework.batch.core.step.StepExecution;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
@@ -46,7 +45,7 @@ class JdbcExecutionContextDaoTests {
 
 	private JdbcJobInstanceDao jdbcJobInstanceDao;
 
-	private JdbcTemplate jdbcTemplate;
+	private JdbcClient jdbcClient;
 
 	@BeforeEach
 	void setup() throws Exception {
@@ -54,29 +53,29 @@ class JdbcExecutionContextDaoTests {
 			.addScript(DatabaseType.H2.getProductSchemaDrop())
 			.addScript(DatabaseType.H2.getProductSchema())
 			.build();
-		jdbcTemplate = new JdbcTemplate(database);
+		jdbcClient = JdbcClient.create(database);
 
-		jdbcJobInstanceDao = new JdbcJobInstanceDao(JdbcClient.create(jdbcTemplate));
+		jdbcJobInstanceDao = new JdbcJobInstanceDao(jdbcClient);
 		H2SequenceMaxValueIncrementer jobInstanceIncrementer = new H2SequenceMaxValueIncrementer(database,
 				"BATCH_JOB_INSTANCE_SEQ");
 		jdbcJobInstanceDao.setJobInstanceIncrementer(jobInstanceIncrementer);
 		jdbcJobInstanceDao.afterPropertiesSet();
 
-		jdbcJobExecutionDao = new JdbcJobExecutionDao(JdbcClient.create(jdbcTemplate));
+		jdbcJobExecutionDao = new JdbcJobExecutionDao(jdbcClient);
 		H2SequenceMaxValueIncrementer jobExecutionIncrementer = new H2SequenceMaxValueIncrementer(database,
 				"BATCH_JOB_EXECUTION_SEQ");
 		jdbcJobExecutionDao.setJobExecutionIncrementer(jobExecutionIncrementer);
 		jdbcJobExecutionDao.setJobInstanceDao(jdbcJobInstanceDao);
 		jdbcJobExecutionDao.afterPropertiesSet();
 
-		jdbcStepExecutionDao = new JdbcStepExecutionDao(JdbcClient.create(jdbcTemplate));
+		jdbcStepExecutionDao = new JdbcStepExecutionDao(jdbcClient);
 		H2SequenceMaxValueIncrementer stepExecutionIncrementer = new H2SequenceMaxValueIncrementer(database,
 				"BATCH_STEP_EXECUTION_SEQ");
 		jdbcStepExecutionDao.setStepExecutionIncrementer(stepExecutionIncrementer);
 		jdbcStepExecutionDao.setJobExecutionDao(jdbcJobExecutionDao);
 		jdbcStepExecutionDao.afterPropertiesSet();
 
-		jdbcExecutionContextDao = new JdbcExecutionContextDao(JdbcClient.create(jdbcTemplate));
+		jdbcExecutionContextDao = new JdbcExecutionContextDao(jdbcClient);
 		Jackson2ExecutionContextStringSerializer serializer = new Jackson2ExecutionContextStringSerializer();
 		jdbcExecutionContextDao.setSerializer(serializer);
 		jdbcExecutionContextDao.afterPropertiesSet();
@@ -94,10 +93,13 @@ class JdbcExecutionContextDaoTests {
 		jdbcExecutionContextDao.saveExecutionContext(jobExecution);
 
 		// then
-		int jobExecutionContextsCount = JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_EXECUTION_CONTEXT");
+		int jobExecutionContextsCount = JdbcTestUtils.countRowsInTable(jdbcClient, "BATCH_JOB_EXECUTION_CONTEXT");
 		Assertions.assertEquals(1, jobExecutionContextsCount);
-		Map<String, @Nullable Object> executionContext = jdbcTemplate
-			.queryForMap("select * from BATCH_JOB_EXECUTION_CONTEXT where JOB_EXECUTION_ID = ?", jobExecution.getId());
+		Map<String, @Nullable Object> executionContext = jdbcClient
+			.sql("select * from BATCH_JOB_EXECUTION_CONTEXT where JOB_EXECUTION_ID = ?")
+			.param(1, jobExecution.getId())
+			.query()
+			.singleRow();
 		Object shortContext = executionContext.get("SHORT_CONTEXT");
 		Assertions.assertNotNull(shortContext);
 		Assertions.assertTrue(((String) shortContext).contains("\"name\":\"foo\""));
@@ -116,10 +118,13 @@ class JdbcExecutionContextDaoTests {
 		jdbcExecutionContextDao.saveExecutionContext(stepExecution);
 
 		// then
-		int stepExecutionContextsCount = JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_STEP_EXECUTION_CONTEXT");
+		int stepExecutionContextsCount = JdbcTestUtils.countRowsInTable(jdbcClient, "BATCH_STEP_EXECUTION_CONTEXT");
 		Assertions.assertEquals(1, stepExecutionContextsCount);
-		Map<String, @Nullable Object> executionContext = jdbcTemplate.queryForMap(
-				"select * from BATCH_STEP_EXECUTION_CONTEXT where STEP_EXECUTION_ID = ?", stepExecution.getId());
+		Map<String, @Nullable Object> executionContext = jdbcClient
+			.sql("select * from BATCH_STEP_EXECUTION_CONTEXT where STEP_EXECUTION_ID = ?")
+			.param(1, jobExecution.getId())
+			.query()
+			.singleRow();
 		Object shortContext = executionContext.get("SHORT_CONTEXT");
 		Assertions.assertNotNull(shortContext);
 		Assertions.assertTrue(((String) shortContext).contains("\"name\":\"foo\""));

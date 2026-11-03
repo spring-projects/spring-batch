@@ -23,15 +23,19 @@ import org.springframework.batch.samples.domain.trade.CustomerCredit;
 
 import org.jspecify.annotations.Nullable;
 import org.springframework.batch.samples.domain.trade.CustomerDao;
-import org.springframework.jdbc.core.support.JdbcDaoSupport;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
+
+import javax.sql.DataSource;
 
 /**
  * @author Lucas Ward
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  *
  */
-public class JdbcCustomerDao extends JdbcDaoSupport implements CustomerDao {
+public class JdbcCustomerDao implements CustomerDao {
 
 	private static final String GET_CUSTOMER_BY_NAME = "SELECT ID, NAME, CREDIT from CUSTOMER where NAME = ?";
 
@@ -41,20 +45,26 @@ public class JdbcCustomerDao extends JdbcDaoSupport implements CustomerDao {
 
 	private DataFieldMaxValueIncrementer incrementer;
 
+	private JdbcClient jdbcClient;
+
 	public void setIncrementer(DataFieldMaxValueIncrementer incrementer) {
 		this.incrementer = incrementer;
+	}
+
+	public void setDataSource(DataSource dataSource) {
+		this.jdbcClient = JdbcClient.create(dataSource);
 	}
 
 	@Override
 	public @Nullable CustomerCredit getCustomerByName(String name) {
 
-		List<CustomerCredit> customers = getJdbcTemplate().query(GET_CUSTOMER_BY_NAME, (rs, rowNum) -> {
+		List<CustomerCredit> customers = jdbcClient.sql(GET_CUSTOMER_BY_NAME).param(1, name).query((rs, rowNum) -> {
 			CustomerCredit customer = new CustomerCredit();
 			customer.setName(rs.getString("NAME"));
 			customer.setId(rs.getInt("ID"));
 			customer.setCredit(rs.getBigDecimal("CREDIT"));
 			return customer;
-		}, name);
+		}).list();
 
 		if (customers.size() == 0) {
 			return null;
@@ -68,12 +78,12 @@ public class JdbcCustomerDao extends JdbcDaoSupport implements CustomerDao {
 	@Override
 	public void insertCustomer(String name, BigDecimal credit) {
 
-		getJdbcTemplate().update(INSERT_CUSTOMER, new Object[] { incrementer.nextIntValue(), name, credit });
+		jdbcClient.sql(INSERT_CUSTOMER).params(incrementer.nextIntValue(), name, credit).update();
 	}
 
 	@Override
 	public void updateCustomer(String name, BigDecimal credit) {
-		getJdbcTemplate().update(UPDATE_CUSTOMER, new Object[] { credit, name });
+		jdbcClient.sql(UPDATE_CUSTOMER).params(credit, name).update();
 	}
 
 }

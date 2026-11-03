@@ -22,8 +22,7 @@ import org.springframework.batch.infrastructure.item.ItemProcessor;
 import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.OptimisticLockingFailureException;
-import org.springframework.jdbc.core.JdbcOperations;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.util.Assert;
 
 /**
@@ -35,22 +34,19 @@ import org.springframework.util.Assert;
  * @see StagingItemWriter
  * @see ProcessIndicatorItemWrapper
  * @author Robert Kasanicky
+ * @author Yanming Zhou
  */
 public class StagingItemProcessor<T> implements ItemProcessor<ProcessIndicatorItemWrapper<T>, T>, InitializingBean {
 
-	private JdbcOperations jdbcTemplate;
-
-	public void setJdbcTemplate(JdbcOperations jdbcTemplate) {
-		this.jdbcTemplate = jdbcTemplate;
-	}
+	private JdbcClient jdbcClient;
 
 	public void setDataSource(DataSource dataSource) {
-		this.jdbcTemplate = new JdbcTemplate(dataSource);
+		this.jdbcClient = JdbcClient.create(dataSource);
 	}
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.state(jdbcTemplate != null, "Either jdbcTemplate or dataSource must be set");
+		Assert.state(jdbcClient != null, "Either jdbcClient or dataSource must be set");
 	}
 
 	/**
@@ -60,8 +56,9 @@ public class StagingItemProcessor<T> implements ItemProcessor<ProcessIndicatorIt
 	@Override
 	public @Nullable T process(ProcessIndicatorItemWrapper<T> wrapper) throws Exception {
 
-		int count = jdbcTemplate.update("UPDATE BATCH_STAGING SET PROCESSED=? WHERE ID=? AND PROCESSED=?",
-				StagingItemWriter.DONE, wrapper.getId(), StagingItemWriter.NEW);
+		int count = jdbcClient.sql("UPDATE BATCH_STAGING SET PROCESSED=? WHERE ID=? AND PROCESSED=?")
+			.params(StagingItemWriter.DONE, wrapper.getId(), StagingItemWriter.NEW)
+			.update();
 		if (count != 1) {
 			throw new OptimisticLockingFailureException("The staging record with ID=" + wrapper.getId()
 					+ " was updated concurrently when trying to mark as complete (updated " + count + " records.");

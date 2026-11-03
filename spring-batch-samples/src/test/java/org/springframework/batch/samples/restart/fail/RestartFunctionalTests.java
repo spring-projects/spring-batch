@@ -26,7 +26,7 @@ import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.batch.infrastructure.support.PropertiesConverter;
 import org.springframework.batch.test.JobOperatorTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.context.transaction.BeforeTransaction;
 import org.springframework.test.jdbc.JdbcTestUtils;
@@ -41,24 +41,25 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  * @author Glenn Renfro
+ * @author Yanming Zhou
  */
 @SpringJUnitConfig(locations = { "/org/springframework/batch/samples/restart/fail/job/failRestartSample.xml",
 		"/simple-job-launcher-context.xml" })
 class RestartFunctionalTests {
 
-	private JdbcTemplate jdbcTemplate;
+	private JdbcClient jdbcClient;
 
 	@Autowired
 	private JobOperatorTestUtils jobOperatorTestUtils;
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
-		this.jdbcTemplate = new JdbcTemplate(dataSource);
+		this.jdbcClient = JdbcClient.create(dataSource);
 	}
 
 	@BeforeTransaction
 	void onTearDown() {
-		JdbcTestUtils.deleteFromTables(jdbcTemplate, "TRADE");
+		JdbcTestUtils.deleteFromTables(jdbcClient, "TRADE");
 	}
 
 	/*
@@ -69,7 +70,7 @@ class RestartFunctionalTests {
 	 */
 	@Test
 	void testLaunchJob() throws Exception {
-		int before = JdbcTestUtils.countRowsInTable(jdbcTemplate, "TRADE");
+		int before = JdbcTestUtils.countRowsInTable(jdbcClient, "TRADE");
 
 		JobExecution jobExecution = runJobForRestartTest();
 		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
@@ -77,14 +78,14 @@ class RestartFunctionalTests {
 		Throwable ex = jobExecution.getAllFailureExceptions().get(0);
 		assertTrue(ex.getMessage().toLowerCase().contains("planned"));
 
-		int medium = JdbcTestUtils.countRowsInTable(jdbcTemplate, "TRADE");
+		int medium = JdbcTestUtils.countRowsInTable(jdbcClient, "TRADE");
 		// assert based on commit interval = 2
 		assertEquals(before + 2, medium);
 
 		jobExecution = runJobForRestartTest();
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 
-		int after = JdbcTestUtils.countRowsInTable(jdbcTemplate, "TRADE");
+		int after = JdbcTestUtils.countRowsInTable(jdbcClient, "TRADE");
 
 		assertEquals(before + 5, after);
 	}

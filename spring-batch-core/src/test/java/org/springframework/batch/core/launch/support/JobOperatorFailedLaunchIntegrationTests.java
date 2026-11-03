@@ -38,10 +38,11 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.ConverterNotFoundException;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.jdbc.support.JdbcTransactionManager;
+import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.transaction.PlatformTransactionManager;
 
 /**
@@ -50,6 +51,7 @@ import org.springframework.transaction.PlatformTransactionManager;
  * parameters are rejected by the job's validator.
  *
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  */
 class JobOperatorFailedLaunchIntegrationTests {
 
@@ -60,7 +62,7 @@ class JobOperatorFailedLaunchIntegrationTests {
 			// given
 			Job job = context.getBean("job", Job.class);
 			JobOperator jobOperator = context.getBean(JobOperator.class);
-			JdbcTemplate jdbcTemplate = new JdbcTemplate(context.getBean(DataSource.class));
+			JdbcClient jdbcClient = JdbcClient.create(context.getBean(DataSource.class));
 			JobParameters jobParameters = new JobParameters(
 					Set.of(new JobParameter<>("customer", new CustomerId("42"), CustomerId.class, true)));
 
@@ -68,9 +70,9 @@ class JobOperatorFailedLaunchIntegrationTests {
 			Assertions.assertThrows(ConverterNotFoundException.class, () -> jobOperator.start(job, jobParameters));
 
 			// then
-			Assertions.assertEquals(0, count(jdbcTemplate, "BATCH_JOB_EXECUTION_PARAMS"));
-			Assertions.assertEquals(0, count(jdbcTemplate, "BATCH_JOB_EXECUTION"));
-			Assertions.assertEquals(0, count(jdbcTemplate, "BATCH_JOB_INSTANCE"),
+			Assertions.assertEquals(0L, JdbcTestUtils.countRowsInTable(jdbcClient, "BATCH_JOB_EXECUTION_PARAMS"));
+			Assertions.assertEquals(0L, JdbcTestUtils.countRowsInTable(jdbcClient, "BATCH_JOB_EXECUTION"));
+			Assertions.assertEquals(0L, JdbcTestUtils.countRowsInTable(jdbcClient, "BATCH_JOB_INSTANCE"),
 					"A failed launch should not leave an orphan job instance behind");
 		}
 	}
@@ -82,16 +84,16 @@ class JobOperatorFailedLaunchIntegrationTests {
 			// given
 			Job job = context.getBean("jobWithRejectingValidator", Job.class);
 			JobOperator jobOperator = context.getBean(JobOperator.class);
-			JdbcTemplate jdbcTemplate = new JdbcTemplate(context.getBean(DataSource.class));
+			JdbcClient jdbcClient = JdbcClient.create(context.getBean(DataSource.class));
 			JobParameters jobParameters = new JobParameters(Set.of(new JobParameter<>("name", "foo", String.class)));
 
 			// when
 			Assertions.assertThrows(InvalidJobParametersException.class, () -> jobOperator.start(job, jobParameters));
 
 			// then
-			Assertions.assertEquals(0, count(jdbcTemplate, "BATCH_JOB_EXECUTION_PARAMS"));
-			Assertions.assertEquals(0, count(jdbcTemplate, "BATCH_JOB_EXECUTION"));
-			Assertions.assertEquals(0, count(jdbcTemplate, "BATCH_JOB_INSTANCE"),
+			Assertions.assertEquals(0L, JdbcTestUtils.countRowsInTable(jdbcClient, "BATCH_JOB_EXECUTION_PARAMS"));
+			Assertions.assertEquals(0L, JdbcTestUtils.countRowsInTable(jdbcClient, "BATCH_JOB_EXECUTION"));
+			Assertions.assertEquals(0L, JdbcTestUtils.countRowsInTable(jdbcClient, "BATCH_JOB_INSTANCE"),
 					"A failed launch should not leave an orphan job instance behind");
 		}
 	}
@@ -102,7 +104,7 @@ class JobOperatorFailedLaunchIntegrationTests {
 				TestConfiguration.class)) {
 			// given
 			JobRepository jobRepository = context.getBean(JobRepository.class);
-			JdbcTemplate jdbcTemplate = new JdbcTemplate(context.getBean(DataSource.class));
+			JdbcClient jdbcClient = JdbcClient.create(context.getBean(DataSource.class));
 			JobParameters jobParameters = new JobParameters(
 					Set.of(new JobParameter<>("customer", new CustomerId("42"), CustomerId.class, true)));
 
@@ -112,14 +114,9 @@ class JobOperatorFailedLaunchIntegrationTests {
 
 			// then
 			Assertions.assertNull(jobRepository.getJobInstance("job", jobParameters));
-			Assertions.assertEquals(0, count(jdbcTemplate, "BATCH_JOB_INSTANCE"));
-			Assertions.assertEquals(0, count(jdbcTemplate, "BATCH_JOB_EXECUTION"));
+			Assertions.assertEquals(0L, JdbcTestUtils.countRowsInTable(jdbcClient, "BATCH_JOB_INSTANCE"));
+			Assertions.assertEquals(0L, JdbcTestUtils.countRowsInTable(jdbcClient, "BATCH_JOB_EXECUTION"));
 		}
-	}
-
-	private static int count(JdbcTemplate jdbcTemplate, String table) {
-		Integer count = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM " + table, Integer.class);
-		return count != null ? count : 0;
 	}
 
 	/**

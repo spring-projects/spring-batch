@@ -22,8 +22,7 @@ import javax.sql.DataSource;
 
 import org.springframework.batch.core.partition.Partitioner;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
-import org.springframework.jdbc.core.JdbcOperations;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 
 /**
  * Simple minded partitioner for a range of values of a column in a database table. Works
@@ -34,7 +33,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
  */
 public class ColumnRangePartitioner implements Partitioner {
 
-	private JdbcOperations jdbcTemplate;
+	private JdbcClient jdbcClient;
 
 	private String table;
 
@@ -61,7 +60,7 @@ public class ColumnRangePartitioner implements Partitioner {
 	 * @param dataSource a {@link DataSource}
 	 */
 	public void setDataSource(DataSource dataSource) {
-		jdbcTemplate = new JdbcTemplate(dataSource);
+		jdbcClient = JdbcClient.create(dataSource);
 	}
 
 	/**
@@ -74,8 +73,8 @@ public class ColumnRangePartitioner implements Partitioner {
 	 */
 	@Override
 	public Map<String, ExecutionContext> partition(int gridSize) {
-		int min = jdbcTemplate.queryForObject("SELECT MIN(" + column + ") from " + table, Integer.class);
-		int max = jdbcTemplate.queryForObject("SELECT MAX(" + column + ") from " + table, Integer.class);
+		int min = jdbcClient.sql("SELECT MIN(" + column + ") from " + table).query(Integer.class).single();
+		int max = jdbcClient.sql("SELECT MAX(" + column + ") from " + table).query(Integer.class).single();
 		int targetSize = (max - min) / gridSize + 1;
 
 		Map<String, ExecutionContext> result = new HashMap<>();

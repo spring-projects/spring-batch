@@ -34,7 +34,7 @@ import org.springframework.batch.infrastructure.repeat.support.RepeatTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.jms.connection.SessionProxy;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.SessionCallback;
@@ -62,7 +62,7 @@ class SynchronousTests implements ApplicationContextAware {
 	private PlatformTransactionManager transactionManager;
 
 	@Autowired
-	private JdbcTemplate jdbcTemplate;
+	private JdbcClient jdbcClient;
 
 	private ApplicationContext applicationContext;
 
@@ -81,13 +81,13 @@ class SynchronousTests implements ApplicationContextAware {
 			foo = (String) jmsTemplate.receiveAndConvert("queue");
 			count++;
 		}
-		JdbcTestUtils.deleteFromTables(jdbcTemplate, "T_BARS");
+		JdbcTestUtils.deleteFromTables(jdbcClient, "T_BARS");
 		jmsTemplate.convertAndSend("queue", "foo");
 		jmsTemplate.convertAndSend("queue", "bar");
 	}
 
 	private void assertInitialState() {
-		int count = JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_BARS");
+		int count = JdbcTestUtils.countRowsInTable(jdbcClient, "T_BARS");
 		assertEquals(0, count);
 	}
 
@@ -100,11 +100,13 @@ class SynchronousTests implements ApplicationContextAware {
 		repeatTemplate.iterate(context -> {
 			String text = (String) jmsTemplate.receiveAndConvert("queue");
 			list.add(text);
-			jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(), text);
+			jdbcClient.sql("INSERT into T_BARS (id,name,foo_date) values (?,?,null)")
+				.params(list.size(), text)
+				.update();
 			return RepeatStatus.continueIf(text != null);
 		});
 
-		int count = JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_BARS");
+		int count = JdbcTestUtils.countRowsInTable(jdbcClient, "T_BARS");
 		assertEquals(2, count);
 
 		assertTrue(list.contains("foo"));
@@ -126,7 +128,9 @@ class SynchronousTests implements ApplicationContextAware {
 			repeatTemplate.iterate(context -> {
 				String text = (String) jmsTemplate.receiveAndConvert("queue");
 				list.add(text);
-				jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(), text);
+				jdbcClient.sql("INSERT into T_BARS (id,name,foo_date) values (?,?,null)")
+					.params(list.size(), text)
+					.update();
 				return RepeatStatus.continueIf(text != null);
 			});
 			// force rollback...
@@ -142,7 +146,7 @@ class SynchronousTests implements ApplicationContextAware {
 		}
 
 		// The database portion rolled back...
-		int count = JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_BARS");
+		int count = JdbcTestUtils.countRowsInTable(jdbcClient, "T_BARS");
 		assertEquals(0, count);
 
 		// ... and so did the message session. The rollback should have restored
@@ -168,7 +172,9 @@ class SynchronousTests implements ApplicationContextAware {
 			repeatTemplate.iterate(context -> {
 				String text = (String) txJmsTemplate.receiveAndConvert("queue");
 				list.add(text);
-				jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(), text);
+				jdbcClient.sql("INSERT into T_BARS (id,name,foo_date) values (?,?,null)")
+					.params(list.size(), text)
+					.update();
 				return RepeatStatus.continueIf(text != null);
 			});
 
@@ -199,7 +205,7 @@ class SynchronousTests implements ApplicationContextAware {
 		}
 
 		// The database portion committed...
-		int count = JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_BARS");
+		int count = JdbcTestUtils.countRowsInTable(jdbcClient, "T_BARS");
 		assertEquals(2, count);
 
 		// ...but the JMS session rolled back, so the message is still there

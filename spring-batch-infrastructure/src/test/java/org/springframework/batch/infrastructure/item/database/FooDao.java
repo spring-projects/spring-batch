@@ -17,16 +17,13 @@ package org.springframework.batch.infrastructure.item.database;
 
 import org.springframework.batch.infrastructure.item.sample.Foo;
 
-import javax.sql.DataSource;
-
 /**
  * @author Lucas Ward
+ * @author Yanming Zhou
  *
  */
 public interface FooDao {
 
 	Foo getFoo(Object key);
-
-	void setDataSource(DataSource dataSource);
 
 }

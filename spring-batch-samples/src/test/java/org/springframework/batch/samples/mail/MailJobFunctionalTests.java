@@ -28,7 +28,7 @@ import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.test.JobOperatorTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.mail.MailMessage;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
@@ -41,6 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  * @author Glenn Renfro
+ * @author Yanming Zhou
  * @since 2.1
  */
 @SpringJUnitConfig(
@@ -65,7 +66,7 @@ class MailJobFunctionalTests {
 
 	private static final Object[] USER8 = new Object[] { 8, "Martin Van Buren", email };
 
-	private JdbcTemplate jdbcTemplate;
+	private JdbcClient jdbcClient;
 
 	@Autowired
 	private JobOperatorTestUtils jobOperatorTestUtils;
@@ -78,19 +79,19 @@ class MailJobFunctionalTests {
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
-		jdbcTemplate = new JdbcTemplate(dataSource);
+		jdbcClient = JdbcClient.create(dataSource);
 	}
 
 	@BeforeEach
 	void before() {
 		mailSender.clear();
 		errorHandler.clear();
-		jdbcTemplate.update("create table USERS (ID INTEGER, NAME VARCHAR(40), EMAIL VARCHAR(20))");
+		jdbcClient.sql("create table USERS (ID INTEGER, NAME VARCHAR(40), EMAIL VARCHAR(20))").update();
 	}
 
 	@AfterEach
 	void after() {
-		JdbcTestUtils.dropTables(jdbcTemplate, "USERS");
+		JdbcTestUtils.dropTables(jdbcClient, "USERS");
 	}
 
 	@Test
@@ -118,7 +119,7 @@ class MailJobFunctionalTests {
 
 	private void createUsers(Object[][] records) {
 		for (Object[] record : records) {
-			jdbcTemplate.update("insert into USERS values (?,?,?)", record);
+			jdbcClient.sql("insert into USERS values (?,?,?)").params(record).update();
 		}
 	}
 

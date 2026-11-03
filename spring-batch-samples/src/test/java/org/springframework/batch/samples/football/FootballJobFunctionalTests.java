@@ -27,7 +27,7 @@ import org.springframework.batch.test.JobOperatorTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
@@ -41,20 +41,20 @@ class FootballJobFunctionalTests {
 	@Autowired
 	private JobOperatorTestUtils jobOperatorTestUtils;
 
-	private JdbcTemplate jdbcTemplate;
+	private JdbcClient jdbcClient;
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
-		this.jdbcTemplate = new JdbcTemplate(dataSource);
+		this.jdbcClient = JdbcClient.create(dataSource);
 	}
 
 	@Test
 	void testLaunchJobWithXmlConfiguration() throws Exception {
-		JdbcTestUtils.deleteFromTables(jdbcTemplate, "PLAYERS", "GAMES", "PLAYER_SUMMARY");
+		JdbcTestUtils.deleteFromTables(jdbcClient, "PLAYERS", "GAMES", "PLAYER_SUMMARY");
 
 		jobOperatorTestUtils.startJob();
 
-		int count = JdbcTestUtils.countRowsInTable(jdbcTemplate, "PLAYER_SUMMARY");
+		int count = JdbcTestUtils.countRowsInTable(jdbcClient, "PLAYER_SUMMARY");
 		assertTrue(count > 0);
 	}
 
@@ -69,8 +69,7 @@ class FootballJobFunctionalTests {
 		jobOperator.start(job, new JobParameters());
 
 		// then
-		int count = JdbcTestUtils.countRowsInTable(new JdbcTemplate(context.getBean(DataSource.class)),
-				"PLAYER_SUMMARY");
+		int count = JdbcTestUtils.countRowsInTable(jdbcClient, "PLAYER_SUMMARY");
 		assertTrue(count > 0);
 	}
 
@@ -86,8 +85,7 @@ class FootballJobFunctionalTests {
 		jobOperator.start(job, new JobParameters());
 
 		// then
-		int count = JdbcTestUtils.countRowsInTable(new JdbcTemplate(context.getBean(DataSource.class)),
-				"PLAYER_SUMMARY");
+		int count = JdbcTestUtils.countRowsInTable(jdbcClient, "PLAYER_SUMMARY");
 		assertTrue(count > 0);
 	}
 

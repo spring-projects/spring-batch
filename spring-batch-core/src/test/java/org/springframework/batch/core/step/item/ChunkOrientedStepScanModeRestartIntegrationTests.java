@@ -51,7 +51,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.retry.RetryPolicy;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.dao.TransientDataAccessResourceException;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -66,6 +66,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  *
  * @author Kim ByeongChang
  * @author WooSeung Kim
+ * @author Yanming Zhou
  */
 class ChunkOrientedStepScanModeRestartIntegrationTests {
 
@@ -549,9 +550,10 @@ class ChunkOrientedStepScanModeRestartIntegrationTests {
 	private static JobExecution restartAfterCrash(ApplicationContext context, JobExecution jobExecution)
 			throws Exception {
 		CRASHED.set(false);
-		context.getBean(JdbcTemplate.class)
-			.update("UPDATE BATCH_STEP_EXECUTION SET STATUS = 'FAILED', END_TIME = CURRENT_TIMESTAMP"
-					+ " WHERE STATUS = 'STARTED'");
+		context.getBean(JdbcClient.class)
+			.sql("UPDATE BATCH_STEP_EXECUTION SET STATUS = 'FAILED', END_TIME = CURRENT_TIMESTAMP"
+					+ " WHERE STATUS = 'STARTED'")
+			.update();
 		return restart(context, jobExecution);
 	}
 
@@ -575,20 +577,22 @@ class ChunkOrientedStepScanModeRestartIntegrationTests {
 	}
 
 	private static List<String> deliveredItems(ApplicationContext context) {
-		return context.getBean(JdbcTemplate.class)
-			.queryForList("SELECT item_number FROM delivery ORDER BY item_number", String.class);
+		return context.getBean(JdbcClient.class)
+			.sql("SELECT item_number FROM delivery ORDER BY item_number")
+			.query(String.class)
+			.list();
 	}
 
 	private static ChunkOrientedStepBuilder<String, String> stepBuilder(JobRepository jobRepository,
-			JdbcTransactionManager transactionManager, JdbcTemplate jdbcTemplate, List<String> items, int chunkSize,
+			JdbcTransactionManager transactionManager, JdbcClient jdbcClient, List<String> items, int chunkSize,
 			int skipLimit) {
-		return stepBuilder(jobRepository, transactionManager, jdbcTemplate, new RestartableListItemReader(items),
+		return stepBuilder(jobRepository, transactionManager, jdbcClient, new RestartableListItemReader(items),
 				chunkSize, skipLimit);
 	}
 
 	private static ChunkOrientedStepBuilder<String, String> stepBuilder(JobRepository jobRepository,
-			JdbcTransactionManager transactionManager, JdbcTemplate jdbcTemplate, ItemReader<String> reader,
-			int chunkSize, int skipLimit) {
+			JdbcTransactionManager transactionManager, JdbcClient jdbcClient, ItemReader<String> reader, int chunkSize,
+			int skipLimit) {
 		return new ChunkOrientedStepBuilder<String, String>(jobRepository, chunkSize).reader(reader).writer(chunk -> {
 			for (String item : chunk) {
 				if (SKIPPABLE_WRITE_FAILURES.contains(item)) {
@@ -601,7 +605,7 @@ class ChunkOrientedStepScanModeRestartIntegrationTests {
 					CRASHED.set(true);
 					throw new IllegalArgumentException("Simulated crash while writing item: " + item);
 				}
-				jdbcTemplate.update("INSERT INTO delivery (item_number) VALUES (?)", item);
+				jdbcClient.sql("INSERT INTO delivery (item_number) VALUES (?)").param(1, item).update();
 			}
 		})
 			.transactionManager(transactionManager)
@@ -712,15 +716,15 @@ class ChunkOrientedStepScanModeRestartIntegrationTests {
 
 		private final List<String> items;
 
-		private final JdbcTemplate jdbcTemplate;
+		private final JdbcClient jdbcClient;
 
 		private List<String> undelivered = List.of();
 
 		private int updateCount;
 
-		ProcessIndicatorItemReader(List<String> items, JdbcTemplate jdbcTemplate) {
+		ProcessIndicatorItemReader(List<String> items, JdbcClient jdbcClient) {
 			this.items = items;
-			this.jdbcTemplate = jdbcTemplate;
+			this.jdbcClient = jdbcClient;
 			setName("processIndicatorItemReader");
 			setSaveState(false);
 		}
@@ -733,7 +737,7 @@ class ChunkOrientedStepScanModeRestartIntegrationTests {
 
 		@Override
 		protected void doOpen() {
-			List<String> delivered = this.jdbcTemplate.queryForList("SELECT item_number FROM delivery", String.class);
+			List<String> delivered = this.jdbcClient.sql("SELECT item_number FROM delivery").query(String.class).list();
 			this.undelivered = this.items.stream().filter(item -> !delivered.contains(item)).toList();
 		}
 
@@ -754,8 +758,8 @@ class ChunkOrientedStepScanModeRestartIntegrationTests {
 
 		@Bean
 		public Step step(JobRepository jobRepository, JdbcTransactionManager transactionManager,
-				JdbcTemplate jdbcTemplate) {
-			return stepBuilder(jobRepository, transactionManager, jdbcTemplate, List.of("1", "2", "3", "4", "5"), 5, 1)
+				JdbcClient jdbcClient) {
+			return stepBuilder(jobRepository, transactionManager, jdbcClient, List.of("1", "2", "3", "4", "5"), 5, 1)
 				.build();
 		}
 
@@ -766,8 +770,8 @@ class ChunkOrientedStepScanModeRestartIntegrationTests {
 
 		@Bean
 		public Step step(JobRepository jobRepository, JdbcTransactionManager transactionManager,
-				JdbcTemplate jdbcTemplate) {
-			return stepBuilder(jobRepository, transactionManager, jdbcTemplate,
+				JdbcClient jdbcClient) {
+			return stepBuilder(jobRepository, transactionManager, jdbcClient,
 					new NonAdvancingOnFailureItemReader(List.of("1", "2", "3", "4", "5")), 5, 1)
 				.retryPolicy(RetryPolicy.builder()
 					.includes(TransientDataAccessResourceException.class)
@@ -783,14 +787,14 @@ class ChunkOrientedStepScanModeRestartIntegrationTests {
 	static class ProcessIndicatorStepConfiguration {
 
 		@Bean
-		public ProcessIndicatorItemReader reader(JdbcTemplate jdbcTemplate) {
-			return new ProcessIndicatorItemReader(List.of("1", "2", "3", "4", "5"), jdbcTemplate);
+		public ProcessIndicatorItemReader reader(JdbcClient jdbcClient) {
+			return new ProcessIndicatorItemReader(List.of("1", "2", "3", "4", "5"), jdbcClient);
 		}
 
 		@Bean
-		public Step step(JobRepository jobRepository, JdbcTransactionManager transactionManager,
-				JdbcTemplate jdbcTemplate, ProcessIndicatorItemReader reader) {
-			return stepBuilder(jobRepository, transactionManager, jdbcTemplate, reader, 5, 1).build();
+		public Step step(JobRepository jobRepository, JdbcTransactionManager transactionManager, JdbcClient jdbcClient,
+				ProcessIndicatorItemReader reader) {
+			return stepBuilder(jobRepository, transactionManager, jdbcClient, reader, 5, 1).build();
 		}
 
 	}
@@ -802,8 +806,8 @@ class ChunkOrientedStepScanModeRestartIntegrationTests {
 
 		@Bean
 		public Step step(JobRepository jobRepository, JdbcTransactionManager transactionManager,
-				JdbcTemplate jdbcTemplate) {
-			return stepBuilder(jobRepository, transactionManager, jdbcTemplate, TEN_ITEMS, 5, 1).build();
+				JdbcClient jdbcClient) {
+			return stepBuilder(jobRepository, transactionManager, jdbcClient, TEN_ITEMS, 5, 1).build();
 		}
 
 	}
@@ -813,8 +817,8 @@ class ChunkOrientedStepScanModeRestartIntegrationTests {
 
 		@Bean
 		public Step step(JobRepository jobRepository, JdbcTransactionManager transactionManager,
-				JdbcTemplate jdbcTemplate) {
-			return stepBuilder(jobRepository, transactionManager, jdbcTemplate, TEN_ITEMS, 5, 2).build();
+				JdbcClient jdbcClient) {
+			return stepBuilder(jobRepository, transactionManager, jdbcClient, TEN_ITEMS, 5, 2).build();
 		}
 
 	}
@@ -824,8 +828,8 @@ class ChunkOrientedStepScanModeRestartIntegrationTests {
 
 		@Bean
 		public Step step(JobRepository jobRepository, JdbcTransactionManager transactionManager,
-				JdbcTemplate jdbcTemplate) {
-			return stepBuilder(jobRepository, transactionManager, jdbcTemplate, List.of("1", "2", "3", "4", "5"), 5, 1)
+				JdbcClient jdbcClient) {
+			return stepBuilder(jobRepository, transactionManager, jdbcClient, List.of("1", "2", "3", "4", "5"), 5, 1)
 				.taskExecutor(new SimpleAsyncTaskExecutor())
 				.build();
 		}
@@ -837,9 +841,9 @@ class ChunkOrientedStepScanModeRestartIntegrationTests {
 
 		@Bean
 		public Step step(JobRepository jobRepository, JdbcTransactionManager transactionManager,
-				JdbcTemplate jdbcTemplate) {
-			return stepBuilder(jobRepository, transactionManager, jdbcTemplate, List.of("1", "2", "3", "4", "5", "6"),
-					6, 2)
+				JdbcClient jdbcClient) {
+			return stepBuilder(jobRepository, transactionManager, jdbcClient, List.of("1", "2", "3", "4", "5", "6"), 6,
+					2)
 				.skipListener(new SkipListener<String, String>() {
 					@Override
 					public void onSkipInRead(Throwable t) {
@@ -856,8 +860,8 @@ class ChunkOrientedStepScanModeRestartIntegrationTests {
 
 		@Bean
 		public Step step(JobRepository jobRepository, JdbcTransactionManager transactionManager,
-				JdbcTemplate jdbcTemplate) {
-			return stepBuilder(jobRepository, transactionManager, jdbcTemplate,
+				JdbcClient jdbcClient) {
+			return stepBuilder(jobRepository, transactionManager, jdbcClient,
 					List.of("1", "2", "3", "4", "5", "6", "7", "8", "9", "10"), 5, 5)
 				.build();
 		}
@@ -869,8 +873,8 @@ class ChunkOrientedStepScanModeRestartIntegrationTests {
 
 		@Bean
 		public Step step(JobRepository jobRepository, JdbcTransactionManager transactionManager,
-				JdbcTemplate jdbcTemplate) {
-			return stepBuilder(jobRepository, transactionManager, jdbcTemplate, TEN_ITEMS, 5, 5)
+				JdbcClient jdbcClient) {
+			return stepBuilder(jobRepository, transactionManager, jdbcClient, TEN_ITEMS, 5, 5)
 				.taskExecutor(new SimpleAsyncTaskExecutor())
 				.build();
 		}
@@ -882,8 +886,8 @@ class ChunkOrientedStepScanModeRestartIntegrationTests {
 
 		@Bean
 		public Step step(JobRepository jobRepository, JdbcTransactionManager transactionManager,
-				JdbcTemplate jdbcTemplate) {
-			return stepBuilder(crashable(jobRepository), transactionManager, jdbcTemplate,
+				JdbcClient jdbcClient) {
+			return stepBuilder(crashable(jobRepository), transactionManager, jdbcClient,
 					List.of("1", "2", "3", "4", "5"), 5, 1)
 				.build();
 		}
@@ -895,8 +899,8 @@ class ChunkOrientedStepScanModeRestartIntegrationTests {
 
 		@Bean
 		public Step step(JobRepository jobRepository, JdbcTransactionManager transactionManager,
-				JdbcTemplate jdbcTemplate) {
-			return stepBuilder(crashable(jobRepository), transactionManager, jdbcTemplate, TEN_ITEMS, 5, 5).build();
+				JdbcClient jdbcClient) {
+			return stepBuilder(crashable(jobRepository), transactionManager, jdbcClient, TEN_ITEMS, 5, 5).build();
 		}
 
 	}
