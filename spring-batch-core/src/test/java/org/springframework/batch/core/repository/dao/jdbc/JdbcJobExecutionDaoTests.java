@@ -29,6 +29,7 @@ import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersBuilder;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
@@ -176,6 +177,45 @@ public class JdbcJobExecutionDaoTests {
 	void testGetMissingById() {
 		JobExecution retrievedJobExecution = jdbcJobExecutionDao.getJobExecution(1111111L);
 		Assertions.assertNull(retrievedJobExecution);
+	}
+
+	@Test
+	void testGetLastJobExecution() {
+		// given
+		JobParameters jobParameters = new JobParametersBuilder().addString("name", "foo").toJobParameters();
+		JobInstance jobInstance = jdbcJobInstanceDao.createJobInstance("job", jobParameters);
+		jdbcJobExecutionDao.createJobExecution(jobInstance, jobParameters);
+		JobExecution lastJobExecution = jdbcJobExecutionDao.createJobExecution(jobInstance, jobParameters);
+
+		// when
+		JobExecution retrievedJobExecution = jdbcJobExecutionDao.getLastJobExecution(jobInstance);
+
+		// then
+		Assertions.assertNotNull(retrievedJobExecution);
+		Assertions.assertEquals(lastJobExecution.getId(), retrievedJobExecution.getId());
+	}
+
+	@Test
+	void testGetLastJobExecutionWhenNoJobExecution() {
+		JobParameters jobParameters = new JobParametersBuilder().addString("name", "foo").toJobParameters();
+		JobInstance jobInstance = jdbcJobInstanceDao.createJobInstance("job", jobParameters);
+
+		JobExecution lastJobExecution = jdbcJobExecutionDao.getLastJobExecution(jobInstance);
+
+		Assertions.assertNull(lastJobExecution);
+	}
+
+	@Test
+	void testUpdateJobExecutionWhenRowNoLongerExists() {
+		// given
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = jdbcJobInstanceDao.createJobInstance("job", jobParameters);
+		JobExecution jobExecution = jdbcJobExecutionDao.createJobExecution(jobInstance, jobParameters);
+		jdbcTemplate.update("DELETE FROM BATCH_JOB_EXECUTION WHERE JOB_EXECUTION_ID = ?", jobExecution.getId());
+
+		// when & then
+		Assertions.assertThrows(OptimisticLockingFailureException.class,
+				() -> jdbcJobExecutionDao.updateJobExecution(jobExecution));
 	}
 
 }

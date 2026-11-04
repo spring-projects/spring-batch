@@ -269,17 +269,6 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 					jobExecution.getExitStatus().getExitCode(), exitDescription, createTime, lastUpdated,
 					jobExecution.getId(), jobExecution.getVersion() };
 
-			// TODO review this check, it's too late to check for the existence of the job
-			// execution here
-			// Check if given JobExecution's Id already exists, if none is found
-			// it
-			// is invalid and
-			// an exception should be thrown.
-			if (getJdbcTemplate().queryForObject(getQuery(CHECK_JOB_EXECUTION_EXISTS), Integer.class,
-					new Object[] { jobExecution.getId() }) != 1) {
-				throw new RuntimeException("Invalid JobExecution, ID " + jobExecution.getId() + " not found.");
-			}
-
 			int count = getJdbcTemplate().update(getQuery(UPDATE_JOB_EXECUTION), parameters,
 					new int[] { Types.TIMESTAMP, Types.TIMESTAMP, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
 							Types.TIMESTAMP, Types.TIMESTAMP, Types.BIGINT, Types.INTEGER });
