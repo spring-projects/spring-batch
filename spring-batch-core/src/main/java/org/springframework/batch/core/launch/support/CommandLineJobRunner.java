@@ -579,7 +579,7 @@ public class CommandLineJobRunner {
 			return;
 		}
 
-		String[] parameters = params.toArray(new String[params.size()]);
+		String[] parameters = params.toArray(new String[0]);
 
 		int result = command.start(jobPath, jobIdentifier, parameters, opts);
 		command.exit(result);

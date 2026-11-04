@@ -62,7 +62,7 @@ public class ResourcesItemReader extends AbstractItemStreamItemReader<Resource> 
 	 * @param resources the resources
 	 */
 	public void setResources(Resource[] resources) {
-		this.resources = Arrays.asList(resources).toArray(new Resource[resources.length]);
+		this.resources = Arrays.asList(resources).toArray(new Resource[0]);
 	}
 
 	/**

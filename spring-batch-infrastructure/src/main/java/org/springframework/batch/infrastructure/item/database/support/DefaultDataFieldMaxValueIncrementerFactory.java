@@ -153,7 +153,7 @@ public class DefaultDataFieldMaxValueIncrementerFactory implements DataFieldMaxV
 			types.add(type.name());
 		}
 
-		return types.toArray(new String[types.size()]);
+		return types.toArray(new String[0]);
 	}
 
 }

@@ -99,7 +99,7 @@ public class MimeMessageItemWriter implements ItemWriter<MimeMessage> {
 	@Override
 	public void write(Chunk<? extends MimeMessage> chunk) throws MailException {
 		try {
-			mailSender.send(chunk.getItems().toArray(new MimeMessage[chunk.size()]));
+			mailSender.send(chunk.getItems().toArray(new MimeMessage[0]));
 		}
 		catch (MailSendException e) {
 			Map<Object, Exception> failedMessages = e.getFailedMessages();

@@ -43,7 +43,7 @@ public class CompositeCompletionPolicy implements CompletionPolicy {
 	 * {@link #isComplete(RepeatContext)} by consensus.
 	 */
 	public void setPolicies(CompletionPolicy[] policies) {
-		this.policies = Arrays.asList(policies).toArray(new CompletionPolicy[policies.length]);
+		this.policies = Arrays.asList(policies).toArray(new CompletionPolicy[0]);
 	}
 
 	/**
@@ -127,7 +127,7 @@ public class CompositeCompletionPolicy implements CompletionPolicy {
 
 		public CompositeBatchContext(RepeatContext context, List<RepeatContext> contexts) {
 			super(context);
-			this.contexts = contexts.toArray(new RepeatContext[contexts.size()]);
+			this.contexts = contexts.toArray(new RepeatContext[0]);
 			this.policies = CompositeCompletionPolicy.this.policies;
 		}
 
