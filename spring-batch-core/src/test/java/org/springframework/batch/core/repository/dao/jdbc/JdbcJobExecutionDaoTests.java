@@ -39,6 +39,7 @@ import org.springframework.test.jdbc.JdbcTestUtils;
 /**
  * @author Parikshit Dutta
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  */
 public class JdbcJobExecutionDaoTests {
 
@@ -169,6 +170,12 @@ public class JdbcJobExecutionDaoTests {
 		Assertions.assertEquals(2, jobExecutions.size());
 		Assertions.assertEquals(jobExecution2.getId(), jobExecutions.get(0).getId());
 		Assertions.assertEquals(jobExecution1.getId(), jobExecutions.get(1).getId());
+	}
+
+	@Test
+	void testGetMissingById() {
+		JobExecution retrievedJobExecution = jdbcJobExecutionDao.getJobExecution(1111111L);
+		Assertions.assertNull(retrievedJobExecution);
 	}
 
 }

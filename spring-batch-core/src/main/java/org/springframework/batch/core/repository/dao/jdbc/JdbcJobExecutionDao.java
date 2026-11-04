@@ -313,10 +313,10 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 
 	@Override
 	public JobExecution getJobExecution(long jobExecutionId) {
-		long jobInstanceId = getJobInstanceId(jobExecutionId);
-		JobInstance jobInstance = jobInstanceDao.getJobInstance(jobInstanceId);
-		JobParameters jobParameters = getJobParameters(jobExecutionId);
 		try {
+			long jobInstanceId = getJobInstanceId(jobExecutionId);
+			JobInstance jobInstance = jobInstanceDao.getJobInstance(jobInstanceId);
+			JobParameters jobParameters = getJobParameters(jobExecutionId);
 			return getJdbcTemplate().queryForObject(getQuery(GET_EXECUTION_BY_ID),
 					new JobExecutionRowMapper(jobInstance, jobParameters), jobExecutionId);
 		}
