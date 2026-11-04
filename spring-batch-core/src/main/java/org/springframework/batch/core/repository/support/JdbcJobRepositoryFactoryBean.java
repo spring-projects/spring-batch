@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2025 the original author or authors.
+ * Copyright 2002-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,9 @@
  */
 package org.springframework.batch.core.repository.support;
 
+import java.util.List;
+
+import org.springframework.batch.core.configuration.BatchConfigurationException;
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
 import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDao;
 import org.springframework.batch.core.repository.dao.DefaultExecutionContextSerializer;
@@ -26,6 +29,7 @@ import org.springframework.batch.infrastructure.item.database.support.DataFieldM
 import org.springframework.batch.infrastructure.item.database.support.DefaultDataFieldMaxValueIncrementerFactory;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.core.convert.support.ConfigurableConversionService;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -47,6 +51,19 @@ import java.nio.charset.Charset;
  */
 @SuppressWarnings("removal")
 public class JdbcJobRepositoryFactoryBean extends JobRepositoryFactoryBean {
+
+	private static final List<MetadataTable> METADATA_TABLE_COLUMNS = List.of(
+			new MetadataTable("JOB_INSTANCE", "JOB_INSTANCE_ID, VERSION, JOB_NAME, JOB_KEY"),
+			new MetadataTable("JOB_EXECUTION",
+					"JOB_EXECUTION_ID, VERSION, JOB_INSTANCE_ID, CREATE_TIME, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, LAST_UPDATED"),
+			new MetadataTable("JOB_EXECUTION_PARAMS",
+					"JOB_EXECUTION_ID, PARAMETER_NAME, PARAMETER_TYPE, PARAMETER_VALUE, IDENTIFYING"),
+			new MetadataTable("STEP_EXECUTION",
+					"STEP_EXECUTION_ID, VERSION, STEP_NAME, JOB_EXECUTION_ID, CREATE_TIME, START_TIME, END_TIME, STATUS, COMMIT_COUNT, READ_COUNT, FILTER_COUNT, WRITE_COUNT, READ_SKIP_COUNT, WRITE_SKIP_COUNT, PROCESS_SKIP_COUNT, ROLLBACK_COUNT, EXIT_CODE, EXIT_MESSAGE, LAST_UPDATED"),
+			new MetadataTable("JOB_EXECUTION_CONTEXT", "JOB_EXECUTION_ID, SHORT_CONTEXT, SERIALIZED_CONTEXT"),
+			new MetadataTable("STEP_EXECUTION_CONTEXT", "STEP_EXECUTION_ID, SHORT_CONTEXT, SERIALIZED_CONTEXT"));
+
+	private boolean validateSchema;
 
 	/**
 	 * @param type a value from the {@link java.sql.Types} class to indicate the type to
@@ -197,6 +214,16 @@ public class JdbcJobRepositoryFactoryBean extends JobRepositoryFactoryBean {
 	}
 
 	/**
+	 * Set whether the required Batch metadata tables should be validated when this
+	 * factory initializes. Defaults to {@code false}.
+	 * @param validateSchema whether to validate the Batch metadata tables
+	 * @since 6.1
+	 */
+	public void setValidateSchema(boolean validateSchema) {
+		this.validateSchema = validateSchema;
+	}
+
+	/**
 	 * Set the conversion service to use in the job repository. This service is used to
 	 * convert job parameters from String literal to typed values and vice versa.
 	 * @param conversionService the conversion service to use
@@ -210,6 +237,30 @@ public class JdbcJobRepositoryFactoryBean extends JobRepositoryFactoryBean {
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
+		if (this.validateSchema) {
+			validateMetadataTables();
+		}
+	}
+
+	private void validateMetadataTables() {
+		for (MetadataTable table : METADATA_TABLE_COLUMNS) {
+			String tableName = table.tableName();
+			String qualifiedTableName = this.tablePrefix + tableName;
+			try {
+				this.jdbcOperations.query(
+						"SELECT " + table.requiredColumns() + " FROM " + qualifiedTableName + " WHERE 1 = 0",
+						rs -> null);
+			}
+			catch (DataAccessException ex) {
+				throw new BatchConfigurationException("Unable to validate Spring Batch metadata table '"
+						+ qualifiedTableName
+						+ "' and its required columns. Make sure the Batch schema is initialized and the configured table prefix is correct.",
+						ex);
+			}
+		}
+	}
+
+	private record MetadataTable(String tableName, String requiredColumns) {
 	}
 
 }
