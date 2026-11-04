@@ -203,6 +203,31 @@ public class MultiResourceItemWriterFlatFileTests extends AbstractMultiResourceI
 	}
 
 	@Test
+	void testRestartAtResourceBoundary() throws Exception {
+
+		super.setUp(delegate);
+		tested.open(executionContext);
+
+		// Save the delegate position while the first file is still open.
+		tested.write(Chunk.of("1"));
+		tested.update(executionContext);
+		// This chunk closes the first file.
+		tested.write(Chunk.of("2"));
+		tested.update(executionContext);
+		tested.close();
+
+		assertFileExistsAndContains(1, "12");
+
+		tested.open(executionContext);
+
+		tested.write(Chunk.of("3", "4"));
+		tested.close();
+
+		assertFileExistsAndContains(1, "12");
+		assertFileExistsAndContains(2, "34");
+	}
+
+	@Test
 	void testRestartWithFooter() throws Exception {
 
 		delegate.setFooterCallback(writer -> writer.write("f"));
