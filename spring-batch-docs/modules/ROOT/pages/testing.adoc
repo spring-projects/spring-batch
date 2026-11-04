@@ -219,8 +219,8 @@ handles dependency injection from the configured application context to inject t
 The other is the Spring Batch `StepScopeTestExecutionListener`. It works by looking for a
 factory method in the test case for a `StepExecution`, using that as the context for the
 test method, as if that execution were active in a `Step` at runtime. The factory method
-is detected by its signature (it must return a `StepExecution`). If a factory method is
-not provided, a default `StepExecution` is created.
+is detected by its signature (it must return a `StepExecution` and have no parameters). If
+a factory method is not provided, a default `StepExecution` is created.
 
 Starting from v4.1, the `StepScopeTestExecutionListener` and
 `JobScopeTestExecutionListener` are imported as test execution listeners
