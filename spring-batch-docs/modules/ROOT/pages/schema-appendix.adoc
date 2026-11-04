@@ -402,9 +402,14 @@ about indexing:
 |===============
 |Default Table Name|Where Clause|Frequency
 |`BATCH_JOB_INSTANCE`|`JOB_NAME = ? and JOB_KEY = ?`|Every time a job is launched
-|`BATCH_JOB_EXECUTION`|`JOB_INSTANCE_ID = ?`|Every time a job is restarted
-|`BATCH_STEP_EXECUTION`|`VERSION = ?`|On commit interval, a.k.a. chunk (and at start and end of
-            step)
-|`BATCH_STEP_EXECUTION`|`STEP_NAME = ? and JOB_EXECUTION_ID = ?`|Before each step execution
+|`BATCH_JOB_EXECUTION`|`JOB_INSTANCE_ID = ?`|Every time a job is launched for an existing job instance (for example, a restart)
+|`BATCH_JOB_EXECUTION_PARAMS`|`JOB_EXECUTION_ID = ?`|Every time a job execution is loaded (for example, for each execution of the job instance on a restart)
+|`BATCH_STEP_EXECUTION`|`JOB_EXECUTION_ID = ?`|Every time a job execution is loaded, to attach its step executions
+|`BATCH_JOB_EXECUTION` joined with `BATCH_STEP_EXECUTION`|`JE.JOB_INSTANCE_ID = ? and SE.STEP_NAME = ?`, joined on `SE.JOB_EXECUTION_ID = JE.JOB_EXECUTION_ID`|Before each step execution
 
 |===============
+
+NOTE: The DDL scripts declare a unique constraint on `JOB_NAME` and `JOB_KEY` in
+`BATCH_JOB_INSTANCE`, which most databases back with an index. The Oracle script also
+creates an index on `JOB_EXECUTION_ID` in `BATCH_JOB_EXECUTION_PARAMS`. Check the script for
+your database before adding indexes for those columns.
