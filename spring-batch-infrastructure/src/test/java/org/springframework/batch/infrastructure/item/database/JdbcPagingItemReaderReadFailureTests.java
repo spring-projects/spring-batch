@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.IntStream;
 
 import javax.sql.DataSource;
 
@@ -94,6 +96,50 @@ class JdbcPagingItemReaderReadFailureTests {
 		assertEquals(2, reader.read());
 		assertThrows(DataAccessException.class, reader::read);
 		assertEquals(List.of(3, 4, 5), readAll(reader));
+	}
+
+	@ParameterizedTest
+	@CsvSource({ "1, 2, ID > :min, min", "3, 3, ID > :min, min", "1, 2, ID > ?, 1", "3, 3, ID > ?, 1" })
+	void restartAfterRetriedPageQueryDoesNotSkipTheNextItem(int failingId, int lastRead, String whereClause,
+			String parameterName) throws Exception {
+		ExecutionContext context = new ExecutionContext();
+		JdbcPagingItemReader<Integer> reader = readerBuilder(this.dataSource, failingOnceAt(failingId))
+			.whereClause(whereClause)
+			.parameterValues(Map.of(parameterName, 0))
+			.build();
+		reader.open(context);
+		for (int id = 1; id <= lastRead; id++) {
+			if (id == failingId) {
+				assertThrows(DataAccessException.class, reader::read);
+			}
+			assertEquals(id, reader.read());
+		}
+		reader.update(context);
+		reader.close();
+
+		JdbcPagingItemReader<Integer> restarted = readerBuilder(this.dataSource, (rs, rowNum) -> rs.getInt("ID"))
+			.whereClause(whereClause)
+			.parameterValues(Map.of(parameterName, 0))
+			.build();
+		restarted.open(context);
+		assertEquals(IntStream.rangeClosed(lastRead + 1, 5).boxed().toList(), readAll(restarted));
+		restarted.close();
+	}
+
+	@Test
+	void consecutiveFailedPageQueriesAreNotCounted() throws Exception {
+		AtomicInteger failures = new AtomicInteger(2);
+		JdbcPagingItemReader<Integer> reader = createItemReader(this.dataSource, (rs, rowNum) -> {
+			if (failures.getAndDecrement() > 0) {
+				throw new SQLTransientConnectionException("Connection reset");
+			}
+			return rs.getInt("ID");
+		});
+
+		assertThrows(DataAccessException.class, reader::read);
+		assertThrows(DataAccessException.class, reader::read);
+		assertEquals(1, reader.read());
+		assertEquals(1, reader.getCurrentItemCount());
 	}
 
 	private RowMapper<Integer> failingOnceAt(int failingId) {
