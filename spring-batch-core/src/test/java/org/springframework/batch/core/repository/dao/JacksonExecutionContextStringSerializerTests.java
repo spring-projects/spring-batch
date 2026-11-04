@@ -17,6 +17,7 @@ package org.springframework.batch.core.repository.dao;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -29,6 +30,7 @@ import java.util.Map;
 import javax.xml.namespace.QName;
 
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.exc.InvalidTypeIdException;
 import tools.jackson.databind.json.JsonMapper;
 
 import org.springframework.batch.core.job.parameters.JobParameter;
@@ -120,6 +122,45 @@ class JacksonExecutionContextStringSerializerTests {
 		// then
 		QName deserializedQName = (QName) deserializedContext.get("qName");
 		assertEquals(qName, deserializedQName);
+	}
+
+	@Test
+	void testArraySerialization() throws IOException {
+		// given
+		JacksonExecutionContextStringSerializer serializer = new JacksonExecutionContextStringSerializer();
+		Map<String, Object> context = new HashMap<>();
+		context.put("strings", new String[] { "foo", "bar" });
+		context.put("longs", new Long[] { 1L, 2L });
+		context.put("ints", new int[] { 1, 2 });
+		context.put("matrix", new String[][] { { "a" }, { "b", "c" } });
+
+		// when
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		serializer.serialize(context, outputStream);
+		InputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
+		Map<String, Object> deserializedContext = serializer.deserialize(inputStream);
+
+		// then
+		assertArrayEquals(new String[] { "foo", "bar" }, (String[]) deserializedContext.get("strings"));
+		assertArrayEquals(new Long[] { 1L, 2L }, (Long[]) deserializedContext.get("longs"));
+		assertArrayEquals(new int[] { 1, 2 }, (int[]) deserializedContext.get("ints"));
+		assertArrayEquals(new String[][] { { "a" }, { "b", "c" } }, (String[][]) deserializedContext.get("matrix"));
+	}
+
+	@Test
+	void testArrayOfUntrustedTypeIsRejected() throws IOException {
+		// given
+		JacksonExecutionContextStringSerializer serializer = new JacksonExecutionContextStringSerializer();
+		Map<String, Object> context = new HashMap<>();
+		context.put("files", new File[] { new File("foo") });
+
+		// when
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		serializer.serialize(context, outputStream);
+		InputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
+
+		// then
+		assertThrows(InvalidTypeIdException.class, () -> serializer.deserialize(inputStream));
 	}
 
 	@Test
