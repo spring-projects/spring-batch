@@ -16,12 +16,15 @@
 package org.springframework.batch.core.step.tasklet;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.batch.core.BatchStatus;
@@ -111,6 +114,35 @@ class SystemCommandTaskletIntegrationTests {
 		RepeatStatus exitStatus = tasklet.execute(stepExecution.createStepContribution(), null);
 
 		assertEquals(RepeatStatus.FINISHED, exitStatus);
+	}
+
+	/*
+	 * Successful execution of a system command that writes more to its standard output
+	 * and error than the operating system buffers hold.
+	 */
+	@Test
+	void testExecuteWithLargeOutput(@TempDir Path tempDir) throws Exception {
+		Path program = tempDir.resolve("LargeOutput.java");
+		Files.writeString(program, """
+				public class LargeOutput {
+					public static void main(String[] args) {
+						String line = "x".repeat(1023);
+						for (int i = 0; i < 1024; i++) {
+							System.out.println(line);
+							System.err.println(line);
+						}
+					}
+				}
+				""");
+		tasklet.setCommand(getJavaCommand(), program.toString());
+		tasklet.setTimeout(20000); // leaves time for the source launcher to compile
+		tasklet.afterPropertiesSet();
+
+		StepContribution contribution = stepExecution.createStepContribution();
+		RepeatStatus exitStatus = tasklet.execute(contribution, null);
+
+		assertEquals(RepeatStatus.FINISHED, exitStatus);
+		assertEquals(ExitStatus.COMPLETED, contribution.getExitStatus());
 	}
 
 	/*
