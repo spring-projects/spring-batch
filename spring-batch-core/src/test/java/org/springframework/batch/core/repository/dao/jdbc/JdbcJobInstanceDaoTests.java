@@ -209,4 +209,15 @@ public class JdbcJobInstanceDaoTests {
 		assertTrue(jobInstanceIds.contains(second.getId()));
 	}
 
+	@Test
+	void testGetJobInstancesByNameDoesNotTreatUnderscoreAsWildcard() {
+		jdbcJobInstanceDao.createJobInstance("import_job", new JobParameters());
+		jdbcJobInstanceDao.createJobInstance("import-job", new JobParameters());
+
+		List<JobInstance> jobInstances = jdbcJobInstanceDao.getJobInstances("import_job");
+
+		assertEquals(1, jobInstances.size());
+		assertEquals("import_job", jobInstances.get(0).getJobName());
+	}
+
 }
