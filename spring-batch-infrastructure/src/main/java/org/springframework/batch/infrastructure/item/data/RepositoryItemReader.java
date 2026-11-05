@@ -80,6 +80,7 @@ import org.springframework.util.StringUtils;
  * @author Antoine Kapps
  * @author Mahmoud Ben Hassine
  * @author Jimmy Praet
+ * @author WooSeung Kim
  * @since 2.2
  */
 public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> implements InitializingBean {
@@ -212,7 +213,14 @@ public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemR
 					logger.debug("Reading page " + page);
 				}
 
-				results = doPageRead();
+				try {
+					this.results = doPageRead();
+				}
+				catch (Exception e) {
+					// read() has already counted this attempt, but the page was not read
+					setCurrentItemCount(getCurrentItemCount() - 1);
+					throw e;
+				}
 				page++;
 
 				if (results.isEmpty()) {
