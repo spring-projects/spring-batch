@@ -144,6 +144,7 @@ public class JdbcJobExecutionDaoTests {
 		JobExecution retrieved = jdbcJobExecutionDao.getJobExecution(jobExecution.getId());
 
 		// then
+		Assertions.assertNotNull(retrieved);
 		JobParameters parameters = retrieved.getJobParameters();
 		Assertions.assertNotNull(parameters);
 		Assertions.assertEquals(dateParameter, parameters.getDate("date"));

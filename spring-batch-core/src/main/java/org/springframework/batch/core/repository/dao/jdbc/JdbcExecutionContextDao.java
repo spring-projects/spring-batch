@@ -31,7 +31,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.springframework.batch.core.job.JobExecution;
-
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
 import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDao;
@@ -265,12 +264,6 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 		getJdbcClient().sql(getQuery(DELETE_STEP_EXECUTION_CONTEXT))
 			.param("stepExecutionId", stepExecution.getId())
 			.update();
-	}
-
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		super.afterPropertiesSet();
-		Assert.state(serializer != null, "ExecutionContextSerializer is required");
 	}
 
 	/**
