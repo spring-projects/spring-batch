@@ -1,7 +1,9 @@
-{create:'BATCH_JOB_INSTANCE'}
-{create:'BATCH_JOB_EXECUTION'}
-{create:'BATCH_STEP_EXECUTION'}
-{create:'BATCH_SEQUENCES'}
-{insert: "BATCH_SEQUENCES", documents: [ { _id: 'BATCH_JOB_INSTANCE_SEQ', count: NumberLong(0) } ]}
-{insert: "BATCH_SEQUENCES", documents: [ { _id: 'BATCH_JOB_EXECUTION_SEQ', count: NumberLong(0) } ]}
-{insert: "BATCH_SEQUENCES", documents: [ { _id: 'BATCH_STEP_EXECUTION_SEQ', count: NumberLong(0) } ]}
+{update: "BATCH_SEQUENCES", updates: [ { q: { _id: "BATCH_JOB_INSTANCE_SEQ" }, u: { $setOnInsert: { count: NumberLong(0) } }, upsert: true } ]}
+{update: "BATCH_SEQUENCES", updates: [ { q: { _id: "BATCH_JOB_EXECUTION_SEQ" }, u: { $setOnInsert: { count: NumberLong(0) } }, upsert: true } ]}
+{update: "BATCH_SEQUENCES", updates: [ { q: { _id: "BATCH_STEP_EXECUTION_SEQ" }, u: { $setOnInsert: { count: NumberLong(0) } }, upsert: true } ]}
+{createIndexes: "BATCH_JOB_INSTANCE", indexes: [ { key: { jobName: 1 }, name: "job_name_idx" } ]}
+{createIndexes: "BATCH_JOB_INSTANCE", indexes: [ { key: { jobName: 1, jobKey: 1 }, name: "job_name_key_idx" } ]}
+{createIndexes: "BATCH_JOB_INSTANCE", indexes: [ { key: { jobInstanceId: -1 }, name: "job_instance_idx" } ]}
+{createIndexes: "BATCH_JOB_EXECUTION", indexes: [ { key: { jobInstanceId: 1 }, name: "job_instance_idx" } ]}
+{createIndexes: "BATCH_JOB_EXECUTION", indexes: [ { key: { jobInstanceId: 1, status: 1 }, name: "job_instance_status_idx" } ]}
+{createIndexes: "BATCH_STEP_EXECUTION", indexes: [ { key: { stepExecutionId: 1 }, name: "step_execution_idx" } ]}
