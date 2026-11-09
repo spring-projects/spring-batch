@@ -132,6 +132,13 @@ public abstract class AbstractItemCountingItemStreamItemReader<T> extends Abstra
 		this.maxItemCount = count;
 	}
 
+	/**
+	 * {@return the maximum number of items to read}
+	 */
+	protected int getMaxItemCount() {
+		return maxItemCount;
+	}
+
 	@Override
 	public void close() throws ItemStreamException {
 		super.close();
