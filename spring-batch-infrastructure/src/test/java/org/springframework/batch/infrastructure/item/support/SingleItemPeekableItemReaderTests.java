@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,14 @@ package org.springframework.batch.infrastructure.item.support;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 
@@ -27,6 +34,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.batch.infrastructure.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.batch.infrastructure.item.support.SingleItemPeekableItemReader;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
+import org.springframework.batch.infrastructure.item.ItemReader;
+import org.springframework.batch.infrastructure.item.file.FlatFileItemReader;
+import org.springframework.batch.infrastructure.item.file.FlatFileParseException;
+import org.springframework.core.io.ByteArrayResource;
 
 /**
  * @author Dave Syer
@@ -58,6 +69,73 @@ class SingleItemPeekableItemReaderTests {
 		assertEquals("b", reader.read());
 		assertNull(reader.peek());
 		assertNull(reader.read());
+	}
+
+	@Test
+	void testRepeatedPeekWithException() throws Exception {
+		ItemReader<String> delegate = mock();
+		Exception exception = new Exception("read failure");
+		when(delegate.read()).thenThrow(exception).thenReturn("a");
+		SingleItemPeekableItemReader<String> reader = new SingleItemPeekableItemReader<>(delegate);
+		assertSame(exception, assertThrows(Exception.class, reader::peek));
+		assertSame(exception, assertThrows(Exception.class, reader::peek));
+		verify(delegate).read();
+		assertSame(exception, assertThrows(Exception.class, reader::read));
+		assertEquals("a", reader.peek());
+		assertEquals("a", reader.read());
+		verify(delegate, times(2)).read();
+	}
+
+	@Test
+	void testUpdateWithPeekException() throws Exception {
+		SingleItemPeekableItemReader<String> reader = failingReader();
+		ExecutionContext executionContext = new ExecutionContext();
+		reader.open(executionContext);
+		assertEquals("a", reader.read());
+		assertThrows(FlatFileParseException.class, reader::peek);
+		reader.update(executionContext);
+		assertEquals(1, executionContext.getInt("delegate.read.count"));
+		reader.close();
+		reader.open(executionContext);
+		assertThrows(FlatFileParseException.class, reader::read);
+		assertEquals("b", reader.read());
+		reader.close();
+	}
+
+	@Test
+	void testUpdateAfterReadingPeekException() throws Exception {
+		SingleItemPeekableItemReader<String> reader = failingReader();
+		ExecutionContext executionContext = new ExecutionContext();
+		reader.open(executionContext);
+		assertEquals("a", reader.read());
+		FlatFileParseException exception = assertThrows(FlatFileParseException.class, reader::peek);
+		assertSame(exception, assertThrows(FlatFileParseException.class, reader::read));
+		reader.update(executionContext);
+		assertEquals(2, executionContext.getInt("delegate.read.count"));
+		reader.close();
+		reader.open(executionContext);
+		assertEquals("b", reader.read());
+		reader.close();
+	}
+
+	@Test
+	void testOpenClearsPeekException() throws Exception {
+		ItemReader<String> delegate = mock();
+		when(delegate.read()).thenThrow(new Exception("read failure")).thenReturn("a");
+		SingleItemPeekableItemReader<String> reader = new SingleItemPeekableItemReader<>(delegate);
+		assertThrows(Exception.class, reader::peek);
+		reader.open(new ExecutionContext());
+		assertEquals("a", reader.read());
+	}
+
+	@Test
+	void testCloseClearsPeekException() throws Exception {
+		ItemReader<String> delegate = mock();
+		when(delegate.read()).thenThrow(new Exception("read failure")).thenReturn("a");
+		SingleItemPeekableItemReader<String> reader = new SingleItemPeekableItemReader<>(delegate);
+		assertThrows(Exception.class, reader::peek);
+		reader.close();
+		assertEquals("a", reader.read());
 	}
 
 	/**
@@ -107,6 +185,18 @@ class SingleItemPeekableItemReaderTests {
 		reader.close();
 		reader.open(executionContext);
 		assertEquals("c", reader.read());
+	}
+
+	private SingleItemPeekableItemReader<String> failingReader() {
+		FlatFileItemReader<String> delegate = new FlatFileItemReader<>(
+				new ByteArrayResource("a\nbad\nb\n".getBytes(StandardCharsets.UTF_8)), (line, lineNumber) -> {
+					if ("bad".equals(line)) {
+						throw new IllegalArgumentException("read failure");
+					}
+					return line;
+				});
+		delegate.setName("delegate");
+		return new SingleItemPeekableItemReader<>(delegate);
 	}
 
 	static class CountingListItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> {
