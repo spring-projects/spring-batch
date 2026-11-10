@@ -308,8 +308,9 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 	 * Set whether the {@link ItemProcessor} is transactional. Defaults to {@code true},
 	 * which means that the processor is re-invoked for every item that is re-attempted
 	 * during chunk scanning (ie after a write failure has rolled back the chunk
-	 * transaction). Set this flag to {@code false} to cache the results of item
-	 * processing and re-use them during chunk scanning instead.
+	 * transaction) or when a chunk is reprocessed (ie after an item skipped in processing
+	 * has marked the chunk transaction rollback-only). Set this flag to {@code false} to
+	 * cache the results of item processing and re-use them instead.
 	 * <p>
 	 * Only set this flag to {@code false} if the output of the processor is safe to write
 	 * again after a failed, rolled back write. This is typically not the case for items
@@ -763,12 +764,37 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			}
 
 			List<Integer> readPositions = new ArrayList<>();
-			inputChunk = readChunk(contribution, readPositions);
-			if (inputChunk.isEmpty()) {
-				return;
+			List<@Nullable O> cachedOutputs = null;
+			List<ReprocessItem<I, O>> itemsToReprocess = tracker.pollItemsToReprocess();
+			if (itemsToReprocess != null) {
+				logger.debug("Reprocessing chunk without the items skipped in the rolled back transaction");
+				inputChunk = new Chunk<>();
+				cachedOutputs = this.processorTransactional ? null : new ArrayList<>();
+				for (ReprocessItem<I, O> item : itemsToReprocess) {
+					inputChunk.add(item.input());
+					readPositions.add(item.readPosition());
+					if (cachedOutputs != null) {
+						cachedOutputs.add(item.output());
+					}
+				}
+				if (inputChunk.isEmpty()) {
+					// every item of the chunk was skipped or filtered out
+					stepExecution.incrementCommitCount();
+					return;
+				}
+			}
+			else {
+				inputChunk = readChunk(contribution, readPositions);
+				if (inputChunk.isEmpty()) {
+					return;
+				}
 			}
 			compositeChunkListener.beforeChunk(inputChunk);
-			processedChunk = processChunk(inputChunk, readPositions, contribution, scanItems);
+			processedChunk = processChunk(inputChunk, readPositions, cachedOutputs, contribution, scanItems, status);
+			if (tracker.hasItemsToReprocess()) {
+				throw new SilentlyRolledBackException(
+						"An item skipped in processing marked the chunk transaction rollback-only");
+			}
 			writeChunk(processedChunk, scanItems, contribution, status);
 			compositeChunkListener.afterChunk(processedChunk);
 			stepExecution.incrementCommitCount();
@@ -784,6 +810,11 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			if (!scanning && tracker.isScanMode()) {
 				notifyChunkError(e, processedChunk);
 				logger.debug("Chunk transaction rolled back, scan will execute in next transaction");
+				return;
+			}
+			if (tracker.hasItemsToReprocess()) {
+				notifyChunkError(e, processedChunk);
+				logger.debug("Chunk transaction rolled back, chunk will be reprocessed in next transaction");
 				return;
 			}
 
@@ -934,18 +965,42 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 		}
 	}
 
-	private Chunk<O> processChunk(Chunk<I> chunk, List<Integer> readPositions, StepContribution contribution,
-			List<ScanItem<I, O>> scanItems) throws Exception {
+	/*
+	 * Process the items of a chunk, re-using the cached output of an item if there is
+	 * one. An item skipped in processing may mark the chunk transaction rollback-only (eg
+	 * when its exception goes through a transactional service that joins the chunk
+	 * transaction): the chunk cannot be committed then, and the next items could fail
+	 * only because of it, so processing stops and the items that are not skipped are
+	 * queued to be processed again in the next transaction.
+	 */
+	private Chunk<O> processChunk(Chunk<I> chunk, List<Integer> readPositions,
+			@Nullable List<@Nullable O> cachedOutputs, StepContribution contribution, List<ScanItem<I, O>> scanItems,
+			TransactionStatus status) throws Exception {
 		Chunk<O> processedChunk = new Chunk<>();
 		List<I> items = chunk.getItems();
 		for (int i = 0; i < items.size(); i++) {
 			I item = items.get(i);
-			O processedItem = processItem(item, contribution);
+			O cachedOutput = (cachedOutputs != null) ? cachedOutputs.get(i) : null;
+			O processedItem = (cachedOutput != null) ? cachedOutput : processItem(item, contribution);
 			if (processedItem != null) {
 				processedChunk.add(processedItem);
 				// keep track of the input item each output item was produced from, so
 				// that it can be re-processed during a chunk scan
 				scanItems.add(new ScanItem<>(item, processedItem, readPositions.get(i)));
+			}
+			else if (this.faultTolerant && status.isRollbackOnly() && contribution.getProcessSkipCount() > 0) {
+				List<ReprocessItem<I, O>> itemsToReprocess = new ArrayList<>();
+				for (ScanItem<I, O> scanItem : scanItems) {
+					itemsToReprocess
+						.add(new ReprocessItem<>(scanItem.input(), scanItem.output(), scanItem.readPosition()));
+				}
+				for (int j = i + 1; j < items.size(); j++) {
+					itemsToReprocess.add(new ReprocessItem<>(items.get(j), null, readPositions.get(j)));
+				}
+				long pendingFilterCount = TransactionSynchronizationManager.isSynchronizationActive()
+						? contribution.getFilterCount() : 0;
+				this.chunkTracker.get().reprocessChunk(itemsToReprocess, pendingFilterCount);
+				break;
 			}
 		}
 		return processedChunk;
@@ -1206,7 +1261,8 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 	 * manager, after a resource-level failure like an OptimisticLockException that a
 	 * retried write no longer raises). It is used internally to route this case into the
 	 * same failure handling as a write that threw, so that the chunk is never counted as
-	 * committed.
+	 * committed. It also signals that an item skipped in processing marked the
+	 * transaction rollback-only, after the chunk has been queued for reprocessing.
 	 */
 	private static class SilentlyRolledBackException extends RuntimeException {
 
@@ -1228,6 +1284,18 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 	 * one that returned the input item
 	 */
 	private record ScanItem<I, O>(I input, O output, int readPosition) {
+	}
+
+	/**
+	 * An input item to process again in the next transaction, together with the output
+	 * item already produced for it by the {@link ItemProcessor}, if any.
+	 *
+	 * @param input the item as read by the item reader
+	 * @param output the item as produced by the item processor, or {@code null} if the
+	 * item has not been processed yet
+	 * @param readPosition see {@link ScanItem}
+	 */
+	private record ReprocessItem<I, O>(I input, @Nullable O output, int readPosition) {
 	}
 
 	/**
@@ -1293,6 +1361,8 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 
 		private boolean scannedItemSkipped;
 
+		@Nullable private List<ReprocessItem<I, O>> itemsToReprocess;
+
 		private long pendingFilterCount;
 
 		void init() {
@@ -1302,6 +1372,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			this.readsSinceCheckpoint = 0;
 			this.lastScannedReadPosition = 0;
 			this.scannedItemSkipped = false;
+			this.itemsToReprocess = null;
 			this.pendingFilterCount = 0;
 		}
 
@@ -1329,13 +1400,32 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 		}
 
 		boolean moreItems() {
-			return this.moreItems || this.scanMode;
+			return this.moreItems || this.scanMode || this.itemsToReprocess != null;
 		}
 
 		void enterScanMode(List<ScanItem<I, O>> scanItems, long filterCount) {
 			this.scanMode = true;
 			this.pendingScanItems = new LinkedList<>(scanItems);
-			this.pendingFilterCount = filterCount;
+			this.pendingFilterCount += filterCount;
+		}
+
+		/*
+		 * The chunk transaction has been rolled back after items were skipped in
+		 * processing: the remaining items are processed again in the next transaction.
+		 */
+		void reprocessChunk(List<ReprocessItem<I, O>> items, long filterCount) {
+			this.itemsToReprocess = items;
+			this.pendingFilterCount += filterCount;
+		}
+
+		@Nullable List<ReprocessItem<I, O>> pollItemsToReprocess() {
+			List<ReprocessItem<I, O>> items = this.itemsToReprocess;
+			this.itemsToReprocess = null;
+			return items;
+		}
+
+		boolean hasItemsToReprocess() {
+			return this.itemsToReprocess != null;
 		}
 
 		long getPendingFilterCount() {
