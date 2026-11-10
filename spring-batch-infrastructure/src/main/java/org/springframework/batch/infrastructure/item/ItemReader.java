@@ -25,8 +25,10 @@ import org.jspecify.annotations.Nullable;
  * batch, with each call to {@link #read()} returning a different value and finally
  * returning <code>null</code> when all input data is exhausted.<br>
  *
- * Implementations need <b>not</b> be thread-safe and clients of a {@link ItemReader} need
- * to be aware that this is the case.<br>
+ * Implementations <b>might not</b> be thread-safe and clients of a {@link ItemReader} need
+ * to be aware that this is the case. To make a non-thread-safe reader safe for use in a
+ * multi-threaded step, wrap it in a
+ * {@link org.springframework.batch.infrastructure.item.support.SynchronizedItemStreamReader}.<br>
  *
  * A richer interface (e.g. with a look ahead or peek) is not feasible because we need to
  * support transactions in an asynchronous batch.
