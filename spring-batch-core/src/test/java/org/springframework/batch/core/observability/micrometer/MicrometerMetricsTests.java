@@ -56,7 +56,7 @@ class MicrometerMetricsTests {
 		int expectedJobMetricsCount = 2;
 
 		// when
-		JobExecution jobExecution = jobOperator.start(job, new JobParameters());
+		JobExecution jobExecution = jobOperator.start(job, JobParameters.EMPTY);
 
 		// then
 		assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());

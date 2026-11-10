@@ -74,7 +74,7 @@ class CompositeJobExecutionListenerTests {
 				list.add("foo");
 			}
 		});
-		listener.beforeJob(new JobExecution(1L, new JobInstance(11L, "testOpenJob"), new JobParameters()));
+		listener.beforeJob(new JobExecution(1L, new JobInstance(11L, "testOpenJob"), JobParameters.EMPTY));
 		assertEquals(1, list.size());
 	}
 

@@ -62,7 +62,7 @@ class JdbcCursorFunctionalTests {
 		Job job = context.getBean(Job.class);
 
 		// when
-		JobExecution jobExecution = jobOperator.start(job, new JobParameters());
+		JobExecution jobExecution = jobOperator.start(job, JobParameters.EMPTY);
 
 		// then
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());

@@ -63,7 +63,7 @@ class H2CompatibilityModeJobRepositoryIntegrationTests {
 		var jobOperator = context.getBean(JobOperator.class);
 		var job = context.getBean(Job.class);
 
-		var jobExecution = jobOperator.start(job, new JobParameters());
+		var jobExecution = jobOperator.start(job, JobParameters.EMPTY);
 
 		assertNotNull(jobExecution);
 		assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());

@@ -49,9 +49,9 @@ class MongoStepExecutionDaoIntegrationTests extends AbstractMongoDBDaoIntegratio
 	@BeforeEach
 	public void setUp(@Autowired JobInstanceDao jobInstanceDao, @Autowired JobExecutionDao jobExecutionDao)
 			throws Exception {
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		jobInstance = jobInstanceDao.createJobInstance("execTestJob", jobParameters);
-		jobExecution = jobExecutionDao.createJobExecution(jobInstance, new JobParameters());
+		jobExecution = jobExecutionDao.createJobExecution(jobInstance, JobParameters.EMPTY);
 	}
 
 	@Test

@@ -44,7 +44,7 @@ public class MongoExecutionContextDaoIntegrationTests extends AbstractMongoDBDao
 	void testGetJobExecutionWithEmptyResult(@Autowired ExecutionContextDao executionContextDao) {
 		// given
 		JobInstance jobInstance = new JobInstance(1, "job");
-		JobExecution jobExecution = new JobExecution(12345678L, jobInstance, new JobParameters());
+		JobExecution jobExecution = new JobExecution(12345678L, jobInstance, JobParameters.EMPTY);
 
 		// when
 		ExecutionContext actual = executionContextDao.getExecutionContext(jobExecution);
@@ -77,7 +77,7 @@ public class MongoExecutionContextDaoIntegrationTests extends AbstractMongoDBDao
 	void testGetStepExecutionWithEmptyResult(@Autowired ExecutionContextDao executionContextDao) {
 		// given
 		JobInstance jobInstance = new JobInstance(1, "job");
-		JobExecution jobExecution = new JobExecution(12345678L, jobInstance, new JobParameters());
+		JobExecution jobExecution = new JobExecution(12345678L, jobInstance, JobParameters.EMPTY);
 		StepExecution stepExecution = new StepExecution(23456789L, "step", jobExecution);
 
 		// when

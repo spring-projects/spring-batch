@@ -70,7 +70,7 @@ class RetrySampleFunctionalTests {
 		RetrySampleItemWriter<?> itemProcessor = context.getBean(RetrySampleItemWriter.class);
 
 		// when
-		JobExecution jobExecution = jobOperator.start(job, new JobParameters());
+		JobExecution jobExecution = jobOperator.start(job, JobParameters.EMPTY);
 
 		// then
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());

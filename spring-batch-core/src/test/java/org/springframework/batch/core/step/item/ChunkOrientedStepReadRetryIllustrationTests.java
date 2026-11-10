@@ -67,7 +67,7 @@ class ChunkOrientedStepReadRetryIllustrationTests {
 		Job job = context.getBean(Job.class);
 
 		// when
-		JobExecution jobExecution = jobOperator.start(job, new JobParameters());
+		JobExecution jobExecution = jobOperator.start(job, JobParameters.EMPTY);
 
 		// then
 		StepExecution stepExecution = jobExecution.getStepExecutions().iterator().next();

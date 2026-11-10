@@ -44,7 +44,7 @@ class JobScopeTests {
 
 	private final JobScope scope = new JobScope();
 
-	private final JobExecution jobExecution = new JobExecution(11L, new JobInstance(1L, "job"), new JobParameters());
+	private final JobExecution jobExecution = new JobExecution(11L, new JobInstance(1L, "job"), JobParameters.EMPTY);
 
 	private JobContext context;
 

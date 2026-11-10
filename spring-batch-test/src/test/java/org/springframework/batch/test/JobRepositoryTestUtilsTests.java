@@ -84,7 +84,7 @@ class JobRepositoryTestUtilsTests {
 	void testRemoveJobExecutionsWithSameJobInstance() throws Exception {
 		utils = new JobRepositoryTestUtils(jobRepository);
 		List<JobExecution> list = new ArrayList<>();
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		ExecutionContext executionContext = new ExecutionContext();
 		JobInstance jobInstance = jobRepository.createJobInstance("job", jobParameters);
 		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters, executionContext);

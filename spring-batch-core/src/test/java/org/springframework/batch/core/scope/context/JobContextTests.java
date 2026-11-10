@@ -48,7 +48,7 @@ class JobContextTests {
 	@BeforeEach
 	void setUp() {
 		JobInstance jobInstance = new JobInstance(2L, "job");
-		jobExecution = new JobExecution(1L, jobInstance, new JobParameters());
+		jobExecution = new JobExecution(1L, jobInstance, JobParameters.EMPTY);
 		context = new JobContext(jobExecution);
 		list = new ArrayList<>();
 	}

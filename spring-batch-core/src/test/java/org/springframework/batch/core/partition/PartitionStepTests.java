@@ -105,7 +105,7 @@ class PartitionStepTests {
 			return executions;
 		});
 		step.afterPropertiesSet();
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		JobInstance jobInstance = jobRepository.createJobInstance("vanillaJob", jobParameters);
 		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
 				new ExecutionContext());
@@ -133,7 +133,7 @@ class PartitionStepTests {
 			return executions;
 		});
 		step.afterPropertiesSet();
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		JobInstance jobInstance = jobRepository.createJobInstance("vanillaJob", jobParameters);
 		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
 				new ExecutionContext());
@@ -176,7 +176,7 @@ class PartitionStepTests {
 			return executions;
 		});
 		step.afterPropertiesSet();
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		ExecutionContext executionContext = new ExecutionContext();
 		JobInstance jobInstance = jobRepository.createJobInstance("vanillaJob", jobParameters);
 		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters, executionContext);
@@ -213,7 +213,7 @@ class PartitionStepTests {
 			return executions;
 		});
 		step.afterPropertiesSet();
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		JobInstance jobInstance = jobRepository.createJobInstance("vanillaJob", jobParameters);
 		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
 				new ExecutionContext());
@@ -258,7 +258,7 @@ class PartitionStepTests {
 		});
 		step.afterPropertiesSet();
 
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		ExecutionContext executionContext = new ExecutionContext();
 		JobInstance jobInstance = jobRepository.createJobInstance("restartJob", jobParameters);
 		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters, executionContext);
@@ -313,7 +313,7 @@ class PartitionStepTests {
 		});
 		step.afterPropertiesSet();
 
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		ExecutionContext executionContext = new ExecutionContext();
 		JobInstance jobInstance = jobRepository.createJobInstance("restartJob", jobParameters);
 		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters, executionContext);
@@ -351,7 +351,7 @@ class PartitionStepTests {
 		step.setStepExecutionSplitter(stepExecutionSplitter);
 		step.setPartitionHandler((stepSplitter, stepExecution) -> Arrays.asList(stepExecution));
 		step.afterPropertiesSet();
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		JobInstance jobInstance = jobRepository.createJobInstance("vanillaJob", jobParameters);
 		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
 				new ExecutionContext());

@@ -113,7 +113,7 @@ public class MetaDataInstanceFactory {
 	 * @return a {@link JobExecution} with empty {@link JobParameters}
 	 */
 	public static JobExecution createJobExecution(String jobName, Long instanceId, Long executionId) {
-		return createJobExecution(jobName, instanceId, executionId, new JobParameters());
+		return createJobExecution(jobName, instanceId, executionId, JobParameters.EMPTY);
 	}
 
 	/**

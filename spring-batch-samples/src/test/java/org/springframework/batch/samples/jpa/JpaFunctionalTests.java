@@ -35,7 +35,7 @@ class JpaFunctionalTests {
 	@Test
 	void testLaunchJobWithXmlConfig(@Autowired JobOperator jobOperator, @Autowired Job job) throws Exception {
 		// when
-		JobExecution jobExecution = jobOperator.start(job, new JobParameters());
+		JobExecution jobExecution = jobOperator.start(job, JobParameters.EMPTY);
 
 		// then
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
@@ -49,7 +49,7 @@ class JpaFunctionalTests {
 		Job job = context.getBean(Job.class);
 
 		// when
-		JobExecution jobExecution = jobOperator.start(job, new JobParameters());
+		JobExecution jobExecution = jobOperator.start(job, JobParameters.EMPTY);
 
 		// then
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());

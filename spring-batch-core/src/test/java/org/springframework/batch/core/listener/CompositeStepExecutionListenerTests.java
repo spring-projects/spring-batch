@@ -41,7 +41,7 @@ class CompositeStepExecutionListenerTests {
 
 	@Test
 	void testSetListeners() {
-		JobExecution jobExecution = new JobExecution(11L, new JobInstance(1L, "job"), new JobParameters());
+		JobExecution jobExecution = new JobExecution(11L, new JobInstance(1L, "job"), JobParameters.EMPTY);
 		StepExecution stepExecution = new StepExecution("s1", jobExecution);
 		listener.setListeners(new StepExecutionListener[] { new StepExecutionListener() {
 
@@ -65,7 +65,7 @@ class CompositeStepExecutionListenerTests {
 
 	@Test
 	void testSetListener() {
-		JobExecution jobExecution = new JobExecution(11L, new JobInstance(1L, "job"), new JobParameters());
+		JobExecution jobExecution = new JobExecution(11L, new JobInstance(1L, "job"), JobParameters.EMPTY);
 		StepExecution stepExecution = new StepExecution("s1", jobExecution);
 		listener.register(new StepExecutionListener() {
 

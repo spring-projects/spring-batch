@@ -38,7 +38,7 @@ class EndStateTests {
 
 	@BeforeEach
 	void setUp() {
-		jobExecution = new JobExecution(0L, new JobInstance(1L, "job"), new JobParameters());
+		jobExecution = new JobExecution(0L, new JobInstance(1L, "job"), JobParameters.EMPTY);
 	}
 
 	@Test

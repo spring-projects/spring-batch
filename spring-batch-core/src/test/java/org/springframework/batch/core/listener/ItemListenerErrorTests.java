@@ -94,7 +94,7 @@ class ItemListenerErrorTests {
 		listener.setMethodToThrowExceptionFrom("onWriteError");
 		writer.setGoingToFail(true);
 
-		JobExecution execution = jobOperator.start(job, new JobParameters());
+		JobExecution execution = jobOperator.start(job, JobParameters.EMPTY);
 		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
 	}
 
@@ -104,7 +104,7 @@ class ItemListenerErrorTests {
 		listener.setMethodToThrowExceptionFrom("onReadError");
 		reader.setGoingToFail(true);
 
-		JobExecution execution = jobOperator.start(job, new JobParameters());
+		JobExecution execution = jobOperator.start(job, JobParameters.EMPTY);
 		assertEquals(BatchStatus.FAILED, execution.getStatus());
 		StepExecution stepExecution = execution.getStepExecutions().iterator().next();
 		assertEquals(0, stepExecution.getReadCount());
@@ -123,7 +123,7 @@ class ItemListenerErrorTests {
 		listener.setMethodToThrowExceptionFrom("onProcessError");
 		processor.setGoingToFail(true);
 
-		JobExecution execution = jobOperator.start(job, new JobParameters());
+		JobExecution execution = jobOperator.start(job, JobParameters.EMPTY);
 		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
 	}
 

@@ -73,7 +73,7 @@ class GracefulShutdownFunctionalTests {
 
 	@Test
 	void testStopJob(@Autowired Job job, @Autowired JobOperator jobOperator) throws Exception {
-		JobExecution jobExecution = jobOperator.start(job, new JobParameters());
+		JobExecution jobExecution = jobOperator.start(job, JobParameters.EMPTY);
 
 		Thread.sleep(1000);
 

@@ -34,7 +34,7 @@ class DefaultStepExecutionAggregatorTests {
 
 	private final StepExecutionAggregator aggregator = new DefaultStepExecutionAggregator();
 
-	private final JobExecution jobExecution = new JobExecution(11L, new JobInstance(1L, "job"), new JobParameters());
+	private final JobExecution jobExecution = new JobExecution(11L, new JobInstance(1L, "job"), JobParameters.EMPTY);
 
 	private final StepExecution result = new StepExecution(1L, "aggregate", jobExecution);
 

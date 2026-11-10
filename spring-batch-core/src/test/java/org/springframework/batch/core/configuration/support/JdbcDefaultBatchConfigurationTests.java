@@ -63,7 +63,7 @@ class JdbcDefaultBatchConfigurationTests {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(context.getBean(DataSource.class));
 
 		// when
-		JobExecution jobExecution = jobOperator.start(job, new JobParameters());
+		JobExecution jobExecution = jobOperator.start(job, JobParameters.EMPTY);
 
 		// then
 		Assertions.assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());

@@ -273,7 +273,7 @@ class ChunkOrientedStepScanModeChunkListenerTests {
 	private JobExecution run(Step step) throws Exception {
 		JobRepository jobRepository = jobRepository();
 		Job job = new JobBuilder("job", jobRepository).start(step).build();
-		return this.context.getBean(JobOperator.class).start(job, new JobParameters());
+		return this.context.getBean(JobOperator.class).start(job, JobParameters.EMPTY);
 	}
 
 	@Configuration

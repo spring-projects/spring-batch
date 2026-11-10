@@ -279,7 +279,7 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 		JobParametersIncrementer incrementer = job.getJobParametersIncrementer();
 		if (lastInstance == null) {
 			// Start from a completely clean sheet
-			nextParameters = incrementer.getNext(new JobParameters());
+			nextParameters = incrementer.getNext(JobParameters.EMPTY);
 		}
 		else {
 			JobExecution previousExecution = jobRepository.getLastJobExecution(lastInstance);

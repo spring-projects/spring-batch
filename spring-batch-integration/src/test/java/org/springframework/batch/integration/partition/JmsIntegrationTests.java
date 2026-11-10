@@ -61,7 +61,7 @@ class JmsIntegrationTests {
 	@Test
 	void testLaunchJob() throws Exception {
 		int before = jobRepository.findJobInstances(job.getName()).size();
-		assertNotNull(jobOperator.start(job, new JobParameters()));
+		assertNotNull(jobOperator.start(job, JobParameters.EMPTY));
 		List<JobInstance> jobInstances = jobRepository.findJobInstances(job.getName());
 		int after = jobInstances.size();
 		assertEquals(1, after - before);

@@ -85,7 +85,7 @@ class JdbcExecutionContextDaoTests {
 	@Test
 	void testSaveJobExecutionContext() {
 		// given
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		JobInstance jobInstance = jdbcJobInstanceDao.createJobInstance("job", jobParameters);
 		JobExecution jobExecution = jdbcJobExecutionDao.createJobExecution(jobInstance, jobParameters);
 		jobExecution.getExecutionContext().putString("name", "foo");
@@ -106,7 +106,7 @@ class JdbcExecutionContextDaoTests {
 	@Test
 	void testSaveStepExecutionContext() {
 		// given
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		JobInstance jobInstance = jdbcJobInstanceDao.createJobInstance("job", jobParameters);
 		JobExecution jobExecution = jdbcJobExecutionDao.createJobExecution(jobInstance, jobParameters);
 		StepExecution stepExecution = jdbcStepExecutionDao.createStepExecution("step", jobExecution);

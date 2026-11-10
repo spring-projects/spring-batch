@@ -34,7 +34,7 @@ class NoWorkFoundStepExecutionListenerTests {
 	@Test
 	void noWork() {
 		StepExecution stepExecution = new StepExecution("NoProcessingStep",
-				new JobExecution(1L, new JobInstance(1L, "NoProcessingJob"), new JobParameters()));
+				new JobExecution(1L, new JobInstance(1L, "NoProcessingJob"), JobParameters.EMPTY));
 
 		stepExecution.setExitStatus(ExitStatus.COMPLETED);
 		stepExecution.setReadCount(0);
@@ -46,7 +46,7 @@ class NoWorkFoundStepExecutionListenerTests {
 	@Test
 	void workDone() {
 		StepExecution stepExecution = new StepExecution("NoProcessingStep",
-				new JobExecution(1L, new JobInstance(1L, "NoProcessingJob"), new JobParameters()));
+				new JobExecution(1L, new JobInstance(1L, "NoProcessingJob"), JobParameters.EMPTY));
 
 		stepExecution.setReadCount(1);
 

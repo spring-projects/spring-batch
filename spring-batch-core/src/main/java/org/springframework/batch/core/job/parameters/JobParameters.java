@@ -23,7 +23,6 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
@@ -52,22 +51,27 @@ import org.jspecify.annotations.Nullable;
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
  * @author Taeik Lim
+ * @author Yanming Zhou
  * @since 1.0
  */
 public record JobParameters(Set<JobParameter<?>> parameters) implements Serializable, Iterable<JobParameter<?>> {
 
 	/**
+	 * The shared empty {@link JobParameters} instance.
+	 *
+	 * @since 6.1
+	 */
+	public static final JobParameters EMPTY = new JobParameters(Collections.emptySet());
+
+	/**
 	 * Create a new empty {@link JobParameters} instance.
 	 *
 	 * @since 6.0
+	 * @deprecated since 6.1, scheduled for removal in 7.0. Use
+	 * {@link JobParameters#EMPTY} instead.
 	 */
-	//@formatter:off
-    // TODO this is questionable (does this even make sense since the class is immutable?),
-    // TODO but needed for the incrementer, otherwise we would have incrementer.getNext(null)
-    // TODO which is even worse
-    //@formatter:on
 	public JobParameters() {
-		this(new HashSet<>());
+		this(Collections.emptySet());
 	}
 
 	/**
@@ -77,7 +81,7 @@ public record JobParameters(Set<JobParameter<?>> parameters) implements Serializ
 	 */
 	public JobParameters(Set<JobParameter<?>> parameters) {
 		Assert.notNull(parameters, "parameters must not be null");
-		this.parameters = new HashSet<>(parameters);
+		this.parameters = Collections.unmodifiableSet(parameters);
 	}
 
 	/**

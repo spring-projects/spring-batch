@@ -85,7 +85,7 @@ public class FlowJobTests {
 		factory.afterPropertiesSet();
 		this.jobRepository = factory.getObject();
 		job.setJobRepository(this.jobRepository);
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		this.jobInstance = jobRepository.createJobInstance(job.getName(), jobParameters);
 		this.jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters, new ExecutionContext());
 	}
@@ -229,7 +229,7 @@ public class FlowJobTests {
 		assertEquals(ExitStatus.FAILED, jobExecution.getExitStatus());
 		assertEquals(2, jobExecution.getStepExecutions().size());
 		jobRepository.update(jobExecution);
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		this.jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters, new ExecutionContext());
 		fail = false;
 		job.execute(jobExecution);
@@ -471,7 +471,7 @@ public class FlowJobTests {
 		assertEquals(BatchStatus.STOPPED, jobExecution.getStatus());
 		assertEquals(1, jobExecution.getStepExecutions().size());
 
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		this.jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters, new ExecutionContext());
 		job.execute(jobExecution);
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());

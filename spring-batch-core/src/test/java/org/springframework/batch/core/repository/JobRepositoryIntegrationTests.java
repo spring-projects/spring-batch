@@ -52,7 +52,7 @@ public class JobRepositoryIntegrationTests {
 	void testFindRunningJobExecutions(@Autowired JobOperator jobOperator, @Autowired JobRepository jobRepository,
 			@Autowired Job job) throws Exception {
 		// Start a job execution
-		JobExecution jobExecution = jobOperator.start(job, new JobParameters());
+		JobExecution jobExecution = jobOperator.start(job, JobParameters.EMPTY);
 		Assertions.assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
 
 		// Find running job executions, none at this point

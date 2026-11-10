@@ -35,7 +35,7 @@ class RunIdIncrementerTests {
 
 	@Test
 	void testGetNext() {
-		JobParameters next = incrementer.getNext(new JobParameters());
+		JobParameters next = incrementer.getNext(JobParameters.EMPTY);
 		assertEquals(1, next.getLong("run.id"));
 		JobParameters nextNext = incrementer.getNext(next);
 		assertEquals(2, nextNext.getLong("run.id"));
@@ -52,7 +52,7 @@ class RunIdIncrementerTests {
 	@Test
 	void testGetNextNamed() {
 		incrementer.setKey("foo");
-		JobParameters next = incrementer.getNext(new JobParameters());
+		JobParameters next = incrementer.getNext(JobParameters.EMPTY);
 		assertEquals(1, next.getLong("foo"));
 	}
 

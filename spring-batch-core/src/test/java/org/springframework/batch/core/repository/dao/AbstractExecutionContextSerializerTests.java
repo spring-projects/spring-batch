@@ -128,7 +128,7 @@ public abstract class AbstractExecutionContextSerializerTests {
 	@Test
 	void testSerializeEmptyJobParameters() throws IOException {
 		Map<String, Object> m1 = new HashMap<>();
-		m1.put("params", new JobParameters());
+		m1.put("params", JobParameters.EMPTY);
 
 		Map<String, Object> m2 = serializationRoundTrip(m1);
 

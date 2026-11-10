@@ -68,14 +68,14 @@ class JobScopeIntegrationTests {
 
 	@Test
 	void testScopeCreation() throws JobInterruptedException {
-		vanilla.execute(new JobExecution(11L, new JobInstance(1L, "job"), new JobParameters()));
+		vanilla.execute(new JobExecution(11L, new JobInstance(1L, "job"), JobParameters.EMPTY));
 		assertNotNull(TestJob.getContext());
 		assertNull(JobSynchronizationManager.getContext());
 	}
 
 	@Test
 	void testScopedProxy() throws JobInterruptedException {
-		proxied.execute(new JobExecution(11L, new JobInstance(1L, "job"), new JobParameters()));
+		proxied.execute(new JobExecution(11L, new JobInstance(1L, "job"), JobParameters.EMPTY));
 		assertTrue(TestJob.getContext().attributeNames().length > 0);
 		String collaborator = (String) TestJob.getContext().getAttribute("collaborator");
 		assertNotNull(collaborator);
@@ -86,7 +86,7 @@ class JobScopeIntegrationTests {
 
 	@Test
 	void testNestedScopedProxy() throws JobInterruptedException {
-		nested.execute(new JobExecution(11L, new JobInstance(1L, "job"), new JobParameters()));
+		nested.execute(new JobExecution(11L, new JobInstance(1L, "job"), JobParameters.EMPTY));
 		assertTrue(TestJob.getContext().attributeNames().length > 0);
 		String collaborator = (String) TestJob.getContext().getAttribute("collaborator");
 		assertNotNull(collaborator);
@@ -100,7 +100,7 @@ class JobScopeIntegrationTests {
 
 	@Test
 	void testExecutionContext() throws JobInterruptedException {
-		JobExecution stepExecution = new JobExecution(11L, new JobInstance(1L, "job"), new JobParameters());
+		JobExecution stepExecution = new JobExecution(11L, new JobInstance(1L, "job"), JobParameters.EMPTY);
 		ExecutionContext executionContext = new ExecutionContext();
 		executionContext.put("name", "spam");
 		stepExecution.setExecutionContext(executionContext);
@@ -113,7 +113,7 @@ class JobScopeIntegrationTests {
 
 	@Test
 	void testScopedProxyForReference() throws JobInterruptedException {
-		enhanced.execute(new JobExecution(11L, new JobInstance(1L, "job"), new JobParameters()));
+		enhanced.execute(new JobExecution(11L, new JobInstance(1L, "job"), JobParameters.EMPTY));
 		assertTrue(TestJob.getContext().attributeNames().length > 0);
 		String collaborator = (String) TestJob.getContext().getAttribute("collaborator");
 		assertNotNull(collaborator);
@@ -122,7 +122,7 @@ class JobScopeIntegrationTests {
 
 	@Test
 	void testScopedProxyForSecondReference() throws JobInterruptedException {
-		doubleEnhanced.execute(new JobExecution(11L, new JobInstance(1L, "job"), new JobParameters()));
+		doubleEnhanced.execute(new JobExecution(11L, new JobInstance(1L, "job"), JobParameters.EMPTY));
 		assertTrue(TestJob.getContext().attributeNames().length > 0);
 		String collaborator = (String) TestJob.getContext().getAttribute("collaborator");
 		assertNotNull(collaborator);

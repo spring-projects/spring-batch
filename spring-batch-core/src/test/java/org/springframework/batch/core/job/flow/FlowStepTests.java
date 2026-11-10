@@ -68,7 +68,7 @@ class FlowStepTests {
 		jobRepositoryFactoryBean.setTransactionManager(new JdbcTransactionManager(embeddedDatabase));
 		jobRepositoryFactoryBean.afterPropertiesSet();
 		jobRepository = jobRepositoryFactoryBean.getObject();
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		JobInstance jobInstance = jobRepository.createJobInstance("job", jobParameters);
 		jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters, new ExecutionContext());
 	}

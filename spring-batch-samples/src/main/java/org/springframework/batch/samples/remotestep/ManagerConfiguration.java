@@ -98,7 +98,7 @@ public class ManagerConfiguration {
 
 		JobOperator jobOperator = context.getBean(JobOperator.class);
 		Job job = context.getBean(Job.class);
-		JobExecution jobExecution = jobOperator.start(job, new JobParameters());
+		JobExecution jobExecution = jobOperator.start(job, JobParameters.EMPTY);
 		System.out.println("jobExecution = " + jobExecution);
 		integrationFlow.stop();
 		brokerService.stop();

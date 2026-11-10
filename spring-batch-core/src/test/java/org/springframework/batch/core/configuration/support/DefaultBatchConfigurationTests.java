@@ -62,7 +62,7 @@ class DefaultBatchConfigurationTests {
 		JobOperator jobOperator = context.getBean(JobOperator.class);
 
 		// when
-		JobExecution jobExecution = jobOperator.start(job, new JobParameters());
+		JobExecution jobExecution = jobOperator.start(job, JobParameters.EMPTY);
 
 		// then
 		Assertions.assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
@@ -98,7 +98,7 @@ class DefaultBatchConfigurationTests {
 				CustomJobRegistryJobConfiguration.class);
 		Job job = context.getBean(Job.class);
 		JobOperator jobOperator = context.getBean(JobOperator.class);
-		JobExecution jobExecution = jobOperator.start(job, new JobParameters());
+		JobExecution jobExecution = jobOperator.start(job, JobParameters.EMPTY);
 
 		try {
 			jobOperator.restart(jobExecution);

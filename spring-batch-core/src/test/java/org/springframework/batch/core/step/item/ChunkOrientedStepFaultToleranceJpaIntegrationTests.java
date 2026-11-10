@@ -75,7 +75,7 @@ public class ChunkOrientedStepFaultToleranceJpaIntegrationTests {
 		JdbcTemplate jdbcTemplate = context.getBean(JdbcTemplate.class);
 
 		// when
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		JobExecution jobExecution = jobOperator.start(job, jobParameters);
 
 		// then
@@ -112,7 +112,7 @@ public class ChunkOrientedStepFaultToleranceJpaIntegrationTests {
 		jdbcTemplate.update("insert into person_target (id, name, version) values (1, 'v1', 0)");
 
 		// when
-		JobExecution jobExecution = jobOperator.start(job, new JobParameters());
+		JobExecution jobExecution = jobOperator.start(job, JobParameters.EMPTY);
 
 		// then: the in-place retry "succeeds" without an exception, but the transaction
 		// it ran in is rolled back, so the step must fail instead of reporting COMPLETED

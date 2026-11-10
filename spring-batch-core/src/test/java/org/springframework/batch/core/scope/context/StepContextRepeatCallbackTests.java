@@ -36,7 +36,7 @@ import org.springframework.batch.infrastructure.repeat.RepeatStatus;
 class StepContextRepeatCallbackTests {
 
 	private final StepExecution stepExecution = new StepExecution(123L, "foo",
-			new JobExecution(0L, new JobInstance(1L, "job"), new JobParameters()));
+			new JobExecution(0L, new JobInstance(1L, "job"), JobParameters.EMPTY));
 
 	private boolean addedAttribute = false;
 

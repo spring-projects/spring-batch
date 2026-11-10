@@ -97,7 +97,7 @@ class TaskExecutorJobOperatorTests {
 	@Test
 	void testStart() throws JobInstanceAlreadyCompleteException, NoSuchJobException,
 			JobExecutionAlreadyRunningException, InvalidJobParametersException, JobRestartException {
-		JobExecution jobExecution = jobOperator.start(job, new JobParameters());
+		JobExecution jobExecution = jobOperator.start(job, JobParameters.EMPTY);
 
 		Assertions.assertNotNull(jobExecution);
 		Assertions.assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
@@ -121,7 +121,7 @@ class TaskExecutorJobOperatorTests {
 			.start(new StepBuilder("step", jobRepository).tasklet(tasklet).build())
 			.build();
 
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		JobExecution jobExecution = jobOperator.start(job, jobParameters);
 
 		Assertions.assertNotNull(jobExecution);
@@ -135,7 +135,7 @@ class TaskExecutorJobOperatorTests {
 
 	@Test
 	void testRestartFromUnknownStatusSurfacesRealReason() throws Exception {
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		JobExecution jobExecution = jobOperator.start(job, jobParameters);
 
 		Assertions.assertNotNull(jobExecution);
