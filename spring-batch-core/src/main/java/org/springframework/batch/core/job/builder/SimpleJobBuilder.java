@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.jspecify.annotations.NullUnmarked;
 
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.job.SimpleJob;
@@ -97,6 +98,15 @@ public class SimpleJobBuilder extends JobBuilderHelper<SimpleJobBuilder> {
 			}
 		}
 		return builder.on(pattern);
+	}
+
+	/**
+	 * Branch into a flow conditional on the outcome of the current step.
+	 * @param status the exit status of the current step
+	 * @return a builder for fluent chaining
+	 */
+	public FlowBuilder.TransitionBuilder<FlowJobBuilder> on(ExitStatus status) {
+		return on(status.getExitCode());
 	}
 
 	/**
