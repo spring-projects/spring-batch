@@ -66,7 +66,6 @@ public class JobContext extends SynchronizedAttributeAccessor {
 	 * with the current {@link JobExecution}
 	 */
 	public String getJobName() {
-		Assert.state(jobExecution.getJobInstance() != null, "JobExecution does not have a JobInstance");
 		return jobExecution.getJobInstance().getJobName();
 	}
 
