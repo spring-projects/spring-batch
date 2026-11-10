@@ -18,6 +18,8 @@ package org.springframework.batch.core.job.flow;
 
 import org.springframework.batch.infrastructure.support.DatabaseType;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.ArrayList;
@@ -32,6 +34,7 @@ import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.JobInterruptedException;
 import org.springframework.batch.core.job.SimpleJob;
 import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.job.flow.support.SimpleFlow;
 import org.springframework.batch.core.job.flow.support.StateTransition;
@@ -106,6 +109,59 @@ class FlowStepTests {
 		assertEquals(ExitStatus.COMPLETED, stepExecution.getExitStatus());
 		assertEquals(3, jobExecution.getStepExecutions().size());
 
+	}
+
+	@Test // GH-4771
+	void testStepNestedInFlowStepIsLocatableFromJob() throws Exception {
+
+		SimpleFlow flow = new SimpleFlow("outerFlow");
+		List<StateTransition> transitions = new ArrayList<>();
+		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("innerStep")), "end0"));
+		transitions.add(StateTransition.createEndStateTransition(new EndState(FlowExecutionStatus.COMPLETED, "end0")));
+		flow.setStateTransitions(transitions);
+		flow.afterPropertiesSet();
+
+		FlowStep flowStep = new FlowStep(flow);
+		flowStep.setFlow(flow);
+
+		SimpleJob job = new SimpleJob("job");
+		job.addStep(flowStep);
+
+		assertTrue(job.getStepNames().contains("innerStep"));
+		Step innerStep = job.getStep("innerStep");
+		assertNotNull(innerStep);
+		assertEquals("innerStep", innerStep.getName());
+	}
+
+	@Test // GH-4771
+	void testGetStepNamesIncludesStepsNestedInFlows() throws Exception {
+
+		SimpleFlow innerFlow = new SimpleFlow("innerFlow");
+		List<StateTransition> innerTransitions = new ArrayList<>();
+		innerTransitions.add(StateTransition.createStateTransition(new StepState(new StubStep("innerStep")), "end0"));
+		innerTransitions
+			.add(StateTransition.createEndStateTransition(new EndState(FlowExecutionStatus.COMPLETED, "end0")));
+		innerFlow.setStateTransitions(innerTransitions);
+		innerFlow.afterPropertiesSet();
+
+		FlowStep innerFlowStep = new FlowStep(innerFlow);
+		innerFlowStep.setFlow(innerFlow);
+
+		SimpleFlow outerFlow = new SimpleFlow("outerFlow");
+		List<StateTransition> outerTransitions = new ArrayList<>();
+		outerTransitions.add(StateTransition.createStateTransition(new StepState(innerFlowStep), "end1"));
+		outerTransitions
+			.add(StateTransition.createEndStateTransition(new EndState(FlowExecutionStatus.COMPLETED, "end1")));
+		outerFlow.setStateTransitions(outerTransitions);
+		outerFlow.afterPropertiesSet();
+
+		FlowStep flowStep = new FlowStep(outerFlow);
+		flowStep.setFlow(outerFlow);
+
+		assertTrue(flowStep.getStepNames().contains("innerStep"));
+		Step innerStep = flowStep.getStep("innerStep");
+		assertNotNull(innerStep);
+		assertEquals("innerStep", innerStep.getName());
 	}
 
 	// BATCH-1620
