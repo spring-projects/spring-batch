@@ -1,0 +1,144 @@
+
+[appendix]
+[[databaseTipsAndCaveats]]
+= Database Tips and Caveats
+
+This appendix summarises database-specific tips and known caveats that are not enforced by
+Spring Batch itself but that can significantly affect the performance or correctness of
+batch jobs. Issues vary by database vendor and JDBC driver; the subsections below are
+organised by database product.
+
+[[database-tips-mysql]]
+== MySQL
+
+[[mysql-cursor-reader-streaming]]
+=== JdbcCursorItemReader: Streaming vs. In-Memory ResultSet
+
+By default, MySQL's Connector/J fetches the entire `ResultSet` into memory before the
+first row is returned to the application. For large datasets this causes excessive heap
+usage and can lead to out-of-memory errors.
+
+There are two ways to enable streaming on MySQL:
+
+**Option 1 — row-by-row streaming (simplest)**
+
+Set the fetch size to the special sentinel value `Integer.MIN_VALUE` and disable cursor
+position verification:
+
+[source,java]
+----
+@Bean
+public JdbcCursorItemReader<MyItem> reader(DataSource dataSource) {
+    return new JdbcCursorItemReaderBuilder<MyItem>()
+        .dataSource(dataSource)
+        .sql("SELECT * FROM my_table ORDER BY id")
+        .rowMapper(new MyItemRowMapper())
+        .fetchSize(Integer.MIN_VALUE)   // <1>
+        .verifyCursorPosition(false)    // <2>
+        .build();
+}
+----
+<1> `Integer.MIN_VALUE` tells Connector/J to stream one row at a time.
+<2> Cursor position verification must be disabled when streaming because the driver
+    does not support absolute positioning in streaming mode.
+
+NOTE: In streaming mode the connection cannot be used for other queries until the
+`ResultSet` is fully consumed. Spring Batch keeps the connection open for the entire
+step; avoid sharing the streaming connection with other components.
+
+**Option 2 — cursor-based fetch (configurable batch size)**
+
+Add `useCursorFetch=true` to the JDBC URL and configure a reasonable fetch size:
+
+[source,properties]
+----
+spring.datasource.url=jdbc:mysql://localhost:3306/mydb?useCursorFetch=true
+----
+
+[source,java]
+----
+@Bean
+public JdbcCursorItemReader<MyItem> reader(DataSource dataSource) {
+    return new JdbcCursorItemReaderBuilder<MyItem>()
+        .dataSource(dataSource)
+        .sql("SELECT * FROM my_table ORDER BY id")
+        .rowMapper(new MyItemRowMapper())
+        .fetchSize(1000)  // fetch 1000 rows per round-trip
+        .build();
+}
+----
+
+This option uses a server-side cursor and fetches rows in batches, balancing memory
+usage against the number of round-trips.
+
+[[mysql-batch-writer-performance]]
+=== JdbcBatchItemWriter: Rewriting Batched INSERT/UPDATE Statements
+
+MySQL's Connector/J can rewrite individual `INSERT` or `UPDATE` statements in a
+`PreparedStatement` batch into a single multi-row statement, which dramatically reduces
+round-trips and improves throughput. Enable this by adding
+`rewriteBatchedStatements=true` to the JDBC URL:
+
+[source,properties]
+----
+spring.datasource.url=jdbc:mysql://localhost:3306/mydb?rewriteBatchedStatements=true
+----
+
+[IMPORTANT]
+====
+This optimisation is transparent to Spring Batch — no code changes are needed.
+Benchmarks commonly show 2×–10× write throughput improvements for large batches on
+MySQL.
+====
+
+[[database-tips-postgresql]]
+== PostgreSQL
+
+[[postgresql-select-for-update-skip-locked]]
+=== JdbcCursorItemReader with SELECT FOR UPDATE SKIP LOCKED
+
+A common pattern is to use `SELECT ... FOR UPDATE SKIP LOCKED` in the `ItemReader` to
+claim rows for processing, then update or delete them in the `ItemWriter` within the
+same transaction. This pattern works correctly for most databases, but PostgreSQL
+enforces stricter transaction-level lock management.
+
+The issue arises because Spring Batch holds the `ResultSet` cursor open while iterating
+through items. When the `ItemWriter` tries to modify (or lock) rows that are already
+held by the same reader cursor within the same transaction, PostgreSQL may raise an
+error or enter a deadlock.
+
+*Workaround:* Use paging (`JdbcPagingItemReader`) instead of a cursor reader when you
+need `SELECT FOR UPDATE SKIP LOCKED` on PostgreSQL:
+
+[source,java]
+----
+@Bean
+public JdbcPagingItemReader<MyItem> reader(DataSource dataSource) {
+    Map<String, Order> sortKeys = new LinkedHashMap<>();
+    sortKeys.put("id", Order.ASCENDING);
+
+    PostgreSqlPagingQueryProvider queryProvider = new PostgreSqlPagingQueryProvider();
+    queryProvider.setSelectClause("SELECT *");
+    queryProvider.setFromClause("FROM my_table");
+    queryProvider.setWhereClause("FOR UPDATE SKIP LOCKED");
+    queryProvider.setSortKeys(sortKeys);
+
+    return new JdbcPagingItemReaderBuilder<MyItem>()
+        .dataSource(dataSource)
+        .queryProvider(queryProvider)
+        .rowMapper(new MyItemRowMapper())
+        .pageSize(100)
+        .build();
+}
+----
+
+Each page is fetched in a separate query, so the reader does not hold an open cursor
+while the writer runs. The writer can then freely update the rows it received from the
+reader within the same transaction.
+
+[[postgresql-foreign-key-indexes]]
+=== Foreign Key Columns Are Not Automatically Indexed
+
+PostgreSQL does not create indexes on foreign key columns automatically. For guidance
+on which columns to index in the Spring Batch metadata tables, see
+xref:schema-appendix.adoc#recommendationsForIndexingMetaDataTables[Recommendations for Indexing Metadata Tables].
