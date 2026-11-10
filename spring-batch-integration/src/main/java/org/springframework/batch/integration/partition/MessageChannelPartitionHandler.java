@@ -116,6 +116,8 @@ public class MessageChannelPartitionHandler extends AbstractPartitionHandler imp
 	 */
 	private final ConcurrentMap<String, BlockingQueue<Message<?>>> pendingReplies = new ConcurrentHashMap<>();
 
+	private final AtomicBoolean countRunningSupported = new AtomicBoolean(true);
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(stepName != null, "A step name must be provided for the remote workers.");
@@ -276,13 +278,12 @@ public class MessageChannelPartitionHandler extends AbstractPartitionHandler imp
 	private Set<StepExecution> pollReplies(StepExecution managerStepExecution, final Set<StepExecution> split)
 			throws Exception {
 		Set<Long> partitionStepExecutionIds = split.stream().map(StepExecution::getId).collect(Collectors.toSet());
-		AtomicBoolean countRunningSupported = new AtomicBoolean(true);
 
 		Callable<Set<StepExecution>> callback = () -> {
 			// While workers are running, only count them: this avoids loading the whole
 			// object graph of the job execution (including the execution context of every
 			// step execution) at each poll.
-			if (countRunningSupported.get()) {
+			if (this.countRunningSupported.get()) {
 				try {
 					long running = jobRepository.countRunningStepExecutions(partitionStepExecutionIds);
 					if (running > 0) {
@@ -296,7 +297,7 @@ public class MessageChannelPartitionHandler extends AbstractPartitionHandler imp
 				catch (UnsupportedOperationException e) {
 					logger.debug("The job repository cannot count running step executions, "
 							+ "falling back to loading the job execution at each poll");
-					countRunningSupported.set(false);
+					this.countRunningSupported.set(false);
 				}
 			}
 
