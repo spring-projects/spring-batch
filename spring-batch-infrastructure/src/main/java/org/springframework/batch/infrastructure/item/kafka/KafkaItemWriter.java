@@ -17,6 +17,7 @@
 package org.springframework.batch.infrastructure.item.kafka;
 
 import org.jspecify.annotations.Nullable;
+import org.springframework.batch.infrastructure.item.Chunk;
 import org.springframework.batch.infrastructure.item.ItemWriter;
 import org.springframework.batch.infrastructure.item.KeyValueItemWriter;
 import org.springframework.core.convert.converter.Converter;
@@ -42,6 +43,7 @@ import java.util.concurrent.TimeUnit;
  * @author Mathieu Ouellet
  * @author Mahmoud Ben Hassine
  * @author Stefano Cordio
+ * @author Cobi Eun
  * @since 4.2
  *
  */
@@ -63,6 +65,23 @@ public class KafkaItemWriter<K, T> extends KeyValueItemWriter<K, T> {
 		super(itemKeyMapper);
 		Assert.notNull(kafkaTemplate, "KafkaTemplate must not be null");
 		this.kafkaTemplate = kafkaTemplate;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * The pending send futures of a write call are discarded when this method returns or
+	 * throws, so futures from a failed write are not carried over to subsequent calls.
+	 * Sends that were already handed to the producer are not cancelled.
+	 */
+	@Override
+	public void write(Chunk<? extends T> chunk) throws Exception {
+		try {
+			super.write(chunk);
+		}
+		finally {
+			this.completableFutures.clear();
+		}
 	}
 
 	@Override
