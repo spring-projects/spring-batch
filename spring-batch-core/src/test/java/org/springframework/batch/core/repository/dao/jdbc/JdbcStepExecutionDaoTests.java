@@ -38,8 +38,7 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.jdbc.support.incrementer.H2SequenceMaxValueIncrementer;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class JdbcStepExecutionDaoTests {
 
@@ -105,9 +104,7 @@ class JdbcStepExecutionDaoTests {
 	void testTruncateExitDescription() {
 		jdbcStepExecutionDao.setExitMessageLength(250);
 
-		StringBuilder sb = new StringBuilder();
-		sb.append("too long exit description".repeat(100));
-		String longDescription = sb.toString();
+		String longDescription = "too long exit description".repeat(100);
 
 		ExitStatus exitStatus = ExitStatus.FAILED.addExitDescription(longDescription);
 
@@ -124,6 +121,7 @@ class JdbcStepExecutionDaoTests {
 
 		StepExecution retrievedAfterUpdate = jdbcStepExecutionDao.getStepExecution(stepExecution.getId());
 
+		assertNotNull(retrievedAfterUpdate);
 		assertTrue(retrievedAfterUpdate.getExitStatus().getExitDescription().length() < stepExecution.getExitStatus()
 			.getExitDescription()
 			.length(), "Exit description should be truncated");
