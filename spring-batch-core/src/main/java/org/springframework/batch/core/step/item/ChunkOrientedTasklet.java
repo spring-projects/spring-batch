@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@ import org.jspecify.annotations.Nullable;
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
+ * @author Taeik Lim
  * @param <I> input item type
  * @deprecated Since 6.0, use
  * {@link org.springframework.batch.core.step.item.ChunkOrientedStep} instead. Scheduled
@@ -68,9 +69,8 @@ public class ChunkOrientedTasklet<I> implements Tasklet {
 		this.buffering = buffering;
 	}
 
-	@Nullable
 	@Override
-	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+	public @Nullable RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 
 		@SuppressWarnings("unchecked")
 		Chunk<I> inputs = (Chunk<I>) chunkContext.getAttribute(INPUTS_KEY);

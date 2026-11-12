@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@ import org.jspecify.annotations.Nullable;
  * @author Robert Kasanicky
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ * @author Taeik Lim
  *
  */
 public interface JobInstanceDao {
@@ -72,10 +73,9 @@ public interface JobInstanceDao {
 	 * @return the JobInstance for the provided execution or {@code null} if it doesn't
 	 * exist.
 	 */
-	@Nullable
 	// TODO what is the added value of this? client should call
 	// jobExecution.getJobInstance()
-	JobInstance getJobInstance(JobExecution jobExecution);
+	@Nullable JobInstance getJobInstance(JobExecution jobExecution);
 
 	/**
 	 * Fetch the last job instances with the provided name, sorted backwards by primary
@@ -107,7 +107,7 @@ public interface JobInstanceDao {
 	 *
 	 * @since 4.2
 	 */
-	@Nullable default JobInstance getLastJobInstance(String jobName) {
+	default @Nullable JobInstance getLastJobInstance(String jobName) {
 		throw new UnsupportedOperationException();
 	}
 

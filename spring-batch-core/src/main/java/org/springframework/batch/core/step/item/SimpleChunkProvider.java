@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,6 +45,7 @@ import org.jspecify.annotations.Nullable;
  * @author Dave Syer
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ * @author Taeik Lim
  * @see ChunkOrientedTasklet
  * @deprecated Since 6.0, use
  * {@link org.springframework.batch.core.step.item.ChunkOrientedStep} instead. Scheduled
@@ -109,7 +110,7 @@ public class SimpleChunkProvider<I> implements ChunkProvider<I> {
 	 * @return the item or {@code null} if the data source is exhausted
 	 * @throws Exception is thrown if error occurs during read.
 	 */
-	@Nullable protected final I doRead() throws Exception {
+	protected final @Nullable I doRead() throws Exception {
 		try {
 			listener.beforeRead();
 			I item = itemReader.read();
@@ -184,7 +185,7 @@ public class SimpleChunkProvider<I> implements ChunkProvider<I> {
 	 * data (e.g. skips) and it wants to force a commit.
 	 * @throws Exception if there is a generic issue
 	 */
-	@Nullable protected I read(StepContribution contribution, Chunk<I> chunk) throws SkipOverflowException, Exception {
+	protected @Nullable I read(StepContribution contribution, Chunk<I> chunk) throws SkipOverflowException, Exception {
 		return doRead();
 	}
 
