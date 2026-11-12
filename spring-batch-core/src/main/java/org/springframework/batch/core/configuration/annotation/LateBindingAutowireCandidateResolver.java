@@ -15,12 +15,15 @@
  */
 package org.springframework.batch.core.configuration.annotation;
 
+import java.util.Map;
+
 import org.jspecify.annotations.Nullable;
 
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.config.DependencyDescriptor;
 import org.springframework.beans.factory.support.AutowireCandidateResolver;
 import org.springframework.core.MethodParameter;
+import org.springframework.core.ResolvableType;
 
 /**
  * {@link AutowireCandidateResolver} implementation that supports the annotations used to
@@ -55,6 +58,11 @@ class LateBindingAutowireCandidateResolver implements AutowireCandidateResolver 
 		if (jobParameter != null) {
 			String key = jobParameter.value();
 			if (key.isEmpty()) {
+				if (descriptor.getResolvableType()
+					.isAssignableFrom(ResolvableType.forClassWithGenerics(Map.class, String.class, Object.class))) {
+					return "#{jobParameters}";
+				}
+
 				key = descriptor.getDependencyName();
 				if (key == null) {
 					MethodParameter methodParam = descriptor.getMethodParameter();
