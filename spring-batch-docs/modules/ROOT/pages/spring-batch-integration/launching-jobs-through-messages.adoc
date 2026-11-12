@@ -221,7 +221,7 @@ The following Java example shows the necessary bean configuration:
 ----
 @Bean
 @StepScope
-public ItemReader sampleReader(@Value("#{jobParameters[input.file.name]}") String resource) {
+public ItemReader sampleReader(@JobParameter("input.file.name") String resource) {
 ...
     FlatFileItemReader flatFileItemReader = new FlatFileItemReader();
     flatFileItemReader.setResource(new FileSystemResource(resource));

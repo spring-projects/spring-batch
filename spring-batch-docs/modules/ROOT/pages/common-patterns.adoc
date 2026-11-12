@@ -641,11 +641,9 @@ The following example shows how to call an external command in Java:
 ----
 @Bean
 public SystemCommandTasklet tasklet() {
-	SystemCommandTasklet tasklet = new SystemCommandTasklet();
-
-	tasklet.setCommand("echo hello");
+	SystemCommandTasklet tasklet = new SystemCommandTasklet("echo", "hello");
+	// 5 second timeout for the command to complete
 	tasklet.setTimeout(5000);
-
 	return tasklet;
 }
 ----
@@ -658,7 +656,12 @@ The following example shows how to call an external command in XML:
 [source, xml]
 ----
 <bean class="org.springframework.batch.core.step.tasklet.SystemCommandTasklet">
-    <property name="command" value="echo hello" />
+    <constructor-arg name="command">
+        <list>
+            <value>echo</value>
+            <value>hello</value>
+        </list>
+    </constructor-arg>
     <!-- 5 second timeout for the command to complete -->
     <property name="timeout" value="5000" />
 </bean>

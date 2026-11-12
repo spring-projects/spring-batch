@@ -98,8 +98,17 @@ already filters and does placeholder replacement on system properties.
 Often, in a batch setting, it is preferable to parameterize the file name in the
 `JobParameters` of the job (instead of through system properties) and access them that
 way. To accomplish this, Spring Batch allows for the late binding of various `Job` and
-`Step` attributes.
+`Step` attributes. You can use `@JobParameter("key")` or `@Value("#{jobParameters['key']}")`
+to inject job parameters.
 
+NOTE: When the name is omitted (as in `@JobParameter`), the name of the annotated field or
+parameter is used. For a method or constructor parameter, this requires the code to be
+compiled with the `-parameters` flag (which is the default with the Spring Boot Maven and
+Gradle plugins). Otherwise, specify the name explicitly with `@JobParameter("key")`.
+
+NOTE: `@JobParameter` is declared in the `org.springframework.batch.core.configuration.annotation`
+package, not to be confused with the `org.springframework.batch.core.job.parameters.JobParameter`
+class.
 
 [tabs]
 ====
@@ -110,9 +119,11 @@ The following example shows how to parameterize a file name in Java:
 .Java Configuration
 [source, java]
 ----
+import org.springframework.batch.core.configuration.annotation.JobParameter;
+
 @StepScope
 @Bean
-public FlatFileItemReader flatFileItemReader(@Value("#{jobParameters['input.file.name']}") String name) {
+public FlatFileItemReader flatFileItemReader(@JobParameter("input.file.name") String name) {
 	return new FlatFileItemReaderBuilder<Foo>()
 			.name("flatFileItemReader")
 			.resource(new FileSystemResource(name))
@@ -238,7 +249,7 @@ The following example shows an example of binding to step scope in Java:
 ----
 @StepScope
 @Bean
-public FlatFileItemReader flatFileItemReader(@Value("#{jobParameters[input.file.name]}") String name) {
+public FlatFileItemReader flatFileItemReader(@JobParameter("input.file.name") String name) {
 	return new FlatFileItemReaderBuilder<Foo>()
 			.name("flatFileItemReader")
 			.resource(new FileSystemResource(name))
@@ -310,7 +321,7 @@ chunk-oriented step by using the job scope in Java:
 ----
 @Bean
 @JobScope
-public Step step(JobRepository jobRepository, @Value("#{jobParameters['chunkSize']}") int chunkSize) {
+public Step step(JobRepository jobRepository, @JobParameter int chunkSize) {
     return new StepBuilder(jobRepository)
             .<Integer, Integer>chunk(chunkSize)
             .reader(...)
@@ -402,7 +413,7 @@ known implementation, as shown in the following example:
 ----
 @Bean
 @StepScope
-public FlatFileItemReader flatFileItemReader(@Value("#{jobParameters['input.file.name']}") String name) {
+public FlatFileItemReader flatFileItemReader(@JobParameter("input.file.name") String name) {
 	return new FlatFileItemReaderBuilder<Foo>()
 			.resource(new FileSystemResource(name))
 			// set other properties of the item reader

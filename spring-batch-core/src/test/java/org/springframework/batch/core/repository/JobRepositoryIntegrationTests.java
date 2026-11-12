@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.repository;
 
+import org.springframework.batch.infrastructure.support.DatabaseType;
 import java.util.Set;
 
 import javax.sql.DataSource;
@@ -76,8 +77,8 @@ public class JobRepositoryIntegrationTests {
 		@Bean
 		public DataSource dataSource() {
 			return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2)
-				.addScript("/org/springframework/batch/core/schema-drop-h2.sql")
-				.addScript("/org/springframework/batch/core/schema-h2.sql")
+				.addScript(DatabaseType.H2.getProductSchemaDrop())
+				.addScript(DatabaseType.H2.getProductSchema())
 				.generateUniqueName(true)
 				.build();
 		}

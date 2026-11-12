@@ -1,7 +1,24 @@
+/*
+ * Copyright 2025-present the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.springframework.batch.core.repository.dao.jdbc;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
@@ -11,51 +28,91 @@ import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.jdbc.core.RowMapper;
 
 /**
- * @author Dave Syer
- * @author Mahmoud Ben Hassine
+ * Maps a row of the job execution table to a
+ * {@link JobExecutionRowMapper.JobExecutionRow}, which can then be turned into a
+ * {@link JobExecution} once the enclosing {@link JobInstance} and the
+ * {@link JobParameters} have been loaded. Mapping to an intermediate row rather than
+ * directly to a {@link JobExecution} keeps those two lookups out of this mapper, so that
+ * they are not issued while the result set is still open.
  * <p>
- * Expects a result set with the following columns: *
+ * Expects a result set with the following columns:
  * <ul>
- * *
- * <li>JOB_EXECUTION_ID</li> *
- * <li>START_TIME</li> *
- * <li>END_TIME</li> *
- * <li>STATUS</li> *
- * <li>EXIT_CODE</li> *
- * <li>EXIT_MESSAGE</li> *
- * <li>CREATE_TIME</li> *
- * <li>LAST_UPDATED</li> *
- * <li>VERSION</li> *
+ * <li>JOB_EXECUTION_ID</li>
+ * <li>JOB_INSTANCE_ID</li>
+ * <li>START_TIME</li>
+ * <li>END_TIME</li>
+ * <li>STATUS</li>
+ * <li>EXIT_CODE</li>
+ * <li>EXIT_MESSAGE</li>
+ * <li>CREATE_TIME</li>
+ * <li>LAST_UPDATED</li>
+ * <li>VERSION</li>
  * </ul>
  *
+ * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  */
-class JobExecutionRowMapper implements RowMapper<JobExecution> {
+class JobExecutionRowMapper implements RowMapper<JobExecutionRowMapper.JobExecutionRow> {
 
-	private final JobInstance jobInstance;
+	private final String columnPrefix;
 
-	private final JobParameters jobParameters;
+	JobExecutionRowMapper() {
+		this("");
+	}
 
-	public JobExecutionRowMapper(JobInstance jobInstance, JobParameters jobParameters) {
-		this.jobInstance = jobInstance;
-		this.jobParameters = jobParameters;
+	/**
+	 * @param columnPrefix prefix of the aliases the job execution columns are selected
+	 * under, for queries that also select columns of the same name from another table
+	 */
+	JobExecutionRowMapper(String columnPrefix) {
+		this.columnPrefix = columnPrefix;
+	}
+
+	/**
+	 * A single row of the job execution table, including the id of the job instance it
+	 * belongs to.
+	 */
+	record JobExecutionRow(long jobExecutionId, long jobInstanceId, LocalDateTime startTime, LocalDateTime endTime,
+			BatchStatus status, ExitStatus exitStatus, LocalDateTime createTime, LocalDateTime lastUpdated,
+			int version) {
+
+		/**
+		 * Assemble the {@link JobExecution} described by this row.
+		 * @param jobInstance the job instance this execution is a part of
+		 * @param jobParameters the parameters this execution was started with
+		 * @return the corresponding {@link JobExecution}
+		 */
+		JobExecution toJobExecution(JobInstance jobInstance, JobParameters jobParameters) {
+			JobExecution jobExecution = new JobExecution(this.jobExecutionId, jobInstance, jobParameters);
+			jobExecution.setStartTime(this.startTime);
+			jobExecution.setEndTime(this.endTime);
+			jobExecution.setStatus(this.status);
+			jobExecution.setExitStatus(this.exitStatus);
+			jobExecution.setCreateTime(this.createTime);
+			jobExecution.setLastUpdated(this.lastUpdated);
+			jobExecution.setVersion(this.version);
+			return jobExecution;
+		}
+
 	}
 
 	@Override
-	public JobExecution mapRow(ResultSet rs, int rowNum) throws SQLException {
-		long id = rs.getLong("JOB_EXECUTION_ID");
-		JobExecution jobExecution = new JobExecution(id, this.jobInstance, this.jobParameters);
-		jobExecution.setStartTime(
-				rs.getTimestamp("START_TIME") == null ? null : rs.getTimestamp("START_TIME").toLocalDateTime());
-		jobExecution
-			.setEndTime(rs.getTimestamp("END_TIME") == null ? null : rs.getTimestamp("END_TIME").toLocalDateTime());
-		jobExecution.setStatus(BatchStatus.valueOf(rs.getString("STATUS")));
-		jobExecution.setExitStatus(new ExitStatus(rs.getString("EXIT_CODE"), rs.getString("EXIT_MESSAGE")));
-		jobExecution.setCreateTime(
-				rs.getTimestamp("CREATE_TIME") == null ? null : rs.getTimestamp("CREATE_TIME").toLocalDateTime());
-		jobExecution.setLastUpdated(
-				rs.getTimestamp("LAST_UPDATED") == null ? null : rs.getTimestamp("LAST_UPDATED").toLocalDateTime());
-		jobExecution.setVersion(rs.getInt("VERSION"));
-		return jobExecution;
+	public JobExecutionRow mapRow(ResultSet rs, int rowNum) throws SQLException {
+		return new JobExecutionRow(rs.getLong(column("JOB_EXECUTION_ID")), rs.getLong(column("JOB_INSTANCE_ID")),
+				toLocalDateTime(rs.getTimestamp(column("START_TIME"))),
+				toLocalDateTime(rs.getTimestamp(column("END_TIME"))),
+				BatchStatus.valueOf(rs.getString(column("STATUS"))),
+				new ExitStatus(rs.getString(column("EXIT_CODE")), rs.getString(column("EXIT_MESSAGE"))),
+				toLocalDateTime(rs.getTimestamp(column("CREATE_TIME"))),
+				toLocalDateTime(rs.getTimestamp(column("LAST_UPDATED"))), rs.getInt(column("VERSION")));
+	}
+
+	private String column(String name) {
+		return this.columnPrefix + name;
+	}
+
+	private static LocalDateTime toLocalDateTime(Timestamp timestamp) {
+		return timestamp == null ? null : timestamp.toLocalDateTime();
 	}
 
 }

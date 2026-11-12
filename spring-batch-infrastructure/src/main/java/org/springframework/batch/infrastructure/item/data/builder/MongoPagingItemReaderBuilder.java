@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2025 the original author or authors.
+ * Copyright 2017-present the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -51,6 +51,8 @@ public class MongoPagingItemReaderBuilder<T> {
 
 	protected @Nullable Class<? extends T> targetType;
 
+	protected @Nullable Sort sort;
+
 	protected @Nullable Map<String, Sort.Direction> sorts;
 
 	protected @Nullable String hint;
@@ -86,8 +88,9 @@ public class MongoPagingItemReaderBuilder<T> {
 	}
 
 	/**
-	 * The name used to calculate the key within the {@link ExecutionContext}. Required if
-	 * {@link #saveState(boolean)} is set to true.
+	 * The name used to calculate the key within the {@link ExecutionContext}. Defaults to
+	 * the bean name, or to the short class name if this instance is not a bean. Set it
+	 * explicitly to disambiguate several non-bean instances of the same type in a step.
 	 * @param name name of the reader instance
 	 * @return The current instance of the builder.
 	 * @see ItemStreamSupport#setName(String)
@@ -128,7 +131,6 @@ public class MongoPagingItemReaderBuilder<T> {
 	 * @param template the MongoOperations instance to use
 	 * @see MongoOperations
 	 * @return The current instance of the builder
-	 * @see MongoPagingItemReader#setTemplate(MongoOperations)
 	 */
 	public MongoPagingItemReaderBuilder<T> template(MongoOperations template) {
 		this.template = template;
@@ -155,7 +157,6 @@ public class MongoPagingItemReaderBuilder<T> {
 	 * call.
 	 * @param targetType the type of object to return
 	 * @return The current instance of the builder
-	 * @see MongoPagingItemReader#setTargetType(Class)
 	 */
 	public MongoPagingItemReaderBuilder<T> targetType(Class<? extends T> targetType) {
 		this.targetType = targetType;
@@ -199,13 +200,29 @@ public class MongoPagingItemReaderBuilder<T> {
 	}
 
 	/**
+	 * The {@link Sort} to sort the input by.
+	 * @param sort the sort parameters.
+	 * @return The current instance of the builder
+	 * @since 6.1
+	 * @see MongoPagingItemReader#setSort(Sort)
+	 */
+	public MongoPagingItemReaderBuilder<T> sort(Sort sort) {
+		this.sort = sort;
+
+		return this;
+	}
+
+	/**
 	 * {@link Map} of property
 	 * names/{@link org.springframework.data.domain.Sort.Direction} values to sort the
 	 * input by.
 	 * @param sorts map of properties and direction to sort each.
 	 * @return The current instance of the builder
+	 * @deprecated since 6.1 in favor of {@link #sort(Sort)}. Scheduled for removal in
+	 * 7.0.
 	 * @see MongoPagingItemReader#setSort(Map)
 	 */
+	@Deprecated(since = "6.1", forRemoval = true)
 	public MongoPagingItemReaderBuilder<T> sorts(Map<String, Sort.Direction> sorts) {
 		this.sorts = sorts;
 
@@ -261,25 +278,24 @@ public class MongoPagingItemReaderBuilder<T> {
 		return this;
 	}
 
+	@SuppressWarnings("removal")
 	public MongoPagingItemReader<T> build() {
 		Assert.notNull(this.template, "template is required.");
-		if (this.saveState) {
-			Assert.hasText(this.name, "A name is required when saveState is set to true");
-		}
 		Assert.notNull(this.targetType, "targetType is required.");
 		Assert.state(StringUtils.hasText(this.jsonQuery) || this.query != null, "A query is required");
 
 		if (StringUtils.hasText(this.jsonQuery) || this.query != null) {
-			Assert.notNull(this.sorts, "sorts map is required.");
+			Assert.isTrue(this.sort != null || this.sorts != null, "sort is required.");
 		}
 
 		MongoPagingItemReader<T> reader = new MongoPagingItemReader<>(this.template, this.targetType);
-		reader.setTemplate(this.template);
-		reader.setTargetType(this.targetType);
 		if (StringUtils.hasText(this.jsonQuery)) {
 			reader.setQuery(this.jsonQuery);
 		}
-		if (this.sorts != null) {
+		if (this.sort != null) {
+			reader.setSort(this.sort);
+		}
+		else if (this.sorts != null) {
 			reader.setSort(this.sorts);
 		}
 		if (this.hint != null) {

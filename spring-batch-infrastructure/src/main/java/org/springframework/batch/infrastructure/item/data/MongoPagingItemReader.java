@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2025 the original author or authors.
+ * Copyright 2012-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -126,7 +126,10 @@ public class MongoPagingItemReader<T> extends AbstractPaginatedDataItemReader<T>
 	 * of documents to objects.
 	 * @param template the MongoOperations instance to use
 	 * @see MongoOperations
+	 * @deprecated since 6.1 in favor of passing the template to the constructor.
+	 * Scheduled for removal in 7.0.
 	 */
+	@Deprecated(since = "6.1", forRemoval = true)
 	public void setTemplate(MongoOperations template) {
 		this.template = template;
 	}
@@ -144,7 +147,10 @@ public class MongoPagingItemReader<T> extends AbstractPaginatedDataItemReader<T>
 	/**
 	 * The type of object to be returned for each {@link #read()} call.
 	 * @param type the type of object to return
+	 * @deprecated since 6.1 in favor of passing the target type to the constructor.
+	 * Scheduled for removal in 7.0.
 	 */
+	@Deprecated(since = "6.1", forRemoval = true)
 	public void setTargetType(Class<? extends T> type) {
 		this.type = type;
 	}
@@ -168,11 +174,25 @@ public class MongoPagingItemReader<T> extends AbstractPaginatedDataItemReader<T>
 	}
 
 	/**
+	 * The {@link Sort} to sort the input by. Use {@link Sort#by(Sort.Order...)} to sort
+	 * by multiple properties, each with its own direction.
+	 * @param sort the sort parameters. Must not be null.
+	 * @since 6.1
+	 */
+	public void setSort(Sort sort) {
+		Assert.notNull(sort, "Sort must not be null");
+		this.sort = sort;
+	}
+
+	/**
 	 * {@link Map} of property
 	 * names/{@link org.springframework.data.domain.Sort.Direction} values to sort the
 	 * input by.
 	 * @param sorts map of properties and direction to sort each.
+	 * @deprecated since 6.1 in favor of {@link #setSort(Sort)}. Scheduled for removal in
+	 * 7.0.
 	 */
+	@Deprecated(since = "6.1", forRemoval = true)
 	public void setSort(Map<String, Sort.Direction> sorts) {
 		Assert.notNull(sorts, "Sorts must not be null");
 		this.sort = convertToSort(sorts);

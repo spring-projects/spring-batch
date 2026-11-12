@@ -1,0 +1,189 @@
+/*
+ * Copyright 2026 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.springframework.batch.core.configuration.annotation;
+
+import java.util.stream.Stream;
+
+import io.micrometer.observation.ObservationRegistry;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import org.springframework.aop.framework.ProxyFactory;
+import org.springframework.batch.core.job.SimpleJob;
+import org.springframework.batch.core.launch.JobOperator;
+import org.springframework.batch.core.launch.support.TaskExecutorJobOperator;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.tasklet.TaskletStep;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.beans.factory.support.RootBeanDefinition;
+import org.springframework.test.util.ReflectionTestUtils;
+
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.mockito.Mockito.mock;
+
+/**
+ * Test class for {@link BatchObservabilityBeanPostProcessor}.
+ *
+ * @author Sanghyuk Jung
+ */
+class BatchObservabilityBeanPostProcessorTests {
+
+	private final DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
+
+	private final ObservationRegistry observationRegistry = ObservationRegistry.create();
+
+	private final BatchObservabilityBeanPostProcessor postProcessor = new BatchObservabilityBeanPostProcessor();
+
+	@Test
+	void observationRegistryShouldBeSetOnJobOperator() {
+		// given
+		this.beanFactory.registerSingleton("observationRegistry", this.observationRegistry);
+		this.postProcessor.postProcessBeanFactory(this.beanFactory);
+		TaskExecutorJobOperator jobOperator = new TaskExecutorJobOperator();
+
+		// when
+		this.postProcessor.postProcessAfterInitialization(jobOperator, "jobOperator");
+
+		// then
+		assertSame(this.observationRegistry, ReflectionTestUtils.getField(jobOperator, "observationRegistry"));
+	}
+
+	@Test
+	void observationRegistryShouldBeSetOnJobWithoutObservationRegistry() {
+		// given
+		this.beanFactory.registerSingleton("observationRegistry", this.observationRegistry);
+		this.postProcessor.postProcessBeanFactory(this.beanFactory);
+		SimpleJob job = new SimpleJob();
+
+		// when
+		this.postProcessor.postProcessAfterInitialization(job, "job");
+
+		// then
+		assertSame(this.observationRegistry, job.getObservationRegistry());
+	}
+
+	@Test
+	void observationRegistryShouldBeSetOnStepWithoutObservationRegistry() {
+		// given
+		this.beanFactory.registerSingleton("observationRegistry", this.observationRegistry);
+		this.postProcessor.postProcessBeanFactory(this.beanFactory);
+		TaskletStep step = new TaskletStep(mock(JobRepository.class));
+
+		// when
+		this.postProcessor.postProcessAfterInitialization(step, "step");
+
+		// then
+		assertSame(this.observationRegistry, step.getObservationRegistry());
+	}
+
+	@ParameterizedTest
+	@MethodSource("explicitlyConfiguredObservationRegistries")
+	void explicitlyConfiguredObservationRegistryShouldNotBeOverridden(ObservationRegistry configuredRegistry) {
+		// given
+		this.beanFactory.registerSingleton("observationRegistry", this.observationRegistry);
+		this.postProcessor.postProcessBeanFactory(this.beanFactory);
+		SimpleJob job = new SimpleJob();
+		job.setObservationRegistry(configuredRegistry);
+		TaskletStep step = new TaskletStep(mock(JobRepository.class));
+		step.setObservationRegistry(configuredRegistry);
+		TaskExecutorJobOperator jobOperator = new TaskExecutorJobOperator();
+		jobOperator.setObservationRegistry(configuredRegistry);
+
+		// when
+		this.postProcessor.postProcessAfterInitialization(job, "job");
+		this.postProcessor.postProcessAfterInitialization(step, "step");
+		this.postProcessor.postProcessAfterInitialization(jobOperator, "jobOperator");
+
+		// then
+		assertSame(configuredRegistry, job.getObservationRegistry());
+		assertSame(configuredRegistry, step.getObservationRegistry());
+		assertSame(configuredRegistry, jobOperator.getObservationRegistry());
+	}
+
+	static Stream<ObservationRegistry> explicitlyConfiguredObservationRegistries() {
+		return Stream.of(ObservationRegistry.create(), ObservationRegistry.NOOP);
+	}
+
+	@Test
+	void observationRegistryShouldNotBeSetWhenSeveralObservationRegistriesAreFound() {
+		// given
+		this.beanFactory.registerSingleton("firstRegistry", ObservationRegistry.create());
+		this.beanFactory.registerSingleton("secondRegistry", ObservationRegistry.create());
+		this.postProcessor.postProcessBeanFactory(this.beanFactory);
+		SimpleJob job = new SimpleJob();
+		TaskletStep step = new TaskletStep(mock(JobRepository.class));
+		TaskExecutorJobOperator jobOperator = new TaskExecutorJobOperator();
+
+		// when
+		assertDoesNotThrow(() -> {
+			this.postProcessor.postProcessAfterInitialization(job, "job");
+			this.postProcessor.postProcessAfterInitialization(step, "step");
+			this.postProcessor.postProcessAfterInitialization(jobOperator, "jobOperator");
+		});
+
+		// then
+		assertNull(job.getObservationRegistry());
+		assertNull(step.getObservationRegistry());
+		assertNull(jobOperator.getObservationRegistry());
+	}
+
+	@Test
+	void primaryObservationRegistryShouldBeSetWhenSeveralObservationRegistriesAreFound() {
+		// given
+		ObservationRegistry primaryRegistry = ObservationRegistry.create();
+		RootBeanDefinition primaryDefinition = new RootBeanDefinition(ObservationRegistry.class, () -> primaryRegistry);
+		primaryDefinition.setPrimary(true);
+		this.beanFactory.registerSingleton("otherRegistry", ObservationRegistry.create());
+		this.beanFactory.registerBeanDefinition("primaryRegistry", primaryDefinition);
+		this.postProcessor.postProcessBeanFactory(this.beanFactory);
+		SimpleJob job = new SimpleJob();
+		TaskletStep step = new TaskletStep(mock(JobRepository.class));
+		TaskExecutorJobOperator jobOperator = new TaskExecutorJobOperator();
+
+		// when
+		this.postProcessor.postProcessAfterInitialization(job, "job");
+		this.postProcessor.postProcessAfterInitialization(step, "step");
+		this.postProcessor.postProcessAfterInitialization(jobOperator, "jobOperator");
+
+		// then
+		assertSame(primaryRegistry, job.getObservationRegistry());
+		assertSame(primaryRegistry, step.getObservationRegistry());
+		assertSame(primaryRegistry, jobOperator.getObservationRegistry());
+	}
+
+	@Test
+	void observationRegistryShouldBeSetOnProxiedJobOperator() {
+		// given
+		this.beanFactory.registerSingleton("observationRegistry", this.observationRegistry);
+		this.postProcessor.postProcessBeanFactory(this.beanFactory);
+		TaskExecutorJobOperator target = new TaskExecutorJobOperator();
+		ProxyFactory proxyFactory = new ProxyFactory();
+		proxyFactory.setTarget(target);
+		proxyFactory.setProxyTargetClass(false);
+		proxyFactory.addInterface(JobOperator.class);
+		Object jobOperator = proxyFactory.getProxy();
+
+		// when
+		this.postProcessor.postProcessAfterInitialization(jobOperator, "jobOperator");
+
+		// then
+		assertSame(this.observationRegistry, ReflectionTestUtils.getField(target, "observationRegistry"));
+	}
+
+}

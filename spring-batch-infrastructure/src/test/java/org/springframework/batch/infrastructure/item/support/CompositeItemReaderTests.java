@@ -15,7 +15,9 @@
  */
 package org.springframework.batch.infrastructure.item.support;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -25,6 +27,7 @@ import org.springframework.batch.infrastructure.item.ItemStreamException;
 import org.springframework.batch.infrastructure.item.ItemStreamReader;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -38,6 +41,7 @@ import static org.mockito.Mockito.when;
  * @author Mahmoud Ben Hassine
  * @author Elimelec Burghelea
  * @author Yanming Zhou
+ * @author SangHoon Han
  */
 public class CompositeItemReaderTests {
 
@@ -99,6 +103,82 @@ public class CompositeItemReaderTests {
 		verify(reader1).update(executionContext);
 		verify(reader2, times(0)).update(executionContext); // reader1 is the current
 															// delegate in this setup
+	}
+
+	@Test
+	void testCompositeItemReaderRestartWhenChunkSpansDelegates() throws Exception {
+		// given
+		ExecutionContext executionContext = new ExecutionContext();
+		CompositeItemReader<String> compositeItemReader = new CompositeItemReader<>(Arrays
+			.asList(new StatefulReader("reader1", "a1", "a2", "a3"), new StatefulReader("reader2", "b1", "b2")));
+		compositeItemReader.open(executionContext);
+		compositeItemReader.read(); // a1
+		compositeItemReader.read(); // a2
+		compositeItemReader.update(executionContext);
+		compositeItemReader.read(); // a3
+		compositeItemReader.read(); // b1, the chunk spans reader1 and reader2
+		compositeItemReader.update(executionContext);
+		compositeItemReader.close();
+
+		// when
+		compositeItemReader = new CompositeItemReader<>(Arrays.asList(new StatefulReader("reader1", "a1", "a2", "a3"),
+				new StatefulReader("reader2", "b1", "b2")));
+		compositeItemReader.open(executionContext);
+		List<String> items = readAll(compositeItemReader);
+
+		// then
+		assertIterableEquals(List.of("b2"), items);
+	}
+
+	@Test
+	void testCompositeItemReaderRestartWhenAllDelegatesAreExhausted() throws Exception {
+		// given
+		ExecutionContext executionContext = new ExecutionContext();
+		CompositeItemReader<String> compositeItemReader = new CompositeItemReader<>(
+				Arrays.asList(new StatefulReader("reader1", "a1", "a2"), new StatefulReader("reader2", "b1")));
+		compositeItemReader.open(executionContext);
+		compositeItemReader.read(); // a1
+		compositeItemReader.read(); // a2
+		compositeItemReader.update(executionContext);
+		compositeItemReader.read(); // b1
+		assertNull(compositeItemReader.read()); // all delegates are exhausted
+		compositeItemReader.update(executionContext);
+		compositeItemReader.close();
+
+		// when
+		compositeItemReader = new CompositeItemReader<>(
+				Arrays.asList(new StatefulReader("reader1", "a1", "a2"), new StatefulReader("reader2", "b1")));
+		compositeItemReader.open(executionContext);
+		List<String> items = readAll(compositeItemReader);
+
+		// then
+		assertIterableEquals(List.of(), items);
+	}
+
+	@Test
+	void testCompositeItemReaderRestartWhenChunkSpansMoreThanTwoDelegates() throws Exception {
+		// given
+		ExecutionContext executionContext = new ExecutionContext();
+		CompositeItemReader<String> compositeItemReader = new CompositeItemReader<>(
+				Arrays.asList(new StatefulReader("reader1", "a1", "a2"), new StatefulReader("reader2", "b1"),
+						new StatefulReader("reader3", "c1", "c2")));
+		compositeItemReader.open(executionContext);
+		compositeItemReader.read(); // a1
+		compositeItemReader.update(executionContext);
+		compositeItemReader.read(); // a2
+		compositeItemReader.read(); // b1, reader2 is read entirely in this chunk
+		compositeItemReader.read(); // c1, the chunk spans reader1, reader2 and reader3
+		compositeItemReader.update(executionContext);
+		compositeItemReader.close();
+
+		// when
+		compositeItemReader = new CompositeItemReader<>(Arrays.asList(new StatefulReader("reader1", "a1", "a2"),
+				new StatefulReader("reader2", "b1"), new StatefulReader("reader3", "c1", "c2")));
+		compositeItemReader.open(executionContext);
+		List<String> items = readAll(compositeItemReader);
+
+		// then
+		assertIterableEquals(List.of("c2"), items);
 	}
 
 	@Test
@@ -197,6 +277,39 @@ public class CompositeItemReaderTests {
 		assertNull(compositeItemReader.read());
 
 		compositeItemReader.close();
+	}
+
+	private static List<String> readAll(CompositeItemReader<String> reader) throws Exception {
+		List<String> items = new ArrayList<>();
+		String item;
+		while ((item = reader.read()) != null) {
+			items.add(item);
+		}
+		return items;
+	}
+
+	private static class StatefulReader extends AbstractItemCountingItemStreamItemReader<String> {
+
+		private final List<String> items;
+
+		StatefulReader(String name, String... items) {
+			this.items = List.of(items);
+			setName(name);
+		}
+
+		@Override
+		protected String doRead() {
+			return getCurrentItemCount() <= this.items.size() ? this.items.get(getCurrentItemCount() - 1) : null;
+		}
+
+		@Override
+		protected void doOpen() {
+		}
+
+		@Override
+		protected void doClose() {
+		}
+
 	}
 
 }

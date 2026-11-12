@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2026 the original author or authors.
+ * Copyright 2002-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,14 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jspecify.annotations.NullUnmarked;
 
-import org.springframework.batch.core.converter.DateToStringConverter;
-import org.springframework.batch.core.converter.LocalDateTimeToStringConverter;
-import org.springframework.batch.core.converter.LocalDateToStringConverter;
-import org.springframework.batch.core.converter.LocalTimeToStringConverter;
-import org.springframework.batch.core.converter.StringToDateConverter;
-import org.springframework.batch.core.converter.StringToLocalDateConverter;
-import org.springframework.batch.core.converter.StringToLocalDateTimeConverter;
-import org.springframework.batch.core.converter.StringToLocalTimeConverter;
+import org.springframework.batch.core.converter.ConversionServiceFactory;
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
 import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDao;
 import org.springframework.batch.core.repository.dao.DefaultExecutionContextSerializer;
@@ -42,9 +35,9 @@ import org.springframework.batch.infrastructure.support.DatabaseType;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.convert.support.ConfigurableConversionService;
-import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -118,9 +111,9 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 
 	protected Charset charset = StandardCharsets.UTF_8;
 
-	protected ConfigurableConversionService conversionService;
+	protected ConfigurableConversionService conversionService = ConversionServiceFactory.createConversionService();
 
-	protected Object getTarget() throws Exception {
+	protected Object getTarget() {
 		JdbcJobInstanceDao jobInstanceDao = createJobInstanceDao();
 		JdbcJobExecutionDao jobExecutionDao = createJobExecutionDao();
 		jobExecutionDao.setJobInstanceDao(jobInstanceDao);
@@ -309,25 +302,12 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 			Assert.state(isValidTypes(clobType), "lobType must be a value from the java.sql.Types class");
 		}
 
-		if (this.conversionService == null) {
-			DefaultConversionService conversionService = new DefaultConversionService();
-			conversionService.addConverter(new DateToStringConverter());
-			conversionService.addConverter(new StringToDateConverter());
-			conversionService.addConverter(new LocalDateToStringConverter());
-			conversionService.addConverter(new StringToLocalDateConverter());
-			conversionService.addConverter(new LocalTimeToStringConverter());
-			conversionService.addConverter(new StringToLocalTimeConverter());
-			conversionService.addConverter(new LocalDateTimeToStringConverter());
-			conversionService.addConverter(new StringToLocalDateTimeConverter());
-			this.conversionService = conversionService;
-		}
-
 		super.afterPropertiesSet();
 	}
 
 	@Override
 	protected JdbcJobInstanceDao createJobInstanceDao() {
-		JdbcJobInstanceDao dao = new JdbcJobInstanceDao();
+		JdbcJobInstanceDao dao = new JdbcJobInstanceDao(JdbcClient.create(jdbcOperations));
 		String legacySchema = "false";
 		if (System.getenv(SPRING_BATCH_JDBC_SCHEMA_LEGACY) != null) {
 			legacySchema = System.getenv(SPRING_BATCH_JDBC_SCHEMA_LEGACY);
@@ -339,7 +319,6 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 			jobInstanceIncrementerName = LEGACY_JOB_INSTANCE_INCREMENTER_NAME;
 			logger.info("Using legacy name for job instance incrementer: " + jobInstanceIncrementerName);
 		}
-		dao.setJdbcTemplate(jdbcOperations);
 		dao.setJobInstanceIncrementer(
 				incrementerFactory.getIncrementer(databaseType, tablePrefix + jobInstanceIncrementerName));
 		dao.setJobKeyGenerator(jobKeyGenerator);
@@ -349,8 +328,7 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 
 	@Override
 	protected JdbcJobExecutionDao createJobExecutionDao() {
-		JdbcJobExecutionDao dao = new JdbcJobExecutionDao();
-		dao.setJdbcTemplate(jdbcOperations);
+		JdbcJobExecutionDao dao = new JdbcJobExecutionDao(JdbcClient.create(jdbcOperations));
 		dao.setJobExecutionIncrementer(
 				incrementerFactory.getIncrementer(databaseType, tablePrefix + jobExecutionIncrementerName));
 		dao.setTablePrefix(tablePrefix);
@@ -362,8 +340,7 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 
 	@Override
 	protected JdbcStepExecutionDao createStepExecutionDao() {
-		JdbcStepExecutionDao dao = new JdbcStepExecutionDao();
-		dao.setJdbcTemplate(jdbcOperations);
+		JdbcStepExecutionDao dao = new JdbcStepExecutionDao(JdbcClient.create(jdbcOperations));
 		dao.setStepExecutionIncrementer(
 				incrementerFactory.getIncrementer(databaseType, tablePrefix + stepExecutionIncrementerName));
 		dao.setTablePrefix(tablePrefix);
@@ -374,8 +351,7 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 
 	@Override
 	protected JdbcExecutionContextDao createExecutionContextDao() {
-		JdbcExecutionContextDao dao = new JdbcExecutionContextDao();
-		dao.setJdbcTemplate(jdbcOperations);
+		JdbcExecutionContextDao dao = new JdbcExecutionContextDao(JdbcClient.create(jdbcOperations));
 		dao.setTablePrefix(tablePrefix);
 		dao.setClobTypeToUse(determineClobTypeToUse(this.databaseType));
 		dao.setSerializer(serializer);

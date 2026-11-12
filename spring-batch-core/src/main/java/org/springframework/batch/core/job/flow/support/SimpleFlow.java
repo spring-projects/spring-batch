@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2024 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jspecify.annotations.Nullable;
 
+import org.springframework.batch.core.BatchConstants;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.job.flow.Flow;
@@ -165,6 +166,12 @@ public class SimpleFlow implements Flow, InitializingBean {
 				}
 				status = state.handle(executor);
 				stepExecution = executor.getStepExecution();
+
+				if (logger.isDebugEnabled()) {
+					logger.debug("Completed state=" + stateName + " with status=" + status);
+				}
+
+				state = nextState(stateName, status, stepExecution);
 			}
 			catch (FlowExecutionException e) {
 				executor.close(new FlowExecution(stateName, status));
@@ -175,12 +182,6 @@ public class SimpleFlow implements Flow, InitializingBean {
 				throw new FlowExecutionException(
 						String.format("Ended flow=%s at state=%s with exception", name, stateName), e);
 			}
-
-			if (logger.isDebugEnabled()) {
-				logger.debug("Completed state=" + stateName + " with status=" + status);
-			}
-
-			state = nextState(stateName, status, stepExecution);
 		}
 
 		FlowExecution result = new FlowExecution(stateName, status);
@@ -248,8 +249,8 @@ public class SimpleFlow implements Flow, InitializingBean {
 		boolean continued = state != null && status != FlowExecutionStatus.STOPPED;
 
 		if (stepExecution != null) {
-			Boolean reRun = (Boolean) stepExecution.getExecutionContext().get("batch.restart");
-			Boolean executed = (Boolean) stepExecution.getExecutionContext().get("batch.executed");
+			Boolean reRun = (Boolean) stepExecution.getExecutionContext().get(BatchConstants.BATCH_RESTART);
+			Boolean executed = (Boolean) stepExecution.getExecutionContext().get(BatchConstants.BATCH_EXECUTED);
 
 			if ((executed == null || !executed) && reRun != null && reRun && status == FlowExecutionStatus.STOPPED
 					&& !state.getName().endsWith(stepExecution.getStepName())) {

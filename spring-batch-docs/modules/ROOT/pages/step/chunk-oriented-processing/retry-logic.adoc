@@ -62,3 +62,77 @@ In XML, retry should be configured as follows:
 The `Step` allows a limit for the number of times an individual item can be retried and a
 list of exceptions that are "`retryable`".
 
+[[retryLogicAndReaders]]
+== Retry and `ItemReader`
+
+Retrying a failed `ItemProcessor` or `ItemWriter` call is always safe with respect to the
+xref:readers-and-writers/item-reader.adoc[forward-only `ItemReader` contract]: the item
+being retried is already held by the step, so a retry simply re-invokes `process`/`write`
+with the exact same item.
+
+Retrying a failed `ItemReader#read()` call is different, because the item does not exist
+yet: `read()` is what produces it. Whether a retry re-attempts the *same* logical item
+or silently moves on to the next one depends entirely on the reader implementation, not on
+the framework: on a failed read, `ChunkOrientedStep` simply calls `read()` again on the
+same reader instance, with no coordination beyond that. This is safe as long as the reader
+does not advance its internal position until it is about to return an item successfully.
+Built-in paging-style readers (such as `JdbcPagingItemReader`) already follow this rule:
+each page is fetched by a fresh, self-contained query, and the current position advances
+only once that query succeeds. Cursor-based readers (such as `JdbcCursorItemReader`) hold
+a live `ResultSet`/`Connection` across calls, so a retry can only help with narrower
+transient hiccups that do not actually invalidate the cursor.
+
+A custom reader that consumes its underlying source *before* deciding whether to throw is
+not retry-safe:
+
+[source, java]
+----
+public class UnsafeItemReader extends ListItemReader<String> {
+
+	@Override
+	public String read() {
+		String item = super.read(); // <1>
+		validate(item); // <2>
+		return item;
+	}
+
+}
+----
+<1> The delegate is consumed here, advancing its position, regardless of what happens next.
+<2> If this throws and the read is retried, the next call to `read()` invokes
+`super.read()` again and returns a *different* item. The item that failed validation is
+never retried, never skipped, and never seen again -- it is silently dropped.
+
+Contrast this with a reader whose position only advances after a successful read:
+
+[source, java]
+----
+public class SafeItemReader implements ItemReader<String> {
+
+	private long lastId = 0;
+
+	@Override
+	public String read() {
+		Row row = fetchNext(lastId); // does not mutate any reader state
+		if (row == null) {
+			return null;
+		}
+		lastId = row.id(); // only advances on success
+		return row.value();
+	}
+
+}
+----
+
+Here, a `read()` call that throws before returning has not moved `lastId`, so a retry
+re-issues the exact same fetch and returns the exact same next item.
+
+This is also why retryable exceptions on read should be reserved for genuinely transient
+conditions (a dropped connection, a timeout, a deadlock), as described above. A
+deterministic exception, such as one raised while parsing invalid input, is thrown for the
+same record every time: retrying it only spends the configured retry attempts before
+eventually failing (or being skipped, if a skip policy also applies) anyway. Route
+deterministic read failures to a
+xref:step/chunk-oriented-processing/configuring-skip.adoc[`SkipPolicy`] instead of a
+`RetryPolicy`.
+

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package org.springframework.batch.infrastructure.item.database;
 
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.sql.DataSource;
 
@@ -38,8 +38,8 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.support.JdbcUtils;
 import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
 
 /**
  * <p>
@@ -75,6 +75,8 @@ import org.springframework.util.ClassUtils;
  * @author Mahmoud Ben Hassine
  * @author Stefano Cordio
  * @author Jimmy Praet
+ * @author Duyeor Kim
+ * @author WooSeung Kim
  * @since 2.0
  */
 public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> implements InitializingBean {
@@ -117,6 +119,13 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 		this.queryProvider = pagingQueryProvider;
 	}
 
+	/**
+	 * Set the data source to use.
+	 * @param dataSource the DataSource to use
+	 * @deprecated since 6.1 in favor of passing the data source to the constructor.
+	 * Scheduled for removal in 7.0.
+	 */
+	@Deprecated(since = "6.1", forRemoval = true)
 	public void setDataSource(DataSource dataSource) {
 		this.dataSource = dataSource;
 	}
@@ -136,7 +145,10 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 	 * A {@link PagingQueryProvider}. Supplies all the platform dependent query generation
 	 * capabilities needed by the reader.
 	 * @param queryProvider the {@link PagingQueryProvider} to use
+	 * @deprecated since 6.1 in favor of passing the paging query provider to the
+	 * constructor. Scheduled for removal in 7.0.
 	 */
+	@Deprecated(since = "6.1", forRemoval = true)
 	public void setQueryProvider(PagingQueryProvider queryProvider) {
 		this.queryProvider = queryProvider;
 	}
@@ -184,7 +196,7 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 	@Override
 	protected void doReadPage() {
 		if (results == null) {
-			results = new CopyOnWriteArrayList<>();
+			results = new ArrayList<>();
 		}
 		else {
 			results.clear();
@@ -231,6 +243,10 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 			query = Collections.emptyList();
 		}
 
+		// only move past the page once it has been read
+		if (rowCallback.sortKeyValues != null) {
+			this.startAfterValues = rowCallback.sortKeyValues;
+		}
 		results.addAll(query);
 	}
 
@@ -311,15 +327,54 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 
 	private class PagingRowMapper implements RowMapper<T> {
 
+		private final Map<String, Integer> sortKeyColumns = new LinkedHashMap<>();
+
+		private @Nullable Map<String, Object> sortKeyValues;
+
 		@SuppressWarnings("DataFlowIssue")
 		@Override
 		public @Nullable T mapRow(ResultSet rs, int rowNum) throws SQLException {
-			startAfterValues = new LinkedHashMap<>();
+			this.sortKeyValues = new LinkedHashMap<>();
 			for (Map.Entry<String, Order> sortKey : queryProvider.getSortKeys().entrySet()) {
-				startAfterValues.put(sortKey.getKey(), rs.getObject(sortKey.getKey()));
+				String key = sortKey.getKey();
+				Integer column = sortKeyColumns.get(key);
+				if (column == null) {
+					column = findSortKeyColumn(rs, key);
+					sortKeyColumns.put(key, column);
+				}
+				this.sortKeyValues.put(key, rs.getObject(column));
 			}
 
 			return rowMapper.mapRow(rs, rowNum);
+		}
+
+		private int findSortKeyColumn(ResultSet rs, String key) throws SQLException {
+			try {
+				// Preserve existing output aliases and driver-specific qualified lookup.
+				return rs.findColumn(key);
+			}
+			catch (SQLException original) {
+				int separator = key.lastIndexOf('.');
+				if (separator < 0) {
+					throw original;
+				}
+				String label = key.substring(separator + 1);
+				ResultSetMetaData metadata = rs.getMetaData();
+				int match = -1;
+				for (int i = 1; i <= metadata.getColumnCount(); i++) {
+					if (label.equalsIgnoreCase(JdbcUtils.lookupColumnName(metadata, i))) {
+						if (match != -1) {
+							// Do not silently choose between duplicate output labels.
+							throw original;
+						}
+						match = i;
+					}
+				}
+				if (match == -1) {
+					throw original;
+				}
+				return match;
+			}
 		}
 
 	}

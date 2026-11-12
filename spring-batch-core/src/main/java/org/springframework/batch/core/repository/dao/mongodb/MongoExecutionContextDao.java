@@ -1,5 +1,5 @@
 /*
- * Copyright 2024-2025 the original author or authors.
+ * Copyright 2024-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import java.util.Collections;
 
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.step.StepExecution;
+import org.springframework.batch.core.repository.dao.AbstractMongoBatchMetadataDao;
 import org.springframework.batch.core.repository.dao.ExecutionContextDao;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -31,13 +32,14 @@ import static org.springframework.data.mongodb.core.query.Query.query;
 
 /**
  * @author Mahmoud Ben Hassine
+ * @author Myeongha Shin
  * @since 5.2.0
  */
-public class MongoExecutionContextDao implements ExecutionContextDao {
+public class MongoExecutionContextDao extends AbstractMongoBatchMetadataDao implements ExecutionContextDao {
 
-	private static final String STEP_EXECUTIONS_COLLECTION_NAME = "BATCH_STEP_EXECUTION";
+	private static final String STEP_EXECUTIONS_COLLECTION_NAME = "STEP_EXECUTION";
 
-	private static final String JOB_EXECUTIONS_COLLECTION_NAME = "BATCH_JOB_EXECUTION";
+	private static final String JOB_EXECUTIONS_COLLECTION_NAME = "JOB_EXECUTION";
 
 	private final MongoOperations mongoOperations;
 
@@ -50,7 +52,7 @@ public class MongoExecutionContextDao implements ExecutionContextDao {
 		Query query = query(where("jobExecutionId").is(jobExecution.getId()));
 		org.springframework.batch.core.repository.persistence.JobExecution execution = this.mongoOperations.findOne(
 				query, org.springframework.batch.core.repository.persistence.JobExecution.class,
-				JOB_EXECUTIONS_COLLECTION_NAME);
+				getCollectionName(JOB_EXECUTIONS_COLLECTION_NAME));
 		if (execution == null) {
 			return new ExecutionContext();
 		}
@@ -62,7 +64,7 @@ public class MongoExecutionContextDao implements ExecutionContextDao {
 		Query query = query(where("stepExecutionId").is(stepExecution.getId()));
 		org.springframework.batch.core.repository.persistence.StepExecution execution = this.mongoOperations.findOne(
 				query, org.springframework.batch.core.repository.persistence.StepExecution.class,
-				STEP_EXECUTIONS_COLLECTION_NAME);
+				getCollectionName(STEP_EXECUTIONS_COLLECTION_NAME));
 		if (execution == null) {
 			return new ExecutionContext();
 		}
@@ -79,7 +81,7 @@ public class MongoExecutionContextDao implements ExecutionContextDao {
 						executionContext.isDirty()));
 		this.mongoOperations.updateFirst(query, update,
 				org.springframework.batch.core.repository.persistence.JobExecution.class,
-				JOB_EXECUTIONS_COLLECTION_NAME);
+				getCollectionName(JOB_EXECUTIONS_COLLECTION_NAME));
 	}
 
 	@Override
@@ -92,7 +94,7 @@ public class MongoExecutionContextDao implements ExecutionContextDao {
 						executionContext.isDirty()));
 		this.mongoOperations.updateFirst(query, update,
 				org.springframework.batch.core.repository.persistence.StepExecution.class,
-				STEP_EXECUTIONS_COLLECTION_NAME);
+				getCollectionName(STEP_EXECUTIONS_COLLECTION_NAME));
 
 	}
 
@@ -119,7 +121,8 @@ public class MongoExecutionContextDao implements ExecutionContextDao {
 		org.springframework.batch.core.repository.persistence.ExecutionContext executionContext = new org.springframework.batch.core.repository.persistence.ExecutionContext(
 				Collections.emptyMap(), false);
 		Update executionContextRemovalUpdate = new Update().set("executionContext", executionContext);
-		this.mongoOperations.updateFirst(query, executionContextRemovalUpdate, JOB_EXECUTIONS_COLLECTION_NAME);
+		this.mongoOperations.updateFirst(query, executionContextRemovalUpdate,
+				getCollectionName(JOB_EXECUTIONS_COLLECTION_NAME));
 	}
 
 	@Override
@@ -128,7 +131,8 @@ public class MongoExecutionContextDao implements ExecutionContextDao {
 		org.springframework.batch.core.repository.persistence.ExecutionContext executionContext = new org.springframework.batch.core.repository.persistence.ExecutionContext(
 				Collections.emptyMap(), false);
 		Update executionContextRemovalUpdate = new Update().set("executionContext", executionContext);
-		this.mongoOperations.updateFirst(query, executionContextRemovalUpdate, STEP_EXECUTIONS_COLLECTION_NAME);
+		this.mongoOperations.updateFirst(query, executionContextRemovalUpdate,
+				getCollectionName(STEP_EXECUTIONS_COLLECTION_NAME));
 	}
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2023 the original author or authors.
+ * Copyright 2009-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,10 @@ import org.w3c.dom.Element;
  * @since 2.0
  * @see StepListenerParser
  * @see JobExecutionListenerParser
+ * @deprecated since 6.0 in favor of Java configuration or plain XML bean definitions.
+ * Scheduled for removal in 7.0.
  */
+@Deprecated(since = "6.0", forRemoval = true)
 public abstract class AbstractListenerParser {
 
 	private static final String ID_ATTR = "id";

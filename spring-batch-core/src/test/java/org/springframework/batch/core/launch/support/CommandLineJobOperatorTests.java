@@ -1,5 +1,5 @@
 /*
- * Copyright 2025-2026 the original author or authors.
+ * Copyright 2025-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.converter.JobParametersConverter;
 import org.springframework.batch.core.job.Job;
@@ -74,6 +75,9 @@ class CommandLineJobOperatorTests {
 		// when
 		Mockito.when(jobRegistry.getJob(jobName)).thenReturn(job);
 		Mockito.when(jobParametersConverter.getJobParameters(parameters)).thenReturn(jobParameters);
+		JobExecution jobExecution = mock();
+		Mockito.when(jobExecution.getExitStatus()).thenReturn(ExitStatus.COMPLETED);
+		Mockito.when(jobOperator.start(job, jobParameters)).thenReturn(jobExecution);
 		this.commandLineJobOperator.start(jobName, parameters);
 
 		// then
@@ -90,6 +94,9 @@ class CommandLineJobOperatorTests {
 
 		// when
 		Mockito.when(jobRegistry.getJob(jobName)).thenReturn(job);
+		JobExecution jobExecution = mock();
+		Mockito.when(jobExecution.getExitStatus()).thenReturn(ExitStatus.COMPLETED);
+		Mockito.when(jobOperator.startNextInstance(job)).thenReturn(jobExecution);
 		this.commandLineJobOperator.startNextInstance(jobName);
 
 		// then
@@ -117,9 +124,11 @@ class CommandLineJobOperatorTests {
 		long jobExecutionId = 1;
 		JobExecution jobExecution = mock();
 		Mockito.when(jobExecution.getStatus()).thenReturn(BatchStatus.FAILED);
+		Mockito.when(jobExecution.getExitStatus()).thenReturn(ExitStatus.COMPLETED);
 
 		// when
 		Mockito.when(jobRepository.getJobExecution(jobExecutionId)).thenReturn(jobExecution);
+		Mockito.when(jobOperator.restart(jobExecution)).thenReturn(jobExecution);
 		this.commandLineJobOperator.restart(jobExecutionId);
 
 		// then
@@ -132,7 +141,9 @@ class CommandLineJobOperatorTests {
 		long jobExecutionId = 1;
 		JobExecution jobExecution = mock();
 		Mockito.when(jobExecution.getStatus()).thenReturn(BatchStatus.STOPPED);
+		Mockito.when(jobExecution.getExitStatus()).thenReturn(ExitStatus.COMPLETED);
 		Mockito.when(jobRepository.getJobExecution(jobExecutionId)).thenReturn(jobExecution);
+		Mockito.when(jobOperator.restart(jobExecution)).thenReturn(jobExecution);
 
 		// when
 		this.commandLineJobOperator.restart(jobExecutionId);
@@ -163,7 +174,9 @@ class CommandLineJobOperatorTests {
 		long jobExecutionId = 1;
 		JobExecution jobExecution = mock();
 		Mockito.when(jobExecution.getStatus()).thenReturn(BatchStatus.STOPPED);
+		Mockito.when(jobExecution.getExitStatus()).thenReturn(ExitStatus.COMPLETED);
 		Mockito.when(jobRepository.getJobExecution(jobExecutionId)).thenReturn(jobExecution);
+		Mockito.when(jobOperator.abandon(jobExecution)).thenReturn(jobExecution);
 
 		// when
 		this.commandLineJobOperator.abandon(jobExecutionId);
@@ -246,8 +259,11 @@ class CommandLineJobOperatorTests {
 		long jobExecutionId = 1;
 		JobExecution jobExecution = mock();
 
+		Mockito.when(jobExecution.getExitStatus()).thenReturn(ExitStatus.COMPLETED);
+
 		// when
 		Mockito.when(jobRepository.getJobExecution(jobExecutionId)).thenReturn(jobExecution);
+		Mockito.when(jobOperator.recover(jobExecution)).thenReturn(jobExecution);
 		this.commandLineJobOperator.recover(jobExecutionId);
 
 		// then

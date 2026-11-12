@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,6 +46,7 @@ import org.springframework.util.Assert;
  * @author Mahmoud Ben Hassine
  * @author Stefano Cordio
  * @author Jimmy Praet
+ * @author WooSeung Kim
  * @since 2.0
  */
 public abstract class AbstractPagingItemReader<T> extends AbstractItemCountingItemStreamItemReader<T>
@@ -114,7 +115,14 @@ public abstract class AbstractPagingItemReader<T> extends AbstractItemCountingIt
 					logger.debug("Reading page " + getPage());
 				}
 
-				doReadPage();
+				try {
+					doReadPage();
+				}
+				catch (RuntimeException e) {
+					// the page was not read, so read it again on the next call
+					this.results = null;
+					throw e;
+				}
 				page++;
 				if (current >= pageSize) {
 					current = 0;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2025 the original author or authors.
+ * Copyright 2022-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,6 +74,7 @@ import org.springframework.batch.core.scope.context.JobContext;
 import org.springframework.batch.core.scope.context.StepContext;
 import org.springframework.batch.infrastructure.item.Chunk;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
+import org.springframework.batch.infrastructure.support.DatabaseType;
 import org.springframework.core.DecoratingProxy;
 import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
@@ -100,18 +101,13 @@ public class CoreRuntimeHints implements RuntimeHintsRegistrar {
 				"java.util.concurrent.ConcurrentHashMap$Segment");
 
 		// resource hints
-		hints.resources().registerPattern("org/springframework/batch/core/schema-h2.sql");
-		hints.resources().registerPattern("org/springframework/batch/core/schema-derby.sql");
-		hints.resources().registerPattern("org/springframework/batch/core/schema-hsqldb.sql");
-		hints.resources().registerPattern("org/springframework/batch/core/schema-sqlite.sql");
-		hints.resources().registerPattern("org/springframework/batch/core/schema-db2.sql");
-		hints.resources().registerPattern("org/springframework/batch/core/schema-hana.sql");
-		hints.resources().registerPattern("org/springframework/batch/core/schema-mysql.sql");
-		hints.resources().registerPattern("org/springframework/batch/core/schema-mariadb.sql");
-		hints.resources().registerPattern("org/springframework/batch/core/schema-oracle.sql");
-		hints.resources().registerPattern("org/springframework/batch/core/schema-postgresql.sql");
-		hints.resources().registerPattern("org/springframework/batch/core/schema-sqlserver.sql");
-		hints.resources().registerPattern("org/springframework/batch/core/schema-sybase.sql");
+		for (DatabaseType databaseType : DatabaseType.values()) {
+			hints.resources().registerPattern(databaseType.getProductSchema());
+		}
+		hints.resources().registerPattern("org/springframework/batch/core/schema-mongodb.jsonl");
+		hints.resources().registerPattern("org/springframework/batch/core/schema-mongodb.js");
+		hints.resources().registerPattern("org/springframework/batch/core/schema-drop-mongodb.jsonl");
+		hints.resources().registerPattern("org/springframework/batch/core/schema-drop-mongodb.js");
 
 		// proxy hints
 		hints.proxies()
@@ -153,6 +149,15 @@ public class CoreRuntimeHints implements RuntimeHintsRegistrar {
 		jdkTypes.stream()
 			.map(TypeReference::of)
 			.forEach(type -> hints.reflection().registerType(type, MemberCategory.values()));
+
+		Set<Class<?>> persistenceTypes = Set.of(
+				org.springframework.batch.core.repository.persistence.ExecutionContext.class,
+				org.springframework.batch.core.repository.persistence.ExitStatus.class,
+				org.springframework.batch.core.repository.persistence.JobExecution.class,
+				org.springframework.batch.core.repository.persistence.JobInstance.class,
+				org.springframework.batch.core.repository.persistence.JobParameter.class,
+				org.springframework.batch.core.repository.persistence.StepExecution.class);
+		persistenceTypes.forEach(type -> hints.reflection().registerType(type, MemberCategory.values()));
 
 		// reflection hints: methods
 		Method jobContextGetJobParametersMethod = ReflectionUtils.findMethod(JobContext.class, "getJobParameters");

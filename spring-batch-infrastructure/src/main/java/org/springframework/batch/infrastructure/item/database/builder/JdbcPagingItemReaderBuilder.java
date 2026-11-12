@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2025 the original author or authors.
+ * Copyright 2017-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -108,8 +108,9 @@ public class JdbcPagingItemReaderBuilder<T> {
 	}
 
 	/**
-	 * The name used to calculate the key within the {@link ExecutionContext}. Required if
-	 * {@link #saveState(boolean)} is set to true.
+	 * The name used to calculate the key within the {@link ExecutionContext}. Defaults to
+	 * the bean name, or to the short class name if this instance is not a bean. Set it
+	 * explicitly to disambiguate several non-bean instances of the same type in a step.
 	 * @param name name of the reader instance
 	 * @return The current instance of the builder.
 	 * @see ItemStreamSupport#setName(String)
@@ -148,7 +149,6 @@ public class JdbcPagingItemReaderBuilder<T> {
 	 * The {@link DataSource} to query against. Required.
 	 * @param dataSource the {@link DataSource}
 	 * @return this instance for method chaining
-	 * @see JdbcPagingItemReader#setDataSource(DataSource)
 	 */
 	public JdbcPagingItemReaderBuilder<T> dataSource(DataSource dataSource) {
 		this.dataSource = dataSource;
@@ -302,7 +302,6 @@ public class JdbcPagingItemReaderBuilder<T> {
 	 * and {@link #sortKeys(Map)} are ignored.
 	 * @param provider the db-specific query provider
 	 * @return this instance for method chaining
-	 * @see JdbcPagingItemReader#setQueryProvider(PagingQueryProvider)
 	 */
 	public JdbcPagingItemReaderBuilder<T> queryProvider(PagingQueryProvider provider) {
 		this.queryProvider = provider;
@@ -317,10 +316,6 @@ public class JdbcPagingItemReaderBuilder<T> {
 	public JdbcPagingItemReader<T> build() throws Exception {
 		Assert.isTrue(pageSize > 0, "pageSize must be greater than zero");
 		Assert.notNull(dataSource, "dataSource is required");
-
-		if (saveState) {
-			Assert.hasText(name, "A name is required when saveState is set to true");
-		}
 
 		JdbcPagingItemReader<T> reader = new JdbcPagingItemReader<>(this.dataSource,
 				queryProvider == null ? determineQueryProvider(dataSource) : queryProvider);
@@ -344,6 +339,7 @@ public class JdbcPagingItemReaderBuilder<T> {
 		return reader;
 	}
 
+	@SuppressWarnings("removal") // for the deprecated Derby support
 	protected PagingQueryProvider determineQueryProvider(DataSource dataSource) {
 		Assert.hasLength(this.selectClause, "selectClause is required when not providing a PagingQueryProvider");
 		Assert.hasLength(this.fromClause, "fromClause is required when not providing a PagingQueryProvider");

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2025 the original author or authors.
+ * Copyright 2014-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.test;
 
+import org.springframework.batch.infrastructure.support.DatabaseType;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -110,8 +111,8 @@ class StepScopeAnnotatedListenerIntegrationTests {
 		@Bean
 		public DataSource dataSource() {
 			EmbeddedDatabaseBuilder embeddedDatabaseBuilder = new EmbeddedDatabaseBuilder();
-			return embeddedDatabaseBuilder.addScript("classpath:org/springframework/batch/core/schema-drop-hsqldb.sql")
-				.addScript("classpath:org/springframework/batch/core/schema-hsqldb.sql")
+			return embeddedDatabaseBuilder.addScript("classpath:" + DatabaseType.HSQL.getProductSchemaDrop())
+				.addScript("classpath:" + DatabaseType.HSQL.getProductSchema())
 				.setType(EmbeddedDatabaseType.HSQL)
 				.build();
 		}

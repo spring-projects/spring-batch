@@ -15,9 +15,6 @@
  */
 package org.springframework.batch.samples.mongodb;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.job.builder.JobBuilder;
@@ -45,14 +42,12 @@ public class DeletionJobConfiguration {
 
 	@Bean
 	public MongoPagingItemReader<Person> mongoPersonReader(MongoTemplate mongoTemplate) {
-		Map<String, Sort.Direction> sortOptions = new HashMap<>();
-		sortOptions.put("name", Sort.Direction.DESC);
 		return new MongoPagingItemReaderBuilder<Person>().name("personItemReader")
 			.collection("person_out")
 			.targetType(Person.class)
 			.template(mongoTemplate)
 			.query(new Query().addCriteria(where("name").is("foo3")))
-			.sorts(sortOptions)
+			.sort(Sort.by(Sort.Direction.DESC, "name"))
 			.build();
 	}
 

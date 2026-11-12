@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2025 the original author or authors.
+ * Copyright 2011-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.partition.support;
 
+import org.springframework.batch.infrastructure.support.DatabaseType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
@@ -29,8 +30,10 @@ import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -45,11 +48,15 @@ class RemoteStepExecutionAggregatorTests {
 
 	private StepExecution stepExecution2;
 
+	private JobRepository jobRepository;
+
+	private JobInstance jobInstance;
+
 	@BeforeEach
 	void init() throws Exception {
 		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
-			.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-			.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
+			.addScript(DatabaseType.HSQL.getProductSchemaDrop())
+			.addScript(DatabaseType.HSQL.getProductSchema())
 			.generateUniqueName(true)
 			.build();
 		JdbcTransactionManager transactionManager = new JdbcTransactionManager(embeddedDatabase);
@@ -57,10 +64,10 @@ class RemoteStepExecutionAggregatorTests {
 		factory.setDataSource(embeddedDatabase);
 		factory.setTransactionManager(transactionManager);
 		factory.afterPropertiesSet();
-		JobRepository jobRepository = factory.getObject();
+		jobRepository = factory.getObject();
 		aggregator = new RemoteStepExecutionAggregator(jobRepository);
 		JobParameters jobParameters = new JobParameters();
-		JobInstance jobInstance = jobRepository.createJobInstance("job", jobParameters);
+		jobInstance = jobRepository.createJobInstance("job", jobParameters);
 		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
 				new ExecutionContext());
 		result = jobRepository.createStepExecution("aggregate", jobExecution);
@@ -85,6 +92,26 @@ class RemoteStepExecutionAggregatorTests {
 		aggregator.aggregate(result, Arrays.<StepExecution>asList(stepExecution1, stepExecution2));
 		assertNotNull(result);
 		assertEquals(BatchStatus.STARTING, result.getStatus());
+	}
+
+	/**
+	 * A partition that completed in a previous run of the same job instance is not part
+	 * of the current job execution, so there is nothing to refresh: it must be aggregated
+	 * as is rather than filtered out.
+	 */
+	@Test
+	void testAggregateStepExecutionFromAnotherJobExecution() {
+		JobExecution otherJobExecution = jobRepository.createJobExecution(jobInstance, new JobParameters(),
+				new ExecutionContext());
+		StepExecution completedPartition = jobRepository.createStepExecution("foo:3", otherJobExecution);
+		completedPartition.setStatus(BatchStatus.COMPLETED);
+		completedPartition.setWriteCount(5);
+		completedPartition.setEndTime(LocalDateTime.now());
+		jobRepository.update(completedPartition);
+
+		aggregator.aggregate(result, List.of(completedPartition));
+
+		assertEquals(5, result.getWriteCount());
 	}
 
 }

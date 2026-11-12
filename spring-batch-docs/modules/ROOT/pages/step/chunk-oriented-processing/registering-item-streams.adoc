@@ -27,7 +27,7 @@ public Step step1(JobRepository jobRepository, PlatformTransactionManager transa
 	return new StepBuilder("step1", jobRepository)
 				.<String, String>chunk(2).transactionManager(transactionManager)
 				.reader(itemReader())
-				.writer(compositeItemWriter())
+				.writer(classifierCompositeItemWriter())
 				.stream(fileItemWriter1())
 				.stream(fileItemWriter2())
 				.build();
@@ -43,7 +43,7 @@ The following example shows how to register a `stream` on a `step` in XML:
 ----
 <step id="step1">
     <tasklet>
-        <chunk reader="itemReader" writer="compositeWriter" commit-interval="2">
+        <chunk reader="itemReader" writer="classifierCompositeWriter" commit-interval="2">
             <streams>
                 <stream ref="fileItemWriter1"/>
                 <stream ref="fileItemWriter2"/>
@@ -56,7 +56,7 @@ The following example shows how to register a `stream` on a `step` in XML:
 ====
 
 
-In the preceding example, the `CompositeItemWriter` is not an `ItemStream`, but both of its
+In the preceding example, the `ClassifierCompositeItemWriter` is not an `ItemStream`, but both of its
 delegates are. Therefore, both delegate writers must be explicitly registered as streams
 for the framework to handle them correctly. The `ItemReader` does not need to be
 explicitly registered as a stream because it is a direct property of the `Step`. The step

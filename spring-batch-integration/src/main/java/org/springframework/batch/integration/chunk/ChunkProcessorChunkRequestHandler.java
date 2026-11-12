@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -105,7 +105,7 @@ public class ChunkProcessorChunkRequestHandler<S> implements ChunkRequestHandler
 		Chunk chunk = chunkRequest.getItems();
 		Throwable failure = null;
 		try {
-			chunkProcessor.process(stepContribution, chunk);
+			chunkProcessor.process(chunk, stepContribution);
 		}
 		catch (SkipLimitExceededException | NonSkippableReadException | SkipListenerFailedException | RetryException
 				| JobInterruptedException e) {

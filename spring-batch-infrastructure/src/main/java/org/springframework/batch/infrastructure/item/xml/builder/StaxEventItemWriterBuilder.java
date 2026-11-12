@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2025 the original author or authors.
+ * Copyright 2017-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,8 +68,9 @@ public class StaxEventItemWriterBuilder<T> {
 	private @Nullable String name;
 
 	/**
-	 * The name used to calculate the key within the {@link ExecutionContext}. Required if
-	 * {@link StaxEventItemWriterBuilder#saveState(boolean)} is set to true.
+	 * The name used to calculate the key within the {@link ExecutionContext}. Defaults to
+	 * the bean name, or to the short class name if this instance is not a bean. Set it
+	 * explicitly to disambiguate several non-bean instances of the same type in a step.
 	 * @param name name of the reader instance
 	 * @return The current instance of the builder.
 	 * @see StaxEventItemWriter#setName(String)
@@ -97,7 +98,6 @@ public class StaxEventItemWriterBuilder<T> {
 	 * items to XML. This field is required.
 	 * @param marshaller the component used to generate XML
 	 * @return the current instance of the builder.
-	 * @see StaxEventItemWriter#setMarshaller(Marshaller)
 	 */
 	public StaxEventItemWriterBuilder<T> marshaller(Marshaller marshaller) {
 		this.marshaller = marshaller;
@@ -263,10 +263,6 @@ public class StaxEventItemWriterBuilder<T> {
 	public StaxEventItemWriter<T> build() {
 		Assert.notNull(this.marshaller, "A marshaller is required");
 		Assert.notNull(this.resource, "A resource is required");
-
-		if (this.saveState) {
-			Assert.notNull(this.name, "A name is required");
-		}
 
 		StaxEventItemWriter<T> writer = new StaxEventItemWriter<>(this.resource, this.marshaller);
 

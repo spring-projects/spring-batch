@@ -12,6 +12,25 @@ provides dedicated support for:
 * Remote Chunking
 * Remote Partitioning
 
+[NOTE]
+====
+When using JMS as the transport for remote chunking or remote partitioning, make sure to
+configure the `DefaultJmsHeaderMapper` to map the headers Spring Batch relies on
+(`correlationId`, `sequenceNumber`, and `sequenceSize`) on any
+`Jms.messageDrivenChannelAdapter` used to receive replies. Spring Batch uses Spring
+Integration's generic `correlationId` message header to correlate replies coming back from
+workers. That header is mapped by `DefaultJmsHeaderMapper` like any other user-defined JMS
+property: on the inbound side, it is only copied back into the message headers if it matches
+the mapper's `propertyNames` allowlist, which, as of Spring Integration 7.0.6+, defaults to
+mapping only the `content_type` property. Without an explicit allowlist, the `correlationId`,
+`sequenceNumber` and `sequenceSize` headers are silently dropped on the way back in, and the
+reply aggregator can hang or fail with an `IllegalStateException: Null correlation not allowed`.
+
+You can map all JMS properties with `new DefaultJmsHeaderMapper("*")`, or, if that is too
+permissive for your security requirements, restrict the allowlist to just the headers
+Spring Batch needs: `new DefaultJmsHeaderMapper("correlationId", "sequenceNumber", "sequenceSize")`.
+====
+
 [[remote-chunking]]
 === Remote Chunking
 
@@ -126,14 +145,16 @@ public IntegrationFlow outboundFlow(ActiveMQConnectionFactory connectionFactory)
  * Configure inbound flow (replies coming from workers)
  */
 @Bean
-public QueueChannel replies() {
-    return new QueueChannel();
+public DirectChannel replies() {
+    return new DirectChannel();
 }
 
 @Bean
 public IntegrationFlow inboundFlow(ActiveMQConnectionFactory connectionFactory) {
     return IntegrationFlow
-            .from(Jms.messageDrivenChannelAdapter(connectionFactory).destination("replies"))
+            .from(Jms.messageDrivenChannelAdapter(connectionFactory)
+                    .headerMapper(new DefaultJmsHeaderMapper("*"))
+                    .destination("replies"))
             .channel(replies())
             .get();
 }
@@ -180,9 +201,7 @@ The following XML configuration provides a basic manager setup:
   <property name="replyChannel" ref="replies"/>
 </bean>
 
-<int:channel id="replies">
-  <int:queue/>
-</int:channel>
+<int:channel id="replies"/>
 
 <int-jms:message-driven-channel-adapter id="jmsReplies"
     destination-name="replies"
@@ -231,7 +250,9 @@ public DirectChannel requests() {
 @Bean
 public IntegrationFlow inboundFlow(ActiveMQConnectionFactory connectionFactory) {
     return IntegrationFlow
-            .from(Jms.messageDrivenChannelAdapter(connectionFactory).destination("requests"))
+            .from(Jms.messageDrivenChannelAdapter(connectionFactory)
+                    .headerMapper(new DefaultJmsHeaderMapper("*"))
+                    .destination("requests"))
             .channel(requests())
             .get();
 }
@@ -253,15 +274,15 @@ public IntegrationFlow outboundFlow(ActiveMQConnectionFactory connectionFactory)
 }
 
 /*
- * Configure the ChunkProcessorChunkHandler
+ * Configure the ChunkProcessorChunkRequestHandler
  */
 @Bean
 @ServiceActivator(inputChannel = "requests", outputChannel = "replies")
-public ChunkProcessorChunkHandler<Integer> chunkProcessorChunkHandler() {
+public ChunkProcessorChunkRequestHandler<Integer> chunkProcessorChunkHandler() {
     ChunkProcessor<Integer> chunkProcessor
-            = new SimpleChunkProcessor<>(itemProcessor(), itemWriter());
-    ChunkProcessorChunkHandler<Integer> chunkProcessorChunkHandler
-            = new ChunkProcessorChunkHandler<>();
+            = new DefaultChunkProcessor<>(itemProcessor(), itemWriter());
+    ChunkProcessorChunkRequestHandler<Integer> chunkProcessorChunkHandler
+            = new ChunkProcessorChunkRequestHandler<>();
     chunkProcessorChunkHandler.setChunkProcessor(chunkProcessor);
     return chunkProcessorChunkHandler;
 }
@@ -294,18 +315,18 @@ The following example shows the worker configuration in XML:
     input-channel="requests"
     output-channel="replies"
     ref="chunkProcessorChunkHandler"
-    method="handleChunk"/>
+    method="handle"/>
 
 <bean id="chunkProcessorChunkHandler"
     class="org.springframework.batch.integration.chunk.ChunkProcessorChunkRequestHandler">
   <property name="chunkProcessor">
-    <bean class="org.springframework.batch.core.step.item.SimpleChunkProcessor">
-      <property name="itemWriter">
-        <bean class="io.spring.sbi.PersonItemWriter"/>
-      </property>
-      <property name="itemProcessor">
+    <bean class="org.springframework.batch.core.step.item.DefaultChunkProcessor">
+      <constructor-arg name="itemProcessor">
         <bean class="io.spring.sbi.PersonItemProcessor"/>
-      </property>
+      </constructor-arg>
+      <constructor-arg name="itemWriter">
+        <bean class="io.spring.sbi.PersonItemWriter"/>
+      </constructor-arg>
     </bean>
   </property>
 </bean>
@@ -321,7 +342,7 @@ the Spring Batch `JobRepository` nor
 to the actual job configuration file. The main bean of interest
 is the `chunkProcessorChunkHandler`. The
 `chunkProcessor` property of `ChunkProcessorChunkRequestHandler` takes a
-configured `SimpleChunkProcessor`, which is where you would provide a reference to your
+configured `DefaultChunkProcessor`, which is where you would provide a reference to your
 `ItemWriter` (and, optionally, your
 `ItemProcessor`) that will run on the worker
 when it receives chunks from the manager.
@@ -330,23 +351,35 @@ For more information, see the section of the "`Scalability`" chapter on
 link:$$https://docs.spring.io/spring-batch/reference/scalability.html#remoteChunking[Remote Chunking].
 
 Starting from version 4.1, Spring Batch Integration introduces the `@EnableBatchIntegration`
-annotation that can be used to simplify a remote chunking setup. This annotation provides
-two beans that you can autowire in your application context:
+annotation that can be used to simplify a remote chunking setup. Starting from version 6.1,
+the following builders are available:
 
-* `RemoteChunkingManagerStepBuilderFactory`: Configures the manager step
-* `RemoteChunkingWorkerBuilder`: Configures the remote worker integration flow
+* `RemoteChunkingManagerBuilder`: Configures the manager step
+* `RemoteChunkingWorkerBuilder`: Configures the remote worker integration flow. This
+builder is provided as a bean by `@EnableBatchIntegration`, that you can autowire in your
+application context
+
+NOTE: The `RemoteChunkingManagerStepBuilderFactory` bean and the
+`RemoteChunkingManagerStepBuilder` are deprecated since version 6.1 in favor of
+`RemoteChunkingManagerBuilder`, and are scheduled for removal in version 7.0.
 
 These APIs take care of configuring a number of components, as the following diagram shows:
 
 .Remote Chunking Configuration
 image::remote-chunking-config.png[Remote Chunking Configuration, scaledwidth="80%"]
 
-On the manager side, the `RemoteChunkingManagerStepBuilderFactory` lets you
-configure a manager step by declaring:
+On the manager side, the `RemoteChunkingManagerBuilder` lets you configure a manager step by
+declaring:
 
-* The item reader to read items and send them to workers
 * The output channel ("Outgoing requests") to send requests to workers
 * The input channel ("Incoming replies") to receive replies from workers
+
+The call to `chunk(int)` returns the same `ChunkOrientedStepBuilder` as for any other
+chunk-oriented step, on which you declare the item reader to read items and send them to
+workers, and any other property of the step (listeners, skip and retry policies, etc).
+The item writer is set by the builder and must not be changed. Like for any other
+chunk-oriented step, the transaction manager defaults to a resourceless one, so you should
+set it explicitly if the item reader of the manager step needs a transactional resource.
 
 You need not explicitly configure `ChunkMessageChannelItemWriter` and the `MessagingTemplate`.
 (You can still explicitly configure them if find a reason to do so).
@@ -354,11 +387,11 @@ You need not explicitly configure `ChunkMessageChannelItemWriter` and the `Messa
 On the worker side, the `RemoteChunkingWorkerBuilder` lets you configure a worker to:
 
 * Listen to requests sent by the manager on the input channel ("`Incoming requests`")
-* Call the `handleChunk` method of `ChunkProcessorChunkRequestHandler` for each request
+* Call the `handle` method of `ChunkProcessorChunkRequestHandler` for each request
 with the configured `ItemProcessor` and `ItemWriter`
 * Send replies on the output channel ("`Outgoing replies`") to the manager
 
-You need not explicitly configure the `SimpleChunkProcessor`
+You need not explicitly configure the `DefaultChunkProcessor`
 and the `ChunkProcessorChunkRequestHandler`. (You can still explicitly configure them if you find
    a reason to do so).
 
@@ -373,16 +406,14 @@ public class RemoteChunkingJobConfiguration {
     @Configuration
     public static class ManagerConfiguration {
 
-        @Autowired
-        private RemoteChunkingManagerStepBuilderFactory managerStepBuilderFactory;
-
         @Bean
-        public TaskletStep managerStep() {
-            return this.managerStepBuilderFactory.get("managerStep")
-                       .chunk(100)
-                       .reader(itemReader())
+        public Step managerStep(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+            return new RemoteChunkingManagerBuilder("managerStep", jobRepository)
                        .outputChannel(requests()) // requests sent to workers
                        .inputChannel(replies())   // replies received from workers
+                       .chunk(100)
+                       .reader(itemReader())
+                       .transactionManager(transactionManager)
                        .build();
         }
 
@@ -482,8 +513,8 @@ public PartitionHandler partitionHandler() {
 }
 
 @Bean
-public QueueChannel outboundReplies() {
-    return new QueueChannel();
+public DirectChannel outboundReplies() {
+    return new DirectChannel();
 }
 
 @Bean
@@ -519,6 +550,7 @@ public IntegrationFlow inboundJmsStaging() {
     return IntegrationFlow
             .from(Jms.messageDrivenChannelAdapter(connectionFactory())
                     .configureListenerContainer(c -> c.subscriptionDurable(false))
+                    .headerMapper(new DefaultJmsHeaderMapper("*"))
                     .destination("stagingQueue"))
             .channel(inboundStaging())
             .get();
@@ -550,6 +582,7 @@ public IntegrationFlow inboundJmsRequests() {
     return IntegrationFlow
             .from(Jms.messageDrivenChannelAdapter(connectionFactory())
                     .configureListenerContainer(c -> c.subscriptionDurable(false))
+                    .headerMapper(new DefaultJmsHeaderMapper("*"))
                     .destination("requestsQueue"))
             .channel(inboundRequests())
             .get();
@@ -618,9 +651,7 @@ The following example assumes an existing partitioned job and focuses on the
 <int:aggregator ref="partitionHandler" input-channel="inbound-staging"
     output-channel="outbound-replies"/>
 
-<int:channel id="outbound-replies">
-  <int:queue/>
-</int:channel>
+<int:channel id="outbound-replies"/>
 
 <bean id="stepLocator"
     class="org.springframework.batch.integration.partition.BeanFactoryStepLocator" />

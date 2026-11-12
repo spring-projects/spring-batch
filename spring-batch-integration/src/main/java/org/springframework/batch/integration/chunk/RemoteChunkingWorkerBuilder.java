@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2025 the original author or authors.
+ * Copyright 2018-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,9 @@ package org.springframework.batch.integration.chunk;
 
 import org.jspecify.annotations.NullUnmarked;
 
-import org.springframework.batch.core.step.item.SimpleChunkProcessor;
+import org.springframework.batch.core.step.item.DefaultChunkProcessor;
 import org.springframework.batch.infrastructure.item.ItemProcessor;
 import org.springframework.batch.infrastructure.item.ItemWriter;
-import org.springframework.batch.infrastructure.item.support.PassThroughItemProcessor;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.util.Assert;
@@ -29,9 +28,9 @@ import org.springframework.util.Assert;
  * Builder for a worker in a remote chunking setup. This builder:
  *
  * <ul>
- * <li>creates a {@link ChunkProcessorChunkRequestHandler} with the provided item
- * processor and writer. If no item processor is provided, a
- * {@link PassThroughItemProcessor} will be used</li>
+ * <li>creates a {@link ChunkProcessorChunkRequestHandler} with a
+ * {@link DefaultChunkProcessor} based on the provided item processor and writer. If no
+ * item processor is provided, items are written as is</li>
  * <li>creates an {@link IntegrationFlow} with the
  * {@link ChunkProcessorChunkRequestHandler} as a service activator which listens to
  * incoming requests on <code>inputChannel</code> and sends replies on
@@ -106,16 +105,12 @@ public class RemoteChunkingWorkerBuilder<I, O> {
 	 * the output channel.
 	 * @return the integration flow
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public IntegrationFlow build() {
 		Assert.notNull(this.itemWriter, "An ItemWriter must be provided");
 		Assert.notNull(this.inputChannel, "An InputChannel must be provided");
 		Assert.notNull(this.outputChannel, "An OutputChannel must be provided");
 
-		if (this.itemProcessor == null) {
-			this.itemProcessor = new PassThroughItemProcessor();
-		}
-		SimpleChunkProcessor<I, O> chunkProcessor = new SimpleChunkProcessor<>(this.itemProcessor, this.itemWriter);
+		DefaultChunkProcessor<I, O> chunkProcessor = new DefaultChunkProcessor<>(this.itemProcessor, this.itemWriter);
 
 		ChunkProcessorChunkRequestHandler<I> chunkProcessorChunkRequestHandler = new ChunkProcessorChunkRequestHandler<>();
 		chunkProcessorChunkRequestHandler.setChunkProcessor(chunkProcessor);

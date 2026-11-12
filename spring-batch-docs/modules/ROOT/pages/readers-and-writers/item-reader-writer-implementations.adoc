@@ -174,6 +174,7 @@ Spring Batch offers the following database readers:
 
 * xref:readers-and-writers/item-reader-writer-implementations.adoc#mongoPagingItemReader[`MongoPagingItemReader`]
 * xref:readers-and-writers/item-reader-writer-implementations.adoc#mongoCursorItemReader[`MongoCursorItemReader`]
+* xref:readers-and-writers/item-reader-writer-implementations.adoc#pageableItemReader[`PageableItemReader`]
 * xref:readers-and-writers/item-reader-writer-implementations.adoc#repositoryItemReader[`RepositoryItemReader`]
 
 [[mongoPagingItemReader]]
@@ -188,11 +189,42 @@ The `MongoCursorItemReader` is an `ItemReader` that reads documents from MongoDB
 streaming technique. Spring Batch provides a `MongoCursorItemReaderBuilder` to construct an
 instance of the `MongoCursorItemReader`.
 
+[[pageableItemReader]]
+=== `PageableItemReader`
+The `PageableItemReader` reads records by applying a query function to a Spring Data
+`Pageable`. The function can be a repository method reference or a lambda that invokes a
+custom repository query returning a `Slice`. Unlike `RepositoryItemReader`, it does not
+use reflection to select a repository method.
+
+The reader requires a query function and a page size. A `Sort` can optionally be
+specified, in which case it is passed to the query function through the `Pageable`. If no
+`Sort` is specified, the results are not sorted. Spring Batch provides a
+`PageableItemReaderBuilder` to construct an instance of the `PageableItemReader`. For
+example, a repository that extends `PagingAndSortingRepository` can be used as follows:
+
+[source, java]
+----
+PageableItemReader<Customer> reader = new PageableItemReaderBuilder<Customer>()
+		.pageSize(100)
+		.query(customerRepository::findAll)
+		.sort(Sort.by(Sort.Direction.ASC, "id"))
+		.build();
+----
+
+`Sort` can reference properties either by name, as shown above, or through
+https://docs.spring.io/spring-data/commons/reference/property-paths.html#type-safe-property-references[type-safe property references],
+which are validated by the compiler and are refactoring-safe:
+
+[source, java]
+----
+.sort(Sort.by(Sort.Direction.ASC, Customer::getId))
+----
+
 [[repositoryItemReader]]
 === `RepositoryItemReader`
 The `RepositoryItemReader` is an `ItemReader` that reads records by using a
-`PagingAndSortingRepository`. Spring Batch provides a `RepositoryItemReaderBuilder` to
-construct an instance of the `RepositoryItemReader`.
+`PagingAndSortingRepository`. For a type-safe alternative that does not rely on reflection,
+see xref:readers-and-writers/item-reader-writer-implementations.adoc#pageableItemReader[`PageableItemReader`].
 
 [[databaseWriters]]
 == Database Writers
@@ -215,6 +247,33 @@ The `RepositoryItemWriter` is an `ItemWriter` wrapper for a `CrudRepository` fro
 Data. Spring Batch provides a `RepositoryItemWriterBuilder` to construct an instance of
 the `RepositoryItemWriter`.
 
+By default, the writer calls `CrudRepository#saveAll(Iterable)` with the whole chunk.
+Another method can be selected with `setMethodName`. If the named method accepts a
+single item, it is invoked once per item in the chunk. If it accepts an `Iterable`
+instead (for example `JpaRepository#saveAllAndFlush(Iterable)`), it is invoked once with
+the whole chunk.
+
+If the underlying repository needs to be flushed after writing and does not expose a
+single method that both saves and flushes (unlike `saveAllAndFlush`), the `flush` method
+can be overridden in a subclass to perform the flush after the chunk has been written.
+The `repository` field is `protected` so that subclasses can access it directly:
+
+[source, java]
+----
+public class FlushingRepositoryItemWriter<T> extends RepositoryItemWriter<T> {
+
+	public FlushingRepositoryItemWriter(JpaRepository<T, ?> repository) {
+		super(repository);
+	}
+
+	@Override
+	protected void flush() {
+		((JpaRepository<T, ?>) this.repository).flush();
+	}
+
+}
+----
+
 [[jdbcBatchItemWriter]]
 === `JdbcBatchItemWriter`
 The `JdbcBatchItemWriter` is an `ItemWriter` that uses the batching features from
@@ -235,6 +294,7 @@ Spring Batch offers the following specialized readers:
 * xref:readers-and-writers/item-reader-writer-implementations.adoc#ldifReader[`LdifReader`]
 * xref:readers-and-writers/item-reader-writer-implementations.adoc#mappingLdifReader[`MappingLdifReader`]
 * xref:readers-and-writers/item-reader-writer-implementations.adoc#avroItemReader[`AvroItemReader`]
+* xref:readers-and-writers/item-reader-writer-implementations.adoc#resourcesItemReader[`ResourcesItemReader`]
 
 [[ldifReader]]
 === `LdifReader`
@@ -256,6 +316,27 @@ The `AvroItemReader` reads serialized Avro data from a Resource.
 Each read returns an instance of the type specified by a Java class or Avro Schema.
 The reader may be optionally configured  for input that embeds an Avro schema or not.
 Spring Batch provides an `AvroItemReaderBuilder` to construct an instance of the `AvroItemReader`.
+
+[[resourcesItemReader]]
+=== `ResourcesItemReader`
+The `ResourcesItemReader` serves up `Resource` items themselves, instead of their
+content, one `Resource` per `read`. It is typically used as the reader of a step that
+processes each matching resource individually (for example, an archiving or file-moving
+step). Spring Batch provides a `ResourcesItemReaderBuilder` to construct an instance of
+the `ResourcesItemReader`, which can resolve resources directly from one or more location
+patterns:
+
+[source, java]
+----
+ResourcesItemReader reader = new ResourcesItemReaderBuilder()
+				.resources("file:/data/inputs/*.csv")
+				.name("resourcesReader")
+				.build();
+----
+
+Each pattern is resolved with a `PathMatchingResourcePatternResolver`, so any resource
+prefix supported by Spring (`file:`, `classpath:`, `classpath*:`, and so on) can be used,
+in addition to Ant-style wildcards (`*`, `**`, and `?`).
 
 [[specializedWriters]]
 == Specialized Writers

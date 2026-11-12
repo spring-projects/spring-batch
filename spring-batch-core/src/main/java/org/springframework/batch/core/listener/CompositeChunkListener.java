@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ import org.springframework.core.Ordered;
  */
 public class CompositeChunkListener<I, O> implements ChunkListener<I, O> {
 
-	private final OrderedComposite<ChunkListener> listeners = new OrderedComposite<>();
+	private final OrderedComposite<ChunkListener<I, O>> listeners = new OrderedComposite<>();
 
 	/**
 	 * Default constructor
@@ -43,7 +43,7 @@ public class CompositeChunkListener<I, O> implements ChunkListener<I, O> {
 	 * Convenience constructor for setting the {@link ChunkListener}s.
 	 * @param listeners list of {@link ChunkListener}.
 	 */
-	public CompositeChunkListener(List<? extends ChunkListener> listeners) {
+	public CompositeChunkListener(List<? extends ChunkListener<I, O>> listeners) {
 		setListeners(listeners);
 	}
 
@@ -51,7 +51,8 @@ public class CompositeChunkListener<I, O> implements ChunkListener<I, O> {
 	 * Convenience constructor for setting the {@link ChunkListener}s.
 	 * @param listeners array of {@link ChunkListener}.
 	 */
-	public CompositeChunkListener(ChunkListener... listeners) {
+	@SafeVarargs
+	public CompositeChunkListener(ChunkListener<I, O>... listeners) {
 		this(Arrays.asList(listeners));
 	}
 
@@ -59,7 +60,7 @@ public class CompositeChunkListener<I, O> implements ChunkListener<I, O> {
 	 * Public setter for the listeners.
 	 * @param listeners list of {@link ChunkListener}.
 	 */
-	public void setListeners(List<? extends ChunkListener> listeners) {
+	public void setListeners(List<? extends ChunkListener<I, O>> listeners) {
 		this.listeners.setItems(listeners);
 	}
 
@@ -67,7 +68,7 @@ public class CompositeChunkListener<I, O> implements ChunkListener<I, O> {
 	 * Register additional listener.
 	 * @param chunkListener instance of {@link ChunkListener}.
 	 */
-	public void register(ChunkListener chunkListener) {
+	public void register(ChunkListener<I, O> chunkListener) {
 		listeners.add(chunkListener);
 	}
 
@@ -81,8 +82,8 @@ public class CompositeChunkListener<I, O> implements ChunkListener<I, O> {
 	@Deprecated(since = "6.0", forRemoval = true)
 	@Override
 	public void afterChunk(ChunkContext context) {
-		for (Iterator<ChunkListener> iterator = listeners.reverse(); iterator.hasNext();) {
-			ChunkListener listener = iterator.next();
+		for (Iterator<ChunkListener<I, O>> iterator = listeners.reverse(); iterator.hasNext();) {
+			ChunkListener<I, O> listener = iterator.next();
 			listener.afterChunk(context);
 		}
 	}
@@ -93,9 +94,9 @@ public class CompositeChunkListener<I, O> implements ChunkListener<I, O> {
 	 * @see ChunkListener#afterChunk(Chunk)
 	 */
 	@Override
-	public void afterChunk(Chunk chunk) {
-		for (Iterator<ChunkListener> iterator = listeners.reverse(); iterator.hasNext();) {
-			ChunkListener listener = iterator.next();
+	public void afterChunk(Chunk<O> chunk) {
+		for (Iterator<ChunkListener<I, O>> iterator = listeners.reverse(); iterator.hasNext();) {
+			ChunkListener<I, O> listener = iterator.next();
 			listener.afterChunk(chunk);
 		}
 	}
@@ -111,8 +112,8 @@ public class CompositeChunkListener<I, O> implements ChunkListener<I, O> {
 	@Deprecated(since = "6.0", forRemoval = true)
 	@Override
 	public void beforeChunk(ChunkContext context) {
-		for (Iterator<ChunkListener> iterator = listeners.iterator(); iterator.hasNext();) {
-			ChunkListener listener = iterator.next();
+		for (Iterator<ChunkListener<I, O>> iterator = listeners.iterator(); iterator.hasNext();) {
+			ChunkListener<I, O> listener = iterator.next();
 			listener.beforeChunk(context);
 		}
 	}
@@ -124,9 +125,9 @@ public class CompositeChunkListener<I, O> implements ChunkListener<I, O> {
 	 * @see ChunkListener#beforeChunk(Chunk chunk)
 	 */
 	@Override
-	public void beforeChunk(Chunk chunk) {
-		for (Iterator<ChunkListener> iterator = listeners.iterator(); iterator.hasNext();) {
-			ChunkListener listener = iterator.next();
+	public void beforeChunk(Chunk<I> chunk) {
+		for (Iterator<ChunkListener<I, O>> iterator = listeners.iterator(); iterator.hasNext();) {
+			ChunkListener<I, O> listener = iterator.next();
 			listener.beforeChunk(chunk);
 		}
 	}
@@ -141,8 +142,8 @@ public class CompositeChunkListener<I, O> implements ChunkListener<I, O> {
 	@Deprecated(since = "6.0", forRemoval = true)
 	@Override
 	public void afterChunkError(ChunkContext context) {
-		for (Iterator<ChunkListener> iterator = listeners.reverse(); iterator.hasNext();) {
-			ChunkListener listener = iterator.next();
+		for (Iterator<ChunkListener<I, O>> iterator = listeners.reverse(); iterator.hasNext();) {
+			ChunkListener<I, O> listener = iterator.next();
 			listener.afterChunkError(context);
 		}
 	}
@@ -153,9 +154,9 @@ public class CompositeChunkListener<I, O> implements ChunkListener<I, O> {
 	 * @see ChunkListener#onChunkError(Exception, Chunk)
 	 */
 	@Override
-	public void onChunkError(Exception exception, Chunk chunk) {
-		for (Iterator<ChunkListener> iterator = listeners.reverse(); iterator.hasNext();) {
-			ChunkListener listener = iterator.next();
+	public void onChunkError(Exception exception, Chunk<O> chunk) {
+		for (Iterator<ChunkListener<I, O>> iterator = listeners.reverse(); iterator.hasNext();) {
+			ChunkListener<I, O> listener = iterator.next();
 			listener.onChunkError(exception, chunk);
 		}
 	}

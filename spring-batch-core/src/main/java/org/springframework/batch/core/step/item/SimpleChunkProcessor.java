@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,8 +43,10 @@ import org.springframework.util.Assert;
  *
  * @see ChunkOrientedTasklet
  * @deprecated Since 6.0, use
- * {@link org.springframework.batch.core.step.item.ChunkOrientedStep} instead. Scheduled
- * for removal in 7.0.
+ * {@link org.springframework.batch.core.step.item.ChunkOrientedStep} instead. To process
+ * chunks outside of a step (for example in a remote chunking worker or with a
+ * {@link ChunkTaskExecutorItemWriter}), use {@link DefaultChunkProcessor}. Scheduled for
+ * removal in 7.0.
  */
 @NullUnmarked
 @Deprecated(since = "6.0", forRemoval = true)

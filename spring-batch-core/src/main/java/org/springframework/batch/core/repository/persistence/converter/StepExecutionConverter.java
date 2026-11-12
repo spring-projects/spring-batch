@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 the original author or authors.
+ * Copyright 2024-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,9 +56,9 @@ public class StepExecutionConverter {
 	public StepExecution fromStepExecution(org.springframework.batch.core.step.StepExecution source) {
 		StepExecution stepExecution = new StepExecution();
 		stepExecution.setStepExecutionId(source.getId());
-		stepExecution.setJobExecutionId(source.getJobExecutionId());
+		stepExecution.setJobExecutionId(source.getJobExecution().getId());
 		stepExecution.setName(source.getStepName());
-		stepExecution.setJobExecutionId(source.getJobExecutionId());
+		stepExecution.setJobExecutionId(source.getJobExecution().getId());
 		stepExecution.setStatus(source.getStatus());
 		stepExecution.setReadCount(source.getReadCount());
 		stepExecution.setWriteCount(source.getWriteCount());

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 the original author or authors.
+ * Copyright 2023-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.infrastructure.item.data.MongoCursorItemReader;
-import org.springframework.batch.infrastructure.item.data.builder.MongoCursorItemReaderBuilder;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
@@ -35,7 +34,7 @@ import static org.mockito.Mockito.mock;
  *
  * @author Mahmoud Ben Hassine
  */
-public class MongoCursorItemReaderBuilderTests {
+class MongoCursorItemReaderBuilderTests {
 
 	@Test
 	void testBuild() {
@@ -43,7 +42,7 @@ public class MongoCursorItemReaderBuilderTests {
 		MongoTemplate template = mock();
 		Class<String> targetType = String.class;
 		Query query = mock();
-		Map<String, Sort.Direction> sorts = mock();
+		Sort sort = Sort.by(Sort.Direction.DESC, "name");
 		int batchSize = 100;
 		int limit = 10000;
 		Duration maxTime = Duration.ofSeconds(1);
@@ -53,7 +52,7 @@ public class MongoCursorItemReaderBuilderTests {
 			.template(template)
 			.targetType(targetType)
 			.query(query)
-			.sorts(sorts)
+			.sort(sort)
 			.batchSize(batchSize)
 			.limit(limit)
 			.maxTime(maxTime)
@@ -63,9 +62,71 @@ public class MongoCursorItemReaderBuilderTests {
 		Assertions.assertEquals(template, ReflectionTestUtils.getField(reader, "template"));
 		Assertions.assertEquals(targetType, ReflectionTestUtils.getField(reader, "targetType"));
 		Assertions.assertEquals(query, ReflectionTestUtils.getField(reader, "query"));
+		Assertions.assertEquals(sort, ReflectionTestUtils.getField(reader, "sort"));
 		Assertions.assertEquals(batchSize, ReflectionTestUtils.getField(reader, "batchSize"));
 		Assertions.assertEquals(limit, ReflectionTestUtils.getField(reader, "limit"));
 		Assertions.assertEquals(maxTime, ReflectionTestUtils.getField(reader, "maxTime"));
+	}
+
+	@Test
+	@SuppressWarnings("removal")
+	void testBuildWithDeprecatedSorts() {
+		// given
+		MongoTemplate template = mock();
+
+		// when
+		MongoCursorItemReader<String> reader = new MongoCursorItemReaderBuilder<String>().name("reader")
+			.template(template)
+			.targetType(String.class)
+			.jsonQuery("{ }")
+			.sorts(Map.of("name", Sort.Direction.DESC))
+			.build();
+
+		// then
+		Assertions.assertEquals(Sort.by(Sort.Direction.DESC, "name"), ReflectionTestUtils.getField(reader, "sort"));
+	}
+
+	@Test
+	void testBuildWithQueryNoSorts() {
+		// given
+		MongoTemplate template = mock();
+		Class<String> targetType = String.class;
+		Query query = mock();
+		int batchSize = 100;
+		int limit = 10000;
+		Duration maxTime = Duration.ofSeconds(1);
+
+		// when & then
+		Assertions.assertDoesNotThrow(() -> new MongoCursorItemReaderBuilder<String>().name("reader")
+			.template(template)
+			.targetType(targetType)
+			.query(query)
+			.batchSize(batchSize)
+			.limit(limit)
+			.maxTime(maxTime)
+			.build());
+	}
+
+	@Test
+	void testBuildWithJsonQueryNoSorts() {
+		// given
+		MongoTemplate template = mock();
+		Class<String> targetType = String.class;
+		String jsonQuery = "{ }";
+		int batchSize = 100;
+		int limit = 10000;
+		Duration maxTime = Duration.ofSeconds(1);
+
+		// when & then
+		Assertions.assertThrows(IllegalArgumentException.class,
+				() -> new MongoCursorItemReaderBuilder<String>().name("reader")
+					.template(template)
+					.targetType(targetType)
+					.jsonQuery(jsonQuery)
+					.batchSize(batchSize)
+					.limit(limit)
+					.maxTime(maxTime)
+					.build());
 	}
 
 }

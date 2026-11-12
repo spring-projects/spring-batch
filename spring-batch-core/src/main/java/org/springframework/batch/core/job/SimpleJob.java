@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,7 +49,9 @@ public class SimpleJob extends AbstractJob {
 
 	/**
 	 * Default constructor for job with null name
+	 * @deprecated since 6.0 for removal in 7.0. Use {@link #SimpleJob(String)} instead.
 	 */
+	@Deprecated(since = "6.0", forRemoval = true)
 	public SimpleJob() {
 		this(null);
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2023 the original author or authors.
+ * Copyright 2012-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,7 +43,10 @@ import org.springframework.util.StringUtils;
  *
  * @author Dave Syer
  * @author Michael Minella
+ * @deprecated since 6.0 in favor of Java configuration or plain XML bean definitions.
+ * Scheduled for removal in 7.0.
  */
+@Deprecated(since = "6.0", forRemoval = true)
 public class SimpleFlowFactoryBean implements FactoryBean<SimpleFlow>, InitializingBean {
 
 	private String name;
@@ -162,11 +165,6 @@ public class SimpleFlowFactoryBean implements FactoryBean<SimpleFlow>, Initializ
 	@Override
 	public Class<?> getObjectType() {
 		return SimpleFlow.class;
-	}
-
-	@Override
-	public boolean isSingleton() {
-		return true;
 	}
 
 	/**

@@ -166,8 +166,22 @@ public interface JobExplorer {
 	 * repository.
 	 * @throws NoSuchJobException thrown when there is no {@link JobInstance} for the
 	 * jobName specified.
+	 * @deprecated since 6.1 in favor of {@link #countJobInstances(String)}.
 	 */
+	@Deprecated(since = "6.1", forRemoval = true)
 	default long getJobInstanceCount(String jobName) throws NoSuchJobException {
+		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 * Query the repository for the number of unique {@link JobInstance} objects
+	 * associated with the supplied job name.
+	 * @param jobName The name of the job for which to query.
+	 * @return the number of {@link JobInstance}s that exist within the associated job
+	 * repository, or {@code 0} if none is found.
+	 * @since 6.1
+	 */
+	default long countJobInstances(String jobName) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -286,8 +300,22 @@ public interface JobExplorer {
 	 * @param jobInstance {@link JobInstance} instance containing the step executions.
 	 * @param stepName the name of the step execution that might have run.
 	 * @return the execution count of the step within the given job instance.
+	 * @deprecated since 6.1 in favor of
+	 * {@link #countStepExecutions(JobInstance, String)}.
 	 */
+	@Deprecated(since = "6.1", forRemoval = true)
 	default long getStepExecutionCount(JobInstance jobInstance, String stepName) throws NoSuchStepException {
+		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 * @param jobInstance {@link JobInstance} instance containing the step executions.
+	 * @param stepName the name of the step execution that might have run.
+	 * @return the execution count of the step within the given job instance, or {@code 0}
+	 * if none is found.
+	 * @since 6.1
+	 */
+	default long countStepExecutions(JobInstance jobInstance, String stepName) {
 		throw new UnsupportedOperationException();
 	}
 

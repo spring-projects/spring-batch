@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import javax.sql.DataSource;
 import java.sql.DatabaseMetaData;
 
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -37,13 +38,29 @@ import java.util.stream.Collectors;
  * @author Lucas Ward
  * @author Mahmoud Ben Hassine
  * @author Stefano Cordio
+ * @author Yanming Zhou
  * @since 2.0
  */
 public enum DatabaseType {
 
-	DERBY("Apache Derby"), DB2("DB2"), DB2VSE("DB2VSE"), DB2ZOS("DB2ZOS"), DB2AS400("DB2AS400"),
-	HSQL("HSQL Database Engine"), SQLSERVER("Microsoft SQL Server"), MYSQL("MySQL"), ORACLE("Oracle"),
-	POSTGRES("PostgreSQL"), SYBASE("Sybase"), H2("H2"), SQLITE("SQLite"), HANA("HDB"), MARIADB("MariaDB");
+	/**
+	 * Apache Derby.
+	 * @deprecated since 6.1.0 with no replacement. Scheduled for removal in 7.0.0.
+	 */
+	@Deprecated(since = "6.1.0", forRemoval = true)
+	DERBY("Apache Derby"),
+
+	DB2("DB2"), DB2VSE("DB2VSE", "schema-db2.sql", "schema-drop-db2.sql"),
+	DB2ZOS("DB2ZOS", "schema-db2.sql", "schema-drop-db2.sql"),
+	DB2AS400("DB2AS400", "schema-db2.sql", "schema-drop-db2.sql"),
+	HSQL("HSQL Database Engine", "schema-hsqldb.sql", "schema-drop-hsqldb.sql"), SQLSERVER("Microsoft SQL Server"),
+	MYSQL("MySQL"), ORACLE("Oracle"), POSTGRES("PostgreSQL", "schema-postgresql.sql", "schema-drop-postgresql.sql"),
+	SYBASE("Sybase"), H2("H2"), SQLITE("SQLite"), HANA("HDB"), MARIADB("MariaDB");
+
+	/**
+	 * The package in which the schema scripts for supported databases are located.
+	 */
+	private static final String SCHEMA_LOCATION = "org/springframework/batch/core/";
 
 	private static final Map<String, DatabaseType> DATABASE_TYPES = Arrays.stream(DatabaseType.values())
 		.collect(Collectors.toMap(DatabaseType::getProductName, Function.identity()));
@@ -52,12 +69,51 @@ public enum DatabaseType {
 	// in metadata.
 	private final String productName;
 
+	private final String productSchema;
+
+	private final String productSchemaDrop;
+
 	DatabaseType(String productName) {
+		String name = name().toLowerCase(Locale.ROOT);
 		this.productName = productName;
+		this.productSchema = SCHEMA_LOCATION + "schema-%s.sql".formatted(name);
+		this.productSchemaDrop = SCHEMA_LOCATION + "schema-drop-%s.sql".formatted(name);
+	}
+
+	DatabaseType(String productName, String productSchema, String productSchemaDrop) {
+		this.productName = productName;
+		this.productSchema = SCHEMA_LOCATION + productSchema;
+		this.productSchemaDrop = SCHEMA_LOCATION + productSchemaDrop;
 	}
 
 	public String getProductName() {
 		return productName;
+	}
+
+	/**
+	 * Return the classpath location of the schema creation script for this database type.
+	 * The returned location does not have a leading {@code /}, so that it can be used
+	 * as-is with classpath-relative resource loading APIs (eg {@code ClassPathResource})
+	 * as well as with AOT resource hint registration (eg
+	 * {@code RuntimeHints.resources().registerPattern(...)}).
+	 * @return the classpath location of the schema creation script
+	 * @since 6.1
+	 */
+	public String getProductSchema() {
+		return productSchema;
+	}
+
+	/**
+	 * Return the classpath location of the schema drop script for this database type. The
+	 * returned location does not have a leading {@code /}, so that it can be used as-is
+	 * with classpath-relative resource loading APIs (eg {@code ClassPathResource}) as
+	 * well as with AOT resource hint registration (eg
+	 * {@code RuntimeHints.resources().registerPattern(...)}).
+	 * @return the classpath location of the schema drop script
+	 * @since 6.1
+	 */
+	public String getProductSchemaDrop() {
+		return productSchemaDrop;
 	}
 
 	/**

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2025 the original author or authors.
+ * Copyright 2016-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.batch.infrastructure.item.Chunk;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.batch.infrastructure.item.file.FlatFileItemWriter;
-import org.springframework.batch.infrastructure.item.file.builder.FlatFileItemWriterBuilder;
 import org.springframework.batch.infrastructure.item.file.transform.BeanWrapperFieldExtractor;
 import org.springframework.batch.infrastructure.item.file.transform.DelimitedLineAggregator;
 import org.springframework.batch.infrastructure.item.file.transform.FormatterLineAggregator;
@@ -38,6 +37,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.WritableResource;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
@@ -66,18 +66,36 @@ class FlatFileItemWriterBuilderTests {
 	}
 
 	@Test
-	void testMultipleLineAggregators() throws IOException {
+	void testCompileTimeSafetyForDelimitedAndFormatted() throws IOException {
 		WritableResource output = new FileSystemResource(File.createTempFile("foo", "txt"));
 
-		FlatFileItemWriterBuilder<Foo> builder = new FlatFileItemWriterBuilder<Foo>().name("itemWriter")
+		// Pattern 1: Using delimited() only
+		assertDoesNotThrow(() -> new FlatFileItemWriterBuilder<Foo>().name("itemWriter")
 			.resource(output)
 			.delimited()
 			.delimiter(";")
 			.names("foo", "bar")
+			.build());
+
+		// Pattern 2: Using formatted() only
+		assertDoesNotThrow(() -> new FlatFileItemWriterBuilder<Foo>().name("itemWriter")
+			.resource(output)
 			.formatted()
 			.format("%2s%2s")
-			.names("foo", "bar");
-		assertThrows(IllegalStateException.class, builder::build);
+			.names("foo", "bar")
+			.build());
+
+		// The following would not compile, providing the same guarantee that used to be
+		// enforced at runtime via an IllegalStateException:
+		//
+		// new FlatFileItemWriterBuilder<Foo>().name("itemWriter")
+		// .resource(output)
+		// .delimited()
+		// .delimiter(";")
+		// .names("foo", "bar")
+		// .formatted() // compile error: method not available on DelimitedStage
+		// .format("%2s%2s")
+		// .names("foo", "bar");
 	}
 
 	@Test

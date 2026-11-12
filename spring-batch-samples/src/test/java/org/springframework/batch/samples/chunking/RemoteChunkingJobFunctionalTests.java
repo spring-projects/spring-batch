@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2025 the original author or authors.
+ * Copyright 2018-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,11 @@
  */
 package org.springframework.batch.samples.chunking;
 
+import org.apache.activemq.artemis.api.core.SimpleString;
 import org.apache.activemq.artemis.core.config.Configuration;
 import org.apache.activemq.artemis.core.config.impl.ConfigurationImpl;
 import org.apache.activemq.artemis.core.server.embedded.EmbeddedActiveMQ;
+import org.apache.activemq.artemis.core.settings.impl.AddressSettings;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -60,7 +62,9 @@ class RemoteChunkingJobFunctionalTests {
 			.setPersistenceEnabled(false)
 			.setSecurityEnabled(false)
 			.setJMXManagementEnabled(false)
-			.setJournalDatasync(false);
+			.setJournalDatasync(false)
+			.addAddressSetting("#", new AddressSettings().setDeadLetterAddress(SimpleString.of("DLQ"))
+				.setExpiryAddress(SimpleString.of("ExpiryQueue")));
 		this.brokerService = new EmbeddedActiveMQ().setConfiguration(configuration).start();
 		this.workerApplicationContext = new AnnotationConfigApplicationContext(WorkerConfiguration.class);
 	}

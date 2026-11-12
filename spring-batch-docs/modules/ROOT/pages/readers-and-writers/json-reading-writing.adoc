@@ -86,3 +86,91 @@ public JsonFileItemWriter<Trade> jsonFileItemWriter() {
 }
 ----
 
+
+[[jsonLines]]
+== JSON Lines
+
+Spring Batch also supports the https://jsonlines.org[JSON Lines] format, where each line of
+a file is a valid JSON object corresponding to an item:
+
+[source, json]
+----
+{"isin": "123", "quantity": 1, "price": 1.2, "customer": "foo"}
+{"isin": "456", "quantity": 2, "price": 1.4, "customer": "bar"}
+----
+
+Since each line is an item, there is no need for a dedicated item reader or writer: the
+`FlatFileItemReader` and `FlatFileItemWriter` are used, with a JSON-aware `LineMapper` and
+`LineAggregator`. Like the JSON item readers and writers, they delegate the JSON processing
+to a collaborator, so they are not tied to any particular JSON library.
+
+[[jsonLineMapper]]
+=== `JsonLineMapper`
+
+The `JsonLineMapper` is a
+xref:readers-and-writers/flat-files/file-item-reader.adoc#lineMapper[`LineMapper`] that
+delegates the conversion of a line to an item to the
+`org.springframework.batch.infrastructure.item.json.JsonObjectUnmarshaller` interface. The
+contract of this interface is to take a JSON `String` and unmarshall it to an object. Two
+implementations are currently provided:
+
+* link:$$https://github.com/FasterXML/jackson$$[Jackson] through the `org.springframework.batch.infrastructure.item.json.JacksonJsonObjectUnmarshaller`
+* link:$$https://github.com/google/gson$$[Gson] through the `org.springframework.batch.infrastructure.item.json.GsonJsonObjectUnmarshaller`
+
+The following example shows how to define a `FlatFileItemReader` that reads the previous
+JSON Lines file, using an unmarshaller based on Jackson:
+
+[source, java]
+----
+@Bean
+public FlatFileItemReader<Trade> jsonLinesItemReader() {
+   return new FlatFileItemReaderBuilder<Trade>()
+                 .name("tradeJsonLinesItemReader")
+                 .resource(new ClassPathResource("trades.jsonl"))
+                 .lineMapper(new JsonLineMapper<>(new JacksonJsonObjectUnmarshaller<>(Trade.class)))
+                 .build();
+}
+----
+
+A custom `JsonMapper` or `Gson` can be provided to the unmarshaller, for example
+`new JacksonJsonObjectUnmarshaller<>(jsonMapper, Trade.class)`. For parameterized target
+types, such as `Map<String, Object>`, which cannot be expressed with a `Class`, the
+unmarshallers accept a Jackson `TypeReference` or a Gson `TypeToken`:
+
+[source, java]
+----
+JsonLineMapper<Map<String, Object>> lineMapper = new JsonLineMapper<>(
+		new JacksonJsonObjectUnmarshaller<>(new TypeReference<Map<String, Object>>() {}));
+----
+
+NOTE: A line that cannot be parsed causes a `ParseException` that wraps the exception of the
+JSON library. The `FlatFileItemReader` reports it as a `FlatFileParseException` that also
+contains the line and its number.
+
+[[jsonLineAggregator]]
+=== `JsonLineAggregator`
+
+The `JsonLineAggregator` is a
+xref:readers-and-writers/flat-files/file-item-writer.adoc#lineAggregator[`LineAggregator`]
+that delegates the conversion of an item to a line to the
+`org.springframework.batch.infrastructure.item.json.JsonObjectMarshaller` interface, which is
+the same one used by the `JsonFileItemWriter` (see <<jsonfileitemwriter>>).
+
+The following example shows how to define a `FlatFileItemWriter` that writes a JSON Lines
+file, using a marshaller based on Jackson:
+
+[source, java]
+----
+@Bean
+public FlatFileItemWriter<Trade> jsonLinesItemWriter() {
+   return new FlatFileItemWriterBuilder<Trade>()
+                 .name("tradeJsonLinesItemWriter")
+                 .resource(new FileSystemResource("trades.jsonl"))
+                 .lineAggregator(new JsonLineAggregator<>(new JacksonJsonObjectMarshaller<>()))
+                 .build();
+}
+----
+
+IMPORTANT: Each item is written as a single line, so the marshaller must produce a JSON
+object that fits on one line. This is the case of the default Jackson and Gson marshallers,
+but not of a marshaller that is configured to pretty-print its output.

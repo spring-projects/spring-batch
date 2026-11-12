@@ -28,7 +28,6 @@ import org.springframework.batch.infrastructure.item.json.JsonItemReader;
 import org.springframework.batch.infrastructure.item.json.JsonObjectReader;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
 
 /**
  * A builder for {@link JsonItemReader}.
@@ -60,7 +59,6 @@ public class JsonItemReaderBuilder<T> {
 	 * objects.
 	 * @param jsonObjectReader to use
 	 * @return The current instance of the builder.
-	 * @see JsonItemReader#setJsonObjectReader(JsonObjectReader)
 	 */
 	public JsonItemReaderBuilder<T> jsonObjectReader(JsonObjectReader<T> jsonObjectReader) {
 		this.jsonObjectReader = jsonObjectReader;
@@ -81,8 +79,9 @@ public class JsonItemReaderBuilder<T> {
 	}
 
 	/**
-	 * The name used to calculate the key within the {@link ExecutionContext}. Required if
-	 * {@link #saveState(boolean)} is set to true.
+	 * The name used to calculate the key within the {@link ExecutionContext}. Defaults to
+	 * the bean name, or to the short class name if this instance is not a bean. Set it
+	 * explicitly to disambiguate several non-bean instances of the same type in a step.
 	 * @param name name of the reader instance
 	 * @return The current instance of the builder.
 	 * @see ItemStreamSupport#setName(String)
@@ -148,9 +147,6 @@ public class JsonItemReaderBuilder<T> {
 	 */
 	public JsonItemReader<T> build() {
 		Assert.notNull(this.jsonObjectReader, "A json object reader is required.");
-		if (this.saveState) {
-			Assert.state(StringUtils.hasText(this.name), "A name is required when saveState is set to true.");
-		}
 
 		if (this.resource == null) {
 			logger.debug("The resource is null. This is only a valid scenario when "

@@ -15,10 +15,12 @@
  */
 package org.springframework.batch.core.step.item;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.ExitStatus;
+import org.springframework.batch.core.annotation.BeforeStep;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.EnableJdbcJobRepository;
 import org.springframework.batch.core.job.Job;
@@ -27,6 +29,7 @@ import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobOperator;
+import org.springframework.batch.core.listener.ItemProcessListener;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
@@ -183,6 +186,42 @@ public class ChunkOrientedStepIntegrationTests {
 		Assertions.assertEquals(2, itemWriter.getWrittenItems().size());
 	}
 
+	// Issue: https://github.com/spring-projects/spring-batch/issues/5466
+	@Test
+	void testItemHandlerImplementingListenerInterfaceIsRegisteredOnce() throws Exception {
+		// given
+		ApplicationContext context = new AnnotationConfigApplicationContext(
+				InterfaceOnlyListenerStepConfiguration.class);
+		JobOperator jobOperator = context.getBean(JobOperator.class);
+		Job job = context.getBean(Job.class);
+
+		// when
+		jobOperator.start(job, new JobParametersBuilder().addLong("run.id", 1L).toJobParameters());
+
+		// then
+		InterfaceOnlyListenerProcessor processor = context.getBean(InterfaceOnlyListenerProcessor.class);
+		Assertions.assertEquals(1, processor.beforeProcessCount);
+		Assertions.assertEquals(1, processor.afterProcessCount);
+	}
+
+	// Issue: https://github.com/spring-projects/spring-batch/issues/5466
+	@Test
+	void testItemHandlerMixingListenerInterfaceAndAnnotationIsRegisteredOnce() throws Exception {
+		// given
+		ApplicationContext context = new AnnotationConfigApplicationContext(MixedListenerStepConfiguration.class);
+		JobOperator jobOperator = context.getBean(JobOperator.class);
+		Job job = context.getBean(Job.class);
+
+		// when
+		jobOperator.start(job, new JobParametersBuilder().addLong("run.id", 1L).toJobParameters());
+
+		// then
+		MixedListenerProcessor processor = context.getBean(MixedListenerProcessor.class);
+		Assertions.assertEquals(1, processor.beforeStepCount);
+		Assertions.assertEquals(1, processor.beforeProcessCount);
+		Assertions.assertEquals(1, processor.afterProcessCount);
+	}
+
 	@Configuration
 	static class ChunkOrientedStepConfiguration {
 
@@ -238,6 +277,97 @@ public class ChunkOrientedStepIntegrationTests {
 				.writer(itemWriter)
 				.build();
 			return new JobBuilder(jobRepository).start(step).build();
+		}
+
+	}
+
+	@Configuration
+	@EnableBatchProcessing
+	@EnableJdbcJobRepository
+	@Import(JdbcInfrastructureConfiguration.class)
+	static class InterfaceOnlyListenerStepConfiguration {
+
+		@Bean
+		public InterfaceOnlyListenerProcessor itemProcessor() {
+			return new InterfaceOnlyListenerProcessor();
+		}
+
+		@Bean
+		Job job(JobRepository jobRepository, JdbcTransactionManager transactionManager,
+				InterfaceOnlyListenerProcessor itemProcessor) {
+			ChunkOrientedStep<String, String> step = new StepBuilder("step", jobRepository).<String, String>chunk(1)
+				.transactionManager(transactionManager)
+				.reader(new SingleItemStreamReader<>("foo"))
+				.processor(itemProcessor)
+				.writer(items -> {
+				})
+				.build();
+			return new JobBuilder(jobRepository).start(step).build();
+		}
+
+	}
+
+	@Configuration
+	@EnableBatchProcessing
+	@EnableJdbcJobRepository
+	@Import(JdbcInfrastructureConfiguration.class)
+	static class MixedListenerStepConfiguration {
+
+		@Bean
+		public MixedListenerProcessor itemProcessor() {
+			return new MixedListenerProcessor();
+		}
+
+		@Bean
+		Job job(JobRepository jobRepository, JdbcTransactionManager transactionManager,
+				MixedListenerProcessor itemProcessor) {
+			ChunkOrientedStep<String, String> step = new StepBuilder("step", jobRepository).<String, String>chunk(1)
+				.transactionManager(transactionManager)
+				.reader(new SingleItemStreamReader<>("foo"))
+				.processor(itemProcessor)
+				.writer(items -> {
+				})
+				.build();
+			return new JobBuilder(jobRepository).start(step).build();
+		}
+
+	}
+
+	// item processor that implements a listener interface without any listener
+	// annotation, the control case for the processor below
+	static class InterfaceOnlyListenerProcessor
+			implements ItemProcessor<String, String>, ItemProcessListener<String, String> {
+
+		int beforeProcessCount;
+
+		int afterProcessCount;
+
+		@Override
+		public @Nullable String process(String item) {
+			return item;
+		}
+
+		@Override
+		public void beforeProcess(String item) {
+			this.beforeProcessCount++;
+		}
+
+		@Override
+		public void afterProcess(String item, @Nullable String result) {
+			this.afterProcessCount++;
+		}
+
+	}
+
+	// the same item processor with an annotated listener method added, so it must
+	// still be registered as a listener only once
+	static class MixedListenerProcessor extends InterfaceOnlyListenerProcessor {
+
+		int beforeStepCount;
+
+		@BeforeStep
+		public void init(StepExecution stepExecution) {
+			this.beforeStepCount++;
 		}
 
 	}

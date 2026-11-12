@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2024 the original author or authors.
+ * Copyright 2013-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,6 +51,12 @@ import java.util.Comparator;
  */
 public class DefaultStateTransitionComparator implements Comparator<StateTransition> {
 
+	/**
+	 * Name of the bean registered by the batch XML namespace for the default comparator.
+	 * @deprecated since 6.0 with no replacement, as it is only used by the deprecated
+	 * batch XML namespace. Scheduled for removal in 7.0.
+	 */
+	@Deprecated(since = "6.0", forRemoval = true)
 	public static final String STATE_TRANSITION_COMPARATOR = "batch_state_transition_comparator";
 
 	@Override

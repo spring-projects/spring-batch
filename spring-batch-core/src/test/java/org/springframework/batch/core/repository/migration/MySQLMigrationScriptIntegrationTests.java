@@ -17,7 +17,7 @@ package org.springframework.batch.core.repository.migration;
 
 import com.mysql.cj.jdbc.MysqlDataSource;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
@@ -28,11 +28,14 @@ import org.testcontainers.utility.DockerImageName;
 
 /**
  * Integration tests for Mysql migration script for v6.0
+ * <p>
+ * Excluded from the build by default through the {@code migration} tag. Run it on demand
+ * with {@code -Dexcluded.groups= -Dgroups=migration}.
  *
  * @author Jinwoo Bae
  * @author Mahmoud Ben Hassine
  */
-@Disabled("On purpose, not part of the CI build. Used on demand to validate migration scripts.")
+@Tag("migration")
 @Testcontainers(disabledWithoutDocker = true)
 class MySQLMigrationScriptIntegrationTests {
 

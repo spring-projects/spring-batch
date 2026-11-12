@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2025 the original author or authors.
+ * Copyright 2018-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,11 @@
 package org.springframework.batch.samples.file.json;
 
 import java.io.File;
-import java.io.FileInputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.Job;
@@ -29,15 +31,18 @@ import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.util.DigestUtils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Mahmoud Ben Hassine
  * @author Glenn Renfro
  */
 class JsonFunctionalTests {
+
+	@TempDir
+	private Path tempDirectory;
 
 	public static final String INPUT_FILE = "org/springframework/batch/samples/file/json/data/trades.json";
 
@@ -57,10 +62,32 @@ class JsonFunctionalTests {
 		assertFileEquals(new File("src/main/resources/" + INPUT_FILE), new File(OUTPUT_FILE));
 	}
 
+	@Test
+	void testFileComparisonNormalizesCrLfInExpectedFile() throws Exception {
+		Path expected = this.tempDirectory.resolve("expected.json");
+		Path actual = this.tempDirectory.resolve("actual.json");
+		String json = "[\n {\"id\":1}\n]\n";
+		Files.writeString(expected, json.replace("\n", "\r\n"));
+		Files.writeString(actual, json);
+
+		assertFileEquals(expected.toFile(), actual.toFile());
+	}
+
+	@Test
+	void testFileComparisonDoesNotNormalizeActualFile() throws Exception {
+		Path expected = this.tempDirectory.resolve("expected.json");
+		Path actual = this.tempDirectory.resolve("actual.json");
+		String json = "[\n {\"id\":1}\n]\n";
+		Files.writeString(expected, json);
+		Files.writeString(actual, json.replace("\n", "\r\n"));
+
+		assertThrows(AssertionError.class, () -> assertFileEquals(expected.toFile(), actual.toFile()));
+	}
+
 	private void assertFileEquals(File expected, File actual) throws Exception {
-		String expectedHash = DigestUtils.md5DigestAsHex(new FileInputStream(expected));
-		String actualHash = DigestUtils.md5DigestAsHex(new FileInputStream(actual));
-		assertEquals(expectedHash, actualHash);
+		String expectedContent = Files.readString(expected.toPath()).replace("\r\n", "\n");
+		String actualContent = Files.readString(actual.toPath());
+		assertEquals(expectedContent, actualContent);
 	}
 
 }

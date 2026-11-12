@@ -17,7 +17,6 @@ package org.springframework.batch.infrastructure.item.data;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -60,11 +59,12 @@ class RepositoryItemReaderTests {
 	@Mock
 	private PagingAndSortingRepository<Object, Integer> repository;
 
-	private Map<String, Sort.Direction> sorts = Map.of("id", Direction.ASC);
+	private final Sort sort = Sort.by(Direction.ASC, "id");
 
 	@BeforeEach
 	void setUp() {
-		reader = new RepositoryItemReader<>(repository, sorts);
+		reader = new RepositoryItemReader<>(repository);
+		reader.setSort(sort);
 		reader.setPageSize(1);
 		reader.setMethodName("findAll");
 	}
@@ -193,10 +193,56 @@ class RepositoryItemReaderTests {
 	}
 
 	@Test
+	void testUnsortedByDefault() throws Exception {
+		reader = new RepositoryItemReader<>(repository);
+		reader.setPageSize(1);
+		reader.setMethodName("findAll");
+		ArgumentCaptor<PageRequest> pageRequestContainer = ArgumentCaptor.forClass(PageRequest.class);
+		when(repository.findAll(pageRequestContainer.capture())).thenReturn(new PageImpl<>(singletonList("result")));
+
+		assertEquals("result", reader.doRead());
+
+		assertEquals(Sort.unsorted(), pageRequestContainer.getValue().getSort());
+	}
+
+	@Test
+	void testMultipleSortCriteriaWithDifferentDirections() throws Exception {
+		reader.setSort(Sort.by(Sort.Order.asc("id"), Sort.Order.desc("name")));
+		ArgumentCaptor<PageRequest> pageRequestContainer = ArgumentCaptor.forClass(PageRequest.class);
+		when(repository.findAll(pageRequestContainer.capture())).thenReturn(new PageImpl<>(singletonList("result")));
+
+		assertEquals("result", reader.doRead());
+
+		assertEquals("id: ASC,name: DESC", pageRequestContainer.getValue().getSort().toString());
+	}
+
+	@Test
+	void testNullSortNotAllowed() {
+		assertThrows(IllegalArgumentException.class, () -> reader.setSort(null));
+	}
+
+	@Test
+	@SuppressWarnings("removal")
+	void testDeprecatedMapOfSorts() throws Exception {
+		reader = new RepositoryItemReader<>(repository, Map.of("id", Direction.DESC));
+		reader.setPageSize(1);
+		reader.setMethodName("findAll");
+		ArgumentCaptor<PageRequest> pageRequestContainer = ArgumentCaptor.forClass(PageRequest.class);
+		when(repository.findAll(pageRequestContainer.capture())).thenReturn(new PageImpl<>(singletonList("result")));
+
+		assertEquals("result", reader.doRead());
+		assertEquals("id: DESC", pageRequestContainer.getValue().getSort().toString());
+
+		reader.setSorts(Map.of("name", Direction.ASC));
+		reader.doRead();
+		assertEquals("name: ASC", pageRequestContainer.getValue().getSort().toString());
+	}
+
+	@Test
 	void testDifferentTypes() throws Exception {
 		TestRepository differentRepository = mock();
-		sorts = Collections.singletonMap("id", Direction.ASC);
-		RepositoryItemReader<String> reader = new RepositoryItemReader<>(differentRepository, sorts);
+		RepositoryItemReader<String> reader = new RepositoryItemReader<>(differentRepository);
+		reader.setSort(sort);
 		reader.setPageSize(1);
 		reader.setMethodName("findFirstNames");
 

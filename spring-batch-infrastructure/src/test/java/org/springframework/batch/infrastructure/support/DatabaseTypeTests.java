@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2024 the original author or authors.
+ * Copyright 2008-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.jdbc.support.MetaDataAccessException;
 
 import javax.sql.DataSource;
+import java.util.EnumSet;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -41,6 +43,7 @@ import static org.springframework.batch.infrastructure.support.DatabaseType.from
 /**
  * @author Lucas Ward
  * @author Will Schipp
+ * @author Yanming Zhou
  *
  */
 class DatabaseTypeTests {
@@ -161,6 +164,27 @@ class DatabaseTypeTests {
 	void testBadMetaData() throws Exception {
 		DataSource ds = DatabaseTypeTestUtils.getMockDataSource(new MetaDataAccessException("Bad!"));
 		assertThrows(MetaDataAccessException.class, () -> DatabaseType.fromMetaData(ds));
+	}
+
+	@Test
+	void testSchemaLocation() {
+		Map<DatabaseType, String> schemaNames = Map.ofEntries(Map.entry(DatabaseType.DERBY, "derby"),
+				Map.entry(DatabaseType.DB2, "db2"), Map.entry(DatabaseType.DB2VSE, "db2"),
+				Map.entry(DatabaseType.DB2ZOS, "db2"), Map.entry(DatabaseType.DB2AS400, "db2"),
+				Map.entry(DatabaseType.HSQL, "hsqldb"), Map.entry(DatabaseType.SQLSERVER, "sqlserver"),
+				Map.entry(DatabaseType.MYSQL, "mysql"), Map.entry(DatabaseType.ORACLE, "oracle"),
+				Map.entry(DatabaseType.POSTGRES, "postgresql"), Map.entry(DatabaseType.SYBASE, "sybase"),
+				Map.entry(DatabaseType.H2, "h2"), Map.entry(DatabaseType.SQLITE, "sqlite"),
+				Map.entry(DatabaseType.HANA, "hana"), Map.entry(DatabaseType.MARIADB, "mariadb"));
+
+		// guard against a new database type being added without a schema mapping
+		assertEquals(schemaNames.keySet(), EnumSet.allOf(DatabaseType.class));
+		schemaNames.forEach((type, name) -> {
+			assertEquals("org/springframework/batch/core/schema-" + name + ".sql", type.getProductSchema(),
+					type.name());
+			assertEquals("org/springframework/batch/core/schema-drop-" + name + ".sql", type.getProductSchemaDrop(),
+					type.name());
+		});
 	}
 
 }

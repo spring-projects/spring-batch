@@ -30,7 +30,7 @@ import org.springframework.batch.infrastructure.item.database.JdbcBatchItemWrite
 import org.springframework.batch.infrastructure.item.database.builder.JdbcBatchItemWriterBuilder;
 import org.springframework.batch.infrastructure.item.file.FlatFileItemReader;
 import org.springframework.batch.infrastructure.item.file.builder.FlatFileItemReaderBuilder;
-import org.springframework.batch.integration.chunk.ChunkTaskExecutorItemWriter;
+import org.springframework.batch.core.step.item.ChunkTaskExecutorItemWriter;
 import org.springframework.batch.samples.common.DataSourceConfiguration;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

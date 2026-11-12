@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,6 +66,9 @@ public abstract class StepContextRepeatCallback implements RepeatCallback {
 		// The StepContext has to be the same for all chunks,
 		// otherwise step-scoped beans will be re-initialised for each chunk.
 		StepContext stepContext = StepSynchronizationManager.register(stepExecution);
+		// the callback might be executed in a pooled thread, where the job context is
+		// not available either
+		JobSynchronizationManager.register(stepExecution.getJobExecution());
 		if (logger.isDebugEnabled()) {
 			logger.debug("Preparing chunk execution for StepContext: " + ObjectUtils.identityToString(stepContext));
 		}
@@ -87,6 +90,7 @@ public abstract class StepContextRepeatCallback implements RepeatCallback {
 			if (!chunkContext.isComplete()) {
 				attributeQueue.add(chunkContext);
 			}
+			JobSynchronizationManager.close();
 			StepSynchronizationManager.close();
 		}
 	}

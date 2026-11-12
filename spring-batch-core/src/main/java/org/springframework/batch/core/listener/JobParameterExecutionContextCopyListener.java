@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,7 +58,7 @@ public class JobParameterExecutionContextCopyListener implements StepExecutionLi
 	@Override
 	public void beforeStep(StepExecution stepExecution) {
 		ExecutionContext stepContext = stepExecution.getExecutionContext();
-		JobParameters jobParameters = stepExecution.getJobParameters();
+		JobParameters jobParameters = stepExecution.getJobExecution().getJobParameters();
 		Collection<String> keys = this.keys;
 		if (keys == null) {
 			keys = jobParameters.parameters().stream().map(JobParameter::name).collect(Collectors.toSet());

@@ -18,6 +18,7 @@ package org.springframework.batch.core.step.item;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Version;
 
 @Entity(name = "person_target")
 public class PersonEntity {
@@ -27,6 +28,9 @@ public class PersonEntity {
 
 	@Column(name = "name", nullable = false)
 	private String name;
+
+	@Version
+	private long version;
 
 	public PersonEntity() {
 	}
@@ -50,6 +54,10 @@ public class PersonEntity {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public long getVersion() {
+		return version;
 	}
 
 	@Override

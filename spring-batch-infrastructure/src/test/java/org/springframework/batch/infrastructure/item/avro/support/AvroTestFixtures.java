@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2023 the original author or authors.
+ * Copyright 2019-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,16 @@ import org.springframework.core.io.Resource;
  * @author Mahmoud Ben Hassine
  */
 public abstract class AvroTestFixtures {
+
+	static {
+		// Avro 1.12.2 rejects reflection-based (de)serialization of classes that are
+		// not explicitly trusted. Trust the item types used by these fixtures before
+		// any Avro class is touched by a test; applications using AvroItemReader/
+		// AvroItemWriter need to configure this system property (or
+		// org.apache.avro.SERIALIZABLE_CLASSES) themselves.
+		System.setProperty("org.apache.avro.SERIALIZABLE_PACKAGES",
+				"org.springframework.batch.infrastructure.item.avro.example,org.springframework.batch.infrastructure.item.avro.support");
+	}
 
 	//@formatter:off
 	private final Chunk<User> avroGeneratedUsers = Chunk.of(

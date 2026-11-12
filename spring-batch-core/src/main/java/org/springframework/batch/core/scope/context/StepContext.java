@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -90,7 +90,7 @@ public class StepContext extends SynchronizedAttributeAccessor {
 	 * current {@link StepExecution}
 	 */
 	public Long getJobInstanceId() {
-		return stepExecution.getJobExecution().getJobInstance().getInstanceId();
+		return stepExecution.getJobExecution().getJobInstance().getId();
 	}
 
 	/**
@@ -121,7 +121,7 @@ public class StepContext extends SynchronizedAttributeAccessor {
 	 */
 	public Map<String, Object> getJobParameters() {
 		Map<String, Object> result = new HashMap<>();
-		for (JobParameter<?> jobParameter : stepExecution.getJobParameters()) {
+		for (JobParameter<?> jobParameter : stepExecution.getJobExecution().getJobParameters()) {
 			result.put(jobParameter.name(), jobParameter.value());
 		}
 		return Collections.unmodifiableMap(result);

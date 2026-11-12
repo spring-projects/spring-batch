@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,9 +41,6 @@ import org.springframework.util.Assert;
  * @author Stefano Cordio
  * @author Jimmy Praet
  */
-// FIXME the design of creating a flat file writer with an optional resource (to support
-// the multi-resource case) is broken.
-// FIXME The multi-resource writer should create the delegate with the current resource
 public class FlatFileItemWriter<T> extends AbstractFileItemWriter<T> {
 
 	protected LineAggregator<T> lineAggregator;
@@ -88,7 +85,10 @@ public class FlatFileItemWriter<T> extends AbstractFileItemWriter<T> {
 	 * Public setter for the {@link LineAggregator}. This will be used to translate the
 	 * item into a line for output.
 	 * @param lineAggregator the {@link LineAggregator} to set
+	 * @deprecated since 6.1 in favor of passing the line aggregator to the constructor.
+	 * Scheduled for removal in 7.0.
 	 */
+	@Deprecated(since = "6.1", forRemoval = true)
 	public void setLineAggregator(LineAggregator<T> lineAggregator) {
 		this.lineAggregator = lineAggregator;
 	}

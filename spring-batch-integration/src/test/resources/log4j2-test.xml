@@ -6,7 +6,21 @@
         </Console>
     </Appenders>
     <Loggers>
-        <Logger name="org.springframework.batch" level="info" />
+        <Logger name="org.springframework.batch" level="warn" />
+        <!--
+            Many tests provoke failures on purpose, and the framework logs them at ERROR with a full
+            stack trace. These loggers are silenced so that they do not drown the output of the tests.
+            To debug a test that fails unexpectedly, set the logger concerned back to "error".
+        -->
+        <Logger name="org.springframework.batch.core.job.AbstractJob" level="off" />
+        <Logger name="org.springframework.batch.core.step.AbstractStep" level="off" />
+        <Logger name="org.springframework.batch.core.step.item.ChunkOrientedStep" level="off" />
+        <Logger name="org.springframework.batch.core.step.item.ChunkTaskExecutorItemWriter" level="off" />
+        <Logger name="org.springframework.batch.core.step.tasklet.TaskletStep" level="off" />
+        <Logger name="org.springframework.batch.core.launch.support.CommandLineJobOperator" level="off" />
+        <Logger name="org.springframework.batch.core.launch.support.CommandLineJobRunner" level="off" />
+        <Logger name="org.springframework.batch.infrastructure.repeat.exception.LogOrRethrowExceptionHandler" level="off" />
+        <Logger name="org.springframework.batch.samples.mail.TestMailErrorHandler" level="off" />
         <Root level="error">
             <AppenderRef ref="Console" />
         </Root>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,7 +74,7 @@ public class StepExecutionSimpleCompletionPolicy implements StepExecutionListene
 	 */
 	@Override
 	public void beforeStep(StepExecution stepExecution) {
-		JobParameters jobParameters = stepExecution.getJobParameters();
+		JobParameters jobParameters = stepExecution.getJobExecution().getJobParameters();
 		Assert.state(jobParameters.getParameter(keyName) != null,
 				"JobParameters do not contain Long parameter with key=[" + keyName + "]");
 		delegate = new SimpleCompletionPolicy(jobParameters.getLong(keyName).intValue());

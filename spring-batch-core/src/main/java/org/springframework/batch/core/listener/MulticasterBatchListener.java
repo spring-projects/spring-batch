@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,11 +27,19 @@ import org.springframework.batch.infrastructure.item.Chunk;
 import org.springframework.batch.infrastructure.item.ItemStream;
 
 /**
+ * Listener that broadcasts the callbacks of the legacy chunk-oriented processing engine
+ * to the individual listeners registered with it.
+ *
  * @author Dave Syer
  * @author Michael Minella
  * @author Chris Schaefer
  * @author Mahmoud Ben Hassine
+ * @deprecated since 6.0 with no replacement, as it is only used by the legacy
+ * chunk-oriented processing engine (see
+ * {@link org.springframework.batch.core.step.item.SimpleChunkProcessor}), which is
+ * deprecated. Scheduled for removal in 7.0.
  */
+@Deprecated(since = "6.0", forRemoval = true)
 public class MulticasterBatchListener<T, S> implements StepExecutionListener, ChunkListener, ItemReadListener<T>,
 		ItemProcessListener<T, S>, ItemWriteListener<S>, SkipListener<T, S> {
 

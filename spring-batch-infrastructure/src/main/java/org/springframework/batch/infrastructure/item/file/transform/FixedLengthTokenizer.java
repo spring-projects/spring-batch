@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,8 +53,9 @@ public class FixedLengthTokenizer extends AbstractLineTokenizer {
 	 * Set the column ranges. Used in conjunction with the
 	 * {@link RangeArrayPropertyEditor} this property can be set in the form of a String
 	 * describing the range boundaries, e.g. "1,4,7" or "1-3,4-6,7" or "1-2,4-5,7-10". If
-	 * the last range is open then the rest of the line is read into that column
-	 * (irrespective of the strict flag setting).
+	 * a range is open, meaning it has no maximum value, then the rest of the line is read
+	 * into that column (irrespective of the strict flag setting and of the position of
+	 * that range in the given array).
 	 *
 	 * @see #setStrict(boolean)
 	 * @param ranges the column ranges expected in the input
@@ -85,9 +86,7 @@ public class FixedLengthTokenizer extends AbstractLineTokenizer {
 			}
 			else {
 				upperBound = range.getMin();
-				if (upperBound > maxRange) {
-					open = true;
-				}
+				open = true;
 			}
 
 			if (upperBound > maxRange) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2025 the original author or authors.
+ * Copyright 2012-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.job.builder;
 
+import org.springframework.batch.infrastructure.support.DatabaseType;
 import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -118,8 +119,8 @@ class FlowJobBuilderTests {
 	@BeforeEach
 	void init() throws Exception {
 		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
-			.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-			.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
+			.addScript(DatabaseType.HSQL.getProductSchemaDrop())
+			.addScript(DatabaseType.HSQL.getProductSchema())
 			.generateUniqueName(true)
 			.build();
 		JdbcJobRepositoryFactoryBean factory = new JdbcJobRepositoryFactoryBean();
@@ -425,8 +426,8 @@ class FlowJobBuilderTests {
 
 		@Bean
 		public DataSource dataSource() {
-			return new EmbeddedDatabaseBuilder().addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-				.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
+			return new EmbeddedDatabaseBuilder().addScript(DatabaseType.HSQL.getProductSchemaDrop())
+				.addScript(DatabaseType.HSQL.getProductSchema())
 				.generateUniqueName(true)
 				.build();
 		}

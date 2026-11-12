@@ -36,6 +36,7 @@ import org.springframework.integration.channel.NullChannel;
 import org.springframework.integration.config.EnableIntegration;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.StandardIntegrationFlow;
+import org.springframework.integration.jms.DefaultJmsHeaderMapper;
 import org.springframework.integration.jms.dsl.Jms;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 
@@ -70,7 +71,10 @@ public class WorkerConfiguration {
 		StepExecutionRequestHandler stepExecutionRequestHandler = new StepExecutionRequestHandler();
 		stepExecutionRequestHandler.setJobRepository(jobRepository);
 		stepExecutionRequestHandler.setStepLocator(stepLocator);
-		return IntegrationFlow.from(Jms.messageDrivenChannelAdapter(connectionFactory).destination("requests"))
+		return IntegrationFlow
+			.from(Jms.messageDrivenChannelAdapter(connectionFactory)
+				.headerMapper(new DefaultJmsHeaderMapper("*"))
+				.destination("requests"))
 			.channel(requests())
 			.handle(stepExecutionRequestHandler, "handle")
 			.channel(new NullChannel()) // No replies are sent back to the manager

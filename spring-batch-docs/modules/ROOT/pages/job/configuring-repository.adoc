@@ -262,6 +262,41 @@ Given the preceding changes, every query to the metadata tables is prefixed with
 
 NOTE: Only the table prefix is configurable. The table and column names are not.
 
+[[repositoryCollectionPrefix]]
+== Changing the Collection Prefix
+
+The MongoDB job repository offers the same capability for the metadata collections. By
+default, they are all prefixed with `BATCH_`: `BATCH_JOB_INSTANCE`,
+`BATCH_JOB_EXECUTION`, `BATCH_STEP_EXECUTION` and `BATCH_SEQUENCES`. The prefix can be
+changed to run several applications against the same MongoDB database, or to isolate
+environments from each other.
+
+.Java Configuration
+[source, java]
+----
+@Configuration
+@EnableBatchProcessing
+@EnableMongoJobRepository(collectionPrefix = "MY_APP_")
+public class MyJobConfiguration {
+
+   // job definition
+
+}
+----
+
+Given the preceding change, the metadata is stored in the `MY_APP_JOB_INSTANCE`,
+`MY_APP_JOB_EXECUTION`, `MY_APP_STEP_EXECUTION` and `MY_APP_SEQUENCES` collections. The
+identifiers of the sequence documents held in the sequences collection are prefixed as
+well, so `MY_APP_SEQUENCES` contains `MY_APP_JOB_INSTANCE_SEQ`,
+`MY_APP_JOB_EXECUTION_SEQ` and `MY_APP_STEP_EXECUTION_SEQ`.
+
+IMPORTANT: The `org/springframework/batch/core/schema-mongodb.jsonl` script that creates
+the collections and seeds the sequence documents uses the default prefix. When you
+configure a custom prefix, you need to adapt that script accordingly, just as you would
+adapt the DDL scripts for a custom table prefix.
+
+NOTE: Only the collection prefix is configurable. The collection and field names are not.
+
 [[nonStandardDatabaseTypesInRepository]]
 == Non-standard Database Types in a Repository
 
@@ -269,6 +304,10 @@ If you use a database platform that is not in the list of supported platforms, y
 may be able to use one of the supported types, if the SQL variant is close enough. To do
 this, you can use the raw `JdbcJobRepositoryFactoryBean` instead of the namespace shortcut and
 use it to set the database type to the closest match.
+
+WARNING: The `derby` database type is deprecated as of Spring Batch 6.1.0 and will be
+removed in version 7.0.0. If you are currently running the job repository on Apache
+Derby, you should plan a migration to another supported database platform.
 
 [tabs]
 ====

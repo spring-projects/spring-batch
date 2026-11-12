@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2025 the original author or authors.
+ * Copyright 2012-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -132,7 +132,10 @@ public class MongoItemWriter<T> implements ItemWriter<T> {
 	/**
 	 * Set the {@link MongoOperations} to be used to save items to be written.
 	 * @param template the template implementation to be used.
+	 * @deprecated since 6.1 in favor of passing the template to the constructor.
+	 * Scheduled for removal in 7.0.
 	 */
+	@Deprecated(since = "6.1", forRemoval = true)
 	public void setTemplate(MongoOperations template) {
 		this.template = template;
 	}

@@ -35,6 +35,7 @@ import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -126,10 +127,31 @@ public class SimpleJobRepository extends SimpleJobExplorer implements JobReposit
 	 * @since 6.0
 	 */
 	public StepExecution createStepExecution(String stepName, JobExecution jobExecution) {
-		Assert.notNull(jobExecution, "JobExecution must not be null.");
+		return this.createStepExecution(stepName, jobExecution, new ExecutionContext());
+	}
+
+	/**
+	 * Create a new {@link StepExecution} for the given {@link JobExecution} and step
+	 * name, associate a copy of the given {@link ExecutionContext} with it, persist both
+	 * and add the new {@link StepExecution} to the {@link JobExecution}.
+	 * @param stepName the name of the step
+	 * @param jobExecution the job execution to which the step execution belongs
+	 * @param stepExecutionContext the execution context of the step execution, must not
+	 * be {@code null}
+	 * @return the new step execution
+	 * @since 6.1
+	 */
+	@Override
+	public StepExecution createStepExecution(String stepName, JobExecution jobExecution,
+			ExecutionContext stepExecutionContext) {
 		Assert.notNull(stepName, "Step name must not be null.");
+		Assert.notNull(jobExecution, "JobExecution must not be null.");
+		Assert.notNull(stepExecutionContext, "ExecutionContext must not be null.");
 
 		StepExecution stepExecution = stepExecutionDao.createStepExecution(stepName, jobExecution);
+		if (!stepExecutionContext.isEmpty()) {
+			stepExecution.setExecutionContext(new ExecutionContext(stepExecutionContext));
+		}
 		ecDao.saveExecutionContext(stepExecution);
 		jobExecution.addStepExecution(stepExecution);
 
@@ -174,7 +196,7 @@ public class SimpleJobRepository extends SimpleJobExplorer implements JobReposit
 	private void validateStepExecution(StepExecution stepExecution) {
 		Assert.notNull(stepExecution, "StepExecution cannot be null.");
 		Assert.notNull(stepExecution.getStepName(), "StepExecution's step name cannot be null.");
-		Assert.notNull(stepExecution.getJobExecutionId(), "StepExecution must belong to persisted JobExecution");
+		Assert.notNull(stepExecution.getJobExecution().getId(), "StepExecution must belong to persisted JobExecution");
 	}
 
 	@Override
@@ -222,6 +244,17 @@ public class SimpleJobRepository extends SimpleJobExplorer implements JobReposit
 		Assert.notNull(jobParameters, "Job parameters are required to create a JobInstance");
 
 		return jobInstanceDao.createJobInstance(jobName, jobParameters);
+	}
+
+	/**
+	 * @since 6.1
+	 */
+	@Override
+	public long countRunningStepExecutions(Collection<Long> stepExecutionIds) {
+		if (stepExecutionIds.isEmpty()) {
+			return 0;
+		}
+		return this.stepExecutionDao.countRunningStepExecutions(stepExecutionIds);
 	}
 
 }

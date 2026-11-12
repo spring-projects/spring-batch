@@ -33,11 +33,12 @@
 	<bean id="authorRepositoryItemReader" class="org.springframework.batch.infrastructure.item.data.RepositoryItemReader">
 		<constructor-arg name="repository" ref="authorRepository"/>
 		<property name="methodName" value="findAll"/>
-		<constructor-arg name="sorts">
-			<map>
-				<entry key="id" value="ASC"/>
-			</map>
-		</constructor-arg>
+		<property name="sort">
+			<bean class="org.springframework.data.domain.Sort" factory-method="by">
+				<constructor-arg value="ASC"/>
+				<constructor-arg value="id"/>
+			</bean>
+		</property>
 	</bean>
 
 </beans>

@@ -158,11 +158,11 @@ class MappingLdifReaderBuilderTests extends MappingLdifReaderTestSupport {
 	}
 
 	@Test
-	void itemReaderWithNoNameAndDefaultSaveStateShouldFail() {
-		assertThrows(IllegalArgumentException.class,
-				() -> new MappingLdifReaderBuilder<String>().resource(ldifResource)
-					.recordMapper(new StringMapper())
-					.build());
+	void itemReaderWithNoNameAndDefaultSaveStateShouldUseDefaultName() throws Exception {
+		MappingLdifReader<String> reader = new MappingLdifReaderBuilder<String>().resource(ldifResource)
+			.recordMapper(new StringMapper())
+			.build();
+		assertEquals("MappingLdifReader", reader.getName());
 	}
 
 	@Test

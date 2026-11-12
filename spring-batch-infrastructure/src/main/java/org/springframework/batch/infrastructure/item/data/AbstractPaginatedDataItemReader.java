@@ -15,8 +15,6 @@
  */
 package org.springframework.batch.infrastructure.item.data;
 
-import org.springframework.batch.infrastructure.item.ItemReader;
-import org.springframework.batch.infrastructure.item.ItemStreamReader;
 import org.springframework.batch.infrastructure.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.util.Assert;
 
@@ -42,7 +40,12 @@ import org.jspecify.annotations.Nullable;
  */
 public abstract class AbstractPaginatedDataItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> {
 
-	protected volatile int page = 0;
+	/**
+	 * The number of the page to be read next. This field is guarded by the reader's
+	 * internal lock, so subclasses must only access it from within {@link #doPageRead()},
+	 * which is always invoked while the lock is held.
+	 */
+	protected int page = 0;
 
 	protected int pageSize = 10;
 
@@ -83,13 +86,16 @@ public abstract class AbstractPaginatedDataItemReader<T> extends AbstractItemCou
 	}
 
 	/**
-	 * Method this {@link ItemStreamReader} delegates to for the actual work of reading a
-	 * page. Each time this method is called, the resulting {@link Iterator} should
-	 * contain the items read within the next page. <br>
-	 * <br>
-	 * If the {@link Iterator} is empty when it is returned, this {@link ItemReader} will
-	 * assume that the input has been exhausted.
-	 * @return an {@link Iterator} containing the items within a page.
+	 * Method this reader delegates to for the actual work of reading a page. Each time
+	 * this method is called, the resulting {@link Iterator} should contain the items read
+	 * within the next page.
+	 * <p>
+	 * If the {@link Iterator} is empty when it is returned, this reader will assume that
+	 * the input has been exhausted.
+	 * <p>
+	 * This method is always called while holding the reader's internal lock, which makes
+	 * it the only safe place for subclasses to read {@link #page}.
+	 * @return an {@link Iterator} containing the items read within the next page.
 	 */
 	protected abstract Iterator<T> doPageRead();
 
@@ -122,6 +128,7 @@ public abstract class AbstractPaginatedDataItemReader<T> extends AbstractItemCou
 				initialPage.next();
 			}
 			this.results = initialPage;
+			page++;
 		}
 		finally {
 			this.lock.unlock();

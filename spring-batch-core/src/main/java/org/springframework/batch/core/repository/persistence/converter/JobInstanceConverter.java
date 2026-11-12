@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 the original author or authors.
+ * Copyright 2024-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ public class JobInstanceConverter {
 	public JobInstance fromJobInstance(org.springframework.batch.core.job.JobInstance source) {
 		JobInstance jobInstance = new JobInstance();
 		jobInstance.setJobName(source.getJobName());
-		jobInstance.setJobInstanceId(source.getInstanceId());
+		jobInstance.setJobInstanceId(source.getId());
 		return jobInstance;
 	}
 

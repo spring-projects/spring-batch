@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.step.item;
 
+import org.springframework.batch.infrastructure.support.DatabaseType;
 import javax.sql.DataSource;
 
 import org.springframework.context.annotation.Bean;
@@ -35,8 +36,8 @@ public class JdbcInfrastructureConfiguration {
 	@Bean
 	public DataSource dataSource() {
 		return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2)
-			.addScript("/org/springframework/batch/core/schema-drop-h2.sql")
-			.addScript("/org/springframework/batch/core/schema-h2.sql")
+			.addScript(DatabaseType.H2.getProductSchemaDrop())
+			.addScript(DatabaseType.H2.getProductSchema())
 			.addScript("schema.sql")
 			.generateUniqueName(true)
 			.build();

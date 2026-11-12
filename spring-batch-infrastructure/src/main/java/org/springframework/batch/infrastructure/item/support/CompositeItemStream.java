@@ -19,9 +19,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.batch.infrastructure.item.ItemStream;
 import org.springframework.batch.infrastructure.item.ItemStreamException;
+import org.springframework.batch.infrastructure.item.ItemStreamSupport;
 
 /**
  * Simple {@link ItemStream} that delegates to a list of other streams.
@@ -32,6 +36,8 @@ import org.springframework.batch.infrastructure.item.ItemStreamException;
  */
 public class CompositeItemStream implements ItemStream {
 
+	private static final Log logger = LogFactory.getLog(CompositeItemStream.class);
+
 	private final List<ItemStream> streams = new ArrayList<>();
 
 	/**
@@ -39,7 +45,7 @@ public class CompositeItemStream implements ItemStream {
 	 * @param streams {@link List} of {@link ItemStream}.
 	 */
 	public void setStreams(List<ItemStream> streams) {
-		this.streams.addAll(streams);
+		streams.forEach(this::register);
 	}
 
 	/**
@@ -47,7 +53,7 @@ public class CompositeItemStream implements ItemStream {
 	 * @param streams array of {@link ItemStream}.
 	 */
 	public void setStreams(ItemStream[] streams) {
-		this.streams.addAll(Arrays.asList(streams));
+		setStreams(Arrays.asList(streams));
 	}
 
 	/**
@@ -60,6 +66,41 @@ public class CompositeItemStream implements ItemStream {
 			if (!streams.contains(stream)) {
 				streams.add(stream);
 			}
+		}
+	}
+
+	/**
+	 * Best-effort check for two registered {@link ItemStreamSupport}s sharing the same
+	 * {@link ItemStreamSupport#getName name}: both would persist their restart state
+	 * under the same {@link ExecutionContext} key namespace and silently overwrite each
+	 * other's position. This can't tell whether either stream actually persists state
+	 * (not every {@link ItemStreamSupport} exposes {@code saveState}), so it only warns.
+	 * <p>
+	 * Deliberately run from {@link #open(ExecutionContext)} rather than
+	 * {@link #register(ItemStream)}: a stream registered while still {@code @StepScope}d
+	 * (the common case for readers/writers) cannot have {@code getName()} called on it
+	 * before the step context is registered, which {@link #register(ItemStream)} may run
+	 * ahead of.
+	 */
+	private void warnOnDuplicateNames() {
+		List<ItemStreamSupport> named = new ArrayList<>();
+		for (ItemStream stream : this.streams) {
+			if (!(stream instanceof ItemStreamSupport itemStreamSupport)) {
+				continue;
+			}
+			String name = itemStreamSupport.getName();
+			if (name == null) {
+				continue;
+			}
+			for (ItemStreamSupport other : named) {
+				if (name.equals(other.getName())) {
+					logger.warn("Duplicate ExecutionContext name '" + name + "' between " + other.getClass().getName()
+							+ " and " + itemStreamSupport.getClass().getName()
+							+ ". If both persist state (saveState=true), one will silently overwrite the other's "
+							+ "restart position. Give each stream an explicit, unique name.");
+				}
+			}
+			named.add(itemStreamSupport);
 		}
 	}
 
@@ -134,6 +175,7 @@ public class CompositeItemStream implements ItemStream {
 	 */
 	@Override
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
+		warnOnDuplicateNames();
 		for (ItemStream itemStream : streams) {
 			itemStream.open(executionContext);
 		}

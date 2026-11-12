@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -116,7 +116,10 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 
 	/**
 	 * @param unmarshaller maps xml fragments corresponding to records to objects
+	 * @deprecated since 6.1 in favor of passing the unmarshaller to the constructor.
+	 * Scheduled for removal in 7.0.
 	 */
+	@Deprecated(since = "6.1", forRemoval = true)
 	public void setUnmarshaller(Unmarshaller unmarshaller) {
 		this.unmarshaller = unmarshaller;
 	}
@@ -154,7 +157,7 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 	 * @param encoding the encoding to be used. Can be {@code null}, in which case, the
 	 * XML event reader will attempt to auto-detect the encoding from tht input file.
 	 */
-	public void setEncoding(String encoding) {
+	public void setEncoding(@Nullable String encoding) {
 		this.encoding = encoding;
 	}
 

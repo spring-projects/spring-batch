@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.partition.support;
 
+import org.springframework.batch.infrastructure.support.DatabaseType;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collection;
@@ -57,8 +58,8 @@ class SimpleStepExecutionSplitterTests {
 	void setUp() throws Exception {
 		step = new TaskletStep("step");
 		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
-			.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-			.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
+			.addScript(DatabaseType.HSQL.getProductSchemaDrop())
+			.addScript(DatabaseType.HSQL.getProductSchema())
 			.generateUniqueName(true)
 			.build();
 		JdbcJobRepositoryFactoryBean factory = new JdbcJobRepositoryFactoryBean();
@@ -107,6 +108,48 @@ class SimpleStepExecutionSplitterTests {
 		SimpleStepExecutionSplitter splitter = new SimpleStepExecutionSplitter(jobRepository, step.getName(),
 				gridSize -> map);
 		assertEquals(1, splitter.split(stepExecution, 2).size());
+	}
+
+	@Test
+	void testPersistStepExecutionContext() throws Exception {
+		final Map<String, ExecutionContext> map = Map.of("foo", new ExecutionContext(Map.of("foo", "bar")), "bar",
+				new ExecutionContext(Map.of("foo", "bar")));
+		SimpleStepExecutionSplitter splitter = new SimpleStepExecutionSplitter(jobRepository, step.getName(),
+				gridSize -> map);
+		Set<StepExecution> execs = splitter.split(stepExecution, 2);
+		assertEquals(2, execs.size());
+
+		for (StepExecution execution : execs) {
+			StepExecution persisted = jobRepository.getStepExecution(execution.getId());
+			assertNotNull(persisted);
+			assertTrue(persisted.getExecutionContext().containsKey("foo"));
+		}
+	}
+
+	@Test
+	void testRestartedPartitionStartsWithContextOfPreviousExecution() throws Exception {
+		// given a failed partition from a previous job execution
+		Map<String, ExecutionContext> firstPartitions = Map.of("partition", new ExecutionContext(Map.of("foo", "bar")));
+		SimpleStepExecutionSplitter splitter = new SimpleStepExecutionSplitter(jobRepository, step.getName(),
+				gridSize -> firstPartitions);
+		StepExecution failedPartition = splitter.split(stepExecution, 1).iterator().next();
+		failedPartition.setStatus(BatchStatus.FAILED);
+		jobRepository.update(failedPartition);
+
+		// when the job is restarted with a partitioner returning a different context
+		JobExecution restartedJobExecution = jobRepository.createJobExecution(
+				stepExecution.getJobExecution().getJobInstance(), new JobParameters(), new ExecutionContext());
+		StepExecution restartedStepExecution = jobRepository.createStepExecution("step", restartedJobExecution);
+		Map<String, ExecutionContext> otherPartitions = Map.of("partition", new ExecutionContext(Map.of("foo", "baz")));
+		splitter = new SimpleStepExecutionSplitter(jobRepository, step.getName(), gridSize -> otherPartitions);
+		Set<StepExecution> execs = splitter.split(restartedStepExecution, 1);
+
+		// then the new partition is persisted with the context of the failed one
+		assertEquals(1, execs.size());
+		StepExecution restartedPartition = execs.iterator().next();
+		StepExecution persisted = jobRepository.getStepExecution(restartedPartition.getId());
+		assertNotNull(persisted);
+		assertEquals("bar", persisted.getExecutionContext().get("foo"));
 	}
 
 	@Test

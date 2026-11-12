@@ -149,8 +149,25 @@ public interface JobInstanceDao {
 	 * @return the number of {@link JobInstance}s that exist within the associated job
 	 * repository
 	 * @throws NoSuchJobException thrown if no Job has the jobName specified.
+	 * @deprecated since 6.1 in favor of {@link #countJobInstances(String)}. This DAO has
+	 * no access to the registry of known jobs, so it cannot soundly determine whether a
+	 * job name is unknown as opposed to simply never having been persisted yet. Scheduled
+	 * for removal in 7.0.
 	 */
+	@Deprecated(since = "6.1", forRemoval = true)
 	long getJobInstanceCount(String jobName) throws NoSuchJobException;
+
+	/**
+	 * Query the repository for the number of unique {@link JobInstance}s associated with
+	 * the supplied job name.
+	 * @param jobName the name of the job to query for
+	 * @return the number of {@link JobInstance}s that exist within the associated job
+	 * repository, or {@code 0} if none is found
+	 * @since 6.1
+	 */
+	default long countJobInstances(String jobName) {
+		throw new UnsupportedOperationException();
+	}
 
 	/**
 	 * Delete the job instance. This method is not expected to delete the associated job

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2023 the original author or authors.
+ * Copyright 2008-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package org.springframework.batch.core.partition.support;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -23,6 +24,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,6 +34,7 @@ import org.springframework.batch.core.job.JobExecutionException;
 import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.JobInterruptedException;
 import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.partition.StepExecutionSplitter;
 import org.springframework.batch.core.step.StepSupport;
@@ -87,6 +90,64 @@ class TaskExecutorPartitionHandlerTests {
 		Exception exception = assertThrows(IllegalStateException.class, handler::afterPropertiesSet);
 		String message = exception.getMessage();
 		assertEquals("A Step must be provided.", message, "Wrong message: " + message);
+	}
+
+	@Test
+	void testConstructorsRequireAStep() {
+		assertThrows(IllegalArgumentException.class, () -> new TaskExecutorPartitionHandler(null));
+		assertThrows(IllegalArgumentException.class,
+				() -> new TaskExecutorPartitionHandler(null, new SimpleAsyncTaskExecutor()));
+	}
+
+	@Test
+	void testConstructorRequiresATaskExecutor() {
+		assertThrows(IllegalArgumentException.class, () -> new TaskExecutorPartitionHandler(new StepSupport(), null));
+	}
+
+	@Test
+	void testConstructorsConfigureTheHandler() throws Exception {
+		// given
+		Step step = new StepSupport() {
+			@Override
+			public void execute(StepExecution stepExecution) throws JobInterruptedException {
+				count++;
+				stepExecutions.add(stepExecution.getStepName());
+			}
+		};
+
+		// when
+		handler = new TaskExecutorPartitionHandler(step);
+		handler.afterPropertiesSet();
+		handler.setGridSize(2);
+		Collection<StepExecution> result = handler.handle(stepExecutionSplitter, stepExecution);
+
+		// then
+		assertSame(step, handler.getStep());
+		assertEquals(2, count);
+		assertEquals(2, result.size());
+	}
+
+	@Test
+	void testConstructorWithTaskExecutor() throws Exception {
+		// given
+		AtomicInteger executions = new AtomicInteger();
+		Step step = new StepSupport() {
+			@Override
+			public void execute(StepExecution stepExecution) throws JobInterruptedException {
+				executions.incrementAndGet();
+			}
+		};
+		handler = new TaskExecutorPartitionHandler(step, new SimpleAsyncTaskExecutor());
+		handler.afterPropertiesSet();
+		handler.setGridSize(3);
+
+		// when
+		Collection<StepExecution> result = handler.handle(stepExecutionSplitter, stepExecution);
+
+		// then
+		assertSame(step, handler.getStep());
+		assertEquals(3, executions.get());
+		assertEquals(3, result.size());
 	}
 
 	@Test

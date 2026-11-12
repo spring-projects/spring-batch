@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,13 @@ import org.springframework.batch.infrastructure.item.ItemReader;
 
 /**
  * Listener interface around the reading of an item.
+ *
+ * <p>
+ * <em>Note: </em> This listener is not designed to throw exceptions. Errors must be
+ * handled in the implementation. An exception thrown by one of its methods is not
+ * considered as a read failure: it is never subject to the skip or retry policies of a
+ * fault-tolerant step and it terminates the step.
+ * </p>
  *
  * @author Lucas Ward
  * @author Mahmoud Ben Hassine

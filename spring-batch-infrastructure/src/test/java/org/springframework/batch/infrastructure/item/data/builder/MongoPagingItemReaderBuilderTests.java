@@ -18,7 +18,6 @@ package org.springframework.batch.infrastructure.item.data.builder;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -57,12 +56,11 @@ class MongoPagingItemReaderBuilderTests {
 	@Mock
 	private MongoOperations template;
 
-	private Map<String, Sort.Direction> sortOptions;
+	private Sort sort;
 
 	@BeforeEach
 	void setUp() {
-		this.sortOptions = new HashMap<>();
-		this.sortOptions.put("name", Sort.Direction.DESC);
+		this.sort = Sort.by(Sort.Direction.DESC, "name");
 	}
 
 	@Test
@@ -147,7 +145,7 @@ class MongoPagingItemReaderBuilderTests {
 		MongoPagingItemReader<String> reader = new MongoPagingItemReaderBuilder<String>().template(this.template)
 			.targetType(String.class)
 			.query(new Query())
-			.sorts(this.sortOptions)
+			.sort(this.sort)
 			.name("mongoReaderTest")
 			.pageSize(50)
 			.build();
@@ -164,7 +162,7 @@ class MongoPagingItemReaderBuilderTests {
 		MongoPagingItemReader<String> reader = new MongoPagingItemReaderBuilder<String>().template(this.template)
 			.targetType(String.class)
 			.query(new Query())
-			.sorts(this.sortOptions)
+			.sort(this.sort)
 			.name("mongoReaderTest")
 			.build();
 
@@ -179,7 +177,7 @@ class MongoPagingItemReaderBuilderTests {
 	void testNullTemplate() {
 		validateExceptionMessage(new MongoPagingItemReaderBuilder<String>().targetType(String.class)
 			.jsonQuery("{ }")
-			.sorts(this.sortOptions)
+			.sort(this.sort)
 			.name("mongoReaderTest")
 			.pageSize(50), "template is required.");
 	}
@@ -188,7 +186,7 @@ class MongoPagingItemReaderBuilderTests {
 	void testNullTargetType() {
 		validateExceptionMessage(new MongoPagingItemReaderBuilder<String>().template(this.template)
 			.jsonQuery("{ }")
-			.sorts(this.sortOptions)
+			.sort(this.sort)
 			.name("mongoReaderTest")
 			.pageSize(50), "targetType is required.");
 	}
@@ -197,9 +195,29 @@ class MongoPagingItemReaderBuilderTests {
 	void testNullQuery() {
 		validateExceptionMessage(new MongoPagingItemReaderBuilder<String>().template(this.template)
 			.targetType(String.class)
-			.sorts(this.sortOptions)
+			.sort(this.sort)
 			.name("mongoReaderTest")
 			.pageSize(50), "A query is required");
+	}
+
+	@Test
+	@SuppressWarnings("removal")
+	void testDeprecatedSorts() throws Exception {
+		MongoPagingItemReader<String> reader = new MongoPagingItemReaderBuilder<String>().template(this.template)
+			.targetType(String.class)
+			.jsonQuery("{ }")
+			.collection("collection")
+			.sorts(Map.of("name", Sort.Direction.DESC))
+			.name("mongoReaderTest")
+			.pageSize(50)
+			.build();
+
+		when(template.find(any(), any(), anyString())).thenReturn(new ArrayList<>());
+
+		assertNull(reader.read(), "reader should not return result");
+
+		verify(this.template).find(assertArg(query -> assertEquals("{\"name\": -1}", query.getSortObject().toJson())),
+				eq(String.class), eq("collection"));
 	}
 
 	@Test
@@ -208,7 +226,7 @@ class MongoPagingItemReaderBuilderTests {
 			.targetType(String.class)
 			.jsonQuery("{ }")
 			.name("mongoReaderTest")
-			.pageSize(50), "sorts map is required.");
+			.pageSize(50), "sort is required.");
 	}
 
 	@Test
@@ -217,16 +235,18 @@ class MongoPagingItemReaderBuilderTests {
 			.targetType(String.class)
 			.query(query(where("_id").is("10")))
 			.name("mongoReaderTest")
-			.pageSize(50), "sorts map is required.");
+			.pageSize(50), "sort is required.");
 	}
 
 	@Test
-	void testNullName() {
-		validateExceptionMessage(new MongoPagingItemReaderBuilder<String>().template(this.template)
+	void testDefaultName() {
+		MongoPagingItemReader<String> reader = new MongoPagingItemReaderBuilder<String>().template(this.template)
 			.targetType(String.class)
 			.jsonQuery("{ }")
-			.sorts(this.sortOptions)
-			.pageSize(50), "A name is required when saveState is set to true");
+			.sort(this.sort)
+			.pageSize(50)
+			.build();
+		assertEquals("MongoPagingItemReader", reader.getName());
 	}
 
 	private void validateExceptionMessage(MongoPagingItemReaderBuilder<String> builder, String message) {
@@ -239,7 +259,7 @@ class MongoPagingItemReaderBuilderTests {
 		return new MongoPagingItemReaderBuilder<String>().template(this.template)
 			.targetType(String.class)
 			.jsonQuery("{ }")
-			.sorts(this.sortOptions)
+			.sort(this.sort)
 			.name("mongoReaderTest")
 			.pageSize(50);
 	}

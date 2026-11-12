@@ -50,8 +50,6 @@ import org.springframework.util.CollectionUtils;
  */
 public class SimpleStepExecutionSplitter implements StepExecutionSplitter {
 
-	private static final String STEP_NAME_SEPARATOR = ":";
-
 	private String stepName;
 
 	private Partitioner partitioner;
@@ -137,16 +135,14 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter {
 			StepExecution lastStepExecution = jobRepository.getLastStepExecution(jobExecution.getJobInstance(),
 					stepName);
 			if (lastStepExecution == null) { // fresh start
-				StepExecution currentStepExecution = jobRepository.createStepExecution(stepName, jobExecution);
-				currentStepExecution.setExecutionContext(context.getValue());
-				jobRepository.updateExecutionContext(currentStepExecution);
+				StepExecution currentStepExecution = jobRepository.createStepExecution(stepName, jobExecution,
+						context.getValue());
 				set.add(currentStepExecution);
 			}
 			else { // restart
 				if (shouldStart(allowStartIfComplete, stepExecution, lastStepExecution)) {
-					StepExecution currentStepExecution = jobRepository.createStepExecution(stepName, jobExecution);
-					currentStepExecution.setExecutionContext(lastStepExecution.getExecutionContext());
-					jobRepository.updateExecutionContext(currentStepExecution);
+					StepExecution currentStepExecution = jobRepository.createStepExecution(stepName, jobExecution,
+							lastStepExecution.getExecutionContext());
 					set.add(currentStepExecution);
 				}
 			}
@@ -238,7 +234,7 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter {
 	}
 
 	private boolean isSameJobExecution(StepExecution stepExecution, StepExecution lastStepExecution) {
-		return stepExecution.getJobExecutionId() == lastStepExecution.getJobExecutionId();
+		return stepExecution.getJobExecution().getId() == lastStepExecution.getJobExecution().getId();
 	}
 
 }

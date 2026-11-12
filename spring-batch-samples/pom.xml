@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.springframework.batch</groupId>
 		<artifactId>spring-batch</artifactId>
-		<version>6.0.5-SNAPSHOT</version>
+		<version>6.1.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>spring-batch-samples</artifactId>
 	<packaging>jar</packaging>
@@ -64,16 +64,6 @@
 			<version>${jakarta.mail-api.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.aspectj</groupId>
-			<artifactId>aspectjrt</artifactId>
-			<version>${aspectj.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.aspectj</groupId>
-			<artifactId>aspectjweaver</artifactId>
-			<version>${aspectj.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>org.hibernate.orm</groupId>
 			<artifactId>hibernate-core</artifactId>
 			<version>${hibernate-core.version}</version>
@@ -84,17 +74,12 @@
 			<version>${commons-dbcp2.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>jakarta.inject</groupId>
-			<artifactId>jakarta.inject-api</artifactId>
-			<version>${jakarta.inject-api.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.activemq</groupId>
+			<groupId>org.apache.artemis</groupId>
 			<artifactId>artemis-jakarta-client</artifactId>
 			<version>${artemis.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.activemq</groupId>
+			<groupId>org.apache.artemis</groupId>
 			<artifactId>artemis-server</artifactId>
 			<version>${artemis.version}</version>
 		</dependency>
@@ -187,12 +172,7 @@
 		<dependency>
 			<groupId>io.prometheus</groupId>
 			<artifactId>prometheus-metrics-exporter-pushgateway</artifactId>
-			<version>${prometheus-metrics-exporter-pushgateway}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-databind</artifactId>
-			<version>${jackson2.version}</version>
+			<version>${prometheus-metrics-exporter-pushgateway.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>tools.jackson.core</groupId>
@@ -245,26 +225,8 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.hamcrest</groupId>
-			<artifactId>hamcrest-library</artifactId>
-			<version>${hamcrest.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.mockito</groupId>
-			<artifactId>mockito-core</artifactId>
-			<version>${mockito.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>jakarta.el</groupId>
-			<artifactId>jakarta.el-api</artifactId>
-			<version>${jakarta.el-api.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -273,13 +235,13 @@
 			<version>${hsqldb.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.codehaus.groovy</groupId>
+			<groupId>org.apache.groovy</groupId>
 			<artifactId>groovy</artifactId>
 			<version>${groovy.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.codehaus.groovy</groupId>
+			<groupId>org.apache.groovy</groupId>
 			<artifactId>groovy-ant</artifactId>
 			<version>${groovy.version}</version>
 			<scope>test</scope>

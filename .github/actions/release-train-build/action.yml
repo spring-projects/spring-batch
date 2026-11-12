@@ -1,0 +1,7 @@
+name: Build Release
+runs:
+  using: composite
+  steps:
+    - name: Build Release
+      shell: bash
+      run:  ./mvnw --batch-mode --no-transfer-progress --settings release-train-settings.xml --activate-profiles releaseTrain -Dmaven.test.skip=true -DaltDeploymentRepository=local::file:deployment-repository clean deploy

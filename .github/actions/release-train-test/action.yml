@@ -1,0 +1,7 @@
+name: Test Release
+runs:
+  using: composite
+  steps:
+    - name: Test Release
+      shell: bash
+      run:  ./mvnw --batch-mode --no-transfer-progress --settings release-train-settings.xml --activate-profiles releaseTrain clean verify

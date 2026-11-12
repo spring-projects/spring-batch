@@ -85,7 +85,7 @@ public class ChunkOrientedStepFaultToleranceIntegrationTests {
 		Assertions.assertEquals(ExitStatus.COMPLETED.getExitCode(), stepExecutionExitStatus.getExitCode());
 		Assertions.assertEquals(4, stepExecution.getReadCount());
 		Assertions.assertEquals(3, stepExecution.getWriteCount());
-		Assertions.assertEquals(2, stepExecution.getCommitCount());
+		Assertions.assertEquals(3, stepExecution.getCommitCount());
 		Assertions.assertEquals(2, stepExecution.getRollbackCount());
 		Assertions.assertEquals(2, stepExecution.getReadSkipCount());
 		Assertions.assertEquals(1, stepExecution.getWriteSkipCount());
@@ -116,7 +116,7 @@ public class ChunkOrientedStepFaultToleranceIntegrationTests {
 		Assertions.assertEquals(ExitStatus.COMPLETED.getExitCode(), stepExecutionExitStatus.getExitCode());
 		Assertions.assertEquals(4, stepExecution.getReadCount());
 		Assertions.assertEquals(3, stepExecution.getWriteCount());
-		Assertions.assertEquals(2, stepExecution.getCommitCount());
+		Assertions.assertEquals(3, stepExecution.getCommitCount());
 		Assertions.assertEquals(2, stepExecution.getRollbackCount());
 		Assertions.assertEquals(2, stepExecution.getReadSkipCount());
 		Assertions.assertEquals(1, stepExecution.getWriteSkipCount());

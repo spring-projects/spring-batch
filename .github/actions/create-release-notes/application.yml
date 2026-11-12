@@ -2,12 +2,12 @@ changelog:
   repository: spring-projects/spring-batch
   sections:
     - title: ":star: New features"
-      labels: [ "type: feature" ]
+      labels: [ "type: feature", "pr-for: feature" ]
     - title: ":rocket: Enhancements"
-      labels: [ "type: enhancement" ]
+      labels: [ "type: enhancement", "pr-for: enhancement" ]
     - title: ":lady_beetle: Bug fixes"
-      labels: [ "type: bug" ]
+      labels: [ "type: bug", "pr-for: bug" ]
     - title: ":notebook_with_decorative_cover: Documentation"
       labels: [ "in: documentation" ]
     - title: ":hammer: Tasks"
-      labels: [ "type: task" ]
+      labels: [ "type: task", "pr-for: task" ]

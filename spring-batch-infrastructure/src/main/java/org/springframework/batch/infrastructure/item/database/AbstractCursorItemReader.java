@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -161,7 +161,10 @@ public abstract class AbstractCursorItemReader<T> extends AbstractItemCountingIt
 	/**
 	 * Public setter for the data source for injection purposes.
 	 * @param dataSource {@link javax.sql.DataSource} to be used
+	 * @deprecated since 6.1 in favor of passing the data source to the constructor.
+	 * Scheduled for removal in 7.0.
 	 */
+	@Deprecated(since = "6.1", forRemoval = true)
 	public void setDataSource(DataSource dataSource) {
 		this.dataSource = dataSource;
 	}

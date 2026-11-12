@@ -16,7 +16,6 @@
 package org.springframework.batch.samples.jpa;
 
 import java.math.BigDecimal;
-import java.util.Map;
 
 import javax.sql.DataSource;
 import jakarta.persistence.EntityManagerFactory;
@@ -70,7 +69,7 @@ public class JpaRepositoryJobConfiguration {
 			.methodName("findByCreditGreaterThan")
 			.repository(repository)
 			.arguments(BigDecimal.valueOf(credit))
-			.sorts(Map.of("id", Sort.Direction.ASC))
+			.sort(Sort.by(Sort.Direction.ASC, "id"))
 			.build();
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,6 +64,8 @@ import org.springframework.beans.factory.InitializingBean;
 import org.jspecify.annotations.Nullable;
 import org.springframework.util.Assert;
 
+import static org.springframework.batch.core.BatchConstants.BATCH_RECOVERED;
+
 /**
  * Simple implementation of the {@link JobOperator} interface. the following dependencies
  * are required:
@@ -110,7 +112,7 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
-		Assert.state(jobRegistry != null, "JobLocator must be provided");
+		Assert.state(jobRegistry != null, "JobRegistry must be provided");
 	}
 
 	/**
@@ -245,9 +247,12 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 		try {
 			return run(job, parameters);
 		}
-		catch (Exception e) {
+		catch (JobExecutionAlreadyRunningException e) {
 			throw new JobRestartException(
 					String.format(ILLEGAL_STATE_MSG, "job execution already running", jobName, parameters), e);
+		}
+		catch (JobInstanceAlreadyCompleteException | InvalidJobParametersException e) {
+			throw new JobRestartException(e.getMessage(), e);
 		}
 
 	}
@@ -416,7 +421,7 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 	@Override
 	public JobExecution recover(JobExecution jobExecution) {
 		Assert.notNull(jobExecution, "JobExecution must not be null");
-		if (jobExecution.getExecutionContext().containsKey("batch.recovered")) {
+		if (jobExecution.getExecutionContext().containsKey(BATCH_RECOVERED)) {
 			if (logger.isWarnEnabled()) {
 				logger.warn("Job execution already recovered: " + jobExecution);
 			}
@@ -443,14 +448,14 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 			if (stepStatus.isRunning()) {
 				stepExecution.setStatus(BatchStatus.FAILED);
 				stepExecution.setEndTime(LocalDateTime.now());
-				stepExecution.getExecutionContext().put("batch.recovered", true);
+				stepExecution.getExecutionContext().put(BATCH_RECOVERED, true);
 				jobRepository.update(stepExecution);
 			}
 		}
 
 		jobExecution.setStatus(BatchStatus.FAILED);
 		jobExecution.setEndTime(LocalDateTime.now());
-		jobExecution.getExecutionContext().put("batch.recovered", true);
+		jobExecution.getExecutionContext().put(BATCH_RECOVERED, true);
 		jobRepository.update(jobExecution);
 
 		return jobExecution;
