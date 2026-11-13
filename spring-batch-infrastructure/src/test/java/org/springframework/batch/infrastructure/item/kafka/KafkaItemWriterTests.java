@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2023 the original author or authors.
+ * Copyright 2019-present the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -17,7 +17,9 @@ package org.springframework.batch.infrastructure.item.kafka;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,8 +35,11 @@ import org.springframework.kafka.support.SendResult;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -61,6 +66,74 @@ class KafkaItemWriterTests {
 		this.writer.setDelete(false);
 		this.writer.setTimeout(10L);
 		this.writer.afterPropertiesSet();
+	}
+
+	@Test
+	void testWriteDoesNotRethrowPreviousAsyncFailure() throws Exception {
+		when(this.kafkaTemplate.sendDefault("a", "a"))
+			.thenReturn(CompletableFuture.failedFuture(new RuntimeException("send failed")));
+		when(this.kafkaTemplate.sendDefault("b", "b")).thenReturn(CompletableFuture.completedFuture(null));
+
+		assertThrows(ExecutionException.class, () -> this.writer.write(Chunk.of("a")));
+		assertDoesNotThrow(() -> this.writer.write(Chunk.of("b")));
+	}
+
+	@Test
+	void testWriteDoesNotCarryFutureAfterSynchronousSendFailure() throws Exception {
+		when(this.kafkaTemplate.sendDefault("a", "a"))
+			.thenReturn(CompletableFuture.failedFuture(new RuntimeException("prior async")));
+		when(this.kafkaTemplate.sendDefault("boom", "boom")).thenThrow(new IllegalStateException("send failed"));
+		when(this.kafkaTemplate.sendDefault("c", "c")).thenReturn(CompletableFuture.completedFuture(null));
+
+		assertThrows(IllegalStateException.class, () -> this.writer.write(Chunk.of("a", "boom")));
+		verify(this.kafkaTemplate, never()).flush();
+		assertDoesNotThrow(() -> this.writer.write(Chunk.of("c")));
+	}
+
+	@Test
+	void testWriteDoesNotCarryFutureAfterKafkaTemplateFlushFailure() throws Exception {
+		when(this.kafkaTemplate.sendDefault("a", "a"))
+			.thenReturn(CompletableFuture.failedFuture(new RuntimeException("prior async")));
+		when(this.kafkaTemplate.sendDefault("b", "b")).thenReturn(CompletableFuture.completedFuture(null));
+		doThrow(new IllegalStateException("flush failed")).doNothing().when(this.kafkaTemplate).flush();
+
+		assertThrows(IllegalStateException.class, () -> this.writer.write(Chunk.of("a")));
+		assertDoesNotThrow(() -> this.writer.write(Chunk.of("b")));
+	}
+
+	@Test
+	void testWriteDoesNotCarryFutureAfterTimeout() throws Exception {
+		when(this.kafkaTemplate.sendDefault("a", "a")).thenReturn(new CompletableFuture<>());
+		when(this.kafkaTemplate.sendDefault("b", "b")).thenReturn(CompletableFuture.completedFuture(null));
+
+		assertThrows(TimeoutException.class, () -> this.writer.write(Chunk.of("a")));
+		assertDoesNotThrow(() -> this.writer.write(Chunk.of("b")));
+	}
+
+	@Test
+	void testWriteRethrowsOriginalAsyncFailure() throws Exception {
+		RuntimeException cause = new RuntimeException("send failed");
+		when(this.kafkaTemplate.sendDefault("a", "a")).thenReturn(CompletableFuture.failedFuture(cause));
+
+		ExecutionException exception = assertThrows(ExecutionException.class, () -> this.writer.write(Chunk.of("a")));
+		assertSame(cause, exception.getCause());
+	}
+
+	@Test
+	void testWriteRethrowsOriginalSynchronousFailure() throws Exception {
+		IllegalStateException failure = new IllegalStateException("send failed");
+		when(this.kafkaTemplate.sendDefault("boom", "boom")).thenThrow(failure);
+
+		assertSame(failure, assertThrows(IllegalStateException.class, () -> this.writer.write(Chunk.of("boom"))));
+	}
+
+	@Test
+	void testWriteRethrowsInterruptedException() throws Exception {
+		InterruptedException failure = new InterruptedException("interrupted");
+		when(this.future.get(10L, TimeUnit.MILLISECONDS)).thenThrow(failure).thenReturn(null);
+
+		assertSame(failure, assertThrows(InterruptedException.class, () -> this.writer.write(Chunk.of("a"))));
+		assertDoesNotThrow(() -> this.writer.write(Chunk.of("b")));
 	}
 
 	@Test
