@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2024 the original author or authors.
+ * Copyright 2002-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ import java.util.List;
  * @author Juergen Hoeller
  * @author Marten Deinum
  * @author Taeik Lim
+ * @author Jae Eok Lim
  * @since 2.0
  */
 public abstract class JdbcParameterUtils {
@@ -75,7 +76,11 @@ public abstract class JdbcParameterUtils {
 					currentQuote = sql.charAt(i);
 				}
 				else {
-					if (sql.charAt(i) == ':' || sql.charAt(i) == '&') {
+					if (sql.startsWith("::", i)) {
+						// PostgreSQL-style "::" casting operator, not a named parameter
+						i++;
+					}
+					else if (sql.charAt(i) == ':' || sql.charAt(i) == '&') {
 						int j = i + 1;
 						StringBuilder parameter = new StringBuilder();
 						while (j < sql.length() && parameterNameContinues(sql, j)) {
