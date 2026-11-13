@@ -298,8 +298,9 @@ public class ChunkOrientedStepBuilder<I, O> extends StepBuilderHelper<ChunkOrien
 	 * Mark the item processor as non-transactional (the default is the opposite). By
 	 * default, the {@link ItemProcessor} is re-invoked for every item that is
 	 * re-attempted while scanning a chunk, ie after a write failure has rolled back the
-	 * chunk transaction. If this flag is set, the results of item processing are cached
-	 * and re-used during chunk scanning instead.
+	 * chunk transaction, or while reprocessing a chunk, ie after an item skipped in
+	 * processing has marked the chunk transaction rollback-only. If this flag is set, the
+	 * results of item processing are cached and re-used instead.
 	 * <p>
 	 * Set this flag only if the output of the processor is safe to write again after a
 	 * failed, rolled back write. This is typically not the case for items that the writer
