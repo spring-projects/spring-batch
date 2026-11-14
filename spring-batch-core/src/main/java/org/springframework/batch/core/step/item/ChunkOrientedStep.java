@@ -748,6 +748,11 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 					Chunk<O> singleItemChunk = scan(scanItem, contribution, status);
 					if (!status.isRollbackOnly()) {
 						compositeChunkListener.afterChunk(singleItemChunk);
+						// the listener may have marked the transaction rollback-only
+						if (status.isRollbackOnly()) {
+							throw new SilentlyRolledBackException(
+									"A ChunkListener marked the scanned item transaction rollback-only");
+						}
 					}
 					chunkScanEvent.skipCount = contribution.getSkipCount();
 					chunkScanEvent.commit();
@@ -772,6 +777,10 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			processedChunk = processChunk(inputChunk, readPositions, contribution, scanItems);
 			writeChunk(processedChunk, scanItems, contribution, status);
 			compositeChunkListener.afterChunk(processedChunk);
+			if (status.isRollbackOnly()) {
+				throw new SilentlyRolledBackException(
+						"A ChunkListener marked the chunk transaction rollback-only after the chunk was written");
+			}
 			stepExecution.incrementCommitCount();
 		}
 		catch (Exception e) {
@@ -1063,6 +1072,12 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			}
 			contribution.incrementWriteCount(chunk.size());
 			this.compositeItemWriteListener.afterWrite(chunk);
+			// a listener running inside the transaction may also mark it rollback-only
+			// without throwing (eg by catching the failure of a call that joined it)
+			if (status.isRollbackOnly()) {
+				throw new SilentlyRolledBackException(
+						"An ItemWriteListener marked the chunk transaction rollback-only after the chunk was written");
+			}
 			chunkWriteEvent.chunkWriteStatus = BatchMetrics.STATUS_SUCCESS;
 			observation.lowCardinalityKeyValue(fullyQualifiedMetricName + ".status", BatchMetrics.STATUS_SUCCESS);
 		}
@@ -1194,6 +1209,12 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 		catch (Exception listenerException) {
 			notifyChunkError(listenerException, singleItemChunk);
 			throw listenerException;
+		}
+		if (status.isRollbackOnly()) {
+			SilentlyRolledBackException rollbackOnly = new SilentlyRolledBackException(
+					"An ItemWriteListener marked the scanned item transaction rollback-only after the item was written");
+			notifyChunkError(rollbackOnly, singleItemChunk);
+			throw rollbackOnly;
 		}
 		return singleItemChunk;
 	}
