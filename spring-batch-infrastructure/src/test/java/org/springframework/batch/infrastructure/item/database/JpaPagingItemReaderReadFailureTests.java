@@ -78,6 +78,24 @@ class JpaPagingItemReaderReadFailureTests {
 
 	@ParameterizedTest
 	@ValueSource(booleans = { true, false })
+	void restartAfterRetriedPageQueryDoesNotSkipTheNextItem(boolean transacted) throws Exception {
+		AtomicBoolean fail = new AtomicBoolean(true);
+		JpaPagingItemReader<Foo> reader = openItemReader(fail, transacted, new ExecutionContext());
+
+		assertThrows(PersistenceException.class, reader::read);
+		assertEquals(1, reader.read().getId());
+		assertEquals(2, reader.read().getId());
+		ExecutionContext context = new ExecutionContext();
+		reader.update(context);
+		reader.close();
+
+		JpaPagingItemReader<Foo> restarted = openItemReader(new AtomicBoolean(false), transacted, context);
+		assertEquals(List.of(3, 4, 5), readAllIds(restarted));
+		restarted.close();
+	}
+
+	@ParameterizedTest
+	@ValueSource(booleans = { true, false })
 	void readAfterFailedSecondPageQueryReadsSecondPageAgain(boolean transacted) throws Exception {
 		AtomicBoolean fail = new AtomicBoolean(false);
 		JpaPagingItemReader<Foo> reader = createItemReader(fail, transacted);
@@ -106,12 +124,23 @@ class JpaPagingItemReaderReadFailureTests {
 	}
 
 	private JpaPagingItemReader<Foo> createItemReader(DataSource dataSource, boolean transacted) throws Exception {
+		return openItemReader(dataSource, transacted, new ExecutionContext());
+	}
+
+	private JpaPagingItemReader<Foo> openItemReader(AtomicBoolean fail, boolean transacted, ExecutionContext context)
+			throws Exception {
+		return openItemReader(createFailingDataSource(fail, false), transacted, context);
+	}
+
+	private JpaPagingItemReader<Foo> openItemReader(DataSource dataSource, boolean transacted, ExecutionContext context)
+			throws Exception {
 		JpaPagingItemReader<Foo> reader = new JpaPagingItemReader<>(createEntityManagerFactory(dataSource));
+		reader.setName("reader");
 		reader.setQueryString("select f from Foo f order by f.id");
 		reader.setPageSize(2);
 		reader.setTransacted(transacted);
 		reader.afterPropertiesSet();
-		reader.open(new ExecutionContext());
+		reader.open(context);
 		return reader;
 	}
 

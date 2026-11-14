@@ -35,6 +35,7 @@ import org.jspecify.annotations.Nullable;
  * @author Glenn Renfro
  * @author Mahmoud Ben Hassine
  * @author Stefano Cordio
+ * @author WooSeung Kim
  * @since 2.2
  * @param <T> Type of item to be read
  */
@@ -69,7 +70,14 @@ public abstract class AbstractPaginatedDataItemReader<T> extends AbstractItemCou
 		try {
 			if (results == null || !results.hasNext()) {
 
-				results = doPageRead();
+				try {
+					this.results = doPageRead();
+				}
+				catch (RuntimeException e) {
+					// read() has already counted this attempt, but the page was not read
+					setCurrentItemCount(getCurrentItemCount() - 1);
+					throw e;
+				}
 
 				page++;
 
