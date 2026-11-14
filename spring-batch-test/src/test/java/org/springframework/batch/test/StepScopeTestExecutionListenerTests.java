@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2022 the original author or authors.
+ * Copyright 2010-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,6 +60,21 @@ class StepScopeTestExecutionListenerTests {
 		testJobParameters(new WithStepExecutionFactory());
 	}
 
+	@Test
+	void testWithMethodWithParameters() throws Exception {
+		TestContext testContext = getTestContext(new WithMethodWithParameters());
+		listener.prepareTestInstance(testContext);
+		try {
+			listener.beforeTestMethod(testContext);
+			StepContext context = StepSynchronizationManager.getContext();
+			assertNotNull(context);
+		}
+		finally {
+			listener.afterTestMethod(testContext);
+		}
+		assertNull(StepSynchronizationManager.getContext());
+	}
+
 	private void testExecutionContext(Object target) throws Exception {
 		TestContext testContext = getTestContext(target);
 		listener.prepareTestInstance(testContext);
@@ -99,6 +114,15 @@ class StepScopeTestExecutionListenerTests {
 			StepExecution stepExecution = MetaDataInstanceFactory.createStepExecution(jobExecution, "step", 1L);
 			stepExecution.getExecutionContext().putString("foo", "bar");
 			return stepExecution;
+		}
+
+	}
+
+	@SuppressWarnings("unused")
+	private static class WithMethodWithParameters {
+
+		private StepExecution launchStep(String stepName) {
+			throw new IllegalStateException("Should not be called by the listener");
 		}
 
 	}
