@@ -15,32 +15,32 @@ writes back the chunk as soon as all the results become available.
 ====
 Java::
 +
-The following example shows how to configuration the `AsyncItemProcessor` in Java:
+The following example shows how to configure the `AsyncItemProcessor` in Java:
 +
 .Java Configuration
 [source, java]
 ----
 @Bean
-public AsyncItemProcessor processor(ItemProcessor itemProcessor, TaskExecutor taskExecutor) {
-    AsyncItemProcessor asyncItemProcessor = new AsyncItemProcessor();
+public AsyncItemProcessor<String, String> processor(ItemProcessor<String, String> itemProcessor,
+        TaskExecutor taskExecutor) {
+    AsyncItemProcessor<String, String> asyncItemProcessor = new AsyncItemProcessor<>(itemProcessor);
     asyncItemProcessor.setTaskExecutor(taskExecutor);
-    asyncItemProcessor.setDelegate(itemProcessor);
     return asyncItemProcessor;
 }
 ----
 
 XML::
 +
-The following example shows how to configuration the `AsyncItemProcessor` in XML:
+The following example shows how to configure the `AsyncItemProcessor` in XML:
 +
 .XML Configuration
 [source, xml]
 ----
 <bean id="processor"
     class="org.springframework.batch.core.step.item.AsyncItemProcessor">
-  <property name="delegate">
+  <constructor-arg>
     <bean class="your.ItemProcessor"/>
-  </property>
+  </constructor-arg>
   <property name="taskExecutor">
     <bean class="org.springframework.core.task.SimpleAsyncTaskExecutor"/>
   </property>
@@ -49,7 +49,7 @@ The following example shows how to configuration the `AsyncItemProcessor` in XML
 
 ====
 
-The `delegate` property refers to your `ItemProcessor` bean, and the `taskExecutor`
+The constructor argument refers to your `ItemProcessor` bean, and the `taskExecutor`
 property refers to the `TaskExecutor` of your choice.
 
 
@@ -63,10 +63,8 @@ The following example shows how to configure the `AsyncItemWriter` in Java:
 [source, java]
 ----
 @Bean
-public AsyncItemWriter writer(ItemWriter itemWriter) {
-    AsyncItemWriter asyncItemWriter = new AsyncItemWriter();
-    asyncItemWriter.setDelegate(itemWriter);
-    return asyncItemWriter;
+public AsyncItemWriter<String> writer(ItemWriter<String> itemWriter) {
+    return new AsyncItemWriter<>(itemWriter);
 }
 ----
 
@@ -79,9 +77,9 @@ The following example shows how to configure the `AsyncItemWriter` in XML:
 ----
 <bean id="itemWriter"
     class="org.springframework.batch.core.step.item.AsyncItemWriter">
-  <property name="delegate">
-    <bean id="itemWriter" class="your.ItemWriter"/>
-  </property>
+  <constructor-arg>
+    <bean class="your.ItemWriter"/>
+  </constructor-arg>
 </bean>
 ----
 
@@ -89,5 +87,44 @@ The following example shows how to configure the `AsyncItemWriter` in XML:
 
 
 
-Again, the `delegate` property is
-actually a reference to your `ItemWriter` bean.
+Again, the constructor argument refers to your `ItemWriter` bean.
+
+=== Handling Processing Errors
+
+Exceptions thrown by the delegate `ItemProcessor` are stored in the `Future`, so
+`ItemProcessListener.onProcessError` is not called for those exceptions. The
+`AsyncItemWriter` unwraps the futures during writing and rethrows the underlying
+processing exception. Register an `ItemWriteListener` on the step to handle it through
+`onWriteError`, as shown in the following example:
+
+[source, java]
+----
+@Bean
+public ItemWriteListener<Future<String>> asyncErrorListener() {
+    return new ItemWriteListener<>() {
+        @Override
+        public void onWriteError(Exception exception, Chunk<? extends Future<String>> items) {
+            System.err.println("Processing or writing failed: " + exception.getMessage());
+        }
+    };
+}
+
+@Bean
+public Step asyncStep(JobRepository jobRepository, PlatformTransactionManager transactionManager,
+        ItemReader<String> reader, AsyncItemProcessor<String, String> processor,
+        AsyncItemWriter<String> writer, ItemWriteListener<Future<String>> asyncErrorListener) {
+    return new StepBuilder("asyncStep", jobRepository)
+            .<String, Future<String>>chunk(10)
+            .transactionManager(transactionManager)
+            .reader(reader)
+            .processor(processor)
+            .writer(writer)
+            .listener(asyncErrorListener)
+            .build();
+}
+----
+
+This listener also receives exceptions thrown by the delegate `ItemWriter`. Its chunk
+contains futures rather than the original input items. If the error handler needs the
+input item that failed processing, include that item in a custom exception thrown by the
+delegate processor.
