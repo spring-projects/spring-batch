@@ -1,6 +1,6 @@
 
 [[testing]]
-= Unit Testing
+= Testing
 
 As with other application styles, it is extremely important to unit test any code written
 as part of a batch job. The Spring core documentation covers how to unit and integration
@@ -10,9 +10,9 @@ The `spring-batch-test` project includes classes that facilitate this end-to-end
 approach.
 
 [[creatingUnitTestClass]]
-== Creating a Unit Test Class
+== Creating a Test Class
 
-For the unit test to run a batch job, the framework must load the job's
+For a test to run a batch job, the framework must load the job's
 `ApplicationContext`. Two annotations are used to trigger this behavior:
 
 * `@SpringJUnitConfig` indicates that the class should use Spring's
@@ -298,7 +298,7 @@ The framework provides the preceding listener example and checks a `StepExecutio
 for an empty read count, thus signifying that no work was done. While this example is
 fairly simple, it serves to illustrate the types of problems that you may encounter when
 you try to unit test classes that implement interfaces requiring Spring Batch domain
-objects. Consider the following unit test for the listener's in the preceding example:
+objects. Consider the following unit test for the listener in the preceding example:
 
 [source, java]
 ----
