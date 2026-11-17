@@ -166,6 +166,49 @@ class FlowBuilderTests {
 		assertFalse(stepExecutions.hasNext());
 	}
 
+	@Test
+	void testOnExitStatus() throws Exception {
+		FlowBuilder<Flow> builder = new FlowBuilder<>("transitionsFlow");
+		JobRepository jobRepository = new ResourcelessJobRepository();
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = jobRepository.createJobInstance("foo", jobParameters);
+		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
+				new ExecutionContext());
+
+		StepSupport stepA = new StepSupport("stepA") {
+			@Override
+			public void execute(StepExecution stepExecution) throws UnexpectedJobExecutionException {
+				stepExecution.setExitStatus(ExitStatus.FAILED);
+			}
+		};
+
+		StepSupport stepB = new StepSupport("stepB") {
+			@Override
+			public void execute(StepExecution stepExecution) throws UnexpectedJobExecutionException {
+			}
+		};
+
+		StepSupport stepC = new StepSupport("stepC") {
+			@Override
+			public void execute(StepExecution stepExecution) throws UnexpectedJobExecutionException {
+			}
+		};
+
+		FlowExecution flowExecution = builder.start(stepA)
+			.on("*")
+			.to(stepB)
+			.from(stepA)
+			.on(ExitStatus.FAILED)
+			.to(stepC)
+			.end()
+			.start(new JobFlowExecutor(jobRepository, new SimpleStepHandler(jobRepository), jobExecution));
+
+		Iterator<StepExecution> stepExecutions = jobExecution.getStepExecutions().iterator();
+		assertEquals("stepA", stepExecutions.next().getStepName());
+		assertEquals("stepC", stepExecutions.next().getStepName());
+		assertFalse(stepExecutions.hasNext());
+	}
+
 	private static StepSupport createCompleteStep(String name) {
 		return new StepSupport(name) {
 			@Override
