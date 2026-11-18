@@ -214,6 +214,100 @@ include the  appropriate namespace declarations and to make sure `spring-tx` and
 
 
 
+[[linkingWorkItemToJobExecution]]
+=== Synchronizing a Work Item with a JDBC Job Execution
+
+Configure a `JobExecutionPersistenceListener` on a `JdbcJobRepositoryFactoryBean` to
+write related data in the repository transaction. The listener receives the saved
+execution after initial creation and restart, and after repository updates to
+the job execution. With default transaction attributes, an unchecked exception from
+the listener rolls back the metadata and any writes participating in that transaction.
+These callbacks run synchronously, before commit, and can be called repeatedly for
+updates with the same status.
+
+The following example links a work item to the latest execution and mirrors the
+execution status in `WORK_ITEM`. The `workItemId` is a `Long` identifying job parameter.
+Use the same `DataSource` and JDBC transaction manager for the work item and repository.
+
+[source, java]
+----
+@Bean
+public JdbcJobRepositoryFactoryBean jobRepository(DataSource dataSource,
+        PlatformTransactionManager transactionManager) {
+    JdbcTemplate jdbc = new JdbcTemplate(dataSource);
+    JdbcJobRepositoryFactoryBean factory = new JdbcJobRepositoryFactoryBean();
+    factory.setDataSource(dataSource);
+    factory.setTransactionManager(transactionManager);
+    factory.setJobExecutionPersistenceListener(new JobExecutionPersistenceListener() {
+        @Override
+        public void afterCreate(JobExecution execution) {
+            Long workItemId = execution.getJobParameters().getLong("workItemId");
+            if (workItemId == null) {
+                return;
+            }
+            int updated = jdbc.update("""
+                    UPDATE WORK_ITEM SET EXECUTION_ID = ?, STATUS = ?
+                    WHERE ID = ? AND STATUS IN ('QUEUED', 'FAILED', 'STOPPED')
+                    """, execution.getId(), execution.getStatus().name(), workItemId);
+            if (updated != 1) {
+                throw new IllegalStateException("Work item is no longer eligible for dispatch");
+            }
+        }
+
+        @Override
+        public void afterUpdate(JobExecution execution) {
+            jdbc.update("UPDATE WORK_ITEM SET STATUS = ? WHERE EXECUTION_ID = ?",
+                    execution.getStatus().name(), execution.getId());
+        }
+    });
+    return factory;
+}
+----
+
+Updates match the execution ID so a late update to an older execution cannot replace
+the current work item status. Reload execution metadata from the repository before
+retrying an update that rolled back.
+
+=== Coordinating Launches for a JDBC Work Queue
+
+Use `JdbcJobExecutionCoordinator` to coordinate start and restart requests for a
+job across workers. Configure it with the JDBC `JobRepository` used by the operators
+and a shared data source for the coordination table. Create this table and insert
+one row for each coordinated job before dispatch. The following SQL works on
+PostgreSQL and H2.
+
+[source, sql]
+----
+CREATE TABLE BATCH_JOB_DISPATCH_LOCK (
+    JOB_NAME VARCHAR(100) PRIMARY KEY
+);
+INSERT INTO BATCH_JOB_DISPATCH_LOCK (JOB_NAME) VALUES ('fileJob');
+----
+
+Route starts and restarts for a job through `dispatchIfIdle(jobName, dispatch)`
+using the same coordination table. The coordinator locks the job's row and calls
+`JobRepository.findRunningJobExecutions(jobName)` before invoking the dispatch
+action. The action selects the next work item and starts or restarts one execution
+through the job operator before returning. Return `Optional.empty()` if there is
+no eligible work. For a queue that must run in order, select the oldest unfinished
+item and restart it if eligible before considering later items.
+
+Record the work item claim in the persistence listener so that the claim and the
+new execution are saved in the same transaction. Update only a work item that is still
+eligible for dispatch. If the claim fails, throw from the listener to roll back the
+new execution. A later dispatch can retry against the persisted queue state.
+
+Invoke the coordinator outside an existing Spring transaction. It holds the lock on a separate connection while the
+repository uses its normal launch transaction. Size the connection pool for the
+coordination and repository connections. The lock stays held until the dispatch
+action returns, including during job execution if the operator uses a synchronous
+executor.
+
+A worker that stops between commit and task submission can leave the execution in
+`STARTING`. After confirming that the original worker cannot resume, an operator can
+explicitly recover it with `JobOperator.recover` and then retry the same work item
+through the coordinator.
+
 [[repositoryTablePrefix]]
 == Changing the Table Prefix
 
