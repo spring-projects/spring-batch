@@ -23,6 +23,7 @@ import org.springframework.batch.core.job.JobExecution;
  * and before commit. With the default transaction attributes, a runtime exception thrown
  * from a callback rolls back the write and any related writes in the same transaction.
  *
+ * @author YeongJae Min
  * @since 6.1
  */
 public interface JobExecutionPersistenceListener {

@@ -30,6 +30,7 @@ import org.springframework.util.Assert;
  * needs a row with its name in {@code BATCH_JOB_DISPATCH_LOCK}. All starts and restarts
  * for that job must use the same coordination table.
  *
+ * @author YeongJae Min
  * @since 6.1
  */
 public class JdbcJobExecutionCoordinator {

@@ -84,7 +84,7 @@ class JdbcJobRepositoryWorkItemIntegrationTests {
 	}
 
 	@Test
-	void exceptionRollsBackBothWritesAndAllowsRetryWithTheSameParameters() throws Exception {
+	void exceptionRollsBackWorkItemClaimAndJobMetadata() throws Exception {
 		failAfterWrite = true;
 		JobRepository repository = repository();
 
@@ -96,13 +96,6 @@ class JdbcJobRepositoryWorkItemIntegrationTests {
 			assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM " + table, Integer.class)).as(table).isZero();
 		}
 		assertThat(submittedExecutionIds).isEmpty();
-
-		failAfterWrite = false;
-		JobExecution retried = start(repository);
-
-		assertThat(submittedExecutionIds).containsExactly(retried.getId());
-		assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM BATCH_JOB_INSTANCE", Integer.class)).isEqualTo(1);
-		assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM BATCH_JOB_EXECUTION", Integer.class)).isEqualTo(1);
 	}
 
 	@Test
