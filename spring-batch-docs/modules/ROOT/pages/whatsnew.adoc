@@ -23,6 +23,7 @@ Spring Batch 6.1 includes the following features and improvements:
 * xref:whatsnew.adoc#new-defaultchunkprocessor[New `DefaultChunkProcessor`]
 * xref:whatsnew.adoc#jsonlinemapper-agnostic-to-the-json-library[`JsonLineMapper` agnostic to the JSON library]
 * xref:whatsnew.adoc#new-jsonlineaggregator[New `JsonLineAggregator`]
+* xref:whatsnew.adoc#performance-improvements[Performance improvements]
 * xref:whatsnew.adoc#deprecations[Deprecations]
 
 [[dependencies-upgrade]]
@@ -33,7 +34,7 @@ In this release, Spring dependencies are upgraded to the following versions:
 * Spring Framework 7.1
 * Spring Integration 7.2
 * Spring Data 2026.1.0
-* Spring LDAP 4.1
+* Spring LDAP 4.2
 * Spring AMQP 4.2
 * Spring Kafka 4.2
 * Micrometer 1.18
@@ -663,6 +664,58 @@ that fits on one line, which is the case of the default Jackson and Gson marshal
 For more details, please refer to the
 xref:readers-and-writers/json-reading-writing.adoc#jsonLineAggregator[`JsonLineAggregator`]
 section.
+
+[[performance-improvements]]
+== Performance improvements
+
+This release makes several parts of the job repository and of partitioned steps faster and
+lighter on memory. Here are the biggest gains.
+
+=== Job launch and restart
+
+Restarting a job used to read the full history of its job instance, loading every past
+execution with all its steps. So the more often a job was restarted, the more SQL statements
+each restart needed: on 6.0.4, the 12th restart of the same failed job issued 130 statements,
+8 more for each past execution. Now only the last execution is checked, so the cost of a
+restart no longer depends on the history. This is also available in 6.0.6.
+
+Finding the executions of a job instance is faster too.
+`JdbcJobExecutionDao#findJobExecutions` used to run 3 extra queries for each execution
+(1 + 3N queries for N executions). It now needs 2 queries, whatever N is. For a job instance
+with 10 executions, that is 2 queries instead of 31, which is *about 15 times fewer*.
+`getLastJobExecution` goes from 4 queries to 2, which is *half as many*.
+
+=== Partitioned steps
+
+`MessageChannelPartitionHandler` regularly asks the job repository if its workers are done.
+Each time, it used to load the step execution of every worker, and each of them came with the
+whole job execution and all its step executions. With many partitions, this adds up quickly:
+in one reported case, a step with 837 partitions kept 837 × 837 = 700,569 `StepExecution`
+objects in memory, and the node polling the workers used 15 GB of memory, *10 times more*
+than another node doing the same amount of work (1.5 GB).
+
+The handler now only counts the running workers, with the new
+`JobRepository#countRunningStepExecutions(Collection<Long>)`, and loads the job execution
+once, when all workers are done. In the same case, that is 837 objects instead of 700,569,
+which is *837 times fewer*, and it removes the extra memory of the polling node: *about 10
+times less memory*. The new methods are `default` methods, so existing `JobRepository`
+implementations still work, and the handler falls back to the previous behavior if counting
+is not supported.
+
+=== JDBC job repository
+
+A few more queries were removed from the JDBC DAOs. Each one saves one query every time it
+applies:
+
+* Loading a job execution no longer runs a separate query to find its job instance id, since
+that id is already in the `JOB_EXECUTION` table.
+* Updating a job execution no longer runs a `SELECT COUNT(*)` first to check that the row
+exists, since the update itself reports a missing row.
+* `JdbcJobExecutionDao#synchronizeStatus(StepExecution)` saves one query.
+* A failed update of a job or step execution caused by a concurrent change no longer runs an
+extra query only to show the current version in the error message.
+
+The last two are also available in 6.0.6.
 
 [[deprecations]]
 == Deprecations
