@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2022 the original author or authors.
+ * Copyright 2013-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,6 +56,32 @@ class JobScopeTestExecutionListenerTests {
 	@Test
 	void testWithParameters() throws Exception {
 		testJobParameters(new WithJobExecutionFactory());
+	}
+
+	@Test
+	void testDefaultJobContextDoesNotHideJobContextOfLaunchedJob() throws Exception {
+		TestContext testContext = getTestContext(new Object());
+		listener.prepareTestInstance(testContext);
+		try {
+			listener.beforeTestMethod(testContext);
+			// a job launched in the test registers its own execution, as AbstractJob does
+			JobExecution jobExecution = MetaDataInstanceFactory.createJobExecution("job", 11L,
+					MetaDataInstanceFactory.DEFAULT_JOB_EXECUTION_ID,
+					new JobParametersBuilder().addString("foo", "spam").toJobParameters());
+			JobSynchronizationManager.register(jobExecution);
+			try {
+				JobContext context = JobSynchronizationManager.getContext();
+				assertNotNull(context);
+				assertEquals("spam", context.getJobParameters().get("foo"));
+			}
+			finally {
+				JobSynchronizationManager.release();
+			}
+		}
+		finally {
+			listener.afterTestMethod(testContext);
+		}
+		assertNull(JobSynchronizationManager.getContext());
 	}
 
 	private void testExecutionContext(Object target) throws Exception {
