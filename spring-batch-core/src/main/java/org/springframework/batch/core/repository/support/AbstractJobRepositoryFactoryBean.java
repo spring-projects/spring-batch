@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,6 +40,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.interceptor.NameMatchTransactionAttributeSource;
 import org.springframework.transaction.interceptor.TransactionAttributeSource;
 import org.springframework.transaction.interceptor.TransactionInterceptor;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
 
@@ -53,6 +54,7 @@ import org.springframework.util.Assert;
  * @author Lucas Ward
  * @author Robert Kasanicky
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  */
 public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean<JobRepository>, InitializingBean {
 
@@ -60,20 +62,15 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean<Jo
 
 	private @Nullable TransactionAttributeSource transactionAttributeSource;
 
-	private final ProxyFactory proxyFactory = new ProxyFactory();
-
 	private String isolationLevelForCreate = DEFAULT_ISOLATION_LEVEL;
 
 	private boolean validateTransactionState = true;
 
-	private static final String TRANSACTION_ISOLATION_LEVEL_PREFIX = "ISOLATION_";
-
-	private static final String TRANSACTION_PROPAGATION_PREFIX = "PROPAGATION_";
-
 	/**
 	 * Default value for isolation level in create* method.
 	 */
-	private static final String DEFAULT_ISOLATION_LEVEL = TRANSACTION_ISOLATION_LEVEL_PREFIX + "SERIALIZABLE";
+	private static final String DEFAULT_ISOLATION_LEVEL = DefaultTransactionDefinition.PREFIX_ISOLATION
+			+ "SERIALIZABLE";
 
 	protected @Nullable JobKeyGenerator jobKeyGenerator;
 
@@ -140,7 +137,7 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean<Jo
 	 * @param isolationLevelForCreate the isolation level to set
 	 */
 	public void setIsolationLevelForCreateEnum(Isolation isolationLevelForCreate) {
-		this.setIsolationLevelForCreate(TRANSACTION_ISOLATION_LEVEL_PREFIX + isolationLevelForCreate.name());
+		this.setIsolationLevelForCreate(DefaultTransactionDefinition.PREFIX_ISOLATION + isolationLevelForCreate.name());
 	}
 
 	/**
@@ -196,6 +193,7 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean<Jo
 	@Override
 	@SuppressWarnings("DataFlowIssue")
 	public JobRepository getObject() throws Exception {
+		ProxyFactory proxyFactory = new ProxyFactory();
 		TransactionInterceptor advice = new TransactionInterceptor((TransactionManager) this.transactionManager,
 				this.transactionAttributeSource);
 		if (this.validateTransactionState) {
@@ -209,13 +207,13 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean<Jo
 			NameMatchMethodPointcut pointcut = new NameMatchMethodPointcut();
 			pointcut.addMethodName("create*");
 			advisor.setPointcut(pointcut);
-			this.proxyFactory.addAdvisor(advisor);
+			proxyFactory.addAdvisor(advisor);
 		}
-		this.proxyFactory.addAdvice(advice);
-		this.proxyFactory.setProxyTargetClass(false);
-		this.proxyFactory.addInterface(JobRepository.class);
-		this.proxyFactory.setTarget(getTarget());
-		return (JobRepository) this.proxyFactory.getProxy(getClass().getClassLoader());
+		proxyFactory.addAdvice(advice);
+		proxyFactory.setProxyTargetClass(false);
+		proxyFactory.addInterface(JobRepository.class);
+		proxyFactory.setTarget(getTarget());
+		return (JobRepository) proxyFactory.getProxy(getClass().getClassLoader());
 	}
 
 	protected Object getTarget() throws Exception {
@@ -227,10 +225,10 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean<Jo
 
 		public DefaultJobRepositoryTransactionAttributeSource(String isolationLevelForCreate) {
 			Properties transactionAttributes = new Properties();
-			transactionAttributes.setProperty("create*",
-					TRANSACTION_PROPAGATION_PREFIX + Propagation.REQUIRES_NEW + "," + isolationLevelForCreate);
-			transactionAttributes.setProperty("getLastJobExecution*",
-					TRANSACTION_PROPAGATION_PREFIX + Propagation.REQUIRES_NEW + "," + isolationLevelForCreate);
+			transactionAttributes.setProperty("create*", DefaultTransactionDefinition.PREFIX_PROPAGATION
+					+ Propagation.REQUIRES_NEW + "," + isolationLevelForCreate);
+			transactionAttributes.setProperty("getLastJobExecution", DefaultTransactionDefinition.PREFIX_PROPAGATION
+					+ Propagation.REQUIRES_NEW + "," + isolationLevelForCreate);
 			transactionAttributes.setProperty("*", "PROPAGATION_REQUIRED");
 			this.setProperties(transactionAttributes);
 		}
