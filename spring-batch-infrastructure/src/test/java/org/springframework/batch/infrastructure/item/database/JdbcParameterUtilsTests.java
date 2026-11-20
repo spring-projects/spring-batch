@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2022 the original author or authors.
+ * Copyright 2002-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,6 +65,14 @@ class JdbcParameterUtilsTests {
 		List<String> l = new ArrayList<>();
 		assertEquals(3, JdbcParameterUtils.countParameterPlaceholders("select :par1, :par2 :par3", l));
 		assertEquals(3, l.size());
+	}
+
+	@Test
+	void testCountParameterPlaceholdersWithTypeCast() {
+		List<String> l = new ArrayList<>();
+		assertEquals(2, JdbcParameterUtils.countParameterPlaceholders("INSERT INTO t VALUES (?, ?::jsonb)", l));
+		assertEquals(1, JdbcParameterUtils.countParameterPlaceholders("SELECT * FROM t WHERE created::date = ?", l));
+		assertTrue(l.isEmpty());
 	}
 
 }
