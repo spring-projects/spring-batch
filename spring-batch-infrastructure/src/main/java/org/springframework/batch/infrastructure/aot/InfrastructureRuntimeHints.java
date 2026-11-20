@@ -29,12 +29,14 @@ import org.springframework.batch.infrastructure.item.database.JdbcPagingItemRead
 import org.springframework.batch.infrastructure.item.database.JpaCursorItemReader;
 import org.springframework.batch.infrastructure.item.database.JpaItemWriter;
 import org.springframework.batch.infrastructure.item.database.JpaPagingItemReader;
+import org.springframework.batch.infrastructure.item.database.StatelessSessionCursorItemReader;
 import org.springframework.batch.infrastructure.item.database.builder.JdbcBatchItemWriterBuilder;
 import org.springframework.batch.infrastructure.item.database.builder.JdbcCursorItemReaderBuilder;
 import org.springframework.batch.infrastructure.item.database.builder.JdbcPagingItemReaderBuilder;
 import org.springframework.batch.infrastructure.item.database.builder.JpaCursorItemReaderBuilder;
 import org.springframework.batch.infrastructure.item.database.builder.JpaItemWriterBuilder;
 import org.springframework.batch.infrastructure.item.database.builder.JpaPagingItemReaderBuilder;
+import org.springframework.batch.infrastructure.item.database.builder.StatelessSessionCursorItemReaderBuilder;
 import org.springframework.batch.infrastructure.item.file.FlatFileItemReader;
 import org.springframework.batch.infrastructure.item.file.FlatFileItemWriter;
 import org.springframework.batch.infrastructure.item.file.builder.FlatFileItemReaderBuilder;
@@ -85,6 +87,7 @@ public class InfrastructureRuntimeHints implements RuntimeHintsRegistrar {
 				JdbcPagingItemReaderBuilder.class, JdbcBatchItemWriter.class, JdbcBatchItemWriterBuilder.class,
 				JpaCursorItemReader.class, JpaCursorItemReaderBuilder.class, JpaPagingItemReader.class,
 				JpaPagingItemReaderBuilder.class, JpaItemWriter.class, JpaItemWriterBuilder.class,
+				StatelessSessionCursorItemReader.class, StatelessSessionCursorItemReaderBuilder.class,
 
 				// Queue IO APIs
 				BlockingQueueItemReader.class, BlockingQueueItemReaderBuilder.class, BlockingQueueItemWriter.class,
