@@ -20,10 +20,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
@@ -120,6 +122,63 @@ class JacksonExecutionContextStringSerializerTests {
 		// then
 		QName deserializedQName = (QName) deserializedContext.get("qName");
 		assertEquals(qName, deserializedQName);
+	}
+
+	@Test
+	void testQNameWithPrefixSerialization() throws IOException {
+		// given
+		JacksonExecutionContextStringSerializer serializer = new JacksonExecutionContextStringSerializer();
+		Map<String, Object> context = new HashMap<>();
+		QName qName = new QName("https://www.springframework.org/batch", "element", "batch");
+		context.put("qName", qName);
+
+		// when
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		serializer.serialize(context, outputStream);
+		InputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
+		Map<String, Object> deserializedContext = serializer.deserialize(inputStream);
+
+		// then
+		QName deserializedQName = (QName) deserializedContext.get("qName");
+		assertEquals(qName, deserializedQName);
+		assertEquals(qName.getPrefix(), deserializedQName.getPrefix());
+	}
+
+	@Test
+	void testQNameListWithPrefixSerialization() throws IOException {
+		// given
+		JacksonExecutionContextStringSerializer serializer = new JacksonExecutionContextStringSerializer();
+		Map<String, Object> context = new HashMap<>();
+		QName qName = new QName("https://www.springframework.org/batch", "element", "batch");
+		context.put("qNames", List.of(qName));
+
+		// when
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		serializer.serialize(context, outputStream);
+		InputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
+		Map<String, Object> deserializedContext = serializer.deserialize(inputStream);
+
+		// then
+		@SuppressWarnings("unchecked")
+		List<QName> deserializedQNames = (List<QName>) deserializedContext.get("qNames");
+		assertEquals(1, deserializedQNames.size());
+		assertEquals(qName.getPrefix(), deserializedQNames.get(0).getPrefix());
+	}
+
+	@Test
+	void testQNameStringFormDeserialization() throws IOException {
+		// given
+		JacksonExecutionContextStringSerializer serializer = new JacksonExecutionContextStringSerializer();
+		String stringForm = """
+				{"qName":["javax.xml.namespace.QName","{https://www.springframework.org/batch}element"]}""";
+
+		// when
+		InputStream inputStream = new ByteArrayInputStream(stringForm.getBytes(StandardCharsets.UTF_8));
+		Map<String, Object> deserializedContext = serializer.deserialize(inputStream);
+
+		// then
+		QName deserializedQName = (QName) deserializedContext.get("qName");
+		assertEquals(new QName("https://www.springframework.org/batch", "element"), deserializedQName);
 	}
 
 	@Test
