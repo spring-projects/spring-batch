@@ -40,6 +40,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Mahmoud Ben Hassine
  * @author Yanming Zhou
+ * @author Hyunwoo Jung
  */
 @ExtendWith(MockitoExtension.class)
 class JsonFileItemWriterTests {
@@ -104,6 +105,47 @@ class JsonFileItemWriterTests {
 		writer.close();
 
 		resourceShouldContain("aaa", "bbb", "ccc");
+	}
+
+	@Test
+	void appendAllowedWithEmptyChunk() throws Exception {
+		JsonFileItemWriter<String> writer = new JsonFileItemWriter<>(this.resource,
+				new JacksonJsonObjectMarshaller<>());
+		writer.setAppendAllowed(true);
+
+		writer.open(new ExecutionContext());
+		writer.write(Chunk.of("aaa"));
+		writer.write(Chunk.of("bbb"));
+		writer.close();
+
+		resourceShouldContain("aaa", "bbb");
+
+		writer.open(new ExecutionContext());
+		writer.write(new Chunk<>());
+		writer.close();
+
+		resourceShouldContain("aaa", "bbb");
+	}
+
+	@Test
+	void appendAllowedWithRestart() throws Exception {
+		JsonFileItemWriter<String> writer = new JsonFileItemWriter<>(this.resource,
+				new JacksonJsonObjectMarshaller<>());
+		writer.setAppendAllowed(true);
+		ExecutionContext executionContext = new ExecutionContext();
+
+		writer.open(executionContext);
+		writer.write(Chunk.of("aaa"));
+		writer.update(executionContext);
+		writer.close();
+
+		resourceShouldContain("aaa");
+
+		writer.open(executionContext);
+		writer.write(Chunk.of("bbb"));
+		writer.close();
+
+		resourceShouldContain("aaa", "bbb");
 	}
 
 	@Test
