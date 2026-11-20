@@ -23,6 +23,10 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -101,6 +105,27 @@ class JacksonExecutionContextStringSerializerTests {
 		// then
 		LocalDate deserializedNow = (LocalDate) deserializedContext.get("now");
 		assertEquals(now, deserializedNow);
+	}
+
+	@Test
+	void testJavaTimeZonedAndOffsetDateTimeSerialization() throws IOException {
+		// given
+		JacksonExecutionContextStringSerializer serializer = new JacksonExecutionContextStringSerializer();
+		Map<String, Object> map = new HashMap<>();
+		ZonedDateTime zonedDateTime = ZonedDateTime.of(2026, 11, 4, 10, 15, 30, 0, ZoneId.of("Europe/Paris"));
+		OffsetDateTime offsetDateTime = OffsetDateTime.of(2026, 11, 4, 10, 15, 30, 0, ZoneOffset.ofHours(5));
+		map.put("zonedDateTime", zonedDateTime);
+		map.put("offsetDateTime", offsetDateTime);
+
+		// when
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		serializer.serialize(map, outputStream);
+		InputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
+		Map<String, Object> deserializedContext = serializer.deserialize(inputStream);
+
+		// then
+		assertEquals(zonedDateTime, deserializedContext.get("zonedDateTime"));
+		assertEquals(offsetDateTime, deserializedContext.get("offsetDateTime"));
 	}
 
 	@Test
