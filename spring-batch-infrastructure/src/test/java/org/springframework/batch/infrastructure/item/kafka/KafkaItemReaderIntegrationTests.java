@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2025 the original author or authors.
+ * Copyright 2019-2026 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -53,6 +53,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
@@ -61,6 +62,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
  * @author François Martin
  * @author Patrick Baumgartner
  * @author Hyunwoo Jung
+ * @author Cobi Eun
  */
 @Testcontainers(disabledWithoutDocker = true)
 @ExtendWith(SpringExtension.class)
@@ -84,7 +86,13 @@ class KafkaItemReaderIntegrationTests {
 		try (AdminClient adminClient = AdminClient.create(properties)) {
 			adminClient.createTopics(List.of(new NewTopic("topic1", 1, (short) 1), new NewTopic("topic2", 2, (short) 1),
 					new NewTopic("topic3", 1, (short) 1), new NewTopic("topic4", 2, (short) 1),
-					new NewTopic("topic5", 1, (short) 1), new NewTopic("topic6", 1, (short) 1)));
+					new NewTopic("topic5", 1, (short) 1), new NewTopic("topic6", 1, (short) 1),
+					new NewTopic("topic7", 1, (short) 1), new NewTopic("topic8", 1, (short) 1),
+					new NewTopic("topic9", 1, (short) 1), new NewTopic("topic10", 1, (short) 1),
+					new NewTopic("topic11", 2, (short) 1), new NewTopic("topic12", 1, (short) 1),
+					new NewTopic("topic13", 1, (short) 1), new NewTopic("topic14", 1, (short) 1),
+					new NewTopic("topic15", 1, (short) 1), new NewTopic("topic16", 1, (short) 1),
+					new NewTopic("topic17", 1, (short) 1)));
 		}
 	}
 
@@ -101,6 +109,209 @@ class KafkaItemReaderIntegrationTests {
 				StringDeserializer.class.getName());
 		this.consumerProperties.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
 				StringDeserializer.class.getName());
+	}
+
+	@Test
+	void testUpdateDoesNotCommitOffsetRestoredFromExecutionContext() throws Exception {
+		ExecutionContext executionContext = new ExecutionContext();
+		executionContext.put("topic.partition.offsets", Map.of("0", 1L));
+		this.reader = new KafkaItemReader<>(noAutoCommitProperties(), "topic9", 0);
+		this.reader.open(executionContext);
+		this.reader.update(executionContext);
+		this.reader.close();
+		assertNull(KafkaTestUtils.getCurrentOffset(kafka.getBootstrapServers(), "1", "topic9", 0));
+	}
+
+	@Test
+	void testUpdateDoesNotCommitCustomStartOffset() throws Exception {
+		this.reader = new KafkaItemReader<>(noAutoCommitProperties(), "topic10", 0);
+		this.reader.setPartitionOffsets(new HashMap<>(Map.of(new TopicPartition("topic10", 0), 2L)));
+		this.reader.open(new ExecutionContext());
+		this.reader.update(new ExecutionContext());
+		this.reader.close();
+		assertNull(KafkaTestUtils.getCurrentOffset(kafka.getBootstrapServers(), "1", "topic10", 0));
+	}
+
+	@Test
+	void testUpdateDoesNotCommitPartitionsWithoutReturnedRecords() throws Exception {
+		for (int partition = 0; partition < 2; partition++) {
+			for (int i = 0; i < 3; i++) {
+				this.template.send("topic11", partition, null, "p" + partition + "-" + i).get();
+			}
+		}
+		this.reader = new KafkaItemReader<>(noAutoCommitProperties(), "topic11", 0, 1);
+		this.reader.setPollTimeout(Duration.ofSeconds(1));
+		this.reader.open(new ExecutionContext());
+		String item = this.reader.read();
+		int partition = Integer.parseInt(item.substring(1, 2));
+		this.reader.update(new ExecutionContext());
+		this.reader.close();
+		assertNull(KafkaTestUtils.getCurrentOffset(kafka.getBootstrapServers(), "1", "topic11", 1 - partition));
+		assertEquals(1,
+				KafkaTestUtils.getCurrentOffset(kafka.getBootstrapServers(), "1", "topic11", partition).offset());
+	}
+
+	@Test
+	void testUpdateAfterFullyConsumingTopicCommitsLastOffsetPlusOne() throws Exception {
+		for (int i = 0; i < 3; i++) {
+			this.template.send("topic12", "val" + i).get();
+		}
+		this.reader = new KafkaItemReader<>(noAutoCommitProperties(), "topic12", 0);
+		this.reader.setPollTimeout(Duration.ofSeconds(1));
+		this.reader.open(new ExecutionContext());
+		assertThat(this.reader.read(), is("val0"));
+		assertThat(this.reader.read(), is("val1"));
+		assertThat(this.reader.read(), is("val2"));
+		assertNull(this.reader.read());
+		this.reader.update(new ExecutionContext());
+		this.reader.close();
+		assertEquals(3, KafkaTestUtils.getCurrentOffset(kafka.getBootstrapServers(), "1", "topic12", 0).offset());
+	}
+
+	@Test
+	void testUpdateKeepsExecutionContextFormat() throws Exception {
+		for (int i = 0; i < 5; i++) {
+			this.template.send("topic13", "val" + i).get();
+		}
+		ExecutionContext executionContext = new ExecutionContext();
+		this.reader = new KafkaItemReader<>(noAutoCommitProperties(), "topic13", 0);
+		this.reader.setPollTimeout(Duration.ofSeconds(1));
+		this.reader.open(executionContext);
+		assertThat(this.reader.read(), is("val0"));
+		assertThat(this.reader.read(), is("val1"));
+		this.reader.update(executionContext);
+		this.reader.close();
+		assertEquals(Map.of("0", 1L), executionContext.get("topic.partition.offsets"));
+	}
+
+	@Test
+	void testUpdateCommitsReturnedRecordsWhenSaveStateIsDisabled() throws Exception {
+		for (int i = 0; i < 5; i++) {
+			this.template.send("topic14", "val" + i).get();
+		}
+		ExecutionContext executionContext = new ExecutionContext();
+		this.reader = new KafkaItemReader<>(noAutoCommitProperties(), "topic14", 0);
+		this.reader.setSaveState(false);
+		this.reader.setPollTimeout(Duration.ofSeconds(1));
+		this.reader.open(executionContext);
+		assertThat(this.reader.read(), is("val0"));
+		assertThat(this.reader.read(), is("val1"));
+		this.reader.update(executionContext);
+		this.reader.close();
+		assertFalse(executionContext.containsKey("topic.partition.offsets"));
+		assertEquals(2, KafkaTestUtils.getCurrentOffset(kafka.getBootstrapServers(), "1", "topic14", 0).offset());
+	}
+
+	@Test
+	void testReopenResetsReturnedOffsets() throws Exception {
+		for (int i = 0; i < 5; i++) {
+			this.template.send("topic15", "val" + i).get();
+		}
+		Properties properties = noAutoCommitProperties();
+		this.reader = new KafkaItemReader<>(properties, "topic15", 0);
+		this.reader.setPollTimeout(Duration.ofSeconds(1));
+		this.reader.open(new ExecutionContext());
+		assertThat(this.reader.read(), is("val0"));
+		assertThat(this.reader.read(), is("val1"));
+		this.reader.update(new ExecutionContext());
+		this.reader.close();
+		assertEquals(2, KafkaTestUtils.getCurrentOffset(kafka.getBootstrapServers(), "1", "topic15", 0).offset());
+
+		properties.setProperty(ConsumerConfig.GROUP_ID_CONFIG, "2");
+		this.reader.open(new ExecutionContext());
+		this.reader.update(new ExecutionContext());
+		this.reader.close();
+		assertNull(KafkaTestUtils.getCurrentOffset(kafka.getBootstrapServers(), "2", "topic15", 0));
+		assertEquals(2, KafkaTestUtils.getCurrentOffset(kafka.getBootstrapServers(), "1", "topic15", 0).offset());
+	}
+
+	@Test
+	void testUpdatePreservesConsumerPositionAfterEmptyPoll() throws Exception {
+		this.template.send("topic16", "initial").get();
+		Properties properties = noAutoCommitProperties();
+		properties.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
+		String lastItem = null;
+		for (int execution = 0; execution < 3; execution++) {
+			this.reader = new KafkaItemReader<>(properties, "topic16", 0);
+			this.reader.setPartitionOffsets(new HashMap<>());
+			this.reader.setPollTimeout(Duration.ofSeconds(1));
+			this.reader.open(new ExecutionContext());
+			String item;
+			while ((item = this.reader.read()) != null) {
+				lastItem = item;
+			}
+			this.reader.update(new ExecutionContext());
+			this.reader.close();
+			if (execution < 2) {
+				this.template.send("topic16", "between-" + (execution + 1)).get();
+			}
+		}
+		assertThat(lastItem, is("between-2"));
+	}
+
+	@Test
+	void testUpdateDoesNotCommitBeforePollingAfterReopen() throws Exception {
+		for (int i = 0; i < 3; i++) {
+			this.template.send("topic17", "val" + i).get();
+		}
+		Properties properties = noAutoCommitProperties();
+		this.reader = new KafkaItemReader<>(properties, "topic17", 0);
+		this.reader.setPollTimeout(Duration.ofSeconds(1));
+		this.reader.open(new ExecutionContext());
+		assertThat(this.reader.read(), is("val0"));
+		assertThat(this.reader.read(), is("val1"));
+		assertThat(this.reader.read(), is("val2"));
+		assertNull(this.reader.read());
+		this.reader.update(new ExecutionContext());
+		this.reader.close();
+		assertEquals(3, KafkaTestUtils.getCurrentOffset(kafka.getBootstrapServers(), "1", "topic17", 0).offset());
+
+		properties.setProperty(ConsumerConfig.GROUP_ID_CONFIG, "2");
+		this.reader.open(new ExecutionContext());
+		this.reader.update(new ExecutionContext());
+		this.reader.close();
+		assertNull(KafkaTestUtils.getCurrentOffset(kafka.getBootstrapServers(), "2", "topic17", 0));
+	}
+
+	private Properties noAutoCommitProperties() {
+		Properties properties = new Properties();
+		properties.putAll(this.consumerProperties);
+		properties.setProperty(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false");
+		return properties;
+	}
+
+	@Test
+	void testUpdateWithoutReadDoesNotCommit() throws Exception {
+		this.reader = new KafkaItemReader<>(noAutoCommitProperties(), "topic8", 0);
+		this.reader.open(new ExecutionContext());
+		this.reader.update(new ExecutionContext());
+		this.reader.close();
+		assertNull(KafkaTestUtils.getCurrentOffset(kafka.getBootstrapServers(), "1", "topic8", 0));
+	}
+
+	@Test
+	void testUpdateCommitsOnlyReturnedRecordsForPartialPoll() throws Exception {
+		for (int i = 0; i < 5; i++) {
+			this.template.send("topic7", "val" + i).get();
+		}
+		this.reader = new KafkaItemReader<>(noAutoCommitProperties(), "topic7", 0);
+		this.reader.setPollTimeout(Duration.ofSeconds(1));
+		this.reader.open(new ExecutionContext());
+		assertThat(this.reader.read(), is("val0"));
+		assertThat(this.reader.read(), is("val1"));
+		this.reader.update(new ExecutionContext());
+		this.reader.close();
+		assertEquals(2, KafkaTestUtils.getCurrentOffset(kafka.getBootstrapServers(), "1", "topic7", 0).offset());
+
+		this.reader = new KafkaItemReader<>(noAutoCommitProperties(), "topic7", 0);
+		this.reader.setPartitionOffsets(new HashMap<>());
+		this.reader.setPollTimeout(Duration.ofSeconds(1));
+		this.reader.open(new ExecutionContext());
+		assertThat(this.reader.read(), is("val2"));
+		assertThat(this.reader.read(), is("val3"));
+		assertThat(this.reader.read(), is("val4"));
+		assertNull(this.reader.read());
+		this.reader.close();
 	}
 
 	@Test

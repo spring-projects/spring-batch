@@ -162,6 +162,15 @@ to read messages from multiple partitions of the same topic. It stores message o
 in the execution context to support restart capabilities. Spring Batch provides a
 `KafkaItemReaderBuilder` to construct an instance of the `KafkaItemReader`.
 
+By default, the underlying Kafka consumer commits the offsets of the records it has polled
+automatically. To continue from the offset stored in Kafka for the consumer group (by
+passing an empty map to `setPartitionOffsets`), set `enable.auto.commit` to `false` in the
+consumer properties. The reader then commits, on each execution context update, the offsets
+following the records it returned while polled records remain buffered, and the consumer
+positions once all polled records have been returned. If an execution ends while records
+are still buffered and no offset was committed for a partition, that partition follows
+`auto.offset.reset` on the next execution.
+
 [[kafkaItemWriter]]
 === `KafkaItemWriter`
 The `KafkaItemWriter` is an `ItemWriter` for Apache Kafka that uses a `KafkaTemplate` to
