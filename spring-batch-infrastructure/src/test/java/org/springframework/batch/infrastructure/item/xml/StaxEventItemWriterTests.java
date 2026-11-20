@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2025 the original author or authors.
+ * Copyright 2008-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,16 +17,19 @@ package org.springframework.batch.infrastructure.item.xml;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Collections;
 
 import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.Result;
-import jakarta.xml.bind.annotation.XmlRootElement;
 
+import jakarta.xml.bind.annotation.XmlRootElement;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 
 import org.springframework.batch.infrastructure.item.Chunk;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
@@ -50,8 +53,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 /**
@@ -828,23 +831,24 @@ class StaxEventItemWriterTests {
 	}
 
 	/**
-	 * Tests that if file.delete() returns false, an appropriate exception is thrown to
+	 * Tests that if the file deletion fails, an appropriate exception is thrown to
 	 * indicate the deletion attempt failed.
 	 */
 	@Test
 	void testFailedFileDeletionThrowsException() throws IOException {
-		File mockedFile = spy(resource.getFile());
-		writer.setResource(new FileSystemResource(mockedFile));
+		writer.setResource(new FileSystemResource(resource.getFile()));
 		writer.setShouldDeleteIfEmpty(true);
 		writer.open(executionContext);
 
-		when(mockedFile.delete()).thenReturn(false);
+		try (MockedStatic<Files> mocked = Mockito.mockStatic(Files.class, Mockito.CALLS_REAL_METHODS)) {
+			mocked.when(() -> Files.delete(any())).thenThrow(new IOException("Failed to delete file"));
 
-		ItemStreamException exception = assertThrows(ItemStreamException.class, () -> writer.close(),
-				"Expected exception when file deletion fails");
+			ItemStreamException exception = assertThrows(ItemStreamException.class, writer::close,
+					"Expected exception when file deletion fails");
 
-		assertEquals("Failed to delete empty file on close", exception.getMessage(), "Wrong exception message");
-		assertNotNull(exception.getCause(), "Exception should have a cause");
+			assertEquals("Failed to delete empty file on close", exception.getMessage(), "Wrong exception message");
+			assertNotNull(exception.getCause(), "Exception should have a cause");
+		}
 	}
 
 	private void initWriterForSimpleCallbackTests() throws Exception {
