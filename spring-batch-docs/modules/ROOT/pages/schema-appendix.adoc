@@ -22,7 +22,7 @@ variations in how individual database vendors handle data types. The following i
 shows an ERD model of all six tables and their relationships to one another:
 
 .Spring Batch Meta-Data ERD
-image::meta-data-erd.png[Spring Batch Meta-Data ERD, scaledwidth="60%"]
+image::meta-data-erd.svg[Spring Batch Meta-Data ERD, scaledwidth="60%"]
 
 [[exampleDDLScripts]]
 === Example DDL Scripts
@@ -322,7 +322,7 @@ CREATE TABLE BATCH_JOB_EXECUTION_CONTEXT  (
 The following list describes each column:
 
 * `JOB_EXECUTION_ID`: Foreign key representing the `JobExecution` to which the context
-belongs. There may be more than one row associated with a given execution.
+belongs. It is also the primary key, so there can be only one row per job execution.
 * `SHORT_CONTEXT`: A string version of the `SERIALIZED_CONTEXT`.
 * `SERIALIZED_CONTEXT`: The entire context, serialized.
 
@@ -351,7 +351,7 @@ CREATE TABLE BATCH_STEP_EXECUTION_CONTEXT  (
 The following list describes each column:
 
 * `STEP_EXECUTION_ID`: Foreign key representing the `StepExecution` to which the context
-belongs. There may be more than one row associated with a given execution.
+belongs. It is also the primary key, so there can be only one row per step execution.
 * `SHORT_CONTEXT`: A string version of the `SERIALIZED_CONTEXT`.
 * `SERIALIZED_CONTEXT`: The entire context, serialized.
 
