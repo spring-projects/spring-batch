@@ -45,7 +45,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
@@ -53,6 +53,7 @@ import org.springframework.test.jdbc.JdbcTestUtils;
  * Integration tests of {@link ChunkOrientedStep}.
  *
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  */
 public class ChunkOrientedStepIntegrationTests {
 
@@ -66,7 +67,7 @@ public class ChunkOrientedStepIntegrationTests {
 				ChunkOrientedStepConfiguration.class);
 		JobOperator jobOperator = context.getBean(JobOperator.class);
 		Job job = context.getBean(Job.class);
-		JdbcTemplate jdbcTemplate = context.getBean(JdbcTemplate.class);
+		JdbcClient jdbcClient = context.getBean(JdbcClient.class);
 
 		// when
 		JobParameters jobParameters = new JobParametersBuilder().addString("file", "data/persons.csv")
@@ -81,7 +82,7 @@ public class ChunkOrientedStepIntegrationTests {
 		Assertions.assertEquals(5, stepExecution.getWriteCount());
 		Assertions.assertEquals(3, stepExecution.getCommitCount());
 		Assertions.assertEquals(0, stepExecution.getRollbackCount());
-		Assertions.assertEquals(5, JdbcTestUtils.countRowsInTable(jdbcTemplate, "person_target"));
+		Assertions.assertEquals(5, JdbcTestUtils.countRowsInTable(jdbcClient, "person_target"));
 	}
 
 	@Test
@@ -91,7 +92,7 @@ public class ChunkOrientedStepIntegrationTests {
 				ConcurrentChunkOrientedStepConfiguration.class);
 		JobOperator jobOperator = context.getBean(JobOperator.class);
 		Job job = context.getBean(Job.class);
-		JdbcTemplate jdbcTemplate = context.getBean(JdbcTemplate.class);
+		JdbcClient jdbcClient = context.getBean(JdbcClient.class);
 
 		// when
 		JobParameters jobParameters = new JobParametersBuilder().addString("file", "data/persons.csv")
@@ -106,7 +107,7 @@ public class ChunkOrientedStepIntegrationTests {
 		Assertions.assertEquals(5, stepExecution.getWriteCount());
 		Assertions.assertEquals(3, stepExecution.getCommitCount());
 		Assertions.assertEquals(0, stepExecution.getRollbackCount());
-		Assertions.assertEquals(5, JdbcTestUtils.countRowsInTable(jdbcTemplate, "person_target"));
+		Assertions.assertEquals(5, JdbcTestUtils.countRowsInTable(jdbcClient, "person_target"));
 	}
 
 	@Test
@@ -117,7 +118,7 @@ public class ChunkOrientedStepIntegrationTests {
 				ChunkOrientedStepConfiguration.class);
 		JobOperator jobOperator = context.getBean(JobOperator.class);
 		Job job = context.getBean(Job.class);
-		JdbcTemplate jdbcTemplate = context.getBean(JdbcTemplate.class);
+		JdbcClient jdbcClient = context.getBean(JdbcClient.class);
 
 		// when
 		JobParameters jobParameters = new JobParametersBuilder().addString("file", "data/persons.csv")
@@ -135,7 +136,7 @@ public class ChunkOrientedStepIntegrationTests {
 		Assertions.assertEquals(0, stepExecution.getWriteCount());
 		Assertions.assertEquals(0, stepExecution.getCommitCount());
 		Assertions.assertEquals(1, stepExecution.getRollbackCount());
-		Assertions.assertEquals(0, JdbcTestUtils.countRowsInTable(jdbcTemplate, "person_target"));
+		Assertions.assertEquals(0, JdbcTestUtils.countRowsInTable(jdbcClient, "person_target"));
 		System.clearProperty("fail");
 	}
 
@@ -147,7 +148,7 @@ public class ChunkOrientedStepIntegrationTests {
 				ConcurrentChunkOrientedStepConfiguration.class);
 		JobOperator jobOperator = context.getBean(JobOperator.class);
 		Job job = context.getBean(Job.class);
-		JdbcTemplate jdbcTemplate = context.getBean(JdbcTemplate.class);
+		JdbcClient jdbcClient = context.getBean(JdbcClient.class);
 
 		// when
 		JobParameters jobParameters = new JobParametersBuilder().addString("file", "data/persons.csv")
@@ -165,7 +166,7 @@ public class ChunkOrientedStepIntegrationTests {
 		Assertions.assertEquals(0, stepExecution.getWriteCount());
 		Assertions.assertEquals(0, stepExecution.getCommitCount());
 		Assertions.assertEquals(1, stepExecution.getRollbackCount());
-		Assertions.assertEquals(0, JdbcTestUtils.countRowsInTable(jdbcTemplate, "person_target"));
+		Assertions.assertEquals(0, JdbcTestUtils.countRowsInTable(jdbcClient, "person_target"));
 		System.clearProperty("fail");
 	}
 

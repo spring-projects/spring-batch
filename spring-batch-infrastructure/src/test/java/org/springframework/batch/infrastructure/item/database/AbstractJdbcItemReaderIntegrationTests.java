@@ -31,7 +31,7 @@ import org.springframework.batch.infrastructure.item.sample.Foo;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -40,6 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
  *
  * @author Lucas Ward
  * @author Robert Kasanicky
+ * @author Yanming Zhou
  */
 public abstract class AbstractJdbcItemReaderIntegrationTests {
 
@@ -51,12 +52,12 @@ public abstract class AbstractJdbcItemReaderIntegrationTests {
 
 	protected DataSource dataSource;
 
-	protected JdbcTemplate jdbcTemplate;
+	protected JdbcClient jdbcClient;
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
 		this.dataSource = dataSource;
-		this.jdbcTemplate = new JdbcTemplate(dataSource);
+		this.jdbcClient = JdbcClient.create(dataSource);
 	}
 
 	@BeforeEach

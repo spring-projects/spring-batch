@@ -37,7 +37,7 @@ import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -65,11 +65,11 @@ public abstract class AbstractJobDaoTests {
 
 	protected LocalDateTime jobExecutionStartTime = LocalDateTime.now();
 
-	protected JdbcTemplate jdbcTemplate;
+	protected JdbcClient jdbcClient;
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
-		this.jdbcTemplate = new JdbcTemplate(dataSource);
+		this.jdbcClient = JdbcClient.create(dataSource);
 	}
 
 	/*
@@ -102,17 +102,20 @@ public abstract class AbstractJobDaoTests {
 	@Transactional
 	@Test
 	void testVersionIsNotNullForJob() {
-		int version = jdbcTemplate.queryForObject(
-				"select version from BATCH_JOB_INSTANCE where JOB_INSTANCE_ID=" + jobInstance.getId(), Integer.class);
+		int version = jdbcClient
+			.sql("select version from BATCH_JOB_INSTANCE where JOB_INSTANCE_ID=" + jobInstance.getId())
+			.query(Integer.class)
+			.single();
 		assertEquals(0, version);
 	}
 
 	@Transactional
 	@Test
 	void testVersionIsNotNullForJobExecution() {
-		int version = jdbcTemplate.queryForObject(
-				"select version from BATCH_JOB_EXECUTION where JOB_EXECUTION_ID=" + jobExecution.getId(),
-				Integer.class);
+		int version = jdbcClient
+			.sql("select version from BATCH_JOB_EXECUTION where JOB_EXECUTION_ID=" + jobExecution.getId())
+			.query(Integer.class)
+			.single();
 		assertEquals(1, version);
 	}
 
@@ -213,8 +216,10 @@ public abstract class AbstractJobDaoTests {
 		// Create job.
 		jobInstance = jobInstanceDao.createJobInstance(testJob, jobParameters);
 
-		List<Map<String, Object>> jobs = jdbcTemplate
-			.queryForList("SELECT * FROM BATCH_JOB_INSTANCE where JOB_INSTANCE_ID=?", jobInstance.getId());
+		List<Map<String, Object>> jobs = jdbcClient.sql("SELECT * FROM BATCH_JOB_INSTANCE where JOB_INSTANCE_ID=?")
+			.param(1, jobInstance.getId())
+			.query()
+			.listOfRows();
 		assertEquals(1, jobs.size());
 		assertEquals("test", jobs.get(0).get("JOB_NAME"));
 

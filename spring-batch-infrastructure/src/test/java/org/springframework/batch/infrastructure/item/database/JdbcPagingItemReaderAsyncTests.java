@@ -40,7 +40,7 @@ import org.springframework.batch.infrastructure.item.ItemReader;
 import org.springframework.batch.infrastructure.item.database.support.HsqlPagingQueryProvider;
 import org.springframework.batch.infrastructure.item.sample.Foo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
@@ -71,19 +71,18 @@ class JdbcPagingItemReaderAsyncTests {
 
 	@BeforeEach
 	void init() {
-		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-		Integer maxIdResult = jdbcTemplate.queryForObject("SELECT MAX(ID) from T_FOOS", Integer.class);
-		maxId = maxIdResult == null ? 0 : maxIdResult;
+		JdbcClient jdbcClient = JdbcClient.create(dataSource);
+		maxId = jdbcClient.sql("SELECT MAX(ID) from T_FOOS").query(Integer.class).optional().orElse(0);
 		for (int i = maxId + 1; i <= ITEM_COUNT; i++) {
-			jdbcTemplate.update("INSERT into T_FOOS (ID,NAME,VALUE) values (?, ?, ?)", i, "foo" + i, i);
+			jdbcClient.sql("INSERT into T_FOOS (ID,NAME,VALUE) values (?, ?, ?)").params(i, "foo" + i, i).update();
 		}
-		assertEquals(ITEM_COUNT, JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_FOOS"));
+		assertEquals(ITEM_COUNT, JdbcTestUtils.countRowsInTable(jdbcClient, "T_FOOS"));
 	}
 
 	@AfterEach
 	void destroy() {
-		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-		jdbcTemplate.update("DELETE from T_FOOS where ID>?", maxId);
+		JdbcClient jdbcClient = JdbcClient.create(dataSource);
+		jdbcClient.sql("DELETE from T_FOOS where ID>?").params(maxId).update();
 	}
 
 	@Test

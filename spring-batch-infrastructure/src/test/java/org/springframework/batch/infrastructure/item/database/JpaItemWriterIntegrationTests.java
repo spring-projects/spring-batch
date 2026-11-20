@@ -27,7 +27,7 @@ import org.springframework.batch.infrastructure.item.sample.Person;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.orm.jpa.JpaTransactionManager;
@@ -52,16 +52,16 @@ class JpaItemWriterIntegrationTests {
 	private EntityManagerFactory entityManagerFactory;
 
 	@Autowired
-	private JdbcTemplate jdbcTemplate;
+	private JdbcClient jdbcClient;
 
 	@BeforeEach
 	void init() {
-		this.jdbcTemplate.update("create table person (id int not null primary key, name varchar(32))");
+		this.jdbcClient.sql("create table person (id int not null primary key, name varchar(32))").update();
 	}
 
 	@AfterEach
 	void destroy() {
-		JdbcTestUtils.dropTables(this.jdbcTemplate, "person");
+		JdbcTestUtils.dropTables(this.jdbcClient, "person");
 	}
 
 	@Test
@@ -74,7 +74,7 @@ class JpaItemWriterIntegrationTests {
 		writer.write(items);
 
 		// then
-		assertEquals(2, JdbcTestUtils.countRowsInTable(this.jdbcTemplate, "person"));
+		assertEquals(2, JdbcTestUtils.countRowsInTable(this.jdbcClient, "person"));
 	}
 
 	@Test
@@ -88,7 +88,7 @@ class JpaItemWriterIntegrationTests {
 		writer.write(items);
 
 		// then
-		assertEquals(2, JdbcTestUtils.countRowsInTable(this.jdbcTemplate, "person"));
+		assertEquals(2, JdbcTestUtils.countRowsInTable(this.jdbcClient, "person"));
 	}
 
 	@Configuration
@@ -100,8 +100,8 @@ class JpaItemWriterIntegrationTests {
 		}
 
 		@Bean
-		public JdbcTemplate jdbcTemplate(DataSource dataSource) {
-			return new JdbcTemplate(dataSource);
+		public JdbcClient jdbcClient(DataSource dataSource) {
+			return JdbcClient.create(dataSource);
 		}
 
 		@Bean

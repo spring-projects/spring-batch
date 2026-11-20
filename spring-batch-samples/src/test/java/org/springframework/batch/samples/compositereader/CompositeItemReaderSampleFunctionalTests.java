@@ -46,7 +46,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.core.DataClassRowMapper;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.jdbc.support.JdbcTransactionManager;
@@ -69,8 +69,8 @@ public class CompositeItemReaderSampleFunctionalTests {
 
 		// then
 		Assertions.assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
-		JdbcTemplate jdbcTemplate = new JdbcTemplate(context.getBean(DataSource.class));
-		int personsCount = JdbcTestUtils.countRowsInTable(jdbcTemplate, "person_target");
+		JdbcClient jdbcClient = JdbcClient.create(context.getBean(DataSource.class));
+		int personsCount = JdbcTestUtils.countRowsInTable(jdbcClient, "person_target");
 		Assertions.assertEquals(6, personsCount);
 	}
 

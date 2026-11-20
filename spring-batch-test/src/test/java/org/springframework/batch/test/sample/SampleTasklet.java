@@ -26,12 +26,12 @@ import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.batch.infrastructure.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 
 public class SampleTasklet implements Tasklet {
 
 	@Autowired
-	private JdbcTemplate jdbcTemplate;
+	private JdbcClient jdbcClient;
 
 	private JobExecution jobExecution;
 
@@ -45,7 +45,7 @@ public class SampleTasklet implements Tasklet {
 
 	@Override
 	public @Nullable RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		this.jdbcTemplate.update("insert into TESTS(ID, NAME) values (?, 'SampleTasklet" + id + "')", id);
+		this.jdbcClient.sql("insert into TESTS(ID, NAME) values (?, 'SampleTasklet" + id + "')").params(id).update();
 
 		if (jobExecution != null) {
 			ExecutionContext jobContext = jobExecution.getExecutionContext();

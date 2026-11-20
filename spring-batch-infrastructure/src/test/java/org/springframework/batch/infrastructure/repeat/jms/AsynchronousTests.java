@@ -28,7 +28,7 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.infrastructure.jms.BatchMessageListenerContainer;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.listener.SessionAwareMessageListener;
 import org.springframework.test.annotation.DirtiesContext;
@@ -51,7 +51,7 @@ class AsynchronousTests {
 	private JmsTemplate jmsTemplate;
 
 	@Autowired
-	private JdbcTemplate jdbcTemplate;
+	private JdbcClient jdbcClient;
 
 	@BeforeEach
 	void onSetUp() {
@@ -61,7 +61,7 @@ class AsynchronousTests {
 			foo = (String) jmsTemplate.receiveAndConvert("queue");
 			count++;
 		}
-		JdbcTestUtils.deleteFromTables(jdbcTemplate, "T_BARS");
+		JdbcTestUtils.deleteFromTables(jdbcClient, "T_BARS");
 
 		// Queue is now drained...
 		assertNull(foo);
@@ -88,7 +88,7 @@ class AsynchronousTests {
 	private final List<String> list = new ArrayList<>();
 
 	private void assertInitialState() {
-		int count = JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_BARS");
+		int count = JdbcTestUtils.countRowsInTable(jdbcClient, "T_BARS");
 		assertEquals(0, count);
 	}
 
@@ -100,7 +100,9 @@ class AsynchronousTests {
 		container.setMessageListener((SessionAwareMessageListener<Message>) (message, session) -> {
 			list.add(message.toString());
 			String text = ((TextMessage) message).getText();
-			jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(), text);
+			jdbcClient.sql("INSERT into T_BARS (id,name,foo_date) values (?,?,null)")
+				.params(list.size(), text)
+				.update();
 		});
 
 		container.initializeProxy();
@@ -115,7 +117,7 @@ class AsynchronousTests {
 		String foo = (String) jmsTemplate.receiveAndConvert("queue");
 		assertNull(foo);
 
-		int count = JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_BARS");
+		int count = JdbcTestUtils.countRowsInTable(jdbcClient, "T_BARS");
 		assertEquals(2, count);
 
 	}
@@ -131,7 +133,9 @@ class AsynchronousTests {
 		container.setMessageListener((SessionAwareMessageListener<Message>) (message, session) -> {
 			list.add(message.toString());
 			final String text = ((TextMessage) message).getText();
-			jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(), text);
+			jdbcClient.sql("INSERT into T_BARS (id,name,foo_date) values (?,?,null)")
+				.params(list.size(), text)
+				.update();
 			// This causes the DB to rollback but not the message
 			if (text.equals("bar")) {
 				throw new RuntimeException("Rollback!");
@@ -159,7 +163,7 @@ class AsynchronousTests {
 			msgs.add(text);
 		}
 
-		int count = JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_BARS");
+		int count = JdbcTestUtils.countRowsInTable(jdbcClient, "T_BARS");
 		assertEquals(0, count);
 
 		assertTrue(msgs.contains("foo"), "Foo not on queue");

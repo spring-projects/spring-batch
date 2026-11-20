@@ -24,7 +24,7 @@ import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.test.JobOperatorTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
@@ -37,18 +37,18 @@ class ProcessIndicatorJobFunctionalTests {
 	@Autowired
 	private JobOperatorTestUtils jobOperatorTestUtils;
 
-	private JdbcTemplate jdbcTemplate;
+	private JdbcClient jdbcClient;
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
-		jdbcTemplate = new JdbcTemplate(dataSource);
+		jdbcClient = JdbcClient.create(dataSource);
 	}
 
 	@Test
 	void testLaunchJob() throws Exception {
-		int before = JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_STAGING");
+		int before = JdbcTestUtils.countRowsInTable(jdbcClient, "BATCH_STAGING");
 		JobExecution execution = jobOperatorTestUtils.startJob();
-		int after = JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_STAGING");
+		int after = JdbcTestUtils.countRowsInTable(jdbcClient, "BATCH_STAGING");
 		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
 		assertEquals(after - before, execution.getStepExecutions().iterator().next().getReadCount());
 	}

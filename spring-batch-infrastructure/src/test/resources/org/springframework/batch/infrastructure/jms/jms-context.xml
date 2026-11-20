@@ -17,6 +17,11 @@
 		<property name="dataSource" ref="dataSource" />
 	</bean>
 
+	<bean id="jdbcClient" class="org.springframework.jdbc.core.simple.JdbcClient"
+		  factory-method="create">
+		<constructor-arg ref="dataSource" />
+	</bean>
+
 	<bean id="connectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory">
 		<property name="targetConnectionFactory" ref="targetConnectionFactory"/>
 		<property name="sessionCacheSize" value="5"/>

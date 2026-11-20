@@ -31,7 +31,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.batch.samples.domain.trade.Trade;
 import org.springframework.batch.test.JobOperatorTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
@@ -51,7 +51,7 @@ class TradeJobFunctionalTests {
 
 	private int activeRow = 0;
 
-	private JdbcTemplate jdbcTemplate;
+	private JdbcClient jdbcClient;
 
 	private final Map<String, Double> credits = new HashMap<>();
 
@@ -60,13 +60,13 @@ class TradeJobFunctionalTests {
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
-		this.jdbcTemplate = new JdbcTemplate(dataSource);
+		this.jdbcClient = JdbcClient.create(dataSource);
 	}
 
 	@BeforeEach
 	void onSetUp() {
-		JdbcTestUtils.deleteFromTables(jdbcTemplate, "TRADE");
-		List<Map<String, Object>> list = jdbcTemplate.queryForList("select NAME, CREDIT from CUSTOMER");
+		JdbcTestUtils.deleteFromTables(jdbcClient, "TRADE");
+		List<Map<String, Object>> list = jdbcClient.sql("select NAME, CREDIT from CUSTOMER").query().listOfRows();
 
 		for (Map<String, Object> map : list) {
 			credits.put((String) map.get("NAME"), ((Number) map.get("CREDIT")).doubleValue());
@@ -75,7 +75,7 @@ class TradeJobFunctionalTests {
 
 	@AfterEach
 	void tearDown() {
-		JdbcTestUtils.deleteFromTables(jdbcTemplate, "TRADE");
+		JdbcTestUtils.deleteFromTables(jdbcClient, "TRADE");
 	}
 
 	@Test
@@ -93,7 +93,7 @@ class TradeJobFunctionalTests {
 				new Trade("UK21341EAH48", 108, new BigDecimal("109.25"), "customer3"),
 				new Trade("UK21341EAH49", 854, new BigDecimal("123.39"), "customer4"));
 
-		jdbcTemplate.query(GET_TRADES, rs -> {
+		jdbcClient.sql(GET_TRADES).query(rs -> {
 			Trade trade = trades.get(activeRow++);
 
 			assertEquals(trade.getIsin(), rs.getString(1));
@@ -105,7 +105,7 @@ class TradeJobFunctionalTests {
 		assertEquals(activeRow, trades.size());
 
 		activeRow = 0;
-		jdbcTemplate.query(GET_CUSTOMERS, rs -> {
+		jdbcClient.sql(GET_CUSTOMERS).query(rs -> {
 			Customer customer = customers.get(activeRow++);
 
 			assertEquals(customer.getName(), rs.getString(1));

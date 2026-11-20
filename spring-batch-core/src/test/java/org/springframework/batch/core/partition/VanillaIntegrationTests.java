@@ -25,13 +25,14 @@ import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
 /**
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  *
  */
 @SpringJUnitConfig(locations = "launch-context.xml")
@@ -43,11 +44,11 @@ public class VanillaIntegrationTests {
 	@Autowired
 	private Job job;
 
-	private JdbcTemplate jdbcTemplate;
+	private JdbcClient jdbcClient;
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
-		this.jdbcTemplate = new JdbcTemplate(dataSource);
+		this.jdbcClient = JdbcClient.create(dataSource);
 	}
 
 	@Test
@@ -57,14 +58,14 @@ public class VanillaIntegrationTests {
 
 	@Test
 	void testLaunchJob() throws Exception {
-		int beforeManager = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "BATCH_STEP_EXECUTION",
+		int beforeManager = JdbcTestUtils.countRowsInTableWhere(jdbcClient, "BATCH_STEP_EXECUTION",
 				"STEP_NAME='step1:manager'");
-		int beforePartition = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "BATCH_STEP_EXECUTION",
+		int beforePartition = JdbcTestUtils.countRowsInTableWhere(jdbcClient, "BATCH_STEP_EXECUTION",
 				"STEP_NAME like 'step1:partition%'");
 		assertNotNull(jobOperator.start(job, new JobParameters()));
-		int afterManager = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "BATCH_STEP_EXECUTION",
+		int afterManager = JdbcTestUtils.countRowsInTableWhere(jdbcClient, "BATCH_STEP_EXECUTION",
 				"STEP_NAME='step1:manager'");
-		int afterPartition = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "BATCH_STEP_EXECUTION",
+		int afterPartition = JdbcTestUtils.countRowsInTableWhere(jdbcClient, "BATCH_STEP_EXECUTION",
 				"STEP_NAME like 'step1:partition%'");
 		assertEquals(1, afterManager - beforeManager);
 		// Should be same as grid size in step splitter

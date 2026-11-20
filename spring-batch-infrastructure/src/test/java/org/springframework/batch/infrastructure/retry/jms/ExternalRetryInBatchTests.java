@@ -26,7 +26,7 @@ import org.springframework.batch.infrastructure.repeat.policy.SimpleCompletionPo
 import org.springframework.batch.infrastructure.repeat.support.RepeatSynchronizationManager;
 import org.springframework.batch.infrastructure.repeat.support.RepeatTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.retry.RecoveryCallback;
 import org.springframework.retry.RetryCallback;
@@ -60,7 +60,7 @@ class ExternalRetryInBatchTests {
 	private ItemReader<String> provider;
 
 	@Autowired
-	private JdbcTemplate jdbcTemplate;
+	private JdbcClient jdbcClient;
 
 	@Autowired
 	private PlatformTransactionManager transactionManager;
@@ -68,7 +68,7 @@ class ExternalRetryInBatchTests {
 	@BeforeEach
 	void onSetUp() {
 		getMessages(); // drain queue
-		JdbcTestUtils.deleteFromTables(jdbcTemplate, "T_BARS");
+		JdbcTestUtils.deleteFromTables(jdbcClient, "T_BARS");
 		jmsTemplate.convertAndSend("queue", "foo");
 		jmsTemplate.convertAndSend("queue", "bar");
 		provider = () -> {
@@ -82,11 +82,11 @@ class ExternalRetryInBatchTests {
 	@AfterEach
 	void onTearDown() {
 		getMessages(); // drain queue
-		JdbcTestUtils.deleteFromTables(jdbcTemplate, "T_BARS");
+		JdbcTestUtils.deleteFromTables(jdbcClient, "T_BARS");
 	}
 
 	private void assertInitialState() {
-		int count = JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_BARS");
+		int count = JdbcTestUtils.countRowsInTable(jdbcClient, "T_BARS");
 		assertEquals(0, count);
 	}
 
@@ -124,8 +124,9 @@ class ExternalRetryInBatchTests {
 								// back. When it comes back for recovery this
 								// code is not
 								// executed...
-								jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)",
-										list.size(), item);
+								jdbcClient.sql("INSERT into T_BARS (id,name,foo_date) values (?,?,null)")
+									.params(list.size(), item)
+									.update();
 								throw new RuntimeException("Rollback!");
 							};
 
@@ -166,7 +167,7 @@ class ExternalRetryInBatchTests {
 		assertEquals(2, recovered.size());
 
 		// The database portion committed once...
-		int count = JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_BARS");
+		int count = JdbcTestUtils.countRowsInTable(jdbcClient, "T_BARS");
 		assertEquals(0, count);
 
 		// ... and so did the message session.

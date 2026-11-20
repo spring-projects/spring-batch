@@ -49,7 +49,7 @@ import org.springframework.core.retry.RetryException;
 import org.springframework.core.retry.RetryPolicy;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
@@ -57,6 +57,7 @@ import org.springframework.test.jdbc.JdbcTestUtils;
  * Integration tests for the fault-tolerance features of {@link ChunkOrientedStep}.
  *
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  */
 public class ChunkOrientedStepFaultToleranceIntegrationTests {
 
@@ -71,7 +72,7 @@ public class ChunkOrientedStepFaultToleranceIntegrationTests {
 				FaultTolerantChunkOrientedStepConfiguration.class);
 		JobOperator jobOperator = context.getBean(JobOperator.class);
 		Job job = context.getBean(Job.class);
-		JdbcTemplate jdbcTemplate = context.getBean(JdbcTemplate.class);
+		JdbcClient jdbcClient = context.getBean(JdbcClient.class);
 
 		// when
 		JobParameters jobParameters = new JobParametersBuilder().addString("file", "data/persons-bad-data.csv")
@@ -90,7 +91,7 @@ public class ChunkOrientedStepFaultToleranceIntegrationTests {
 		Assertions.assertEquals(2, stepExecution.getReadSkipCount());
 		Assertions.assertEquals(1, stepExecution.getWriteSkipCount());
 		Assertions.assertEquals(3, stepExecution.getSkipCount());
-		Assertions.assertEquals(3, JdbcTestUtils.countRowsInTable(jdbcTemplate, "person_target"));
+		Assertions.assertEquals(3, JdbcTestUtils.countRowsInTable(jdbcClient, "person_target"));
 		System.clearProperty("skipLimit");
 	}
 
@@ -102,7 +103,7 @@ public class ChunkOrientedStepFaultToleranceIntegrationTests {
 				ConcurrentFaultTolerantChunkOrientedStepConfiguration.class);
 		JobOperator jobOperator = context.getBean(JobOperator.class);
 		Job job = context.getBean(Job.class);
-		JdbcTemplate jdbcTemplate = context.getBean(JdbcTemplate.class);
+		JdbcClient jdbcClient = context.getBean(JdbcClient.class);
 
 		// when
 		JobParameters jobParameters = new JobParametersBuilder().addString("file", "data/persons-bad-data.csv")
@@ -121,7 +122,7 @@ public class ChunkOrientedStepFaultToleranceIntegrationTests {
 		Assertions.assertEquals(2, stepExecution.getReadSkipCount());
 		Assertions.assertEquals(1, stepExecution.getWriteSkipCount());
 		Assertions.assertEquals(3, stepExecution.getSkipCount());
-		Assertions.assertEquals(3, JdbcTestUtils.countRowsInTable(jdbcTemplate, "person_target"));
+		Assertions.assertEquals(3, JdbcTestUtils.countRowsInTable(jdbcClient, "person_target"));
 		System.clearProperty("skipLimit");
 	}
 
@@ -133,7 +134,7 @@ public class ChunkOrientedStepFaultToleranceIntegrationTests {
 				FaultTolerantChunkOrientedStepConfiguration.class);
 		JobOperator jobOperator = context.getBean(JobOperator.class);
 		Job job = context.getBean(Job.class);
-		JdbcTemplate jdbcTemplate = context.getBean(JdbcTemplate.class);
+		JdbcClient jdbcClient = context.getBean(JdbcClient.class);
 
 		// when
 		JobParameters jobParameters = new JobParametersBuilder().addString("file", "data/persons-bad-data.csv")
@@ -155,7 +156,7 @@ public class ChunkOrientedStepFaultToleranceIntegrationTests {
 		Assertions.assertEquals(1, stepExecution.getReadSkipCount());
 		Assertions.assertEquals(0, stepExecution.getWriteSkipCount());
 		Assertions.assertEquals(1, stepExecution.getSkipCount());
-		Assertions.assertEquals(2, JdbcTestUtils.countRowsInTable(jdbcTemplate, "person_target"));
+		Assertions.assertEquals(2, JdbcTestUtils.countRowsInTable(jdbcClient, "person_target"));
 		System.clearProperty("skipLimit");
 	}
 
@@ -167,7 +168,7 @@ public class ChunkOrientedStepFaultToleranceIntegrationTests {
 				ConcurrentFaultTolerantChunkOrientedStepConfiguration.class);
 		JobOperator jobOperator = context.getBean(JobOperator.class);
 		Job job = context.getBean(Job.class);
-		JdbcTemplate jdbcTemplate = context.getBean(JdbcTemplate.class);
+		JdbcClient jdbcClient = context.getBean(JdbcClient.class);
 
 		// when
 		JobParameters jobParameters = new JobParametersBuilder().addString("file", "data/persons-bad-data.csv")
@@ -189,7 +190,7 @@ public class ChunkOrientedStepFaultToleranceIntegrationTests {
 		Assertions.assertEquals(1, stepExecution.getReadSkipCount());
 		Assertions.assertEquals(0, stepExecution.getWriteSkipCount());
 		Assertions.assertEquals(1, stepExecution.getSkipCount());
-		Assertions.assertEquals(2, JdbcTestUtils.countRowsInTable(jdbcTemplate, "person_target"));
+		Assertions.assertEquals(2, JdbcTestUtils.countRowsInTable(jdbcClient, "person_target"));
 		System.clearProperty("skipLimit");
 	}
 
@@ -279,7 +280,7 @@ public class ChunkOrientedStepFaultToleranceIntegrationTests {
 				DuplicateWriteDetectionStepConfiguration.class);
 		JobOperator jobOperator = context.getBean(JobOperator.class);
 		Job job = context.getBean(Job.class);
-		JdbcTemplate jdbcTemplate = context.getBean(JdbcTemplate.class);
+		JdbcClient jdbcClient = context.getBean(JdbcClient.class);
 
 		// when
 		JobParameters jobParameters = new JobParametersBuilder().toJobParameters();
@@ -291,9 +292,8 @@ public class ChunkOrientedStepFaultToleranceIntegrationTests {
 		Assertions.assertEquals(3, stepExecution.getReadCount());
 		Assertions.assertEquals(1, stepExecution.getWriteCount());
 		Assertions.assertEquals(2, stepExecution.getWriteSkipCount());
-		Assertions.assertEquals(1,
-				jdbcTemplate.queryForObject("SELECT COUNT(*) FROM delivery WHERE item_number = '1'", Integer.class));
-		Assertions.assertEquals(1, JdbcTestUtils.countRowsInTable(jdbcTemplate, "delivery"));
+		Assertions.assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcClient, "delivery", "item_number = '1'"));
+		Assertions.assertEquals(1, JdbcTestUtils.countRowsInTable(jdbcClient, "delivery"));
 	}
 
 	// Issue https://github.com/spring-projects/spring-batch/issues/5210
@@ -304,7 +304,7 @@ public class ChunkOrientedStepFaultToleranceIntegrationTests {
 				ConcurrentDuplicateWriteDetectionStepConfiguration.class);
 		JobOperator jobOperator = context.getBean(JobOperator.class);
 		Job job = context.getBean(Job.class);
-		JdbcTemplate jdbcTemplate = context.getBean(JdbcTemplate.class);
+		JdbcClient jdbcClient = context.getBean(JdbcClient.class);
 
 		// when
 		JobParameters jobParameters = new JobParametersBuilder().toJobParameters();
@@ -316,9 +316,8 @@ public class ChunkOrientedStepFaultToleranceIntegrationTests {
 		Assertions.assertEquals(3, stepExecution.getReadCount());
 		Assertions.assertEquals(1, stepExecution.getWriteCount());
 		Assertions.assertEquals(2, stepExecution.getWriteSkipCount());
-		Assertions.assertEquals(1,
-				jdbcTemplate.queryForObject("SELECT COUNT(*) FROM delivery WHERE item_number = '1'", Integer.class));
-		Assertions.assertEquals(1, JdbcTestUtils.countRowsInTable(jdbcTemplate, "delivery"));
+		Assertions.assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcClient, "delivery", "item_number = '1'"));
+		Assertions.assertEquals(1, JdbcTestUtils.countRowsInTable(jdbcClient, "delivery"));
 	}
 
 	@Configuration
@@ -469,12 +468,12 @@ public class ChunkOrientedStepFaultToleranceIntegrationTests {
 
 		@Bean
 		public Step step(JobRepository jobRepository, JdbcTransactionManager transactionManager,
-				JdbcTemplate jdbcTemplate) {
+				JdbcClient jdbcClient) {
 			List<String> items = List.of("1", "2", "3");
 			return new ChunkOrientedStepBuilder<String, String>(jobRepository, 2).reader(new ListItemReader<>(items))
 				.writer(chunk -> {
 					for (String item : chunk) {
-						jdbcTemplate.update("INSERT INTO delivery (item_number) VALUES (?)", item);
+						jdbcClient.sql("INSERT INTO delivery (item_number) VALUES (?)").param(1, item).update();
 						if ("2".equals(item) || "3".equals(item)) {
 							throw new RuntimeException("Simulated write error for item: " + item);
 						}
@@ -493,12 +492,12 @@ public class ChunkOrientedStepFaultToleranceIntegrationTests {
 
 		@Bean
 		public Step step(JobRepository jobRepository, JdbcTransactionManager transactionManager,
-				JdbcTemplate jdbcTemplate) {
+				JdbcClient jdbcClient) {
 			List<String> items = List.of("1", "2", "3");
 			return new ChunkOrientedStepBuilder<String, String>(jobRepository, 2).reader(new ListItemReader<>(items))
 				.writer(chunk -> {
 					for (String item : chunk) {
-						jdbcTemplate.update("INSERT INTO delivery (item_number) VALUES (?)", item);
+						jdbcClient.sql("INSERT INTO delivery (item_number) VALUES (?)").param(1, item).update();
 						if ("2".equals(item) || "3".equals(item)) {
 							throw new RuntimeException("Simulated write error for item: " + item);
 						}
