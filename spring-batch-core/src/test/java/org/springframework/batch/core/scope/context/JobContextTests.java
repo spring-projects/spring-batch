@@ -141,7 +141,6 @@ class JobContextTests {
 		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "bar").toJobParameters();
 		JobInstance jobInstance = new JobInstance(0L, "foo");
 		jobExecution = new JobExecution(5L, jobInstance, jobParameters);
-		jobExecution.setJobInstance(jobInstance);
 		context = new JobContext(jobExecution);
 		assertEquals("bar", context.getJobParameters().get("foo"));
 	}
