@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,6 +47,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Tests of regular usage for {@link FlatFileItemWriter} Exception cases will be in
@@ -471,13 +473,12 @@ class FlatFileItemWriterTests {
 	@Test
 	void testOpenWithNonWritableFile() throws Exception {
 		writer = new FlatFileItemWriter<>(new PassThroughLineAggregator<>());
-		FileSystemResource file = new FileSystemResource("target/no-such-file.foo");
-		writer.setResource(file);
-		new File(file.getFile().getParent()).mkdirs();
-		file.getFile().createNewFile();
-		assertTrue(file.exists(), "Test file must exist: " + file);
-		assertTrue(file.getFile().setReadOnly(), "Test file set to read-only: " + file);
-		assertFalse(file.getFile().canWrite(), "Should be readonly file: " + file);
+		File file = mock();
+		when(file.exists()).thenReturn(true);
+		when(file.canWrite()).thenReturn(false);
+		WritableResource resource = mock();
+		when(resource.getFile()).thenReturn(file);
+		writer.setResource(resource);
 		writer.afterPropertiesSet();
 		Exception exception = assertThrows(IllegalStateException.class, () -> writer.open(executionContext));
 		String message = exception.getMessage();
