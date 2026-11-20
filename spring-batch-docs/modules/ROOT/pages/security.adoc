@@ -79,6 +79,12 @@ that value first, as it would for any other untrusted data reaching a sensitive
 operation. Spring Batch does not treat the encoded string of a job parameter as a
 security boundary.
 ====
++
+Identifying job parameters determine which job instance a launch belongs to, so that a
+failed instance can be restarted. They are not an access-control mechanism. Spring Batch
+does not isolate operators, or the tenants of an application, that share a job name in a
+job repository. An application that launches jobs on behalf of several tenants must keep
+them apart itself, for example with a job name or a job repository per tenant.
 
 Data stores::
 The connection, credentials, and schema of a data store are assumed to be secure.
