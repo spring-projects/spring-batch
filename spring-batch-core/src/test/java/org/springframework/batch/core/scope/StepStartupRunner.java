@@ -33,7 +33,7 @@ public class StepStartupRunner implements InitializingBean {
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		StepExecution stepExecution = new StepExecution(0L, "step",
-				new JobExecution(1L, new JobInstance(1L, "job"), new JobParameters()));
+				new JobExecution(1L, new JobInstance(1L, "job"), JobParameters.EMPTY));
 		step.execute(stepExecution);
 		// expect no errors
 	}

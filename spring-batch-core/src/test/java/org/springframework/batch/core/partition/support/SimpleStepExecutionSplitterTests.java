@@ -68,7 +68,7 @@ class SimpleStepExecutionSplitterTests {
 		factory.afterPropertiesSet();
 		jobRepository = factory.getObject();
 		step.setJobRepository(jobRepository);
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		JobInstance jobInstance = jobRepository.createJobInstance("job", jobParameters);
 		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters,
 				new ExecutionContext());
@@ -138,7 +138,7 @@ class SimpleStepExecutionSplitterTests {
 
 		// when the job is restarted with a partitioner returning a different context
 		JobExecution restartedJobExecution = jobRepository.createJobExecution(
-				stepExecution.getJobExecution().getJobInstance(), new JobParameters(), new ExecutionContext());
+				stepExecution.getJobExecution().getJobInstance(), JobParameters.EMPTY, new ExecutionContext());
 		StepExecution restartedStepExecution = jobRepository.createStepExecution("step", restartedJobExecution);
 		Map<String, ExecutionContext> otherPartitions = Map.of("partition", new ExecutionContext(Map.of("foo", "baz")));
 		splitter = new SimpleStepExecutionSplitter(jobRepository, step.getName(), gridSize -> otherPartitions);

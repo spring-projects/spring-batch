@@ -128,7 +128,7 @@ class FlowJobBuilderTests {
 		factory.setTransactionManager(new JdbcTransactionManager(embeddedDatabase));
 		factory.afterPropertiesSet();
 		jobRepository = factory.getObject();
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		jobInstance = jobRepository.createJobInstance("flow", jobParameters);
 		execution = jobRepository.createJobExecution(jobInstance, jobParameters, new ExecutionContext());
 	}
@@ -379,7 +379,7 @@ class FlowJobBuilderTests {
 		assertEquals(BatchStatus.STOPPED, execution.getStatus());
 		assertEquals(1, execution.getStepExecutions().size());
 
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		execution = jobRepository.createJobExecution(jobInstance, jobParameters, new ExecutionContext());
 		job.execute(execution);
 		assertEquals(BatchStatus.COMPLETED, execution.getStatus());

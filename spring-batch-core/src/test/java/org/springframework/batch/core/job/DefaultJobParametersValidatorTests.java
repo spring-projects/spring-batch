@@ -49,13 +49,13 @@ class DefaultJobParametersValidatorTests {
 	@Test
 	void testValidateRequiredValuesMissing() {
 		validator.setRequiredKeys(new String[] { "name", "value" });
-		assertThrows(InvalidJobParametersException.class, () -> validator.validate(new JobParameters()));
+		assertThrows(InvalidJobParametersException.class, () -> validator.validate(JobParameters.EMPTY));
 	}
 
 	@Test
 	void testValidateOptionalValues() throws Exception {
 		validator.setOptionalKeys(new String[] { "name", "value" });
-		validator.validate(new JobParameters());
+		validator.validate(JobParameters.EMPTY);
 	}
 
 	@Test

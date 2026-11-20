@@ -57,7 +57,7 @@ class MongoJobInstanceDaoIntegrationTests extends AbstractMongoDBDaoIntegrationT
 	@Test
 	void testFindJobInstanceByExecution(@Autowired JobExecutionDao jobExecutionDao) {
 
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		JobInstance jobInstance = dao.createJobInstance("testInstance", jobParameters);
 		JobExecution jobExecution = jobExecutionDao.createJobExecution(jobInstance, jobParameters);
 
@@ -82,8 +82,8 @@ class MongoJobInstanceDaoIntegrationTests extends AbstractMongoDBDaoIntegrationT
 	@Disabled("Not supported yet")
 	@Test
 	void testJobInstanceWildcard() {
-		dao.createJobInstance("anotherJob", new JobParameters());
-		dao.createJobInstance("someJob", new JobParameters());
+		dao.createJobInstance("anotherJob", JobParameters.EMPTY);
+		dao.createJobInstance("someJob", JobParameters.EMPTY);
 
 		List<JobInstance> jobInstances = dao.getJobInstances("*Job", 0, 2);
 		assertEquals(2, jobInstances.size());
@@ -99,7 +99,7 @@ class MongoJobInstanceDaoIntegrationTests extends AbstractMongoDBDaoIntegrationT
 	@Test
 	void testDeleteJobInstance() {
 		// given
-		JobInstance jobInstance = dao.createJobInstance("someTestInstance", new JobParameters());
+		JobInstance jobInstance = dao.createJobInstance("someTestInstance", JobParameters.EMPTY);
 
 		// when
 		dao.deleteJobInstance(jobInstance);
@@ -183,10 +183,10 @@ class MongoJobInstanceDaoIntegrationTests extends AbstractMongoDBDaoIntegrationT
 		testCreateAndRetrieve();
 
 		// unrelated job instance that should be ignored by the query
-		dao.createJobInstance("anotherJob", new JobParameters());
+		dao.createJobInstance("anotherJob", JobParameters.EMPTY);
 
 		// we need two instances of the same job to check ordering
-		dao.createJobInstance(fooJob, new JobParameters());
+		dao.createJobInstance(fooJob, JobParameters.EMPTY);
 
 		List<JobInstance> jobInstances = dao.getJobInstances(fooJob, 0, 2);
 		assertEquals(2, jobInstances.size());
@@ -205,10 +205,10 @@ class MongoJobInstanceDaoIntegrationTests extends AbstractMongoDBDaoIntegrationT
 		testCreateAndRetrieve();
 
 		// unrelated job instance that should be ignored by the query
-		dao.createJobInstance("anotherJob", new JobParameters());
+		dao.createJobInstance("anotherJob", JobParameters.EMPTY);
 
 		// we need two instances of the same job to check ordering
-		dao.createJobInstance(fooJob, new JobParameters());
+		dao.createJobInstance(fooJob, JobParameters.EMPTY);
 
 		List<JobInstance> jobInstances = dao.getJobInstances(fooJob, 0, 2);
 		assertEquals(2, jobInstances.size());
@@ -234,7 +234,7 @@ class MongoJobInstanceDaoIntegrationTests extends AbstractMongoDBDaoIntegrationT
 		testCreateAndRetrieve();
 
 		// unrelated job instance that should be ignored by the query
-		dao.createJobInstance("anotherJob", new JobParameters());
+		dao.createJobInstance("anotherJob", JobParameters.EMPTY);
 
 		// we need multiple instances of the same job to check ordering
 		String multiInstanceJob = "multiInstanceJob";
@@ -273,10 +273,10 @@ class MongoJobInstanceDaoIntegrationTests extends AbstractMongoDBDaoIntegrationT
 		testCreateAndRetrieve();
 
 		// unrelated job instance that should be ignored by the query
-		dao.createJobInstance("anotherJob", new JobParameters());
+		dao.createJobInstance("anotherJob", JobParameters.EMPTY);
 
 		// we need two instances of the same job to check ordering
-		dao.createJobInstance(fooJob, new JobParameters());
+		dao.createJobInstance(fooJob, JobParameters.EMPTY);
 
 		assertEquals(1, dao.getJobInstances(fooJob, 0, 1).size());
 		assertEquals(2, dao.getJobInstances(fooJob, 0, 2).size());
@@ -307,7 +307,7 @@ class MongoJobInstanceDaoIntegrationTests extends AbstractMongoDBDaoIntegrationT
 
 		assertNull(jobInstance.getVersion());
 
-		jobInstance = dao.createJobInstance("testVersion", new JobParameters());
+		jobInstance = dao.createJobInstance("testVersion", JobParameters.EMPTY);
 
 		assertNotNull(jobInstance.getVersion());
 	}
@@ -315,9 +315,9 @@ class MongoJobInstanceDaoIntegrationTests extends AbstractMongoDBDaoIntegrationT
 	@Test
 	void testGetJobNamesReturnDistinctAndSortedNames() {
 
-		dao.createJobInstance("charlie", new JobParameters());
-		dao.createJobInstance("alpha", new JobParameters());
-		dao.createJobInstance("bravo", new JobParameters());
+		dao.createJobInstance("charlie", JobParameters.EMPTY);
+		dao.createJobInstance("alpha", JobParameters.EMPTY);
+		dao.createJobInstance("bravo", JobParameters.EMPTY);
 		dao.createJobInstance("alpha", new JobParametersBuilder().addLong("id", 1L).toJobParameters());
 
 		List<String> jobNames = dao.getJobNames();

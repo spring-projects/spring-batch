@@ -104,7 +104,7 @@ class JobParametersTests {
 
 	@Test
 	void testIsEmptyWhenEmpty() {
-		assertTrue(new JobParameters().isEmpty());
+		assertTrue(JobParameters.EMPTY.isEmpty());
 	}
 
 	@Test
@@ -125,7 +125,7 @@ class JobParametersTests {
 
 	@Test
 	void testEqualsDifferent() {
-		assertNotEquals(parameters, new JobParameters());
+		assertNotEquals(parameters, JobParameters.EMPTY);
 	}
 
 	@Test
@@ -140,8 +140,8 @@ class JobParametersTests {
 
 	@Test
 	void testHashCodeEqualWhenEmpty() {
-		int code = new JobParameters().hashCode();
-		assertEquals(code, new JobParameters().hashCode());
+		int code = JobParameters.EMPTY.hashCode();
+		assertEquals(code, JobParameters.EMPTY.hashCode());
 	}
 
 	@Test
@@ -174,22 +174,22 @@ class JobParametersTests {
 
 	@Test
 	void testLongReturnsNullWhenKeyDoesntExit() {
-		assertNull(new JobParameters().getLong("keythatdoesntexist"));
+		assertNull(JobParameters.EMPTY.getLong("keythatdoesntexist"));
 	}
 
 	@Test
 	void testStringReturnsNullWhenKeyDoesntExit() {
-		assertNull(new JobParameters().getString("keythatdoesntexist"));
+		assertNull(JobParameters.EMPTY.getString("keythatdoesntexist"));
 	}
 
 	@Test
 	void testDoubleReturnsNullWhenKeyDoesntExit() {
-		assertNull(new JobParameters().getDouble("keythatdoesntexist"));
+		assertNull(JobParameters.EMPTY.getDouble("keythatdoesntexist"));
 	}
 
 	@Test
 	void testDateReturnsNullWhenKeyDoesntExit() {
-		assertNull(new JobParameters().getDate("keythatdoesntexist"));
+		assertNull(JobParameters.EMPTY.getDate("keythatdoesntexist"));
 	}
 
 }

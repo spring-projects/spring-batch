@@ -58,7 +58,7 @@ class ExecutionContextPromotionListenerTests {
 		ExecutionContextPromotionListener listener = new ExecutionContextPromotionListener();
 
 		JobInstance jobInstance = new JobInstance(1L, "foo");
-		JobExecution jobExecution = new JobExecution(1L, jobInstance, new JobParameters());
+		JobExecution jobExecution = new JobExecution(1L, jobInstance, JobParameters.EMPTY);
 		StepExecution stepExecution = new StepExecution(1L, "step1", jobExecution);
 		jobExecution.addStepExecution(stepExecution);
 		stepExecution.setExitStatus(ExitStatus.COMPLETED);
@@ -90,7 +90,7 @@ class ExecutionContextPromotionListenerTests {
 		listener.setStrict(true);
 
 		JobInstance jobInstance = new JobInstance(1L, "foo");
-		JobExecution jobExecution = new JobExecution(1L, jobInstance, new JobParameters());
+		JobExecution jobExecution = new JobExecution(1L, jobInstance, JobParameters.EMPTY);
 		StepExecution stepExecution = new StepExecution(1L, "step1", jobExecution);
 		jobExecution.addStepExecution(stepExecution);
 		stepExecution.setExitStatus(new ExitStatus(status));
@@ -122,7 +122,7 @@ class ExecutionContextPromotionListenerTests {
 		ExecutionContextPromotionListener listener = new ExecutionContextPromotionListener();
 
 		JobInstance jobInstance = new JobInstance(1L, "foo");
-		JobExecution jobExecution = new JobExecution(1L, jobInstance, new JobParameters());
+		JobExecution jobExecution = new JobExecution(1L, jobInstance, JobParameters.EMPTY);
 		StepExecution stepExecution = new StepExecution(1L, "step1", jobExecution);
 		jobExecution.addStepExecution(stepExecution);
 		stepExecution.setExitStatus(new ExitStatus(status2));
@@ -153,7 +153,7 @@ class ExecutionContextPromotionListenerTests {
 		ExecutionContextPromotionListener listener = new ExecutionContextPromotionListener();
 
 		JobInstance jobInstance = new JobInstance(1L, "foo");
-		JobExecution jobExecution = new JobExecution(1L, jobInstance, new JobParameters());
+		JobExecution jobExecution = new JobExecution(1L, jobInstance, JobParameters.EMPTY);
 		StepExecution stepExecution = new StepExecution(1L, "step1", jobExecution);
 		jobExecution.addStepExecution(stepExecution);
 		stepExecution.setExitStatus(new ExitStatus(status));
@@ -184,7 +184,7 @@ class ExecutionContextPromotionListenerTests {
 		ExecutionContextPromotionListener listener = new ExecutionContextPromotionListener();
 
 		JobInstance jobInstance = new JobInstance(1L, "foo");
-		JobExecution jobExecution = new JobExecution(1L, jobInstance, new JobParameters());
+		JobExecution jobExecution = new JobExecution(1L, jobInstance, JobParameters.EMPTY);
 		StepExecution stepExecution = new StepExecution(1L, "step1", jobExecution);
 		jobExecution.addStepExecution(stepExecution);
 		stepExecution.setExitStatus(ExitStatus.COMPLETED);
@@ -213,7 +213,7 @@ class ExecutionContextPromotionListenerTests {
 		ExecutionContextPromotionListener listener = new ExecutionContextPromotionListener();
 
 		JobInstance jobInstance = new JobInstance(1L, "foo");
-		JobExecution jobExecution = new JobExecution(1L, jobInstance, new JobParameters());
+		JobExecution jobExecution = new JobExecution(1L, jobInstance, JobParameters.EMPTY);
 		StepExecution stepExecution = new StepExecution(1L, "step1", jobExecution);
 		jobExecution.addStepExecution(stepExecution);
 		stepExecution.setExitStatus(ExitStatus.COMPLETED);
@@ -243,7 +243,7 @@ class ExecutionContextPromotionListenerTests {
 		listener.setStrict(true);
 
 		JobInstance jobInstance = new JobInstance(1L, "foo");
-		JobExecution jobExecution = new JobExecution(1L, jobInstance, new JobParameters());
+		JobExecution jobExecution = new JobExecution(1L, jobInstance, JobParameters.EMPTY);
 		StepExecution stepExecution = new StepExecution(1L, "step1", jobExecution);
 		jobExecution.addStepExecution(stepExecution);
 		stepExecution.setExitStatus(ExitStatus.COMPLETED);

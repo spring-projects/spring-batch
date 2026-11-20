@@ -58,7 +58,7 @@ class SystemCommandTaskletIntegrationTests {
 	private SystemCommandTasklet tasklet;
 
 	private final StepExecution stepExecution = new StepExecution("systemCommandStep",
-			new JobExecution(1L, new JobInstance(1L, "systemCommandJob"), new JobParameters()));
+			new JobExecution(1L, new JobInstance(1L, "systemCommandJob"), JobParameters.EMPTY));
 
 	@Mock
 	private JobRepository jobRepository;

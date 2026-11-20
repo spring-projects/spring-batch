@@ -57,9 +57,9 @@ class ChunkMessageChannelItemWriterConcurrencyTests {
 		ChunkMessageChannelItemWriter<String> writer2 = newWriter(replyChannel);
 
 		StepExecution stepExecution1 = new StepExecution(1L, "step",
-				new JobExecution(1L, new JobInstance(1L, "job"), new JobParameters()));
+				new JobExecution(1L, new JobInstance(1L, "job"), JobParameters.EMPTY));
 		StepExecution stepExecution2 = new StepExecution(2L, "step",
-				new JobExecution(2L, new JobInstance(2L, "job"), new JobParameters()));
+				new JobExecution(2L, new JobInstance(2L, "job"), JobParameters.EMPTY));
 
 		writer1.beforeStep(stepExecution1);
 		writer2.beforeStep(stepExecution2);
@@ -113,7 +113,7 @@ class ChunkMessageChannelItemWriterConcurrencyTests {
 
 	private Message<ChunkResponse> chunkResponse(long jobInstanceId, int sequence) {
 		StepExecution stepExecution = new StepExecution(jobInstanceId, "step",
-				new JobExecution(jobInstanceId, new JobInstance(jobInstanceId, "job"), new JobParameters()));
+				new JobExecution(jobInstanceId, new JobInstance(jobInstanceId, "job"), JobParameters.EMPTY));
 		ChunkResponse response = new ChunkResponse(sequence, jobInstanceId, stepExecution.createStepContribution());
 		return MessageBuilder.withPayload(response).build();
 	}

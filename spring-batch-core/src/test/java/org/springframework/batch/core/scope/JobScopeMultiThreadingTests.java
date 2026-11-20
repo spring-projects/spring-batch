@@ -139,7 +139,7 @@ class JobScopeMultiThreadingTests {
 		try (AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(
 				JobConfiguration.class)) {
 			Job job = context.getBean(jobName, Job.class);
-			return context.getBean(JobOperator.class).start(job, new JobParameters());
+			return context.getBean(JobOperator.class).start(job, JobParameters.EMPTY);
 		}
 	}
 

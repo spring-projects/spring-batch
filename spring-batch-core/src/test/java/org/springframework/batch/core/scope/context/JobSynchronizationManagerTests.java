@@ -41,7 +41,7 @@ import org.springframework.batch.core.job.parameters.JobParameters;
  */
 class JobSynchronizationManagerTests {
 
-	private final JobExecution jobExecution = new JobExecution(0L, new JobInstance(1L, "job"), new JobParameters());
+	private final JobExecution jobExecution = new JobExecution(0L, new JobInstance(1L, "job"), JobParameters.EMPTY);
 
 	@BeforeEach
 	@AfterEach

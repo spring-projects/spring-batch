@@ -52,7 +52,7 @@ class DataFieldMaxValueJobParametersIncrementerTests {
 	@Test
 	void testGetNext() {
 		// given
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		when(this.incrementer.nextLongValue()).thenReturn(10L);
 		DataFieldMaxValueJobParametersIncrementer jobParametersIncrementer = new DataFieldMaxValueJobParametersIncrementer(
 				this.incrementer);

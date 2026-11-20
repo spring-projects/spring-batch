@@ -78,7 +78,7 @@ class PartitionJdbcJobFunctionalTests implements ApplicationContextAware {
 		List<CustomerCredit> inputs = new ArrayList<>(getCredits(inputReader));
 		close(inputReader);
 
-		JobExecution jobExecution = jobOperator.start(job, new JobParameters());
+		JobExecution jobExecution = jobOperator.start(job, JobParameters.EMPTY);
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 
 		@SuppressWarnings("unchecked")
@@ -106,7 +106,7 @@ class PartitionJdbcJobFunctionalTests implements ApplicationContextAware {
 		Job job = context.getBean(Job.class);
 
 		// when
-		JobExecution jobExecution = jobOperator.start(job, new JobParameters());
+		JobExecution jobExecution = jobOperator.start(job, JobParameters.EMPTY);
 
 		// then
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());

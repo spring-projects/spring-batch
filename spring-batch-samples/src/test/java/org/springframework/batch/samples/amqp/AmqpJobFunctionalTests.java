@@ -96,7 +96,7 @@ class AmqpJobFunctionalTests {
 		Job job = context.getBean(Job.class);
 
 		// when
-		jobOperator.start(job, new JobParameters());
+		jobOperator.start(job, JobParameters.EMPTY);
 
 		// then
 		JobRepository localJobRepository = context.getBean(JobRepository.class);

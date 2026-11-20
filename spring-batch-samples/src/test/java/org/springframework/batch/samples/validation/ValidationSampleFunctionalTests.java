@@ -51,7 +51,7 @@ class ValidationSampleFunctionalTests {
 	@Test
 	void testItemValidation() throws Exception {
 		// given
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 
 		// when
 		JobExecution jobExecution = this.jobOperator.start(this.job, jobParameters);

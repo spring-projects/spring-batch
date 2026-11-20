@@ -41,7 +41,7 @@ class JobRepositoryTests {
 		// given a repository that only implements createStepExecution(String,
 		// JobExecution)
 		JobRepository jobRepository = mock();
-		JobExecution jobExecution = new JobExecution(1L, new JobInstance(1L, "job"), new JobParameters());
+		JobExecution jobExecution = new JobExecution(1L, new JobInstance(1L, "job"), JobParameters.EMPTY);
 		StepExecution stepExecution = new StepExecution(1L, "step", jobExecution);
 		ExecutionContext stepExecutionContext = new ExecutionContext();
 		stepExecutionContext.putString("foo", "bar");
