@@ -22,6 +22,7 @@ import java.util.stream.IntStream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.batch.infrastructure.item.support.AbstractItemCountingItemStreamItemReader;
@@ -29,6 +30,7 @@ import org.springframework.batch.infrastructure.item.support.AbstractItemCountin
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Restartability tests shared by all the paging readers that are based on a Spring Data
@@ -79,6 +81,35 @@ abstract class AbstractPaginatedItemReaderRestartTests {
 		AbstractItemCountingItemStreamItemReader<Integer> restartedReader = newReader(source);
 		restartedReader.open(executionContext);
 		for (int i = readCount; i < itemCount; i++) {
+			assertEquals(i, restartedReader.read());
+		}
+		assertNull(restartedReader.read());
+		restartedReader.close();
+	}
+
+	@ParameterizedTest(name = "page {0} fails once")
+	@ValueSource(ints = { 0, 1 })
+	void testRestartAfterRetriedPageQueryInFreshInstance(int failingPage) throws Exception {
+		PageSource source = new PageSource(20);
+		source.failOnce(failingPage);
+		ExecutionContext executionContext = new ExecutionContext();
+		int readCount = 7;
+
+		AbstractItemCountingItemStreamItemReader<Integer> reader = newReader(source);
+		reader.open(executionContext);
+		for (int i = 0; i < readCount; i++) {
+			if (i == failingPage * PAGE_SIZE) {
+				assertThrows(IllegalStateException.class, reader::read);
+			}
+			assertEquals(i, reader.read());
+		}
+		reader.update(executionContext);
+		reader.close();
+		assertEquals(readCount, executionContext.getInt(CONTEXT_KEY));
+
+		AbstractItemCountingItemStreamItemReader<Integer> restartedReader = newReader(source);
+		restartedReader.open(executionContext);
+		for (int i = readCount; i < 20; i++) {
 			assertEquals(i, restartedReader.read());
 		}
 		assertNull(restartedReader.read());
@@ -151,11 +182,21 @@ abstract class AbstractPaginatedItemReaderRestartTests {
 
 		private final List<Integer> requestedPages = new ArrayList<>();
 
+		private int failingPage = -1;
+
 		PageSource(int itemCount) {
 			this.items = IntStream.range(0, itemCount).boxed().toList();
 		}
 
+		void failOnce(int pageNumber) {
+			this.failingPage = pageNumber;
+		}
+
 		List<Integer> page(int pageNumber, int pageSize) {
+			if (pageNumber == this.failingPage) {
+				this.failingPage = -1;
+				throw new IllegalStateException("Page query failed");
+			}
 			this.requestedPages.add(pageNumber);
 			int start = Math.min(pageNumber * pageSize, this.items.size());
 			int end = Math.min(start + pageSize, this.items.size());

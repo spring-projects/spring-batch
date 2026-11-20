@@ -119,8 +119,10 @@ public abstract class AbstractPagingItemReader<T> extends AbstractItemCountingIt
 					doReadPage();
 				}
 				catch (RuntimeException e) {
-					// the page was not read, so read it again on the next call
+					// the page was not read, so read it again on the next call.
+					// read() has already counted this attempt
 					this.results = null;
+					setCurrentItemCount(getCurrentItemCount() - 1);
 					throw e;
 				}
 				page++;
