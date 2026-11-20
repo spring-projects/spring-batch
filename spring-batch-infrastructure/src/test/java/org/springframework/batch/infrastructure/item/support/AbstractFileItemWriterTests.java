@@ -1,5 +1,5 @@
 /*
- * Copyright 2025-present the original author or authors.
+ * Copyright 2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,13 @@ package org.springframework.batch.infrastructure.item.support;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
 
-import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.springframework.batch.infrastructure.item.Chunk;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
@@ -34,18 +36,15 @@ import org.springframework.core.io.FileSystemResource;
  * Tests for common methods from {@link AbstractFileItemWriter}.
  *
  * @author Elimelec Burghelea
- * @author Mahmoud Ben Hassine
  */
 class AbstractFileItemWriterTests {
 
 	@Test
 	void testFailedFileDeletionThrowsException() {
-		File outputFile = new File("target/data/output.tmp");
-		File mocked = Mockito.spy(outputFile);
 
 		TestFileItemWriter writer = new TestFileItemWriter();
 
-		writer.setResource(new FileSystemResource(mocked));
+		writer.setResource(new FileSystemResource("target/data/output.tmp"));
 		writer.setShouldDeleteIfEmpty(true);
 		writer.setName(writer.getClass().getSimpleName());
 		writer.open(new ExecutionContext());
