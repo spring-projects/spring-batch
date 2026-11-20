@@ -352,13 +352,19 @@ In the following XML example, after the `step` executes, the `Job` ends:
 
 ====
 
-If no transitions are defined for a `Step`, the status of the `Job` is defined as
-follows:
+If no transitions are defined for a `Step`, the `BatchStatus` of the `Job` is
+determined by the `BatchStatus` of the `Step`:
 
-* If the `Step` ends with `ExitStatus` of `FAILED`, the `BatchStatus` and `ExitStatus` of
-the `Job` are both `FAILED`.
+* If the `Step` ends with a `BatchStatus` of `FAILED`, the `BatchStatus` of the `Job` is
+`FAILED`.
 
-* Otherwise, the `BatchStatus` and `ExitStatus` of the `Job` are both `COMPLETED`.
+* Otherwise, the `BatchStatus` of the `Job` is `COMPLETED`.
+
+The `BatchStatus` and `ExitStatus` are separate values. In particular, returning
+`ExitStatus.FAILED` from a `StepExecutionListener`'s `afterStep` method does not, by
+itself, change the `BatchStatus` of the `Step` to `FAILED`. If the listener changes only
+the `ExitStatus`, the `Job`'s `BatchStatus` can still be `COMPLETED`. To fail the `Job`,
+the `Step` must finish with a `BatchStatus` of `FAILED`.
 
 While this method of terminating a batch job is sufficient for some batch jobs, such as a
 simple sequential step job, custom defined job-stopping scenarios may be required. For
