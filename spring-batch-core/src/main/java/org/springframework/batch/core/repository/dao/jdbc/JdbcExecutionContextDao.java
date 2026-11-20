@@ -108,6 +108,8 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 
 	private static final int DEFAULT_MAX_VARCHAR_LENGTH = 2500;
 
+	private static final String ELLIPSIS = " ...";
+
 	private int shortContextLength = DEFAULT_MAX_VARCHAR_LENGTH;
 
 	private ExecutionContextSerializer serializer = new DefaultExecutionContextSerializer();
@@ -282,10 +284,8 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 
 		final String shortContext;
 		final String longContext;
-		if (serializedContext.length() > shortContextLength) {
-			// Overestimate length of ellipsis to be on the safe side with
-			// 2-byte chars
-			shortContext = serializedContext.substring(0, shortContextLength - 8) + " ...";
+		if (exceedsShortContextLength(serializedContext)) {
+			shortContext = truncate(serializedContext);
 			longContext = serializedContext;
 		}
 		else {
@@ -302,6 +302,67 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 	}
 
 	/**
+	 * Whether the given serialized context does not fit in the short context column. The
+	 * length is measured in UTF-8 bytes, which is never less than the number of
+	 * characters, so that the check holds whether the column length is defined in
+	 * characters or in bytes (and within the 4000 bytes limit of an Oracle
+	 * {@code VARCHAR2} column).
+	 * @param serializedContext the serialized context
+	 * @return {@code true} if the serialized context needs to be truncated
+	 */
+	private boolean exceedsShortContextLength(String serializedContext) {
+		if (serializedContext.length() > this.shortContextLength) {
+			return true;
+		}
+		int bytes = 0;
+		for (int i = 0; i < serializedContext.length();) {
+			int codePoint = serializedContext.codePointAt(i);
+			bytes += utf8Length(codePoint);
+			if (bytes > this.shortContextLength) {
+				return true;
+			}
+			i += Character.charCount(codePoint);
+		}
+		return false;
+	}
+
+	/**
+	 * Truncate the given serialized context so that, including the trailing ellipsis, its
+	 * UTF-8 encoded length does not exceed the short context length. The context is only
+	 * cut between code points, so a surrogate pair is never split.
+	 * @param serializedContext the serialized context
+	 * @return the truncated serialized context
+	 */
+	private String truncate(String serializedContext) {
+		int maxBytes = this.shortContextLength - ELLIPSIS.length();
+		int bytes = 0;
+		int end = 0;
+		while (end < serializedContext.length()) {
+			int codePoint = serializedContext.codePointAt(end);
+			int length = utf8Length(codePoint);
+			if (bytes + length > maxBytes) {
+				break;
+			}
+			bytes += length;
+			end += Character.charCount(codePoint);
+		}
+		return serializedContext.substring(0, end) + ELLIPSIS;
+	}
+
+	private static int utf8Length(int codePoint) {
+		if (codePoint < 0x80) {
+			return 1;
+		}
+		if (codePoint < 0x800) {
+			return 2;
+		}
+		if (codePoint < 0x10000) {
+			return 3;
+		}
+		return 4;
+	}
+
+	/**
 	 * @param serializedContexts the execution contexts to serialize
 	 */
 	private void persistSerializedContexts(Map<Long, String> serializedContexts) {
@@ -311,10 +372,8 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 				String serializedContext = sc.getValue();
 				String shortContext;
 				String longContext;
-				if (serializedContext.length() > shortContextLength) {
-					// Overestimate length of ellipsis to be on the safe side with
-					// 2-byte chars
-					shortContext = serializedContext.substring(0, shortContextLength - 8) + " ...";
+				if (exceedsShortContextLength(serializedContext)) {
+					shortContext = truncate(serializedContext);
 					longContext = serializedContext;
 				}
 				else {

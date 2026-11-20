@@ -16,6 +16,8 @@
 package org.springframework.batch.core.repository.dao.jdbc;
 
 import org.springframework.batch.infrastructure.support.DatabaseType;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Map;
 
 import org.jspecify.annotations.Nullable;
@@ -123,6 +125,73 @@ class JdbcExecutionContextDaoTests {
 		Object shortContext = executionContext.get("SHORT_CONTEXT");
 		Assertions.assertNotNull(shortContext);
 		Assertions.assertTrue(((String) shortContext).contains("\"name\":\"foo\""));
+	}
+
+	@Test
+	void testSaveJobExecutionContextWithMultibyteCharacters() {
+		// given
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = jdbcJobInstanceDao.createJobInstance("job", jobParameters);
+		JobExecution jobExecution = jdbcJobExecutionDao.createJobExecution(jobInstance, jobParameters);
+		// fewer than 2500 characters, but more than 2500 bytes in UTF-8
+		String value = "\u00e9".repeat(2000);
+		jobExecution.getExecutionContext().putString("name", value);
+
+		// when
+		jdbcExecutionContextDao.saveExecutionContext(jobExecution);
+
+		// then
+		Map<String, @Nullable Object> executionContext = jdbcTemplate
+			.queryForMap("select * from BATCH_JOB_EXECUTION_CONTEXT where JOB_EXECUTION_ID = ?", jobExecution.getId());
+		assertShortContextFits((String) executionContext.get("SHORT_CONTEXT"));
+		Assertions.assertNotNull(executionContext.get("SERIALIZED_CONTEXT"));
+		Assertions.assertEquals(value, jdbcExecutionContextDao.getExecutionContext(jobExecution).getString("name"));
+	}
+
+	@Test
+	void testSaveStepExecutionContextsWithMultibyteCharacters() {
+		// given
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = jdbcJobInstanceDao.createJobInstance("job", jobParameters);
+		JobExecution jobExecution = jdbcJobExecutionDao.createJobExecution(jobInstance, jobParameters);
+		StepExecution stepExecution = jdbcStepExecutionDao.createStepExecution("step", jobExecution);
+		String value = "\uac00".repeat(2000);
+		stepExecution.getExecutionContext().putString("name", value);
+
+		// when
+		jdbcExecutionContextDao.saveExecutionContexts(List.of(stepExecution));
+
+		// then
+		Map<String, @Nullable Object> executionContext = jdbcTemplate.queryForMap(
+				"select * from BATCH_STEP_EXECUTION_CONTEXT where STEP_EXECUTION_ID = ?", stepExecution.getId());
+		assertShortContextFits((String) executionContext.get("SHORT_CONTEXT"));
+		Assertions.assertNotNull(executionContext.get("SERIALIZED_CONTEXT"));
+		Assertions.assertEquals(value, jdbcExecutionContextDao.getExecutionContext(stepExecution).getString("name"));
+	}
+
+	@Test
+	void testSaveJobExecutionContextWithLongAsciiContext() {
+		// given
+		JobParameters jobParameters = new JobParameters();
+		JobInstance jobInstance = jdbcJobInstanceDao.createJobInstance("job", jobParameters);
+		JobExecution jobExecution = jdbcJobExecutionDao.createJobExecution(jobInstance, jobParameters);
+		jobExecution.getExecutionContext().putString("name", "a".repeat(3000));
+
+		// when
+		jdbcExecutionContextDao.saveExecutionContext(jobExecution);
+
+		// then
+		String shortContext = jdbcTemplate.queryForObject(
+				"select SHORT_CONTEXT from BATCH_JOB_EXECUTION_CONTEXT where JOB_EXECUTION_ID = ?", String.class,
+				jobExecution.getId());
+		assertShortContextFits(shortContext);
+	}
+
+	private static void assertShortContextFits(@Nullable String shortContext) {
+		Assertions.assertNotNull(shortContext);
+		Assertions.assertTrue(shortContext.getBytes(StandardCharsets.UTF_8).length <= 2500,
+				() -> "Short context is " + shortContext.getBytes(StandardCharsets.UTF_8).length + " bytes");
+		Assertions.assertTrue(shortContext.endsWith(" ..."));
 	}
 
 }
