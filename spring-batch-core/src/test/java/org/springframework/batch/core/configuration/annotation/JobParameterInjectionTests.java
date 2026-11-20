@@ -27,23 +27,30 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.batch.core.ExitStatus;
+import org.springframework.batch.core.configuration.support.GenericApplicationContextFactory;
 import org.springframework.batch.core.configuration.support.JdbcDefaultBatchConfiguration;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.scope.context.ChunkContext;
+import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.StepContribution;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.core.step.tasklet.Tasklet;
+import org.springframework.batch.infrastructure.item.ItemReader;
 import org.springframework.batch.infrastructure.repeat.RepeatStatus;
 import org.springframework.batch.infrastructure.support.DatabaseType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.DependencyDescriptor;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -137,6 +144,64 @@ class JobParameterInjectionTests {
 
 		Assertions.assertEquals("#{jobParameters['date']}",
 				copy.getAutowireCandidateResolver().getSuggestedValue(descriptor("explicitName", 0)));
+	}
+
+	@Test
+	@SuppressWarnings("removal")
+	void testChildContextsResolveTheirOwnStepScopedReaders() throws Exception {
+		try (var parent = new AnnotationConfigApplicationContext(ParentBatchConfiguration.class)) {
+			var first = new GenericApplicationContextFactory(ChildReaderConfiguration.class);
+			first.setApplicationContext(parent);
+			var second = new GenericApplicationContextFactory(ChildReaderConfiguration.class);
+			second.setApplicationContext(parent);
+
+			try (var firstChild = first.createApplicationContext();
+					var secondChild = second.createApplicationContext()) {
+				Assertions.assertNotSame(firstChild.getBean("reader"), secondChild.getBean("reader"));
+				assertScopedReaderValue(firstChild, "first", 1);
+				assertScopedReaderValue(secondChild, "second", 2);
+			}
+		}
+	}
+
+	private static void assertScopedReaderValue(ConfigurableApplicationContext context, String item, long id)
+			throws Exception {
+		ItemReader<String> reader = context.getBean(ReaderHolder.class).reader();
+		Assertions.assertSame(context.getBean("reader"), reader);
+		JobParameters parameters = new JobParametersBuilder().addString("item", item).toJobParameters();
+		JobExecution execution = new JobExecution(id, new JobInstance(id, "job"), parameters);
+		StepSynchronizationManager.register(new StepExecution(id, "step", execution));
+		try {
+			Assertions.assertEquals(item, reader.read());
+		}
+		finally {
+			StepSynchronizationManager.release();
+		}
+	}
+
+	@Configuration(proxyBeanMethods = false)
+	@EnableBatchProcessing
+	static class ParentBatchConfiguration {
+
+	}
+
+	@Configuration(proxyBeanMethods = false)
+	static class ChildReaderConfiguration {
+
+		@Bean
+		@StepScope
+		ItemReader<String> reader(@JobParameter("item") String item) {
+			return () -> item;
+		}
+
+		@Bean
+		ReaderHolder readerHolder(ItemReader<String> reader) {
+			return new ReaderHolder(reader);
+		}
+
+	}
+
+	record ReaderHolder(ItemReader<String> reader) {
 	}
 
 	void implicitName(@JobParameter String myName) {
