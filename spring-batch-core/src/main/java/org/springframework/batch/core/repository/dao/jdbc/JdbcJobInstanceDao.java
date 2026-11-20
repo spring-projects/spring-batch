@@ -277,12 +277,9 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 			.orElse(null);
 	}
 
+	@Deprecated(since = "6.1", forRemoval = true)
 	@Override
-	@Nullable
-	// TODO what is the added value of this method?
-	// TODO clients should use
-	// JobExecutionDao.getJobExecution(jobExecutionId).getJobInstance() instead
-	public JobInstance getJobInstance(JobExecution jobExecution) {
+	public @Nullable JobInstance getJobInstance(JobExecution jobExecution) {
 		return getJdbcClient().sql(getQuery(GET_JOB_FROM_EXECUTION_ID))
 			.param("jobExecutionId", jobExecution.getId())
 			.query(new JobInstanceRowMapper())
