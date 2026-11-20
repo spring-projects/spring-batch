@@ -126,7 +126,7 @@ public class ClasspathXmlApplicationContextsFactoryBean
 			factory.setApplicationContext(applicationContext);
 			applicationContextFactories.add(factory);
 		}
-		return applicationContextFactories.toArray(new ApplicationContextFactory[applicationContextFactories.size()]);
+		return applicationContextFactories.toArray(new ApplicationContextFactory[0]);
 	}
 
 	/**
