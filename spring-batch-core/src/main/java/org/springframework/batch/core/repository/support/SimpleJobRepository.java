@@ -55,6 +55,7 @@ import java.util.List;
  * @author Mark John Moreno
  * @author Yanming Zhou
  * @author Andrey Litvitski
+ * @author Taeik Lim
  * @see JobRepository
  * @see JobInstanceDao
  * @see JobExecutionDao
@@ -82,9 +83,8 @@ public class SimpleJobRepository extends SimpleJobExplorer implements JobReposit
 		return this.jobInstanceDao.getJobInstances(jobName);
 	}
 
-	@Nullable
 	@Override
-	public StepExecution getStepExecution(long executionId) {
+	public @Nullable StepExecution getStepExecution(long executionId) {
 		StepExecution stepExecution = this.stepExecutionDao.getStepExecution(executionId);
 		if (stepExecution != null) {
 			fillStepExecutionDependencies(stepExecution);
