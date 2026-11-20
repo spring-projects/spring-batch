@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -119,6 +119,24 @@ class ItemCountingItemStreamItemReaderTests {
 		reader.open(context);
 		reader.read();
 		assertNull(reader.read());
+	}
+
+	@Test
+	void testOpenWithCurrentItemCountAndSaveStateDisabled() throws Exception {
+		reader.setSaveState(false);
+		reader.setCurrentItemCount(2);
+		reader.open(new ExecutionContext());
+		assertEquals("c", reader.read());
+		assertEquals(3, reader.getCurrentItemCount());
+	}
+
+	@Test
+	void testOpenWithSaveStateDisabledIgnoresExecutionContext() throws Exception {
+		reader.setSaveState(false);
+		ExecutionContext context = new ExecutionContext();
+		context.putInt("foo.read.count", 2);
+		reader.open(context);
+		assertEquals("a", reader.read());
 	}
 
 	@Test
