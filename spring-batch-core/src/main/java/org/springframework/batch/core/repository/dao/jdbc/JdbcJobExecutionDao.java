@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.Nullable;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.job.JobExecution;
@@ -46,7 +47,6 @@ import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
-import org.jspecify.annotations.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
@@ -141,10 +141,12 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 			ORDER BY JOB_EXECUTION_ID DESC
 			""";
 
-	JdbcJobInstanceDao jobInstanceDao;
-
 	private int exitMessageLength = DEFAULT_EXIT_MESSAGE_LENGTH;
 
+	@SuppressWarnings("NullAway.Init")
+	private JdbcJobInstanceDao jobInstanceDao;
+
+	@SuppressWarnings("NullAway.Init")
 	private DataFieldMaxValueIncrementer jobExecutionIncrementer;
 
 	private final Lock lock = new ReentrantLock();
@@ -183,8 +185,8 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
-		Assert.state(jobExecutionIncrementer != null, "The jobExecutionIncrementer must not be null.");
-		Assert.state(jobInstanceDao != null, "The jobInstanceDao must not be null.");
+		Assert.notNull(jobExecutionIncrementer, "The jobExecutionIncrementer must not be null.");
+		Assert.notNull(jobInstanceDao, "The jobInstanceDao must not be null.");
 	}
 
 	public JobExecution createJobExecution(JobInstance jobInstance, JobParameters jobParameters) {
@@ -202,9 +204,6 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		Timestamp createTime = Timestamp.valueOf(jobExecution.getCreateTime());
 		Timestamp lastUpdated = jobExecution.getLastUpdated() == null ? null
 				: Timestamp.valueOf(jobExecution.getLastUpdated());
-		Object[] parameters = new Object[] { jobExecution.getId(), jobInstance.getId(), startTime, endTime,
-				jobExecution.getStatus().toString(), jobExecution.getExitStatus().getExitCode(),
-				jobExecution.getExitStatus().getExitDescription(), jobExecution.getVersion(), createTime, lastUpdated };
 		getJdbcClient().sql(getQuery(SAVE_JOB_EXECUTION))
 			.param("jobExecutionId", jobExecution.getId(), Types.BIGINT)
 			.param("jobInstanceId", jobExecution.getJobInstance().getId(), Types.BIGINT)
@@ -269,7 +268,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		try {
 
 			String exitDescription = jobExecution.getExitStatus().getExitDescription();
-			if (exitDescription != null && exitDescription.length() > exitMessageLength) {
+			if (exitDescription.length() > exitMessageLength) {
 				exitDescription = exitDescription.substring(0, exitMessageLength);
 				if (logger.isDebugEnabled()) {
 					logger.debug("Truncating long message before update of JobExecution: " + jobExecution);
@@ -307,33 +306,25 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		}
 	}
 
-	@Nullable
 	@Override
-	public JobExecution getLastJobExecution(JobInstance jobInstance) {
-		JobExecutionRow jobExecutionRow = getJdbcClient().sql(getQuery(GET_LAST_JOB_EXECUTION))
+	public @Nullable JobExecution getLastJobExecution(JobInstance jobInstance) {
+		return getJdbcClient().sql(getQuery(GET_LAST_JOB_EXECUTION))
 			.param("jobInstanceId", jobInstance.getId())
 			.query(new JobExecutionRowMapper())
 			.optional()
+			.map(row -> row.toJobExecution(jobInstance, getJobParameters(row.jobExecutionId())))
 			.orElse(null);
-		if (jobExecutionRow == null) {
-			return null;
-		}
-		return jobExecutionRow.toJobExecution(jobInstance, getJobParameters(jobExecutionRow.jobExecutionId()));
 	}
 
 	@Override
-	public JobExecution getJobExecution(long jobExecutionId) {
-		JobExecutionRow jobExecutionRow = getJdbcClient().sql(getQuery(GET_EXECUTION_BY_ID))
+	public @Nullable JobExecution getJobExecution(long jobExecutionId) {
+		return getJdbcClient().sql(getQuery(GET_EXECUTION_BY_ID))
 			.param("jobExecutionId", jobExecutionId)
 			.query(new JobExecutionRowMapper())
 			.optional()
+			.map(row -> row.toJobExecution(Objects.requireNonNull(jobInstanceDao.getJobInstance(row.jobInstanceId())),
+					getJobParameters(jobExecutionId)))
 			.orElse(null);
-		if (jobExecutionRow == null) {
-			return null;
-		}
-		// resolved once the result set is closed, to avoid nesting queries in it
-		JobInstance jobInstance = jobInstanceDao.getJobInstance(jobExecutionRow.jobInstanceId());
-		return jobExecutionRow.toJobExecution(jobInstance, getJobParameters(jobExecutionId));
 	}
 
 	@Override
@@ -343,7 +334,9 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 			.query(Long.class)
 			.list()
 			.stream()
+			.filter(Objects::nonNull)
 			.map(this::getJobExecution)
+			.filter(Objects::nonNull)
 			.collect(Collectors.toSet());
 	}
 
@@ -419,7 +412,6 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	 * @param executionId {@link Long} containing the id for the execution.
 	 * @return job parameters for the requested execution id
 	 */
-	@SuppressWarnings(value = { "unchecked", "rawtypes" })
 	public JobParameters getJobParameters(Long executionId) {
 		final Set<JobParameter<?>> jobParameters = new HashSet<>();
 		RowCallbackHandler handler = rs -> jobParameters.add(mapJobParameter(rs));
@@ -451,6 +443,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 			.collect(Collectors.toMap(Map.Entry::getKey, entry -> new JobParameters(entry.getValue())));
 	}
 
+	@SuppressWarnings(value = { "unchecked", "rawtypes" })
 	private JobParameter<?> mapJobParameter(ResultSet rs) throws SQLException {
 		String parameterName = rs.getString("PARAMETER_NAME");
 

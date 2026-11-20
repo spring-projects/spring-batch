@@ -21,6 +21,9 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+
+import org.jspecify.annotations.Nullable;
 
 import org.springframework.batch.core.job.DefaultJobKeyGenerator;
 import org.springframework.batch.core.job.JobExecution;
@@ -37,7 +40,6 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
-import org.jspecify.annotations.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -134,6 +136,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 			SELECT JOB_INSTANCE_ID FROM %PREFIX%JOB_INSTANCE WHERE JOB_NAME = :jobName
 			""";
 
+	@SuppressWarnings("NullAway.Init")
 	private DataFieldMaxValueIncrementer jobInstanceIncrementer;
 
 	private JobKeyGenerator jobKeyGenerator = new DefaultJobKeyGenerator();
@@ -177,7 +180,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 	 * @throws IllegalArgumentException if any {@link JobParameters} fields are null.
 	 */
 	@Override
-	@Nullable public JobInstance getJobInstance(final String jobName, final JobParameters jobParameters) {
+	public @Nullable JobInstance getJobInstance(final String jobName, final JobParameters jobParameters) {
 
 		Assert.notNull(jobName, "Job name must not be null.");
 		Assert.notNull(jobParameters, "JobParameters must not be null.");
@@ -203,7 +206,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 	}
 
 	@Override
-	@Nullable public JobInstance getJobInstance(long instanceId) {
+	public @Nullable JobInstance getJobInstance(long instanceId) {
 		return getJdbcClient().sql(getQuery(GET_JOB_FROM_ID))
 			.param("jobInstanceId", instanceId)
 			.query(new JobInstanceRowMapper())
@@ -213,7 +216,12 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 
 	@Override
 	public List<String> getJobNames() {
-		return getJdbcClient().sql(getQuery(FIND_JOB_NAMES)).query(String.class).list();
+		return getJdbcClient().sql(getQuery(FIND_JOB_NAMES))
+			.query(String.class)
+			.list()
+			.stream()
+			.filter(Objects::nonNull)
+			.toList();
 	}
 
 	@Override
@@ -265,11 +273,14 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 		return getJdbcClient().sql(getQuery(GET_JOB_INSTANCE_IDS_BY_JOB_NAME))
 			.param("jobName", jobName)
 			.query(Long.class)
-			.list();
+			.list()
+			.stream()
+			.filter(Objects::nonNull)
+			.toList();
 	}
 
 	@Override
-	@Nullable public JobInstance getLastJobInstance(String jobName) {
+	public @Nullable JobInstance getLastJobInstance(String jobName) {
 		return getJdbcClient().sql(getQuery(FIND_LAST_JOB_INSTANCE_BY_JOB_NAME))
 			.param("jobName", jobName)
 			.query(new JobInstanceRowMapper())
@@ -278,11 +289,10 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 	}
 
 	@Override
-	@Nullable
 	// TODO what is the added value of this method?
 	// TODO clients should use
 	// JobExecutionDao.getJobExecution(jobExecutionId).getJobInstance() instead
-	public JobInstance getJobInstance(JobExecution jobExecution) {
+	public @Nullable JobInstance getJobInstance(JobExecution jobExecution) {
 		return getJdbcClient().sql(getQuery(GET_JOB_FROM_EXECUTION_ID))
 			.param("jobExecutionId", jobExecution.getId())
 			.query(new JobInstanceRowMapper())
@@ -363,7 +373,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
-		Assert.state(jobInstanceIncrementer != null, "jobInstanceIncrementer is required");
+		Assert.notNull(jobInstanceIncrementer, "jobInstanceIncrementer is required");
 	}
 
 	/**
