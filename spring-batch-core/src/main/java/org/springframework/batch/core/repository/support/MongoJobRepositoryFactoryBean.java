@@ -21,6 +21,7 @@ import org.springframework.batch.core.repository.dao.AbstractMongoBatchMetadataD
 import org.springframework.batch.core.repository.dao.mongodb.MongoExecutionContextDao;
 import org.springframework.batch.core.repository.dao.mongodb.MongoJobExecutionDao;
 import org.springframework.batch.core.repository.dao.mongodb.MongoJobInstanceDao;
+import org.springframework.batch.core.repository.dao.mongodb.MongoJobParameterDao;
 import org.springframework.batch.core.repository.dao.mongodb.MongoSequenceIncrementer;
 import org.springframework.batch.core.repository.dao.mongodb.MongoStepExecutionDao;
 import org.springframework.beans.factory.InitializingBean;
@@ -40,6 +41,7 @@ import org.springframework.util.Assert;
  *
  * @author Mahmoud Ben Hassine
  * @author Myeongha Shin
+ * @author Moad Elfatihi
  * @since 5.2.0
  */
 public class MongoJobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean implements InitializingBean {
@@ -85,7 +87,9 @@ public class MongoJobRepositoryFactoryBean extends AbstractJobRepositoryFactoryB
 	protected Object getTarget() throws Exception {
 		MongoJobInstanceDao jobInstanceDao = createJobInstanceDao();
 		MongoJobExecutionDao jobExecutionDao = createJobExecutionDao();
+		MongoJobParameterDao jobParameterDao = createJobParameterDao();
 		jobExecutionDao.setJobInstanceDao(jobInstanceDao);
+		jobExecutionDao.setJobParameterDao(jobParameterDao);
 		MongoStepExecutionDao stepExecutionDao = createStepExecutionDao();
 		stepExecutionDao.setJobExecutionDao(jobExecutionDao);
 		MongoExecutionContextDao executionContextDao = createExecutionContextDao();
@@ -107,6 +111,13 @@ public class MongoJobRepositoryFactoryBean extends AbstractJobRepositoryFactoryB
 		mongoJobExecutionDao.setCollectionPrefix(this.collectionPrefix);
 		mongoJobExecutionDao.setJobExecutionIncrementer(this.jobExecutionIncrementer);
 		return mongoJobExecutionDao;
+	}
+
+	@Override
+	protected MongoJobParameterDao createJobParameterDao() {
+		MongoJobParameterDao mongoJobParameterDao = new MongoJobParameterDao(this.mongoOperations);
+		mongoJobParameterDao.setCollectionPrefix(this.collectionPrefix);
+		return mongoJobParameterDao;
 	}
 
 	@Override

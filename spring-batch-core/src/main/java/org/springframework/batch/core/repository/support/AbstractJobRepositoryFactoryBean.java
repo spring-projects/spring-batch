@@ -30,6 +30,7 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.dao.ExecutionContextDao;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.dao.JobInstanceDao;
+import org.springframework.batch.core.repository.dao.JobParameterDao;
 import org.springframework.batch.core.repository.dao.StepExecutionDao;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -53,6 +54,7 @@ import org.springframework.util.Assert;
  * @author Lucas Ward
  * @author Robert Kasanicky
  * @author Mahmoud Ben Hassine
+ * @author Moad Elfatihi
  */
 public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean<JobRepository>, InitializingBean {
 
@@ -88,6 +90,12 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean<Jo
 	 * @throws Exception thrown if error occurs creating JobExecutionDao.
 	 */
 	protected abstract JobExecutionDao createJobExecutionDao() throws Exception;
+
+	/**
+	 * @return fully configured {@link JobParameterDao} implementation.
+	 * @throws Exception thrown if error occurs creating JobParameterDao.
+	 */
+	protected abstract JobParameterDao createJobParameterDao() throws Exception;
 
 	/**
 	 * @return fully configured {@link StepExecutionDao} implementation.

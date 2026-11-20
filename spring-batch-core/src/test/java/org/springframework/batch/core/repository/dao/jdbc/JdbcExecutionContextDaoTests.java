@@ -62,11 +62,14 @@ class JdbcExecutionContextDaoTests {
 		jdbcJobInstanceDao.setJobInstanceIncrementer(jobInstanceIncrementer);
 		jdbcJobInstanceDao.afterPropertiesSet();
 
+		JdbcJobParameterDao jdbcJobParameterDao = new JdbcJobParameterDao(JdbcClient.create(jdbcTemplate));
+
 		jdbcJobExecutionDao = new JdbcJobExecutionDao(JdbcClient.create(jdbcTemplate));
 		H2SequenceMaxValueIncrementer jobExecutionIncrementer = new H2SequenceMaxValueIncrementer(database,
 				"BATCH_JOB_EXECUTION_SEQ");
 		jdbcJobExecutionDao.setJobExecutionIncrementer(jobExecutionIncrementer);
 		jdbcJobExecutionDao.setJobInstanceDao(jdbcJobInstanceDao);
+		jdbcJobExecutionDao.setJobParameterDao(jdbcJobParameterDao);
 		jdbcJobExecutionDao.afterPropertiesSet();
 
 		jdbcStepExecutionDao = new JdbcStepExecutionDao(JdbcClient.create(jdbcTemplate));
@@ -74,6 +77,7 @@ class JdbcExecutionContextDaoTests {
 				"BATCH_STEP_EXECUTION_SEQ");
 		jdbcStepExecutionDao.setStepExecutionIncrementer(stepExecutionIncrementer);
 		jdbcStepExecutionDao.setJobExecutionDao(jdbcJobExecutionDao);
+		jdbcStepExecutionDao.setJobParameterDao(jdbcJobParameterDao);
 		jdbcStepExecutionDao.afterPropertiesSet();
 
 		jdbcExecutionContextDao = new JdbcExecutionContextDao(JdbcClient.create(jdbcTemplate));
