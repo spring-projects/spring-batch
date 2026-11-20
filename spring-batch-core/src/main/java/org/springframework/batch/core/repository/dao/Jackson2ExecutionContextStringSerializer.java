@@ -363,7 +363,7 @@ public class Jackson2ExecutionContextStringSerializer implements ExecutionContex
 			DeserializationConfig config = (DeserializationConfig) context.getConfig();
 			JavaType result = delegate.typeFromId(context, id);
 			String className = result.getRawClass().getName();
-			if (isTrusted(className)) {
+			if (isTrusted(className) || isTrustedArrayType(result.getRawClass())) {
 				return result;
 			}
 			boolean isExplicitMixin = config.findMixInClassFor(result.getRawClass()) != null;
@@ -384,6 +384,17 @@ public class Jackson2ExecutionContextStringSerializer implements ExecutionContex
 
 		private boolean isTrusted(String id) {
 			return this.trustedClassNames.contains(id);
+		}
+
+		private boolean isTrustedArrayType(Class<?> type) {
+			if (!type.isArray()) {
+				return false;
+			}
+			Class<?> componentType = type.getComponentType();
+			while (componentType.isArray()) {
+				componentType = componentType.getComponentType();
+			}
+			return componentType.isPrimitive() || isTrusted(componentType.getName());
 		}
 
 		@Override

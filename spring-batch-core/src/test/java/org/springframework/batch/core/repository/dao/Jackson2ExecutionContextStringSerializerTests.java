@@ -17,6 +17,7 @@ package org.springframework.batch.core.repository.dao;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Timestamp;
@@ -38,6 +39,7 @@ import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -78,6 +80,44 @@ class Jackson2ExecutionContextStringSerializerTests extends AbstractExecutionCon
 		InputStream in = new ByteArrayInputStream(os.toByteArray());
 
 		assertDoesNotThrow(() -> j.deserialize(in));
+	}
+
+	@Test
+	void testArraySerialization() throws IOException {
+		// given
+		Map<String, Object> context = new HashMap<>();
+		context.put("strings", new String[] { "foo", "bar" });
+		context.put("longs", new Long[] { 1L, 2L });
+		context.put("ints", new int[] { 1, 2 });
+		context.put("matrix", new String[][] { { "a" }, { "b", "c" } });
+
+		// when
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		serializer.serialize(context, outputStream);
+		InputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
+		Map<String, Object> deserializedContext = serializer.deserialize(inputStream);
+
+		// then
+		assertArrayEquals(new String[] { "foo", "bar" }, (String[]) deserializedContext.get("strings"));
+		assertArrayEquals(new Long[] { 1L, 2L }, (Long[]) deserializedContext.get("longs"));
+		assertArrayEquals(new int[] { 1, 2 }, (int[]) deserializedContext.get("ints"));
+		assertArrayEquals(new String[][] { { "a" }, { "b", "c" } }, (String[][]) deserializedContext.get("matrix"));
+	}
+
+	@Test
+	void testArrayOfUntrustedTypeIsRejected() throws IOException {
+		// given
+		Map<String, Object> context = new HashMap<>();
+		context.put("files", new File[] { new File("foo") });
+
+		// when
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		serializer.serialize(context, outputStream);
+		InputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
+
+		// then
+		Exception exception = assertThrows(Exception.class, () -> serializer.deserialize(inputStream));
+		assertTrue(exception.getMessage().contains("is not trusted"), "message was: " + exception.getMessage());
 	}
 
 	@Test
