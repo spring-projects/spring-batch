@@ -175,6 +175,12 @@
 			<version>${jakarta.validation-api.version}</version>
 			<optional>true</optional>
 		</dependency>
+		<dependency>
+		<groupId>org.hibernate.orm</groupId>
+		<artifactId>hibernate-core</artifactId>
+		<version>${hibernate-core.version}</version>
+		<optional>true</optional>
+		</dependency>
 
 		<!-- test dependencies -->
 		<dependency>
@@ -495,12 +501,6 @@
 			<groupId>jakarta.transaction</groupId>
 			<artifactId>jakarta.transaction-api</artifactId>
 			<version>${jakarta.transaction-api.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.hibernate.orm</groupId>
-			<artifactId>hibernate-core</artifactId>
-			<version>${hibernate-core.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
