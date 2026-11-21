@@ -302,7 +302,7 @@ for more detail.
 [[partitioning]]
 == Partitioning
 
-Spring Batch also provides an SPI for partitioning a `Step` execution and executing it
+Spring Batch also provides a Service Provider Interface (SPI) for partitioning a `Step` execution and executing it
 remotely. In this case, the remote participants are `Step` instances that could just as
 easily have been configured and used for local processing. The following image shows the
 pattern:
