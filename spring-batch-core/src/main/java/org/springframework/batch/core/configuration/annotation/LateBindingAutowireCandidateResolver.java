@@ -17,6 +17,8 @@ package org.springframework.batch.core.configuration.annotation;
 
 import org.jspecify.annotations.Nullable;
 
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.config.DependencyDescriptor;
 import org.springframework.beans.factory.support.AutowireCandidateResolver;
@@ -35,12 +37,19 @@ import org.springframework.core.MethodParameter;
  * @since 6.1
  * @see JobParameter
  */
-class LateBindingAutowireCandidateResolver implements AutowireCandidateResolver {
+class LateBindingAutowireCandidateResolver implements AutowireCandidateResolver, BeanFactoryAware {
 
 	private final AutowireCandidateResolver delegate;
 
 	LateBindingAutowireCandidateResolver(AutowireCandidateResolver delegate) {
 		this.delegate = delegate;
+	}
+
+	@Override
+	public void setBeanFactory(BeanFactory beanFactory) {
+		if (this.delegate instanceof BeanFactoryAware beanFactoryAware) {
+			beanFactoryAware.setBeanFactory(beanFactory);
+		}
 	}
 
 	@Override
