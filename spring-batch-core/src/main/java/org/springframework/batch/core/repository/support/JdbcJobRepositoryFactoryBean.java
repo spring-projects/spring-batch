@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2025 the original author or authors.
+ * Copyright 2002-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package org.springframework.batch.core.repository.support;
 
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
+import org.springframework.batch.core.repository.JobExecutionPersistenceListener;
 import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDao;
 import org.springframework.batch.core.repository.dao.DefaultExecutionContextSerializer;
 import org.springframework.batch.core.repository.dao.jdbc.JdbcExecutionContextDao;
@@ -47,6 +48,16 @@ import java.nio.charset.Charset;
  */
 @SuppressWarnings("removal")
 public class JdbcJobRepositoryFactoryBean extends JobRepositoryFactoryBean {
+
+	/**
+	 * Set a listener for job execution creation and updates. The listener is called
+	 * synchronously after persistence and before the repository transaction commits.
+	 * @param listener the listener to invoke
+	 * @since 6.1
+	 */
+	public void setJobExecutionPersistenceListener(JobExecutionPersistenceListener listener) {
+		configureJobExecutionPersistenceListener(listener);
+	}
 
 	/**
 	 * @param type a value from the {@link java.sql.Types} class to indicate the type to
