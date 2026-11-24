@@ -27,6 +27,7 @@ import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.launch.JobOperator;
+import org.springframework.batch.core.repository.JobExecutionPersistenceListener;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDao;
 import org.springframework.batch.core.repository.support.ResourcelessJobRepository;
@@ -34,6 +35,7 @@ import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.infrastructure.repeat.RepeatStatus;
+import org.springframework.beans.factory.NoUniqueBeanDefinitionException;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -42,6 +44,9 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
+
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * @author Yanming Zhou
@@ -53,6 +58,32 @@ class JdbcDefaultBatchConfigurationTests {
 	private static final String jobExecutionIncrementerName = "JE_SEQ";
 
 	private static final String stepExecutionIncrementerName = "SE_SEQ";
+
+	@Test
+	void testJobExecutionPersistenceListenerBean() {
+		try (AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(
+				MyJobConfiguration.class, ListenerConfiguration.class)) {
+			JobRepository repository = context.getBean(JobRepository.class);
+			RecordingListener listener = context.getBean(RecordingListener.class);
+
+			JobExecution execution = repository.createJobExecution("listenerJob", new JobParameters());
+			Assertions.assertSame(execution, listener.created);
+
+			repository.update(execution);
+			Assertions.assertSame(execution, listener.updated);
+		}
+	}
+
+	@Test
+	void testAmbiguousJobExecutionPersistenceListenerBeans() {
+		try (AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext()) {
+			context.register(MyJobConfiguration.class);
+			context.registerBean("firstListener", RecordingListener.class, RecordingListener::new);
+			context.registerBean("secondListener", RecordingListener.class, RecordingListener::new);
+
+			assertThatThrownBy(context::refresh).hasRootCauseInstanceOf(NoUniqueBeanDefinitionException.class);
+		}
+	}
 
 	@Test
 	void testCustomIncrementerName() throws Exception {
@@ -94,6 +125,36 @@ class JdbcDefaultBatchConfigurationTests {
 							"select count(*) from " + AbstractJdbcBatchMetadataDao.DEFAULT_TABLE_PREFIX
 									+ AbstractJdbcBatchMetadataDao.DEFAULT_STEP_EXECUTION_INCREMENTER_NAME,
 							Long.class));
+	}
+
+	@Configuration
+	static class ListenerConfiguration {
+
+		@Bean
+		RecordingListener jobExecutionPersistenceListener() {
+			return new RecordingListener();
+		}
+
+	}
+
+	static class RecordingListener implements JobExecutionPersistenceListener {
+
+		private JobExecution created;
+
+		private JobExecution updated;
+
+		@Override
+		public void afterCreate(JobExecution execution) {
+			Assertions.assertTrue(TransactionSynchronizationManager.isActualTransactionActive());
+			this.created = execution;
+		}
+
+		@Override
+		public void afterUpdate(JobExecution execution) {
+			Assertions.assertTrue(TransactionSynchronizationManager.isActualTransactionActive());
+			this.updated = execution;
+		}
+
 	}
 
 	@Configuration
