@@ -369,18 +369,26 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 								Tasklet tasklet = taskletStep.getTasklet();
 								if (tasklet instanceof StoppableTasklet stoppableTasklet) {
 									StepSynchronizationManager.register(stepExecution);
-									stoppableTasklet.stop(stepExecution);
-									jobRepository.update(stepExecution);
-									jobRepository.updateExecutionContext(stepExecution);
-									StepSynchronizationManager.close();
+									try {
+										stoppableTasklet.stop(stepExecution);
+										jobRepository.update(stepExecution);
+										jobRepository.updateExecutionContext(stepExecution);
+									}
+									finally {
+										StepSynchronizationManager.close();
+									}
 								}
 							}
 							if (step instanceof StoppableStep stoppableStep) {
 								StepSynchronizationManager.register(stepExecution);
-								stoppableStep.stop(stepExecution);
-								jobRepository.update(stepExecution);
-								jobRepository.updateExecutionContext(stepExecution);
-								StepSynchronizationManager.close();
+								try {
+									stoppableStep.stop(stepExecution);
+									jobRepository.update(stepExecution);
+									jobRepository.updateExecutionContext(stepExecution);
+								}
+								finally {
+									StepSynchronizationManager.close();
+								}
 							}
 						}
 					}

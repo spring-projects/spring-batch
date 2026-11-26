@@ -45,6 +45,7 @@ import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.batch.core.step.StepContribution;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.step.builder.StepBuilder;
+import org.springframework.batch.core.step.tasklet.StoppableTasklet;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.batch.infrastructure.repeat.RepeatStatus;
@@ -227,6 +228,44 @@ class TaskExecutorJobOperatorTests {
 			StepSynchronizationManager.release();
 		}
 		Assertions.assertTrue(destroyed.get());
+	}
+
+	@Test
+	void testStopUnregistersTheStepExecutionWhenStoppingTheStepFails() throws Exception {
+		StoppableTasklet tasklet = new StoppableTasklet() {
+			@Override
+			public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) {
+				return RepeatStatus.FINISHED;
+			}
+
+			@Override
+			public void stop() {
+				throw new IllegalStateException("Planned failure");
+			}
+
+			@Override
+			public void stop(StepExecution stepExecution) {
+				throw new IllegalStateException("Planned failure");
+			}
+		};
+		Job stoppableJob = new JobBuilder("stoppableJob", jobRepository)
+			.start(new StepBuilder("step", jobRepository).tasklet(tasklet).build())
+			.build();
+		jobRegistry.register(stoppableJob);
+		JobInstance jobInstance = jobRepository.createJobInstance(stoppableJob.getName(), new JobParameters());
+		// freshly created executions are in STARTING status, i.e. running
+		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, new JobParameters(),
+				new ExecutionContext());
+		jobRepository.createStepExecution("step", jobExecution);
+		try {
+			Assertions.assertThrows(IllegalStateException.class,
+					() -> jobOperator.stop(jobRepository.getJobExecution(jobExecution.getId())));
+
+			Assertions.assertNull(StepSynchronizationManager.getContext());
+		}
+		finally {
+			StepSynchronizationManager.close();
+		}
 	}
 
 }
