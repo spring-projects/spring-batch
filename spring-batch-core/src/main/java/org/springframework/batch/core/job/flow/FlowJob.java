@@ -33,7 +33,6 @@ import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.job.AbstractJob;
 import org.springframework.batch.core.job.SimpleStepHandler;
 import org.springframework.batch.core.step.StepHolder;
-import org.springframework.batch.core.step.StepLocator;
 
 /**
  * Implementation of the {@link Job} interface that allows for complex flows of steps,
@@ -43,6 +42,7 @@ import org.springframework.batch.core.step.StepLocator;
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  * @author Taeik Lim
+ * @author Yanming Zhou
  * @since 2.0
  */
 public class FlowJob extends AbstractJob {
@@ -166,13 +166,14 @@ public class FlowJob extends AbstractJob {
 	 */
 	@Override
 	protected void doExecute(JobExecution execution) throws JobExecutionException {
-		// done at execution time, as the names of job/step scoped steps can only be
-		// resolved once the scope is active
-		warnOnDuplicateStepNames();
 		try {
 			JobFlowExecutor executor = new JobFlowExecutor(getJobRepository(),
 					new SimpleStepHandler(getJobRepository()), execution);
 			executor.updateJobExecutionStatus(flow.start(executor).getStatus());
+
+			// getting names of all steps triggers creation of target step beans early
+			// we should defer creating bean as possible to avoid breaking late binding.
+			warnOnDuplicateStepNames();
 		}
 		catch (FlowExecutionException e) {
 			if (e.getCause() instanceof JobExecutionException) {
