@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.IntStream;
 
 import javax.sql.DataSource;
 
@@ -35,6 +36,7 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.core.step.item.ChunkOrientedStep;
+import org.springframework.batch.core.step.item.ChunkProcessor;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.batch.infrastructure.item.ItemReader;
 import org.springframework.batch.infrastructure.item.support.ListItemReader;
@@ -46,6 +48,7 @@ import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.core.MessagingTemplate;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.support.JdbcTransactionManager;
+import org.springframework.messaging.MessageHandler;
 import org.springframework.messaging.support.GenericMessage;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -267,7 +270,80 @@ class RemoteChunkingManagerBuilderTests {
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 		assertEquals(Arrays.asList("a", "b", "c", "d", "e"), written);
 		assertEquals(5, stepExecution.getReadCount());
+		assertEquals(5, stepExecution.getWriteCount());
 		assertEquals(3, stepExecution.getCommitCount());
+	}
+
+	@Test
+	void testWriteCountIsNotCountedOnTheManagerSide() throws Exception {
+		int[][] itemCountAndChunkSize = { { 1, 2 }, { 5, 2 }, { 9, 2 }, { 9, 3 }, { 12, 3 } };
+		for (int[] parameters : itemCountAndChunkSize) {
+			// given
+			int itemCount = parameters[0];
+			int chunkSize = parameters[1];
+			List<String> items = IntStream.rangeClosed(1, itemCount).mapToObj(String::valueOf).toList();
+			List<String> written = new ArrayList<>();
+			MessageHandler worker = subscribeWorker(written, null);
+
+			ChunkOrientedStep<String, String> step = new RemoteChunkingManagerBuilder("managerStep", this.jobRepository)
+				.inputChannel(this.inputChannel)
+				.outputChannel(this.outputChannel)
+				.<String, String>chunk(chunkSize)
+				.reader(new ListItemReader<>(items))
+				.transactionManager(this.transactionManager)
+				.build();
+			StepExecution stepExecution = createStepExecution("managerStep");
+
+			// when
+			try {
+				step.execute(stepExecution);
+			}
+			finally {
+				this.outputChannel.unsubscribe(worker);
+			}
+
+			// then
+			assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
+			assertEquals(items, written);
+			assertEquals(itemCount, stepExecution.getReadCount());
+			assertEquals(itemCount, stepExecution.getWriteCount());
+		}
+	}
+
+	@Test
+	void testWriteSkipCountIsTheOneReportedByTheWorkers() throws Exception {
+		// given: the worker skips item "c" on write
+		List<String> written = new ArrayList<>();
+		subscribeWorker((chunk, contribution) -> {
+			for (String item : chunk.getItems()) {
+				if (item.equals("c")) {
+					contribution.incrementWriteSkipCount();
+				}
+				else {
+					written.add(item);
+					contribution.incrementWriteCount(1);
+				}
+			}
+		});
+
+		ChunkOrientedStep<String, String> step = new RemoteChunkingManagerBuilder("managerStep", this.jobRepository)
+			.inputChannel(this.inputChannel)
+			.outputChannel(this.outputChannel)
+			.<String, String>chunk(2)
+			.reader(this.itemReader)
+			.transactionManager(this.transactionManager)
+			.build();
+		StepExecution stepExecution = createStepExecution("managerStep");
+
+		// when
+		step.execute(stepExecution);
+
+		// then
+		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
+		assertEquals(Arrays.asList("a", "b", "d", "e"), written);
+		assertEquals(5, stepExecution.getReadCount());
+		assertEquals(4, stepExecution.getWriteCount());
+		assertEquals(1, stepExecution.getWriteSkipCount());
 	}
 
 	@Test
@@ -298,17 +374,21 @@ class RemoteChunkingManagerBuilderTests {
 	 * ChunkProcessorChunkRequestHandler and replies are sent on the input channel. The
 	 * worker fails when it receives the item passed as failOn.
 	 */
-	@SuppressWarnings("unchecked")
-	private void subscribeWorker(List<String> written, String failOn) {
-		ChunkProcessorChunkRequestHandler<String> handler = new ChunkProcessorChunkRequestHandler<>();
-		handler.setChunkProcessor((chunk, contribution) -> {
+	private MessageHandler subscribeWorker(List<String> written, String failOn) {
+		return subscribeWorker((chunk, contribution) -> {
 			if (failOn != null && chunk.getItems().contains(failOn)) {
 				throw new IllegalStateException("Unable to process " + failOn);
 			}
 			written.addAll(chunk.getItems());
 			contribution.incrementWriteCount(chunk.size());
 		});
-		this.outputChannel.subscribe(message -> {
+	}
+
+	@SuppressWarnings("unchecked")
+	private MessageHandler subscribeWorker(ChunkProcessor<String> chunkProcessor) {
+		ChunkProcessorChunkRequestHandler<String> handler = new ChunkProcessorChunkRequestHandler<>();
+		handler.setChunkProcessor(chunkProcessor);
+		MessageHandler worker = message -> {
 			try {
 				ChunkResponse response = handler.handle((ChunkRequest<String>) message.getPayload());
 				this.inputChannel.send(new GenericMessage<>(response));
@@ -316,7 +396,9 @@ class RemoteChunkingManagerBuilderTests {
 			catch (Exception e) {
 				throw new IllegalStateException(e);
 			}
-		});
+		};
+		this.outputChannel.subscribe(worker);
+		return worker;
 	}
 
 	private StepExecution createStepExecution(String stepName) {

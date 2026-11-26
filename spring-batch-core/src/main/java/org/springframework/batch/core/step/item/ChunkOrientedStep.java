@@ -101,6 +101,7 @@ import static org.springframework.batch.core.observability.BatchMetrics.METRICS_
  * @author Taeik Lim
  * @author Kim ByeongChang
  * @author WooSeung Kim
+ * @author Gabriel Hall
  * @since 6.0
  */
 public class ChunkOrientedStep<I, O> extends AbstractStep {
@@ -828,6 +829,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 			this.interruptionPolicy.checkInterrupted(stepExecution);
 		}
 		catch (JobInterruptedException exception) {
+			stepExecution.setTerminateOnly();
 			return true;
 		}
 		// check external interruption via job operator
