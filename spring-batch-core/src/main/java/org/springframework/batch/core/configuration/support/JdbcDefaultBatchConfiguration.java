@@ -22,6 +22,7 @@ import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.JobKeyGenerator;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
+import org.springframework.batch.core.repository.JobExecutionPersistenceListener;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDao;
 import org.springframework.batch.core.repository.dao.DefaultExecutionContextSerializer;
@@ -106,6 +107,12 @@ public class JdbcDefaultBatchConfiguration extends DefaultBatchConfiguration {
 			jobRepositoryFactoryBean.setMaxVarCharLength(getMaxVarCharLength());
 			jobRepositoryFactoryBean.setIsolationLevelForCreateEnum(getIsolationLevelForCreate());
 			jobRepositoryFactoryBean.setValidateTransactionState(getValidateTransactionState());
+			JobExecutionPersistenceListener listener = this.applicationContext
+				.getBeanProvider(JobExecutionPersistenceListener.class)
+				.getIfAvailable();
+			if (listener != null) {
+				jobRepositoryFactoryBean.setJobExecutionPersistenceListener(listener);
+			}
 			jobRepositoryFactoryBean.afterPropertiesSet();
 			return jobRepositoryFactoryBean.getObject();
 		}

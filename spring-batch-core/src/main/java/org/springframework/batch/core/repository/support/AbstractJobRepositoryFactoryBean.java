@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package org.springframework.batch.core.repository.support;
 
+import java.lang.reflect.Method;
 import java.util.Properties;
 
 import org.aopalliance.intercept.MethodInterceptor;
@@ -24,8 +25,11 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.aop.support.NameMatchMethodPointcut;
+import org.springframework.aop.support.StaticMethodMatcherPointcut;
 import org.springframework.batch.core.job.DefaultJobKeyGenerator;
+import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobKeyGenerator;
+import org.springframework.batch.core.repository.JobExecutionPersistenceListener;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.dao.ExecutionContextDao;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
@@ -60,7 +64,7 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean<Jo
 
 	private @Nullable TransactionAttributeSource transactionAttributeSource;
 
-	private final ProxyFactory proxyFactory = new ProxyFactory();
+	private @Nullable JobExecutionPersistenceListener jobExecutionPersistenceListener;
 
 	private String isolationLevelForCreate = DEFAULT_ISOLATION_LEVEL;
 
@@ -193,9 +197,14 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean<Jo
 		}
 	}
 
+	void configureJobExecutionPersistenceListener(JobExecutionPersistenceListener listener) {
+		this.jobExecutionPersistenceListener = listener;
+	}
+
 	@Override
 	@SuppressWarnings("DataFlowIssue")
 	public JobRepository getObject() throws Exception {
+		ProxyFactory proxyFactory = new ProxyFactory();
 		TransactionInterceptor advice = new TransactionInterceptor((TransactionManager) this.transactionManager,
 				this.transactionAttributeSource);
 		if (this.validateTransactionState) {
@@ -209,13 +218,37 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean<Jo
 			NameMatchMethodPointcut pointcut = new NameMatchMethodPointcut();
 			pointcut.addMethodName("create*");
 			advisor.setPointcut(pointcut);
-			this.proxyFactory.addAdvisor(advisor);
+			proxyFactory.addAdvisor(advisor);
 		}
-		this.proxyFactory.addAdvice(advice);
-		this.proxyFactory.setProxyTargetClass(false);
-		this.proxyFactory.addInterface(JobRepository.class);
-		this.proxyFactory.setTarget(getTarget());
-		return (JobRepository) this.proxyFactory.getProxy(getClass().getClassLoader());
+		proxyFactory.addAdvice(advice);
+		JobExecutionPersistenceListener listener = this.jobExecutionPersistenceListener;
+		if (listener != null) {
+			var pointcut = new StaticMethodMatcherPointcut() {
+				@Override
+				public boolean matches(Method method, Class<?> targetClass) {
+					return (method.getName().equals("createJobExecution")
+							&& method.getReturnType() == JobExecution.class)
+							|| (method.getName().equals("update") && method.getParameterCount() == 1
+									&& method.getParameterTypes()[0] == JobExecution.class);
+				}
+			};
+			proxyFactory.addAdvisor(new DefaultPointcutAdvisor(pointcut, (MethodInterceptor) invocation -> {
+				Assert.state(TransactionSynchronizationManager.isActualTransactionActive(),
+						"JobExecution persistence listener requires an active repository transaction");
+				Object result = invocation.proceed();
+				if (result instanceof JobExecution execution) {
+					listener.afterCreate(execution);
+				}
+				else {
+					listener.afterUpdate((JobExecution) invocation.getArguments()[0]);
+				}
+				return result;
+			}));
+		}
+		proxyFactory.setProxyTargetClass(false);
+		proxyFactory.addInterface(JobRepository.class);
+		proxyFactory.setTarget(getTarget());
+		return (JobRepository) proxyFactory.getProxy(getClass().getClassLoader());
 	}
 
 	protected Object getTarget() throws Exception {
