@@ -23,6 +23,7 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.cfg.DateTimeFeature;
 import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 import tools.jackson.databind.jsontype.PolymorphicTypeValidator;
@@ -64,7 +65,9 @@ public class JacksonExecutionContextStringSerializer implements ExecutionContext
 	 * deserialized).
 	 */
 	public JacksonExecutionContextStringSerializer() {
-		this(JsonMapper.builder());
+		this(JsonMapper.builder()
+			.enable(DateTimeFeature.WRITE_DATES_WITH_ZONE_ID)
+			.disable(DateTimeFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE));
 	}
 
 	/**
