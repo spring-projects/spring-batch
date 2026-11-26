@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2022 the original author or authors.
+ * Copyright 2013-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.batch.core.scope.context.JobContext;
 import org.springframework.batch.core.scope.context.JobSynchronizationManager;
@@ -45,6 +46,21 @@ class JobScopeTestExecutionListenerTests {
 		JobContext context = JobSynchronizationManager.getContext();
 		assertNotNull(context);
 		listener.afterTestMethod(testContext);
+		assertNull(JobSynchronizationManager.getContext());
+	}
+
+	@Test
+	void testWithMethodWithParameters() throws Exception {
+		TestContext testContext = getTestContext(new WithMethodWithParameters());
+		listener.prepareTestInstance(testContext);
+		try {
+			listener.beforeTestMethod(testContext);
+			JobContext context = JobSynchronizationManager.getContext();
+			assertNotNull(context);
+		}
+		finally {
+			listener.afterTestMethod(testContext);
+		}
 		assertNull(JobSynchronizationManager.getContext());
 	}
 
@@ -96,6 +112,15 @@ class JobScopeTestExecutionListenerTests {
 					new JobParametersBuilder().addString("foo", "spam").toJobParameters());
 			jobExecution.getExecutionContext().putString("foo", "bar");
 			return jobExecution;
+		}
+
+	}
+
+	@SuppressWarnings("unused")
+	private static class WithMethodWithParameters {
+
+		private JobExecution launchJob(JobParameters jobParameters) {
+			throw new IllegalStateException("Should not be called by the listener");
 		}
 
 	}
