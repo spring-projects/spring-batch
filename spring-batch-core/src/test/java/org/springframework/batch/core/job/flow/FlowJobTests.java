@@ -18,6 +18,7 @@ package org.springframework.batch.core.job.flow;
 import org.springframework.batch.infrastructure.support.DatabaseType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.aop.scope.ScopedObject;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.JobExecution;
@@ -57,6 +58,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  * @author Dave Syer
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ * @author Taehun Lee
  *
  */
 public class FlowJobTests {
@@ -148,6 +150,28 @@ public class FlowJobTests {
 		List<StateTransition> transitions = new ArrayList<>();
 		transitions.add(StateTransition.createStateTransition(new StepState("step0", step), "step1"));
 		transitions.add(StateTransition.createStateTransition(new StepState("step1", step), "end0"));
+		transitions.add(StateTransition.createEndStateTransition(new EndState(FlowExecutionStatus.COMPLETED, "end0")));
+		flow.setStateTransitions(transitions);
+		flow.afterPropertiesSet();
+		job.setFlow(flow);
+		job.afterPropertiesSet();
+		assertEquals(Set.of(), job.findDuplicateStepNames());
+	}
+
+	@Test
+	void testScopedStepsAreNotResolvedWhenLookingForDuplicateStepNames() throws Exception {
+		SimpleFlow subflow = new SimpleFlow("subflow");
+		List<StateTransition> subTransitions = new ArrayList<>();
+		subTransitions.add(StateTransition.createStateTransition(new StepState("step1", new ScopedStep()), "end0"));
+		subTransitions
+			.add(StateTransition.createEndStateTransition(new EndState(FlowExecutionStatus.COMPLETED, "end0")));
+		subflow.setStateTransitions(subTransitions);
+		subflow.afterPropertiesSet();
+
+		SimpleFlow flow = new SimpleFlow("job");
+		List<StateTransition> transitions = new ArrayList<>();
+		transitions.add(StateTransition.createStateTransition(new StepState("step0", new StubStep("step1")), "flow"));
+		transitions.add(StateTransition.createStateTransition(new FlowState(subflow, "flow"), "end0"));
 		transitions.add(StateTransition.createEndStateTransition(new EndState(FlowExecutionStatus.COMPLETED, "end0")));
 		flow.setStateTransitions(transitions);
 		flow.afterPropertiesSet();
@@ -754,6 +778,32 @@ public class FlowJobTests {
 			stepExecution.setStatus(BatchStatus.COMPLETED);
 			stepExecution.setExitStatus(ExitStatus.COMPLETED);
 			jobRepository.update(stepExecution);
+		}
+
+	}
+
+	/**
+	 * A scoped step whose target must not be created outside of the flow execution.
+	 */
+	private static class ScopedStep implements Step, ScopedObject {
+
+		@Override
+		public String getName() {
+			throw new IllegalStateException("The scoped step should not be created");
+		}
+
+		@Override
+		public void execute(StepExecution stepExecution) {
+			throw new IllegalStateException("The scoped step should not be created");
+		}
+
+		@Override
+		public Object getTargetObject() {
+			throw new IllegalStateException("The scoped step should not be created");
+		}
+
+		@Override
+		public void removeFromScope() {
 		}
 
 	}
