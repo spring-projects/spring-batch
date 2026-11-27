@@ -86,6 +86,7 @@ import static org.springframework.batch.core.BatchConstants.BATCH_RECOVERED;
  * @author Andrey Litvitski
  * @author Yejeong Ham
  * @author Hyunsang Han
+ * @author Gabriel Hall
  * @since 2.0
  * @deprecated since 6.0 in favor of {@link TaskExecutorJobOperator}. Scheduled for
  * removal in 6.2 or later.
@@ -368,18 +369,26 @@ public class SimpleJobOperator extends TaskExecutorJobLauncher implements JobOpe
 								Tasklet tasklet = taskletStep.getTasklet();
 								if (tasklet instanceof StoppableTasklet stoppableTasklet) {
 									StepSynchronizationManager.register(stepExecution);
-									stoppableTasklet.stop(stepExecution);
-									jobRepository.update(stepExecution);
-									jobRepository.updateExecutionContext(stepExecution);
-									StepSynchronizationManager.release();
+									try {
+										stoppableTasklet.stop(stepExecution);
+										jobRepository.update(stepExecution);
+										jobRepository.updateExecutionContext(stepExecution);
+									}
+									finally {
+										StepSynchronizationManager.close();
+									}
 								}
 							}
 							if (step instanceof StoppableStep stoppableStep) {
 								StepSynchronizationManager.register(stepExecution);
-								stoppableStep.stop(stepExecution);
-								jobRepository.update(stepExecution);
-								jobRepository.updateExecutionContext(stepExecution);
-								StepSynchronizationManager.release();
+								try {
+									stoppableStep.stop(stepExecution);
+									jobRepository.update(stepExecution);
+									jobRepository.updateExecutionContext(stepExecution);
+								}
+								finally {
+									StepSynchronizationManager.close();
+								}
 							}
 						}
 					}

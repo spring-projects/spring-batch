@@ -17,6 +17,7 @@ package org.springframework.batch.core.launch.support;
 
 import org.springframework.batch.infrastructure.support.DatabaseType;
 import java.time.LocalDateTime;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,8 +40,12 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.launch.JobRestartException;
 import org.springframework.batch.core.repository.support.JdbcJobRepositoryFactoryBean;
 import org.springframework.batch.core.scope.context.ChunkContext;
+import org.springframework.batch.core.scope.context.StepContext;
+import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.batch.core.step.StepContribution;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.step.builder.StepBuilder;
+import org.springframework.batch.core.step.tasklet.StoppableTasklet;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.batch.infrastructure.repeat.RepeatStatus;
@@ -55,6 +60,7 @@ import org.springframework.jdbc.support.JdbcTransactionManager;
  * @author Mahmoud Ben Hassine
  * @author Jinwoo Bae
  * @author Yejeong Ham
+ * @author Gabriel Hall
  */
 class TaskExecutorJobOperatorTests {
 
@@ -199,6 +205,67 @@ class TaskExecutorJobOperatorTests {
 
 		Assertions.assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		Assertions.assertEquals(4, jobRepository.getJobExecutions(jobExecution.getJobInstance()).size());
+	}
+
+	@Test
+	void testStopDoesNotCloseTheScopeOfTheRunningStep() throws Exception {
+		JobInstance jobInstance = jobRepository.createJobInstance(job.getName(), new JobParameters());
+		// freshly created executions are in STARTING status, i.e. running
+		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, new JobParameters(),
+				new ExecutionContext());
+		StepExecution stepExecution = jobRepository.createStepExecution("step", jobExecution);
+		var destroyed = new AtomicBoolean();
+		// register the step execution as the thread running the step does
+		StepContext stepContext = StepSynchronizationManager.register(stepExecution);
+		try {
+			stepContext.registerDestructionCallback("reader", () -> destroyed.set(true));
+
+			jobOperator.stop(jobRepository.getJobExecution(jobExecution.getId()));
+
+			Assertions.assertFalse(destroyed.get(), "Step-scoped beans were destroyed while the step was running");
+		}
+		finally {
+			StepSynchronizationManager.release();
+		}
+		Assertions.assertTrue(destroyed.get());
+	}
+
+	@Test
+	void testStopUnregistersTheStepExecutionWhenStoppingTheStepFails() throws Exception {
+		StoppableTasklet tasklet = new StoppableTasklet() {
+			@Override
+			public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) {
+				return RepeatStatus.FINISHED;
+			}
+
+			@Override
+			public void stop() {
+				throw new IllegalStateException("Planned failure");
+			}
+
+			@Override
+			public void stop(StepExecution stepExecution) {
+				throw new IllegalStateException("Planned failure");
+			}
+		};
+		Job stoppableJob = new JobBuilder("stoppableJob", jobRepository)
+			.start(new StepBuilder("step", jobRepository).tasklet(tasklet).build())
+			.build();
+		jobRegistry.register(stoppableJob);
+		JobInstance jobInstance = jobRepository.createJobInstance(stoppableJob.getName(), new JobParameters());
+		// freshly created executions are in STARTING status, i.e. running
+		JobExecution jobExecution = jobRepository.createJobExecution(jobInstance, new JobParameters(),
+				new ExecutionContext());
+		jobRepository.createStepExecution("step", jobExecution);
+		try {
+			Assertions.assertThrows(IllegalStateException.class,
+					() -> jobOperator.stop(jobRepository.getJobExecution(jobExecution.getId())));
+
+			Assertions.assertNull(StepSynchronizationManager.getContext());
+		}
+		finally {
+			StepSynchronizationManager.close();
+		}
 	}
 
 }
