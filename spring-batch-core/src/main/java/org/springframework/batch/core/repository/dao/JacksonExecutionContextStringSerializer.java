@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -45,16 +46,10 @@ import org.springframework.batch.core.repository.ExecutionContextSerializer;
  */
 public class JacksonExecutionContextStringSerializer implements ExecutionContextSerializer {
 
-	private static final PolymorphicTypeValidator polymorphicTypeValidator = BasicPolymorphicTypeValidator.builder()
-		.allowIfSubType("java.util.")
-		.allowIfSubType("java.sql.")
-		.allowIfSubType("java.lang.")
-		.allowIfSubType("java.math.")
-		.allowIfSubType("java.time.")
-		.allowIfSubType("java.net.")
-		.allowIfSubType("javax.xml.namespace.QName")
-		.allowIfSubType("org.springframework.batch.")
-		.build();
+	private static final List<String> TRUSTED_TYPE_PREFIXES = List.of("java.util.", "java.sql.", "java.lang.",
+			"java.math.", "java.time.", "java.net.", "javax.xml.namespace.QName", "org.springframework.batch.");
+
+	private static final PolymorphicTypeValidator polymorphicTypeValidator = createPolymorphicTypeValidator();
 
 	private final JsonMapper jsonMapper;
 
@@ -98,6 +93,27 @@ public class JacksonExecutionContextStringSerializer implements ExecutionContext
 	@Override
 	public void serialize(Map<String, Object> object, OutputStream outputStream) throws IOException {
 		this.jsonMapper.writeValue(outputStream, object);
+	}
+
+	private static PolymorphicTypeValidator createPolymorphicTypeValidator() {
+		BasicPolymorphicTypeValidator.Builder builder = BasicPolymorphicTypeValidator.builder();
+		TRUSTED_TYPE_PREFIXES.forEach(builder::allowIfSubType);
+		// the type id of an array starts with '[', so arrays are not matched by the
+		// prefixes above: allow them only when their component type is trusted
+		builder.allowIfSubType((context, type) -> isTrustedArrayType(type));
+		return builder.build();
+	}
+
+	private static boolean isTrustedArrayType(Class<?> type) {
+		if (!type.isArray()) {
+			return false;
+		}
+		Class<?> componentType = type.getComponentType();
+		while (componentType.isArray()) {
+			componentType = componentType.getComponentType();
+		}
+		String componentTypeName = componentType.getName();
+		return componentType.isPrimitive() || TRUSTED_TYPE_PREFIXES.stream().anyMatch(componentTypeName::startsWith);
 	}
 
 	@SuppressWarnings("unused")
