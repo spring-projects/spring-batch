@@ -42,6 +42,7 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * @author Robert Fischer
  * @author Mahmoud Ben Hassine
+ * @author Taeik Lim
  */
 public class MapJobRegistry implements JobRegistry, SmartInitializingSingleton, ApplicationContextAware {
 
@@ -90,9 +91,8 @@ public class MapJobRegistry implements JobRegistry, SmartInitializingSingleton, 
 		this.map.remove(name);
 	}
 
-	@Nullable
 	@Override
-	public Job getJob(String name) {
+	public @Nullable Job getJob(String name) {
 		return this.map.get(name);
 	}
 

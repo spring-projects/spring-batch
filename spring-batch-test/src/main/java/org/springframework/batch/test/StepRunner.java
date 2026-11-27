@@ -63,6 +63,7 @@ import org.jspecify.annotations.Nullable;
  * @author Dan Garrette
  * @author Lucas Ward
  * @author Mahmoud Ben Hassine
+ * @author Taeik Lim
  * @since 2.0
  * @see SimpleJob
  * @deprecated since 6.0 in favor of
@@ -140,7 +141,7 @@ public class StepRunner {
 	 * @return JobExecution
 	 */
 	public JobExecution launchStep(Step step, JobParameters jobParameters,
-			@Nullable final ExecutionContext jobExecutionContext) {
+			final @Nullable ExecutionContext jobExecutionContext) {
 		//
 		// Create a fake job
 		//
