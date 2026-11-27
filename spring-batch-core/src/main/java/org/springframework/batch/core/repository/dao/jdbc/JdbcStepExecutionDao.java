@@ -25,6 +25,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.Nullable;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.job.JobExecution;
@@ -38,7 +39,6 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
-import org.jspecify.annotations.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -140,8 +140,10 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 
 	private int exitMessageLength = DEFAULT_EXIT_MESSAGE_LENGTH;
 
+	@SuppressWarnings("NullAway.Init")
 	private DataFieldMaxValueIncrementer stepExecutionIncrementer;
 
+	@SuppressWarnings("NullAway.Init")
 	private JdbcJobExecutionDao jobExecutionDao;
 
 	private final Lock lock = new ReentrantLock();
@@ -175,8 +177,8 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
-		Assert.state(stepExecutionIncrementer != null, "StepExecutionIncrementer cannot be null.");
-		Assert.state(jobExecutionDao != null, "JobExecutionDao cannot be null.");
+		Assert.notNull(stepExecutionIncrementer, "StepExecutionIncrementer cannot be null.");
+		Assert.notNull(jobExecutionDao, "JobExecutionDao cannot be null.");
 	}
 
 	public StepExecution createStepExecution(String stepName, JobExecution jobExecution) {
@@ -283,7 +285,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 	 * @return truncated description
 	 */
 	private String truncateExitDescription(String description) {
-		if (description != null && description.length() > exitMessageLength) {
+		if (description.length() > exitMessageLength) {
 			if (logger.isDebugEnabled()) {
 				logger.debug(
 						"Truncating long message before update of StepExecution, original message is: " + description);
@@ -296,9 +298,10 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 	}
 
 	@Override
-	@Nullable public StepExecution getStepExecution(long stepExecutionId) {
+	public @Nullable StepExecution getStepExecution(long stepExecutionId) {
 		long jobExecutionId = getJobExecutionId(stepExecutionId);
 		JobExecution jobExecution = this.jobExecutionDao.getJobExecution(jobExecutionId);
+		Assert.notNull(jobExecution, "JobExecution is required");
 		return getStepExecution(jobExecution, stepExecutionId);
 	}
 
@@ -310,9 +313,8 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 	}
 
 	@Override
-	@Nullable
 	@Deprecated(since = "6.0", forRemoval = true)
-	public StepExecution getStepExecution(JobExecution jobExecution, long stepExecutionId) {
+	public @Nullable StepExecution getStepExecution(JobExecution jobExecution, long stepExecutionId) {
 		List<StepExecution> executions = getJdbcClient().sql(getQuery(GET_STEP_EXECUTION))
 			.param("stepExecutionId", stepExecutionId)
 			.query(new StepExecutionRowMapper())
@@ -347,29 +349,27 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 			});
 	}
 
-	@Nullable
 	@Override
-	public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
+	public @Nullable StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
 		// both halves of the joined row are mapped while the result set is open, so that
 		// they can be assembled once it is closed
 		record JoinedRow(StepExecutionRow stepExecutionRow, JobExecutionRow jobExecutionRow) {
 		}
 
-		JoinedRow row = getJdbcClient().sql(getQuery(GET_LAST_STEP_EXECUTION))
+		return getJdbcClient().sql(getQuery(GET_LAST_STEP_EXECUTION))
 			.param("jobInstanceId", jobInstance.getId())
 			.param("stepName", stepName)
 			.withMaxRows(1)
 			.query((rs, rowNum) -> new JoinedRow(new StepExecutionRowMapper().mapRow(rs, rowNum),
 					new JobExecutionRowMapper("JE_").mapRow(rs, rowNum)))
 			.optional()
+			.map(row -> {
+				JobExecutionRow jobExecutionRow = row.jobExecutionRow();
+				JobExecution jobExecution = jobExecutionRow.toJobExecution(jobInstance,
+						jobExecutionDao.getJobParameters(jobExecutionRow.jobExecutionId()));
+				return row.stepExecutionRow().toStepExecution(jobExecution);
+			})
 			.orElse(null);
-		if (row == null) {
-			return null;
-		}
-		JobExecutionRow jobExecutionRow = row.jobExecutionRow();
-		JobExecution jobExecution = jobExecutionRow.toJobExecution(jobInstance,
-				jobExecutionDao.getJobParameters(jobExecutionRow.jobExecutionId()));
-		return row.stepExecutionRow().toStepExecution(jobExecution);
 	}
 
 	/**

@@ -20,6 +20,8 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
+import org.jspecify.annotations.NullUnmarked;
+
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.JobExecution;
@@ -52,6 +54,7 @@ import org.springframework.jdbc.core.RowMapper;
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  */
+@NullUnmarked
 class JobExecutionRowMapper implements RowMapper<JobExecutionRowMapper.JobExecutionRow> {
 
 	private final String columnPrefix;
