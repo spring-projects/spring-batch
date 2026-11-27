@@ -92,7 +92,7 @@ public class SimpleMailMessageItemWriter implements ItemWriter<SimpleMailMessage
 	@Override
 	public void write(Chunk<? extends SimpleMailMessage> chunk) throws MailException {
 		try {
-			mailSender.send(chunk.getItems().toArray(new SimpleMailMessage[chunk.size()]));
+			mailSender.send(chunk.getItems().toArray(new SimpleMailMessage[0]));
 		}
 		catch (MailSendException e) {
 			Map<Object, Exception> failedMessages = e.getFailedMessages();
