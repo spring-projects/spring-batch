@@ -408,3 +408,13 @@ about indexing:
 |`BATCH_STEP_EXECUTION`|`STEP_NAME = ? and JOB_EXECUTION_ID = ?`|Before each step execution
 
 |===============
+
+[NOTE]
+====
+When using Oracle with `SERIALIZABLE` transactions, review the `INITRANS` setting of the
+metadata tables with your database administrator. This setting reserves space in each data
+block for transaction entries. Oracle requires a value of at least `3` for this isolation
+level and recommends higher values when many transactions update the same blocks.
+The sample Oracle DDL does not set `INITRANS`, so you may need to customize it for your
+workload. See https://docs.oracle.com/en/database/oracle/oracle-database/19/adfns/sql-processing-for-application-developers.html#GUID-E79D04D4-6543-49B3-BAEB-D6585EE67AD7[Oracle's guidance on setting isolation levels].
+====
