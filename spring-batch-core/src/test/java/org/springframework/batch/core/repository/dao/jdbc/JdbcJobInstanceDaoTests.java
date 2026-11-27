@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.repository.dao.jdbc;
 
+import org.junit.jupiter.api.AfterEach;
 import org.springframework.batch.infrastructure.support.DatabaseType;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -47,25 +48,33 @@ public class JdbcJobInstanceDaoTests {
 
 	JdbcTemplate jdbcTemplate;
 
+	private EmbeddedDatabase database;
+
 	@BeforeEach
 	void setup() throws Exception {
-		EmbeddedDatabase database = new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2)
+		database = new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2)
 			.addScript(DatabaseType.H2.getProductSchemaDrop())
 			.addScript(DatabaseType.H2.getProductSchema())
 			.build();
 		jdbcTemplate = new JdbcTemplate(database);
-		jdbcJobInstanceDao = new JdbcJobInstanceDao(JdbcClient.create(jdbcTemplate));
+		JdbcClient jdbcClient = JdbcClient.create(jdbcTemplate);
+		jdbcJobInstanceDao = new JdbcJobInstanceDao(jdbcClient);
 		H2SequenceMaxValueIncrementer jobInstanceIncrementer = new H2SequenceMaxValueIncrementer(database,
 				"BATCH_JOB_INSTANCE_SEQ");
 		jdbcJobInstanceDao.setJobInstanceIncrementer(jobInstanceIncrementer);
 		jdbcJobInstanceDao.afterPropertiesSet();
 
-		jdbcJobExecutionDao = new JdbcJobExecutionDao(JdbcClient.create(jdbcTemplate));
+		jdbcJobExecutionDao = new JdbcJobExecutionDao(jdbcClient);
 		H2SequenceMaxValueIncrementer jobExecutionIncrementer = new H2SequenceMaxValueIncrementer(database,
 				"BATCH_JOB_EXECUTION_SEQ");
 		jdbcJobExecutionDao.setJobExecutionIncrementer(jobExecutionIncrementer);
 		jdbcJobExecutionDao.setJobInstanceDao(jdbcJobInstanceDao);
 		jdbcJobExecutionDao.afterPropertiesSet();
+	}
+
+	@AfterEach
+	void teardown() {
+		database.shutdown();
 	}
 
 	@Test
