@@ -30,6 +30,8 @@ import tools.jackson.databind.jsontype.PolymorphicTypeValidator;
 import org.springframework.batch.core.job.parameters.JobParameter;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
+import tools.jackson.databind.type.MapType;
+import tools.jackson.databind.type.TypeFactory;
 
 /**
  * An {@link ExecutionContextSerializer} that uses Jackson 3 to serialize/deserialize the
@@ -57,6 +59,8 @@ public class JacksonExecutionContextStringSerializer implements ExecutionContext
 		.build();
 
 	private final JsonMapper jsonMapper;
+
+	private final MapType mapType;
 
 	/**
 	 * Create a new {@link JacksonExecutionContextStringSerializer} with default
@@ -86,13 +90,14 @@ public class JacksonExecutionContextStringSerializer implements ExecutionContext
 	 */
 	public JacksonExecutionContextStringSerializer(JsonMapper jsonMapper) {
 		this.jsonMapper = jsonMapper;
+		TypeFactory typeFactory = jsonMapper.getTypeFactory();
+		this.mapType = typeFactory.constructMapType(HashMap.class, String.class, Object.class);
+
 	}
 
 	@Override
 	public Map<String, Object> deserialize(InputStream inputStream) throws IOException {
-		TypeReference<HashMap<String, Object>> typeRef = new TypeReference<>() {
-		};
-		return this.jsonMapper.readValue(inputStream, typeRef);
+		return this.jsonMapper.readValue(inputStream, this.mapType);
 	}
 
 	@Override

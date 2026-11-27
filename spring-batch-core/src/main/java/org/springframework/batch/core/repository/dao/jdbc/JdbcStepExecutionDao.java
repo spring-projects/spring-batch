@@ -146,6 +146,8 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 
 	private final Lock lock = new ReentrantLock();
 
+	private final List<String> runningStatuses;
+
 	/**
 	 * Create a new {@link JdbcStepExecutionDao}.
 	 * @param jdbcClient the client to use to interact with the batch metadata tables
@@ -153,6 +155,10 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 	 */
 	public JdbcStepExecutionDao(JdbcClient jdbcClient) {
 		super(jdbcClient);
+		this.runningStatuses = Arrays.stream(BatchStatus.values())
+			.filter(BatchStatus::isRunning)
+			.map(BatchStatus::name)
+			.toList();
 	}
 
 	/**
@@ -393,10 +399,6 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 
 	@Override
 	public long countRunningStepExecutions(Collection<Long> stepExecutionIds) {
-		List<String> runningStatuses = Arrays.stream(BatchStatus.values())
-			.filter(BatchStatus::isRunning)
-			.map(BatchStatus::name)
-			.toList();
 		long count = 0;
 		Iterator<Long> ids = stepExecutionIds.iterator();
 		while (ids.hasNext()) {
@@ -406,7 +408,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 			}
 			count += getJdbcClient().sql(getQuery(COUNT_STEP_EXECUTIONS_BY_IDS_AND_STATUSES))
 				.param("stepExecutionIds", chunk)
-				.param("statuses", runningStatuses)
+				.param("statuses", this.runningStatuses)
 				.query(Long.class)
 				.single();
 		}
