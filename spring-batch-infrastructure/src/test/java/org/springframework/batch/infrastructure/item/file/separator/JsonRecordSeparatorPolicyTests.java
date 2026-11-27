@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2022 the original author or authors.
+ * Copyright 2009-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,48 @@ class JsonRecordSeparatorPolicyTests {
 	void testNestedObject() {
 		assertFalse(policy.isEndOfRecord("{\"a\": {\"b\": 2}"));
 		assertTrue(policy.isEndOfRecord("{\"a\": {\"b\": 2}} "));
+	}
+
+	@Test
+	void testBracesInStringValues() {
+		assertTrue(policy.isEndOfRecord("{\"a\":\"{\"}"));
+		assertTrue(policy.isEndOfRecord("{\"a\":\"}\"}"));
+	}
+
+	@Test
+	void testBracesInPropertyNames() {
+		assertTrue(policy.isEndOfRecord("{\"{\":\"value\"}"));
+		assertTrue(policy.isEndOfRecord("{\"}\":\"value\"}"));
+	}
+
+	@Test
+	void testNestedObjectWithBracesInString() {
+		assertFalse(policy.isEndOfRecord("{\"a\": {\"b\": \"}\"}"));
+		assertTrue(policy.isEndOfRecord("{\"a\": {\"b\": \"{\"}}"));
+	}
+
+	@Test
+	void testEscapedQuote() {
+		assertTrue(policy.isEndOfRecord("{\"a\":\"\\\"{\"}"));
+		assertTrue(policy.isEndOfRecord("{\"a\":\"\\\"}\"}"));
+	}
+
+	@Test
+	void testEscapedBackslash() {
+		assertTrue(policy.isEndOfRecord("{\"a\":\"\\\\\",\"b\":\"{\"}"));
+		assertFalse(policy.isEndOfRecord("{\"a\":\"\\\\\",\"b\":{\"c\":\"value\"}"));
+	}
+
+	@Test
+	void testUnterminatedString() {
+		assertFalse(policy.isEndOfRecord("{\"a\":\"}"));
+	}
+
+	@Test
+	void testNullAndEmptyInput() {
+		assertFalse(policy.isEndOfRecord(null));
+		assertFalse(policy.isEndOfRecord(""));
+		assertTrue(policy.isEndOfRecord("{}"));
 	}
 
 }
