@@ -77,6 +77,7 @@ import org.springframework.util.Assert;
  * @author Jimmy Praet
  * @author Duyeor Kim
  * @author WooSeung Kim
+ * @author Jinhui Kim
  * @since 2.0
  */
 public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> implements InitializingBean {
@@ -325,7 +326,67 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 		return parameterList;
 	}
 
+	/**
+	 * The result set column label of a sort key, and whether the sort key named that
+	 * column with an ANSI double-quoted identifier.
+	 *
+	 * @param label the column label, with identifier quoting removed
+	 * @param quoted whether the last identifier of the sort key was quoted
+	 * @param plain whether the sort key is the column label itself, without quoting or a
+	 * qualifier
+	 */
+	record SortKeyLabel(String label, boolean quoted, boolean plain) {
+	}
+
+	/**
+	 * Return the column label of the last identifier in the given sort key, dropping
+	 * identifier quoting. For example both {@code "A"} and {@code t."A"} yield the label
+	 * {@code A}, the first as a quoted key. Leading and trailing spaces on the sort key
+	 * are ignored, while spaces inside a quoted identifier are preserved. Only ANSI
+	 * double quotes ({@code "}) delimit an identifier: identifiers quoted with backticks
+	 * or brackets are out of scope, because those databases may still compare them case
+	 * insensitively.
+	 * @param key the configured sort key
+	 * @return the column label of the sort key
+	 */
+	static SortKeyLabel getSortKeyLabel(String key) {
+		String trimmedKey = key.trim();
+		StringBuilder label = new StringBuilder();
+		boolean inQuotedIdentifier = false;
+		boolean quoted = false;
+		for (int i = 0; i < trimmedKey.length(); i++) {
+			char c = trimmedKey.charAt(i);
+			if (c == '"') {
+				if (inQuotedIdentifier && i + 1 < trimmedKey.length() && trimmedKey.charAt(i + 1) == '"') {
+					// Escaped double quote inside a delimited identifier
+					label.append('"');
+					i++;
+				}
+				else {
+					inQuotedIdentifier = !inQuotedIdentifier;
+					if (inQuotedIdentifier) {
+						quoted = true;
+					}
+				}
+			}
+			else if (c == '.' && !inQuotedIdentifier) {
+				// Start a new identifier segment
+				label.setLength(0);
+				quoted = false;
+			}
+			else {
+				label.append(c);
+			}
+		}
+		String labelString = label.toString();
+		return new SortKeyLabel(labelString, quoted, labelString.equals(trimmedKey));
+	}
+
 	private class PagingRowMapper implements RowMapper<T> {
+
+		private static final int NOT_FOUND = -1;
+
+		private static final int AMBIGUOUS = -2;
 
 		private final Map<String, Integer> sortKeyColumns = new LinkedHashMap<>();
 
@@ -354,27 +415,47 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 				return rs.findColumn(key);
 			}
 			catch (SQLException original) {
-				int separator = key.lastIndexOf('.');
-				if (separator < 0) {
+				SortKeyLabel sortKeyLabel = getSortKeyLabel(key);
+				if (sortKeyLabel.plain()) {
+					// A plain label needs no metadata scan: findColumn already looked
+					// up exactly this label.
 					throw original;
 				}
-				String label = key.substring(separator + 1);
-				ResultSetMetaData metadata = rs.getMetaData();
-				int match = -1;
-				for (int i = 1; i <= metadata.getColumnCount(); i++) {
-					if (label.equalsIgnoreCase(JdbcUtils.lookupColumnName(metadata, i))) {
-						if (match != -1) {
-							// Do not silently choose between duplicate output labels.
-							throw original;
-						}
-						match = i;
-					}
-				}
-				if (match == -1) {
+				// The sort key is a SQL column reference (which may be quoted or
+				// qualified), while findColumn expects a result set column label.
+				// A quoted identifier is case sensitive, so it may only match the
+				// exact label; an unquoted key may match a unique label that differs
+				// in case. The single pass matters: an exact match tried first would
+				// let an unquoted key such as p.id bind to a quoted "id" column while
+				// the unquoted id column is also in the result set.
+				int column = findColumnIndex(rs, sortKeyLabel.label(), !sortKeyLabel.quoted());
+				if (column < 0) {
 					throw original;
 				}
-				return match;
+				return column;
 			}
+		}
+
+		/**
+		 * Return the index of the only column whose label matches the given label.
+		 * @return the column index, {@code NOT_FOUND} if no label matches, or
+		 * {@code AMBIGUOUS} if more than one label matches
+		 */
+		private int findColumnIndex(ResultSet rs, String label, boolean ignoreCase) throws SQLException {
+			ResultSetMetaData metadata = rs.getMetaData();
+			int match = NOT_FOUND;
+			for (int i = 1; i <= metadata.getColumnCount(); i++) {
+				String columnLabel = JdbcUtils.lookupColumnName(metadata, i);
+				boolean matches = ignoreCase ? label.equalsIgnoreCase(columnLabel) : label.equals(columnLabel);
+				if (matches) {
+					if (match != NOT_FOUND) {
+						// Do not silently choose between duplicate output labels.
+						return AMBIGUOUS;
+					}
+					match = i;
+				}
+			}
+			return match;
 		}
 
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2024 the original author or authors.
+ * Copyright 2006-present the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,6 +52,7 @@ import org.springframework.util.StringUtils;
  * @author Mahmoud Ben Hassine
  * @author Benjamin Hetz
  * @author Stefano Cordio
+ * @author Jinhui Kim
  * @since 2.0
  */
 public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvider {
@@ -162,12 +163,31 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 
 	/**
 	 * The sort key placeholder will vary depending on whether named parameters or
-	 * traditional placeholders are used in query strings.
+	 * traditional placeholders are used in query strings. A sort key can be a quoted or
+	 * qualified SQL column reference, such as {@code "A"} or {@code t."A"}. As the quote
+	 * characters are not valid in a plain named parameter, such a key is wrapped in the
+	 * {@code :{...}} form, in which the braces delimit the parameter name.
 	 * @return placeholder for sortKey.
 	 */
 	@Override
 	public String getSortKeyPlaceHolder(String keyName) {
-		return usingNamedParameters ? ":_" + keyName : "?";
+		if (!usingNamedParameters) {
+			return "?";
+		}
+		String parameterName = "_" + keyName;
+		// A sort key can be a quoted or qualified column reference (for example "A"
+		// or t."A"), which is not a valid unquoted named parameter name
+		return isPlainParameterName(parameterName) ? ":" + parameterName : ":{" + parameterName + "}";
+	}
+
+	private static boolean isPlainParameterName(String parameterName) {
+		for (int i = 0; i < parameterName.length(); i++) {
+			char c = parameterName.charAt(i);
+			if (!Character.isLetterOrDigit(c) && c != '_' && c != '.') {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	/**
