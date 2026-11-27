@@ -38,7 +38,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
+ * Sort keys that are column references, including qualified and quoted (delimited) ones.
+ * A quoted sort key reaches the upper case or mixed case column names of databases that
+ * use ANSI double quotes ({@code "}) to delimit identifiers, such as PostgreSQL, H2 and
+ * HSQLDB. Identifiers delimited with backticks or brackets are out of scope, because
+ * those databases may still compare quoted identifiers case insensitively.
+ *
  * @author Mahmoud Ben Hassine
+ * @author Jinhui Kim
  */
 class JdbcPagingItemReaderSortKeyTests {
 
@@ -53,10 +60,11 @@ class JdbcPagingItemReaderSortKeyTests {
 			.build();
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(this.dataSource);
 		jdbcTemplate.execute("SET MODE DB2");
-		jdbcTemplate.execute("CREATE TABLE records (id BIGINT PRIMARY KEY, group_id INTEGER)");
+		jdbcTemplate
+			.execute("CREATE TABLE records (id BIGINT PRIMARY KEY, group_id INTEGER, \"A\" BIGINT, \"group\" INTEGER)");
 		jdbcTemplate.execute("CREATE TABLE related (id BIGINT PRIMARY KEY)");
 		for (long id = 1; id <= 5; id++) {
-			jdbcTemplate.update("INSERT INTO records VALUES (?, ?)", id, (id - 1) / 2);
+			jdbcTemplate.update("INSERT INTO records VALUES (?, ?, ?, ?)", id, (id - 1) / 2, id, (id - 1) / 2);
 			jdbcTemplate.update("INSERT INTO related VALUES (?)", id + 100);
 		}
 	}
@@ -121,6 +129,24 @@ class JdbcPagingItemReaderSortKeyTests {
 	}
 
 	@Test
+	void rejectUnquotedSortKeyThatMatchesAQuotedColumn() throws Exception {
+		JdbcTemplate jdbcTemplate = new JdbcTemplate(this.dataSource);
+		jdbcTemplate.execute("ALTER TABLE records ADD COLUMN \"id\" BIGINT");
+		jdbcTemplate.update("UPDATE records SET \"id\" = \"A\" * 10");
+		// The result set holds the labels ID and id. An unquoted key must not bind to
+		// the quoted column, which would store its values as the restart checkpoint and
+		// skip rows 3 to 5 on the next page.
+		JdbcPagingItemReader<Long> reader = reader("p.id, p.\"id\"", FROM, Map.of("p.id", Order.ASCENDING), false);
+		try {
+			reader.open(new ExecutionContext());
+			assertThrows(BadSqlGrammarException.class, reader::read);
+		}
+		finally {
+			reader.close();
+		}
+	}
+
+	@Test
 	void rejectAmbiguousOutputLabels() throws Exception {
 		JdbcPagingItemReader<Long> reader = reader("p.id, r.id", FROM, Map.of("r.id", Order.ASCENDING), false);
 		try {
@@ -135,6 +161,86 @@ class JdbcPagingItemReaderSortKeyTests {
 	@Test
 	void rejectMissingUnqualifiedOutputLabel() throws Exception {
 		JdbcPagingItemReader<Long> reader = reader("p.group_id", "records p", Map.of("id", Order.ASCENDING), false);
+		try {
+			reader.open(new ExecutionContext());
+			assertThrows(BadSqlGrammarException.class, reader::read);
+		}
+		finally {
+			reader.close();
+		}
+	}
+
+	@ParameterizedTest
+	@ValueSource(booleans = { true, false })
+	void readWithQuotedSortKey(boolean namedParameters) throws Exception {
+		JdbcPagingItemReader<Long> reader = reader("\"A\", \"group\"", FROM, Map.of("\"A\"", Order.ASCENDING),
+				namedParameters);
+
+		assertEquals(List.of(1L, 2L, 3L, 4L, 5L), readAll(reader, new ExecutionContext()));
+	}
+
+	@ParameterizedTest
+	@ValueSource(booleans = { true, false })
+	void restartWithQualifiedQuotedSortKey(boolean namedParameters) throws Exception {
+		assertRestart("p.\"A\", p.\"group\"", Map.of("p.\"A\"", Order.ASCENDING), namedParameters, List.of(1L, 2L),
+				List.of(3L, 4L, 5L), Map.of("p.\"A\"", 2L));
+	}
+
+	@ParameterizedTest
+	@ValueSource(booleans = { true, false })
+	void restartWithCompositeQuotedSortKeys(boolean namedParameters) throws Exception {
+		Map<String, Order> sortKeys = new LinkedHashMap<>();
+		sortKeys.put("\"group\"", Order.ASCENDING);
+		sortKeys.put("\"A\"", Order.DESCENDING);
+
+		assertRestart("\"A\", \"group\"", sortKeys, namedParameters, List.of(2L, 1L), List.of(4L, 3L, 5L),
+				Map.of("\"group\"", 0, "\"A\"", 1L));
+	}
+
+	@Test
+	void readWithQuotedSortKeyContainingSpaces() throws Exception {
+		JdbcTemplate jdbcTemplate = new JdbcTemplate(this.dataSource);
+		jdbcTemplate.execute("ALTER TABLE records ADD COLUMN \" A \" BIGINT");
+		jdbcTemplate.update("UPDATE records SET \" A \" = \"A\" * 10");
+		JdbcPagingItemReader<Long> reader = reader("\" A \"", FROM, Map.of("\" A \"", Order.ASCENDING), false);
+
+		assertEquals(List.of(10L, 20L, 30L, 40L, 50L), readAll(reader, new ExecutionContext()));
+	}
+
+	@Test
+	void preferExactLabelOverLabelDifferingOnlyInCase() throws Exception {
+		JdbcTemplate jdbcTemplate = new JdbcTemplate(this.dataSource);
+		jdbcTemplate.execute("ALTER TABLE records ADD COLUMN \"a\" BIGINT");
+		jdbcTemplate.update("UPDATE records SET \"a\" = \"A\" * 100");
+		JdbcPagingItemReader<Long> reader = reader("\"A\", \"a\"", FROM, Map.of("\"A\"", Order.ASCENDING), false);
+
+		assertEquals(List.of(1L, 2L, 3L, 4L, 5L), readAll(reader, new ExecutionContext()));
+	}
+
+	@Test
+	void rejectQuotedSortKeyThatOnlyMatchesAnotherColumnInCase() throws Exception {
+		JdbcTemplate jdbcTemplate = new JdbcTemplate(this.dataSource);
+		jdbcTemplate.execute("ALTER TABLE records ADD COLUMN \"a\" BIGINT");
+		jdbcTemplate.update("UPDATE records SET \"a\" = \"A\" * 100");
+		// "a" is a different column: a quoted sort key that is missing from the select
+		// clause must not fall back to it, which would silently store the wrong values
+		// as the restart checkpoint.
+		JdbcPagingItemReader<Long> reader = reader("\"a\"", FROM, Map.of("\"A\"", Order.ASCENDING), false);
+		try {
+			reader.open(new ExecutionContext());
+			assertThrows(BadSqlGrammarException.class, reader::read);
+		}
+		finally {
+			reader.close();
+		}
+	}
+
+	@Test
+	void rejectAmbiguousQuotedOutputLabels() throws Exception {
+		// Both sides of the join output a column labeled A, so the guard must reject the
+		// sort key instead of silently picking one of them.
+		JdbcPagingItemReader<Long> reader = reader("p.\"A\", q.\"A\"", "records p, records q",
+				Map.of("p.\"A\"", Order.ASCENDING), false);
 		try {
 			reader.open(new ExecutionContext());
 			assertThrows(BadSqlGrammarException.class, reader::read);
