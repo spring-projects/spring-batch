@@ -96,7 +96,7 @@ public class JobRepositoryTestUtils {
 	public List<JobExecution> createJobExecutions(String jobName, String[] stepNames, int count)
 			throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
 		List<JobExecution> list = new ArrayList<>();
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		JobInstance jobInstance = jobRepository.createJobInstance(jobName, jobParameters);
 		for (int i = 0; i < count; i++) {
 			JobParameters nextJobParameters = jobParametersIncrementer.getNext(jobParameters);

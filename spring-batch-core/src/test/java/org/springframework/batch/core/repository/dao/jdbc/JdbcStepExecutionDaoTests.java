@@ -83,7 +83,7 @@ class JdbcStepExecutionDaoTests {
 	@Test
 	void testCreateStepExecution() {
 		// given
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		JobInstance jobInstance = jdbcJobInstanceDao.createJobInstance("job", jobParameters);
 		JobExecution jobExecution = jdbcJobExecutionDao.createJobExecution(jobInstance, jobParameters);
 
@@ -111,7 +111,7 @@ class JdbcStepExecutionDaoTests {
 
 		ExitStatus exitStatus = ExitStatus.FAILED.addExitDescription(longDescription);
 
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		JobInstance jobInstance = jdbcJobInstanceDao.createJobInstance("job", jobParameters);
 		JobExecution jobExecution = jdbcJobExecutionDao.createJobExecution(jobInstance, jobParameters);
 
@@ -133,7 +133,7 @@ class JdbcStepExecutionDaoTests {
 	@Test
 	void testCountStepExecutions() {
 		// Given
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		JobInstance jobInstance = jdbcJobInstanceDao.createJobInstance("job", jobParameters);
 		JobExecution jobExecution = jdbcJobExecutionDao.createJobExecution(jobInstance, jobParameters);
 		jdbcStepExecutionDao.createStepExecution("step1", jobExecution);
@@ -150,7 +150,7 @@ class JdbcStepExecutionDaoTests {
 	@Test
 	void testCountRunningStepExecutions() {
 		// given
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		JobInstance jobInstance = jdbcJobInstanceDao.createJobInstance("job", jobParameters);
 		JobExecution jobExecution = jdbcJobExecutionDao.createJobExecution(jobInstance, jobParameters);
 		List<Long> ids = new ArrayList<>();
@@ -179,7 +179,7 @@ class JdbcStepExecutionDaoTests {
 	@Test
 	void testCountRunningStepExecutionsWithMoreIdsThanTheInClauseLimit() {
 		// given
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		JobInstance jobInstance = jdbcJobInstanceDao.createJobInstance("job", jobParameters);
 		JobExecution jobExecution = jdbcJobExecutionDao.createJobExecution(jobInstance, jobParameters);
 		int total = 1200;
@@ -204,7 +204,7 @@ class JdbcStepExecutionDaoTests {
 	@Test
 	void testDeleteStepExecution() {
 		// Given
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		JobInstance jobInstance = jdbcJobInstanceDao.createJobInstance("job", jobParameters);
 		JobExecution jobExecution = jdbcJobExecutionDao.createJobExecution(jobInstance, jobParameters);
 		StepExecution stepExecution = jdbcStepExecutionDao.createStepExecution("step", jobExecution);

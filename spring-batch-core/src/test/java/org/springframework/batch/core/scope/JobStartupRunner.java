@@ -31,7 +31,7 @@ public class JobStartupRunner implements InitializingBean {
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		JobExecution jobExecution = new JobExecution(11L, new JobInstance(11L, "test"), new JobParameters());
+		JobExecution jobExecution = new JobExecution(11L, new JobInstance(11L, "test"), JobParameters.EMPTY);
 		job.execute(jobExecution);
 		// expect no errors
 	}

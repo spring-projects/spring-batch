@@ -61,7 +61,7 @@ class StepScopeDestructionCallbackIntegrationTests {
 	void testDisposableScopedProxy() throws Exception {
 		assertNotNull(proxied);
 		JobInstance jobInstance = new JobInstance(0L, "job");
-		JobExecution jobExecution = new JobExecution(0L, jobInstance, new JobParameters());
+		JobExecution jobExecution = new JobExecution(0L, jobInstance, JobParameters.EMPTY);
 		StepExecution step = new StepExecution(1L, "step", jobExecution);
 		proxied.execute(step);
 		assertEquals(1, StringUtils.countOccurrencesOf(TestDisposableCollaborator.message, "destroyed"));
@@ -71,7 +71,7 @@ class StepScopeDestructionCallbackIntegrationTests {
 	void testDisposableInnerScopedProxy() throws Exception {
 		assertNotNull(nested);
 		JobInstance jobInstance = new JobInstance(0L, "job");
-		JobExecution jobExecution = new JobExecution(0L, jobInstance, new JobParameters());
+		JobExecution jobExecution = new JobExecution(0L, jobInstance, JobParameters.EMPTY);
 		StepExecution step = new StepExecution(1L, "step", jobExecution);
 		nested.execute(step);
 		assertEquals(1, StringUtils.countOccurrencesOf(TestDisposableCollaborator.message, "destroyed"));
@@ -81,7 +81,7 @@ class StepScopeDestructionCallbackIntegrationTests {
 	void testProxiedScopedProxy() throws Exception {
 		assertNotNull(nested);
 		JobInstance jobInstance = new JobInstance(0L, "job");
-		JobExecution jobExecution = new JobExecution(0L, jobInstance, new JobParameters());
+		JobExecution jobExecution = new JobExecution(0L, jobInstance, JobParameters.EMPTY);
 		StepExecution step = new StepExecution(1L, "step", jobExecution);
 		nested.execute(step);
 		assertEquals(4, TestAdvice.names.size());
@@ -93,7 +93,7 @@ class StepScopeDestructionCallbackIntegrationTests {
 	void testRefScopedProxy() throws Exception {
 		assertNotNull(ref);
 		JobInstance jobInstance = new JobInstance(0L, "job");
-		JobExecution jobExecution = new JobExecution(0L, jobInstance, new JobParameters());
+		JobExecution jobExecution = new JobExecution(0L, jobInstance, JobParameters.EMPTY);
 		StepExecution step = new StepExecution(1L, "step", jobExecution);
 		ref.execute(step);
 		assertEquals(4, TestAdvice.names.size());

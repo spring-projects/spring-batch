@@ -81,7 +81,7 @@ class SimpleJobTests {
 
 	private StubStep step2;
 
-	private final JobParameters jobParameters = new JobParameters();
+	private final JobParameters jobParameters = JobParameters.EMPTY;
 
 	private SimpleJob job;
 
@@ -372,7 +372,7 @@ class SimpleJobTests {
 		Throwable e = jobExecution.getAllFailureExceptions().get(0);
 		assertSame(exception, e);
 
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		JobInstance jobInstance = jobRepository.createJobInstance(job.getName(), jobParameters);
 		jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters, new ExecutionContext());
 		job.execute(jobExecution);
@@ -419,7 +419,7 @@ class SimpleJobTests {
 
 		assertFalse(jobExecution.getExecutionContext().isEmpty());
 
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		JobInstance jobInstance = jobRepository.createJobInstance(job.getName(), jobParameters);
 		jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters, new ExecutionContext());
 

@@ -77,7 +77,7 @@ public class JdbcJobExecutionDaoTests {
 	@Test
 	void testCreateJobExecution() {
 		// given
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		JobInstance jobInstance = jdbcJobInstanceDao.createJobInstance("job", jobParameters);
 
 		// when
@@ -94,7 +94,7 @@ public class JdbcJobExecutionDaoTests {
 	@Test
 	void testDeleteJobExecution() {
 		// given
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		JobInstance jobInstance = jdbcJobInstanceDao.createJobInstance("job", jobParameters);
 		JobExecution jobExecution = jdbcJobExecutionDao.createJobExecution(jobInstance, jobParameters);
 
@@ -207,7 +207,7 @@ public class JdbcJobExecutionDaoTests {
 	@Test
 	void testUpdateJobExecutionWhenRowNoLongerExists() {
 		// given
-		JobParameters jobParameters = new JobParameters();
+		JobParameters jobParameters = JobParameters.EMPTY;
 		JobInstance jobInstance = jdbcJobInstanceDao.createJobInstance("job", jobParameters);
 		JobExecution jobExecution = jdbcJobExecutionDao.createJobExecution(jobInstance, jobParameters);
 		jdbcTemplate.update("DELETE FROM BATCH_JOB_EXECUTION WHERE JOB_EXECUTION_ID = ?", jobExecution.getId());
@@ -226,7 +226,7 @@ public class JdbcJobExecutionDaoTests {
 				new JobParametersBuilder().addString("name", "foo").toJobParameters());
 		JobExecution second = jdbcJobExecutionDao.createJobExecution(jobInstance,
 				new JobParametersBuilder().addString("name", "bar").addLong("run", 2L).toJobParameters());
-		JobExecution third = jdbcJobExecutionDao.createJobExecution(jobInstance, new JobParameters());
+		JobExecution third = jdbcJobExecutionDao.createJobExecution(jobInstance, JobParameters.EMPTY);
 
 		// when
 		List<JobExecution> jobExecutions = jdbcJobExecutionDao.findJobExecutions(jobInstance);

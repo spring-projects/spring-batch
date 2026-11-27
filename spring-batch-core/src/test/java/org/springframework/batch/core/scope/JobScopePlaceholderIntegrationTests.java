@@ -88,7 +88,7 @@ class JobScopePlaceholderIntegrationTests implements BeanFactoryAware {
 
 		JobSynchronizationManager.close();
 		JobInstance jobInstance = new JobInstance(1L, "foo");
-		jobExecution = new JobExecution(123L, jobInstance, new JobParameters());
+		jobExecution = new JobExecution(123L, jobInstance, JobParameters.EMPTY);
 
 		ExecutionContext executionContext = new ExecutionContext();
 		executionContext.put("foo", foo);
@@ -129,7 +129,7 @@ class JobScopePlaceholderIntegrationTests implements BeanFactoryAware {
 
 		JobSynchronizationManager.close();
 		JobInstance jobInstance = new JobInstance(1L, "foo");
-		jobExecution = new JobExecution(123L, jobInstance, new JobParameters());
+		jobExecution = new JobExecution(123L, jobInstance, JobParameters.EMPTY);
 
 		ExecutionContext executionContext = new ExecutionContext();
 		executionContext.put("foo", "spam");

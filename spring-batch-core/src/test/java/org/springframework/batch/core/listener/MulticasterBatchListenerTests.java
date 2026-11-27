@@ -62,7 +62,7 @@ class MulticasterBatchListenerTests {
 	@Test
 	void testSetListeners() {
 		JobInstance jobInstance = new JobInstance(1L, "job");
-		JobExecution jobExecution = new JobExecution(1L, jobInstance, new JobParameters());
+		JobExecution jobExecution = new JobExecution(1L, jobInstance, JobParameters.EMPTY);
 		StepExecution stepExecution = new StepExecution("s1", jobExecution);
 		multicast.setListeners(Arrays.asList(new StepListenerSupport<Integer, String>() {
 
@@ -85,7 +85,7 @@ class MulticasterBatchListenerTests {
 	@Test
 	void testRegister() {
 		JobInstance jobInstance = new JobInstance(1L, "job");
-		JobExecution jobExecution = new JobExecution(1L, jobInstance, new JobParameters());
+		JobExecution jobExecution = new JobExecution(1L, jobInstance, JobParameters.EMPTY);
 		StepExecution stepExecution = new StepExecution("s1", jobExecution);
 		multicast.register(new StepListenerSupport<Integer, String>() {
 

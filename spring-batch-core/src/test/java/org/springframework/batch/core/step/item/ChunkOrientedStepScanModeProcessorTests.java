@@ -310,7 +310,7 @@ class ChunkOrientedStepScanModeProcessorTests {
 		JobRepository jobRepository = jobRepository();
 		Job job = new JobBuilder("job", jobRepository).start(step).build();
 		JobOperator jobOperator = this.context.getBean(JobOperator.class);
-		return jobOperator.start(job, new JobParameters());
+		return jobOperator.start(job, JobParameters.EMPTY);
 	}
 
 	@Configuration

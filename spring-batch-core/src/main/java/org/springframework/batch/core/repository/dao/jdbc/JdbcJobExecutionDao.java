@@ -235,7 +235,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 				jobExecutionRows.stream().map(JobExecutionRow::jobExecutionId).toList());
 		return jobExecutionRows.stream()
 			.map(jobExecutionRow -> jobExecutionRow.toJobExecution(jobInstance,
-					jobParameters.getOrDefault(jobExecutionRow.jobExecutionId(), new JobParameters())))
+					jobParameters.getOrDefault(jobExecutionRow.jobExecutionId(), JobParameters.EMPTY)))
 			.toList();
 	}
 
