@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2025 the original author or authors.
+ * Copyright 2019-2026 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import java.util.Properties;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.common.TopicPartition;
 import org.jspecify.annotations.Nullable;
 
@@ -47,9 +48,31 @@ import org.springframework.util.Assert;
  * Since {@link KafkaConsumer} is not thread-safe, this reader is not thread-safe.
  * </p>
  *
+ * <p>
+ * <strong>Offsets.</strong> By default, a {@link KafkaConsumer} commits the offsets of
+ * the records it has polled ({@code enable.auto.commit=true}), which can be ahead of the
+ * records this reader has returned. To control the offsets stored in Kafka for the
+ * consumer group through this reader (for example, to continue from them with
+ * {@link #setPartitionOffsets(Map) an empty partition offsets map}), set
+ * {@code enable.auto.commit=false} in the consumer properties. In that case, while
+ * records from the current poll remain buffered, {@link #update(ExecutionContext)}
+ * commits only the offsets following the records returned by this reader. Once all
+ * records from the current poll have been returned, including after an empty poll, it
+ * commits the consumer positions. If no record has been returned, no offsets are
+ * committed before the reader has polled since it was opened.
+ * </p>
+ *
+ * <p>
+ * If an execution ends while records are still buffered and no offset has been committed
+ * for a partition, the next execution uses {@code auto.offset.reset} for that partition.
+ * With {@code auto.offset.reset=latest}, records arriving between executions can be
+ * skipped for that partition.
+ * </p>
+ *
  * @author Mathieu Ouellet
  * @author Mahmoud Ben Hassine
  * @author Hyunwoo Jung
+ * @author Cobi Eun
  * @since 4.2
  */
 public class KafkaItemReader<K, V> extends AbstractItemStreamItemReader<V> {
@@ -68,11 +91,15 @@ public class KafkaItemReader<K, V> extends AbstractItemStreamItemReader<V> {
 
 	private final Properties consumerProperties;
 
+	private final Map<TopicPartition, OffsetAndMetadata> offsetsToCommit = new HashMap<>();
+
 	private @Nullable Iterator<ConsumerRecord<K, V>> consumerRecords;
 
 	private Duration pollTimeout = Duration.ofSeconds(DEFAULT_POLL_TIMEOUT);
 
 	private boolean saveState = true;
+
+	private boolean polledSinceOpen;
 
 	/**
 	 * Create a new {@link KafkaItemReader}.
@@ -156,7 +183,8 @@ public class KafkaItemReader<K, V> extends AbstractItemStreamItemReader<V> {
 	 * Setter for partition offsets. This mapping tells the reader the offset to start
 	 * reading from in each partition. This is optional, defaults to starting from offset
 	 * 0 in each partition. Passing an empty map makes the reader start from the offset
-	 * stored in Kafka for the consumer group ID.
+	 * stored in Kafka for the consumer group ID. See the class-level documentation for
+	 * automatic commit configuration.
 	 *
 	 * <p>
 	 * <strong>In case of a restart, offsets stored in the execution context will take
@@ -171,6 +199,8 @@ public class KafkaItemReader<K, V> extends AbstractItemStreamItemReader<V> {
 	@SuppressWarnings({ "unchecked", "DataFlowIssue" })
 	@Override
 	public void open(ExecutionContext executionContext) {
+		this.offsetsToCommit.clear();
+		this.polledSinceOpen = false;
 		this.kafkaConsumer = new KafkaConsumer<>(this.consumerProperties);
 		if (this.partitionOffsets == null) {
 			this.partitionOffsets = new HashMap<>();
@@ -194,10 +224,14 @@ public class KafkaItemReader<K, V> extends AbstractItemStreamItemReader<V> {
 	public @Nullable V read() {
 		if (this.consumerRecords == null || !this.consumerRecords.hasNext()) {
 			this.consumerRecords = this.kafkaConsumer.poll(this.pollTimeout).iterator();
+			this.polledSinceOpen = true;
 		}
 		if (this.consumerRecords.hasNext()) {
 			ConsumerRecord<K, V> record = this.consumerRecords.next();
-			this.partitionOffsets.put(new TopicPartition(record.topic(), record.partition()), record.offset());
+			TopicPartition topicPartition = new TopicPartition(record.topic(), record.partition());
+			this.partitionOffsets.put(topicPartition, record.offset());
+			this.offsetsToCommit.put(topicPartition,
+					new OffsetAndMetadata(record.offset() + 1, record.leaderEpoch(), ""));
 			return record.value();
 		}
 		else {
@@ -215,7 +249,12 @@ public class KafkaItemReader<K, V> extends AbstractItemStreamItemReader<V> {
 			}
 			executionContext.put(TOPIC_PARTITION_OFFSETS, offsets);
 		}
-		this.kafkaConsumer.commitSync();
+		if (this.polledSinceOpen && this.consumerRecords != null && !this.consumerRecords.hasNext()) {
+			this.kafkaConsumer.commitSync();
+		}
+		else if (!this.offsetsToCommit.isEmpty()) {
+			this.kafkaConsumer.commitSync(this.offsetsToCommit);
+		}
 	}
 
 	@Override
