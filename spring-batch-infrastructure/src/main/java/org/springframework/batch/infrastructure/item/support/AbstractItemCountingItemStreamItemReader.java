@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2023 the original author or authors.
+ * Copyright 2006-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,7 @@ import org.springframework.util.Assert;
  * @author Robert Kasanicky
  * @author Glenn Renfro
  * @author Mahmoud Ben Hassine
+ * @author Jae Eok Lim
  */
 public abstract class AbstractItemCountingItemStreamItemReader<T> extends AbstractItemStreamItemReader<T> {
 
@@ -153,16 +154,12 @@ public abstract class AbstractItemCountingItemStreamItemReader<T> extends Abstra
 		catch (Exception e) {
 			throw new ItemStreamException("Failed to initialize the reader", e);
 		}
-		if (!isSaveState()) {
-			return;
-		}
-
-		if (executionContext.containsKey(getExecutionContextKey(READ_COUNT_MAX))) {
+		if (isSaveState() && executionContext.containsKey(getExecutionContextKey(READ_COUNT_MAX))) {
 			maxItemCount = executionContext.getInt(getExecutionContextKey(READ_COUNT_MAX));
 		}
 
 		int itemCount = 0;
-		if (executionContext.containsKey(getExecutionContextKey(READ_COUNT))) {
+		if (isSaveState() && executionContext.containsKey(getExecutionContextKey(READ_COUNT))) {
 			itemCount = executionContext.getInt(getExecutionContextKey(READ_COUNT));
 		}
 		else if (currentItemCount > 0) {
