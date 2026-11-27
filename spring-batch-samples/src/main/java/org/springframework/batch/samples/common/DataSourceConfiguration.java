@@ -22,12 +22,14 @@ import javax.sql.DataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.transaction.support.TransactionTemplate;
 
 /**
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  */
 @Configuration
 public class DataSourceConfiguration {
@@ -44,6 +46,11 @@ public class DataSourceConfiguration {
 	@Bean
 	public JdbcTemplate jdbcTemplate(DataSource dataSource) {
 		return new JdbcTemplate(dataSource);
+	}
+
+	@Bean
+	public JdbcClient jdbcClient(DataSource dataSource) {
+		return JdbcClient.create(dataSource);
 	}
 
 	@Bean

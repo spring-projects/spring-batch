@@ -29,9 +29,11 @@ import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.batch.test.sample.SampleTasklet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.jdbc.JdbcTestUtils;
+
+import javax.sql.DataSource;
 
 /**
  * This is an abstract test class.
@@ -44,7 +46,7 @@ import org.springframework.test.jdbc.JdbcTestUtils;
 abstract class AbstractSampleJobTests {
 
 	@Autowired
-	private JdbcTemplate jdbcTemplate;
+	private JdbcClient jdbcClient;
 
 	@Autowired
 	private JobLauncherTestUtils jobLauncherTestUtils;
@@ -55,13 +57,13 @@ abstract class AbstractSampleJobTests {
 
 	@BeforeEach
 	void setUp() {
-		this.jdbcTemplate.update("create table TESTS (ID integer, NAME varchar(40))");
+		jdbcClient.sql("create table TESTS (ID integer, NAME varchar(40))").update();
 		tasklet2.jobContextEntryFound = false;
 	}
 
 	@AfterEach
 	void tearDown() {
-		JdbcTestUtils.dropTables(this.jdbcTemplate, "TESTS");
+		JdbcTestUtils.dropTables(jdbcClient, "TESTS");
 	}
 
 	@Test
@@ -107,9 +109,9 @@ abstract class AbstractSampleJobTests {
 
 	private void verifyTasklet(int id) {
 		assertEquals(id,
-				jdbcTemplate
-					.queryForObject("SELECT ID from TESTS where NAME = 'SampleTasklet" + id + "'", Integer.class)
-					.intValue());
+				jdbcClient.sql("SELECT ID from TESTS where NAME = 'SampleTasklet" + id + "'")
+					.query(Integer.class)
+					.single());
 	}
 
 }

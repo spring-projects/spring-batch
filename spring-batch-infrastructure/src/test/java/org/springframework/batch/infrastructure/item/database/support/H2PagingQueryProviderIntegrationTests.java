@@ -27,8 +27,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
 import org.springframework.batch.infrastructure.item.database.Order;
-import org.springframework.batch.infrastructure.item.database.support.H2PagingQueryProvider;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -39,6 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 /**
  * @author Henning Pöttker
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  */
 class H2PagingQueryProviderIntegrationTests {
 
@@ -47,15 +47,15 @@ class H2PagingQueryProviderIntegrationTests {
 	void testQueryProvider(ModeEnum compatibilityMode) {
 		String connectionUrl = String.format("jdbc:h2:mem:%s;MODE=%s", UUID.randomUUID(), compatibilityMode);
 		DataSource dataSource = new SimpleDriverDataSource(new org.h2.Driver(), connectionUrl, "sa", "");
-		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+		JdbcClient jdbcClient = JdbcClient.create(dataSource);
 		PlatformTransactionManager transactionManager = new JdbcTransactionManager(dataSource);
 		TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
 
 		transactionTemplate.executeWithoutResult(status -> {
-			jdbcTemplate.execute("CREATE TABLE TEST_TABLE (ID BIGINT NOT NULL, STRING VARCHAR(16) NOT NULL)");
-			jdbcTemplate.execute("INSERT INTO TEST_TABLE (ID, STRING) VALUES (1, 'Spring')");
-			jdbcTemplate.execute("INSERT INTO TEST_TABLE (ID, STRING) VALUES (2, 'Batch')");
-			jdbcTemplate.execute("INSERT INTO TEST_TABLE (ID, STRING) VALUES (3, 'Infrastructure')");
+			jdbcClient.sql("CREATE TABLE TEST_TABLE (ID BIGINT NOT NULL, STRING VARCHAR(16) NOT NULL)").update();
+			jdbcClient.sql("INSERT INTO TEST_TABLE (ID, STRING) VALUES (1, 'Spring')").update();
+			jdbcClient.sql("INSERT INTO TEST_TABLE (ID, STRING) VALUES (2, 'Batch')").update();
+			jdbcClient.sql("INSERT INTO TEST_TABLE (ID, STRING) VALUES (3, 'Infrastructure')").update();
 
 			H2PagingQueryProvider queryProvider = new H2PagingQueryProvider();
 			queryProvider.setSelectClause("STRING");
@@ -64,11 +64,13 @@ class H2PagingQueryProviderIntegrationTests {
 			sortKeys.put("ID", Order.ASCENDING);
 			queryProvider.setSortKeys(sortKeys);
 
-			List<String> firstPage = jdbcTemplate.queryForList(queryProvider.generateFirstPageQuery(2), String.class);
+			List<String> firstPage = jdbcClient.sql(queryProvider.generateFirstPageQuery(2)).query(String.class).list();
 			assertArrayEquals(new String[] { "Spring", "Batch" }, firstPage.toArray(), "firstPage");
 
-			List<String> secondPage = jdbcTemplate.queryForList(queryProvider.generateRemainingPagesQuery(2),
-					String.class, 2);
+			List<String> secondPage = jdbcClient.sql(queryProvider.generateRemainingPagesQuery(2))
+				.param(1, 2)
+				.query(String.class)
+				.list();
 			assertArrayEquals(new String[] { "Infrastructure" }, secondPage.toArray(), "secondPage");
 		});
 	}

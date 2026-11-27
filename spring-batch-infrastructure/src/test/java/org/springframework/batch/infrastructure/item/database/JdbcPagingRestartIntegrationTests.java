@@ -39,7 +39,7 @@ import org.springframework.batch.infrastructure.item.ItemStream;
 import org.springframework.batch.infrastructure.item.database.support.SqlPagingQueryProviderFactoryBean;
 import org.springframework.batch.infrastructure.item.sample.Foo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
@@ -47,6 +47,7 @@ import org.springframework.test.jdbc.JdbcTestUtils;
  * @author Dave Syer
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  * @since 2.1
  */
 @SpringJUnitConfig(locations = "JdbcPagingItemReaderCommonTests-context.xml")
@@ -59,7 +60,7 @@ class JdbcPagingRestartIntegrationTests {
 
 	private int maxId;
 
-	private JdbcTemplate jdbcTemplate;
+	private JdbcClient jdbcClient;
 
 	private final int itemCount = 9;
 
@@ -67,18 +68,18 @@ class JdbcPagingRestartIntegrationTests {
 
 	@BeforeEach
 	void init() {
-		jdbcTemplate = new JdbcTemplate(dataSource);
-		maxId = jdbcTemplate.queryForObject("SELECT MAX(ID) from T_FOOS", Integer.class);
+		jdbcClient = JdbcClient.create(dataSource);
+		maxId = jdbcClient.sql("SELECT MAX(ID) from T_FOOS").query(Integer.class).single();
 		for (int i = itemCount; i > maxId; i--) {
-			jdbcTemplate.update("INSERT into T_FOOS (ID,NAME,VALUE) values (?, ?, ?)", i, "foo" + i, i);
+			jdbcClient.sql("INSERT into T_FOOS (ID,NAME,VALUE) values (?, ?, ?)").params(i, "foo" + i, i).update();
 		}
 
-		assertEquals(itemCount, JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_FOOS"));
+		assertEquals(itemCount, JdbcTestUtils.countRowsInTable(jdbcClient, "T_FOOS"));
 	}
 
 	@AfterEach
 	void destroy() {
-		jdbcTemplate.update("DELETE from T_FOOS where ID>?", maxId);
+		jdbcClient.sql("DELETE from T_FOOS where ID>?").params(maxId).update();
 	}
 
 	@Test
@@ -87,7 +88,7 @@ class JdbcPagingRestartIntegrationTests {
 
 		ItemReader<Foo> reader = getItemReader();
 
-		int total = JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_FOOS");
+		int total = JdbcTestUtils.countRowsInTable(jdbcClient, "T_FOOS");
 
 		ExecutionContext executionContext = new ExecutionContext();
 		((ItemStream) reader).open(executionContext);
@@ -110,7 +111,7 @@ class JdbcPagingRestartIntegrationTests {
 
 		ItemReader<Foo> reader = getItemReader();
 
-		int total = JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_FOOS");
+		int total = JdbcTestUtils.countRowsInTable(jdbcClient, "T_FOOS");
 		int count = (total / pageSize) * pageSize;
 		int pagesToRead = Math.min(3, total / pageSize);
 		if (count >= pagesToRead * pageSize) {
@@ -121,7 +122,9 @@ class JdbcPagingRestartIntegrationTests {
 		executionContext.putInt("JdbcPagingItemReader.read.count", count);
 		// Assume the primary keys are in order
 
-		List<Map<String, Object>> ids = jdbcTemplate.queryForList("SELECT ID,NAME FROM T_FOOS ORDER BY ID ASC");
+		List<Map<String, Object>> ids = jdbcClient.sql("SELECT ID,NAME FROM T_FOOS ORDER BY ID ASC")
+			.query()
+			.listOfRows();
 		logger.debug("Ids: " + ids);
 		int startAfterValue = Integer.parseInt(ids.get(count - 1).get("ID").toString());
 		logger.debug("Start after: " + startAfterValue);

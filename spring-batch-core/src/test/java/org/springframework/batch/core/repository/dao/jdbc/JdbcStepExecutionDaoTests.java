@@ -30,7 +30,6 @@ import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.batch.core.step.StepExecution;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
@@ -49,7 +48,7 @@ class JdbcStepExecutionDaoTests {
 
 	private JdbcJobInstanceDao jdbcJobInstanceDao;
 
-	private JdbcTemplate jdbcTemplate;
+	private JdbcClient jdbcClient;
 
 	@BeforeEach
 	void setup() throws Exception {
@@ -57,22 +56,22 @@ class JdbcStepExecutionDaoTests {
 			.addScript(DatabaseType.H2.getProductSchemaDrop())
 			.addScript(DatabaseType.H2.getProductSchema())
 			.build();
-		jdbcTemplate = new JdbcTemplate(database);
+		jdbcClient = JdbcClient.create(database);
 
-		jdbcJobInstanceDao = new JdbcJobInstanceDao(JdbcClient.create(jdbcTemplate));
+		jdbcJobInstanceDao = new JdbcJobInstanceDao(jdbcClient);
 		H2SequenceMaxValueIncrementer jobInstanceIncrementer = new H2SequenceMaxValueIncrementer(database,
 				"BATCH_JOB_INSTANCE_SEQ");
 		jdbcJobInstanceDao.setJobInstanceIncrementer(jobInstanceIncrementer);
 		jdbcJobInstanceDao.afterPropertiesSet();
 
-		jdbcJobExecutionDao = new JdbcJobExecutionDao(JdbcClient.create(jdbcTemplate));
+		jdbcJobExecutionDao = new JdbcJobExecutionDao(jdbcClient);
 		H2SequenceMaxValueIncrementer jobExecutionIncrementer = new H2SequenceMaxValueIncrementer(database,
 				"BATCH_JOB_EXECUTION_SEQ");
 		jdbcJobExecutionDao.setJobExecutionIncrementer(jobExecutionIncrementer);
 		jdbcJobExecutionDao.setJobInstanceDao(jdbcJobInstanceDao);
 		jdbcJobExecutionDao.afterPropertiesSet();
 
-		jdbcStepExecutionDao = new JdbcStepExecutionDao(JdbcClient.create(jdbcTemplate));
+		jdbcStepExecutionDao = new JdbcStepExecutionDao(jdbcClient);
 		H2SequenceMaxValueIncrementer stepExecutionIncrementer = new H2SequenceMaxValueIncrementer(database,
 				"BATCH_STEP_EXECUTION_SEQ");
 		jdbcStepExecutionDao.setStepExecutionIncrementer(stepExecutionIncrementer);
@@ -94,7 +93,7 @@ class JdbcStepExecutionDaoTests {
 		Assertions.assertNotNull(stepExecution);
 		assertEquals(1, stepExecution.getId());
 		assertEquals(jobExecution, stepExecution.getJobExecution());
-		int stepExecutionsCount = JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_STEP_EXECUTION");
+		int stepExecutionsCount = JdbcTestUtils.countRowsInTable(jdbcClient, "BATCH_STEP_EXECUTION");
 		assertEquals(1, stepExecutionsCount);
 	}
 
@@ -213,7 +212,7 @@ class JdbcStepExecutionDaoTests {
 		jdbcStepExecutionDao.deleteStepExecution(stepExecution);
 
 		// Then
-		Assertions.assertEquals(0, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_STEP_EXECUTION"));
+		Assertions.assertEquals(0, JdbcTestUtils.countRowsInTable(jdbcClient, "BATCH_STEP_EXECUTION"));
 	}
 
 	@Test

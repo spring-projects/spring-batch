@@ -31,7 +31,6 @@ import org.springframework.batch.core.job.JobInstance;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.dao.OptimisticLockingFailureException;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
@@ -42,6 +41,7 @@ import org.springframework.test.jdbc.JdbcTestUtils;
 /**
  * @author Parikshit Dutta
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  */
 public class JdbcJobExecutionDaoTests {
 
@@ -49,7 +49,7 @@ public class JdbcJobExecutionDaoTests {
 
 	private JdbcJobInstanceDao jdbcJobInstanceDao;
 
-	private JdbcTemplate jdbcTemplate;
+	private JdbcClient jdbcClient;
 
 	@BeforeEach
 	void setup() throws Exception {
@@ -57,15 +57,15 @@ public class JdbcJobExecutionDaoTests {
 			.addScript(DatabaseType.H2.getProductSchemaDrop())
 			.addScript(DatabaseType.H2.getProductSchema())
 			.build();
-		jdbcTemplate = new JdbcTemplate(database);
+		jdbcClient = JdbcClient.create(database);
 
-		jdbcJobInstanceDao = new JdbcJobInstanceDao(JdbcClient.create(jdbcTemplate));
+		jdbcJobInstanceDao = new JdbcJobInstanceDao(jdbcClient);
 		H2SequenceMaxValueIncrementer jobInstanceIncrementer = new H2SequenceMaxValueIncrementer(database,
 				"BATCH_JOB_INSTANCE_SEQ");
 		jdbcJobInstanceDao.setJobInstanceIncrementer(jobInstanceIncrementer);
 		jdbcJobInstanceDao.afterPropertiesSet();
 
-		jdbcJobExecutionDao = new JdbcJobExecutionDao(JdbcClient.create(jdbcTemplate));
+		jdbcJobExecutionDao = new JdbcJobExecutionDao(jdbcClient);
 		H2SequenceMaxValueIncrementer jobExecutionIncrementer = new H2SequenceMaxValueIncrementer(database,
 				"BATCH_JOB_EXECUTION_SEQ");
 		jdbcJobExecutionDao.setJobExecutionIncrementer(jobExecutionIncrementer);
@@ -87,7 +87,7 @@ public class JdbcJobExecutionDaoTests {
 		Assertions.assertNotNull(jobExecution);
 		Assertions.assertEquals(1, jobExecution.getId());
 		Assertions.assertEquals(jobInstance, jobExecution.getJobInstance());
-		int batchJobExecutionsCount = JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_EXECUTION");
+		int batchJobExecutionsCount = JdbcTestUtils.countRowsInTable(jdbcClient, "BATCH_JOB_EXECUTION");
 		Assertions.assertEquals(1, batchJobExecutionsCount);
 	}
 
@@ -102,7 +102,7 @@ public class JdbcJobExecutionDaoTests {
 		jdbcJobExecutionDao.deleteJobExecution(jobExecution);
 
 		// then
-		Assertions.assertEquals(0, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_EXECUTION"));
+		Assertions.assertEquals(0, JdbcTestUtils.countRowsInTable(jdbcClient, "BATCH_JOB_EXECUTION"));
 	}
 
 	@Test
@@ -116,7 +116,7 @@ public class JdbcJobExecutionDaoTests {
 		jdbcJobExecutionDao.deleteJobExecutionParameters(jobExecution);
 
 		// then
-		Assertions.assertEquals(0, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_EXECUTION_PARAMS"));
+		Assertions.assertEquals(0, JdbcTestUtils.countRowsInTable(jdbcClient, "BATCH_JOB_EXECUTION_PARAMS"));
 	}
 
 	@Test
@@ -144,6 +144,7 @@ public class JdbcJobExecutionDaoTests {
 		JobExecution retrieved = jdbcJobExecutionDao.getJobExecution(jobExecution.getId());
 
 		// then
+		Assertions.assertNotNull(retrieved);
 		JobParameters parameters = retrieved.getJobParameters();
 		Assertions.assertNotNull(parameters);
 		Assertions.assertEquals(dateParameter, parameters.getDate("date"));
@@ -210,7 +211,9 @@ public class JdbcJobExecutionDaoTests {
 		JobParameters jobParameters = new JobParameters();
 		JobInstance jobInstance = jdbcJobInstanceDao.createJobInstance("job", jobParameters);
 		JobExecution jobExecution = jdbcJobExecutionDao.createJobExecution(jobInstance, jobParameters);
-		jdbcTemplate.update("DELETE FROM BATCH_JOB_EXECUTION WHERE JOB_EXECUTION_ID = ?", jobExecution.getId());
+		jdbcClient.sql("DELETE FROM BATCH_JOB_EXECUTION WHERE JOB_EXECUTION_ID = ?")
+			.param(1, jobExecution.getId())
+			.update();
 
 		// when & then
 		Assertions.assertThrows(OptimisticLockingFailureException.class,

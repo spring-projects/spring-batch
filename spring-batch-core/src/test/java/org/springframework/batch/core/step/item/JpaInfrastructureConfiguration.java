@@ -23,6 +23,7 @@ import jakarta.persistence.EntityManagerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.orm.jpa.JpaTransactionManager;
@@ -34,6 +35,7 @@ import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
  * JPA batch infrastructure configuration for tests.
  *
  * @author Mahmoud Ben Hassine
+ * @author Yanming Zhou
  */
 @Configuration
 public class JpaInfrastructureConfiguration {
@@ -51,6 +53,11 @@ public class JpaInfrastructureConfiguration {
 	@Bean
 	public JdbcTemplate jdbcTemplate(DataSource dataSource) {
 		return new JdbcTemplate(dataSource);
+	}
+
+	@Bean
+	public JdbcClient jdbcClient(DataSource dataSource) {
+		return JdbcClient.create(dataSource);
 	}
 
 	@Bean

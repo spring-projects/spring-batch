@@ -27,7 +27,7 @@ import org.springframework.batch.infrastructure.item.Chunk;
 import org.springframework.batch.infrastructure.item.ItemReader;
 import org.springframework.batch.infrastructure.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.retry.RecoveryCallback;
 import org.springframework.retry.RetryCallback;
@@ -53,7 +53,7 @@ class ExternalRetryTests {
 	private ItemReader<String> provider;
 
 	@Autowired
-	private JdbcTemplate jdbcTemplate;
+	private JdbcClient jdbcClient;
 
 	@Autowired
 	private PlatformTransactionManager transactionManager;
@@ -61,7 +61,7 @@ class ExternalRetryTests {
 	@BeforeEach
 	void onSetUp() {
 		getMessages(); // drain queue
-		JdbcTestUtils.deleteFromTables(jdbcTemplate, "T_BARS");
+		JdbcTestUtils.deleteFromTables(jdbcClient, "T_BARS");
 		jmsTemplate.convertAndSend("queue", "foo");
 		provider = () -> {
 			String text = (String) jmsTemplate.receiveAndConvert("queue");
@@ -72,7 +72,7 @@ class ExternalRetryTests {
 	}
 
 	private void assertInitialState() {
-		int count = JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_BARS");
+		int count = JdbcTestUtils.countRowsInTable(jdbcClient, "T_BARS");
 		assertEquals(0, count);
 	}
 
@@ -93,7 +93,9 @@ class ExternalRetryTests {
 
 			for (Object text : texts) {
 
-				jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(), text);
+				jdbcClient.sql("INSERT into T_BARS (id,name,foo_date) values (?,?,null)")
+					.params(list.size(), text)
+					.update();
 				if (list.size() == 1) {
 					throw new RuntimeException("Rollback!");
 				}
@@ -138,7 +140,7 @@ class ExternalRetryTests {
 		List<String> msgs = getMessages();
 
 		// The database portion committed once...
-		int count = JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_BARS");
+		int count = JdbcTestUtils.countRowsInTable(jdbcClient, "T_BARS");
 		assertEquals(1, count);
 
 		// ... and so did the message session.
@@ -155,7 +157,9 @@ class ExternalRetryTests {
 
 		final String item = provider.read();
 		final RetryCallback<String, Exception> callback = context -> {
-			jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(), item);
+			jdbcClient.sql("INSERT into T_BARS (id,name,foo_date) values (?,?,null)")
+				.params(list.size(), item)
+				.update();
 			throw new RuntimeException("Rollback!");
 		};
 
@@ -197,7 +201,7 @@ class ExternalRetryTests {
 		assertEquals(1, recovered.size());
 
 		// The database portion committed once...
-		int count = JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_BARS");
+		int count = JdbcTestUtils.countRowsInTable(jdbcClient, "T_BARS");
 		assertEquals(0, count);
 
 		// ... and so did the message session.

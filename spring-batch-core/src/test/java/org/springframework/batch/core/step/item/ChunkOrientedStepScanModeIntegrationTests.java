@@ -39,7 +39,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
@@ -47,6 +47,7 @@ import org.springframework.test.jdbc.JdbcTestUtils;
  * Tests for scan mode functionality in {@link ChunkOrientedStep}.
  *
  * @author KMGeon
+ * @author Yanming Zhou
  */
 class ChunkOrientedStepScanModeIntegrationTests {
 
@@ -58,7 +59,7 @@ class ChunkOrientedStepScanModeIntegrationTests {
 				SequentialScanModeStepConfiguration.class);
 		JobOperator jobOperator = context.getBean(JobOperator.class);
 		Job job = context.getBean(Job.class);
-		JdbcTemplate jdbcTemplate = context.getBean(JdbcTemplate.class);
+		JdbcClient jdbcClient = context.getBean(JdbcClient.class);
 
 		// when
 		JobParameters jobParameters = new JobParametersBuilder().toJobParameters();
@@ -71,9 +72,8 @@ class ChunkOrientedStepScanModeIntegrationTests {
 		Assertions.assertEquals(1, stepExecution.getWriteCount());
 		Assertions.assertEquals(2, stepExecution.getWriteSkipCount());
 		Assertions.assertEquals(3, stepExecution.getRollbackCount());
-		Assertions.assertEquals(1,
-				jdbcTemplate.queryForObject("SELECT COUNT(*) FROM delivery WHERE item_number = '1'", Integer.class));
-		Assertions.assertEquals(1, JdbcTestUtils.countRowsInTable(jdbcTemplate, "delivery"));
+		Assertions.assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcClient, "delivery", "item_number = '1'"));
+		Assertions.assertEquals(1, JdbcTestUtils.countRowsInTable(jdbcClient, "delivery"));
 	}
 
 	// Issue https://github.com/spring-projects/spring-batch/issues/5210
@@ -84,7 +84,7 @@ class ChunkOrientedStepScanModeIntegrationTests {
 				ConcurrentScanModeStepConfiguration.class);
 		JobOperator jobOperator = context.getBean(JobOperator.class);
 		Job job = context.getBean(Job.class);
-		JdbcTemplate jdbcTemplate = context.getBean(JdbcTemplate.class);
+		JdbcClient jdbcClient = context.getBean(JdbcClient.class);
 
 		// when
 		JobParameters jobParameters = new JobParametersBuilder().toJobParameters();
@@ -97,9 +97,8 @@ class ChunkOrientedStepScanModeIntegrationTests {
 		Assertions.assertEquals(1, stepExecution.getWriteCount());
 		Assertions.assertEquals(2, stepExecution.getWriteSkipCount());
 		Assertions.assertEquals(3, stepExecution.getRollbackCount());
-		Assertions.assertEquals(1,
-				jdbcTemplate.queryForObject("SELECT COUNT(*) FROM delivery WHERE item_number = '1'", Integer.class));
-		Assertions.assertEquals(1, JdbcTestUtils.countRowsInTable(jdbcTemplate, "delivery"));
+		Assertions.assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcClient, "delivery", "item_number = '1'"));
+		Assertions.assertEquals(1, JdbcTestUtils.countRowsInTable(jdbcClient, "delivery"));
 	}
 
 	// Issue https://github.com/spring-projects/spring-batch/issues/5210
@@ -110,7 +109,7 @@ class ChunkOrientedStepScanModeIntegrationTests {
 				MultipleSuccessfulItemsStepConfiguration.class);
 		JobOperator jobOperator = context.getBean(JobOperator.class);
 		Job job = context.getBean(Job.class);
-		JdbcTemplate jdbcTemplate = context.getBean(JdbcTemplate.class);
+		JdbcClient jdbcClient = context.getBean(JdbcClient.class);
 
 		// when
 		JobParameters jobParameters = new JobParametersBuilder().toJobParameters();
@@ -122,15 +121,11 @@ class ChunkOrientedStepScanModeIntegrationTests {
 		Assertions.assertEquals(5, stepExecution.getReadCount());
 		Assertions.assertEquals(4, stepExecution.getWriteCount());
 		Assertions.assertEquals(1, stepExecution.getWriteSkipCount());
-		Assertions.assertEquals(1,
-				jdbcTemplate.queryForObject("SELECT COUNT(*) FROM delivery WHERE item_number = '1'", Integer.class));
-		Assertions.assertEquals(1,
-				jdbcTemplate.queryForObject("SELECT COUNT(*) FROM delivery WHERE item_number = '2'", Integer.class));
-		Assertions.assertEquals(1,
-				jdbcTemplate.queryForObject("SELECT COUNT(*) FROM delivery WHERE item_number = '4'", Integer.class));
-		Assertions.assertEquals(1,
-				jdbcTemplate.queryForObject("SELECT COUNT(*) FROM delivery WHERE item_number = '5'", Integer.class));
-		Assertions.assertEquals(4, JdbcTestUtils.countRowsInTable(jdbcTemplate, "delivery"));
+		Assertions.assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcClient, "delivery", "item_number = '1'"));
+		Assertions.assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcClient, "delivery", "item_number = '2'"));
+		Assertions.assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcClient, "delivery", "item_number = '4'"));
+		Assertions.assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcClient, "delivery", "item_number = '5'"));
+		Assertions.assertEquals(4, JdbcTestUtils.countRowsInTable(jdbcClient, "delivery"));
 	}
 
 	// Issue https://github.com/spring-projects/spring-batch/issues/5210
@@ -173,7 +168,7 @@ class ChunkOrientedStepScanModeIntegrationTests {
 				AllItemsFailStepConfiguration.class);
 		JobOperator jobOperator = context.getBean(JobOperator.class);
 		Job job = context.getBean(Job.class);
-		JdbcTemplate jdbcTemplate = context.getBean(JdbcTemplate.class);
+		JdbcClient jdbcClient = context.getBean(JdbcClient.class);
 
 		// when
 		JobParameters jobParameters = new JobParametersBuilder().toJobParameters();
@@ -185,7 +180,7 @@ class ChunkOrientedStepScanModeIntegrationTests {
 		Assertions.assertEquals(3, stepExecution.getReadCount());
 		Assertions.assertEquals(0, stepExecution.getWriteCount());
 		Assertions.assertEquals(3, stepExecution.getWriteSkipCount());
-		Assertions.assertEquals(0, JdbcTestUtils.countRowsInTable(jdbcTemplate, "delivery"));
+		Assertions.assertEquals(0, JdbcTestUtils.countRowsInTable(jdbcClient, "delivery"));
 	}
 
 	@Configuration
@@ -193,7 +188,7 @@ class ChunkOrientedStepScanModeIntegrationTests {
 
 		@Bean
 		public Step step(JobRepository jobRepository, JdbcTransactionManager transactionManager,
-				JdbcTemplate jdbcTemplate) {
+				JdbcClient jdbcClient) {
 			List<String> items = List.of("1", "2", "3");
 			return new ChunkOrientedStepBuilder<String, String>(jobRepository, 3).reader(new ListItemReader<>(items))
 				.writer(chunk -> {
@@ -201,7 +196,7 @@ class ChunkOrientedStepScanModeIntegrationTests {
 						if ("2".equals(item) || "3".equals(item)) {
 							throw new RuntimeException("Simulated write error for item: " + item);
 						}
-						jdbcTemplate.update("INSERT INTO delivery (item_number) VALUES (?)", item);
+						jdbcClient.sql("INSERT INTO delivery (item_number) VALUES (?)").param(1, item).update();
 					}
 				})
 				.transactionManager(transactionManager)
@@ -217,7 +212,7 @@ class ChunkOrientedStepScanModeIntegrationTests {
 
 		@Bean
 		public Step step(JobRepository jobRepository, JdbcTransactionManager transactionManager,
-				JdbcTemplate jdbcTemplate) {
+				JdbcClient jdbcClient) {
 			List<String> items = List.of("1", "2", "3");
 			return new ChunkOrientedStepBuilder<String, String>(jobRepository, 3).reader(new ListItemReader<>(items))
 				.writer(chunk -> {
@@ -225,7 +220,7 @@ class ChunkOrientedStepScanModeIntegrationTests {
 						if ("2".equals(item) || "3".equals(item)) {
 							throw new RuntimeException("Simulated write error for item: " + item);
 						}
-						jdbcTemplate.update("INSERT INTO delivery (item_number) VALUES (?)", item);
+						jdbcClient.sql("INSERT INTO delivery (item_number) VALUES (?)").param(1, item).update();
 					}
 				})
 				.transactionManager(transactionManager)
@@ -242,7 +237,7 @@ class ChunkOrientedStepScanModeIntegrationTests {
 
 		@Bean
 		public Step step(JobRepository jobRepository, JdbcTransactionManager transactionManager,
-				JdbcTemplate jdbcTemplate) {
+				JdbcClient jdbcClient) {
 			List<String> items = List.of("1", "2", "3", "4", "5");
 			return new ChunkOrientedStepBuilder<String, String>(jobRepository, 5).reader(new ListItemReader<>(items))
 				.writer(chunk -> {
@@ -250,7 +245,7 @@ class ChunkOrientedStepScanModeIntegrationTests {
 						if ("3".equals(item)) {
 							throw new RuntimeException("Simulated write error for item: " + item);
 						}
-						jdbcTemplate.update("INSERT INTO delivery (item_number) VALUES (?)", item);
+						jdbcClient.sql("INSERT INTO delivery (item_number) VALUES (?)").param(1, item).update();
 					}
 				})
 				.transactionManager(transactionManager)
@@ -265,8 +260,7 @@ class ChunkOrientedStepScanModeIntegrationTests {
 	static class AllItemsFailStepConfiguration {
 
 		@Bean
-		public Step step(JobRepository jobRepository, JdbcTransactionManager transactionManager,
-				JdbcTemplate jdbcTemplate) {
+		public Step step(JobRepository jobRepository, JdbcTransactionManager transactionManager) {
 			List<String> items = List.of("1", "2", "3");
 			return new ChunkOrientedStepBuilder<String, String>(jobRepository, 3).reader(new ListItemReader<>(items))
 				.writer(chunk -> {
