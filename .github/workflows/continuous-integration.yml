@@ -32,7 +32,7 @@ jobs:
 
       - name: Deploy to Artifactory
         if: ${{ github.repository == 'spring-projects/spring-batch' && github.ref_name == 'main' }}
-        uses: spring-io/artifactory-deploy-action@c9ab821b2d7fb778b7e29f9cd6e9007e54a1eb4c # v0.0.7
+        uses: spring-io/artifactory-deploy-action@860632611280011966e3f460520dca3733bd9a93 # v0.0.8
         with:
           uri: 'https://repo.spring.io'
           username: ${{ secrets.ARTIFACTORY_USERNAME }}

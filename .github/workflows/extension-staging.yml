@@ -55,7 +55,7 @@ jobs:
         working-directory: ${{ github.event.inputs.extension }}
 
       - name: Deploy to Artifactory
-        uses: spring-io/artifactory-deploy-action@9cb1c7df78cd8d1223de1dde974819fa6378af9f # v0.0.6
+        uses: spring-io/artifactory-deploy-action@860632611280011966e3f460520dca3733bd9a93 # v0.0.8
         with:
           uri: 'https://repo.spring.io'
           username: ${{ secrets.ARTIFACTORY_USERNAME }}
