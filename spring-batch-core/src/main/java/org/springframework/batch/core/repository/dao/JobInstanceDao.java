@@ -31,7 +31,7 @@ import org.jspecify.annotations.Nullable;
  * @author Robert Kasanicky
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
- *
+ * @author Yanming Zhou
  */
 public interface JobInstanceDao {
 
@@ -71,11 +71,10 @@ public interface JobInstanceDao {
 	 * @param jobExecution the JobExecution
 	 * @return the JobInstance for the provided execution or {@code null} if it doesn't
 	 * exist.
+	 * @deprecated as of 6.1 with no replacement. Scheduled for removal in 6.2.
 	 */
-	@Nullable
-	// TODO what is the added value of this? client should call
-	// jobExecution.getJobInstance()
-	JobInstance getJobInstance(JobExecution jobExecution);
+	@Deprecated(since = "6.1", forRemoval = true)
+	@Nullable JobInstance getJobInstance(JobExecution jobExecution);
 
 	/**
 	 * Fetch the last job instances with the provided name, sorted backwards by primary
