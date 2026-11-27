@@ -45,6 +45,7 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -178,6 +179,26 @@ public class FlowJobTests {
 		job.setFlow(flow);
 		job.afterPropertiesSet();
 		assertEquals(Set.of(), job.findDuplicateStepNames());
+	}
+
+	@Test
+	void testFailureWhenCheckingStepNamesAtJobStartDoesNotFailTheJob() throws Exception {
+		SimpleFlow flow = new SimpleFlow("job") {
+			@Override
+			public Collection<State> getStates() {
+				throw new UnsupportedOperationException("The states of this flow cannot be listed");
+			}
+		};
+		List<StateTransition> transitions = new ArrayList<>();
+		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1")), "end0"));
+		transitions.add(StateTransition.createEndStateTransition(new EndState(FlowExecutionStatus.COMPLETED, "end0")));
+		flow.setStateTransitions(transitions);
+		flow.afterPropertiesSet();
+		job.setFlow(flow);
+		job.afterPropertiesSet();
+		job.execute(jobExecution);
+		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
+		assertEquals(1, jobExecution.getStepExecutions().size());
 	}
 
 	@Test
