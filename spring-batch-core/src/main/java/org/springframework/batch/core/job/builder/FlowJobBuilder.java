@@ -22,7 +22,6 @@ import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.job.flow.Flow;
 import org.springframework.batch.core.job.flow.FlowJob;
 import org.springframework.batch.core.job.flow.JobExecutionDecider;
-import org.springframework.batch.core.step.builder.StepBuilderException;
 
 /**
  * A job builder for {@link FlowJob} instances. A flow job delegates processing to a

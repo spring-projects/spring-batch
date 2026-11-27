@@ -32,7 +32,6 @@ import org.springframework.batch.infrastructure.item.Chunk;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.batch.infrastructure.item.ItemStreamException;
 import org.springframework.batch.infrastructure.item.xml.StaxEventItemWriter;
-import org.springframework.batch.infrastructure.item.xml.builder.StaxEventItemWriterBuilder;
 import org.springframework.batch.infrastructure.support.transaction.TransactionAwareBufferedWriter;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.WritableResource;

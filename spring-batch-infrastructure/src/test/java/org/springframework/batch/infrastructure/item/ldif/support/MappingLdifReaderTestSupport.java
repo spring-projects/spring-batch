@@ -21,7 +21,6 @@ import java.util.List;
 
 import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.batch.infrastructure.item.ldif.MappingLdifReader;
-import org.springframework.ldap.core.LdapAttributes;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

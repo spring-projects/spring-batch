@@ -16,7 +16,6 @@
 
 package org.springframework.batch.core.partition.support;
 
-import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;

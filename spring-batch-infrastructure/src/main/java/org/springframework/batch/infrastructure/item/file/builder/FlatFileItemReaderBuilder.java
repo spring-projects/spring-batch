@@ -20,7 +20,6 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -50,7 +49,6 @@ import org.springframework.batch.infrastructure.item.file.separator.RecordSepara
 import org.springframework.batch.infrastructure.item.file.separator.SimpleRecordSeparatorPolicy;
 import org.springframework.batch.infrastructure.item.file.transform.DefaultFieldSetFactory;
 import org.springframework.beans.factory.BeanFactory;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
