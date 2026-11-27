@@ -16,7 +16,6 @@
 package org.springframework.batch.core.job.flow;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -26,12 +25,14 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.batch.core.job.Job;
 
 import org.jspecify.annotations.Nullable;
+import org.springframework.aop.scope.ScopedObject;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.JobExecutionException;
 import org.springframework.batch.core.step.ListableStepLocator;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.job.AbstractJob;
 import org.springframework.batch.core.job.SimpleStepHandler;
+import org.springframework.batch.core.job.StepHandler;
 import org.springframework.batch.core.step.StepHolder;
 import org.springframework.batch.core.step.StepLocator;
 
@@ -43,6 +44,7 @@ import org.springframework.batch.core.step.StepLocator;
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  * @author Taeik Lim
+ * @author Taehun Lee
  * @since 2.0
  */
 public class FlowJob extends AbstractJob {
@@ -54,6 +56,11 @@ public class FlowJob extends AbstractJob {
 	private volatile boolean initialized = false;
 
 	private volatile boolean duplicateStepNamesChecked = false;
+
+	// scoped steps are only added when the flow reaches them
+	private final Map<String, Step> stepsByName = new ConcurrentHashMap<>();
+
+	private final Set<String> reportedDuplicateStepNames = ConcurrentHashMap.newKeySet();
 
 	/**
 	 * Create a {@link FlowJob} with null name and no flow (invalid state).
@@ -75,22 +82,53 @@ public class FlowJob extends AbstractJob {
 	private void warnOnDuplicateStepNames() {
 		if (!this.duplicateStepNamesChecked) {
 			this.duplicateStepNamesChecked = true;
-			for (String name : findDuplicateStepNames()) {
-				logger.warn("Step name [" + name + "] is used by more than one step in job [" + getName()
-						+ "]. Step names should be unique within a job: restart relies on them.");
+			// the check only produces a warning and must not fail the job
+			try {
+				for (String name : findDuplicateStepNames()) {
+					warnOnDuplicateStepName(name);
+				}
 			}
+			catch (RuntimeException e) {
+				logger.debug("Could not check the step names of job [" + getName() + "] for duplicates", e);
+			}
+		}
+	}
+
+	private void warnIfScopedStepNameIsDuplicate(Step step) {
+		if (step instanceof ScopedObject) {
+			// the check only produces a warning and must not fail the job
+			try {
+				String name = step.getName();
+				Step previous = this.stepsByName.putIfAbsent(name, step);
+				if (previous != null && previous != step) {
+					warnOnDuplicateStepName(name);
+				}
+			}
+			catch (RuntimeException e) {
+				logger.debug("Could not check the name of a scoped step of job [" + getName() + "] for duplicates", e);
+			}
+		}
+	}
+
+	private void warnOnDuplicateStepName(String name) {
+		if (this.reportedDuplicateStepNames.add(name)) {
+			logger.warn("Step name [" + name + "] is used by more than one step in job [" + getName()
+					+ "]. Step names should be unique within a job: restart relies on them.");
 		}
 	}
 
 	/**
 	 * Find the names shared by distinct steps of the flow (including nested flows). The
 	 * same step instance used several times in the flow is not considered a duplicate.
+	 * Scoped steps are not checked here, as resolving their name would create them before
+	 * the flow reaches them and break the late binding of their attributes. They are
+	 * checked when the flow executes them.
 	 * @return the duplicate step names, empty if all step names are unique
 	 * @since 6.1
 	 */
 	Set<String> findDuplicateStepNames() {
 		Set<String> duplicates = new LinkedHashSet<>();
-		findSteps(this.flow, new HashMap<>(), duplicates);
+		findSteps(this.flow, this.stepsByName, duplicates, false);
 		return duplicates;
 	}
 
@@ -117,13 +155,17 @@ public class FlowJob extends AbstractJob {
 	 * Initialize the step names
 	 */
 	private void init() {
-		findSteps(flow, stepMap, new HashSet<>());
+		findSteps(flow, stepMap, new HashSet<>(), true);
 		initialized = true;
 	}
 
-	private void findSteps(Flow flow, Map<String, Step> map, Set<String> duplicates) {
+	private void findSteps(Flow flow, Map<String, Step> map, Set<String> duplicates, boolean includeScopedSteps) {
 
 		for (State state : flow.getStates()) {
+			if (!includeScopedSteps && state instanceof StepHolder stepHolder
+					&& stepHolder.getStep() instanceof ScopedObject) {
+				continue;
+			}
 			if (state instanceof ListableStepLocator locator) {
 				for (String name : locator.getStepNames()) {
 					register(map, name, locator.getStep(name), duplicates);
@@ -135,7 +177,7 @@ public class FlowJob extends AbstractJob {
 			}
 			else if (state instanceof FlowHolder flowHolder) {
 				for (Flow subflow : flowHolder.getFlows()) {
-					findSteps(subflow, map, duplicates);
+					findSteps(subflow, map, duplicates, includeScopedSteps);
 				}
 			}
 		}
@@ -166,12 +208,15 @@ public class FlowJob extends AbstractJob {
 	 */
 	@Override
 	protected void doExecute(JobExecution execution) throws JobExecutionException {
-		// done at execution time, as the names of job/step scoped steps can only be
-		// resolved once the scope is active
+		// scoped steps are checked only when the flow reaches them: getting their name
+		// earlier would create them before their late bound attributes are available
 		warnOnDuplicateStepNames();
+		StepHandler stepHandler = new SimpleStepHandler(getJobRepository());
 		try {
-			JobFlowExecutor executor = new JobFlowExecutor(getJobRepository(),
-					new SimpleStepHandler(getJobRepository()), execution);
+			JobFlowExecutor executor = new JobFlowExecutor(getJobRepository(), (step, jobExecution) -> {
+				warnIfScopedStepNameIsDuplicate(step);
+				return stepHandler.handleStep(step, jobExecution);
+			}, execution);
 			executor.updateJobExecutionStatus(flow.start(executor).getStatus());
 		}
 		catch (FlowExecutionException e) {
