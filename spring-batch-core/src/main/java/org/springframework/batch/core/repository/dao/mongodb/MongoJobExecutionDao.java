@@ -40,7 +40,6 @@ import org.springframework.batch.core.repository.persistence.converter.JobExecut
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.springframework.util.CollectionUtils;
 
@@ -51,6 +50,7 @@ import static org.springframework.data.mongodb.core.query.Query.query;
  * @author Mahmoud Ben Hassine
  * @author Yanming Zhou
  * @author Myeongha Shin
+ * @author Moad Elfatihi
  * @since 5.2.0
  */
 public class MongoJobExecutionDao extends AbstractMongoBatchMetadataDao implements JobExecutionDao {
@@ -65,6 +65,8 @@ public class MongoJobExecutionDao extends AbstractMongoBatchMetadataDao implemen
 
 	private MongoJobInstanceDao jobInstanceDao;
 
+	private MongoJobParameterDao jobParameterDao;
+
 	public MongoJobExecutionDao(MongoOperations mongoOperations) {
 		this.mongoOperations = mongoOperations;
 	}
@@ -75,6 +77,10 @@ public class MongoJobExecutionDao extends AbstractMongoBatchMetadataDao implemen
 
 	public void setJobInstanceDao(MongoJobInstanceDao jobInstanceDao) {
 		this.jobInstanceDao = jobInstanceDao;
+	}
+
+	public void setJobParameterDao(MongoJobParameterDao jobParameterDao) {
+		this.jobParameterDao = jobParameterDao;
 	}
 
 	/*
@@ -184,10 +190,7 @@ public class MongoJobExecutionDao extends AbstractMongoBatchMetadataDao implemen
 
 	@Override
 	public void deleteJobExecutionParameters(JobExecution jobExecution) {
-		Query query = new Query(where("jobExecutionId").is(jobExecution.getId()));
-		Update jobParametersRemovalUpdate = new Update().set("jobParameters", Collections.emptyList());
-		this.mongoOperations.updateFirst(query, jobParametersRemovalUpdate,
-				getCollectionName(JOB_EXECUTIONS_COLLECTION_NAME));
+		jobParameterDao.deleteParametersOf(jobExecution);
 	}
 
 	private JobExecution convert(org.springframework.batch.core.repository.persistence.JobExecution jobExecution,

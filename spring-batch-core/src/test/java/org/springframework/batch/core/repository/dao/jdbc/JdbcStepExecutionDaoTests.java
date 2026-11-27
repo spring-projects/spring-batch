@@ -66,10 +66,14 @@ class JdbcStepExecutionDaoTests {
 		jdbcJobInstanceDao.afterPropertiesSet();
 
 		jdbcJobExecutionDao = new JdbcJobExecutionDao(JdbcClient.create(jdbcTemplate));
+		JdbcJobParameterDao jdbcJobParameterDao = new JdbcJobParameterDao(JdbcClient.create(jdbcTemplate));
+		jdbcJobParameterDao.afterPropertiesSet();
+
 		H2SequenceMaxValueIncrementer jobExecutionIncrementer = new H2SequenceMaxValueIncrementer(database,
 				"BATCH_JOB_EXECUTION_SEQ");
 		jdbcJobExecutionDao.setJobExecutionIncrementer(jobExecutionIncrementer);
 		jdbcJobExecutionDao.setJobInstanceDao(jdbcJobInstanceDao);
+		jdbcJobExecutionDao.setJobParameterDao(jdbcJobParameterDao);
 		jdbcJobExecutionDao.afterPropertiesSet();
 
 		jdbcStepExecutionDao = new JdbcStepExecutionDao(JdbcClient.create(jdbcTemplate));
@@ -77,6 +81,7 @@ class JdbcStepExecutionDaoTests {
 				"BATCH_STEP_EXECUTION_SEQ");
 		jdbcStepExecutionDao.setStepExecutionIncrementer(stepExecutionIncrementer);
 		jdbcStepExecutionDao.setJobExecutionDao(jdbcJobExecutionDao);
+		jdbcStepExecutionDao.setJobParameterDao(jdbcJobParameterDao);
 		jdbcStepExecutionDao.afterPropertiesSet();
 	}
 
