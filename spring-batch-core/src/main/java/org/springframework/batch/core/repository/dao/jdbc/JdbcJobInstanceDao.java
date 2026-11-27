@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2025 the original author or authors.
+ * Copyright 2006-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,6 +57,7 @@ import org.springframework.util.StringUtils;
  * @author Mahmoud Ben Hassine
  * @author Parikshit Dutta
  * @author Yanming Zhou
+ * @author Jae Eok Lim
  */
 public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements JobInstanceDao, InitializingBean {
 
@@ -116,7 +117,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 	private static final String FIND_JOB_INSTANCES_BY_JOB_NAME = """
 			SELECT JOB_INSTANCE_ID, JOB_NAME
 			FROM %PREFIX%JOB_INSTANCE
-			WHERE JOB_NAME LIKE :jobName
+			WHERE JOB_NAME = :jobName
 			""";
 
 	private static final String FIND_LAST_JOB_INSTANCE_BY_JOB_NAME = """
