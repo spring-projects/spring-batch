@@ -96,8 +96,9 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 
 	private static final String GET_JOB_FROM_EXECUTION_ID = """
 			SELECT JI.JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, JI.VERSION
-			FROM %PREFIX%JOB_INSTANCE JI, %PREFIX%JOB_EXECUTION JE
-			WHERE JOB_EXECUTION_ID = :jobExecutionId AND JI.JOB_INSTANCE_ID = JE.JOB_INSTANCE_ID
+			FROM %PREFIX%JOB_INSTANCE JI
+			JOIN %PREFIX%JOB_EXECUTION JE ON (JI.JOB_INSTANCE_ID = JE.JOB_INSTANCE_ID)
+			WHERE JOB_EXECUTION_ID = :jobExecutionId
 			""";
 
 	private static final String FIND_JOB_NAMES = """
