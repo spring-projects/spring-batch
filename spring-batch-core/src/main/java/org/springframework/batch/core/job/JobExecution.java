@@ -50,7 +50,7 @@ public class JobExecution extends Entity {
 
 	private final JobParameters jobParameters;
 
-	private JobInstance jobInstance;
+	private final JobInstance jobInstance;
 
 	private final List<StepExecution> stepExecutions = Collections.synchronizedList(new LinkedList<>());
 
@@ -98,14 +98,6 @@ public class JobExecution extends Entity {
 	 */
 	@Nullable public LocalDateTime getEndTime() {
 		return endTime;
-	}
-
-	/**
-	 * Set the {@link JobInstance} used by the {@link JobExecution}.
-	 * @param jobInstance The {@link JobInstance} used by the {@link JobExecution}.
-	 */
-	public void setJobInstance(JobInstance jobInstance) {
-		this.jobInstance = jobInstance;
 	}
 
 	/**
